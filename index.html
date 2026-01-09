@@ -38,7 +38,6 @@
         .branch-hero { background:linear-gradient(145deg,#1a1a1a,#222); border:1px solid #333; border-top:3px solid var(--gold); border-radius:12px; padding:25px; text-align:center; margin-bottom:25px; }
         .branch-hero h2 { margin:0; font-size:1.8rem; }
         
-        /* Social Bar Styles */
         .social-bar { display:flex; justify-content:center; gap:15px; margin-top:20px; flex-wrap:wrap; }
         .social-btn { 
             width:45px; height:45px; border-radius:50%; 
@@ -48,7 +47,7 @@
         }
         .social-btn:hover { border-color:var(--gold); color:var(--gold); transform: translateY(-3px); }
         
-        /* Colors for brands */
+        /* Brand Colors */
         .social-btn.waze:hover { color: #33ccff; border-color: #33ccff; }
         .social-btn.whatsapp:hover { color: #25D366; border-color: #25D366; }
         .social-btn.instagram:hover { color: #C13584; border-color: #C13584; }
@@ -136,20 +135,29 @@
 </div>
 
 <script>
-    // === AUTO LANGUAGE ===
+    // === 1. تحديد اللغة بناءً على الجهاز ===
     function detectLanguage() {
+        // إذا كان هناك رابط مخصص، نتبعه
         const params = new URLSearchParams(window.location.search);
         if (params.get('lang')) return params.get('lang') === 'he' ? 'he' : 'ar';
+        
+        // فحص لغة الجهاز/المتصفح
         const browserLang = navigator.language || navigator.userLanguage;
-        if (browserLang && browserLang.startsWith('he')) return 'he';
+        
+        // 'he' للعبرية الحديثة، 'iw' للعبرية القديمة (بعض أجهزة أندرويد)
+        if (browserLang && (browserLang.startsWith('he') || browserLang.startsWith('iw'))) {
+            return 'he';
+        }
+        
+        // الافتراضي عربية
         return 'ar';
     }
+
     const LANG = detectLanguage();
     document.documentElement.lang = LANG;
     document.documentElement.dir = LANG === 'he' ? 'ltr' : 'rtl';
 
     // === CONFIG ===
-    // تم تغيير رقم النسخة إلى v4.4 لإجبار النظام على جلب الملفات الجديدة
     const URLS = { b: 'branches.csv', p: 'products.csv' };
     const VERSION = 'v4.4'; 
     const BATCH_SIZE = 24;
@@ -174,7 +182,7 @@
             finishLoad();
         } catch(e) { 
             console.error(e); 
-            document.getElementById('loader').innerHTML = '<p style="color:red">Loading Error. Please refresh.</p>';
+            document.getElementById('loader').innerHTML = '<p style="color:red">Error loading files.</p>';
         }
     }
 
@@ -223,21 +231,18 @@
         let ph = (b['الهاتف']||'').replace(/\D/g,'').replace(/^0/,'972');
         VIEW.phone = ph;
         
-        // دالة مساعدة لإنشاء الأيقونات
         const icon = (url, iconClass, typeClass) => { 
             if(url && url.length > 5) {
                 soc.innerHTML += `<a href="${url}" target="_blank" class="social-btn ${typeClass}"><i class="${iconClass}"></i></a>`;
             }
         };
 
-        // قراءة الروابط من أعمدة الملف كما في الصورة
         icon(b['رابط Waze / Maps'], 'fas fa-location-arrow', 'waze');
         icon(b['WhatsApp'] || `https://wa.me/${ph}`, 'fab fa-whatsapp', 'whatsapp');
         icon(b['Instagram'], 'fab fa-instagram', 'instagram');
         icon(b['Facebook'], 'fab fa-facebook-f', 'facebook');
         icon(b['TikTok'], 'fab fa-tiktok', 'tiktok');
 
-        // منطق المنتجات
         const specific = DATA.p.filter(x => x['Internal Label'] && x['Internal Label'].toString().includes(id));
         const fallbackArea = document.getElementById('fallback-area');
         const showGlobalBtn = document.getElementById('btn-show-global');
