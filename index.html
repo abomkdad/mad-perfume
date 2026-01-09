@@ -1,221 +1,269 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MAD PARFUMEUR</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+
+<style>
+:root{
+  --black:#0a0a0a;
+  --gold:#d4af37;
+  --bg:#f2f2f2;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:Arial,Helvetica,sans-serif;
+  background:var(--bg);
+  color:#111;
+}
+header{
+  background:var(--black);
+  color:var(--gold);
+  padding:20px;
+  text-align:center;
+  letter-spacing:2px;
+  font-weight:bold;
+}
+.container{
+  max-width:1200px;
+  margin:auto;
+  padding:20px;
+}
+.hidden{display:none}
+
+/* فروع */
+.branch-list a{
+  display:block;
+  background:#fff;
+  padding:18px;
+  border-radius:14px;
+  margin-bottom:14px;
+  text-decoration:none;
+  color:#000;
+  box-shadow:0 8px 20px rgba(0,0,0,.06);
+}
+.branch-list small{color:#777}
+
+/* بطاقات */
+.card{
+  background:#fff;
+  border-radius:20px;
+  padding:24px;
+  margin-bottom:30px;
+  box-shadow:0 15px 35px rgba(0,0,0,.08);
+}
+
+/* أزرار */
+.btn{
+  display:block;
+  padding:14px;
+  margin-top:12px;
+  border-radius:10px;
+  text-align:center;
+  text-decoration:none;
+  font-weight:bold;
+}
+.btn-gold{background:var(--gold);color:#000}
+.btn-green{background:#25D366;color:#fff}
+.btn-blue{background:#0099cc;color:#fff}
+
+/* منتجات */
+.category-block{margin-bottom:50px}
+.category-title{
+  font-size:22px;
+  font-weight:bold;
+  margin-bottom:20px;
+  border-bottom:3px solid var(--gold);
+  padding-bottom:6px;
+}
+.products{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(200px,1fr));
+  gap:24px;
+}
+.product{
+  background:#fff;
+  border-radius:20px;
+  padding:18px;
+  text-align:center;
+  box-shadow:0 12px 28px rgba(0,0,0,.1);
+  transition:.3s;
+}
+.product:hover{transform:translateY(-6px)}
+.product img{
+  width:100%;
+  height:200px;
+  object-fit:contain;
+}
+.price{
+  color:var(--gold);
+  font-weight:bold;
+  margin:10px 0;
+}
+</style>
+</head>
+
+<body>
+
+<header>MAD PARFUMEUR</header>
+
+<div class="container">
+
+<!-- قائمة الفروع -->
+<div id="branchesView" class="branch-list"></div>
+
+<!-- صفحة الفرع -->
+<div id="branchView" class="hidden">
+
+  <!-- معلومات الفرع -->
+  <div class="card">
+    <h2 id="branchNameAr"></h2>
+    <h4 id="branchNameHe" style="color:#777"></h4>
+    <p id="branchHours"></p>
+    <p id="branchPhone" dir="ltr"></p>
+
+    <a id="branchWaze" class="btn btn-blue" target="_blank">Waze</a>
+    <a id="branchWhatsapp" class="btn btn-green" target="_blank">WhatsApp</a>
+  </div>
+
+  <!-- منتجات الفرع -->
+  <div class="card">
+    <h3 style="margin-bottom:25px">المنتجات المتوفرة في هذا الفرع</h3>
+    <div id="branchProducts"></div>
+  </div>
+
+</div>
+
+</div>
+
 <script>
-// ================= روابط البيانات =================
-const SHEET_BRANCHES = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQzL_F54ThIR-jtJoX9mU4gc6FPo2FzMWsvaPY9K9CDJ_qdHFf3VAqncUj51mEa3A/pub?output=csv';
-const SHEET_PRODUCTS = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSEkstd7ZCKTNYZL_8TC2ofQ9Z91JJ2IM0awOPLgegDweraKayLGitwiLY7A382iQ/pub?output=csv';
+/* ========= CSV ========= */
+const BRANCHES_CSV =
+'https://docs.google.com/spreadsheets/d/e/2PACX-1vQzL_F54ThIR-jtJoX9mU4gc6FPo2FzMWsvaPY9K9CDJ_qdHFf3VAqncUj51mEa3A/pub?output=csv';
 
-// ================= إعدادات اللغة =================
-function getLang() {
-  const p = new URLSearchParams(location.search);
-  return p.get('lang') === 'he' ? 'he' : 'ar';
-}
-const currentLang = getLang();
-document.documentElement.lang = currentLang;
-document.documentElement.dir = currentLang === 'he' ? 'ltr' : 'rtl';
+const PRODUCTS_CSV =
+'https://docs.google.com/spreadsheets/d/e/2PACX-1vSEkstd7ZCKTNYZL_8TC2ofQ9Z91JJ2IM0awOPLgegDweraKayLGitwiLY7A382iQ/pub?output=csv';
 
-const UI = {
-  ar: { back: 'كل الفروع', buy: 'شراء', price: 'شيكل', loading: 'جاري التحميل...', noProducts: 'لا توجد منتجات متاحة حالياً' },
-  he: { back: 'כל הסניפים', buy: 'לרכישה', price: '₪', loading: 'טוען...', noProducts: 'אין מוצרים זמינים כרגע' }
-};
-
-document.getElementById('backBtn').innerHTML = `<i class="fas fa-arrow-${currentLang==='he'?'left':'right'}"></i> ${UI[currentLang].back}`;
-document.getElementById('loader').innerText = UI[currentLang].loading;
-
-// ================= التشغيل الرئيسي =================
-const urlParams = new URLSearchParams(window.location.search);
-const branchId = urlParams.get('id');
-
-if (branchId) {
-  initBranchPage(branchId);
-} else {
-  initBranchesList();
+/* ========= سعر آمن ========= */
+function getPrice(val){
+  if(!val) return 0;
+  return parseFloat(val.toString().replace(/[^\d.]/g,'')) || 0;
 }
 
-// --------------------------------------------------
-// دالة جلب البيانات (محسنة)
-// --------------------------------------------------
-function fetchCSV(url) {
-  return new Promise((resolve) => {
-    Papa.parse(url, {
-      download: true,
-      header: true,
-      skipEmptyLines: true,
-      // هذا السطر مهم جداً: يزيل المسافات الزائدة من عناوين الأعمدة
-      transformHeader: function(h) { return h.trim(); }, 
-      complete: (res) => {
-        console.log(`Loaded ${res.data.length} rows from ${url}`); // للفحص
-        resolve(res.data);
-      },
-      error: (err) => {
-        console.error("CSV Error:", err);
-        resolve([]); 
-      }
-    });
-  });
+/* ========= لغة ========= */
+function getLang(){
+  const p=new URLSearchParams(location.search);
+  if(p.get('lang')==='he') return 'he';
+  return navigator.language.startsWith('he')?'he':'ar';
 }
+const lang=getLang();
+document.documentElement.lang=lang;
+document.documentElement.dir=lang==='he'?'ltr':'rtl';
 
-// --------------------------------------------------
-// صفحة قائمة الفروع
-// --------------------------------------------------
-function initBranchesList() {
-  showLoader(true);
-  fetchCSV(SHEET_BRANCHES).then(data => {
-    showLoader(false);
-    const container = document.getElementById('branchesContainer');
-    container.innerHTML = '';
-    
-    data.forEach(branch => {
-      if(!branch.ID) return;
-      container.innerHTML += `
-        <a href="?id=${branch.ID}&lang=${currentLang}" class="branch-list-item">
-          <div style="font-weight:bold; font-size:1.1rem;">${branch['اسم الفرع عربي']}</div>
-          <div style="color:#777;">${branch['اسم الفرع عبري']}</div>
+/* ========= راوتر ========= */
+const params=new URLSearchParams(location.search);
+const branchId=params.get('id');
+branchId ? loadBranch(branchId) : loadBranches();
+
+/* ========= فروع ========= */
+function loadBranches(){
+Papa.parse(BRANCHES_CSV,{
+  download:true,
+  header:true,
+  complete:r=>{
+    const box=document.getElementById('branchesView');
+    box.innerHTML='';
+    r.data.forEach(b=>{
+      if(!b.ID) return;
+      box.innerHTML+=`
+        <a href="?id=${b.ID}&lang=${lang}">
+          ${b['اسم الفرع عربي']}<br>
+          <small>${b['اسم الفرع عبري']}</small>
         </a>`;
     });
-  });
+  }
+});
 }
 
-// --------------------------------------------------
-// صفحة الفرع والمنتجات
-// --------------------------------------------------
-let allProducts = []; // متغير عام للمنتجات
+/* ========= فرع ========= */
+function loadBranch(id){
+Papa.parse(BRANCHES_CSV,{
+  download:true,
+  header:true,
+  complete:r=>{
+    const b=r.data.find(x=>x.ID==id);
+    if(!b) return;
 
-function initBranchPage(id) {
-  showLoader(true);
-  document.getElementById('backBtn').classList.remove('hidden');
+    document.getElementById('branchesView').classList.add('hidden');
+    document.getElementById('branchView').classList.remove('hidden');
 
-  Promise.all([
-    fetchCSV(SHEET_BRANCHES),
-    fetchCSV(SHEET_PRODUCTS)
-  ]).then(([branchesData, productsData]) => {
-    showLoader(false);
-    
-    // 1. عرض بيانات الفرع
-    const branch = branchesData.find(b => b.ID == id);
-    if (!branch) {
-      alert("الفرع غير موجود (Branch not found)");
-      window.location.href = "?";
-      return;
-    }
-    renderBranchDetails(branch);
+    branchNameAr.innerText=b['اسم الفرع عربي'];
+    branchNameHe.innerText=b['اسم الفرع عبري'];
+    branchHours.innerText=b['ساعات الدوام عربي']||b['ساعات الدوام عبري'];
+    branchPhone.innerText=b['الهاتف'];
 
-    // 2. تصفية المنتجات
-    console.log("Total products before filter:", productsData.length);
-    
-    allProducts = productsData.filter(p => {
-        // تأكد من وجود عنوان للمنتج (تجاوز الأسطر الفارغة)
-        if (!p['Title']) return false;
-        
-        // تصفية حسب الفرع (إذا كان العمود موجوداً)
-        // إذا كنت تريد إظهار كل المنتجات دائماً، قم بتعليق السطرين التاليين:
-        const labels = p['Internal Label'] || '';
-        if (labels && !labels.includes(id)) return false; 
-        
-        return true; 
+    branchWaze.href=b['رابط Waze / Maps'];
+    branchWhatsapp.href=b['WhatsApp'] ||
+      `https://wa.me/${b['الهاتف'].replace(/\D/g,'').replace(/^0/,'972')}`;
+
+    loadBranchProducts();
+  }
+});
+}
+
+/* ========= منتجات ========= */
+function loadBranchProducts(){
+Papa.parse(PRODUCTS_CSV,{
+  download:true,
+  header:true,
+  complete:r=>{
+    const container=document.getElementById('branchProducts');
+    container.innerHTML='';
+    const grouped={};
+
+    r.data.forEach(p=>{
+      if(!p['Title']) return;
+      const cat=p['Category (g:product_type)']||'أخرى';
+      if(!grouped[cat]) grouped[cat]=[];
+      grouped[cat].push(p);
     });
 
-    console.log("Products after filter:", allProducts.length);
+    const categoryOrder=['בשמי גברים','בשמי נשים','נישה','أخرى'];
 
-    if (allProducts.length === 0) {
-       // في حال لم يظهر شيء، قد يكون بسبب التصفية، نعرض تنبيهاً في الكونسول
-       console.warn("No products found for this branch ID. Check 'Internal Label' column.");
-    }
+    categoryOrder
+      .filter(c=>grouped[c])
+      .forEach(cat=>{
+        grouped[cat].sort((a,b)=>{
+          return getPrice(a['Price'])-getPrice(b['Price']);
+        });
 
-    initFilters(allProducts);
-    applyFilters(); // عرض المنتجات
+        container.innerHTML+=`
+          <div class="category-block">
+            <div class="category-title">${cat}</div>
+            <div class="products" id="cat-${cat}"></div>
+          </div>`;
 
-    document.getElementById('singleBranchContainer').classList.remove('hidden');
-  });
-}
-
-function renderBranchDetails(b) {
-  document.getElementById('bNameAr').innerText = b['اسم الفرع عربي'];
-  document.getElementById('bNameHe').innerText = b['اسم الفرع عبري'];
-  document.getElementById('bHours').innerText = b['ساعات الدوام عربي'] || b['ساعات الدوام عبري'];
-  document.getElementById('bPhone').innerText = b['الهاتف'];
-  
-  document.getElementById('linkWaze').href = b['رابط Waze / Maps'];
-  
-  let wa = b['WhatsApp'];
-  if(!wa && b['الهاتف']) {
-     const clean = b['الهاتف'].replace(/\D/g, '').replace(/^0/, '972');
-     wa = `https://wa.me/${clean}`;
+        const box=container.querySelector(`#cat-${cat}`);
+        grouped[cat].forEach(p=>{
+          box.innerHTML+=`
+            <div class="product">
+              <img src="${p['Image']}">
+              <h4>${p['Title']}</h4>
+              <div class="price">${p['Price']}</div>
+              <a class="btn btn-gold" target="_blank" href="${p['Product Link']}">
+                ${lang==='he'?'לרכישה':'شراء'}
+              </a>
+            </div>`;
+        });
+      });
   }
-  document.getElementById('linkWa').href = wa;
-}
-
-// --------------------------------------------------
-// أدوات المتجر
-// --------------------------------------------------
-function initFilters(list) {
-  const select = document.getElementById('selCategory');
-  select.innerHTML = `<option value="">${currentLang==='he'?'כל הקטגוריות':'كل الفئات'}</option>`;
-  
-  // استخراج الفئات الفريدة
-  const categories = [...new Set(list.map(p => p['Category (g:product_type)']).filter(Boolean))];
-  
-  categories.forEach(cat => {
-    const opt = document.createElement('option');
-    opt.value = cat;
-    opt.innerText = cat;
-    select.appendChild(opt);
-  });
-
-  document.getElementById('selCategory').onchange = applyFilters;
-  document.getElementById('selSort').onchange = applyFilters;
-}
-
-function applyFilters() {
-  const catVal = document.getElementById('selCategory').value;
-  const sortVal = document.getElementById('selSort').value;
-
-  let filtered = allProducts.filter(p => {
-    if (catVal && p['Category (g:product_type)'] !== catVal) return false;
-    return true;
-  });
-
-  if (sortVal === 'asc') {
-    filtered.sort((a, b) => parseFloat(a['Price']) - parseFloat(b['Price']));
-  } else if (sortVal === 'desc') {
-    filtered.sort((a, b) => parseFloat(b['Price']) - parseFloat(a['Price']));
-  }
-
-  renderProducts(filtered);
-}
-
-function renderProducts(list) {
-  const grid = document.getElementById('productsGrid');
-  grid.innerHTML = '';
-
-  if(list.length === 0) {
-    grid.innerHTML = `<p style="grid-column:1/-1;text-align:center;padding:20px;">${UI[currentLang].noProducts}</p>`;
-    return;
-  }
-
-  list.forEach(p => {
-    let img = p['Image'];
-    if(!img && p['Additional Images']) img = p['Additional Images'].split('|')[0].trim();
-    if(!img) img = 'https://via.placeholder.com/200x200?text=No+Image';
-
-    const html = `
-      <div class="product-card">
-        <div>
-          <img src="${img}" class="product-img" loading="lazy">
-          <div class="product-cat">${p['Category (g:product_type)'] || ''}</div>
-          <div class="product-title">${p['Title']}</div>
-          <div class="product-price">${p['Price']} ${UI[currentLang].price}</div>
-        </div>
-        <a href="${p['Product Link']}" target="_blank" class="btn btn-buy">
-          ${UI[currentLang].buy} <i class="fas fa-shopping-bag"></i>
-        </a>
-      </div>
-    `;
-    grid.innerHTML += html;
-  });
-}
-
-function showLoader(show) {
-  const l = document.getElementById('loader');
-  if(show) l.classList.remove('hidden');
-  else l.classList.add('hidden');
+});
 }
 </script>
+
+</body>
+</html>
