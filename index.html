@@ -38,7 +38,7 @@
         .social-btn { width:45px; height:45px; border-radius:50%; display:flex; align-items:center; justify-content:center; background:#2a2a2a; color:#aaa; border:1px solid #333; text-decoration:none; transition: all 0.3s ease; font-size: 1.2rem; }
         .social-btn:hover { border-color:var(--gold); color:var(--gold); transform: translateY(-3px); }
         
-        /* Brand Colors */
+        /* Brands Colors */
         .social-btn.waze:hover { color: #33ccff; border-color: #33ccff; }
         .social-btn.whatsapp:hover { color: #25D366; border-color: #25D366; }
         .social-btn.instagram:hover { color: #C13584; border-color: #C13584; }
@@ -97,13 +97,14 @@
 
         <div class="branch-hero">
             <h2 id="b-name"></h2>
-            <div id="b-name-he" style="color:var(--gold); margin-bottom:10px;"></div>
+            <div id="b-name-sub" style="color:var(--gold); margin-bottom:10px;"></div>
+            
             <div style="color:#888; font-size:0.9rem"><i class="far fa-clock"></i> <span id="b-hours"></span></div>
             
             <div id="social-container" class="social-bar"></div>
             
             <div class="actions">
-                <a href="tel:*9935" class="btn-svc"><i class="fas fa-phone-alt"></i> *9935</a>
+                <a href="tel:*9935" class="btn-svc"><i class="fas fa-phone-alt"></i> <span id="ui-svc">Service</span> *9935</a>
                 <a href="mailto:info@madperfume.co.il" class="btn-svc"><i class="fas fa-envelope"></i> <span id="ui-email">Email</span></a>
                 <a href="https://madperfume.co.il/" target="_blank" class="btn-svc"><i class="fas fa-globe"></i> <span id="ui-web">Web</span></a>
             </div>
@@ -134,6 +135,7 @@
             loading: "جاري تحميل النظام...",
             select_boutique: "اختر الفرع الأقرب إليك",
             back_btn: "قائمة الفروع",
+            svc: "خدمة الزبائن",
             email: "البريد",
             web: "الموقع",
             all_cats: "كل الفئات",
@@ -144,14 +146,15 @@
             branch_ended: "انتهت منتجات هذا الفرع",
             show_global: "عرض باقي منتجات المتجر",
             check_stock: "هل متوفر؟",
-            wa_msg: "مرحباً، هل العطر [PROD] متوفر؟",
+            wa_msg: "مرحباً، هل العطر [PROD] متوفر في الفرع؟",
             no_products: "لا توجد منتجات",
             currency: "شيكل"
         },
         he: {
-            loading: "טוען מערכת...",
+            loading: "טוען נתונים...",
             select_boutique: "בחר את הסניף הקרוב אליך",
-            back_btn: "רשימת סניפים",
+            back_btn: "רשימת הסניפים",
+            svc: "שירות לקוחות",
             email: "אימייל",
             web: "אתר",
             all_cats: "כל הקטגוריות",
@@ -159,8 +162,8 @@
             sort_asc: "מחיר: מהנמוך לגבוה",
             sort_desc: "מחיר: מהגבוה לנמוך",
             load_more: "הצג עוד",
-            branch_ended: "אין עוד מוצרים בסניף זה",
-            show_global: "הצג את שאר מוצרי החנות",
+            branch_ended: "הגעת לסוף רשימת המוצרים בסניף",
+            show_global: "הצג את שאר מוצרי הרשת",
             check_stock: "בדיקת זמינות",
             wa_msg: "היי, האם הבושם [PROD] זמין בסניף?",
             no_products: "אין מוצרים זמינים",
@@ -177,22 +180,22 @@
     }
 
     const LANG = detectLanguage();
-    const T = DICT[LANG]; // Current Language Dictionary
+    const T = DICT[LANG]; 
 
     document.documentElement.lang = LANG;
     document.documentElement.dir = LANG === 'he' ? 'ltr' : 'rtl';
 
-    // Apply translations to Static UI
+    // Apply UI Translations
     document.getElementById('ui-loading-text').innerText = T.loading;
     document.getElementById('ui-select-title').innerText = T.select_boutique;
     document.getElementById('ui-back-btn').innerText = T.back_btn;
+    document.getElementById('ui-svc').innerText = T.svc;
     document.getElementById('ui-email').innerText = T.email;
     document.getElementById('ui-web').innerText = T.web;
     document.getElementById('btn-load-more').innerText = T.load_more;
     document.getElementById('ui-branch-ended').innerText = T.branch_ended;
     document.getElementById('btn-show-global').innerText = T.show_global;
 
-    // Populate Sort Options
     const sortSel = document.getElementById('sort-select');
     sortSel.innerHTML = `
         <option value="">${T.sort_default}</option>
@@ -202,7 +205,7 @@
 
     // === CONFIG ===
     const URLS = { b: 'branches.csv', p: 'products.csv' };
-    const VERSION = 'v4.5'; 
+    const VERSION = 'v5.0'; 
     const BATCH_SIZE = 24;
 
     let DATA = { b: [], p: [] };
@@ -249,9 +252,17 @@
         box.innerHTML = '';
         DATA.b.forEach(b => {
             if(!b.ID) return;
+            
+            // تحديد الاسم الأساسي والثانوي بناءً على اللغة
+            let mainName = LANG === 'he' ? b['اسم الفرع عبري'] : b['اسم الفرع عربي'];
+            let subName = LANG === 'he' ? b['اسم الفرع عربي'] : b['اسم الفرع عبري'];
+
             box.innerHTML += `
             <a href="?id=${b.ID}&lang=${LANG}" class="branch-item" onclick="nav(event, '${b.ID}')">
-                <div>${b['اسم الفرع عربي']} <small style="color:#777;display:block;font-size:0.8rem">${b['اسم الفرع عبري']}</small></div>
+                <div>
+                    ${mainName} 
+                    <small style="color:#777;display:block;font-size:0.8rem">${subName}</small>
+                </div>
                 <i class="fas fa-chevron-${LANG==='he'?'right':'left'}" style="color:var(--gold)"></i>
             </a>`;
         });
@@ -262,9 +273,20 @@
         if(!b) { goHome(); return; }
         
         document.getElementById('detail-view').classList.remove('hidden');
-        document.getElementById('b-name').innerText = b['اسم الفرع عربي'];
-        document.getElementById('b-name-he').innerText = b['اسم الفرع عبري'];
-        document.getElementById('b-hours').innerText = b['ساعات الدوام عربي']||b['ساعات الدوام عبري'];
+        
+        // === ترجمة بيانات الفرع ===
+        // إذا اللغة عبرية: الاسم الكبير عبري، والاسم الصغير عربي. والعكس صحيح.
+        if (LANG === 'he') {
+            document.getElementById('b-name').innerText = b['اسم الفرع عبري'];
+            document.getElementById('b-name-sub').innerText = b['اسم الفرع عربي'];
+            // استخدام ساعات الدوام العبرية إذا توفرت، وإلا العربية
+            document.getElementById('b-hours').innerHTML = b['ساعات الدوام عبري'] || b['ساعات الدوام عربي'];
+        } else {
+            document.getElementById('b-name').innerText = b['اسم الفرع عربي'];
+            document.getElementById('b-name-sub').innerText = b['اسم الفرع عبري'];
+            // استخدام ساعات الدوام العربية
+            document.getElementById('b-hours').innerHTML = b['ساعات الدوام عربي'] || b['ساعات الدوام عبري'];
+        }
         
         const soc = document.getElementById('social-container');
         soc.innerHTML = '';
