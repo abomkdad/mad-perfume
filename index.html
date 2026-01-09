@@ -38,7 +38,6 @@
         .social-btn { width:45px; height:45px; border-radius:50%; display:flex; align-items:center; justify-content:center; background:#2a2a2a; color:#aaa; border:1px solid #333; text-decoration:none; transition: all 0.3s ease; font-size: 1.2rem; }
         .social-btn:hover { border-color:var(--gold); color:var(--gold); transform: translateY(-3px); }
         
-        /* Brands Colors */
         .social-btn.waze:hover { color: #33ccff; border-color: #33ccff; }
         .social-btn.whatsapp:hover { color: #25D366; border-color: #25D366; }
         .social-btn.instagram:hover { color: #C13584; border-color: #C13584; }
@@ -98,11 +97,8 @@
         <div class="branch-hero">
             <h2 id="b-name"></h2>
             <div id="b-name-sub" style="color:var(--gold); margin-bottom:10px;"></div>
-            
             <div style="color:#888; font-size:0.9rem"><i class="far fa-clock"></i> <span id="b-hours"></span></div>
-            
             <div id="social-container" class="social-bar"></div>
-            
             <div class="actions">
                 <a href="tel:*9935" class="btn-svc"><i class="fas fa-phone-alt"></i> <span id="ui-svc">Service</span> *9935</a>
                 <a href="mailto:info@madperfume.co.il" class="btn-svc"><i class="fas fa-envelope"></i> <span id="ui-email">Email</span></a>
@@ -138,16 +134,16 @@
             svc: "خدمة الزبائن",
             email: "البريد",
             web: "الموقع",
-            all_cats: "كل الفئات",
+            all_cats: "كل الفئات (عرض كامل)",
             sort_default: "ترتيب افتراضي",
             sort_asc: "السعر: من الأقل للأعلى",
             sort_desc: "السعر: من الأعلى للأقل",
             load_more: "عرض المزيد",
-            branch_ended: "انتهت منتجات هذا الفرع",
-            show_global: "عرض باقي منتجات المتجر",
+            branch_ended: "انتهت منتجات هذا الفرع المحددة",
+            show_global: "اضغط هنا لعرض باقي منتجات المتجر",
             check_stock: "هل متوفر؟",
             wa_msg: "مرحباً، هل العطر [PROD] متوفر في الفرع؟",
-            no_products: "لا توجد منتجات",
+            no_products: "لا توجد منتجات مطابقة",
             currency: "شيكل"
         },
         he: {
@@ -157,13 +153,13 @@
             svc: "שירות לקוחות",
             email: "אימייל",
             web: "אתר",
-            all_cats: "כל הקטגוריות",
+            all_cats: "כל הקטגוריות (הצג הכל)",
             sort_default: "מיון ברירת מחדל",
             sort_asc: "מחיר: מהנמוך לגבוה",
             sort_desc: "מחיר: מהגבוה לנמוך",
             load_more: "הצג עוד",
             branch_ended: "הגעת לסוף רשימת המוצרים בסניף",
-            show_global: "הצג את שאר מוצרי הרשת",
+            show_global: "לחץ כאן להצגת שאר מוצרי הרשת",
             check_stock: "בדיקת זמינות",
             wa_msg: "היי, האם הבושם [PROD] זמין בסניף?",
             no_products: "אין מוצרים זמינים",
@@ -181,11 +177,10 @@
 
     const LANG = detectLanguage();
     const T = DICT[LANG]; 
-
     document.documentElement.lang = LANG;
     document.documentElement.dir = LANG === 'he' ? 'ltr' : 'rtl';
 
-    // Apply UI Translations
+    // UI Translations
     document.getElementById('ui-loading-text').innerText = T.loading;
     document.getElementById('ui-select-title').innerText = T.select_boutique;
     document.getElementById('ui-back-btn').innerText = T.back_btn;
@@ -197,15 +192,11 @@
     document.getElementById('btn-show-global').innerText = T.show_global;
 
     const sortSel = document.getElementById('sort-select');
-    sortSel.innerHTML = `
-        <option value="">${T.sort_default}</option>
-        <option value="asc">${T.sort_asc}</option>
-        <option value="desc">${T.sort_desc}</option>
-    `;
+    sortSel.innerHTML = `<option value="">${T.sort_default}</option><option value="asc">${T.sort_asc}</option><option value="desc">${T.sort_desc}</option>`;
 
     // === CONFIG ===
     const URLS = { b: 'branches.csv', p: 'products.csv' };
-    const VERSION = 'v5.0'; 
+    const VERSION = 'v5.1'; 
     const BATCH_SIZE = 24;
 
     let DATA = { b: [], p: [] };
@@ -213,28 +204,17 @@
 
     async function start() {
         const stored = localStorage.getItem('mad_data_' + VERSION);
-        if(stored) {
-            DATA = JSON.parse(stored);
-            finishLoad();
-            return;
-        }
-
+        if(stored) { DATA = JSON.parse(stored); finishLoad(); return; }
         try {
             const [rb, rp] = await Promise.all([ fetchCSV(URLS.b), fetchCSV(URLS.p) ]);
             DATA = { b: rb, p: rp };
             localStorage.setItem('mad_data_' + VERSION, JSON.stringify(DATA));
             finishLoad();
-        } catch(e) { 
-            console.error(e); 
-            document.getElementById('loader').innerHTML = '<p style="color:red">Error loading files.</p>';
-        }
+        } catch(e) { console.error(e); }
     }
 
     function fetchCSV(u) {
-        return new Promise((r, j) => Papa.parse(u, { 
-            download:true, header:true, skipEmptyLines:true, transformHeader:h=>h.trim(), 
-            complete:x=>r(x.data), error:e=>j(e) 
-        }));
+        return new Promise((r, j) => Papa.parse(u, { download:true, header:true, skipEmptyLines:true, transformHeader:h=>h.trim(), complete:x=>r(x.data), error:e=>j(e) }));
     }
 
     function finishLoad() {
@@ -245,24 +225,17 @@
         if(id) showBranch(id); else showList();
     }
 
-    // === VIEWS ===
     function showList() {
         document.getElementById('list-view').classList.remove('hidden');
         const box = document.getElementById('branches-list');
         box.innerHTML = '';
         DATA.b.forEach(b => {
             if(!b.ID) return;
-            
-            // تحديد الاسم الأساسي والثانوي بناءً على اللغة
             let mainName = LANG === 'he' ? b['اسم الفرع عبري'] : b['اسم الفرع عربي'];
             let subName = LANG === 'he' ? b['اسم الفرع عربي'] : b['اسم الفرع عبري'];
-
             box.innerHTML += `
             <a href="?id=${b.ID}&lang=${LANG}" class="branch-item" onclick="nav(event, '${b.ID}')">
-                <div>
-                    ${mainName} 
-                    <small style="color:#777;display:block;font-size:0.8rem">${subName}</small>
-                </div>
+                <div>${mainName} <small style="color:#777;display:block;font-size:0.8rem">${subName}</small></div>
                 <i class="fas fa-chevron-${LANG==='he'?'right':'left'}" style="color:var(--gold)"></i>
             </a>`;
         });
@@ -273,54 +246,46 @@
         if(!b) { goHome(); return; }
         
         document.getElementById('detail-view').classList.remove('hidden');
-        
-        // === ترجمة بيانات الفرع ===
-        // إذا اللغة عبرية: الاسم الكبير عبري، والاسم الصغير عربي. والعكس صحيح.
         if (LANG === 'he') {
             document.getElementById('b-name').innerText = b['اسم الفرع عبري'];
             document.getElementById('b-name-sub').innerText = b['اسم الفرع عربي'];
-            // استخدام ساعات الدوام العبرية إذا توفرت، وإلا العربية
             document.getElementById('b-hours').innerHTML = b['ساعات الدوام عبري'] || b['ساعات الدوام عربي'];
         } else {
             document.getElementById('b-name').innerText = b['اسم الفرع عربي'];
             document.getElementById('b-name-sub').innerText = b['اسم الفرع عبري'];
-            // استخدام ساعات الدوام العربية
             document.getElementById('b-hours').innerHTML = b['ساعات الدوام عربي'] || b['ساعات الدوام عبري'];
         }
         
         const soc = document.getElementById('social-container');
         soc.innerHTML = '';
-        
         let ph = (b['الهاتف']||'').replace(/\D/g,'').replace(/^0/,'972');
         VIEW.phone = ph;
         
-        const icon = (url, iconClass, typeClass) => { 
-            if(url && url.length > 5) {
-                soc.innerHTML += `<a href="${url}" target="_blank" class="social-btn ${typeClass}"><i class="${iconClass}"></i></a>`;
-            }
-        };
-
+        const icon = (u,c,t) => { if(u && u.length>5) soc.innerHTML += `<a href="${u}" target="_blank" class="social-btn ${t}"><i class="${c}"></i></a>`; };
         icon(b['رابط Waze / Maps'], 'fas fa-location-arrow', 'waze');
         icon(b['WhatsApp'] || `https://wa.me/${ph}`, 'fab fa-whatsapp', 'whatsapp');
         icon(b['Instagram'], 'fab fa-instagram', 'instagram');
         icon(b['Facebook'], 'fab fa-facebook-f', 'facebook');
         icon(b['TikTok'], 'fab fa-tiktok', 'tiktok');
 
+        // Logic: Get specific products for branch
         const specific = DATA.p.filter(x => x['Internal Label'] && x['Internal Label'].toString().includes(id));
         const fallbackArea = document.getElementById('fallback-area');
         const showGlobalBtn = document.getElementById('btn-show-global');
 
         if(specific.length > 0) {
             VIEW.list = specific;
-            if(specific.length < 8) {
+            // If few products, show button to load global
+            if(specific.length < 10) {
                 fallbackArea.classList.remove('hidden');
                 showGlobalBtn.onclick = () => {
                     VIEW.list = DATA.p.filter(x => x['Title']);
                     fallbackArea.classList.add('hidden');
-                    updateFilters();
+                    updateFilters(); // Update dropdown with ALL categories
                 }
             } else { fallbackArea.classList.add('hidden'); }
         } else {
+            // No specific products? Load everything
             VIEW.list = DATA.p.filter(x => x['Title']);
             fallbackArea.classList.add('hidden');
         }
@@ -330,8 +295,10 @@
     function updateFilters() {
         const sel = document.getElementById('cat-select');
         sel.innerHTML = `<option value="">${T.all_cats}</option>`;
-        const cats = [...new Set(VIEW.list.map(x => x['Category (g:product_type)']).filter(Boolean))];
-        cats.forEach(c => sel.innerHTML += `<option>${c}</option>`);
+        
+        // FIX: Load categories from ALL products (DATA.p) so user sees full list immediately
+        const cats = [...new Set(DATA.p.map(x => x['Category (g:product_type)']).filter(Boolean))];
+        cats.sort().forEach(c => sel.innerHTML += `<option>${c}</option>`);
 
         sel.onchange = applyFilter;
         document.getElementById('sort-select').onchange = applyFilter;
@@ -341,7 +308,13 @@
     function applyFilter() {
         const cat = document.getElementById('cat-select').value;
         const sort = document.getElementById('sort-select').value;
-        let final = VIEW.list.filter(x => !cat || x['Category (g:product_type)'] === cat);
+        
+        // If a category is selected, we search in ALL products (DATA.p) to ensure results
+        // If no category selected, we respect the current view list (Branch specific or Global)
+        let sourceList = cat ? DATA.p : VIEW.list;
+
+        let final = sourceList.filter(x => !cat || x['Category (g:product_type)'] === cat);
+        
         if(sort === 'asc') final.sort((a,b) => parseFloat(a.Price)-parseFloat(b.Price));
         if(sort === 'desc') final.sort((a,b) => parseFloat(b.Price)-parseFloat(a.Price));
 
