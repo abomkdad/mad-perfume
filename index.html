@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        :root { --primary: #000; --accent: #d4af37; --bg: #f8f8f8; --white: #fff; }
+        :root { --primary: #000; --accent: #d4af37; --bg: #f8f8f8; --white: #fff; --wa-color: #25D366; }
         body { margin: 0; font-family: 'Segoe UI', sans-serif; background-color: var(--bg); padding-bottom: 60px; }
         
         /* Header */
@@ -18,39 +18,71 @@
 
         .container { max-width: 1000px; margin: 20px auto; padding: 0 15px; }
         
-        /* البطاقات والأزرار */
+        /* Cards & Buttons */
         .card { background: var(--white); border-radius: 12px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 20px; }
         .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 10px 20px; border-radius: 50px; text-decoration: none; font-weight: bold; border: none; cursor: pointer; transition: 0.2s; }
         .btn:active { transform: scale(0.95); }
+        
         .btn-waze { background: #33ccff; color: white; }
-        .btn-wa { background: #25D366; color: white; }
+        .btn-wa { background: var(--wa-color); color: white; }
         .btn-black { background: var(--primary); color: var(--accent); }
         .btn-back { background: #eee; color: #333; margin-bottom: 15px; }
 
-        /* الشبكة والمنتجات */
+        /* زر استفسار المنتج الجديد */
+        .btn-ask-wa {
+            background: var(--wa-color);
+            color: #fff;
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+        }
+        .btn-ask-wa:hover { background: #1ebc57; }
+
+        /* Filters */
         .filters { display: flex; gap: 10px; margin-bottom: 20px; }
-        .filters select { flex: 1; padding: 12px; border-radius: 8px; border: 1px solid #ddd; background: #fff; }
+        .filters select { flex: 1; padding: 12px; border-radius: 8px; border: 1px solid #ddd; background: #fff; outline: none; }
         
+        /* Products Grid */
         .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; }
         .product-card { background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.05); display: flex; flex-direction: column; transition: transform 0.2s; }
         .product-card:hover { transform: translateY(-5px); }
-        .p-img { width: 100%; height: 180px; object-fit: contain; padding: 10px; box-sizing: border-box; }
+        
+        .p-img-container {
+            width: 100%;
+            height: 180px;
+            background: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+        .p-img { max-width: 100%; max-height: 100%; object-fit: contain; }
+        
         .p-info { padding: 12px; flex-grow: 1; display: flex; flex-direction: column; text-align: center; }
         .p-title { font-size: 0.95rem; font-weight: bold; margin-bottom: 5px; color: #333; flex-grow: 1; }
         .p-price { color: var(--accent); font-weight: bold; font-size: 1.1rem; margin-bottom: 10px; }
 
-        /* القائمة الرئيسية */
-        .branch-item { display: block; background: #fff; padding: 15px; margin-bottom: 10px; border-radius: 8px; border-right: 4px solid var(--primary); text-decoration: none; color: #333; font-weight: bold; }
+        /* List Items */
+        .branch-item { display: block; background: #fff; padding: 15px; margin-bottom: 10px; border-radius: 8px; border-right: 4px solid var(--primary); text-decoration: none; color: #333; font-weight: bold; transition: 0.2s; }
+        .branch-item:hover { background: #fafafa; }
 
-        /* لودر */
-        #loader { position: fixed; inset: 0; background: rgba(255,255,255,0.95); z-index: 999; display: flex; align-items: center; justify-content: center; font-weight: bold; }
+        /* Loader & Utils */
+        #loader { position: fixed; inset: 0; background: rgba(255,255,255,0.95); z-index: 999; display: flex; align-items: center; justify-content: center; font-weight: bold; flex-direction: column; gap: 10px; }
+        .spinner { width: 30px; height: 30px; border: 3px solid #eee; border-top: 3px solid var(--accent); border-radius: 50%; animation: spin 1s infinite linear; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
         .hidden { display: none !important; }
     </style>
 </head>
 <body>
 
     <header><h1>MAD PARFUMEUR</h1></header>
-    <div id="loader">جاري التحميل...</div>
+    
+    <div id="loader">
+        <div class="spinner"></div>
+        <span>جاري التحميل...</span>
+    </div>
 
     <div class="container">
         
@@ -69,7 +101,7 @@
                 <div id="b-hours" style="color:#666; margin-bottom:15px;"></div>
                 <div style="display:flex; justify-content:center; gap:10px;">
                     <a id="btn-waze" target="_blank" class="btn btn-waze"><i class="fas fa-location-arrow"></i> WAZE</a>
-                    <a id="btn-wa" target="_blank" class="btn btn-wa"><i class="fab fa-whatsapp"></i> WhatsApp</a>
+                    <a id="btn-wa" target="_blank" class="btn btn-wa"><i class="fab fa-whatsapp"></i> المحادثة العامة</a>
                 </div>
             </div>
 
@@ -92,28 +124,33 @@
     </div>
 
 <script>
-    // الروابط
+    // ================= CONFIG =================
     const URL_BRANCHES = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQzL_F54ThIR-jtJoX9mU4gc6FPo2FzMWsvaPY9K9CDJ_qdHFf3VAqncUj51mEa3A/pub?output=csv';
     const URL_PRODUCTS = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSEkstd7ZCKTNYZL_8TC2ofQ9Z91JJ2IM0awOPLgegDweraKayLGitwiLY7A382iQ/pub?output=csv';
 
-    // اللغة
+    // ================= LANGUAGE =================
     const p = new URLSearchParams(location.search);
     const LANG = p.get('lang') === 'he' ? 'he' : 'ar';
     document.documentElement.lang = LANG;
     document.documentElement.dir = LANG === 'he' ? 'ltr' : 'rtl';
 
-    // تحميل البيانات
+    // ================= STATE =================
+    let currentProducts = [];
+    let currentBranchPhone = ''; // لتخزين رقم الفرع الحالي للاستخدام في المنتجات
+
+    // ================= LOADER =================
     function loadCSV(url) {
         return new Promise(resolve => {
             Papa.parse(url, {
                 download: true, header: true, skipEmptyLines: true,
-                transformHeader: h => h.trim(), // تنظيف العناوين
-                complete: res => resolve(res.data)
+                transformHeader: h => h.trim(),
+                complete: res => resolve(res.data),
+                error: () => resolve([]) 
             });
         });
     }
 
-    // التشغيل
+    // ================= INIT =================
     Promise.all([loadCSV(URL_BRANCHES), loadCSV(URL_PRODUCTS)]).then(([branches, products]) => {
         document.getElementById('loader').classList.add('hidden');
         const branchId = p.get('id');
@@ -122,6 +159,7 @@
         else showList(branches);
     });
 
+    // ================= VIEWS =================
     function showList(branches) {
         document.getElementById('list-view').classList.remove('hidden');
         const container = document.getElementById('branches-list');
@@ -133,43 +171,41 @@
         });
     }
 
-    let currentProducts = [];
-
     function showBranch(id, branches, products) {
         const b = branches.find(x => x.ID == id);
         if(!b) return location.href = '?';
 
         document.getElementById('detail-view').classList.remove('hidden');
         
-        // تفاصيل الفرع
+        // 1. تفاصيل الفرع
         document.getElementById('b-name').innerText = b['اسم الفرع عربي'];
         document.getElementById('b-hours').innerText = b['ساعات الدوام عربي'] || b['ساعات الدوام عبري'];
         document.getElementById('btn-waze').href = b['رابط Waze / Maps'] || '#';
         
-        let wa = b['WhatsApp'];
-        if(!wa && b['الهاتف']) wa = `https://wa.me/${b['الهاتف'].replace(/\D/g,'').replace(/^0/,'972')}`;
-        document.getElementById('btn-wa').href = wa || '#';
+        // تجهيز رقم الواتساب للفرع
+        let cleanPhone = (b['الهاتف'] || '').replace(/\D/g,'').replace(/^0/,'972');
+        currentBranchPhone = cleanPhone; // حفظه كمتغير عام
 
-        // === منطق المنتجات الذكي (SMART FALLBACK) ===
-        // 1. محاولة العثور على منتجات مخصصة لهذا الفرع
+        // زر المحادثة العامة
+        let waLink = b['WhatsApp'] || `https://wa.me/${cleanPhone}`;
+        document.getElementById('btn-wa').href = waLink;
+
+        // 2. منطق المنتجات (Smart Fallback)
         let filtered = products.filter(p => {
             if(!p['Title']) return false;
             const label = p['Internal Label'];
-            // تأكد من تحويل القيم إلى نصوص للمقارنة
             return label && label.toString().includes(id.toString());
         });
 
-        // 2. إذا لم نجد منتجات مخصصة، نعرض كل شيء!
         if(filtered.length === 0) {
-            console.log("No specific products found. Switching to ALL products.");
-            filtered = products.filter(p => p['Title']); // فقط التأكد من وجود عنوان
-            // يمكنك إزالة التعليق أدناه لإظهار رسالة للمستخدم
-            // document.getElementById('fallback-msg').style.display = 'block';
+            console.log("Showing ALL products fallback");
+            filtered = products.filter(p => p['Title']);
+            // document.getElementById('fallback-msg').style.display = 'block'; // يمكن تفعيل هذا السطر لإظهار رسالة
         }
 
         currentProducts = filtered;
         
-        // إعداد قائمة الفئات (Categories) بناءً على المنتجات المعروضة
+        // تعبئة الفئات
         const cats = [...new Set(currentProducts.map(p => p['Category (g:product_type)']).filter(Boolean))];
         cats.forEach(c => {
             const opt = document.createElement('option');
@@ -177,9 +213,10 @@
             document.getElementById('cat-select').appendChild(opt);
         });
 
+        // تشغيل العرض
         renderProducts();
 
-        // تفعيل الفلاتر عند التغيير
+        // تفعيل الفلاتر
         document.getElementById('cat-select').onchange = renderProducts;
         document.getElementById('sort-select').onchange = renderProducts;
     }
@@ -189,13 +226,14 @@
         const cat = document.getElementById('cat-select').value;
         const sort = document.getElementById('sort-select').value;
 
-        // تصفية القائمة الحالية حسب الفئة المختارة
+        // تصفية
         let list = currentProducts.filter(p => !cat || p['Category (g:product_type)'] === cat);
 
-        // الترتيب
+        // ترتيب
         if(sort === 'asc') list.sort((a,b) => parseFloat(a['Price']) - parseFloat(b['Price']));
         if(sort === 'desc') list.sort((a,b) => parseFloat(b['Price']) - parseFloat(a['Price']));
 
+        // عرض
         grid.innerHTML = '';
         if(list.length === 0) {
             grid.innerHTML = '<p style="grid-column:1/-1; text-align:center;">لا توجد منتجات</p>';
@@ -203,18 +241,34 @@
         }
 
         list.forEach(p => {
-            // معالجة الصورة
-            let img = (p['Image'] || '').split('|')[0] || 'https://via.placeholder.com/150';
-            const btnText = LANG === 'he' ? 'לרכישה' : 'شراء';
+            // صورة المنتج
+            let img = (p['Image'] || '').split('|')[0] || 'https://via.placeholder.com/150?text=No+Image';
             
+            // نصوص الزر والرسالة
+            let btnText, waMsg;
+            if (LANG === 'he') {
+                btnText = 'בדוק זמינות';
+                waMsg = `שלום, רציתי לדעת אם הבושם הזה זמין בסניף: ${p['Title']}`;
+            } else {
+                btnText = 'استفسر عن التوفر';
+                waMsg = `مرحباً، أود الاستفسار عن توفر العطر: ${p['Title']} في فرعكم.`;
+            }
+
+            // رابط واتساب للمنتج
+            // نستخدم رقم الفرع الذي خزنّاه سابقاً (currentBranchPhone)
+            const waProductLink = `https://wa.me/${currentBranchPhone}?text=${encodeURIComponent(waMsg)}`;
+
             grid.innerHTML += `
             <div class="product-card">
-                <img src="${img}" class="p-img" loading="lazy">
+                <div class="p-img-container">
+                    <img src="${img}" class="p-img" loading="lazy" alt="${p['Title']}">
+                </div>
                 <div class="p-info">
                     <div class="p-title">${p['Title']}</div>
                     <div class="p-price">${p['Price'] || ''} ${LANG==='he'?'₪':'شيكل'}</div>
-                    <a href="${p['Product Link']}" target="_blank" class="btn btn-black" style="width:100%">
-                        ${btnText}
+                    
+                    <a href="${waProductLink}" target="_blank" class="btn btn-ask-wa">
+                        <i class="fab fa-whatsapp"></i> ${btnText}
                     </a>
                 </div>
             </div>`;
