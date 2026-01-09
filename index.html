@@ -3,385 +3,279 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MAD PARFUMEUR - Luxury Store</title>
-    
+    <title>MAD PARFUMEUR</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        /* ================= LUXURY DARK THEME ================= */
-        :root { 
-            --bg-color: #121212;
-            --card-bg: #1e1e1e;
-            --gold: #d4af37;
-            --gold-light: #f3e5ab;
-            --text-main: #ffffff;
-            --text-sub: #b0b0b0;
-            --wa-green: #25D366;
-            --waze-blue: #33ccff;
-        }
+        /* LUXURY DARK THEME */
+        :root { --bg:#0f0f0f; --card:#1a1a1a; --gold:#d4af37; --text:#fff; --sub:#b0b0b0; }
+        body { margin:0; font-family:'Segoe UI',sans-serif; background:var(--bg); color:var(--text); padding-bottom:50px; }
         
-        body { 
-            margin: 0; 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            background-color: var(--bg-color); 
-            color: var(--text-main); 
-            padding-bottom: 80px; 
-        }
+        header { background:#000; padding:15px; text-align:center; border-bottom:1px solid #333; position:sticky; top:0; z-index:900; }
+        header h1 { margin:0; font-size:1.4rem; color:var(--gold); letter-spacing:2px; font-weight:300; }
+
+        .container { max-width:1000px; margin:20px auto; padding:0 15px; }
         
-        /* Header Fakhama */
-        header { 
-            background: #000; 
-            border-bottom: 2px solid var(--gold);
-            padding: 20px; 
-            text-align: center; 
-            position: sticky; 
-            top: 0; 
-            z-index: 1000; 
-            box-shadow: 0 4px 30px rgba(0,0,0,0.5); 
-        }
-        header h1 { 
-            margin: 0; 
-            font-size: 1.6rem; 
-            letter-spacing: 3px; 
-            color: var(--gold); 
-            text-transform: uppercase; 
-            font-weight: 300;
-        }
-
-        .container { max-width: 1000px; margin: 30px auto; padding: 0 15px; }
+        /* Elements */
+        .btn-gold { border:1px solid var(--gold); color:var(--gold); padding:8px 20px; border-radius:50px; text-decoration:none; display:inline-flex; align-items:center; gap:8px; transition:0.2s; background:transparent; cursor:pointer; }
+        .btn-gold:hover { background:var(--gold); color:#000; }
         
-        /* General Buttons - Gold Style */
-        .btn-gold-outline {
-            display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-            background: transparent; border: 1px solid var(--gold); color: var(--gold);
-            padding: 10px 20px; border-radius: 50px; text-decoration: none;
-            transition: 0.3s; font-size: 0.9rem; margin-bottom: 20px;
-        }
-        .btn-gold-outline:hover { background: var(--gold); color: #000; }
-
-        /* Branch Hero Section */
-        .branch-hero {
-            background: linear-gradient(145deg, #1a1a1a, #222);
-            border: 1px solid #333;
-            border-top: 4px solid var(--gold);
-            border-radius: 15px;
-            padding: 30px 20px;
-            text-align: center;
-            margin-bottom: 30px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.4);
-            position: relative;
-        }
-        .branch-hero h2 { margin: 0; font-size: 2rem; color: var(--text-main); font-weight: 400; }
-        .branch-hero .he-name { color: var(--gold); font-size: 1rem; margin-bottom: 15px; letter-spacing: 1px; }
+        .branch-hero { background:linear-gradient(145deg,#1a1a1a,#222); border:1px solid #333; border-top:3px solid var(--gold); border-radius:12px; padding:25px; text-align:center; margin-bottom:25px; }
+        .branch-hero h2 { margin:0; font-size:1.8rem; }
         
-        /* Social Icons - Minimalist Luxury */
-        .social-bar {
-            display: flex; justify-content: center; gap: 15px; margin-top: 25px; flex-wrap: wrap;
-        }
-        .social-btn {
-            width: 45px; height: 45px; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 1.2rem; text-decoration: none;
-            background: #333; color: var(--text-sub);
-            border: 1px solid #444; transition: 0.3s;
-        }
-        .social-btn:hover { border-color: var(--gold); color: var(--gold); transform: translateY(-3px); }
+        .social-bar, .actions { display:flex; justify-content:center; gap:12px; margin-top:20px; flex-wrap:wrap; }
+        .social-btn { width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; background:#2a2a2a; color:#aaa; border:1px solid #333; text-decoration:none; transition:0.2s; }
+        .social-btn:hover { border-color:var(--gold); color:var(--gold); }
         
-        /* Service Buttons (*9935 & Site) */
-        .service-actions {
-            display: flex; justify-content: center; gap: 15px; margin-top: 25px; flex-wrap: wrap;
-        }
-        .btn-service {
-            background: #000; border: 1px solid var(--gold); color: var(--gold);
-            padding: 12px 25px; border-radius: 8px; text-decoration: none;
-            font-weight: bold; display: flex; align-items: center; gap: 10px;
-            transition: 0.3s;
-        }
-        .btn-service:hover { background: var(--gold); color: #000; }
+        .btn-svc { background:#000; border:1px solid var(--gold); color:var(--gold); padding:10px 20px; border-radius:6px; text-decoration:none; font-weight:bold; display:flex; align-items:center; gap:8px; font-size:0.9rem; }
 
-        /* Filters */
-        .filters { display: flex; gap: 15px; margin-bottom: 25px; }
-        .filters select { 
-            flex: 1; padding: 12px; background: #222; 
-            border: 1px solid #444; color: var(--text-main); 
-            border-radius: 8px; outline: none;
-        }
+        .filters { display:flex; gap:10px; margin-bottom:20px; }
+        .filters select { flex:1; padding:12px; background:#222; border:1px solid #444; color:#fff; border-radius:8px; outline:none; }
 
-        /* Products Grid */
-        .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 20px; }
-        .product-card { 
-            background: var(--card-bg); border-radius: 12px; overflow: hidden; 
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3); transition: 0.3s;
-            display: flex; flex-direction: column; border: 1px solid #333;
-        }
-        .product-card:hover { transform: translateY(-5px); border-color: var(--gold); }
+        /* Grid */
+        .products-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:15px; }
+        .product-card { background:var(--card); border-radius:10px; overflow:hidden; border:1px solid #333; display:flex; flex-direction:column; }
+        .p-img-box { width:100%; height:180px; background:#fff; display:flex; align-items:center; justify-content:center; padding:10px; box-sizing:border-box; }
+        .p-img { max-width:100%; max-height:100%; object-fit:contain; }
+        .p-info { padding:15px; text-align:center; flex-grow:1; display:flex; flex-direction:column; }
+        .p-title { font-size:0.95rem; margin-bottom:5px; flex-grow:1; color:#eee; }
+        .p-price { color:var(--gold); font-weight:bold; margin-bottom:10px; }
+        .btn-ask { background:transparent; border:1px solid #444; color:#aaa; width:100%; padding:8px; border-radius:6px; text-decoration:none; display:flex; align-items:center; justify-content:center; gap:5px; font-size:0.85rem; transition:0.2s; }
+        .btn-ask:hover { border-color:#25D366; color:#25D366; }
+
+        .branch-item { display:flex; justify-content:space-between; align-items:center; background:var(--card); padding:18px; margin-bottom:12px; border-radius:8px; text-decoration:none; border-right:3px solid var(--gold); color:#fff; }
+        .branch-item:hover { background:#252525; }
+
+        .hidden { display:none!important; }
+        #loader { position:fixed; inset:0; background:#000; z-index:2000; display:flex; flex-direction:column; align-items:center; justify-content:center; transition:opacity 0.3s; }
+        .spinner { width:30px; height:30px; border:3px solid #333; border-top-color:var(--gold); border-radius:50%; animation:s 0.8s infinite linear; margin-bottom:15px; }
+        @keyframes s { to { transform:rotate(360deg); } }
         
-        .p-img-container {
-            width: 100%; height: 200px; background: #fff; /* الصور تحتاج خلفية بيضاء لتبدو نظيفة */
-            display: flex; align-items: center; justify-content: center; padding: 10px;
-        }
-        .p-img { max-width: 100%; max-height: 100%; object-fit: contain; }
-
-        .p-info { padding: 15px; text-align: center; flex-grow: 1; display: flex; flex-direction: column; }
-        .p-title { font-size: 1rem; color: #fff; margin-bottom: 5px; font-weight: normal; flex-grow: 1; }
-        .p-price { color: var(--gold); font-size: 1.1rem; font-weight: bold; margin-bottom: 15px; }
-
-        .btn-ask {
-            background: transparent; border: 1px solid #444; color: #aaa;
-            width: 100%; padding: 10px; border-radius: 6px; text-decoration: none;
-            display: flex; align-items: center; justify-content: center; gap: 8px;
-            transition: 0.3s; font-size: 0.9rem;
-        }
-        .btn-ask:hover { border-color: var(--wa-green); color: var(--wa-green); background: rgba(37, 211, 102, 0.05); }
-
-        /* List View (Home) */
-        .branch-item {
-            display: block; background: var(--card-bg); padding: 20px; margin-bottom: 15px;
-            border-radius: 10px; text-decoration: none; border-right: 4px solid var(--gold);
-            display: flex; justify-content: space-between; align-items: center;
-            transition: 0.3s;
-        }
-        .branch-item:hover { background: #252525; }
-        .branch-item div { color: #fff; font-size: 1.1rem; }
-        .branch-item small { color: #777; display: block; margin-top: 5px; }
-
-        /* Loader */
-        #loader { position: fixed; inset: 0; background: #000; z-index: 2000; display: flex; align-items: center; justify-content: center; color: var(--gold); flex-direction: column; }
-        .spinner { width: 40px; height: 40px; border: 3px solid #333; border-top: 3px solid var(--gold); border-radius: 50%; animation: spin 1s infinite linear; margin-bottom: 15px; }
-        @keyframes spin { 100% { transform: rotate(360deg); } }
-        .hidden { display: none !important; }
-
-        /* Toggle Button */
-        .show-all-btn-container { text-align: center; margin: 20px 0; }
-        .btn-show-all { background: var(--gold); color: #000; padding: 10px 30px; border-radius: 50px; font-weight: bold; border: none; cursor: pointer; }
+        .load-more-container { text-align:center; margin:30px 0; }
+        .btn-more { background:var(--gold); color:#000; border:none; padding:12px 40px; border-radius:50px; font-weight:bold; cursor:pointer; }
     </style>
 </head>
 <body>
 
-    <header><h1>MAD PARFUMEUR</h1></header>
-    
-    <div id="loader">
-        <div class="spinner"></div>
-        <span>LOADING...</span>
+<header><h1>MAD PARFUMEUR</h1></header>
+
+<div id="loader"><div class="spinner"></div><span style="color:#666;font-size:0.8rem">SYSTEM LOADING...</span></div>
+
+<div class="container">
+    <div id="list-view" class="hidden">
+        <h3 style="text-align:center; color:var(--sub); font-weight:normal; margin-bottom:20px;">SELECT YOUR BOUTIQUE</h3>
+        <div id="branches-list"></div>
     </div>
 
-    <div class="container">
+    <div id="detail-view" class="hidden">
+        <button onclick="goHome()" class="btn-gold" style="margin-bottom:20px;"><i class="fas fa-arrow-right"></i> القائمة</button>
+
+        <div class="branch-hero">
+            <h2 id="b-name"></h2>
+            <div id="b-name-he" style="color:var(--gold); margin-bottom:10px;"></div>
+            <div style="color:#888; font-size:0.9rem"><i class="far fa-clock"></i> <span id="b-hours"></span></div>
+            <div id="social-container" class="social-bar"></div>
+            <div class="actions">
+                <a href="tel:*9935" class="btn-svc"><i class="fas fa-headset"></i> *9935</a>
+                <a href="https://madperfume.co.il/" target="_blank" class="btn-svc"><i class="fas fa-globe"></i> الموقع</a>
+            </div>
+        </div>
+
+        <div class="filters">
+            <select id="cat-select"><option value="">كل الفئات</option></select>
+            <select id="sort-select"><option value="">ترتيب تلقائي</option><option value="asc">السعر: الأقل</option><option value="desc">السعر: الأعلى</option></select>
+        </div>
+
+        <div id="products-grid" class="products-grid"></div>
         
-        <div id="list-view" class="hidden">
-            <h3 style="text-align:center; color:var(--text-sub); margin-bottom:30px;">SELECT YOUR BOUTIQUE</h3>
-            <div id="branches-list"></div>
+        <div id="load-more-area" class="load-more-container hidden">
+            <button id="btn-load-more" class="btn-more">عرض المزيد</button>
         </div>
-
-        <div id="detail-view" class="hidden">
-            <a href="?lang=ar" class="btn-gold-outline">
-                <i class="fas fa-arrow-right"></i> قائمة الفروع
-            </a>
-
-            <div class="branch-hero">
-                <h2 id="b-name"></h2>
-                <div id="b-name-he" class="he-name"></div>
-                <div style="color:#888; margin-bottom:20px;">
-                    <i class="far fa-clock"></i> <span id="b-hours"></span>
-                </div>
-
-                <div id="social-container" class="social-bar"></div>
-
-                <div class="service-actions">
-                    <a href="tel:*9935" class="btn-service">
-                        <i class="fas fa-headset"></i> خدمة الزبائن *9935
-                    </a>
-                    <a href="https://madperfume.co.il/" target="_blank" class="btn-service">
-                        <i class="fas fa-globe"></i> الموقع الرسمي
-                    </a>
-                </div>
-            </div>
-
-            <div class="filters">
-                <select id="cat-select"><option value="">كل الفئات (All Collections)</option></select>
-                <select id="sort-select">
-                    <option value="">ترتيب تلقائي</option>
-                    <option value="asc">السعر: من الأقل للأعلى</option>
-                    <option value="desc">السعر: من الأعلى للأقل</option>
-                </select>
-            </div>
-
-            <div id="products-grid" class="products-grid"></div>
-
-            <div id="show-all-container" class="show-all-btn-container hidden">
-                <button id="btn-show-all" class="btn-show-all">عرض باقي منتجات المتجر</button>
-            </div>
+        
+        <div id="fallback-area" class="load-more-container hidden">
+             <p style="color:#777; margin-bottom:15px">انتهت منتجات هذا الفرع.</p>
+             <button id="btn-show-global" class="btn-more" style="background:#333; color:#fff; border:1px solid #555">عرض باقي منتجات المتجر</button>
         </div>
-
     </div>
+</div>
 
 <script>
-    // ================= SETUP =================
-    const URL_BRANCHES = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQzL_F54ThIR-jtJoX9mU4gc6FPo2FzMWsvaPY9K9CDJ_qdHFf3VAqncUj51mEa3A/pub?output=csv';
-    const URL_PRODUCTS = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSEkstd7ZCKTNYZL_8TC2ofQ9Z91JJ2IM0awOPLgegDweraKayLGitwiLY7A382iQ/pub?output=csv';
+    // === LOCAL FILE CONFIG ===
+    // هنا التغيير: النظام يقرأ الملفات من نفس المجلد
+    const URLS = {
+        b: 'branches.csv', 
+        p: 'products.csv'
+    };
+    
+    // إجبار النظام على تحديث الكاش عند تغيير الملفات (بتغيير هذا الرقم)
+    const VERSION = 'v4.0'; 
+    const BATCH_SIZE = 24;
+
+    let DATA = { b: [], p: [] };
+    let VIEW = { list: [], renderedCount: 0, phone: '' };
 
     const p = new URLSearchParams(location.search);
     const LANG = p.get('lang') === 'he' ? 'he' : 'ar';
     document.documentElement.lang = LANG;
-    document.documentElement.dir = LANG === 'he' ? 'ltr' : 'rtl';
+    document.documentElement.dir = LANG==='he'?'ltr':'rtl';
 
-    let allProductsData = [];
-    let currentDisplayedProducts = [];
-    let currentBranchPhone = '';
+    async function start() {
+        // التحقق من الكاش
+        const stored = localStorage.getItem('mad_data_' + VERSION);
+        if(stored) {
+            DATA = JSON.parse(stored);
+            console.log('⚡ Loaded from Local Storage');
+            finishLoad();
+            return;
+        }
 
-    // ================= LOAD DATA =================
-    function loadCSV(url) {
-        return new Promise(resolve => {
-            Papa.parse(url, {
-                download: true, header: true, skipEmptyLines: true, transformHeader: h => h.trim(),
-                complete: res => resolve(res.data), error: () => resolve([])
-            });
-        });
+        try {
+            // تحميل الملفات المحلية
+            const [rb, rp] = await Promise.all([ fetchCSV(URLS.b), fetchCSV(URLS.p) ]);
+            DATA = { b: rb, p: rp };
+            // حفظ البيانات
+            localStorage.setItem('mad_data_' + VERSION, JSON.stringify(DATA));
+            console.log('⬇ Loaded from Files');
+            finishLoad();
+        } catch(e) { 
+            console.error(e); 
+            document.getElementById('loader').innerHTML = '<p style="color:red">يرجى رفع ملفات branches.csv و products.csv بجانب ملف الموقع</p>';
+        }
     }
 
-    Promise.all([loadCSV(URL_BRANCHES), loadCSV(URL_PRODUCTS)]).then(([branches, products]) => {
-        document.getElementById('loader').classList.add('hidden');
-        allProductsData = products;
-        
-        const branchId = p.get('id');
-        if(branchId) showBranch(branchId, branches);
-        else showList(branches);
-    });
+    function fetchCSV(u) {
+        return new Promise((r, j) => Papa.parse(u, { 
+            download:true, header:true, skipEmptyLines:true, transformHeader:h=>h.trim(), 
+            complete:x=>r(x.data), error:e=>j(e) 
+        }));
+    }
 
-    // ================= RENDER LIST =================
-    function showList(branches) {
+    function finishLoad() {
+        document.getElementById('loader').style.opacity = '0';
+        setTimeout(() => document.getElementById('loader').classList.add('hidden'), 300);
+        const id = p.get('id');
+        if(id) showBranch(id); else showList();
+    }
+
+    // === VIEWS ===
+    function showList() {
         document.getElementById('list-view').classList.remove('hidden');
-        const container = document.getElementById('branches-list');
-        branches.forEach(b => {
+        const box = document.getElementById('branches-list');
+        box.innerHTML = '';
+        DATA.b.forEach(b => {
             if(!b.ID) return;
-            container.innerHTML += `
-            <a href="?id=${b.ID}&lang=${LANG}" class="branch-item">
-                <div>${b['اسم الفرع عربي']} <small>${b['اسم الفرع عبري']}</small></div>
+            box.innerHTML += `
+            <a href="?id=${b.ID}&lang=${LANG}" class="branch-item" onclick="nav(event, '${b.ID}')">
+                <div>${b['اسم الفرع عربي']} <small style="color:#777;display:block;font-size:0.8rem">${b['اسم الفرع عبري']}</small></div>
                 <i class="fas fa-chevron-${LANG==='he'?'right':'left'}" style="color:var(--gold)"></i>
             </a>`;
         });
     }
 
-    // ================= RENDER BRANCH =================
-    function showBranch(id, branches) {
-        const b = branches.find(x => x.ID == id);
-        if(!b) return location.href = '?';
-
-        document.getElementById('detail-view').classList.remove('hidden');
+    function showBranch(id) {
+        const b = DATA.b.find(x => x.ID == id);
+        if(!b) { goHome(); return; }
         
-        // Info
+        document.getElementById('detail-view').classList.remove('hidden');
         document.getElementById('b-name').innerText = b['اسم الفرع عربي'];
         document.getElementById('b-name-he').innerText = b['اسم الفرع عبري'];
-        document.getElementById('b-hours').innerText = b['ساعات الدوام عربي'] || b['ساعات الدوام عبري'];
-
-        // Social Icons
+        document.getElementById('b-hours').innerText = b['ساعات الدوام عربي']||b['ساعات الدوام عبري'];
+        
         const soc = document.getElementById('social-container');
-        let cleanPhone = (b['الهاتف'] || '').replace(/\D/g,'').replace(/^0/,'972');
-        currentBranchPhone = cleanPhone;
-
-        const addIcon = (url, icon) => {
-            if(url && url.length > 5) soc.innerHTML += `<a href="${url}" target="_blank" class="social-btn"><i class="${icon}"></i></a>`;
-        };
-        addIcon(b['رابط Waze / Maps'], 'fas fa-location-arrow'); // Waze
-        addIcon(b['WhatsApp'] || `https://wa.me/${cleanPhone}`, 'fab fa-whatsapp'); // WA
-        addIcon(b['Instagram'], 'fab fa-instagram');
-        addIcon(b['Facebook'], 'fab fa-facebook-f');
-        addIcon(b['TikTok'], 'fab fa-tiktok');
-
-        // === SMART FILTER LOGIC (Fixing Tiberias) ===
-        // 1. Get Branch Specific Products
-        let branchSpecific = allProductsData.filter(p => {
-            if(!p['Title']) return false;
-            const label = p['Internal Label'];
-            return label && label.toString().includes(id.toString());
-        });
-
-        // 2. Decide what to show
-        let showAllBtn = document.getElementById('show-all-container');
+        soc.innerHTML = '';
+        let ph = (b['الهاتف']||'').replace(/\D/g,'').replace(/^0/,'972');
+        VIEW.phone = ph;
         
-        if (branchSpecific.length === 0) {
-            // No specific products -> Show ALL
-            currentDisplayedProducts = allProductsData.filter(p => p['Title']);
-            showAllBtn.classList.add('hidden');
-        } else if (branchSpecific.length < 10) {
-            // Few specific products (Like Tiberias) -> Show Specific + "Show All" Button
-            currentDisplayedProducts = branchSpecific;
-            showAllBtn.classList.remove('hidden');
-            
-            // Activate button to merge all
-            document.getElementById('btn-show-all').onclick = function() {
-                currentDisplayedProducts = allProductsData.filter(p => p['Title']);
-                showAllBtn.classList.add('hidden');
-                updateFiltersAndRender();
-            };
+        const icon = (u,c) => { if(u && u.length>5) soc.innerHTML += `<a href="${u}" target="_blank" class="social-btn"><i class="${c}"></i></a>`; };
+        icon(b['رابط Waze / Maps'], 'fas fa-location-arrow');
+        icon(b['WhatsApp']||`https://wa.me/${ph}`, 'fab fa-whatsapp');
+        icon(b['Instagram'], 'fab fa-instagram');
+        icon(b['Facebook'], 'fab fa-facebook-f');
+        icon(b['TikTok'], 'fab fa-tiktok');
+
+        const specific = DATA.p.filter(x => x['Internal Label'] && x['Internal Label'].toString().includes(id));
+        const fallbackArea = document.getElementById('fallback-area');
+        const showGlobalBtn = document.getElementById('btn-show-global');
+
+        if(specific.length > 0) {
+            VIEW.list = specific;
+            if(specific.length < 8) {
+                fallbackArea.classList.remove('hidden');
+                showGlobalBtn.onclick = () => {
+                    VIEW.list = DATA.p.filter(x => x['Title']);
+                    fallbackArea.classList.add('hidden');
+                    updateFilters();
+                }
+            } else { fallbackArea.classList.add('hidden'); }
         } else {
-            // Many specific products -> Just show them
-            currentDisplayedProducts = branchSpecific;
-            showAllBtn.classList.add('hidden');
+            VIEW.list = DATA.p.filter(x => x['Title']);
+            fallbackArea.classList.add('hidden');
         }
-
-        updateFiltersAndRender();
+        updateFilters();
     }
 
-    function updateFiltersAndRender() {
-        // Update Categories based on current list
-        const catSelect = document.getElementById('cat-select');
-        catSelect.innerHTML = '<option value="">كل الفئات (All Collections)</option>';
-        
-        const cats = [...new Set(currentDisplayedProducts.map(p => p['Category (g:product_type)']).filter(Boolean))];
-        cats.forEach(c => {
-            const opt = document.createElement('option');
-            opt.value = c; opt.innerText = c;
-            catSelect.appendChild(opt);
-        });
+    function updateFilters() {
+        const sel = document.getElementById('cat-select');
+        sel.innerHTML = '<option value="">كل الفئات</option>';
+        const cats = [...new Set(VIEW.list.map(x => x['Category (g:product_type)']).filter(Boolean))];
+        cats.forEach(c => sel.innerHTML += `<option>${c}</option>`);
 
-        // Render
-        renderProducts();
-        
-        // Bind Events
-        catSelect.onchange = renderProducts;
-        document.getElementById('sort-select').onchange = renderProducts;
+        sel.onchange = applyFilter;
+        document.getElementById('sort-select').onchange = applyFilter;
+        applyFilter();
     }
 
-    function renderProducts() {
-        const grid = document.getElementById('products-grid');
+    function applyFilter() {
         const cat = document.getElementById('cat-select').value;
         const sort = document.getElementById('sort-select').value;
+        let final = VIEW.list.filter(x => !cat || x['Category (g:product_type)'] === cat);
+        if(sort === 'asc') final.sort((a,b) => parseFloat(a.Price)-parseFloat(b.Price));
+        if(sort === 'desc') final.sort((a,b) => parseFloat(b.Price)-parseFloat(a.Price));
 
-        let list = currentDisplayedProducts.filter(p => !cat || p['Category (g:product_type)'] === cat);
+        VIEW.activeList = final;
+        VIEW.renderedCount = 0;
+        document.getElementById('products-grid').innerHTML = '';
+        document.getElementById('load-more-area').classList.add('hidden');
+        renderBatch();
+    }
 
-        if(sort === 'asc') list.sort((a,b) => parseFloat(a['Price']) - parseFloat(b['Price']));
-        if(sort === 'desc') list.sort((a,b) => parseFloat(b['Price']) - parseFloat(a['Price']));
+    function renderBatch() {
+        const grid = document.getElementById('products-grid');
+        const total = VIEW.activeList.length;
+        const next = Math.min(total, VIEW.renderedCount + BATCH_SIZE);
+        
+        if(total === 0) { grid.innerHTML = '<p style="grid-column:1/-1;text-align:center;color:#666">لا توجد منتجات</p>'; return; }
 
-        grid.innerHTML = '';
-        if(list.length === 0) {
-            grid.innerHTML = '<p style="grid-column:1/-1; text-align:center; color:#666;">لا توجد منتجات</p>';
-            return;
-        }
-
-        list.forEach(p => {
-            let img = (p['Image'] || '').split('|')[0] || 'https://via.placeholder.com/200';
-            
-            let btnText = LANG === 'he' ? 'בדיקת זמינות' : 'هل متوفر؟';
-            let waMsg = `مرحباً، هل العطر ${p['Title']} متوفر في الفرع؟`;
-            const waLink = `https://wa.me/${currentBranchPhone}?text=${encodeURIComponent(waMsg)}`;
+        for(let i = VIEW.renderedCount; i < next; i++) {
+            const p = VIEW.activeList[i];
+            const img = (p.Image||'').split('|')[0] || 'https://via.placeholder.com/200';
+            const wa = `https://wa.me/${VIEW.phone}?text=${encodeURIComponent('مرحباً، هل العطر '+p.Title+' متوفر؟')}`;
+            const btnTxt = LANG==='he' ? 'בדיקת זמינות' : 'هل متوفر؟';
 
             grid.innerHTML += `
             <div class="product-card">
-                <div class="p-img-container">
-                    <img src="${img}" class="p-img" loading="lazy" alt="${p['Title']}">
-                </div>
+                <div class="p-img-box"><img src="${img}" class="p-img" loading="lazy"></div>
                 <div class="p-info">
-                    <div class="p-title">${p['Title']}</div>
-                    <div class="p-price">${p['Price'] || ''} ${LANG==='he'?'₪':'شيكل'}</div>
-                    <a href="${waLink}" target="_blank" class="btn-ask">
-                        <i class="fab fa-whatsapp"></i> ${btnText}
-                    </a>
+                    <div class="p-title">${p.Title}</div>
+                    <div class="p-price">${p.Price||''} ${LANG==='he'?'₪':'شيكل'}</div>
+                    <a href="${wa}" target="_blank" class="btn-ask"><i class="fab fa-whatsapp"></i> ${btnTxt}</a>
                 </div>
             </div>`;
-        });
+        }
+        VIEW.renderedCount = next;
+        const loadBtn = document.getElementById('load-more-area');
+        if(VIEW.renderedCount < total) {
+            loadBtn.classList.remove('hidden');
+            document.getElementById('btn-load-more').onclick = renderBatch;
+        } else { loadBtn.classList.add('hidden'); }
     }
-</script>
 
+    window.nav = (e, id) => { e.preventDefault(); const u = `?id=${id}&lang=${LANG}`; history.pushState({path:u},'',u); document.getElementById('list-view').classList.add('hidden'); showBranch(id); };
+    window.goHome = () => { const u = `?lang=${LANG}`; history.pushState({path:u},'',u); document.getElementById('detail-view').classList.add('hidden'); showList(); };
+    window.onpopstate = () => { document.getElementById('detail-view').classList.add('hidden'); document.getElementById('list-view').classList.add('hidden'); const i = new URLSearchParams(location.search).get('id'); if(i) showBranch(i); else showList(); };
+
+    start();
+</script>
 </body>
 </html>
