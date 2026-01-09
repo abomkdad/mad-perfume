@@ -18,18 +18,17 @@
 
         .controls-area { padding: 10px; position: sticky; top: 0; z-index: 50; background: rgba(0,0,0,0.95); backdrop-filter: blur(10px); }
         .lang-switch { display: flex; justify-content: center; background: #1a1a1a; border-radius: 20px; padding: 3px; width: fit-content; margin: 0 auto 10px; }
-        .lang-btn { background: transparent; border: none; color: #888; padding: 5px 20px; border-radius: 18px; cursor: pointer; }
+        .lang-btn { background: transparent; border: none; color: #888; padding: 5px 20px; border-radius: 18px; cursor: pointer; transition: 0.3s; }
         .lang-btn.active { background: var(--gold-text); color: #000; font-weight: bold; }
-        .search-input { width: 100%; padding: 10px; background: #111; border: 1px solid #333; border-radius: 10px; color: #fff; text-align: right; }
+        .search-input { width: 100%; padding: 10px; background: #111; border: 1px solid #333; border-radius: 10px; color: #fff; text-align: right; font-size: 16px; }
         
-        /* تصميم الشبكة */
         .branches-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(165px, 1fr)); gap: 12px; padding: 15px; max-width: 800px; margin: 0 auto; }
         
         .branch-card { 
             background: #111; border: 1px solid #333; border-radius: 12px; overflow: hidden; 
-            display: flex; flex-direction: column; height: 260px; text-decoration: none; position: relative;
+            display: flex; flex-direction: column; height: 260px; text-decoration: none; position: relative; transition: transform 0.2s;
         }
-        .branch-card:hover { border-color: var(--gold-text); }
+        .branch-card:active { transform: scale(0.98); }
         
         .card-image-bg { height: 120px; background-size: cover; background-position: center; position: relative; }
         .card-image-bg::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to top, #111 5%, transparent); }
@@ -65,10 +64,57 @@
         <span style="color: var(--gold-text); font-weight: bold">*9935</span>
     </a>
 
-    <script src="data.js"></script>
-
     <script>
-        // الكود البرمجي للصفحة الرئيسية
+        // --- 1. البيانات مدمجة هنا لضمان العمل ---
+        const genericImages = [
+            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR12uz7uY34z8nwyVEKWyx-JrNQywQ9Th3Z6Q&s",
+            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTHFblPsXbzvGYO2_e280p0rZYgcz3znQdFTQ&s",
+            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRJtcRkHFtdWjbXTUPdKzaHnX8gTSaaloy1qQ&s",
+            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTUXBgnRtca1N4UFoJtugnGkIoJKCwSTqHeGQ&s",
+            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRjaeKBGs-cv9K9a6Apca11aBXmVzMSiqsaBA&s"
+        ];
+
+        const branchesData = [
+            { id: 12, nameAr: "حيفا", nameHe: "חיפה", phone: "0549634449", waze: "Mad Parfumeur Haifa", hoursAr: "10:00 - 22:00", hoursHe: "10:00 - 22:00", facebook: "https://www.facebook.com/s0524033442/", instagram: "https://www.instagram.com/perfume.mad/" },
+            { id: 4, nameAr: "تل أبيب - يافا", nameHe: "תל אביב-יפו", phone: "0527035370", directLink: "https://ul.waze.com/ul?place=EipEYXZpZCBSYXppJ2VsIFN0IDIzLCBUZWwgQXZpdi1ZYWZvLCBJc3JhZWwiMBIuChQKEgntsiS-vkwdFREv7GII8cikqxAXKhQKEgmHZ_csvEwdFRFa3i1EzNr69g", hoursAr: "10:00 - 22:00", hoursHe: "10:00 - 22:00" },
+            { id: 3, nameAr: "الرمله", nameHe: "רמלה", phone: "0527035370", waze: "Ramla", hoursAr: "09:00 - 21:00", hoursHe: "09:00 - 21:00" },
+            { id: 7, nameAr: "هيرتسيليا", nameHe: "הרצליה", phone: "0522438398", waze: "Herzliya", hoursAr: "10:00 - 20:00", hoursHe: "10:00 - 20:00" },
+            { id: 14, nameAr: "الخضيرة", nameHe: "חדרה", phone: "0523953681", waze: "Hadera", hoursAr: "10:00 - 22:00", hoursHe: "10:00 - 22:00" },
+            { id: 24, nameAr: "يركا", nameHe: "ירכא", phone: "0546842420", waze: "Yarka", hoursAr: "10:00 - 22:00", hoursHe: "10:00 - 22:00" },
+            { id: 21, nameAr: "طمرة", nameHe: "טמרה", phone: "0505830733", waze: "Tamra", hoursAr: "10:00 - 22:00", hoursHe: "10:00 - 22:00" },
+            { id: 23, nameAr: "جديدة المكر", nameHe: "ג׳דידה אלמכר", phone: "0508683838", waze: "Jadeidi-Makr", hoursAr: "11:00 - 21:00", hoursHe: "11:00 - 21:00" },
+            { id: 22, nameAr: "سخنين", nameHe: "סח'נין", phone: "0525335571", waze: "Sakhnin", hoursAr: "10:30 - 22:30", hoursHe: "10:30 - 22:30" },
+            { id: 2, nameAr: "كفر مندا", nameHe: "כפר מאנדא", phone: "0505102019", waze: "Kafr Manda", hoursAr: "10:00 - 22:00", hoursHe: "10:00 - 22:00" },
+            { id: 1, nameAr: "دالية الكرمل", nameHe: "דלית אל כרמל", phone: "0525592293", waze: "Daliyat al-Karmel", hoursAr: "10:00 - 22:00", hoursHe: "10:00 - 22:00" },
+            { id: 9, nameAr: "القدس - صلاح الدين", nameHe: "ירושלים - סלאח א-דין", phone: "0545697644", waze: "Salah Ad-din", hoursAr: "09:00-19:30", hoursHe: "09:00-19:30" },
+            { id: 10, nameAr: "القدس - سلطان سليمان", nameHe: "ירושלים - סולטאן סולימאן", phone: "0545697644", waze: "Sultan Suleiman", hoursAr: "09:00-19:30", hoursHe: "09:00-19:30" },
+            { id: 11, nameAr: "بيت حنينا", nameHe: "בית חנינא", phone: "0538318312", waze: "Beit Hanina", hoursAr: "09:00-21:00", hoursHe: "09:00-21:00" },
+            { id: 5, nameAr: "بئر السبع", nameHe: "באר שבע", phone: "0548809957", waze: "Beersheba", hoursAr: "09:00 - 20:00", hoursHe: "09:00 - 20:00" },
+            { id: 6, nameAr: "رهط", nameHe: "רהט", phone: "0505841596", waze: "Rahat", hoursAr: "09:00 - 20:00", hoursHe: "09:00 - 20:00" },
+            { id: 18, nameAr: "أم الفحم", nameHe: "אום אלפחם", phone: "0549634449", waze: "Umm al-Fahm", hoursAr: "10:00 - 22:00", hoursHe: "10:00 - 22:00" },
+            { id: 19, nameAr: "العفولة", nameHe: "עפולה", phone: "0542144255", waze: "Afula", hoursAr: "09:00 - 22:00", hoursHe: "09:00 - 22:00" },
+            { id: 20, nameAr: "الناصرة", nameHe: "נצרת", phone: "0545307980", waze: "Nazareth", hoursAr: "09:00 - 22:00", hoursHe: "09:00 - 22:00" },
+            { id: 15, nameAr: "باقة الغربية", nameHe: "באקה אלג׳רבייה", phone: "0536440073", waze: "Baqa al-Gharbiyye", hoursAr: "10:00 - 23:00", hoursHe: "10:00 - 23:00" },
+            { id: 17, nameAr: "كفر قرع", nameHe: "כפר קרע", phone: "0549634449", waze: "Kafr Qara", hoursAr: "10:00 - 22:00", hoursHe: "10:00 - 22:00" },
+            { id: 8, nameAr: "كفر قاسم", nameHe: "כפר קאסם", phone: "0522438398", waze: "Kafr Qasim", hoursAr: "11:00 - 23:00", hoursHe: "11:00 - 23:00" },
+            { id: 16, nameAr: "الطيبة", nameHe: "טייבה", phone: "0523953681", waze: "Tayibe", hoursAr: "10:00 - 23:00", hoursHe: "10:00 - 23:00" },
+            { id: 25, nameAr: "طبريا", nameHe: "טבריה", phone: "046112266", waze: "Tiberias", hoursAr: "09:00 - 21:00", hoursHe: "09:00 - 21:00" },
+            { id: 26, nameAr: "مجدل شمس", nameHe: "מג'דל שמס", phone: "0508514202", waze: "Majdal Shams", hoursAr: "12:00 - 21:00", hoursHe: "12:00 - 21:00" },
+            { id: 29, nameAr: "رام الله", nameHe: "ראמאללה", phone: "0592592502", waze: "Ramallah", hoursAr: "10:00 - 22:00", hoursHe: "10:00 - 22:00" },
+            { id: 27, nameAr: "نابلس", nameHe: "שכם", phone: "0598094672", waze: "Nablus", hoursAr: "10:00 - 22:00", hoursHe: "10:00 - 22:00" },
+            { id: 31, nameAr: "قلقيلية", nameHe: "קלקוליה", phone: "0595800150", waze: "Qalqilya", hoursAr: "10:00 - 22:00", hoursHe: "10:00 - 22:00" },
+            { id: 28, nameAr: "طولكرم", nameHe: "טול כרם", phone: "0595552670", waze: "Tulkarm", hoursAr: "10:00 - 20:00", hoursHe: "10:00 - 20:00" },
+            { id: 30, nameAr: "بيت لحم", nameHe: "בית לחם", phone: "0599353940", waze: "Bethlehem", hoursAr: "10:00 - 22:00", hoursHe: "10:00 - 22:00" },
+            { id: 32, nameAr: "أريحا", nameHe: "יריחו", phone: "0592592502", waze: "Jericho", hoursAr: "10:00 - 22:00", hoursHe: "10:00 - 22:00" }
+        ];
+
+        const uiText = {
+            ar: { serviceText: "خدمة الزبائن", searchPlaceholder: "ابحث عن مدينتك...", siteBtn: "المتجر الإلكتروني", siteUrl: "https://madperfume.ps/", dir: "rtl" },
+            he: { serviceText: "שירות לקוחות", searchPlaceholder: "חפש לפי עיר...", siteBtn: "לחנות האונליין", siteUrl: "https://madperfume.co.il/", dir: "rtl" }
+        };
+
+        function getBranchImage(index) { return genericImages[index % genericImages.length]; }
+
         function switchLang(lang) {
             document.documentElement.lang = lang;
             document.getElementById('btn-ar').classList.toggle('active', lang === 'ar');
@@ -87,8 +133,8 @@
                 const hours = lang === 'he' ? branch.hoursHe : branch.hoursAr;
                 const imgUrl = getBranchImage(index);
                 
-                // الرابط هنا يذهب لصفحة الفرع مع المعرف ID
                 const card = document.createElement('a');
+                // رابط الصفحة الخاصة بالفرع
                 card.href = `branch.html?id=${branch.id}&lang=${lang}`;
                 card.className = 'branch-card';
                 
