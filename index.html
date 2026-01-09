@@ -3,496 +3,223 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MAD PARFUMEUR - الفروع والمنتجات</title>
+    <title>MAD PARFUMEUR</title>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        /* ================= تصميم الهوية البصرية (Luxury Theme) ================= */
-        :root {
-            --primary: #000000;
-            --accent: #d4af37; /* ذهبي */
-            --bg: #f5f5f5;
-            --white: #ffffff;
-            --text: #333333;
-            --gray: #777777;
-        }
-
-        * { box-sizing: border-box; outline: none; }
+        :root { --primary: #000; --accent: #d4af37; --bg: #f8f8f8; --white: #fff; }
+        body { margin: 0; font-family: 'Segoe UI', sans-serif; background-color: var(--bg); padding-bottom: 60px; }
         
-        body {
-            margin: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg);
-            color: var(--text);
-            padding-bottom: 50px;
-        }
+        /* Header */
+        header { background: var(--primary); color: var(--accent); padding: 15px; text-align: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.2); }
+        header h1 { margin: 0; font-size: 1.4rem; letter-spacing: 1px; }
 
-        /* الرأس */
-        header {
-            background-color: var(--primary);
-            color: var(--accent);
-            padding: 20px;
-            text-align: center;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-        }
-        header h1 { margin: 0; font-size: 1.5rem; letter-spacing: 2px; text-transform: uppercase; }
-
-        .container {
-            max-width: 1100px;
-            margin: 20px auto;
-            padding: 0 15px;
-        }
-
-        /* الأزرار */
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            padding: 12px 20px;
-            border-radius: 50px;
-            text-decoration: none;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            border: none;
-            font-size: 0.95rem;
-        }
-        .btn:active { transform: scale(0.98); }
-        .btn-gold { background: var(--accent); color: var(--primary); }
-        .btn-black { background: var(--primary); color: var(--accent); }
+        .container { max-width: 1000px; margin: 20px auto; padding: 0 15px; }
+        
+        /* البطاقات والأزرار */
+        .card { background: var(--white); border-radius: 12px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 10px 20px; border-radius: 50px; text-decoration: none; font-weight: bold; border: none; cursor: pointer; transition: 0.2s; }
+        .btn:active { transform: scale(0.95); }
         .btn-waze { background: #33ccff; color: white; }
         .btn-wa { background: #25D366; color: white; }
-        .btn-back { background: #e0e0e0; color: #333; margin-bottom: 20px; }
+        .btn-black { background: var(--primary); color: var(--accent); }
+        .btn-back { background: #eee; color: #333; margin-bottom: 15px; }
 
-        /* الشاشات */
-        .view-section { display: none; animation: fadeIn 0.4s; }
-        .view-section.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* قائمة الفروع */
-        .branch-list { list-style: none; padding: 0; }
-        .branch-item {
-            background: var(--white);
-            margin-bottom: 15px;
-            padding: 20px;
-            border-radius: 12px;
-            border-right: 5px solid var(--primary);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-            cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            transition: transform 0.2s;
-        }
-        .branch-item:hover { transform: translateX(-5px); }
-        .branch-name { font-size: 1.2rem; font-weight: bold; color: var(--primary); }
-        .branch-sub { font-size: 0.9rem; color: var(--gray); margin-top: 5px; }
-
-        /* تفاصيل الفرع */
-        .branch-header-card {
-            background: var(--white);
-            padding: 25px;
-            border-radius: 16px;
-            text-align: center;
-            border-top: 4px solid var(--accent);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
-            margin-bottom: 25px;
-        }
-        .info-grid {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 15px;
-            margin: 20px 0;
-        }
-
-        /* فلتر المنتجات */
-        .store-filters {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-            background: var(--white);
-            padding: 10px;
-            border-radius: 12px;
-        }
-        .store-filters select {
-            flex: 1;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            background: #fff;
-        }
-
-        /* شبكة المنتجات */
-        .products-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-            gap: 20px;
-        }
-        .product-card {
-            background: var(--white);
-            border-radius: 15px;
-            overflow: hidden;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
-            transition: transform 0.3s;
-            display: flex;
-            flex-direction: column;
-        }
-        .product-card:hover { transform: translateY(-5px); box-shadow: 0 8px 20px rgba(0,0,0,0.12); }
-        .p-img-container {
-            height: 200px;
-            padding: 15px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: #fff;
-        }
-        .p-img { max-height: 100%; max-width: 100%; object-fit: contain; }
-        .p-details { padding: 15px; flex-grow: 1; display: flex; flex-direction: column; }
-        .p-cat { font-size: 0.75rem; color: var(--gray); text-transform: uppercase; letter-spacing: 1px; }
-        .p-title { font-size: 1rem; font-weight: bold; margin: 5px 0 10px; color: var(--primary); flex-grow: 1; }
-        .p-price { font-size: 1.1rem; color: var(--accent); font-weight: bold; margin-bottom: 10px; }
+        /* الشبكة والمنتجات */
+        .filters { display: flex; gap: 10px; margin-bottom: 20px; }
+        .filters select { flex: 1; padding: 12px; border-radius: 8px; border: 1px solid #ddd; background: #fff; }
         
-        /* شاشة التحميل */
-        #loader {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(255,255,255,0.9);
-            z-index: 2000;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-        }
-        .spinner {
-            width: 40px; height: 40px; border: 4px solid #f3f3f3;
-            border-top: 4px solid var(--accent); border-radius: 50%;
-            animation: spin 1s linear infinite; margin-bottom: 10px;
-        }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; }
+        .product-card { background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.05); display: flex; flex-direction: column; transition: transform 0.2s; }
+        .product-card:hover { transform: translateY(-5px); }
+        .p-img { width: 100%; height: 180px; object-fit: contain; padding: 10px; box-sizing: border-box; }
+        .p-info { padding: 12px; flex-grow: 1; display: flex; flex-direction: column; text-align: center; }
+        .p-title { font-size: 0.95rem; font-weight: bold; margin-bottom: 5px; color: #333; flex-grow: 1; }
+        .p-price { color: var(--accent); font-weight: bold; font-size: 1.1rem; margin-bottom: 10px; }
 
-        /* رسائل الخطأ */
-        .error-msg { text-align: center; padding: 40px; color: var(--gray); }
+        /* القائمة الرئيسية */
+        .branch-item { display: block; background: #fff; padding: 15px; margin-bottom: 10px; border-radius: 8px; border-right: 4px solid var(--primary); text-decoration: none; color: #333; font-weight: bold; }
+
+        /* لودر */
+        #loader { position: fixed; inset: 0; background: rgba(255,255,255,0.95); z-index: 999; display: flex; align-items: center; justify-content: center; font-weight: bold; }
+        .hidden { display: none !important; }
     </style>
 </head>
 <body>
 
-    <header>
-        <h1>MAD PARFUMEUR</h1>
-    </header>
-
-    <div id="loader">
-        <div class="spinner"></div>
-        <div id="loader-text">جاري تحميل النظام...</div>
-    </div>
+    <header><h1>MAD PARFUMEUR</h1></header>
+    <div id="loader">جاري التحميل...</div>
 
     <div class="container">
         
-        <div id="view-branches" class="view-section">
-            <h2 style="text-align:center; margin-bottom:20px;">اختر الفرع الأقرب إليك</h2>
-            <ul id="branches-list-el" class="branch-list"></ul>
+        <div id="list-view" class="hidden">
+            <h3 style="text-align:center;">اختر الفرع</h3>
+            <div id="branches-list"></div>
         </div>
 
-        <div id="view-single-branch" class="view-section">
-            <button onclick="goHome()" class="btn btn-back">
-                <i class="fas fa-arrow-right"></i> العودة للفروع
+        <div id="detail-view" class="hidden">
+            <button onclick="location.href='?lang='+LANG" class="btn btn-back">
+                <i class="fas fa-arrow-right"></i> كل الفروع
             </button>
 
-            <div class="branch-header-card">
-                <h2 id="d-name-ar" style="margin:0;"></h2>
-                <h4 id="d-name-he" style="margin:5px 0 15px; color:#777; font-weight:normal;"></h4>
-                
-                <div class="info-grid">
-                    <span class="btn btn-black" style="background:#f4f4f4; color:#333; cursor:default;">
-                        <i class="far fa-clock"></i> <span id="d-hours"></span>
-                    </span>
-                    <a id="d-phone-link" href="#" class="btn btn-black" style="background:#f4f4f4; color:#333;">
-                        <i class="fas fa-phone"></i> <span id="d-phone"></span>
-                    </a>
-                </div>
-
-                <div class="info-grid">
-                    <a id="d-waze" href="#" target="_blank" class="btn btn-waze">
-                        <i class="fas fa-location-arrow"></i> WAZE
-                    </a>
-                    <a id="d-wa" href="#" target="_blank" class="btn btn-wa">
-                        <i class="fab fa-whatsapp"></i> WhatsApp
-                    </a>
+            <div class="card" style="text-align:center;">
+                <h2 id="b-name" style="margin:0 0 5px;"></h2>
+                <div id="b-hours" style="color:#666; margin-bottom:15px;"></div>
+                <div style="display:flex; justify-content:center; gap:10px;">
+                    <a id="btn-waze" target="_blank" class="btn btn-waze"><i class="fas fa-location-arrow"></i> WAZE</a>
+                    <a id="btn-wa" target="_blank" class="btn btn-wa"><i class="fab fa-whatsapp"></i> WhatsApp</a>
                 </div>
             </div>
 
-            <h3 style="border-right: 4px solid var(--accent); padding-right: 10px;">منتجات متوفرة</h3>
-            
-            <div class="store-filters">
-                <select id="filter-cat">
-                    <option value="">كل الفئات (All Categories)</option>
-                </select>
-                <select id="sort-price">
-                    <option value="">ترتيب تلقائي</option>
-                    <option value="asc">السعر: من الأقل للأعلى</option>
-                    <option value="desc">السعر: من الأعلى للأقل</option>
+            <div id="fallback-msg" style="display:none; background:#fff3cd; color:#856404; padding:10px; border-radius:8px; margin-bottom:15px; text-align:center; font-size:0.9rem;">
+                يتم عرض جميع المنتجات المتوفرة حالياً.
+            </div>
+
+            <div class="filters">
+                <select id="cat-select"><option value="">كل الفئات</option></select>
+                <select id="sort-select">
+                    <option value="">الترتيب</option>
+                    <option value="asc">الأقل سعراً</option>
+                    <option value="desc">الأعلى سعراً</option>
                 </select>
             </div>
 
-            <div id="products-grid-el" class="products-grid"></div>
+            <div id="products-grid" class="products-grid"></div>
         </div>
 
     </div>
 
 <script>
-    // ================= 1. الإعدادات والروابط =================
-    const CONFIG = {
-        branchesCSV: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQzL_F54ThIR-jtJoX9mU4gc6FPo2FzMWsvaPY9K9CDJ_qdHFf3VAqncUj51mEa3A/pub?output=csv',
-        productsCSV: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSEkstd7ZCKTNYZL_8TC2ofQ9Z91JJ2IM0awOPLgegDweraKayLGitwiLY7A382iQ/pub?output=csv'
-    };
+    // الروابط
+    const URL_BRANCHES = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQzL_F54ThIR-jtJoX9mU4gc6FPo2FzMWsvaPY9K9CDJ_qdHFf3VAqncUj51mEa3A/pub?output=csv';
+    const URL_PRODUCTS = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSEkstd7ZCKTNYZL_8TC2ofQ9Z91JJ2IM0awOPLgegDweraKayLGitwiLY7A382iQ/pub?output=csv';
 
-    // متغيرات لتخزين البيانات
-    let DATA = {
-        branches: [],
-        products: [],
-        currentBranchId: null
-    };
-
-    // ================= 2. دوال المساعدة العامة =================
-    function getLang() {
-        // تحديد اللغة (افتراضي عربي)
-        const p = new URLSearchParams(location.search);
-        return p.get('lang') === 'he' ? 'he' : 'ar';
-    }
-    const LANG = getLang();
+    // اللغة
+    const p = new URLSearchParams(location.search);
+    const LANG = p.get('lang') === 'he' ? 'he' : 'ar';
     document.documentElement.lang = LANG;
     document.documentElement.dir = LANG === 'he' ? 'ltr' : 'rtl';
 
-    // دالة جلب الملفات (Promisified CSV Fetcher)
-    function fetchCSV(url) {
-        return new Promise((resolve, reject) => {
+    // تحميل البيانات
+    function loadCSV(url) {
+        return new Promise(resolve => {
             Papa.parse(url, {
-                download: true,
-                header: true,
-                skipEmptyLines: true,
-                // **هام جداً**: هذا السطر ينظف أسماء الأعمدة من المسافات المخفية
-                transformHeader: h => h.trim(), 
-                complete: (results) => resolve(results.data),
-                error: (err) => reject(err)
+                download: true, header: true, skipEmptyLines: true,
+                transformHeader: h => h.trim(), // تنظيف العناوين
+                complete: res => resolve(res.data)
             });
         });
     }
 
-    // ================= 3. منطق التطبيق الرئيسي =================
-    
-    // عند تحميل الصفحة
-    window.addEventListener('DOMContentLoaded', async () => {
-        try {
-            await loadAllData();
-            router(); // توجيه المستخدم للصفحة المناسبة
-        } catch (error) {
-            console.error(error);
-            document.getElementById('loader').innerHTML = '<p style="color:red">حدث خطأ في تحميل البيانات. تأكد من الاتصال بالإنترنت.</p>';
-        }
+    // التشغيل
+    Promise.all([loadCSV(URL_BRANCHES), loadCSV(URL_PRODUCTS)]).then(([branches, products]) => {
+        document.getElementById('loader').classList.add('hidden');
+        const branchId = p.get('id');
+
+        if(branchId) showBranch(branchId, branches, products);
+        else showList(branches);
     });
 
-    // تحميل كل البيانات مرة واحدة لسرعة التنقل
-    async function loadAllData() {
-        const [branches, products] = await Promise.all([
-            fetchCSV(CONFIG.branchesCSV),
-            fetchCSV(CONFIG.productsCSV)
-        ]);
-        
-        DATA.branches = branches;
-        DATA.products = products;
-        
-        console.log(`تم تحميل ${DATA.branches.length} فرع و ${DATA.products.length} منتج.`);
-        document.getElementById('loader').style.display = 'none';
-    }
-
-    // نظام التوجيه البسيط
-    function router() {
-        const params = new URLSearchParams(window.location.search);
-        const branchId = params.get('id');
-
-        // إخفاء جميع الأقسام
-        document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
-
-        if (branchId) {
-            // نحن في صفحة الفرع
-            DATA.currentBranchId = branchId;
-            renderBranchDetails(branchId);
-            document.getElementById('view-single-branch').classList.add('active');
-        } else {
-            // نحن في الرئيسية
-            renderBranchesList();
-            document.getElementById('view-branches').classList.add('active');
-        }
-    }
-
-    function goHome() {
-        // العودة للرئيسية بمسح الـ ID من الرابط بدون إعادة تحميل الصفحة
-        const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + `?lang=${LANG}`;
-        window.history.pushState({path: newUrl}, '', newUrl);
-        router();
-    }
-
-    function goToBranch(id) {
-        const newUrl = `?id=${id}&lang=${LANG}`;
-        window.history.pushState({path: newUrl}, '', newUrl);
-        router();
-    }
-
-    // ================= 4. عرض الفروع =================
-    function renderBranchesList() {
-        const listEl = document.getElementById('branches-list-el');
-        listEl.innerHTML = '';
-
-        DATA.branches.forEach(b => {
-            if (!b.ID) return; // تخطي الصفوف الفارغة
-
-            const li = document.createElement('li');
-            li.className = 'branch-item';
-            li.innerHTML = `
-                <div>
-                    <div class="branch-name">${b['اسم الفرع عربي']}</div>
-                    <div class="branch-sub">${b['اسم الفرع عبري']}</div>
-                </div>
-                <div style="color:var(--accent);"><i class="fas fa-chevron-${LANG==='he'?'left':'left'}"></i></div>
-            `;
-            li.onclick = () => goToBranch(b.ID);
-            listEl.appendChild(li);
+    function showList(branches) {
+        document.getElementById('list-view').classList.remove('hidden');
+        const container = document.getElementById('branches-list');
+        branches.forEach(b => {
+            if(!b.ID) return;
+            container.innerHTML += `<a href="?id=${b.ID}&lang=${LANG}" class="branch-item">
+                ${b['اسم الفرع عربي']} <span style="font-weight:normal; color:#777">| ${b['اسم الفرع عبري']}</span>
+            </a>`;
         });
     }
 
-    // ================= 5. عرض تفاصيل الفرع =================
-    function renderBranchDetails(id) {
-        const b = DATA.branches.find(item => item.ID == id);
+    let currentProducts = [];
+
+    function showBranch(id, branches, products) {
+        const b = branches.find(x => x.ID == id);
+        if(!b) return location.href = '?';
+
+        document.getElementById('detail-view').classList.remove('hidden');
         
-        if (!b) {
-            alert("عذراً، الفرع غير موجود");
-            goHome();
-            return;
-        }
+        // تفاصيل الفرع
+        document.getElementById('b-name').innerText = b['اسم الفرع عربي'];
+        document.getElementById('b-hours').innerText = b['ساعات الدوام عربي'] || b['ساعات الدوام عبري'];
+        document.getElementById('btn-waze').href = b['رابط Waze / Maps'] || '#';
+        
+        let wa = b['WhatsApp'];
+        if(!wa && b['الهاتف']) wa = `https://wa.me/${b['الهاتف'].replace(/\D/g,'').replace(/^0/,'972')}`;
+        document.getElementById('btn-wa').href = wa || '#';
 
-        // تعبئة البيانات
-        document.getElementById('d-name-ar').innerText = b['اسم الفرع عربي'];
-        document.getElementById('d-name-he').innerText = b['اسم الفرع عبري'];
-        document.getElementById('d-hours').innerText = b['ساعات الدوام عربي'] || b['ساعات الدوام عبري'] || '-';
-        document.getElementById('d-phone').innerText = b['الهاتف'];
-        document.getElementById('d-phone-link').href = `tel:${b['الهاتف']}`;
-
-        document.getElementById('d-waze').href = b['رابط Waze / Maps'] || '#';
-
-        // رابط الواتساب الذكي
-        let waLink = b['WhatsApp'];
-        if (!waLink && b['الهاتف']) {
-            let cleanPhone = b['الهاتف'].replace(/\D/g, '').replace(/^0/, '972');
-            waLink = `https://wa.me/${cleanPhone}`;
-        }
-        document.getElementById('d-wa').href = waLink || '#';
-
-        // === استدعاء المنتجات ===
-        prepareProductsForBranch(id);
-    }
-
-    // ================= 6. منطق المنتجات والفلترة =================
-    let branchProducts = []; // المنتجات المصفاة لهذا الفرع
-
-    function prepareProductsForBranch(branchId) {
-        // 1. تصفية المنتجات حسب الـ Internal Label
-        branchProducts = DATA.products.filter(p => {
-            // تجاهل المنتجات بدون عنوان
-            if (!p['Title']) return false;
-
-            // منطق الربط بالفرع
+        // === منطق المنتجات الذكي (SMART FALLBACK) ===
+        // 1. محاولة العثور على منتجات مخصصة لهذا الفرع
+        let filtered = products.filter(p => {
+            if(!p['Title']) return false;
             const label = p['Internal Label'];
-            
-            // إذا كان العمود فارغاً، هل نعرض المنتج؟ نعم (Fallback) لضمان عدم خلو الصفحة
-            if (!label) return true; 
-
-            // إذا كان يحتوي على رقم الفرع
-            // نحول القيم لنصوص لضمان المقارنة الصحيحة "1" == 1
-            return label.toString().includes(branchId.toString());
+            // تأكد من تحويل القيم إلى نصوص للمقارنة
+            return label && label.toString().includes(id.toString());
         });
 
-        console.log(`تم العثور على ${branchProducts.length} منتج للفرع ${branchId}`);
-
-        // 2. تحديث قائمة الكتيجوريات (الفلاتر)
-        const categories = [...new Set(branchProducts.map(p => p['Category (g:product_type)']).filter(Boolean))];
-        const catSelect = document.getElementById('filter-cat');
-        
-        // إعادة تعيين القائمة
-        catSelect.innerHTML = '<option value="">كل الفئات (All Categories)</option>';
-        categories.sort().forEach(c => {
-            const opt = document.createElement('option');
-            opt.value = c;
-            opt.innerText = c;
-            catSelect.appendChild(opt);
-        });
-
-        // 3. تفعيل المستمعين
-        catSelect.onchange = renderFilteredProducts;
-        document.getElementById('sort-price').onchange = renderFilteredProducts;
-
-        // 4. العرض الأولي
-        renderFilteredProducts();
-    }
-
-    function renderFilteredProducts() {
-        const grid = document.getElementById('products-grid-el');
-        const catVal = document.getElementById('filter-cat').value;
-        const sortVal = document.getElementById('sort-price').value;
-
-        // تطبيق الفلتر
-        let displayList = branchProducts.filter(p => {
-            if (catVal && p['Category (g:product_type)'] !== catVal) return false;
-            return true;
-        });
-
-        // تطبيق الترتيب
-        if (sortVal === 'asc') {
-            displayList.sort((a, b) => parseFloat(a['Price']) - parseFloat(b['Price']));
-        } else if (sortVal === 'desc') {
-            displayList.sort((a, b) => parseFloat(b['Price']) - parseFloat(a['Price']));
+        // 2. إذا لم نجد منتجات مخصصة، نعرض كل شيء!
+        if(filtered.length === 0) {
+            console.log("No specific products found. Switching to ALL products.");
+            filtered = products.filter(p => p['Title']); // فقط التأكد من وجود عنوان
+            // يمكنك إزالة التعليق أدناه لإظهار رسالة للمستخدم
+            // document.getElementById('fallback-msg').style.display = 'block';
         }
 
-        // توليد HTML
-        grid.innerHTML = '';
+        currentProducts = filtered;
         
-        if (displayList.length === 0) {
-            grid.innerHTML = '<div class="error-msg" style="grid-column:1/-1;">لا توجد منتجات مطابقة للبحث</div>';
+        // إعداد قائمة الفئات (Categories) بناءً على المنتجات المعروضة
+        const cats = [...new Set(currentProducts.map(p => p['Category (g:product_type)']).filter(Boolean))];
+        cats.forEach(c => {
+            const opt = document.createElement('option');
+            opt.value = c; opt.innerText = c;
+            document.getElementById('cat-select').appendChild(opt);
+        });
+
+        renderProducts();
+
+        // تفعيل الفلاتر عند التغيير
+        document.getElementById('cat-select').onchange = renderProducts;
+        document.getElementById('sort-select').onchange = renderProducts;
+    }
+
+    function renderProducts() {
+        const grid = document.getElementById('products-grid');
+        const cat = document.getElementById('cat-select').value;
+        const sort = document.getElementById('sort-select').value;
+
+        // تصفية القائمة الحالية حسب الفئة المختارة
+        let list = currentProducts.filter(p => !cat || p['Category (g:product_type)'] === cat);
+
+        // الترتيب
+        if(sort === 'asc') list.sort((a,b) => parseFloat(a['Price']) - parseFloat(b['Price']));
+        if(sort === 'desc') list.sort((a,b) => parseFloat(b['Price']) - parseFloat(a['Price']));
+
+        grid.innerHTML = '';
+        if(list.length === 0) {
+            grid.innerHTML = '<p style="grid-column:1/-1; text-align:center;">لا توجد منتجات</p>';
             return;
         }
 
-        displayList.forEach(p => {
-            // معالجة الصورة (أخذ الأولى إذا كان هناك فواصل |)
-            let rawImg = p['Image'] || p['Additional Images'] || '';
-            let imgUrl = rawImg.split('|')[0].trim();
-            if (!imgUrl) imgUrl = 'https://via.placeholder.com/300x300?text=No+Image';
-
-            // نص الزر
+        list.forEach(p => {
+            // معالجة الصورة
+            let img = (p['Image'] || '').split('|')[0] || 'https://via.placeholder.com/150';
             const btnText = LANG === 'he' ? 'לרכישה' : 'شراء';
-
-            const card = `
-                <div class="product-card">
-                    <div class="p-img-container">
-                        <img src="${imgUrl}" class="p-img" loading="lazy" alt="${p['Title']}">
-                    </div>
-                    <div class="p-details">
-                        <div class="p-cat">${p['Category (g:product_type)'] || ''}</div>
-                        <div class="p-title">${p['Title']}</div>
-                        <div class="p-price">${p['Price']} ${LANG==='he'?'₪':'شيكل'}</div>
-                        <a href="${p['Product Link']}" target="_blank" class="btn btn-black" style="width:100%; margin-top:auto;">
-                            ${btnText} <i class="fas fa-shopping-bag"></i>
-                        </a>
-                    </div>
+            
+            grid.innerHTML += `
+            <div class="product-card">
+                <img src="${img}" class="p-img" loading="lazy">
+                <div class="p-info">
+                    <div class="p-title">${p['Title']}</div>
+                    <div class="p-price">${p['Price'] || ''} ${LANG==='he'?'₪':'شيكل'}</div>
+                    <a href="${p['Product Link']}" target="_blank" class="btn btn-black" style="width:100%">
+                        ${btnText}
+                    </a>
                 </div>
-            `;
-            grid.innerHTML += card;
+            </div>`;
         });
     }
-
 </script>
 
 </body>
