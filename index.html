@@ -8,386 +8,468 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        /* LUXURY DARK THEME */
-        :root { --bg:#0f0f0f; --card:#1a1a1a; --gold:#d4af37; --text:#fff; --sub:#b0b0b0; }
-        body { margin:0; font-family:'Segoe UI',sans-serif; background:var(--bg); color:var(--text); padding-bottom:50px; }
-        
-        /* HEADER */
-        header { 
-            background: #000; padding: 10px 0; text-align: center; 
-            border-bottom: 2px solid var(--gold); position: sticky; top: 0; z-index: 900;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+        /* === 1. LUXURY THEME VARIABLES === */
+        :root { 
+            --bg: #121212; 
+            --card-bg: #1e1e1e; 
+            --gold: #d4af37; 
+            --text: #ffffff; 
+            --sub-text: #a0a0a0; 
+            --waze-bg: #1f2d3d; 
+            --waze-text: #33ccff;
+            --wa-bg: #25D366;
+            --input-bg: #222;
         }
-        .header-link { display: inline-block; text-decoration: none; }
-        .header-logo {
-            height: 70px; width: auto; display: block; margin: 0 auto;
-            object-fit: contain; transition: transform 0.3s ease;
+        
+        body { margin: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg); color: var(--text); padding-bottom: 50px; }
+        a { text-decoration: none; }
+
+        /* === 2. HEADER === */
+        header {
+            text-align: center;
+            padding: 20px 15px 10px;
+            background: #000;
+            border-bottom: 2px solid var(--gold);
+            position: sticky; top: 0; z-index: 1000;
         }
-        .header-link:hover .header-logo { transform: scale(1.05); }
-
-        .container { max-width:1000px; margin:20px auto; padding:0 15px; }
         
-        /* Elements */
-        .btn-gold { border:1px solid var(--gold); color:var(--gold); padding:8px 20px; border-radius:50px; text-decoration:none; display:inline-flex; align-items:center; gap:8px; transition:0.2s; background:transparent; cursor:pointer; }
-        .btn-gold:hover { background:var(--gold); color:#000; }
+        .logo-container {
+            width: 90px; height: 90px;
+            margin: 0 auto 10px;
+            border-radius: 50%;
+            background: #000;
+            border: 2px solid #333;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
+            overflow: hidden;
+        }
+        .header-logo { width: 85%; height: auto; object-fit: contain; }
         
-        .branch-hero { background:linear-gradient(145deg,#1a1a1a,#222); border:1px solid #333; border-top:3px solid var(--gold); border-radius:12px; padding:25px; text-align:center; margin-bottom:25px; }
-        .branch-hero h2 { margin:0; font-size:1.8rem; }
+        .tagline { color: var(--sub-text); font-size: 0.8rem; margin-bottom: 10px; letter-spacing: 1px; }
+
+        .btn-visit-site {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: transparent; border: 1px solid var(--gold); color: var(--gold);
+            padding: 6px 20px; border-radius: 50px; font-size: 0.85rem;
+            margin-bottom: 15px; transition: 0.3s; cursor: pointer;
+        }
+        .btn-visit-site:hover { background: var(--gold); color: #000; }
+
+        .lang-switch { display: flex; justify-content: center; gap: 10px; margin-bottom: 15px; }
+        .lang-btn {
+            background: transparent; border: 1px solid #444; color: #888;
+            padding: 5px 15px; border-radius: 20px; font-size: 0.8rem; cursor: pointer;
+        }
+        .lang-btn.active { border-color: var(--gold); color: var(--gold); font-weight: bold; }
+
+        /* Search Bar */
+        .search-container { max-width: 600px; margin: 0 auto 10px; position: relative; }
+        .search-input {
+            width: 100%; padding: 10px 40px 10px 15px;
+            background: var(--input-bg); border: 1px solid #333;
+            border-radius: 8px; color: #fff; font-size: 0.95rem;
+            box-sizing: border-box; outline: none; text-align: right;
+        }
+        .search-input:focus { border-color: var(--gold); }
+        .search-icon { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: #666; }
+
+        /* === 3. BRANCH CARDS (LIST DESIGN) === */
+        .container { max-width: 600px; margin: 0 auto; padding: 0 15px; }
         
-        .social-bar { display:flex; justify-content:center; gap:15px; margin-top:20px; flex-wrap:wrap; }
-        .social-btn { width:45px; height:45px; border-radius:50%; display:flex; align-items:center; justify-content:center; background:#2a2a2a; color:#aaa; border:1px solid #333; text-decoration:none; transition: all 0.3s ease; font-size: 1.2rem; }
-        .social-btn:hover { border-color:var(--gold); color:var(--gold); transform: translateY(-3px); }
+        .branch-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border: 1px solid #2a2a2a;
+            position: relative;
+        }
+
+        .card-header {
+            display: flex; justify-content: flex-end; align-items: center; gap: 10px;
+            margin-bottom: 15px; cursor: pointer;
+        }
+        .card-title { font-size: 1.2rem; font-weight: bold; color: #fff; }
+        .gold-dot { width: 6px; height: 6px; background: var(--gold); border-radius: 50%; }
+
+        .hours-box {
+            background: #141414; padding: 10px; border-radius: 6px;
+            text-align: right; color: #aaa; font-size: 0.85rem;
+            margin-bottom: 20px; display: flex; align-items: center; justify-content: flex-end; gap: 8px;
+        }
+
+        /* حاوية الأزرار الرئيسية */
+        .card-actions-wrapper {
+            display: flex; flex-direction: column; gap: 10px;
+        }
+
+        /* صف أزرار التواصل (واتساب وويز) */
+        .contact-row { display: flex; gap: 10px; }
+
+        .action-btn {
+            flex: 1; padding: 10px; border-radius: 6px; text-align: center;
+            font-weight: bold; font-size: 0.9rem;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            transition: 0.2s; text-decoration: none; cursor: pointer;
+        }
         
-        /* Brands Colors */
-        .social-btn.waze:hover { color: #33ccff; border-color: #33ccff; }
-        .social-btn.whatsapp:hover { color: #25D366; border-color: #25D366; }
-        .social-btn.instagram:hover { color: #C13584; border-color: #C13584; }
-        .social-btn.facebook:hover { color: #1877F2; border-color: #1877F2; }
-        .social-btn.tiktok:hover { color: #fff; border-color: #fff; }
+        /* زر التسوق الجديد */
+        .btn-shop { 
+            background: var(--gold); color: #000; border: none; width: 100%; 
+            padding: 12px; font-size: 1rem;
+        }
+        .btn-shop:hover { background: #b8860b; }
 
-        .actions { display:flex; justify-content:center; gap:10px; margin-top:20px; flex-wrap:wrap; border-top: 1px solid #333; padding-top: 20px; }
-        .btn-svc { background:#000; border:1px solid var(--gold); color:var(--gold); padding:10px 15px; border-radius:6px; text-decoration:none; font-weight:bold; display:flex; align-items:center; gap:8px; font-size:0.85rem; transition: 0.3s; }
-        .btn-svc:hover { background:var(--gold); color:#000; }
+        .btn-waze { background: var(--waze-bg); color: var(--waze-text); border: 1px solid #2c3e50; }
+        .btn-waze:hover { background: #253646; }
 
-        .filters { display:flex; gap:10px; margin-bottom:20px; }
-        .filters select { flex:1; padding:12px; background:#222; border:1px solid #444; color:#fff; border-radius:8px; outline:none; }
+        .btn-whatsapp { background: var(--wa-bg); color: #fff; border: none; }
+        .btn-whatsapp:hover { background: #1ebc57; }
 
-        .products-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:15px; }
-        .product-card { background:var(--card); border-radius:10px; overflow:hidden; border:1px solid #333; display:flex; flex-direction:column; }
-        .p-img-box { width:100%; height:180px; background:#fff; display:flex; align-items:center; justify-content:center; padding:10px; box-sizing:border-box; }
-        .p-img { max-width:100%; max-height:100%; object-fit:contain; }
-        .p-info { padding:15px; text-align:center; flex-grow:1; display:flex; flex-direction:column; }
-        .p-title { font-size:0.95rem; margin-bottom:5px; flex-grow:1; color:#eee; }
-        .p-price { color:var(--gold); font-weight:bold; margin-bottom:10px; }
-        .btn-ask { background:transparent; border:1px solid #444; color:#aaa; width:100%; padding:8px; border-radius:6px; text-decoration:none; display:flex; align-items:center; justify-content:center; gap:5px; font-size:0.85rem; transition:0.2s; }
-        .btn-ask:hover { border-color:#25D366; color:#25D366; }
+        /* Customer Service Bar */
+        .cs-bar {
+            background: #1a1a1a; border: 1px solid var(--gold); border-radius: 50px;
+            padding: 10px 25px; display: flex; justify-content: space-between; align-items: center;
+            margin-top: 20px; text-decoration: none; margin-bottom: 40px;
+        }
+        .cs-text { color: #fff; font-weight: bold; font-size: 0.9rem; }
+        .cs-num { color: var(--gold); font-weight: bold; font-size: 1rem; }
 
-        .branch-item { display:flex; justify-content:space-between; align-items:center; background:var(--card); padding:18px; margin-bottom:12px; border-radius:8px; text-decoration:none; border-right:3px solid var(--gold); color:#fff; }
-        .branch-item:hover { background:#252525; }
-
-        .hidden { display:none!important; }
-        #loader { position:fixed; inset:0; background:#000; z-index:2000; display:flex; flex-direction:column; align-items:center; justify-content:center; transition:opacity 0.3s; }
-        .spinner { width:30px; height:30px; border:3px solid #333; border-top-color:var(--gold); border-radius:50%; animation:s 0.8s infinite linear; margin-bottom:15px; }
-        @keyframes s { to { transform:rotate(360deg); } }
+        /* === 4. DETAIL VIEW (INTERNAL PAGE) === */
+        .detail-header-btn { text-align: left; margin-bottom: 15px; }
+        .back-link { 
+            color: var(--gold); font-size: 0.9rem; display: inline-flex; align-items: center; gap: 5px; cursor: pointer; 
+            padding: 8px 15px; border: 1px solid var(--gold); border-radius: 20px;
+        }
         
-        .load-more-container { text-align:center; margin:30px 0; }
-        .btn-more { background:var(--gold); color:#000; border:none; padding:12px 40px; border-radius:50px; font-weight:bold; cursor:pointer; }
+        .detail-hero {
+            text-align: center; margin-bottom: 25px;
+            background: linear-gradient(145deg, #1a1a1a, #222);
+            padding: 20px; border-radius: 12px; border-top: 3px solid var(--gold);
+        }
+        
+        .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; }
+        .product-card { background: #fff; border-radius: 10px; overflow: hidden; display: flex; flex-direction: column; }
+        .p-img-box { height: 180px; padding: 10px; display: flex; align-items: center; justify-content: center; background: #fff; }
+        .p-img { max-height: 100%; max-width: 100%; object-fit: contain; }
+        .p-info { padding: 15px; text-align: center; color: #333; flex-grow: 1; display: flex; flex-direction: column; }
+        .p-title { font-weight: bold; font-size: 0.9rem; margin-bottom: 5px; color: #000; flex-grow: 1; }
+        .p-price { color: #b8860b; font-weight: bold; margin-bottom: 10px; }
+        
+        /* زر الفحص في الفرع */
+        .btn-ask { 
+            background: #fff; border: 1px solid var(--wa-bg); color: var(--wa-bg); 
+            width: 100%; padding: 10px; border-radius: 5px; text-decoration: none; 
+            display: flex; align-items: center; justify-content: center; gap: 5px; font-size: 0.85rem;
+            margin-top: auto; font-weight: bold; transition: 0.2s;
+        }
+        .btn-ask:hover { background: var(--wa-bg); color: #fff; }
+
+        .filters { display:flex; gap:10px; margin-bottom:15px; }
+        .filters select { flex:1; padding:10px; border-radius:8px; border:1px solid #444; background: #222; color: #fff; }
+
+        .hidden { display: none !important; }
+        #loader { position: fixed; inset: 0; background: #000; z-index: 2000; display: flex; align-items: center; justify-content: center; color: var(--gold); font-weight: bold; letter-spacing: 2px; }
     </style>
 </head>
 <body>
 
 <header>
-    <a href="?" class="header-link">
-        <img src="https://abomkdad.github.io/Digital-Business-Card/logo.png" alt="MAD PARFUMEUR" class="header-logo">
+    <div class="logo-container">
+        <img src="https://abomkdad.github.io/Digital-Business-Card/logo.png" alt="MAD" class="header-logo">
+    </div>
+    <div class="tagline">عطور نيش فاخرة</div>
+    
+    <a href="https://madperfume.co.il/" target="_blank" class="btn-visit-site">
+        <i class="fas fa-globe"></i> زيارة الموقع الإلكتروني
     </a>
+
+    <div class="lang-switch">
+        <button class="lang-btn" id="btn-lang-ar" onclick="setLang('ar')">العربية</button>
+        <button class="lang-btn" id="btn-lang-he" onclick="setLang('he')">עברית</button>
+    </div>
+
+    <div id="search-wrapper" class="search-container">
+        <i class="fas fa-search search-icon"></i>
+        <input type="text" id="search-input" class="search-input" placeholder="ابحث عن اسم المدينة..." onkeyup="filterBranches()">
+    </div>
 </header>
 
-<div id="loader"><div class="spinner"></div><span id="ui-loading-text" style="color:#666;font-size:0.8rem">LOADING...</span></div>
+<div id="loader">LOADING...</div>
 
 <div class="container">
-    <div id="list-view" class="hidden">
-        <h3 id="ui-select-title" style="text-align:center; color:var(--sub); font-weight:normal; margin-bottom:20px;"></h3>
-        <div id="branches-list"></div>
+
+    <div id="list-view">
+        <div id="branches-container"></div>
+        <a href="tel:*9935" class="cs-bar">
+            <span class="cs-num">*9935</span>
+            <span class="cs-text">
+                <i class="fas fa-phone-alt" style="margin-left:8px; color:var(--gold)"></i> خدمة الزبائن
+            </span>
+        </a>
     </div>
 
     <div id="detail-view" class="hidden">
-        <button onclick="goHome()" class="btn-gold" style="margin-bottom:20px;">
-            <i class="fas fa-arrow-right"></i> <span id="ui-back-btn"></span>
-        </button>
+        <div class="detail-header-btn">
+            <div class="back-link" onclick="goHome()">
+                <i class="fas fa-arrow-right"></i> <span id="txt-back">كل الفروع</span>
+            </div>
+        </div>
 
-        <div class="branch-hero">
-            <h2 id="b-name"></h2>
-            <div id="b-name-sub" style="color:var(--gold); margin-bottom:10px;"></div>
+        <div class="detail-hero">
+            <h2 id="d-title" style="margin:0; color:#fff;"></h2>
+            <div id="d-subtitle" style="color:var(--gold); margin-bottom:10px;"></div>
+            <div id="d-hours" style="color:#888; font-size:0.9rem;"></div>
             
-            <div style="color:#888; font-size:0.9rem"><i class="far fa-clock"></i> <span id="b-hours"></span></div>
-            
-            <div id="social-container" class="social-bar"></div>
-            
-            <div class="actions">
-                <a href="tel:*9935" class="btn-svc"><i class="fas fa-phone-alt"></i> <span id="ui-svc">Service</span> *9935</a>
-                <a href="mailto:info@madperfume.co.il" class="btn-svc"><i class="fas fa-envelope"></i> <span id="ui-email">Email</span></a>
-                <a href="https://madperfume.co.il/" target="_blank" class="btn-svc"><i class="fas fa-globe"></i> <span id="ui-web">Web</span></a>
+            <div style="margin-top:15px; display:flex; justify-content:center; gap:15px;">
+                 <a id="d-btn-call" href="#" class="action-btn" style="background:#000; color:var(--gold); border:1px solid var(--gold); padding:8px 20px;">
+                    <i class="fas fa-phone"></i> *9935
+                 </a>
             </div>
         </div>
 
         <div class="filters">
             <select id="cat-select"></select>
-            <select id="sort-select"></select>
+            <select id="sort-select">
+                <option value="">ترتيب افتراضي</option>
+                <option value="asc">السعر: من الأقل</option>
+                <option value="desc">السعر: من الأعلى</option>
+            </select>
         </div>
 
         <div id="products-grid" class="products-grid"></div>
-        
-        <div id="load-more-area" class="load-more-container hidden">
-            <button id="btn-load-more" class="btn-more"></button>
-        </div>
-        
-        <div id="fallback-area" class="load-more-container hidden">
-             <p id="ui-branch-ended" style="color:#777; margin-bottom:15px"></p>
-             <button id="btn-show-global" class="btn-more" style="background:#333; color:#fff; border:1px solid #555"></button>
-        </div>
     </div>
+
 </div>
 
 <script>
-    // === 1. TRANSLATION ENGINE ===
-    const DICT = {
-        ar: {
-            loading: "جاري تحميل النظام...",
-            select_boutique: "اختر الفرع الأقرب إليك",
-            back_btn: "قائمة الفروع",
-            svc: "خدمة الزبائن",
-            email: "البريد",
-            web: "الموقع",
-            all_cats: "كل الفئات",
-            sort_default: "ترتيب افتراضي",
-            sort_asc: "السعر: من الأقل للأعلى",
-            sort_desc: "السعر: من الأعلى للأقل",
-            load_more: "عرض المزيد",
-            branch_ended: "انتهت منتجات هذا الفرع",
-            show_global: "عرض باقي منتجات المتجر",
-            check_stock: "هل متوفر؟",
-            wa_msg: "مرحباً، هل العطر [PROD] متوفر في الفرع؟",
-            no_products: "لا توجد منتجات",
-            currency: "شيكل"
+    // === CONFIG ===
+    const URLS = { b: 'branches.csv', p: 'products.csv' };
+    let DATA = { b: [], p: [] };
+    let LANG = 'ar'; 
+
+    // === TRANSLATIONS ===
+    const T = {
+        ar: { 
+            placeholder: "ابحث عن اسم المدينة...", 
+            back: "كل الفروع", 
+            daily: "يومياً", 
+            waze: "ملاحة WAZE", 
+            wa: "واتساب الفرع", 
+            shop_btn: "تسوق من الفرع",
+            check_stock: "افحص التوفر في الفرع", 
+            all_cats: "كل الفئات" 
         },
-        he: {
-            loading: "טוען נתונים...",
-            select_boutique: "בחר את הסניף הקרוב אליך",
-            back_btn: "רשימת הסניפים",
-            svc: "שירות לקוחות",
-            email: "אימייל",
-            web: "אתר",
-            all_cats: "כל הקטגוריות",
-            sort_default: "מיון ברירת מחדל",
-            sort_asc: "מחיר: מהנמוך לגבוה",
-            sort_desc: "מחיר: מהגבוה לנמוך",
-            load_more: "הצג עוד",
-            branch_ended: "הגעת לסוף רשימת המוצרים בסניף",
-            show_global: "הצג את שאר מוצרי הרשת",
-            check_stock: "בדיקת זמינות",
-            wa_msg: "היי, האם הבושם [PROD] זמין בסניף?",
-            no_products: "אין מוצרים זמינים",
-            currency: "₪"
+        he: { 
+            placeholder: "חפש עיר...", 
+            back: "כל הסניפים", 
+            daily: "יומי", 
+            waze: "ניווט WAZE", 
+            wa: "וואטסאפ סניף", 
+            shop_btn: "לצפייה במוצרי הסניף",
+            check_stock: "בדוק זמינות בסניף", 
+            all_cats: "כל הקטגוריות" 
         }
     };
 
-    function detectLanguage() {
-        const params = new URLSearchParams(window.location.search);
-        if (params.get('lang')) return params.get('lang') === 'he' ? 'he' : 'ar';
-        const browserLang = navigator.language || navigator.userLanguage;
-        if (browserLang && (browserLang.startsWith('he') || browserLang.startsWith('iw'))) return 'he';
-        return 'ar';
-    }
-
-    const LANG = detectLanguage();
-    const T = DICT[LANG]; 
-
-    document.documentElement.lang = LANG;
-    document.documentElement.dir = LANG === 'he' ? 'ltr' : 'rtl';
-
-    // Apply UI Translations
-    document.getElementById('ui-loading-text').innerText = T.loading;
-    document.getElementById('ui-select-title').innerText = T.select_boutique;
-    document.getElementById('ui-back-btn').innerText = T.back_btn;
-    document.getElementById('ui-svc').innerText = T.svc;
-    document.getElementById('ui-email').innerText = T.email;
-    document.getElementById('ui-web').innerText = T.web;
-    document.getElementById('btn-load-more').innerText = T.load_more;
-    document.getElementById('ui-branch-ended').innerText = T.branch_ended;
-    document.getElementById('btn-show-global').innerText = T.show_global;
-
-    const sortSel = document.getElementById('sort-select');
-    sortSel.innerHTML = `
-        <option value="">${T.sort_default}</option>
-        <option value="asc">${T.sort_asc}</option>
-        <option value="desc">${T.sort_desc}</option>
-    `;
-
-    // === CONFIG ===
-    const URLS = { b: 'branches.csv', p: 'products.csv' };
-    const VERSION = 'v5.0'; 
-    const BATCH_SIZE = 24;
-
-    let DATA = { b: [], p: [] };
-    let VIEW = { list: [], renderedCount: 0, phone: '' };
-
-    async function start() {
-        const stored = localStorage.getItem('mad_data_' + VERSION);
-        if(stored) {
-            DATA = JSON.parse(stored);
-            finishLoad();
-            return;
+    // === INIT ===
+    async function init() {
+        const p = new URLSearchParams(location.search);
+        if(p.get('lang') === 'he') LANG = 'he';
+        else {
+             const browserLang = navigator.language || navigator.userLanguage;
+             if (browserLang && browserLang.startsWith('he')) LANG = 'he';
         }
+        updateLangUI();
 
         try {
-            const [rb, rp] = await Promise.all([ fetchCSV(URLS.b), fetchCSV(URLS.p) ]);
+            const [rb, rp] = await Promise.all([fetchCSV(URLS.b), fetchCSV(URLS.p)]);
             DATA = { b: rb, p: rp };
-            localStorage.setItem('mad_data_' + VERSION, JSON.stringify(DATA));
-            finishLoad();
-        } catch(e) { 
-            console.error(e); 
-            document.getElementById('loader').innerHTML = '<p style="color:red">Error loading files.</p>';
-        }
+            
+            const id = p.get('id');
+            if(id) openBranch(id);
+            else renderList(DATA.b);
+            
+            document.getElementById('loader').classList.add('hidden');
+        } catch(e) { console.error(e); }
     }
 
     function fetchCSV(u) {
-        return new Promise((r, j) => Papa.parse(u, { 
-            download:true, header:true, skipEmptyLines:true, transformHeader:h=>h.trim(), 
-            complete:x=>r(x.data), error:e=>j(e) 
-        }));
+        return new Promise(r => Papa.parse(u, { download:true, header:true, skipEmptyLines:true, transformHeader:h=>h.trim(), complete:x=>r(x.data) }));
     }
 
-    function finishLoad() {
-        document.getElementById('loader').style.opacity = '0';
-        setTimeout(() => document.getElementById('loader').classList.add('hidden'), 300);
-        const p = new URLSearchParams(location.search);
-        const id = p.get('id');
-        if(id) showBranch(id); else showList();
+    function setLang(l) {
+        LANG = l;
+        const url = new URL(window.location);
+        url.searchParams.set('lang', l);
+        window.history.pushState({}, '', url);
+        updateLangUI();
+        renderList(DATA.b); 
+        const id = new URLSearchParams(location.search).get('id');
+        if(id) openBranch(id);
     }
 
-    // === VIEWS ===
-    function showList() {
-        document.getElementById('list-view').classList.remove('hidden');
-        const box = document.getElementById('branches-list');
-        box.innerHTML = '';
-        DATA.b.forEach(b => {
+    function updateLangUI() {
+        document.documentElement.lang = LANG;
+        document.documentElement.dir = LANG==='he'?'ltr':'rtl';
+        document.getElementById('btn-lang-ar').classList.toggle('active', LANG==='ar');
+        document.getElementById('btn-lang-he').classList.toggle('active', LANG==='he');
+        document.getElementById('search-input').placeholder = T[LANG].placeholder;
+        document.getElementById('txt-back').innerText = T[LANG].back;
+    }
+
+    // === LIST VIEW LOGIC ===
+    function renderList(list) {
+        const container = document.getElementById('branches-container');
+        container.innerHTML = '';
+
+        list.forEach(b => {
             if(!b.ID) return;
             
-            // تحديد الاسم الأساسي والثانوي بناءً على اللغة
-            let mainName = LANG === 'he' ? b['اسم الفرع عبري'] : b['اسم الفرع عربي'];
-            let subName = LANG === 'he' ? b['اسم الفرع عربي'] : b['اسم الفرع عبري'];
+            let name = LANG==='he' ? b['اسم الفرع عبري'] : b['اسم الفرع عربي'];
+            let hours = LANG==='he' ? (b['ساعات الدوام عبري']||b['ساعات الدوام عربي']) : (b['ساعات الدوام عربي']||b['ساعات الدوام عبري']);
+            let ph = (b['الهاتف']||'').replace(/\D/g,'').replace(/^0/,'972');
+            let waLink = b['WhatsApp'] || `https://wa.me/${ph}`;
+            let wazeLink = b['رابط Waze / Maps'] || '#';
 
-            box.innerHTML += `
-            <a href="?id=${b.ID}&lang=${LANG}" class="branch-item" onclick="nav(event, '${b.ID}')">
-                <div>
-                    ${mainName} 
-                    <small style="color:#777;display:block;font-size:0.8rem">${subName}</small>
+            const card = document.createElement('div');
+            card.className = 'branch-card';
+            card.innerHTML = `
+                <div class="card-header" onclick="nav('${b.ID}')">
+                    <span class="card-title">${name}</span>
+                    <span class="gold-dot"></span>
                 </div>
-                <i class="fas fa-chevron-${LANG==='he'?'right':'left'}" style="color:var(--gold)"></i>
-            </a>`;
+                
+                <div class="hours-box">
+                     ${hours} <i class="far fa-clock" style="color:var(--gold)"></i>
+                </div>
+
+                <div class="card-actions-wrapper">
+                    <button onclick="nav('${b.ID}')" class="action-btn btn-shop">
+                        ${T[LANG].shop_btn} <i class="fas fa-shopping-bag"></i>
+                    </button>
+
+                    <div class="contact-row">
+                        <a href="${wazeLink}" target="_blank" class="action-btn btn-waze">
+                            ${T[LANG].waze} <i class="fas fa-location-arrow"></i>
+                        </a>
+                        <a href="${waLink}" target="_blank" class="action-btn btn-whatsapp">
+                            ${T[LANG].wa} <i class="fab fa-whatsapp"></i>
+                        </a>
+                    </div>
+                </div>
+            `;
+            container.appendChild(card);
         });
     }
 
-    function showBranch(id) {
+    function filterBranches() {
+        const term = document.getElementById('search-input').value.toLowerCase();
+        const filtered = DATA.b.filter(b => {
+            const nAr = (b['اسم الفرع عربي']||'').toLowerCase();
+            const nHe = (b['اسم الفرع عبري']||'').toLowerCase();
+            return nAr.includes(term) || nHe.includes(term);
+        });
+        renderList(filtered);
+    }
+
+    // === DETAIL VIEW LOGIC ===
+    function nav(id) {
+        const url = new URL(window.location);
+        url.searchParams.set('id', id);
+        window.history.pushState({}, '', url);
+        openBranch(id);
+    }
+
+    function goHome() {
+        const url = new URL(window.location);
+        url.searchParams.delete('id');
+        window.history.pushState({}, '', url);
+        document.getElementById('detail-view').classList.add('hidden');
+        document.getElementById('list-view').classList.remove('hidden');
+        document.getElementById('search-wrapper').classList.remove('hidden');
+        window.scrollTo(0,0);
+    }
+
+    let currentProducts = [];
+    let currentBranchPhone = '';
+
+    function openBranch(id) {
         const b = DATA.b.find(x => x.ID == id);
         if(!b) { goHome(); return; }
-        
+
+        document.getElementById('list-view').classList.add('hidden');
+        document.getElementById('search-wrapper').classList.add('hidden');
         document.getElementById('detail-view').classList.remove('hidden');
-        
-        // === ترجمة بيانات الفرع ===
-        // إذا اللغة عبرية: الاسم الكبير عبري، والاسم الصغير عربي. والعكس صحيح.
-        if (LANG === 'he') {
-            document.getElementById('b-name').innerText = b['اسم الفرع عبري'];
-            document.getElementById('b-name-sub').innerText = b['اسم الفرع عربي'];
-            // استخدام ساعات الدوام العبرية إذا توفرت، وإلا العربية
-            document.getElementById('b-hours').innerHTML = b['ساعات الدوام عبري'] || b['ساعات الدوام عربي'];
+
+        if(LANG === 'he') {
+            document.getElementById('d-title').innerText = b['اسم الفرع عبري'];
+            document.getElementById('d-subtitle').innerText = b['اسم الفرع عربي'];
+            document.getElementById('d-hours').innerText = b['ساعات الدوام عبري']||'';
         } else {
-            document.getElementById('b-name').innerText = b['اسم الفرع عربي'];
-            document.getElementById('b-name-sub').innerText = b['اسم الفرع عبري'];
-            // استخدام ساعات الدوام العربية
-            document.getElementById('b-hours').innerHTML = b['ساعات الدوام عربي'] || b['ساعات الدوام عبري'];
+            document.getElementById('d-title').innerText = b['اسم الفرع عربي'];
+            document.getElementById('d-subtitle').innerText = b['اسم الفرع عبري'];
+            document.getElementById('d-hours').innerText = b['ساعات الدوام عربي']||'';
         }
-        
-        const soc = document.getElementById('social-container');
-        soc.innerHTML = '';
-        
-        let ph = (b['الهاتف']||'').replace(/\D/g,'').replace(/^0/,'972');
-        VIEW.phone = ph;
-        
-        const icon = (url, iconClass, typeClass) => { 
-            if(url && url.length > 5) {
-                soc.innerHTML += `<a href="${url}" target="_blank" class="social-btn ${typeClass}"><i class="${iconClass}"></i></a>`;
-            }
-        };
 
-        icon(b['رابط Waze / Maps'], 'fas fa-location-arrow', 'waze');
-        icon(b['WhatsApp'] || `https://wa.me/${ph}`, 'fab fa-whatsapp', 'whatsapp');
-        icon(b['Instagram'], 'fab fa-instagram', 'instagram');
-        icon(b['Facebook'], 'fab fa-facebook-f', 'facebook');
-        icon(b['TikTok'], 'fab fa-tiktok', 'tiktok');
+        currentBranchPhone = (b['الهاتف']||'').replace(/\D/g,'').replace(/^0/,'972');
 
-        const specific = DATA.p.filter(x => x['Internal Label'] && x['Internal Label'].toString().includes(id));
-        const fallbackArea = document.getElementById('fallback-area');
-        const showGlobalBtn = document.getElementById('btn-show-global');
-
-        if(specific.length > 0) {
-            VIEW.list = specific;
-            if(specific.length < 8) {
-                fallbackArea.classList.remove('hidden');
-                showGlobalBtn.onclick = () => {
-                    VIEW.list = DATA.p.filter(x => x['Title']);
-                    fallbackArea.classList.add('hidden');
-                    updateFilters();
-                }
-            } else { fallbackArea.classList.add('hidden'); }
-        } else {
-            VIEW.list = DATA.p.filter(x => x['Title']);
-            fallbackArea.classList.add('hidden');
-        }
+        // Always show ALL products
+        currentProducts = DATA.p.filter(x => x['Title']);
+        
         updateFilters();
     }
 
     function updateFilters() {
+        const cats = [...new Set(currentProducts.map(x => x['Category (g:product_type)']).filter(Boolean))];
         const sel = document.getElementById('cat-select');
-        sel.innerHTML = `<option value="">${T.all_cats}</option>`;
-        const cats = [...new Set(VIEW.list.map(x => x['Category (g:product_type)']).filter(Boolean))];
+        sel.innerHTML = `<option value="">${T[LANG].all_cats}</option>`;
         cats.forEach(c => sel.innerHTML += `<option>${c}</option>`);
-
-        sel.onchange = applyFilter;
-        document.getElementById('sort-select').onchange = applyFilter;
-        applyFilter();
+        
+        sel.onchange = renderProducts;
+        document.getElementById('sort-select').onchange = renderProducts;
+        renderProducts();
     }
 
-    function applyFilter() {
+    function renderProducts() {
+        const grid = document.getElementById('products-grid');
+        grid.innerHTML = '';
+        
         const cat = document.getElementById('cat-select').value;
         const sort = document.getElementById('sort-select').value;
-        let final = VIEW.list.filter(x => !cat || x['Category (g:product_type)'] === cat);
-        if(sort === 'asc') final.sort((a,b) => parseFloat(a.Price)-parseFloat(b.Price));
-        if(sort === 'desc') final.sort((a,b) => parseFloat(b.Price)-parseFloat(a.Price));
 
-        VIEW.activeList = final;
-        VIEW.renderedCount = 0;
-        document.getElementById('products-grid').innerHTML = '';
-        document.getElementById('load-more-area').classList.add('hidden');
-        renderBatch();
-    }
-
-    function renderBatch() {
-        const grid = document.getElementById('products-grid');
-        const total = VIEW.activeList.length;
-        const next = Math.min(total, VIEW.renderedCount + BATCH_SIZE);
+        let list = currentProducts.filter(x => !cat || x['Category (g:product_type)'] === cat);
         
-        if(total === 0) { grid.innerHTML = `<p style="grid-column:1/-1;text-align:center;color:#666">${T.no_products}</p>`; return; }
+        if(sort === 'asc') list.sort((a,b) => parseFloat(a.Price)-parseFloat(b.Price));
+        if(sort === 'desc') list.sort((a,b) => parseFloat(b.Price)-parseFloat(a.Price));
 
-        for(let i = VIEW.renderedCount; i < next; i++) {
-            const p = VIEW.activeList[i];
-            const img = (p.Image||'').split('|')[0] || 'https://via.placeholder.com/200';
-            const msg = T.wa_msg.replace('[PROD]', p.Title);
-            const wa = `https://wa.me/${VIEW.phone}?text=${encodeURIComponent(msg)}`;
+        list.slice(0, 50).forEach(p => {
+            let img = (p.Image||'').split('|')[0] || 'https://via.placeholder.com/200';
             
+            // رابط الواتساب: فحص التوفر في الفرع
+            let msg = LANG==='he' 
+                ? `שלום, האם הבושם ${p.Title} זמין בסניף?` 
+                : `مرحباً، هل العطر ${p.Title} متوفر في الفرع؟`;
+            let waLink = `https://wa.me/${currentBranchPhone}?text=${encodeURIComponent(msg)}`;
+
             grid.innerHTML += `
-            <div class="product-card">
-                <div class="p-img-box"><img src="${img}" class="p-img" loading="lazy"></div>
-                <div class="p-info">
-                    <div class="p-title">${p.Title}</div>
-                    <div class="p-price">${p.Price||''} ${T.currency}</div>
-                    <a href="${wa}" target="_blank" class="btn-ask"><i class="fab fa-whatsapp"></i> ${T.check_stock}</a>
+                <div class="product-card">
+                    <div class="p-img-box"><img src="${img}" class="p-img" loading="lazy"></div>
+                    <div class="p-info">
+                        <div class="p-title">${p.Title}</div>
+                        <div class="p-price">${p.Price} ₪</div>
+                        
+                        <a href="${waLink}" target="_blank" class="btn-ask">
+                            <i class="fab fa-whatsapp"></i> ${T[LANG].check_stock}
+                        </a>
+                    </div>
                 </div>
-            </div>`;
-        }
-        VIEW.renderedCount = next;
-        const loadBtn = document.getElementById('load-more-area');
-        if(VIEW.renderedCount < total) {
-            loadBtn.classList.remove('hidden');
-            document.getElementById('btn-load-more').onclick = renderBatch;
-        } else { loadBtn.classList.add('hidden'); }
+            `;
+        });
     }
 
-    window.nav = (e, id) => { e.preventDefault(); const u = `?id=${id}&lang=${LANG}`; history.pushState({path:u},'',u); document.getElementById('list-view').classList.add('hidden'); showBranch(id); };
-    window.goHome = () => { const u = `?lang=${LANG}`; history.pushState({path:u},'',u); document.getElementById('detail-view').classList.add('hidden'); showList(); };
-    window.onpopstate = () => { document.getElementById('detail-view').classList.add('hidden'); document.getElementById('list-view').classList.add('hidden'); const i = new URLSearchParams(location.search).get('id'); if(i) showBranch(i); else showList(); };
-
-    start();
+    init();
 </script>
+
 </body>
 </html>
