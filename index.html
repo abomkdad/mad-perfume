@@ -9,68 +9,152 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        :root { --primary: #000; --accent: #d4af37; --bg: #f8f8f8; --white: #fff; --wa-color: #25D366; }
-        body { margin: 0; font-family: 'Segoe UI', sans-serif; background-color: var(--bg); padding-bottom: 60px; }
+        :root { 
+            --primary: #000; 
+            --accent: #d4af37; 
+            --bg: #f4f6f9; 
+            --white: #fff; 
+            --wa-color: #25D366; 
+        }
+        
+        body { margin: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg); padding-bottom: 80px; color: #333; }
         
         /* Header */
-        header { background: var(--primary); color: var(--accent); padding: 15px; text-align: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.2); }
-        header h1 { margin: 0; font-size: 1.4rem; letter-spacing: 1px; }
+        header { 
+            background: var(--primary); 
+            color: var(--accent); 
+            padding: 18px; 
+            text-align: center; 
+            position: sticky; 
+            top: 0; 
+            z-index: 1000; 
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2); 
+        }
+        header h1 { margin: 0; font-size: 1.5rem; letter-spacing: 2px; text-transform: uppercase; }
 
-        .container { max-width: 1000px; margin: 20px auto; padding: 0 15px; }
+        .container { max-width: 1000px; margin: 25px auto; padding: 0 15px; }
         
-        /* Cards & Buttons */
-        .card { background: var(--white); border-radius: 12px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 20px; }
-        .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 10px 20px; border-radius: 50px; text-decoration: none; font-weight: bold; border: none; cursor: pointer; transition: 0.2s; }
-        .btn:active { transform: scale(0.95); }
-        
-        .btn-waze { background: #33ccff; color: white; }
-        .btn-wa { background: var(--wa-color); color: white; }
-        .btn-black { background: var(--primary); color: var(--accent); }
-        .btn-back { background: #eee; color: #333; margin-bottom: 15px; }
+        /* Animations */
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        .fade-in { animation: fadeIn 0.5s ease-out forwards; }
 
-        /* زر استفسار المنتج الجديد */
+        /* Branch Hero Card */
+        .branch-hero {
+            background: var(--white);
+            border-radius: 20px;
+            padding: 30px 20px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            margin-bottom: 25px;
+            border-top: 6px solid var(--accent);
+            position: relative;
+            overflow: hidden;
+        }
+        .branch-hero h2 { margin: 0 0 5px; font-size: 1.8rem; color: var(--primary); }
+        .branch-hero .sub-title { color: #888; margin-bottom: 15px; font-size: 1rem; }
+        .branch-hero .hours { 
+            display: inline-block; 
+            background: #f8f8f8; 
+            padding: 8px 15px; 
+            border-radius: 50px; 
+            font-size: 0.9rem; 
+            color: #555; 
+            margin-bottom: 20px;
+            border: 1px solid #eee;
+        }
+
+        /* Social Media Bar */
+        .social-bar {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+        .social-icon {
+            width: 45px; height: 45px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            color: white; text-decoration: none;
+            font-size: 1.2rem;
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+        }
+        .social-icon:hover { transform: scale(1.2); }
+        
+        /* Brand Colors */
+        .bg-waze { background: linear-gradient(45deg, #33ccff, #0099cc); }
+        .bg-wa { background: linear-gradient(45deg, #25D366, #128C7E); }
+        .bg-insta { background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); }
+        .bg-fb { background: linear-gradient(45deg, #1877F2, #0d5cb9); }
+        .bg-tiktok { background: #000; }
+        .bg-phone { background: #555; }
+
+        /* General Buttons */
+        .btn-back { 
+            display: inline-flex; align-items: center; gap: 8px;
+            background: white; color: #333; 
+            padding: 10px 20px; border-radius: 12px; 
+            text-decoration: none; font-weight: bold; 
+            margin-bottom: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            border: 1px solid #eee;
+        }
+
+        /* Filters */
+        .filters { display: flex; gap: 15px; margin-bottom: 25px; }
+        .filters select { 
+            flex: 1; padding: 14px; 
+            border-radius: 12px; border: 1px solid #e0e0e0; 
+            background: #fff; outline: none; 
+            font-size: 1rem; box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+        }
+        
+        /* Product Grid */
+        .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 20px; }
+        .product-card { 
+            background: #fff; border-radius: 16px; 
+            overflow: hidden; 
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05); 
+            display: flex; flex-direction: column; 
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        .product-card:hover { transform: translateY(-7px); box-shadow: 0 12px 25px rgba(0,0,0,0.1); }
+        
+        .p-img-container {
+            width: 100%; height: 200px;
+            background: #fff; display: flex; 
+            align-items: center; justify-content: center; 
+            padding: 15px; box-sizing: border-box;
+        }
+        .p-img { max-width: 100%; max-height: 100%; object-fit: contain; transition: transform 0.3s; }
+        .product-card:hover .p-img { transform: scale(1.05); }
+
+        .p-info { padding: 15px; flex-grow: 1; display: flex; flex-direction: column; text-align: center; }
+        .p-title { font-size: 1rem; font-weight: bold; margin-bottom: 8px; color: #222; flex-grow: 1; }
+        .p-price { color: var(--accent); font-weight: 800; font-size: 1.1rem; margin-bottom: 15px; }
+
         .btn-ask-wa {
-            background: var(--wa-color);
-            color: #fff;
-            width: 100%;
-            padding: 12px;
-            border-radius: 8px;
-            font-size: 0.95rem;
+            background: var(--wa-color); color: #fff; width: 100%;
+            padding: 12px; border-radius: 10px; font-weight: bold;
+            text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px;
+            transition: background 0.3s;
         }
         .btn-ask-wa:hover { background: #1ebc57; }
 
-        /* Filters */
-        .filters { display: flex; gap: 10px; margin-bottom: 20px; }
-        .filters select { flex: 1; padding: 12px; border-radius: 8px; border: 1px solid #ddd; background: #fff; outline: none; }
-        
-        /* Products Grid */
-        .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; }
-        .product-card { background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.05); display: flex; flex-direction: column; transition: transform 0.2s; }
-        .product-card:hover { transform: translateY(-5px); }
-        
-        .p-img-container {
-            width: 100%;
-            height: 180px;
-            background: #fff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 10px;
-            box-sizing: border-box;
-        }
-        .p-img { max-width: 100%; max-height: 100%; object-fit: contain; }
-        
-        .p-info { padding: 12px; flex-grow: 1; display: flex; flex-direction: column; text-align: center; }
-        .p-title { font-size: 0.95rem; font-weight: bold; margin-bottom: 5px; color: #333; flex-grow: 1; }
-        .p-price { color: var(--accent); font-weight: bold; font-size: 1.1rem; margin-bottom: 10px; }
-
         /* List Items */
-        .branch-item { display: block; background: #fff; padding: 15px; margin-bottom: 10px; border-radius: 8px; border-right: 4px solid var(--primary); text-decoration: none; color: #333; font-weight: bold; transition: 0.2s; }
-        .branch-item:hover { background: #fafafa; }
+        .branch-item { 
+            display: flex; justify-content: space-between; align-items: center;
+            background: #fff; padding: 20px; margin-bottom: 15px; 
+            border-radius: 15px; text-decoration: none; color: #333; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.03); transition: 0.3s;
+            border-right: 5px solid transparent;
+        }
+        .branch-item:hover { transform: translateX(-5px); border-right-color: var(--accent); }
 
-        /* Loader & Utils */
-        #loader { position: fixed; inset: 0; background: rgba(255,255,255,0.95); z-index: 999; display: flex; align-items: center; justify-content: center; font-weight: bold; flex-direction: column; gap: 10px; }
-        .spinner { width: 30px; height: 30px; border: 3px solid #eee; border-top: 3px solid var(--accent); border-radius: 50%; animation: spin 1s infinite linear; }
+        /* Loader */
+        #loader { position: fixed; inset: 0; background: rgba(255,255,255,0.98); z-index: 2000; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 15px; }
+        .spinner { width: 40px; height: 40px; border: 4px solid #eee; border-top: 4px solid var(--accent); border-radius: 50%; animation: spin 0.8s infinite linear; }
         @keyframes spin { 100% { transform: rotate(360deg); } }
         .hidden { display: none !important; }
     </style>
@@ -81,40 +165,42 @@
     
     <div id="loader">
         <div class="spinner"></div>
-        <span>جاري التحميل...</span>
+        <span style="font-weight:bold; color:#777">جاري تجهيز المتجر...</span>
     </div>
 
     <div class="container">
         
-        <div id="list-view" class="hidden">
-            <h3 style="text-align:center;">اختر الفرع</h3>
+        <div id="list-view" class="hidden fade-in">
+            <h2 style="text-align:center; margin-bottom:25px; color:#444;">اختر الفرع الأقرب إليك</h2>
             <div id="branches-list"></div>
         </div>
 
-        <div id="detail-view" class="hidden">
-            <button onclick="location.href='?lang='+LANG" class="btn btn-back">
-                <i class="fas fa-arrow-right"></i> كل الفروع
-            </button>
+        <div id="detail-view" class="hidden fade-in">
+            <a href="?lang=ar" class="btn-back">
+                <i class="fas fa-arrow-right"></i> قائمة الفروع
+            </a>
 
-            <div class="card" style="text-align:center;">
-                <h2 id="b-name" style="margin:0 0 5px;"></h2>
-                <div id="b-hours" style="color:#666; margin-bottom:15px;"></div>
-                <div style="display:flex; justify-content:center; gap:10px;">
-                    <a id="btn-waze" target="_blank" class="btn btn-waze"><i class="fas fa-location-arrow"></i> WAZE</a>
-                    <a id="btn-wa" target="_blank" class="btn btn-wa"><i class="fab fa-whatsapp"></i> المحادثة العامة</a>
+            <div class="branch-hero">
+                <h2 id="b-name"></h2>
+                <div id="b-name-he" class="sub-title"></div>
+                
+                <div class="hours">
+                    <i class="far fa-clock" style="color:var(--accent)"></i> <span id="b-hours"></span>
                 </div>
+
+                <div id="social-container" class="social-bar"></div>
             </div>
 
-            <div id="fallback-msg" style="display:none; background:#fff3cd; color:#856404; padding:10px; border-radius:8px; margin-bottom:15px; text-align:center; font-size:0.9rem;">
-                يتم عرض جميع المنتجات المتوفرة حالياً.
+            <div id="fallback-msg" style="display:none; background:#fff8e1; color:#b78e22; padding:15px; border-radius:12px; margin-bottom:20px; text-align:center; font-weight:bold; border:1px solid #ffeeba;">
+                <i class="fas fa-info-circle"></i> يتم عرض جميع المنتجات المتوفرة في المتجر العام.
             </div>
 
             <div class="filters">
-                <select id="cat-select"><option value="">كل الفئات</option></select>
+                <select id="cat-select"><option value="">كل الفئات (Categories)</option></select>
                 <select id="sort-select">
-                    <option value="">الترتيب</option>
-                    <option value="asc">الأقل سعراً</option>
-                    <option value="desc">الأعلى سعراً</option>
+                    <option value="">الترتيب الافتراضي</option>
+                    <option value="asc">السعر: من الأقل للأعلى</option>
+                    <option value="desc">السعر: من الأعلى للأقل</option>
                 </select>
             </div>
 
@@ -128,33 +214,31 @@
     const URL_BRANCHES = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQzL_F54ThIR-jtJoX9mU4gc6FPo2FzMWsvaPY9K9CDJ_qdHFf3VAqncUj51mEa3A/pub?output=csv';
     const URL_PRODUCTS = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSEkstd7ZCKTNYZL_8TC2ofQ9Z91JJ2IM0awOPLgegDweraKayLGitwiLY7A382iQ/pub?output=csv';
 
-    // ================= LANGUAGE =================
+    // ================= INIT =================
     const p = new URLSearchParams(location.search);
     const LANG = p.get('lang') === 'he' ? 'he' : 'ar';
     document.documentElement.lang = LANG;
     document.documentElement.dir = LANG === 'he' ? 'ltr' : 'rtl';
 
-    // ================= STATE =================
     let currentProducts = [];
-    let currentBranchPhone = ''; // لتخزين رقم الفرع الحالي للاستخدام في المنتجات
+    let currentBranchPhone = ''; 
 
-    // ================= LOADER =================
+    // Helper to fetch CSV
     function loadCSV(url) {
         return new Promise(resolve => {
             Papa.parse(url, {
                 download: true, header: true, skipEmptyLines: true,
                 transformHeader: h => h.trim(),
                 complete: res => resolve(res.data),
-                error: () => resolve([]) 
+                error: () => resolve([])
             });
         });
     }
 
-    // ================= INIT =================
+    // Start App
     Promise.all([loadCSV(URL_BRANCHES), loadCSV(URL_PRODUCTS)]).then(([branches, products]) => {
         document.getElementById('loader').classList.add('hidden');
         const branchId = p.get('id');
-
         if(branchId) showBranch(branchId, branches, products);
         else showList(branches);
     });
@@ -165,8 +249,13 @@
         const container = document.getElementById('branches-list');
         branches.forEach(b => {
             if(!b.ID) return;
-            container.innerHTML += `<a href="?id=${b.ID}&lang=${LANG}" class="branch-item">
-                ${b['اسم الفرع عربي']} <span style="font-weight:normal; color:#777">| ${b['اسم الفرع عبري']}</span>
+            container.innerHTML += `
+            <a href="?id=${b.ID}&lang=${LANG}" class="branch-item">
+                <div>
+                    <div style="font-weight:bold; font-size:1.1rem">${b['اسم الفرع عربي']}</div>
+                    <div style="color:#888; font-size:0.9rem">${b['اسم الفرع عبري']}</div>
+                </div>
+                <i class="fas fa-chevron-${LANG==='he'?'right':'left'}" style="color:#ddd"></i>
             </a>`;
         });
     }
@@ -177,20 +266,35 @@
 
         document.getElementById('detail-view').classList.remove('hidden');
         
-        // 1. تفاصيل الفرع
+        // 1. Hero Info
         document.getElementById('b-name').innerText = b['اسم الفرع عربي'];
-        document.getElementById('b-hours').innerText = b['ساعات الدوام عربي'] || b['ساعات الدوام عبري'];
-        document.getElementById('btn-waze').href = b['رابط Waze / Maps'] || '#';
-        
-        // تجهيز رقم الواتساب للفرع
+        document.getElementById('b-name-he').innerText = b['اسم الفرع عبري'];
+        document.getElementById('b-hours').innerText = b['ساعات الدوام عربي'] || b['ساعات الدوام عبري'] || 'غير محدد';
+
+        // 2. Dynamic Social Bar (Only show what exists)
+        const socialContainer = document.getElementById('social-container');
+        socialContainer.innerHTML = ''; // Clear old
+
+        // Phone Setup
         let cleanPhone = (b['الهاتف'] || '').replace(/\D/g,'').replace(/^0/,'972');
-        currentBranchPhone = cleanPhone; // حفظه كمتغير عام
+        currentBranchPhone = cleanPhone;
 
-        // زر المحادثة العامة
-        let waLink = b['WhatsApp'] || `https://wa.me/${cleanPhone}`;
-        document.getElementById('btn-wa').href = waLink;
+        // Helper to add icons
+        const addIcon = (url, iconClass, bgClass) => {
+            if(url && url.length > 5) {
+                socialContainer.innerHTML += `<a href="${url}" target="_blank" class="social-icon ${bgClass}"><i class="${iconClass}"></i></a>`;
+            }
+        };
 
-        // 2. منطق المنتجات (Smart Fallback)
+        // Add Buttons
+        addIcon(b['رابط Waze / Maps'], 'fas fa-location-arrow', 'bg-waze');
+        addIcon(b['WhatsApp'] || `https://wa.me/${cleanPhone}`, 'fab fa-whatsapp', 'bg-wa');
+        addIcon(b['Instagram'], 'fab fa-instagram', 'bg-insta');
+        addIcon(b['Facebook'], 'fab fa-facebook-f', 'bg-fb');
+        addIcon(b['TikTok'], 'fab fa-tiktok', 'bg-tiktok');
+        if(b['الهاتف']) addIcon(`tel:${b['الهاتف']}`, 'fas fa-phone', 'bg-phone');
+
+        // 3. Smart Product Filter
         let filtered = products.filter(p => {
             if(!p['Title']) return false;
             const label = p['Internal Label'];
@@ -198,14 +302,13 @@
         });
 
         if(filtered.length === 0) {
-            console.log("Showing ALL products fallback");
-            filtered = products.filter(p => p['Title']);
-            // document.getElementById('fallback-msg').style.display = 'block'; // يمكن تفعيل هذا السطر لإظهار رسالة
+            filtered = products.filter(p => p['Title']); // Fallback to ALL
+            document.getElementById('fallback-msg').style.display = 'block';
         }
 
         currentProducts = filtered;
         
-        // تعبئة الفئات
+        // 4. Categories & Rendering
         const cats = [...new Set(currentProducts.map(p => p['Category (g:product_type)']).filter(Boolean))];
         cats.forEach(c => {
             const opt = document.createElement('option');
@@ -213,10 +316,8 @@
             document.getElementById('cat-select').appendChild(opt);
         });
 
-        // تشغيل العرض
         renderProducts();
-
-        // تفعيل الفلاتر
+        
         document.getElementById('cat-select').onchange = renderProducts;
         document.getElementById('sort-select').onchange = renderProducts;
     }
@@ -226,40 +327,29 @@
         const cat = document.getElementById('cat-select').value;
         const sort = document.getElementById('sort-select').value;
 
-        // تصفية
         let list = currentProducts.filter(p => !cat || p['Category (g:product_type)'] === cat);
 
-        // ترتيب
         if(sort === 'asc') list.sort((a,b) => parseFloat(a['Price']) - parseFloat(b['Price']));
         if(sort === 'desc') list.sort((a,b) => parseFloat(b['Price']) - parseFloat(a['Price']));
 
-        // عرض
         grid.innerHTML = '';
         if(list.length === 0) {
-            grid.innerHTML = '<p style="grid-column:1/-1; text-align:center;">لا توجد منتجات</p>';
+            grid.innerHTML = '<p style="grid-column:1/-1; text-align:center; color:#777;">لا توجد منتجات</p>';
             return;
         }
 
         list.forEach(p => {
-            // صورة المنتج
-            let img = (p['Image'] || '').split('|')[0] || 'https://via.placeholder.com/150?text=No+Image';
+            let img = (p['Image'] || '').split('|')[0] || 'https://via.placeholder.com/200?text=MAD';
             
-            // نصوص الزر والرسالة
-            let btnText, waMsg;
-            if (LANG === 'he') {
-                btnText = 'בדוק זמינות';
-                waMsg = `שלום, רציתי לדעת אם הבושם הזה זמין בסניף: ${p['Title']}`;
-            } else {
-                btnText = 'استفسر عن التوفر';
-                waMsg = `مرحباً، أود الاستفسار عن توفر العطر: ${p['Title']} في فرعكم.`;
-            }
+            let btnText = LANG === 'he' ? 'בדיקת זמינות' : 'هل متوفر؟';
+            let waMsg = LANG === 'he' 
+                ? `שלום, האם הבושם ${p['Title']} זמין בסניף?` 
+                : `مرحباً، هل العطر ${p['Title']} متوفر في الفرع؟`;
 
-            // رابط واتساب للمنتج
-            // نستخدم رقم الفرع الذي خزنّاه سابقاً (currentBranchPhone)
-            const waProductLink = `https://wa.me/${currentBranchPhone}?text=${encodeURIComponent(waMsg)}`;
+            const waLink = `https://wa.me/${currentBranchPhone}?text=${encodeURIComponent(waMsg)}`;
 
             grid.innerHTML += `
-            <div class="product-card">
+            <div class="product-card fade-in">
                 <div class="p-img-container">
                     <img src="${img}" class="p-img" loading="lazy" alt="${p['Title']}">
                 </div>
@@ -267,7 +357,7 @@
                     <div class="p-title">${p['Title']}</div>
                     <div class="p-price">${p['Price'] || ''} ${LANG==='he'?'₪':'شيكل'}</div>
                     
-                    <a href="${waProductLink}" target="_blank" class="btn btn-ask-wa">
+                    <a href="${waLink}" target="_blank" class="btn-ask-wa">
                         <i class="fab fa-whatsapp"></i> ${btnText}
                     </a>
                 </div>
