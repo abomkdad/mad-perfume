@@ -12,8 +12,26 @@
         :root { --bg:#0f0f0f; --card:#1a1a1a; --gold:#d4af37; --text:#fff; --sub:#b0b0b0; }
         body { margin:0; font-family:'Segoe UI',sans-serif; background:var(--bg); color:var(--text); padding-bottom:50px; }
         
-        header { background:#000; padding:15px; text-align:center; border-bottom:1px solid #333; position:sticky; top:0; z-index:900; }
-        header h1 { margin:0; font-size:1.4rem; color:var(--gold); letter-spacing:2px; font-weight:300; }
+        /* HEADER */
+        header { 
+            background: #000; 
+            padding: 0; 
+            text-align: center; 
+            border-bottom: 2px solid var(--gold); 
+            position: sticky; top: 0; z-index: 900;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+        }
+        
+        .header-link { display: block; width: 100%; height: 100%; }
+        
+        .header-banner {
+            width: 100%;
+            height: auto;
+            max-width: 1200px;
+            display: block;
+            margin: 0 auto;
+            object-fit: cover;
+        }
 
         .container { max-width:1000px; margin:20px auto; padding:0 15px; }
         
@@ -24,11 +42,23 @@
         .branch-hero { background:linear-gradient(145deg,#1a1a1a,#222); border:1px solid #333; border-top:3px solid var(--gold); border-radius:12px; padding:25px; text-align:center; margin-bottom:25px; }
         .branch-hero h2 { margin:0; font-size:1.8rem; }
         
-        .social-bar, .actions { display:flex; justify-content:center; gap:12px; margin-top:20px; flex-wrap:wrap; }
+        .social-bar { display:flex; justify-content:center; gap:12px; margin-top:20px; flex-wrap:wrap; }
         .social-btn { width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; background:#2a2a2a; color:#aaa; border:1px solid #333; text-decoration:none; transition:0.2s; }
         .social-btn:hover { border-color:var(--gold); color:var(--gold); }
         
-        .btn-svc { background:#000; border:1px solid var(--gold); color:var(--gold); padding:10px 20px; border-radius:6px; text-decoration:none; font-weight:bold; display:flex; align-items:center; gap:8px; font-size:0.9rem; }
+        /* Service Actions Area */
+        .actions { 
+            display:flex; justify-content:center; gap:10px; margin-top:20px; flex-wrap:wrap; 
+            border-top: 1px solid #333; padding-top: 20px; /* فاصل جمالي */
+        }
+        
+        .btn-svc { 
+            background:#000; border:1px solid var(--gold); color:var(--gold); 
+            padding:10px 15px; border-radius:6px; text-decoration:none; 
+            font-weight:bold; display:flex; align-items:center; gap:8px; font-size:0.85rem; 
+            transition: 0.3s;
+        }
+        .btn-svc:hover { background:var(--gold); color:#000; }
 
         .filters { display:flex; gap:10px; margin-bottom:20px; }
         .filters select { flex:1; padding:12px; background:#222; border:1px solid #444; color:#fff; border-radius:8px; outline:none; }
@@ -58,7 +88,11 @@
 </head>
 <body>
 
-<header><h1>MAD PARFUMEUR</h1></header>
+<header>
+    <a href="?" class="header-link">
+        <img src="https://madparfumeurglobal.com/wp-content/uploads/2024/09/1920x600-1.jpg" alt="MAD PARFUMEUR" class="header-banner">
+    </a>
+</header>
 
 <div id="loader"><div class="spinner"></div><span style="color:#666;font-size:0.8rem">SYSTEM LOADING...</span></div>
 
@@ -75,10 +109,19 @@
             <h2 id="b-name"></h2>
             <div id="b-name-he" style="color:var(--gold); margin-bottom:10px;"></div>
             <div style="color:#888; font-size:0.9rem"><i class="far fa-clock"></i> <span id="b-hours"></span></div>
+            
             <div id="social-container" class="social-bar"></div>
+            
             <div class="actions">
-                <a href="tel:*9935" class="btn-svc"><i class="fas fa-headset"></i> *9935</a>
-                <a href="https://madperfume.co.il/" target="_blank" class="btn-svc"><i class="fas fa-globe"></i> الموقع</a>
+                <a href="tel:*9935" class="btn-svc">
+                    <i class="fas fa-phone-alt"></i> *9935
+                </a>
+                <a href="mailto:info@madperfume.co.il" class="btn-svc">
+                    <i class="fas fa-envelope"></i> Email
+                </a>
+                <a href="https://madperfume.co.il/" target="_blank" class="btn-svc">
+                    <i class="fas fa-globe"></i> Web
+                </a>
             </div>
         </div>
 
@@ -101,27 +144,27 @@
 </div>
 
 <script>
-    // === LOCAL FILE CONFIG ===
-    // هنا التغيير: النظام يقرأ الملفات من نفس المجلد
-    const URLS = {
-        b: 'branches.csv', 
-        p: 'products.csv'
-    };
-    
-    // إجبار النظام على تحديث الكاش عند تغيير الملفات (بتغيير هذا الرقم)
-    const VERSION = 'v4.0'; 
+    // === AUTO LANGUAGE ===
+    function detectLanguage() {
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('lang')) return params.get('lang') === 'he' ? 'he' : 'ar';
+        const browserLang = navigator.language || navigator.userLanguage;
+        if (browserLang && browserLang.startsWith('he')) return 'he';
+        return 'ar';
+    }
+    const LANG = detectLanguage();
+    document.documentElement.lang = LANG;
+    document.documentElement.dir = LANG === 'he' ? 'ltr' : 'rtl';
+
+    // === CONFIG ===
+    const URLS = { b: 'branches.csv', p: 'products.csv' };
+    const VERSION = 'v4.2'; 
     const BATCH_SIZE = 24;
 
     let DATA = { b: [], p: [] };
     let VIEW = { list: [], renderedCount: 0, phone: '' };
 
-    const p = new URLSearchParams(location.search);
-    const LANG = p.get('lang') === 'he' ? 'he' : 'ar';
-    document.documentElement.lang = LANG;
-    document.documentElement.dir = LANG==='he'?'ltr':'rtl';
-
     async function start() {
-        // التحقق من الكاش
         const stored = localStorage.getItem('mad_data_' + VERSION);
         if(stored) {
             DATA = JSON.parse(stored);
@@ -131,16 +174,14 @@
         }
 
         try {
-            // تحميل الملفات المحلية
             const [rb, rp] = await Promise.all([ fetchCSV(URLS.b), fetchCSV(URLS.p) ]);
             DATA = { b: rb, p: rp };
-            // حفظ البيانات
             localStorage.setItem('mad_data_' + VERSION, JSON.stringify(DATA));
             console.log('⬇ Loaded from Files');
             finishLoad();
         } catch(e) { 
             console.error(e); 
-            document.getElementById('loader').innerHTML = '<p style="color:red">يرجى رفع ملفات branches.csv و products.csv بجانب ملف الموقع</p>';
+            document.getElementById('loader').innerHTML = '<p style="color:red">يرجى رفع ملفات branches.csv و products.csv</p>';
         }
     }
 
@@ -154,6 +195,7 @@
     function finishLoad() {
         document.getElementById('loader').style.opacity = '0';
         setTimeout(() => document.getElementById('loader').classList.add('hidden'), 300);
+        const p = new URLSearchParams(location.search);
         const id = p.get('id');
         if(id) showBranch(id); else showList();
     }
@@ -217,7 +259,7 @@
 
     function updateFilters() {
         const sel = document.getElementById('cat-select');
-        sel.innerHTML = '<option value="">كل الفئات</option>';
+        sel.innerHTML = '<option value="">' + (LANG==='he'?'כל הקטגוריות':'كل الفئات') + '</option>';
         const cats = [...new Set(VIEW.list.map(x => x['Category (g:product_type)']).filter(Boolean))];
         cats.forEach(c => sel.innerHTML += `<option>${c}</option>`);
 
