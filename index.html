@@ -2,165 +2,337 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MAD PARFUMEUR | Locations</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;700&family=Tajawal:wght@300;500;800&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MAD PARFUMEUR - الفروع</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <style>
-        :root { --bg-main: #000000; --gold-text: #D4AF37; --text-primary: #FFFFFF; --gold-gradient: linear-gradient(135deg, #BF953F, #FBF5B7, #AA771C); }
-        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { background-color: var(--bg-main); font-family: 'Cairo', 'Tajawal', sans-serif; color: var(--text-primary); padding-bottom: 80px; }
-        
-        .hero-banner-wrapper { width: 100%; border-bottom: 2px solid var(--gold-text); }
-        .hero-image { width: 100%; height: auto; display: block; max-height: 250px; object-fit: cover; }
-        header { text-align: center; padding: 15px; background: #000; }
-        .logo-img { max-width: 140px; }
-
-        .controls-area { padding: 10px; position: sticky; top: 0; z-index: 50; background: rgba(0,0,0,0.95); backdrop-filter: blur(10px); }
-        .lang-switch { display: flex; justify-content: center; background: #1a1a1a; border-radius: 20px; padding: 3px; width: fit-content; margin: 0 auto 10px; }
-        .lang-btn { background: transparent; border: none; color: #888; padding: 5px 20px; border-radius: 18px; cursor: pointer; transition: 0.3s; }
-        .lang-btn.active { background: var(--gold-text); color: #000; font-weight: bold; }
-        .search-input { width: 100%; padding: 10px; background: #111; border: 1px solid #333; border-radius: 10px; color: #fff; text-align: right; font-size: 16px; }
-        
-        .branches-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(165px, 1fr)); gap: 12px; padding: 15px; max-width: 800px; margin: 0 auto; }
-        
-        .branch-card { 
-            background: #111; border: 1px solid #333; border-radius: 12px; overflow: hidden; 
-            display: flex; flex-direction: column; height: 260px; text-decoration: none; position: relative; transition: transform 0.2s;
+        :root {
+            --primary-color: #000000;
+            --secondary-color: #d4af37;
+            --bg-color: #f9f9f9;
+            --text-color: #333;
         }
-        .branch-card:active { transform: scale(0.98); }
-        
-        .card-image-bg { height: 120px; background-size: cover; background-position: center; position: relative; }
-        .card-image-bg::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to top, #111 5%, transparent); }
-        
-        .card-content { padding: 10px; text-align: center; display: flex; flex-direction: column; flex-grow: 1; }
-        .branch-name { color: var(--gold-text); font-weight: bold; font-size: 1.1rem; margin-bottom: 5px; }
-        .branch-hours { font-size: 0.75rem; color: #ccc; margin-top: auto; background: #222; padding: 5px; border-radius: 5px;}
-        .click-hint { font-size: 0.7rem; color: #888; margin-top: 5px; }
 
-        .sticky-hotline { position: fixed; bottom: 15px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 350px; background: #000; border: 1px solid var(--gold-text); border-radius: 50px; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; z-index: 100; text-decoration: none; color: white;}
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            text-align: center;
+        }
+
+        header {
+            background-color: var(--primary-color);
+            color: var(--secondary-color);
+            padding: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 1.5rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            min-height: 300px;
+        }
+
+        /* شاشة التحميل */
+        #loading {
+            padding: 50px;
+            font-size: 1.2rem;
+            color: #666;
+        }
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--secondary-color);
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px auto;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* تفاصيل الفرع */
+        .branch-card, #list-view {
+            display: none;
+        }
+
+        .info-group {
+            margin-bottom: 20px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 15px;
+        }
+        
+        .label {
+            font-weight: bold;
+            color: var(--secondary-color);
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .value {
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+
+        /* الأزرار */
+        .action-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        .btn {
+            display: block;
+            padding: 15px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 1.1rem;
+            transition: transform 0.2s;
+            border: none;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .btn:active { transform: scale(0.98); }
+
+        .btn-waze {
+            background: linear-gradient(45deg, #0099cc, #33ccff);
+            color: white;
+        }
+
+        .btn-store {
+            background-color: var(--primary-color);
+            color: var(--secondary-color);
+            border: 2px solid var(--primary-color);
+        }
+
+        .btn-whatsapp {
+            background-color: #25D366;
+            color: white;
+        }
+        
+        .social-links {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+        
+        .social-links a {
+            color: var(--primary-color);
+            font-size: 26px;
+            transition: color 0.3s;
+        }
+        .social-links a:hover { color: var(--secondary-color); }
+
+        /* القائمة */
+        #all-branches-list {
+            list-style: none;
+            padding: 0;
+        }
+        #all-branches-list li { margin-bottom: 10px; }
+        #all-branches-list a {
+            display: block;
+            padding: 15px;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            text-decoration: none;
+            color: var(--text-color);
+            font-weight: bold;
+        }
+        
+        .error-msg { color: red; padding: 20px; }
     </style>
 </head>
 <body>
-    <div class="hero-banner-wrapper">
-        <img src="https://madparfumeurglobal.com/wp-content/uploads/2024/09/1920x600-1.jpg" class="hero-image">
-    </div>
+
     <header>
-        <img src="https://abomkdad.github.io/Digital-Business-Card/logo.png" class="logo-img">
+        <h1>MAD PARFUMEUR</h1>
     </header>
 
-    <div class="controls-area">
-        <div class="lang-switch">
-            <button class="lang-btn" onclick="switchLang('ar')" id="btn-ar">العربية</button>
-            <button class="lang-btn" onclick="switchLang('he')" id="btn-he">עברית</button>
+    <div class="container">
+        
+        <div id="loading">
+            <div class="spinner"></div>
+            <p>جاري جلب بيانات الفروع...</p>
         </div>
-        <input type="text" id="searchInput" class="search-input" onkeyup="filterBranches()">
+
+        <div id="error-message" class="error-msg" style="display:none;"></div>
+
+        <div id="branch-details" class="branch-card">
+            <h2 id="b-name-ar" style="margin-top:0;"></h2>
+            <h3 id="b-name-he" style="color:#777; font-weight:normal; margin-top:-10px;"></h3>
+            
+            <div class="info-group">
+                <span class="label"><i class="far fa-clock"></i> ساعات العمل</span>
+                <div id="b-hours" class="value"></div>
+            </div>
+
+            <div class="info-group">
+                <span class="label"><i class="fas fa-phone"></i> الهاتف</span>
+                <div id="b-phone" class="value" dir="ltr"></div>
+            </div>
+
+            <div class="action-buttons">
+                <a id="btn-waze" href="#" target="_blank" class="btn btn-waze">
+                    <i class="fas fa-location-arrow"></i> توجيه للفرع (Waze)
+                </a>
+
+                <a href="https://madperfume.co.il/" target="_blank" class="btn btn-store">
+                    <i class="fas fa-shopping-bag"></i> تسوق من المتجر الإلكتروني
+                </a>
+
+                <a id="btn-whatsapp" href="#" target="_blank" class="btn btn-whatsapp">
+                    <i class="fab fa-whatsapp"></i> تواصل عبر واتساب
+                </a>
+            </div>
+
+            <div class="social-links">
+                <a id="link-insta" href="#" target="_blank"><i class="fab fa-instagram"></i></a>
+                <a id="link-tiktok" href="#" target="_blank"><i class="fab fa-tiktok"></i></a>
+                <a id="link-fb" href="#" target="_blank"><i class="fab fa-facebook"></i></a>
+            </div>
+            
+            <div style="margin-top: 20px;">
+                <a href="index.html" style="color: #999; text-decoration: underline; font-size: 0.9rem;">عرض كل الفروع</a>
+            </div>
+        </div>
+
+        <div id="list-view">
+            <h3>اختر الفرع</h3>
+            <ul id="all-branches-list"></ul>
+        </div>
+
     </div>
 
-    <div class="branches-container" id="branchesList"></div>
-
-    <a href="tel:*9935" class="sticky-hotline">
-        <span id="serviceLabel">Service</span>
-        <span style="color: var(--gold-text); font-weight: bold">*9935</span>
-    </a>
-
     <script>
-        // --- البيانات مدمجة هنا لضمان العمل ---
-        const genericImages = [
-            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR12uz7uY34z8nwyVEKWyx-JrNQywQ9Th3Z6Q&s",
-            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTHFblPsXbzvGYO2_e280p0rZYgcz3znQdFTQ&s",
-            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRJtcRkHFtdWjbXTUPdKzaHnX8gTSaaloy1qQ&s",
-            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTUXBgnRtca1N4UFoJtugnGkIoJKCwSTqHeGQ&s",
-            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRjaeKBGs-cv9K9a6Apca11aBXmVzMSiqsaBA&s"
-        ];
+        // رابط ملف CSV الخاص بك المحدث تلقائياً من جوجل شيت
+        const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQzL_F54ThIR-jtJoX9mU4gc6FPo2FzMWsvaPY9K9CDJ_qdHFf3VAqncUj51mEa3A/pub?output=csv';
 
-        const branchesData = [
-            { id: 12, nameAr: "حيفا", nameHe: "חיפה", phone: "0549634449", waze: "Mad Parfumeur Haifa", hoursAr: "10:00 - 22:00", hoursHe: "10:00 - 22:00", facebook: "https://www.facebook.com/s0524033442/", instagram: "https://www.instagram.com/perfume.mad/" },
-            { id: 4, nameAr: "تل أبيب - يافا", nameHe: "תל אביב-יפו", phone: "0527035370", directLink: "https://ul.waze.com/ul?place=EipEYXZpZCBSYXppJ2VsIFN0IDIzLCBUZWwgQXZpdi1ZYWZvLCBJc3JhZWwiMBIuChQKEgntsiS-vkwdFREv7GII8cikqxAXKhQKEgmHZ_csvEwdFRFa3i1EzNr69g", hoursAr: "10:00 - 22:00", hoursHe: "10:00 - 22:00" },
-            { id: 3, nameAr: "الرمله", nameHe: "רמלה", phone: "0527035370", waze: "Ramla", hoursAr: "09:00 - 21:00", hoursHe: "09:00 - 21:00" },
-            { id: 7, nameAr: "هيرتسيليا", nameHe: "הרצליה", phone: "0522438398", waze: "Herzliya", hoursAr: "10:00 - 20:00", hoursHe: "10:00 - 20:00" },
-            { id: 14, nameAr: "الخضيرة", nameHe: "חדרה", phone: "0523953681", waze: "Hadera", hoursAr: "10:00 - 22:00", hoursHe: "10:00 - 22:00" },
-            { id: 24, nameAr: "يركا", nameHe: "ירכא", phone: "0546842420", waze: "Yarka", hoursAr: "10:00 - 22:00", hoursHe: "10:00 - 22:00" },
-            { id: 21, nameAr: "طمرة", nameHe: "טמרה", phone: "0505830733", waze: "Tamra", hoursAr: "10:00 - 22:00", hoursHe: "10:00 - 22:00" },
-            { id: 23, nameAr: "جديدة المكر", nameHe: "ג׳דידה אלמכר", phone: "0508683838", waze: "Jadeidi-Makr", hoursAr: "11:00 - 21:00", hoursHe: "11:00 - 21:00" },
-            { id: 22, nameAr: "سخنين", nameHe: "סח'נין", phone: "0525335571", waze: "Sakhnin", hoursAr: "10:30 - 22:30", hoursHe: "10:30 - 22:30" },
-            { id: 2, nameAr: "كفر مندا", nameHe: "כפר מאנדא", phone: "0505102019", waze: "Kafr Manda", hoursAr: "10:00 - 22:00", hoursHe: "10:00 - 22:00" },
-            { id: 1, nameAr: "دالية الكرمل", nameHe: "דלית אל כרמל", phone: "0525592293", waze: "Daliyat al-Karmel", hoursAr: "10:00 - 22:00", hoursHe: "10:00 - 22:00" },
-            { id: 9, nameAr: "القدس - صلاح الدين", nameHe: "ירושלים - סלאח א-דין", phone: "0545697644", waze: "Salah Ad-din", hoursAr: "09:00-19:30", hoursHe: "09:00-19:30" },
-            { id: 10, nameAr: "القدس - سلطان سليمان", nameHe: "ירושלים - סולטאן סולימאן", phone: "0545697644", waze: "Sultan Suleiman", hoursAr: "09:00-19:30", hoursHe: "09:00-19:30" },
-            { id: 11, nameAr: "بيت حنينا", nameHe: "בית חנינא", phone: "0538318312", waze: "Beit Hanina", hoursAr: "09:00-21:00", hoursHe: "09:00-21:00" },
-            { id: 5, nameAr: "بئر السبع", nameHe: "באר שבע", phone: "0548809957", waze: "Beersheba", hoursAr: "09:00 - 20:00", hoursHe: "09:00 - 20:00" },
-            { id: 6, nameAr: "رهط", nameHe: "רהט", phone: "0505841596", waze: "Rahat", hoursAr: "09:00 - 20:00", hoursHe: "09:00 - 20:00" },
-            { id: 18, nameAr: "أم الفحم", nameHe: "אום אלפחם", phone: "0549634449", waze: "Umm al-Fahm", hoursAr: "10:00 - 22:00", hoursHe: "10:00 - 22:00" },
-            { id: 19, nameAr: "العفولة", nameHe: "עפולה", phone: "0542144255", waze: "Afula", hoursAr: "09:00 - 22:00", hoursHe: "09:00 - 22:00" },
-            { id: 20, nameAr: "الناصرة", nameHe: "נצרת", phone: "0545307980", waze: "Nazareth", hoursAr: "09:00 - 22:00", hoursHe: "09:00 - 22:00" },
-            { id: 15, nameAr: "باقة الغربية", nameHe: "באקה אלג׳רבייה", phone: "0536440073", waze: "Baqa al-Gharbiyye", hoursAr: "10:00 - 23:00", hoursHe: "10:00 - 23:00" },
-            { id: 17, nameAr: "كفر قرع", nameHe: "כפר קרע", phone: "0549634449", waze: "Kafr Qara", hoursAr: "10:00 - 22:00", hoursHe: "10:00 - 22:00" },
-            { id: 8, nameAr: "كفر قاسم", nameHe: "כפר קאסם", phone: "0522438398", waze: "Kafr Qasim", hoursAr: "11:00 - 23:00", hoursHe: "11:00 - 23:00" },
-            { id: 16, nameAr: "الطيبة", nameHe: "טייבה", phone: "0523953681", waze: "Tayibe", hoursAr: "10:00 - 23:00", hoursHe: "10:00 - 23:00" },
-            { id: 25, nameAr: "طبريا", nameHe: "טבריה", phone: "046112266", waze: "Tiberias", hoursAr: "09:00 - 21:00", hoursHe: "09:00 - 21:00" },
-            { id: 26, nameAr: "مجدل شمس", nameHe: "מג'דל שמס", phone: "0508514202", waze: "Majdal Shams", hoursAr: "12:00 - 21:00", hoursHe: "12:00 - 21:00" },
-            { id: 29, nameAr: "رام الله", nameHe: "ראמאללה", phone: "0592592502", waze: "Ramallah", hoursAr: "10:00 - 22:00", hoursHe: "10:00 - 22:00" },
-            { id: 27, nameAr: "نابلس", nameHe: "שכם", phone: "0598094672", waze: "Nablus", hoursAr: "10:00 - 22:00", hoursHe: "10:00 - 22:00" },
-            { id: 31, nameAr: "قلقيلية", nameHe: "קלקוליה", phone: "0595800150", waze: "Qalqilya", hoursAr: "10:00 - 22:00", hoursHe: "10:00 - 22:00" },
-            { id: 28, nameAr: "طولكرم", nameHe: "טול כרם", phone: "0595552670", waze: "Tulkarm", hoursAr: "10:00 - 20:00", hoursHe: "10:00 - 20:00" },
-            { id: 30, nameAr: "بيت لحم", nameHe: "בית לחם", phone: "0599353940", waze: "Bethlehem", hoursAr: "10:00 - 22:00", hoursHe: "10:00 - 22:00" },
-            { id: 32, nameAr: "أريحا", nameHe: "יריחו", phone: "0592592502", waze: "Jericho", hoursAr: "10:00 - 22:00", hoursHe: "10:00 - 22:00" }
-        ];
+        window.addEventListener('DOMContentLoaded', () => {
+            initApp();
+        });
 
-        const uiText = {
-            ar: { serviceText: "خدمة الزبائن", searchPlaceholder: "ابحث عن مدينتك...", siteBtn: "المتجر الإلكتروني", siteUrl: "https://madperfume.ps/", dir: "rtl" },
-            he: { serviceText: "שירות לקוחות", searchPlaceholder: "חפש לפי עיר...", siteBtn: "לחנות האונליין", siteUrl: "https://madperfume.co.il/", dir: "rtl" }
-        };
-
-        function getBranchImage(index) { return genericImages[index % genericImages.length]; }
-
-        function switchLang(lang) {
-            document.documentElement.lang = lang;
-            document.getElementById('btn-ar').classList.toggle('active', lang === 'ar');
-            document.getElementById('btn-he').classList.toggle('active', lang === 'he');
-            document.getElementById('serviceLabel').innerText = uiText[lang].serviceText;
-            document.getElementById('searchInput').placeholder = uiText[lang].searchPlaceholder;
-            renderBranches(lang);
-        }
-
-        function renderBranches(lang) {
-            const container = document.getElementById('branchesList');
-            container.innerHTML = '';
-            
-            branchesData.forEach((branch, index) => {
-                const name = lang === 'he' ? branch.nameHe : branch.nameAr;
-                const hours = lang === 'he' ? branch.hoursHe : branch.hoursAr;
-                const imgUrl = getBranchImage(index);
-                
-                const card = document.createElement('a');
-                card.href = `branch.html?id=${branch.id}&lang=${lang}`;
-                card.className = 'branch-card';
-                
-                card.innerHTML = `
-                    <div class="card-image-bg" style="background-image: url('${imgUrl}')"></div>
-                    <div class="card-content">
-                        <div class="branch-name">${name}</div>
-                        <div class="branch-hours">${hours}</div>
-                        <div class="click-hint">${lang==='ar'?'اضغط للتفاصيل':'לחץ לפרטים'} 👆</div>
-                    </div>
-                `;
-                container.appendChild(card);
+        function initApp() {
+            // استخدام مكتبة PapaParse لجلب وتحليل البيانات
+            Papa.parse(SHEET_URL, {
+                download: true,
+                header: true, // استخدام الصف الأول كعناوين
+                skipEmptyLines: true,
+                complete: function(results) {
+                    const data = results.data;
+                    console.log("تم جلب البيانات:", data); // للفحص في الكونسول
+                    handleData(data);
+                },
+                error: function(err) {
+                    showError("تعذر تحميل البيانات. يرجى التحقق من الاتصال بالإنترنت.");
+                    console.error("Error fetching CSV:", err);
+                }
             });
-            filterBranches();
         }
 
-        function filterBranches() {
-            const filter = document.getElementById('searchInput').value.trim().toUpperCase();
-            const cards = document.getElementsByClassName('branch-card');
-            for(let card of cards) {
-                const name = card.getElementsByClassName('branch-name')[0].innerText;
-                card.style.display = name.toUpperCase().indexOf(filter) > -1 ? "flex" : "none";
+        function handleData(branches) {
+            // إخفاء التحميل
+            document.getElementById('loading').style.display = 'none';
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const branchId = urlParams.get('id'); // جلب الآيدي من الرابط
+
+            if (branchId) {
+                // البحث عن الفرع المطابق للآيدي
+                // ملاحظة: نقارن كـ String للتأكد
+                const branch = branches.find(b => b['ID'] && b['ID'].trim() === branchId);
+                
+                if (branch) {
+                    showBranchDetails(branch);
+                } else {
+                    showError("عذراً، هذا الفرع غير موجود أو تم تغيير رقمه.");
+                    showList(branches); // عرض القائمة كبديل
+                }
+            } else {
+                showList(branches);
             }
         }
 
-        const userLang = (navigator.language || navigator.userLanguage).includes('he') ? 'he' : 'ar';
-        switchLang(userLang);
+        function showBranchDetails(branch) {
+            const detailsDiv = document.getElementById('branch-details');
+            detailsDiv.style.display = 'block';
+
+            // تعبئة البيانات حسب أسماء الأعمدة في ملف الشيت الخاص بك بدقة
+            document.getElementById('b-name-ar').innerText = branch['اسم الفرع عربي'] || '';
+            document.getElementById('b-name-he').innerText = branch['اسم الفرع عبري'] || '';
+            
+            // دمج ساعات العمل إذا أردت عرض اللغتين، أو الاكتفاء بالعربية
+            // هنا نعرض العربية وإذا كانت فارغة نعرض العبرية
+            document.getElementById('b-hours').innerHTML = branch['ساعات الدوام عربي'] || branch['ساعات الدوام عبري'] || 'غير محدد';
+            
+            document.getElementById('b-phone').innerText = branch['الهاتف'] || '';
+            
+            // الروابط
+            const wazeLink = branch['رابط Waze / Maps'] || '#';
+            document.getElementById('btn-waze').href = wazeLink;
+
+            // الواتساب
+            // نحاول قراءة رابط الواتساب الجاهز من العمود الأخير، أو تكوينه من الهاتف
+            let waLink = branch['WhatsApp'];
+            if (!waLink && branch['الهاتف']) {
+                const cleanPhone = branch['الهاتف'].replace(/\D/g, '').replace(/^0/, '972');
+                waLink = `https://wa.me/${cleanPhone}`;
+            }
+            document.getElementById('btn-whatsapp').href = waLink || '#';
+
+            // السوشيال ميديا
+            document.getElementById('link-insta').href = branch['Instagram'] || '#';
+            document.getElementById('link-tiktok').href = branch['TikTok'] || '#';
+            document.getElementById('link-fb').href = branch['Facebook'] || '#';
+            
+            // إخفاء أيقونات السوشيال الفارغة (اختياري)
+            if(!branch['Instagram']) document.getElementById('link-insta').style.display = 'none';
+        }
+
+        function showList(branches) {
+            const listDiv = document.getElementById('list-view');
+            const listUl = document.getElementById('all-branches-list');
+            listDiv.style.display = 'block';
+
+            branches.forEach(b => {
+                if(!b['ID']) return; // تخطي الصفوف الفارغة
+                const li = document.createElement('li');
+                const a = document.createElement('a');
+                a.href = `?id=${b['ID']}`; // الرابط الداخلي
+                a.innerHTML = `
+                    <span>${b['اسم الفرع عربي']}</span>
+                    <br>
+                    <small style='color:#999'>${b['اسم الفرع عبري']}</small>
+                `;
+                li.appendChild(a);
+                listUl.appendChild(li);
+            });
+        }
+
+        function showError(msg) {
+            const errDiv = document.getElementById('error-message');
+            errDiv.innerText = msg;
+            errDiv.style.display = 'block';
+            document.getElementById('loading').style.display = 'none';
+        }
     </script>
 </body>
 </html>
