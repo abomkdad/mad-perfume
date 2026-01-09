@@ -12,7 +12,7 @@
 :root {
   --black:#000;
   --gold:#d4af37;
-  --bg:#f5f5f5;
+  --bg:#f4f4f4;
 }
 body {
   margin:0;
@@ -24,31 +24,31 @@ header {
   color:var(--gold);
   padding:18px;
   text-align:center;
-  font-weight:bold;
   letter-spacing:2px;
+  font-weight:bold;
 }
 .container {
-  max-width:900px;
+  max-width:1000px;
   margin:auto;
   padding:20px;
-}
-.card {
-  background:#fff;
-  border-radius:14px;
-  padding:20px;
-  margin-bottom:20px;
-  box-shadow:0 10px 30px rgba(0,0,0,.08);
 }
 .hidden {display:none;}
 .list a {
   display:block;
-  padding:15px;
+  padding:16px;
   margin-bottom:12px;
   background:#fff;
-  border-radius:10px;
+  border-radius:12px;
   text-decoration:none;
   color:#000;
-  box-shadow:0 5px 15px rgba(0,0,0,.05);
+  box-shadow:0 6px 18px rgba(0,0,0,.06);
+}
+.card {
+  background:#fff;
+  border-radius:16px;
+  padding:20px;
+  margin-bottom:20px;
+  box-shadow:0 12px 30px rgba(0,0,0,.08);
 }
 .btn {
   display:block;
@@ -65,40 +65,47 @@ header {
 
 .controls {
   display:flex;
-  gap:10px;
+  gap:12px;
   margin-bottom:20px;
 }
 .controls select {
   flex:1;
   padding:12px;
   border-radius:10px;
+  border:1px solid #ddd;
 }
 
 .products {
   display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(180px,1fr));
-  gap:20px;
+  grid-template-columns:repeat(auto-fill,minmax(200px,1fr));
+  gap:22px;
 }
 .product {
   background:#fff;
-  border-radius:16px;
-  padding:15px;
+  border-radius:18px;
+  padding:16px;
   text-align:center;
   box-shadow:0 10px 25px rgba(0,0,0,.1);
   transition:.3s;
 }
-.product:hover {
-  transform:translateY(-6px);
-}
+.product:hover {transform:translateY(-6px);}
 .product img {
   width:100%;
-  height:180px;
+  height:200px;
   object-fit:contain;
 }
 .price {
   color:var(--gold);
   font-weight:bold;
   margin:8px 0;
+}
+.badge {
+  display:inline-block;
+  padding:4px 10px;
+  font-size:12px;
+  background:#eee;
+  border-radius:20px;
+  margin-bottom:6px;
 }
 </style>
 </head>
@@ -109,8 +116,10 @@ header {
 
 <div class="container">
 
+<!-- قائمة الفروع -->
 <div id="branchesView" class="list"></div>
 
+<!-- تفاصيل فرع -->
 <div id="branchView" class="hidden card">
   <h2 id="bAr"></h2>
   <h4 id="bHe" style="color:#777"></h4>
@@ -122,9 +131,10 @@ header {
   <a id="goStore" class="btn btn-black">المتجر</a>
 </div>
 
+<!-- المتجر -->
 <div id="storeView" class="hidden">
   <div class="controls card">
-    <select id="brandFilter"></select>
+    <select id="categoryFilter"></select>
     <select id="sortPrice">
       <option value="">ترتيب السعر</option>
       <option value="asc">الأقل → الأعلى</option>
@@ -137,11 +147,11 @@ header {
 </div>
 
 <script>
-// ====== CONFIG ======
+// ================= CONFIG =================
 const BRANCHES_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQzL_F54ThIR-jtJoX9mU4gc6FPo2FzMWsvaPY9K9CDJ_qdHFf3VAqncUj51mEa3A/pub?output=csv';
 const PRODUCTS_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSEkstd7ZCKTNYZL_8TC2ofQ9Z91JJ2IM0awOPLgegDweraKayLGitwiLY7A382iQ/pub?output=csv';
 
-// ====== LANG ======
+// ================= LANGUAGE =================
 function getLang(){
   const p=new URLSearchParams(location.search);
   if(p.get('lang')==='he') return 'he';
@@ -151,7 +161,7 @@ const lang=getLang();
 document.documentElement.lang=lang;
 document.documentElement.dir=lang==='he'?'ltr':'rtl';
 
-// ====== ROUTER ======
+// ================= ROUTER =================
 const params=new URLSearchParams(location.search);
 const id=params.get('id');
 const page=params.get('page');
@@ -160,14 +170,13 @@ if(page==='products') loadProducts();
 else if(id) loadBranch(id);
 else loadBranches();
 
-// ====== BRANCHES ======
+// ================= BRANCHES =================
 function loadBranches(){
 Papa.parse(BRANCHES_CSV,{download:true,header:true,complete:r=>{
-  const box=document.getElementById('branchesView');
-  box.innerHTML='';
+  branchesView.innerHTML='';
   r.data.forEach(b=>{
     if(!b.ID) return;
-    box.innerHTML+=`
+    branchesView.innerHTML+=`
       <a href="?id=${b.ID}&lang=${lang}">
         ${b['اسم الفرع عربي']}<br>
         <small>${b['اسم الفرع عبري']}</small>
@@ -194,7 +203,7 @@ Papa.parse(BRANCHES_CSV,{download:true,header:true,complete:r=>{
 }});
 }
 
-// ====== PRODUCTS ======
+// ================= PRODUCTS =================
 let allProducts=[];
 
 function loadProducts(){
@@ -203,50 +212,56 @@ storeView.classList.remove('hidden');
 
 Papa.parse(PRODUCTS_CSV,{download:true,header:true,complete:r=>{
   const branchId=params.get('id');
+
   allProducts=r.data.filter(p=>{
-    if(!p.Title) return false;
+    if(!p['Title']) return false;
     if(!branchId) return true;
-    return p['Internal Label']?.includes(branchId);
+    return (p['Internal Label']||'').includes(branchId);
   });
-  initFilters(allProducts);
-  render(allProducts);
+
+  initCategoryFilter(allProducts);
+  applyFilters();
 }});
 }
 
-function initFilters(list){
-const brands=[...new Set(list.map(p=>p.Brand).filter(Boolean))];
-brandFilter.innerHTML='<option value="">كل الماركات</option>';
-brands.forEach(b=>brandFilter.innerHTML+=`<option>${b}</option>`);
+function initCategoryFilter(list){
+const cats=[...new Set(list.map(p=>p['Category (g:product_type)']).filter(Boolean))];
+categoryFilter.innerHTML='<option value="">كل الفئات</option>';
+cats.forEach(c=>categoryFilter.innerHTML+=`<option>${c}</option>`);
 
-brandFilter.onchange=()=>apply();
-sortPrice.onchange=()=>apply();
+categoryFilter.onchange=applyFilters;
+sortPrice.onchange=applyFilters;
 }
 
-function apply(){
+function applyFilters(){
 let list=[...allProducts];
-if(brandFilter.value)
-  list=list.filter(p=>p.Brand===brandFilter.value);
+
+if(categoryFilter.value)
+  list=list.filter(p=>p['Category (g:product_type)']===categoryFilter.value);
 
 if(sortPrice.value==='asc')
   list.sort((a,b)=>parseFloat(a.Price)-parseFloat(b.Price));
 if(sortPrice.value==='desc')
   list.sort((a,b)=>parseFloat(b.Price)-parseFloat(a.Price));
 
-render(list);
+renderProducts(list);
 }
 
-function render(list){
+function renderProducts(list){
 products.innerHTML='';
 list.forEach(p=>{
+  if(!p['Title']||!p['Image']||!p['Product Link']) return;
+
   products.innerHTML+=`
-  <div class="product">
-    <img src="${p.Image}">
-    <h4>${p.Title}</h4>
-    <div class="price">${p.Price}</div>
-    <a class="btn btn-black" target="_blank" href="${p['Product Link']}">
-      ${lang==='he'?'לרכישה':'شراء'}
-    </a>
-  </div>`;
+    <div class="product">
+      <span class="badge">${p['Category (g:product_type)']||''}</span>
+      <img src="${p['Image']}">
+      <h4>${p['Title']}</h4>
+      <div class="price">${p['Price']}</div>
+      <a class="btn btn-black" target="_blank" href="${p['Product Link']}">
+        ${lang==='he'?'לרכישה':'شراء'}
+      </a>
+    </div>`;
 });
 }
 </script>
