@@ -14,14 +14,10 @@
         
         /* HEADER */
         header { 
-            background: #000; 
-            padding: 10px 0; 
-            text-align: center; 
-            border-bottom: 2px solid var(--gold); 
-            position: sticky; top: 0; z-index: 900;
+            background: #000; padding: 10px 0; text-align: center; 
+            border-bottom: 2px solid var(--gold); position: sticky; top: 0; z-index: 900;
             box-shadow: 0 4px 20px rgba(0,0,0,0.5);
         }
-        
         .header-link { display: inline-block; text-decoration: none; }
         .header-logo {
             height: 70px; width: auto; display: block; margin: 0 auto;
@@ -39,12 +35,7 @@
         .branch-hero h2 { margin:0; font-size:1.8rem; }
         
         .social-bar { display:flex; justify-content:center; gap:15px; margin-top:20px; flex-wrap:wrap; }
-        .social-btn { 
-            width:45px; height:45px; border-radius:50%; 
-            display:flex; align-items:center; justify-content:center; 
-            background:#2a2a2a; color:#aaa; border:1px solid #333; 
-            text-decoration:none; transition: all 0.3s ease; font-size: 1.2rem;
-        }
+        .social-btn { width:45px; height:45px; border-radius:50%; display:flex; align-items:center; justify-content:center; background:#2a2a2a; color:#aaa; border:1px solid #333; text-decoration:none; transition: all 0.3s ease; font-size: 1.2rem; }
         .social-btn:hover { border-color:var(--gold); color:var(--gold); transform: translateY(-3px); }
         
         /* Brand Colors */
@@ -91,16 +82,18 @@
     </a>
 </header>
 
-<div id="loader"><div class="spinner"></div><span style="color:#666;font-size:0.8rem">SYSTEM LOADING...</span></div>
+<div id="loader"><div class="spinner"></div><span id="ui-loading-text" style="color:#666;font-size:0.8rem">LOADING...</span></div>
 
 <div class="container">
     <div id="list-view" class="hidden">
-        <h3 style="text-align:center; color:var(--sub); font-weight:normal; margin-bottom:20px;">SELECT YOUR BOUTIQUE</h3>
+        <h3 id="ui-select-title" style="text-align:center; color:var(--sub); font-weight:normal; margin-bottom:20px;"></h3>
         <div id="branches-list"></div>
     </div>
 
     <div id="detail-view" class="hidden">
-        <button onclick="goHome()" class="btn-gold" style="margin-bottom:20px;"><i class="fas fa-arrow-right"></i> القائمة</button>
+        <button onclick="goHome()" class="btn-gold" style="margin-bottom:20px;">
+            <i class="fas fa-arrow-right"></i> <span id="ui-back-btn"></span>
+        </button>
 
         <div class="branch-hero">
             <h2 id="b-name"></h2>
@@ -111,55 +104,105 @@
             
             <div class="actions">
                 <a href="tel:*9935" class="btn-svc"><i class="fas fa-phone-alt"></i> *9935</a>
-                <a href="mailto:info@madperfume.co.il" class="btn-svc"><i class="fas fa-envelope"></i> Email</a>
-                <a href="https://madperfume.co.il/" target="_blank" class="btn-svc"><i class="fas fa-globe"></i> Web</a>
+                <a href="mailto:info@madperfume.co.il" class="btn-svc"><i class="fas fa-envelope"></i> <span id="ui-email">Email</span></a>
+                <a href="https://madperfume.co.il/" target="_blank" class="btn-svc"><i class="fas fa-globe"></i> <span id="ui-web">Web</span></a>
             </div>
         </div>
 
         <div class="filters">
-            <select id="cat-select"><option value="">كل الفئات</option></select>
-            <select id="sort-select"><option value="">ترتيب تلقائي</option><option value="asc">السعر: الأقل</option><option value="desc">السعر: الأعلى</option></select>
+            <select id="cat-select"></select>
+            <select id="sort-select"></select>
         </div>
 
         <div id="products-grid" class="products-grid"></div>
         
         <div id="load-more-area" class="load-more-container hidden">
-            <button id="btn-load-more" class="btn-more">عرض المزيد</button>
+            <button id="btn-load-more" class="btn-more"></button>
         </div>
         
         <div id="fallback-area" class="load-more-container hidden">
-             <p style="color:#777; margin-bottom:15px">انتهت منتجات هذا الفرع.</p>
-             <button id="btn-show-global" class="btn-more" style="background:#333; color:#fff; border:1px solid #555">عرض باقي منتجات المتجر</button>
+             <p id="ui-branch-ended" style="color:#777; margin-bottom:15px"></p>
+             <button id="btn-show-global" class="btn-more" style="background:#333; color:#fff; border:1px solid #555"></button>
         </div>
     </div>
 </div>
 
 <script>
-    // === 1. تحديد اللغة بناءً على الجهاز ===
+    // === 1. TRANSLATION ENGINE ===
+    const DICT = {
+        ar: {
+            loading: "جاري تحميل النظام...",
+            select_boutique: "اختر الفرع الأقرب إليك",
+            back_btn: "قائمة الفروع",
+            email: "البريد",
+            web: "الموقع",
+            all_cats: "كل الفئات",
+            sort_default: "ترتيب افتراضي",
+            sort_asc: "السعر: من الأقل للأعلى",
+            sort_desc: "السعر: من الأعلى للأقل",
+            load_more: "عرض المزيد",
+            branch_ended: "انتهت منتجات هذا الفرع",
+            show_global: "عرض باقي منتجات المتجر",
+            check_stock: "هل متوفر؟",
+            wa_msg: "مرحباً، هل العطر [PROD] متوفر؟",
+            no_products: "لا توجد منتجات",
+            currency: "شيكل"
+        },
+        he: {
+            loading: "טוען מערכת...",
+            select_boutique: "בחר את הסניף הקרוב אליך",
+            back_btn: "רשימת סניפים",
+            email: "אימייל",
+            web: "אתר",
+            all_cats: "כל הקטגוריות",
+            sort_default: "מיון ברירת מחדל",
+            sort_asc: "מחיר: מהנמוך לגבוה",
+            sort_desc: "מחיר: מהגבוה לנמוך",
+            load_more: "הצג עוד",
+            branch_ended: "אין עוד מוצרים בסניף זה",
+            show_global: "הצג את שאר מוצרי החנות",
+            check_stock: "בדיקת זמינות",
+            wa_msg: "היי, האם הבושם [PROD] זמין בסניף?",
+            no_products: "אין מוצרים זמינים",
+            currency: "₪"
+        }
+    };
+
     function detectLanguage() {
-        // إذا كان هناك رابط مخصص، نتبعه
         const params = new URLSearchParams(window.location.search);
         if (params.get('lang')) return params.get('lang') === 'he' ? 'he' : 'ar';
-        
-        // فحص لغة الجهاز/المتصفح
         const browserLang = navigator.language || navigator.userLanguage;
-        
-        // 'he' للعبرية الحديثة، 'iw' للعبرية القديمة (بعض أجهزة أندرويد)
-        if (browserLang && (browserLang.startsWith('he') || browserLang.startsWith('iw'))) {
-            return 'he';
-        }
-        
-        // الافتراضي عربية
+        if (browserLang && (browserLang.startsWith('he') || browserLang.startsWith('iw'))) return 'he';
         return 'ar';
     }
 
     const LANG = detectLanguage();
+    const T = DICT[LANG]; // Current Language Dictionary
+
     document.documentElement.lang = LANG;
     document.documentElement.dir = LANG === 'he' ? 'ltr' : 'rtl';
 
+    // Apply translations to Static UI
+    document.getElementById('ui-loading-text').innerText = T.loading;
+    document.getElementById('ui-select-title').innerText = T.select_boutique;
+    document.getElementById('ui-back-btn').innerText = T.back_btn;
+    document.getElementById('ui-email').innerText = T.email;
+    document.getElementById('ui-web').innerText = T.web;
+    document.getElementById('btn-load-more').innerText = T.load_more;
+    document.getElementById('ui-branch-ended').innerText = T.branch_ended;
+    document.getElementById('btn-show-global').innerText = T.show_global;
+
+    // Populate Sort Options
+    const sortSel = document.getElementById('sort-select');
+    sortSel.innerHTML = `
+        <option value="">${T.sort_default}</option>
+        <option value="asc">${T.sort_asc}</option>
+        <option value="desc">${T.sort_desc}</option>
+    `;
+
     // === CONFIG ===
     const URLS = { b: 'branches.csv', p: 'products.csv' };
-    const VERSION = 'v4.4'; 
+    const VERSION = 'v4.5'; 
     const BATCH_SIZE = 24;
 
     let DATA = { b: [], p: [] };
@@ -169,7 +212,6 @@
         const stored = localStorage.getItem('mad_data_' + VERSION);
         if(stored) {
             DATA = JSON.parse(stored);
-            console.log('⚡ Loaded from Local Storage');
             finishLoad();
             return;
         }
@@ -178,7 +220,6 @@
             const [rb, rp] = await Promise.all([ fetchCSV(URLS.b), fetchCSV(URLS.p) ]);
             DATA = { b: rb, p: rp };
             localStorage.setItem('mad_data_' + VERSION, JSON.stringify(DATA));
-            console.log('⬇ Loaded from Files');
             finishLoad();
         } catch(e) { 
             console.error(e); 
@@ -266,7 +307,7 @@
 
     function updateFilters() {
         const sel = document.getElementById('cat-select');
-        sel.innerHTML = '<option value="">' + (LANG==='he'?'כל הקטגוריות':'كل الفئات') + '</option>';
+        sel.innerHTML = `<option value="">${T.all_cats}</option>`;
         const cats = [...new Set(VIEW.list.map(x => x['Category (g:product_type)']).filter(Boolean))];
         cats.forEach(c => sel.innerHTML += `<option>${c}</option>`);
 
@@ -294,21 +335,21 @@
         const total = VIEW.activeList.length;
         const next = Math.min(total, VIEW.renderedCount + BATCH_SIZE);
         
-        if(total === 0) { grid.innerHTML = '<p style="grid-column:1/-1;text-align:center;color:#666">لا توجد منتجات</p>'; return; }
+        if(total === 0) { grid.innerHTML = `<p style="grid-column:1/-1;text-align:center;color:#666">${T.no_products}</p>`; return; }
 
         for(let i = VIEW.renderedCount; i < next; i++) {
             const p = VIEW.activeList[i];
             const img = (p.Image||'').split('|')[0] || 'https://via.placeholder.com/200';
-            const wa = `https://wa.me/${VIEW.phone}?text=${encodeURIComponent('مرحباً، هل العطر '+p.Title+' متوفر؟')}`;
-            const btnTxt = LANG==='he' ? 'בדיקת זמינות' : 'هل متوفر؟';
-
+            const msg = T.wa_msg.replace('[PROD]', p.Title);
+            const wa = `https://wa.me/${VIEW.phone}?text=${encodeURIComponent(msg)}`;
+            
             grid.innerHTML += `
             <div class="product-card">
                 <div class="p-img-box"><img src="${img}" class="p-img" loading="lazy"></div>
                 <div class="p-info">
                     <div class="p-title">${p.Title}</div>
-                    <div class="p-price">${p.Price||''} ${LANG==='he'?'₪':'شيكل'}</div>
-                    <a href="${wa}" target="_blank" class="btn-ask"><i class="fab fa-whatsapp"></i> ${btnTxt}</a>
+                    <div class="p-price">${p.Price||''} ${T.currency}</div>
+                    <a href="${wa}" target="_blank" class="btn-ask"><i class="fab fa-whatsapp"></i> ${T.check_stock}</a>
                 </div>
             </div>`;
         }
