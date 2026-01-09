@@ -28,7 +28,6 @@
         .btn-whatsapp { background: var(--whatsapp-color); }
         .btn i { font-size: 1.2rem; font-style: normal; }
 
-        /* SHOP SECTION */
         .shop-section { margin-top: 40px; }
         .shop-title { text-align: center; font-size: 1.4rem; color: #fff; margin-bottom: 20px; border-bottom: 1px solid #333; padding-bottom: 10px; }
         .products-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
@@ -80,10 +79,9 @@
     </div>
     
     <script>
-        // ✅ تم وضع الرابط الخاص بك هنا
+        // ✅ رابط الـ CSV الخاص بك
         const productsSheetURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQxUeTYGOl6lwRtESpfu7fidrzBOkX-dRHqNGPFzTiv_aPwG7nTzUxz3uLNybM-Iw/pub?output=csv";
 
-        // 1. بيانات الفروع (مدمجة لضمان العمل)
         const branchesData = [
             { id: 12, nameAr: "حيفا", nameHe: "חיפה", phone: "0549634449", waze: "Mad Parfumeur Haifa", hoursAr: "10:00 - 22:00", hoursHe: "10:00 - 22:00", facebook: "https://facebook.com/mad.haifa" },
             { id: 4, nameAr: "تل أبيب - يافا", nameHe: "תל אביב-יפו", phone: "0527035370", directLink: "https://ul.waze.com/ul?place=EipEYXZpZCBSYXppJ2VsIFN0IDIzLCBUZWwgQXZpdi1ZYWZvLCBJc3JhZWwiMBIuChQKEgntsiS-vkwdFREv7GII8cikqxAXKhQKEgmHZ_csvEwdFRFa3i1EzNr69g", hoursAr: "10:00 - 22:00", hoursHe: "10:00 - 22:00" },
@@ -186,36 +184,33 @@
             document.getElementById('linkInsta').href = branch.instagram ? branch.instagram : mainInsta;
             document.getElementById('linkTiktok').href = branch.tiktok ? branch.tiktok : mainTiktok;
 
-            // --- جلب المنتجات من جوجل شيت ---
-            if(productsSheetURL && productsSheetURL.includes("docs.google.com")) {
+            // --- جلب المنتجات من جوجل شيت (بالترتيب الصحيح) ---
+            if(productsSheetURL) {
                 Papa.parse(productsSheetURL, {
                     download: true,
-                    header: true,
+                    header: false, // 🛑 نستخدم الفهرس (Index) بدلاً من الأسماء لتجنب الأخطاء
                     complete: function(results) {
                         const products = results.data;
                         const productsContainer = document.getElementById('productsList');
                         document.getElementById('loader').style.display = 'none';
 
-                        products.forEach(prod => {
-                            // 🟢🟢 هنا يتم استخدام أسماء الأعمدة الخاصة بملفك الإكسل 🟢🟢
+                        // تخطي صف العناوين الأول (رقم 0)
+                        for(let i = 1; i < products.length; i++) {
+                            const row = products[i];
                             
-                            // اختيار الاسم والوصف حسب لغة المتصفح
-                            let prodName = lang === 'he' ? prod["Perfume Name (Hebrew)"] : prod["Perfume Name (Arabic)"];
-                            // إذا لم يوجد اسم بالعبري أو العربي، جرب الإنجليزي كاحتياط
-                            if (!prodName) prodName = prod["Perfume Name (English)"] || prod["Code or Name"];
-
-                            // الوصف
-                            const prodDesc = prod["Perfume Description (Arabic, Hebrew, English)"] || "";
+                            // 🔢 خريطة الأعمدة حسب ملفك:
+                            // 0: Code | 2: Price | 3: Arabic | 4: Hebrew | 5: English | 6: Desc | 7: Image
                             
-                            // الصورة
-                            const prodImg = prod["رابط الصورهImage URL"];
-                            
-                            // السعر (اختياري)
-                            const prodPrice = prod["Price"] ? (prod["Price"] + " ₪") : "";
+                            // اختيار الاسم
+                            let prodName = lang === 'he' ? row[4] : row[3]; 
+                            if (!prodName || prodName.length < 2) prodName = row[5] || row[0]; // fallback to English or Code
 
-                            if(!prodName) return; // تخطي الصفوف الفارغة
+                            if (!prodName) continue; // تخطي الفارغ
 
-                            // رسالة الواتساب
+                            const prodDesc = row[6] || ""; // الوصف
+                            const prodPrice = row[2] ? `${row[2]} ₪` : ""; // السعر
+                            const prodImg = row[7]; // الصورة
+
                             const msgAr = `مرحباً، هل منتج (${prodName}) متوفر لديكم في فرع ${name}؟`;
                             const msgHe = `היי, האם המוצר (${prodName}) זמין בסניף ${name}?`;
                             const finalMsg = lang === 'he' ? msgHe : msgAr;
@@ -224,7 +219,6 @@
                             const prodCard = document.createElement('div');
                             prodCard.className = 'product-card';
                             
-                            // عرض السعر إذا كان موجوداً
                             let priceHtml = prodPrice ? `<div class="prod-price">${prodPrice}</div>` : "";
 
                             prodCard.innerHTML = `
@@ -239,14 +233,14 @@
                                 </div>
                             `;
                             productsContainer.appendChild(prodCard);
-                        });
+                        }
                     },
                     error: function() {
                         document.getElementById('loader').innerText = "Error loading products.";
                     }
                 });
             } else {
-                document.getElementById('loader').innerText = "Please Setup Google Sheet Link in Code.";
+                document.getElementById('loader').innerText = "Please Setup Google Sheet Link.";
             }
 
         } else {
