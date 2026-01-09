@@ -84,17 +84,17 @@
         </div>
     </div>
 
-    <script src="data.js"></script>
+  <script src="data.js"></script>
     
     <script>
-        // قراءة الـ ID واللغة من الرابط
         const params = new URLSearchParams(window.location.search);
         const id = params.get('id');
-        const lang = params.get('lang') || 'ar'; // الافتراضي عربي
+        const lang = params.get('lang') || 'ar';
 
-        // إعداد النصوص حسب اللغة
         document.documentElement.lang = lang;
         document.documentElement.dir = uiText[lang].dir;
+        
+        // تعيين النصوص الثابتة
         document.getElementById('backBtn').innerText = uiText[lang].backBtn;
         document.getElementById('lblDesc').innerText = uiText[lang].descriptionTitle;
         document.getElementById('lblHours').innerText = uiText[lang].hoursTitle;
@@ -102,17 +102,15 @@
         document.getElementById('txtWa').innerText = uiText[lang].whatsapp;
         document.getElementById('txtWaze').innerText = uiText[lang].waze;
 
-        // البحث عن الفرع
         const branch = branchesData.find(b => b.id == id);
 
         if (branch) {
-            // تعبئة البيانات في الصفحة
             const name = lang === 'he' ? branch.nameHe : branch.nameAr;
-            const desc = lang === 'he' ? (branch.descHe || branch.nameHe) : (branch.descAr || branch.nameAr);
+            // وصف افتراضي إذا لم يكن موجوداً
+            const defaultDesc = lang === 'he' ? `ברוכים הבאים לסניף ${name} של MAD PARFUMEUR` : `أهلاً بكم في فرع ${name} من MAD PARFUMEUR`;
+            const desc = lang === 'he' ? (branch.descHe || defaultDesc) : (branch.descAr || defaultDesc);
             const hours = lang === 'he' ? branch.hoursHe : branch.hoursAr;
             
-            // الصورة: نستخدم صورة عشوائية بناءً على الاندكس إذا لم تكن مخصصة
-            // (لغرض المثال، سنبحث عن الاندكس في المصفوفة الأصلية)
             const index = branchesData.indexOf(branch);
             document.getElementById('bImg').src = getBranchImage(index);
 
@@ -120,7 +118,7 @@
             document.getElementById('bDesc').innerText = desc;
             document.getElementById('bHours').innerText = hours;
 
-            // الأزرار
+            // أزرار الاتصال
             document.getElementById('btnCall').href = `tel:${branch.phone}`;
             
             let wazeLink = branch.directLink || `https://waze.com/ul?q=${encodeURIComponent(branch.waze || name)}&navigate=yes`;
@@ -129,13 +127,22 @@
             let waNum = formatPhoneForWhatsapp(branch.phone);
             document.getElementById('btnWa').href = `https://wa.me/${waNum}`;
 
-            // السوشيال ميديا (استخدم الروابط الخاصة بالفرع إن وجدت، وإلا الروابط العامة)
-            document.getElementById('linkFb').href = branch.facebook || "https://facebook.com/madparfumeur";
-            document.getElementById('linkInsta').href = branch.instagram || "https://instagram.com/madparfumeur";
-            document.getElementById('linkTiktok').href = branch.tiktok || "https://tiktok.com/@madparfumeur";
+            // --- التعامل الذكي مع روابط السوشيال ميديا ---
+            
+            // 1. فيسبوك: استخدم رابط الفرع، وإذا لم يوجد استخدم الرئيسي
+            const fbLink = branch.facebook && branch.facebook.length > 5 ? branch.facebook : mainSocial.facebook;
+            document.getElementById('linkFb').href = fbLink;
+
+            // 2. انستغرام
+            const instaLink = branch.instagram && branch.instagram.length > 5 ? branch.instagram : mainSocial.instagram;
+            document.getElementById('linkInsta').href = instaLink;
+
+            // 3. تيك توك
+            const tiktokLink = branch.tiktok && branch.tiktok.length > 5 ? branch.tiktok : mainSocial.tiktok;
+            document.getElementById('linkTiktok').href = tiktokLink;
 
         } else {
-            document.body.innerHTML = "<h2 style='text-align:center;color:white;margin-top:50px'>Branch Not Found / الفرع غير موجود</h2>";
+            document.body.innerHTML = "<h2 style='text-align:center;color:white;margin-top:50px'>Branch Not Found</h2>";
         }
     </script>
 </body>
