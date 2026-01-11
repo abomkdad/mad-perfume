@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MAD PARFUMEUR | الفروع</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+
+<style>
+:root{
+  --bg:#0a0a0a;
+  --card:#151515;
+  --gold:#d4af37;
+  --muted:#aaa;
+}
+
+body{
+  margin:0;
+  background:var(--bg);
+  font-family:Arial, sans-serif;
+  color:#fff;
+}
+
+header{
+  padding:18px;
+  text-align:center;
+  border-bottom:1px solid #222;
+}
+header img{height:55px}
+
+.container{
+  max-width:500px;
+  margin:20px auto 40px;
+  padding:0 16px;
+}
+
+.branch{
+  background:linear-gradient(180deg,#161616,#0f0f0f);
+  border:1px solid #222;
+  border-radius:16px;
+  padding:16px;
+  margin-bottom:12px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.branch-name{
+  font-size:16px;
+  font-weight:bold;
+}
+
+.branch-hours{
+  font-size:12px;
+  color:var(--muted);
+  margin-top:4px;
+}
+
+.branch a{
+  background:transparent;
+  border:1px solid var(--gold);
+  color:var(--gold);
+  padding:8px 14px;
+  border-radius:20px;
+  font-size:12px;
+  font-weight:bold;
+  text-decoration:none;
+  white-space:nowrap;
+}
+
+.footer{
+  text-align:center;
+  font-size:12px;
+  color:#777;
+  margin-top:30px;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <img src="https://drive.google.com/uc?export=view&id=1GeseZXkkTJG75Gfy9oCPeADSJl90RQG1">
+</header>
+
+<div class="container" id="branches"></div>
+
+<div class="footer">
+  © MAD PARFUMEUR
+</div>
+
+<script>
+const LANG =
+ new URLSearchParams(location.search).get('lang') ||
+ (navigator.language.startsWith('he') ? 'he' : 'ar');
+
+document.documentElement.lang = LANG;
+document.documentElement.dir  = LANG === 'he' ? 'ltr' : 'rtl';
+
+Papa.parse("branches.csv",{
+  download:true,
+  header:true,
+  skipEmptyLines:true,
+  complete:r=>{
+    const box=document.getElementById("branches");
+
+    r.data.forEach(b=>{
+      if(!b.ID) return;
+
+      const name = LANG==='he'
+        ? b["اسم الفرع عبري"]
+        : b["اسم الفرع عربي"];
+
+      const hours = LANG==='he'
+        ? b["ساعات الدوام عبري"]
+        : b["ساعات الدوام عربي"];
+
+      box.innerHTML += `
+        <div class="branch">
+          <div>
+            <div class="branch-name">${name}</div>
+            <div class="branch-hours">${hours || ''}</div>
+          </div>
+
+          <a href="offer.html?branch=${b.ID}">
+            ${LANG==='he' ? 'כניסה' : 'دخول'}
+          </a>
+        </div>
+      `;
+    });
+  }
+});
+</script>
+
+</body>
+</html>
