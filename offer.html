@@ -1,19 +1,18 @@
 <!DOCTYPE html>
-<html>
+<html lang="ar">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>MAD PARFUMEUR</title>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
 
 <style>
 :root{
-  --bg:#0b0b0b;
-  --card:#151515;
+  --bg:#0a0a0a;
+  --card:#161616;
   --gold:#d4af37;
-  --muted:#888;
+  --muted:#999;
   --wa:#25d366;
 }
 
@@ -24,94 +23,96 @@ body{
   color:#fff;
 }
 
+/* ===== HEADER ===== */
 header{
-  position:sticky;
-  top:0;
-  z-index:10;
-  background:#000;
-  border-bottom:1px solid #222;
-  padding:15px;
+  padding:20px;
   text-align:center;
+  border-bottom:1px solid #222;
 }
+header img{height:55px}
 
-header img{
-  height:50px;
-}
-
-.branch-box{
+/* ===== BRANCH INFO ===== */
+.branch{
   max-width:420px;
   margin:20px auto;
-  background:var(--card);
-  border-radius:14px;
-  padding:18px;
+  background:linear-gradient(180deg,#161616,#0f0f0f);
+  border-radius:18px;
+  padding:20px;
   text-align:center;
   border:1px solid #222;
 }
-
-.branch-box h1{
+.branch h1{
   margin:0;
-  font-size:20px;
   color:var(--gold);
+  font-size:20px;
 }
-
-.branch-box .hours{
-  margin-top:6px;
+.branch .hours{
+  margin-top:8px;
   font-size:13px;
   color:var(--muted);
 }
 
+/* ===== PRODUCTS GRID ===== */
 .grid{
   max-width:420px;
-  margin:20px auto;
+  margin:20px auto 100px;
   display:grid;
   grid-template-columns:repeat(2,1fr);
-  gap:12px;
+  gap:14px;
 }
 
 .product{
   background:#fff;
-  border-radius:10px;
+  border-radius:14px;
   overflow:hidden;
   display:flex;
   flex-direction:column;
 }
-
 .product img{
-  width:100%;
-  height:140px;
+  height:150px;
   object-fit:contain;
   background:#fff;
 }
-
 .product .info{
-  padding:10px;
+  padding:12px;
   color:#000;
   text-align:center;
-  display:flex;
-  flex-direction:column;
-  flex:1;
 }
-
 .product .code{
   font-weight:bold;
-  font-size:14px;
 }
-
 .product .price{
   color:#b8860b;
-  font-weight:bold;
   margin:6px 0;
+  font-weight:bold;
 }
-
 .product a{
-  margin-top:auto;
-  background:var(--wa);
+  display:block;
+  background:#2ecc71;
   color:#fff;
   padding:8px;
-  border-radius:6px;
+  border-radius:8px;
   text-decoration:none;
   font-size:13px;
   font-weight:bold;
+}
+
+/* ===== FLOATING WHATSAPP ===== */
+.wa-float{
+  position:fixed;
+  bottom:20px;
+  right:20px;
+  background:var(--wa);
+  color:#fff;
+  width:58px;
+  height:58px;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:28px;
+  box-shadow:0 10px 25px rgba(0,0,0,.4);
+  z-index:99;
 }
 </style>
 </head>
@@ -122,77 +123,64 @@ header img{
   <img src="https://abomkdad.github.io/Digital-Business-Card/logo.png">
 </header>
 
-<div id="branchBox" class="branch-box">
+<div id="branchBox" class="branch">
   <h1 id="branchName">...</h1>
   <div id="branchHours" class="hours"></div>
 </div>
 
 <div id="products" class="grid"></div>
 
+<a id="waFloat" class="wa-float" target="_blank">💬</a>
+
 <script>
 const LANG =
   new URLSearchParams(location.search).get('lang') ||
   (navigator.language.startsWith('he') ? 'he' : 'ar');
 
+document.documentElement.dir = LANG==='he'?'ltr':'rtl';
 document.documentElement.lang = LANG;
-document.documentElement.dir = LANG === 'he' ? 'ltr' : 'rtl';
 
-const TEXT = {
-  ar:{
-    check:"افحص التوفر",
-    msg:(p,b)=>`مرحباً، هل العطر ${p} متوفر في فرع ${b}؟`
-  },
-  he:{
-    check:"בדוק זמינות",
-    msg:(p,b)=>`שלום, האם הבושם ${p} זמין בסניף ${b}?`
-  }
+const T={
+ ar:{check:"افحص التوفر",msg:(p,b)=>`مرحباً، هل العطر ${p} متوفر في فرع ${b}?`},
+ he:{check:"בדוק זמינות",msg:(p,b)=>`שלום, האם הבושם ${p} זמין בסניף ${b}?`}
 };
 
-const branchID = new URLSearchParams(location.search).get('branch');
+const branchID=new URLSearchParams(location.search).get('branch');
+let branchPhone="",branchName="";
 
-let branchPhone="", branchName="";
+Papa.parse("branches.csv",{download:true,header:true,complete:r=>{
+ const b=r.data.find(x=>x.ID===branchID);
+ if(!b){
+   document.getElementById("branchName").innerText="Branch not found";
+   return;
+ }
+ branchName=LANG==='he'?b["اسم الفرع عبري"]:b["اسم الفرع عربي"];
+ branchPhone=(b["الهاتف"]||"").replace(/\D/g,"").replace(/^0/,"972");
+ document.getElementById("branchName").innerText=branchName;
+ document.getElementById("branchHours").innerText=
+  LANG==='he'?b["ساعات الدوام عبري"]:b["ساعات الدوام عربي"];
+ document.getElementById("waFloat").href=`https://wa.me/${branchPhone}`;
+}});
 
-Papa.parse("branches.csv",{
-  download:true,
-  header:true,
-  complete:r=>{
-    const b = r.data.find(x=>x.ID===branchID);
-    if(!b) return;
-
-    branchName = LANG==="he" ? b["اسم الفرع عبري"] : b["اسم الفرع عربي"];
-    branchPhone = (b["الهاتف"]||"").replace(/\D/g,"").replace(/^0/,"972");
-
-    document.getElementById("branchName").innerText = branchName;
-    document.getElementById("branchHours").innerText =
-      LANG==="he" ? b["ساعات الدوام عبري"] : b["ساعات الدوام عربي"];
-  }
-});
-
-Papa.parse("products.csv",{
-  download:true,
-  header:true,
-  complete:r=>{
-    const box=document.getElementById("products");
-    r.data.slice(0,60).forEach(p=>{
-      if(!p.Title) return;
-
-      const img=(p.Image||"").split("|")[0];
-      const msg=TEXT[LANG].msg(p.Title,branchName);
-
-      box.innerHTML+=`
-        <div class="product">
-          <img src="${img}">
-          <div class="info">
-            <div class="code">${p.Title}</div>
-            <div class="price">₪ ${p.Price}</div>
-            <a href="https://wa.me/${branchPhone}?text=${encodeURIComponent(msg)}" target="_blank">
-              ${TEXT[LANG].check}
-            </a>
-          </div>
-        </div>`;
-    });
-  }
-});
+Papa.parse("products.csv",{download:true,header:true,complete:r=>{
+ const box=document.getElementById("products");
+ r.data.slice(0,50).forEach(p=>{
+  if(!p.Title) return;
+  const img=(p.Image||"").split("|")[0];
+  const msg=T[LANG].msg(p.Title,branchName);
+  box.innerHTML+=`
+   <div class="product">
+    <img src="${img}">
+    <div class="info">
+      <div class="code">${p.Title}</div>
+      <div class="price">₪ ${p.Price}</div>
+      <a href="https://wa.me/${branchPhone}?text=${encodeURIComponent(msg)}" target="_blank">
+        ${T[LANG].check}
+      </a>
+    </div>
+   </div>`;
+ });
+}});
 </script>
 
 </body>
