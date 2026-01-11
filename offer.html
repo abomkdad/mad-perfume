@@ -2,14 +2,16 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<title>عرض خاص | MAD PARFUMEUR</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>عرض خاص | MAD PARFUMEUR</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
 
 <style>
 body {
     margin: 0;
-    font-family: "Arial", sans-serif;
     background: #0b0b0b;
+    font-family: Arial, sans-serif;
     color: #fff;
     display: flex;
     justify-content: center;
@@ -18,21 +20,21 @@ body {
 }
 
 .offer-box {
-    max-width: 420px;
     width: 100%;
+    max-width: 420px;
     background: #111;
-    border-radius: 18px;
+    border-radius: 16px;
     overflow: hidden;
     box-shadow: 0 0 40px rgba(212,175,55,0.25);
 }
 
-.offer-media img {
+.offer-box img {
     width: 100%;
     display: block;
 }
 
 .offer-content {
-    padding: 22px;
+    padding: 20px;
     text-align: center;
 }
 
@@ -43,21 +45,20 @@ body {
 }
 
 .offer-content p {
-    font-size: 15px;
     color: #ccc;
-    line-height: 1.6;
+    font-size: 15px;
 }
 
 .whatsapp-btn {
     display: block;
-    margin-top: 22px;
-    padding: 16px;
-    background: #25d366;
+    margin-top: 20px;
+    padding: 15px;
+    background: #25D366;
     color: #fff;
     font-size: 18px;
     font-weight: bold;
     text-decoration: none;
-    border-radius: 14px;
+    border-radius: 12px;
 }
 </style>
 </head>
@@ -65,28 +66,62 @@ body {
 <body>
 
 <div class="offer-box">
-
-    <!-- الصورة -->
-    <div class="offer-media">
-        <img src="https://madperfume.co.il/upload/11-2025/product/691e3804ba4ee.jpg" alt="عرض MAD PARFUMEUR">
-    </div>
+    <img src="https://madperfume.co.il/upload/11-2025/product/691e3804ba4ee.jpg" alt="MAD Offer">
 
     <div class="offer-content">
-        <h1>عرض خاص لفترة محدودة</h1>
-        <p>
-            اطلب الآن مباشرة عبر واتساب<br>
-            التوصيل سريع – الكمية محدودة
-        </p>
+        <h1 id="branch-title">عرض خاص</h1>
+        <p id="branch-desc">اطلب الآن مباشرة من الفرع عبر واتساب</p>
 
-        <!-- زر واتساب -->
-        <a class="whatsapp-btn"
-           href="https://wa.me/972501234567?text=مرحبا،%20أرغب%20بطلب%20هذا%20العرض%20من%20MAD%20PARFUMEUR"
-           target="_blank">
-           اطلب الآن عبر واتساب
+        <a id="wa-btn" class="whatsapp-btn" href="#" target="_blank">
+            اطلب الآن عبر واتساب
         </a>
     </div>
-
 </div>
+
+<script>
+const BRANCHES_CSV = 'branches.csv';
+
+function getParam(name) {
+    return new URLSearchParams(window.location.search).get(name);
+}
+
+const branchId = getParam('branch');
+
+Papa.parse(BRANCHES_CSV, {
+    download: true,
+    header: true,
+    skipEmptyLines: true,
+    transformHeader: h => h.trim(),
+    complete: res => {
+        const branch = res.data.find(b => b.ID === branchId);
+        if (!branch) {
+            document.getElementById('branch-title').innerText = 'الفرع غير موجود';
+            return;
+        }
+
+        const lang = (navigator.language || '').startsWith('he') ? 'he' : 'ar';
+
+        const name =
+            lang === 'he'
+            ? branch['اسم الفرع عبري']
+            : branch['اسم الفرع عربي'];
+
+        const phone =
+            (branch['الهاتف'] || '')
+            .replace(/\D/g, '')
+            .replace(/^0/, '972');
+
+        const msg =
+            lang === 'he'
+            ? `שלום, אני מעוניין להזמין מהסניף ${name}`
+            : `مرحباً، أرغب بطلب هذا العرض من فرع ${name}`;
+
+        document.getElementById('branch-title').innerText = `عرض فرع ${name}`;
+        document.getElementById('wa-btn').href =
+            `https://wa.me/${phone}?text=${encodeURIComponent(msg)}`;
+    }
+});
+</script>
 
 </body>
 </html>
