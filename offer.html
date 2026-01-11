@@ -1,125 +1,197 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>عرض خاص | MAD PARFUMEUR</title>
+
+<title>MAD PARFUMEUR</title>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
 
 <style>
-body {
-    margin: 0;
-    background: #0b0b0b;
-    font-family: Arial, sans-serif;
-    color: #fff;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
+:root{
+  --bg:#0b0b0b;
+  --card:#151515;
+  --gold:#d4af37;
+  --muted:#888;
+  --wa:#25d366;
 }
 
-.offer-box {
-    width: 100%;
-    max-width: 420px;
-    background: #111;
-    border-radius: 16px;
-    overflow: hidden;
-    box-shadow: 0 0 40px rgba(212,175,55,0.25);
+body{
+  margin:0;
+  background:var(--bg);
+  font-family:Arial, sans-serif;
+  color:#fff;
 }
 
-.offer-box img {
-    width: 100%;
-    display: block;
+header{
+  position:sticky;
+  top:0;
+  z-index:10;
+  background:#000;
+  border-bottom:1px solid #222;
+  padding:15px;
+  text-align:center;
 }
 
-.offer-content {
-    padding: 20px;
-    text-align: center;
+header img{
+  height:50px;
 }
 
-.offer-content h1 {
-    margin: 0 0 10px;
-    color: #d4af37;
-    font-size: 22px;
+.branch-box{
+  max-width:420px;
+  margin:20px auto;
+  background:var(--card);
+  border-radius:14px;
+  padding:18px;
+  text-align:center;
+  border:1px solid #222;
 }
 
-.offer-content p {
-    color: #ccc;
-    font-size: 15px;
+.branch-box h1{
+  margin:0;
+  font-size:20px;
+  color:var(--gold);
 }
 
-.whatsapp-btn {
-    display: block;
-    margin-top: 20px;
-    padding: 15px;
-    background: #25D366;
-    color: #fff;
-    font-size: 18px;
-    font-weight: bold;
-    text-decoration: none;
-    border-radius: 12px;
+.branch-box .hours{
+  margin-top:6px;
+  font-size:13px;
+  color:var(--muted);
+}
+
+.grid{
+  max-width:420px;
+  margin:20px auto;
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:12px;
+}
+
+.product{
+  background:#fff;
+  border-radius:10px;
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+}
+
+.product img{
+  width:100%;
+  height:140px;
+  object-fit:contain;
+  background:#fff;
+}
+
+.product .info{
+  padding:10px;
+  color:#000;
+  text-align:center;
+  display:flex;
+  flex-direction:column;
+  flex:1;
+}
+
+.product .code{
+  font-weight:bold;
+  font-size:14px;
+}
+
+.product .price{
+  color:#b8860b;
+  font-weight:bold;
+  margin:6px 0;
+}
+
+.product a{
+  margin-top:auto;
+  background:var(--wa);
+  color:#fff;
+  padding:8px;
+  border-radius:6px;
+  text-decoration:none;
+  font-size:13px;
+  font-weight:bold;
 }
 </style>
 </head>
 
 <body>
 
-<div class="offer-box">
-    <img src="https://madperfume.co.il/upload/11-2025/product/691e3804ba4ee.jpg" alt="MAD Offer">
+<header>
+  <img src="https://abomkdad.github.io/Digital-Business-Card/logo.png">
+</header>
 
-    <div class="offer-content">
-        <h1 id="branch-title">عرض خاص</h1>
-        <p id="branch-desc">اطلب الآن مباشرة من الفرع عبر واتساب</p>
-
-        <a id="wa-btn" class="whatsapp-btn" href="#" target="_blank">
-            اطلب الآن عبر واتساب
-        </a>
-    </div>
+<div id="branchBox" class="branch-box">
+  <h1 id="branchName">...</h1>
+  <div id="branchHours" class="hours"></div>
 </div>
 
+<div id="products" class="grid"></div>
+
 <script>
-const BRANCHES_CSV = 'branches.csv';
+const LANG =
+  new URLSearchParams(location.search).get('lang') ||
+  (navigator.language.startsWith('he') ? 'he' : 'ar');
 
-function getParam(name) {
-    return new URLSearchParams(window.location.search).get(name);
-}
+document.documentElement.lang = LANG;
+document.documentElement.dir = LANG === 'he' ? 'ltr' : 'rtl';
 
-const branchId = getParam('branch');
+const TEXT = {
+  ar:{
+    check:"افحص التوفر",
+    msg:(p,b)=>`مرحباً، هل العطر ${p} متوفر في فرع ${b}؟`
+  },
+  he:{
+    check:"בדוק זמינות",
+    msg:(p,b)=>`שלום, האם הבושם ${p} זמין בסניף ${b}?`
+  }
+};
 
-Papa.parse(BRANCHES_CSV, {
-    download: true,
-    header: true,
-    skipEmptyLines: true,
-    transformHeader: h => h.trim(),
-    complete: res => {
-        const branch = res.data.find(b => b.ID === branchId);
-        if (!branch) {
-            document.getElementById('branch-title').innerText = 'الفرع غير موجود';
-            return;
-        }
+const branchID = new URLSearchParams(location.search).get('branch');
 
-        const lang = (navigator.language || '').startsWith('he') ? 'he' : 'ar';
+let branchPhone="", branchName="";
 
-        const name =
-            lang === 'he'
-            ? branch['اسم الفرع عبري']
-            : branch['اسم الفرع عربي'];
+Papa.parse("branches.csv",{
+  download:true,
+  header:true,
+  complete:r=>{
+    const b = r.data.find(x=>x.ID===branchID);
+    if(!b) return;
 
-        const phone =
-            (branch['الهاتف'] || '')
-            .replace(/\D/g, '')
-            .replace(/^0/, '972');
+    branchName = LANG==="he" ? b["اسم الفرع عبري"] : b["اسم الفرع عربي"];
+    branchPhone = (b["الهاتف"]||"").replace(/\D/g,"").replace(/^0/,"972");
 
-        const msg =
-            lang === 'he'
-            ? `שלום, אני מעוניין להזמין מהסניף ${name}`
-            : `مرحباً، أرغب بطلب هذا العرض من فرع ${name}`;
+    document.getElementById("branchName").innerText = branchName;
+    document.getElementById("branchHours").innerText =
+      LANG==="he" ? b["ساعات الدوام عبري"] : b["ساعات الدوام عربي"];
+  }
+});
 
-        document.getElementById('branch-title').innerText = `عرض فرع ${name}`;
-        document.getElementById('wa-btn').href =
-            `https://wa.me/${phone}?text=${encodeURIComponent(msg)}`;
-    }
+Papa.parse("products.csv",{
+  download:true,
+  header:true,
+  complete:r=>{
+    const box=document.getElementById("products");
+    r.data.slice(0,60).forEach(p=>{
+      if(!p.Title) return;
+
+      const img=(p.Image||"").split("|")[0];
+      const msg=TEXT[LANG].msg(p.Title,branchName);
+
+      box.innerHTML+=`
+        <div class="product">
+          <img src="${img}">
+          <div class="info">
+            <div class="code">${p.Title}</div>
+            <div class="price">₪ ${p.Price}</div>
+            <a href="https://wa.me/${branchPhone}?text=${encodeURIComponent(msg)}" target="_blank">
+              ${TEXT[LANG].check}
+            </a>
+          </div>
+        </div>`;
+    });
+  }
 });
 </script>
 
