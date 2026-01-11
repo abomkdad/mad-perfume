@@ -10,7 +10,7 @@
 <style>
 :root{
   --bg:#0a0a0a;
-  --card:#161616;
+  --card:#151515;
   --gold:#d4af37;
   --muted:#999;
   --wa:#25d366;
@@ -25,28 +25,30 @@ body{
 
 /* ===== HEADER ===== */
 header{
-  padding:20px;
+  padding:18px;
   text-align:center;
   border-bottom:1px solid #222;
 }
-header img{height:55px}
+header img{
+  height:55px;
+}
 
 /* ===== BRANCH INFO ===== */
-.branch{
+.branch-box{
   max-width:420px;
-  margin:20px auto;
+  margin:18px auto;
   background:linear-gradient(180deg,#161616,#0f0f0f);
   border-radius:18px;
-  padding:20px;
+  padding:18px;
   text-align:center;
   border:1px solid #222;
 }
-.branch h1{
+.branch-box h1{
   margin:0;
   color:var(--gold);
   font-size:20px;
 }
-.branch .hours{
+.branch-box .hours{
   margin-top:8px;
   font-size:13px;
   color:var(--muted);
@@ -55,7 +57,7 @@ header img{height:55px}
 /* ===== PRODUCTS GRID ===== */
 .grid{
   max-width:420px;
-  margin:20px auto 100px;
+  margin:20px auto 120px;
   display:grid;
   grid-template-columns:repeat(2,1fr);
   gap:14px;
@@ -68,24 +70,31 @@ header img{height:55px}
   display:flex;
   flex-direction:column;
 }
+
 .product img{
+  width:100%;
   height:150px;
   object-fit:contain;
   background:#fff;
 }
+
 .product .info{
   padding:12px;
   color:#000;
   text-align:center;
 }
+
 .product .code{
   font-weight:bold;
+  font-size:14px;
 }
+
 .product .price{
   color:#b8860b;
   margin:6px 0;
   font-weight:bold;
 }
+
 .product a{
   display:block;
   background:#2ecc71;
@@ -104,14 +113,14 @@ header img{height:55px}
   right:20px;
   background:var(--wa);
   color:#fff;
-  width:58px;
-  height:58px;
+  width:60px;
+  height:60px;
   border-radius:50%;
   display:flex;
   align-items:center;
   justify-content:center;
-  font-size:28px;
-  box-shadow:0 10px 25px rgba(0,0,0,.4);
+  font-size:30px;
+  box-shadow:0 10px 25px rgba(0,0,0,.45);
   z-index:99;
 }
 </style>
@@ -123,7 +132,7 @@ header img{height:55px}
   <img src="https://abomkdad.github.io/Digital-Business-Card/logo.png">
 </header>
 
-<div id="branchBox" class="branch">
+<div id="branchBox" class="branch-box">
   <h1 id="branchName">...</h1>
   <div id="branchHours" class="hours"></div>
 </div>
@@ -133,54 +142,87 @@ header img{height:55px}
 <a id="waFloat" class="wa-float" target="_blank">💬</a>
 
 <script>
+/* ===== LANGUAGE ===== */
 const LANG =
   new URLSearchParams(location.search).get('lang') ||
   (navigator.language.startsWith('he') ? 'he' : 'ar');
 
-document.documentElement.dir = LANG==='he'?'ltr':'rtl';
 document.documentElement.lang = LANG;
+document.documentElement.dir = LANG === 'he' ? 'ltr' : 'rtl';
 
-const T={
- ar:{check:"افحص التوفر",msg:(p,b)=>`مرحباً، هل العطر ${p} متوفر في فرع ${b}?`},
- he:{check:"בדוק זמינות",msg:(p,b)=>`שלום, האם הבושם ${p} זמין בסניף ${b}?`}
+const TEXT = {
+  ar:{
+    check:"افحص التوفر",
+    msg:(p,b)=>`مرحباً، هل العطر ${p} متوفر في فرع ${b}؟`
+  },
+  he:{
+    check:"בדוק זמינות",
+    msg:(p,b)=>`שלום, האם הבושם ${p} זמין בסניף ${b}?`
+  }
 };
 
-const branchID=new URLSearchParams(location.search).get('branch');
-let branchPhone="",branchName="";
+/* ===== GET BRANCH ID ===== */
+const branchID = new URLSearchParams(location.search).get('branch');
+let branchPhone = "";
+let branchName  = "";
 
-Papa.parse("branches.csv",{download:true,header:true,complete:r=>{
- const b=r.data.find(x=>x.ID===branchID);
- if(!b){
-   document.getElementById("branchName").innerText="Branch not found";
-   return;
- }
- branchName=LANG==='he'?b["اسم الفرع عبري"]:b["اسم الفرع عربي"];
- branchPhone=(b["الهاتف"]||"").replace(/\D/g,"").replace(/^0/,"972");
- document.getElementById("branchName").innerText=branchName;
- document.getElementById("branchHours").innerText=
-  LANG==='he'?b["ساعات الدوام عبري"]:b["ساعات الدوام عربي"];
- document.getElementById("waFloat").href=`https://wa.me/${branchPhone}`;
-}});
+/* ===== LOAD BRANCH ===== */
+Papa.parse("branches.csv",{
+  download:true,
+  header:true,
+  skipEmptyLines:true,
+  complete:r=>{
+    const b = r.data.find(x => String(x.ID) === String(branchID));
 
-Papa.parse("products.csv",{download:true,header:true,complete:r=>{
- const box=document.getElementById("products");
- r.data.slice(0,50).forEach(p=>{
-  if(!p.Title) return;
-  const img=(p.Image||"").split("|")[0];
-  const msg=T[LANG].msg(p.Title,branchName);
-  box.innerHTML+=`
-   <div class="product">
-    <img src="${img}">
-    <div class="info">
-      <div class="code">${p.Title}</div>
-      <div class="price">₪ ${p.Price}</div>
-      <a href="https://wa.me/${branchPhone}?text=${encodeURIComponent(msg)}" target="_blank">
-        ${T[LANG].check}
-      </a>
-    </div>
-   </div>`;
- });
-}});
+    if(!b){
+      document.getElementById("branchName").innerText =
+        LANG === 'he' ? "סניף לא נמצא" : "الفرع غير موجود";
+      return;
+    }
+
+    branchName =
+      LANG === 'he' ? b["اسم الفرع عبري"] : b["اسم الفرع عربي"];
+
+    branchPhone = (b["WhatsApp"] || "")
+      .replace("https://wa.me/","");
+
+    document.getElementById("branchName").innerText = branchName;
+    document.getElementById("branchHours").innerHTML =
+      LANG === 'he' ? b["ساعات الدوام عبري"] : b["ساعات الدوام عربي"];
+
+    document.getElementById("waFloat").href =
+      `https://wa.me/${branchPhone}`;
+  }
+});
+
+/* ===== LOAD PRODUCTS ===== */
+Papa.parse("products.csv",{
+  download:true,
+  header:true,
+  skipEmptyLines:true,
+  complete:r=>{
+    const box = document.getElementById("products");
+
+    r.data.slice(0,60).forEach(p=>{
+      if(!p.Title) return;
+
+      const img = (p.Image || "").split("|")[0];
+      const msg = TEXT[LANG].msg(p.Title, branchName);
+
+      box.innerHTML += `
+        <div class="product">
+          <img src="${img}">
+          <div class="info">
+            <div class="code">${p.Title}</div>
+            <div class="price">₪ 100</div>
+            <a href="https://wa.me/${branchPhone}?text=${encodeURIComponent(msg)}" target="_blank">
+              ${TEXT[LANG].check}
+            </a>
+          </div>
+        </div>`;
+    });
+  }
+});
 </script>
 
 </body>
