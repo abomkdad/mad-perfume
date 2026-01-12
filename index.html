@@ -1,88 +1,139 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>MAD Parfumeur | الفروع</title>
+  <meta charset="UTF-8">
+  <title>MAD Parfumeur</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- Leaflet -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <!-- Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
 
   <style>
-    :root {
-      --mad-blue:#1d3a8a;
-      --open:#22c55e;
-      --closed:#ef4444;
-    }
+    * { box-sizing: border-box; }
 
     body {
-      margin:0;
-      font-family:Segoe UI,Tahoma,sans-serif;
-      background:#f4f7ff;
+      margin: 0;
+      font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #ffffff;
+      color: #111;
     }
 
+    /* Header */
     header {
-      background:#fff;
-      padding:10px 15px;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      box-shadow:0 2px 8px rgba(0,0,0,.1);
-      position:sticky;
-      top:0;
-      z-index:1000;
+      position: fixed;
+      top: 0;
+      width: 100%;
+      padding: 18px 36px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(255,255,255,0.85);
+      backdrop-filter: blur(12px);
+      z-index: 10;
     }
 
     header img {
-      height:45px;
+      height: 44px;
     }
 
-    #map {
-      height:320px;
-      margin:15px;
-      border-radius:20px;
-      overflow:hidden;
+    /* Hero */
+    .hero {
+      height: 100vh;
+      background: url("header.jpg") center/cover no-repeat;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 40px;
     }
 
-    .container {
-      max-width:600px;
-      margin:auto;
-      padding:0 15px 40px;
+    .hero-box {
+      max-width: 720px;
+      background: rgba(255,255,255,0.88);
+      padding: 64px 48px;
+      border-radius: 28px;
+      box-shadow: 0 30px 80px rgba(0,0,0,0.15);
     }
 
-    .card {
-      background:#fff;
-      border-radius:20px;
-      padding:20px;
-      margin-bottom:20px;
-      box-shadow:0 5px 20px rgba(0,0,0,.05);
-      text-align:center;
+    .hero-box h1 {
+      font-size: 48px;
+      font-weight: 600;
+      margin: 0 0 20px;
+      letter-spacing: -0.02em;
     }
 
-    .status {
-      font-weight:bold;
-      margin-bottom:5px;
+    .hero-box p {
+      font-size: 20px;
+      font-weight: 300;
+      margin: 0 0 40px;
+      color: #333;
     }
 
-    .open {color:var(--open)}
-    .closed {color:var(--closed)}
-
-    .nearest {
-      color:var(--open);
-      font-weight:bold;
-      margin-bottom:10px;
+    .cta {
+      display: inline-block;
+      padding: 18px 46px;
+      font-size: 18px;
+      border-radius: 999px;
+      background: #111;
+      color: #fff;
+      text-decoration: none;
+      transition: 0.3s ease;
     }
 
-    .actions a {
-      display:inline-block;
-      margin:5px;
-      padding:10px 15px;
-      border-radius:10px;
-      text-decoration:none;
-      font-weight:bold;
-      background:#eef2ff;
-      color:var(--mad-blue);
+    .cta:hover {
+      background: #000;
+      transform: scale(1.06);
+    }
+
+    /* Stats */
+    .stats {
+      padding: 120px 40px;
+      display: flex;
+      justify-content: center;
+      gap: 80px;
+      text-align: center;
+      background: #fff;
+    }
+
+    .stat h2 {
+      font-size: 44px;
+      margin: 0 0 8px;
+      font-weight: 600;
+    }
+
+    .stat p {
+      margin: 0;
+      font-size: 18px;
+      color: #666;
+    }
+
+    /* Footer */
+    footer {
+      padding: 40px 20px;
+      text-align: center;
+      font-size: 14px;
+      color: #999;
+      background: #fafafa;
+    }
+
+    /* Mobile */
+    @media (max-width: 768px) {
+      .hero-box {
+        padding: 48px 28px;
+      }
+
+      .hero-box h1 {
+        font-size: 36px;
+      }
+
+      .hero-box p {
+        font-size: 18px;
+      }
+
+      .stats {
+        flex-direction: column;
+        gap: 40px;
+      }
     }
   </style>
 </head>
@@ -90,154 +141,37 @@
 <body>
 
 <header>
-  <img src="logo.png" alt="MAD">
-  <select id="langSelect" onchange="renderBranches()">
-    <option value="ar" selected>العربية</option>
-    <option value="he">עברית</option>
-  </select>
+  <img src="logo.png" alt="MAD Parfumeur">
 </header>
 
-<div id="map"></div>
+<section class="hero">
+  <div class="hero-box">
+    <h1>MAD Parfumeur</h1>
+    <p>Luxury fragrances. Nearest branch. Instantly.</p>
 
-<div class="container" id="branches"></div>
+    <!-- الرابط المهم -->
+    <a href="stores.html" class="cta">اعثر على أقرب فرع</a>
+  </div>
+</section>
 
-<script>
-/* ================== DATA ================== */
-let db = { branches: [] };
-let userLocation = null;
-let map;
+<section class="stats">
+  <div class="stat">
+    <h2>40+</h2>
+    <p>فروع</p>
+  </div>
+  <div class="stat">
+    <h2>Premium</h2>
+    <p>جودة</p>
+  </div>
+  <div class="stat">
+    <h2>Fast</h2>
+    <p>وصول فوري</p>
+  </div>
+</section>
 
-/* ================== LOAD DATA ================== */
-async function loadData(){
-  const res = await fetch('branches.json');
-  db.branches = await res.json();
-  initMap();
-  renderBranches();
-}
-
-/* ================== LOCATION ================== */
-function getUserLocation(){
-  return new Promise((resolve,reject)=>{
-    navigator.geolocation.getCurrentPosition(
-      p=>resolve({lat:p.coords.latitude,lng:p.coords.longitude}),
-      ()=>reject()
-    );
-  });
-}
-
-/* ================== DISTANCE ================== */
-function distance(lat1,lng1,lat2,lng2){
-  const R=6371;
-  const dLat=(lat2-lat1)*Math.PI/180;
-  const dLng=(lng2-lng1)*Math.PI/180;
-  const a=Math.sin(dLat/2)**2+
-    Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*
-    Math.sin(dLng/2)**2;
-  return R*(2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a)));
-}
-
-/* ================== OPEN / CLOSE ================== */
-function isOpenNow(){
-  const h=new Date().getHours();
-  return h>=10 && h<22;
-}
-
-/* ================== MAP ================== */
-const greenIcon=L.icon({
-  iconUrl:'https://maps.gstatic.com/mapfiles/ms2/micons/green-dot.png',
-  iconSize:[32,32],
-  iconAnchor:[16,32]
-});
-const redIcon=L.icon({
-  iconUrl:'https://maps.gstatic.com/mapfiles/ms2/micons/red-dot.png',
-  iconSize:[32,32],
-  iconAnchor:[16,32]
-});
-const blueIcon=L.icon({
-  iconUrl:'https://maps.gstatic.com/mapfiles/ms2/micons/blue-dot.png',
-  iconSize:[32,32],
-  iconAnchor:[16,32]
-});
-
-async function initMap(){
-  map=L.map('map').setView([32.0853,34.7818],9);
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
-    attribution:'© OpenStreetMap'
-  }).addTo(map);
-
-  try{
-    userLocation=await getUserLocation();
-    L.marker([userLocation.lat,userLocation.lng],{icon:blueIcon})
-      .addTo(map).bindPopup('📍 موقعك');
-  }catch{}
-
-  drawBranchesOnMap();
-}
-
-/* ================== DRAW BRANCHES ================== */
-function drawBranchesOnMap(){
-  const lang=document.getElementById('langSelect').value;
-  let nearest=null,min=Infinity;
-
-  if(userLocation){
-    db.branches.forEach(b=>{
-      if(!isOpenNow())return;
-      const d=distance(userLocation.lat,userLocation.lng,b.lat,b.lng);
-      if(d<min){min=d;nearest=b;}
-    });
-  }
-
-  db.branches.forEach(b=>{
-    const open=isOpenNow();
-    const icon=open?greenIcon:redIcon;
-    const marker=L.marker([b.lat,b.lng],{icon}).addTo(map)
-      .bindPopup(`
-        <b>${lang==='ar'?b.name_ar:b.name_he}</b><br>
-        ${open?'🟢 مفتوح':'🔴 مغلق'}<br><br>
-        <a href="${b.waze_maps}" target="_blank">🧭 Waze</a><br>
-        <a href="tel:${b.phone}">📞 اتصال</a>
-      `);
-
-    if(nearest && b.id===nearest.id){
-      marker.openPopup();
-      map.setView([b.lat,b.lng],13);
-    }
-  });
-}
-
-/* ================== LIST ================== */
-function renderBranches(){
-  const box=document.getElementById('branches');
-  const lang=document.getElementById('langSelect').value;
-  box.innerHTML='';
-
-  let nearestId=null,min=Infinity;
-  if(userLocation){
-    db.branches.forEach(b=>{
-      const d=distance(userLocation.lat,userLocation.lng,b.lat,b.lng);
-      if(d<min && isOpenNow()){min=d;nearestId=b.id;}
-    });
-  }
-
-  db.branches.forEach(b=>{
-    const open=isOpenNow();
-    box.innerHTML+=`
-      <div class="card">
-        ${b.id===nearestId?'<div class="nearest">📍 أقرب فرع لك</div>':''}
-        <div class="status ${open?'open':'closed'}">
-          ${open?'🟢 مفتوح الآن':'🔴 مغلق الآن'}
-        </div>
-        <h2>${lang==='ar'?b.name_ar:b.name_he}</h2>
-        <div class="actions">
-          <a href="${b.waze_maps}" target="_blank">Waze</a>
-          <a href="tel:${b.phone}">اتصال</a>
-        </div>
-      </div>`;
-  });
-}
-
-loadData();
-</script>
+<footer>
+  © MAD Parfumeur — All rights reserved
+</footer>
 
 </body>
 </html>
