@@ -6,191 +6,183 @@
     <title>MAD PARFUMEUR | Luxury Experience</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Cairo:wght@300;400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Cairo:wght@400;700&display=swap" rel="stylesheet">
     
     <style>
         :root { 
             --gold: #d4af37; 
-            --gold-gradient: linear-gradient(135deg, #d4af37 0%, #f3e5ab 50%, #b8860b 100%);
-            --bg-color: #050505;
+            --gold-grad: linear-gradient(135deg, #f3e5ab 0%, #d4af37 50%, #b8860b 100%);
+            --apple-dark: #0a0a0a;
         }
 
         body { 
-            margin: 0; font-family: 'Cairo', sans-serif; background: var(--bg-color); 
-            color: #fff; overflow-x: hidden;
-            /* خلفية متحركة لإضافة روح للموقع */
-            background: radial-gradient(circle at center, #111 0%, #000 100%);
+            margin: 0; font-family: 'Cairo', sans-serif; background: #000; color: #fff;
+            background-image: radial-gradient(circle at top, #1a1a1a 0%, #000 70%);
+            min-height: 100vh;
         }
 
-        /* === Header & Logo === */
+        /* Nav & Dynamic Logo */
         nav {
-            padding: 30px 0; text-align: center;
-            background: rgba(0,0,0,0.5); backdrop-filter: blur(10px);
-            position: sticky; top: 0; z-index: 1000;
+            padding: 25px 0; text-align: center; position: sticky; top: 0; z-index: 1000;
+            background: rgba(0,0,0,0.8); backdrop-filter: blur(20px);
         }
-
-        .logo-container {
-            position: relative; display: inline-block;
-            cursor: pointer; transition: 0.5s;
+        .main-logo {
+            width: 75px; height: 75px; border-radius: 50%; border: 1.5px solid var(--gold);
+            cursor: pointer; transition: 0.5s; box-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
         }
+        .main-logo:active { transform: scale(0.9); }
 
-        .logo-container img {
-            width: 70px; height: 70px; border-radius: 50%;
-            border: 2px solid var(--gold); position: relative; z-index: 2;
-        }
-
-        /* شعاع خلف اللوجو يعطي حياة */
-        .logo-container::after {
-            content: ''; position: absolute; inset: -5px;
-            background: var(--gold-gradient); border-radius: 50%;
-            filter: blur(15px); opacity: 0.3; animation: pulse 3s infinite;
-        }
-
-        /* === Circular Icons (Luxury Gold) === */
-        .gold-circles {
-            display: flex; justify-content: center; gap: 20px; margin: 30px 0;
-        }
-
-        .circle-link {
-            width: 50px; height: 50px; border-radius: 50%;
-            background: var(--gold-gradient); color: #000;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 1.4rem; text-decoration: none;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
-            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-
-        .circle-link:hover {
-            transform: translateY(-8px) scale(1.1);
-            box-shadow: 0 15px 30px rgba(212, 175, 55, 0.4);
-        }
-
-        /* === Branch Detail Cards === */
+        /* Container */
         .container { max-width: 500px; margin: 0 auto; padding: 20px; }
-        
-        .branch-info { text-align: center; margin-bottom: 40px; animation: fadeInUp 1s ease; }
-        .branch-info h1 { font-family: 'Cinzel', serif; color: var(--gold); font-size: 2.2rem; margin: 10px 0; }
-        .branch-info p { color: #888; letter-spacing: 2px; }
 
-        /* === Products (Apple Store Style) === */
-        .products-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-
-        .product-card {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 20px; overflow: hidden;
-            transition: 0.4s; backdrop-filter: blur(5px);
+        /* Branch List Card */
+        .branch-item {
+            background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 25px; padding: 25px; margin-bottom: 20px; text-align: center;
+            transition: 0.4s; backdrop-filter: blur(10px);
         }
+        .branch-item:hover { border-color: var(--gold); background: rgba(255,255,255,0.05); }
 
-        .product-card:hover {
-            background: rgba(255, 255, 255, 0.07);
-            border-color: var(--gold);
-            transform: translateY(-10px);
-        }
-
-        .img-box {
-            background: #fff; padding: 20px; height: 180px;
+        /* Golden Circle Buttons */
+        .social-row { display: flex; justify-content: center; gap: 15px; margin: 20px 0; }
+        .circle-btn {
+            width: 48px; height: 48px; border-radius: 50%; background: var(--gold-grad);
             display: flex; align-items: center; justify-content: center;
-            position: relative;
+            color: #000; text-decoration: none; font-size: 1.3rem; transition: 0.3s;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
         }
+        .circle-btn:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(212, 175, 55, 0.4); }
 
-        .img-box img { max-height: 100%; max-width: 100%; transition: 0.5s; }
-        .product-card:hover .img-box img { transform: scale(1.1); }
+        /* Shop Button */
+        .btn-shop {
+            display: block; width: 100%; padding: 14px; border-radius: 15px;
+            background: transparent; border: 1px solid var(--gold); color: var(--gold);
+            font-weight: bold; text-decoration: none; transition: 0.3s;
+        }
+        .btn-shop:hover { background: var(--gold-grad); color: #000; }
 
-        .p-details { padding: 15px; text-align: center; }
-        .p-name { font-weight: 700; font-size: 0.9rem; margin-bottom: 8px; color: #fff; }
+        /* Detail View */
+        .back-nav { color: var(--gold); cursor: pointer; display: flex; align-items: center; gap: 10px; margin-bottom: 25px; font-weight: bold; }
+        .shop-title { font-family: 'Cinzel', serif; color: var(--gold); font-size: 2rem; margin: 0; text-align: center; }
+
+        /* Products Grid */
+        .products-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 30px; }
+        .p-card {
+            background: #111; border-radius: 20px; overflow: hidden;
+            display: flex; flex-direction: column; border: 1px solid #222;
+        }
+        .p-img-container { background: #fff; height: 160px; display: flex; align-items: center; justify-content: center; padding: 15px; }
+        .p-img-container img { max-height: 100%; max-width: 100%; mix-blend-mode: multiply; }
+        .p-content { padding: 15px; text-align: center; flex-grow: 1; }
+        .p-name { font-weight: bold; font-size: 0.85rem; height: 35px; overflow: hidden; margin-bottom: 10px; }
         .p-price { color: var(--gold); font-size: 1.1rem; font-weight: bold; margin-bottom: 15px; }
-
-        .btn-order {
-            display: block; padding: 10px; background: var(--gold-gradient);
-            color: #000; text-decoration: none; border-radius: 12px;
-            font-size: 0.8rem; font-weight: bold; transition: 0.3s;
-        }
-
-        /* === Animations === */
-        @keyframes pulse { 0% { opacity: 0.2; } 50% { opacity: 0.5; } 100% { opacity: 0.2; } }
-        @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
-
-        .back-btn {
-            color: var(--gold); cursor: pointer; display: inline-flex;
-            align-items: center; gap: 10px; margin-bottom: 30px;
-            font-weight: bold; text-transform: uppercase; font-size: 0.8rem;
+        .btn-wa-order {
+            background: var(--gold-grad); color: #000; padding: 10px; border-radius: 10px;
+            text-decoration: none; display: block; font-size: 0.75rem; font-weight: 800;
         }
 
         .hidden { display: none !important; }
+        #loader { position: fixed; inset: 0; background: #000; z-index: 2000; display: flex; align-items: center; justify-content: center; color: var(--gold); font-family: 'Cinzel'; letter-spacing: 4px; }
     </style>
 </head>
 <body>
 
+<div id="loader">MAD PARFUMEUR</div>
+
 <nav>
-    <div class="logo-container" onclick="goHome()">
-        <img src="https://abomkdad.github.io/Digital-Business-Card/logo.png" alt="MAD">
-    </div>
+    <img src="https://abomkdad.github.io/Digital-Business-Card/logo.png" class="main-logo" onclick="goHome()">
 </nav>
 
 <div class="container">
     <div id="home-view">
-        <h2 style="text-align: center; color: var(--gold);">اختر الفرع لتجربة التسوق</h2>
         <div id="branches-list"></div>
     </div>
 
     <div id="detail-view" class="hidden">
-        <div class="back-btn" onclick="goHome()">
-            <i class="fas fa-arrow-right"></i> فروعنا
+        <div class="back-nav" onclick="goHome()"><i class="fas fa-arrow-right"></i> فروعنا</div>
+        <div id="branch-header" style="text-align:center;">
+            <h1 id="det-name" class="shop-title"></h1>
+            <p id="det-hours" style="color:#888; font-size:0.9rem; margin:10px 0;"></p>
+            <div id="det-social" class="social-row"></div>
         </div>
-        
-        <div class="branch-info">
-            <h1 id="det-name">حيفا</h1>
-            <p id="det-hours">يومياً: 10:00 - 22:00</p>
-            
-            <div class="gold-circles">
-                <a href="#" class="circle-link" id="link-waze"><i class="fab fa-waze"></i></a>
-                <a href="#" class="circle-link" id="link-wa"><i class="fab fa-whatsapp"></i></a>
-                <a href="#" class="circle-link" id="link-ig"><i class="fab fa-instagram"></i></a>
-            </div>
-        </div>
-
-        <div id="products-grid" class="products-grid">
-            </div>
+        <div id="products-grid" class="products-grid"></div>
     </div>
 </div>
 
 <script>
-    // بيانات تجريبية (يتم استبدالها بـ CSV الخاص بك)
-    const mockProducts = [
-        { Title: "I101", Price: "100", Image: "https://via.placeholder.com/200" },
-        { Title: "W183", Price: "100", Image: "https://via.placeholder.com/200" }
-    ];
+    let DATA = { b: [], p: [] };
 
-    function showProducts(branchName, phone) {
-        document.getElementById('home-view').classList.add('hidden');
-        document.getElementById('detail-view').classList.remove('hidden');
-        
-        const grid = document.getElementById('products-grid');
-        grid.innerHTML = '';
+    async function init() {
+        const fetchCSV = u => new Promise(r => Papa.parse(u, { download:true, header:true, complete:x=>r(x.data) }));
+        try {
+            [DATA.b, DATA.p] = await Promise.all([fetchCSV('branches.csv'), fetchCSV('products.csv')]);
+            renderBranches(DATA.b);
+            document.getElementById('loader').classList.add('hidden');
+        } catch(e) { console.error("Data Error"); }
+    }
 
-        mockProducts.forEach(p => {
-            grid.innerHTML += `
-                <div class="product-card">
-                    <div class="img-box"><img src="${p.Image}"></div>
-                    <div class="p-details">
-                        <div class="p-name">${p.Title}</div>
-                        <div class="p-price">${p.Price} ₪</div>
-                        <a href="https://wa.me/${phone}" class="btn-order">طلب عبر واتساب</a>
+    function renderBranches(list) {
+        const container = document.getElementById('branches-list');
+        container.innerHTML = '';
+        list.forEach(b => {
+            if(!b.ID) return;
+            const ph = b['الهاتف'].replace(/\D/g,'').replace(/^0/,'972');
+            container.innerHTML += `
+                <div class="branch-item">
+                    <h2 style="margin:0; font-size:1.4rem;">${b['اسم الفرع عربي']}</h2>
+                    <p style="color:#888; font-size:0.85rem; margin:10px 0;">${b['ساعات الدوام عربي']}</p>
+                    <div class="social-row">
+                        <a href="${b['رابط Waze / Maps']}" class="circle-btn"><i class="fab fa-waze"></i></a>
+                        <a href="https://wa.me/${ph}" class="circle-btn"><i class="fab fa-whatsapp"></i></a>
+                        ${b.Instagram ? `<a href="${b.Instagram}" class="circle-btn"><i class="fab fa-instagram"></i></a>` : ''}
                     </div>
+                    <button class="btn-shop" onclick="openShop('${b.ID}')">دخول الفرع</button>
                 </div>
             `;
         });
     }
 
+    function openShop(id) {
+        const b = DATA.b.find(x => x.ID == id);
+        const ph = b['الهاتف'].replace(/\D/g,'').replace(/^0/,'972');
+        
+        document.getElementById('home-view').classList.add('hidden');
+        document.getElementById('detail-view').classList.remove('hidden');
+        
+        document.getElementById('det-name').innerText = b['اسم الفرع عربي'];
+        document.getElementById('det-hours').innerText = b['ساعات الدوام عربي'];
+        
+        // Social icons in detail
+        document.getElementById('det-social').innerHTML = `
+            <a href="${b['رابط Waze / Maps']}" class="circle-btn"><i class="fab fa-waze"></i></a>
+            <a href="https://wa.me/${ph}" class="circle-btn"><i class="fab fa-whatsapp"></i></a>
+        `;
+
+        const grid = document.getElementById('products-grid');
+        grid.innerHTML = '';
+        DATA.p.slice(0, 30).forEach(p => {
+            if(!p.Title) return;
+            grid.innerHTML += `
+                <div class="p-card">
+                    <div class="p-img-container"><img src="${p.Image.split('|')[0]}" loading="lazy"></div>
+                    <div class="p-content">
+                        <div class="p-name">${p.Title}</div>
+                        <div class="p-price">${p.Price} ₪</div>
+                        <a href="https://wa.me/${ph}?text=استفسار عن ${p.Title}" class="btn-wa-order">طلب عبر واتساب</a>
+                    </div>
+                </div>
+            `;
+        });
+        window.scrollTo(0,0);
+    }
+
     function goHome() {
         document.getElementById('detail-view').classList.add('hidden');
         document.getElementById('home-view').classList.remove('hidden');
+        window.scrollTo(0,0);
     }
 
-    // لتجربة العرض مباشرة
-    window.onload = () => showProducts("حيفا", "972500000000");
+    init();
 </script>
-
 </body>
 </html>
