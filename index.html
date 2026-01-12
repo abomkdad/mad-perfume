@@ -1,174 +1,243 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl" id="madApp">
+<html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mad Parfumeur | النظام الشامل</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        :root {
-            --mad-blue: #1d3a8a;
-            --mad-bg: #f4f7ff;
-            --open-green: #22c55e;
-            --closed-red: #ef4444;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MAD Parfumeur | الفروع</title>
 
-        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--mad-bg); margin: 0; padding: 0; }
-        
-        /* Header */
-        header { background: white; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 1000; }
-        .logo-section { display: flex; align-items: center; gap: 15px; }
-        .logo { height: 45px; cursor: pointer; }
-        .official-site { color: var(--mad-blue); text-decoration: none; font-weight: bold; font-size: 13px; border-right: 2px solid #eee; padding-right: 15px; }
-        
-        .view { display: none; }
-        .view.active { display: block; }
+  <!-- Leaflet -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-        /* Index View */
-        .hero { width: 100%; height: 250px; background: url('header.jpg') center/cover no-repeat; position: relative; }
-        .hero-overlay { position: absolute; bottom: 0; left: 0; right: 0; height: 50%; background: linear-gradient(transparent, var(--mad-bg)); }
-        
-        .container { max-width: 600px; margin: -60px auto 40px; padding: 0 15px; position: relative; z-index: 10; }
-        .card { background: white; border-radius: 30px; padding: 25px; margin-bottom: 25px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
-        
-        .status-badge { display: inline-flex; align-items: center; padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: bold; margin-bottom: 12px; }
-        .status-badge.open { background: #eefdf2; color: var(--open-green); }
-        .dot { width: 8px; height: 8px; border-radius: 50%; margin-left: 8px; background: currentColor; }
+  <style>
+    :root {
+      --mad-blue:#1d3a8a;
+      --open:#22c55e;
+      --closed:#ef4444;
+    }
 
-        .branch-name { font-size: 28px; color: var(--mad-blue); font-weight: 800; margin: 5px 0; }
-        .hours { color: #1e293b; font-weight: 600; margin-bottom: 15px; }
+    body {
+      margin:0;
+      font-family:Segoe UI,Tahoma,sans-serif;
+      background:#f4f7ff;
+    }
 
-        /* Navigation & Call Grid */
-        .action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
-        .action-link { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px; border-radius: 12px; text-decoration: none; font-weight: bold; font-size: 14px; }
-        .waze-btn { background: #f3f6ff; color: #333; border: 1px solid #e2e8f0; }
-        .call-btn { background: #eef2ff; color: var(--mad-blue); border: 1px solid var(--mad-blue); }
+    header {
+      background:#fff;
+      padding:10px 15px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      box-shadow:0 2px 8px rgba(0,0,0,.1);
+      position:sticky;
+      top:0;
+      z-index:1000;
+    }
 
-        /* Social Icons */
-        .social-links { display: flex; justify-content: center; gap: 18px; margin-bottom: 20px; }
-        .social-links a { color: var(--mad-blue); font-size: 24px; transition: 0.2s; }
-        .social-links a:hover { transform: scale(1.2); }
+    header img {
+      height:45px;
+    }
 
-        .btn-main { background: var(--mad-blue); color: white; border: none; width: 100%; padding: 16px; border-radius: 18px; font-size: 18px; font-weight: bold; cursor: pointer; text-decoration: none; display: block; }
+    #map {
+      height:320px;
+      margin:15px;
+      border-radius:20px;
+      overflow:hidden;
+    }
 
-        /* Store View */
-        .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 15px; margin-top: 25px; }
-        .product-card { background: white; border-radius: 20px; padding: 15px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.03); }
-        .product-img { width: 100%; border-radius: 15px; aspect-ratio: 1; object-fit: contain; }
-    </style>
+    .container {
+      max-width:600px;
+      margin:auto;
+      padding:0 15px 40px;
+    }
+
+    .card {
+      background:#fff;
+      border-radius:20px;
+      padding:20px;
+      margin-bottom:20px;
+      box-shadow:0 5px 20px rgba(0,0,0,.05);
+      text-align:center;
+    }
+
+    .status {
+      font-weight:bold;
+      margin-bottom:5px;
+    }
+
+    .open {color:var(--open)}
+    .closed {color:var(--closed)}
+
+    .nearest {
+      color:var(--open);
+      font-weight:bold;
+      margin-bottom:10px;
+    }
+
+    .actions a {
+      display:inline-block;
+      margin:5px;
+      padding:10px 15px;
+      border-radius:10px;
+      text-decoration:none;
+      font-weight:bold;
+      background:#eef2ff;
+      color:var(--mad-blue);
+    }
+  </style>
 </head>
+
 <body>
 
 <header>
-    <div class="logo-section">
-        <img src="logo.png" class="logo" onclick="showView('index')" alt="Mad Logo">
-        <a href="https://madperfume.co.il" target="_blank" class="official-site">الموقع الرسمي</a>
-    </div>
-    <select id="langSelect" onchange="initApp()" style="padding: 5px; border-radius: 5px; border: 1px solid var(--mad-blue);">
-        <option value="he">עברית</option>
-        <option value="ar" selected>العربية</option>
-    </select>
+  <img src="logo.png" alt="MAD">
+  <select id="langSelect" onchange="renderBranches()">
+    <option value="ar" selected>العربية</option>
+    <option value="he">עברית</option>
+  </select>
 </header>
 
-<div id="index-view" class="view active">
-    <div class="hero"><div class="hero-overlay"></div></div>
-    <div class="container" id="branches-list">جاري التحميل...</div>
-</div>
+<div id="map"></div>
 
-<div id="store-view" class="view">
-    <div style="padding: 20px; max-width: 1100px; margin: 0 auto;">
-        <button onclick="showView('index')" style="background:none; border:none; color:var(--mad-blue); font-weight:bold; cursor:pointer; font-size: 18px;">⬅ عودة</button>
-        <h1 id="store-title" style="text-align:center; color:var(--mad-blue);"></h1>
-        <div id="products-container"></div>
-    </div>
-</div>
+<div class="container" id="branches"></div>
 
 <script>
-    let db = { branches: [], productsHe: {}, productsAr: {} };
+/* ================== DATA ================== */
+let db = { branches: [] };
+let userLocation = null;
+let map;
 
-    async function loadData() {
-        try {
-            const [bRes, pArRes, pHeRes] = await Promise.all([
-                fetch('branches.json'),
-                fetch('ar-products.json'),
-                fetch('he-products.json')
-            ]);
-            db.branches = await bRes.json();
-            db.productsAr = (await pArRes.json()).madperfume_catalog;
-            db.productsHe = (await pHeRes.json()).madperfume_catalog;
-            initApp();
-        } catch (err) { console.error("Error loading data:", err); }
+/* ================== LOAD DATA ================== */
+async function loadData(){
+  const res = await fetch('branches.json');
+  db.branches = await res.json();
+  initMap();
+  renderBranches();
+}
+
+/* ================== LOCATION ================== */
+function getUserLocation(){
+  return new Promise((resolve,reject)=>{
+    navigator.geolocation.getCurrentPosition(
+      p=>resolve({lat:p.coords.latitude,lng:p.coords.longitude}),
+      ()=>reject()
+    );
+  });
+}
+
+/* ================== DISTANCE ================== */
+function distance(lat1,lng1,lat2,lng2){
+  const R=6371;
+  const dLat=(lat2-lat1)*Math.PI/180;
+  const dLng=(lng2-lng1)*Math.PI/180;
+  const a=Math.sin(dLat/2)**2+
+    Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*
+    Math.sin(dLng/2)**2;
+  return R*(2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a)));
+}
+
+/* ================== OPEN / CLOSE ================== */
+function isOpenNow(){
+  const h=new Date().getHours();
+  return h>=10 && h<22;
+}
+
+/* ================== MAP ================== */
+const greenIcon=L.icon({
+  iconUrl:'https://maps.gstatic.com/mapfiles/ms2/micons/green-dot.png',
+  iconSize:[32,32],
+  iconAnchor:[16,32]
+});
+const redIcon=L.icon({
+  iconUrl:'https://maps.gstatic.com/mapfiles/ms2/micons/red-dot.png',
+  iconSize:[32,32],
+  iconAnchor:[16,32]
+});
+const blueIcon=L.icon({
+  iconUrl:'https://maps.gstatic.com/mapfiles/ms2/micons/blue-dot.png',
+  iconSize:[32,32],
+  iconAnchor:[16,32]
+});
+
+async function initMap(){
+  map=L.map('map').setView([32.0853,34.7818],9);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
+    attribution:'© OpenStreetMap'
+  }).addTo(map);
+
+  try{
+    userLocation=await getUserLocation();
+    L.marker([userLocation.lat,userLocation.lng],{icon:blueIcon})
+      .addTo(map).bindPopup('📍 موقعك');
+  }catch{}
+
+  drawBranchesOnMap();
+}
+
+/* ================== DRAW BRANCHES ================== */
+function drawBranchesOnMap(){
+  const lang=document.getElementById('langSelect').value;
+  let nearest=null,min=Infinity;
+
+  if(userLocation){
+    db.branches.forEach(b=>{
+      if(!isOpenNow())return;
+      const d=distance(userLocation.lat,userLocation.lng,b.lat,b.lng);
+      if(d<min){min=d;nearest=b;}
+    });
+  }
+
+  db.branches.forEach(b=>{
+    const open=isOpenNow();
+    const icon=open?greenIcon:redIcon;
+    const marker=L.marker([b.lat,b.lng],{icon}).addTo(map)
+      .bindPopup(`
+        <b>${lang==='ar'?b.name_ar:b.name_he}</b><br>
+        ${open?'🟢 مفتوح':'🔴 مغلق'}<br><br>
+        <a href="${b.waze_maps}" target="_blank">🧭 Waze</a><br>
+        <a href="tel:${b.phone}">📞 اتصال</a>
+      `);
+
+    if(nearest && b.id===nearest.id){
+      marker.openPopup();
+      map.setView([b.lat,b.lng],13);
     }
+  });
+}
 
-    function showView(v) {
-        document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
-        document.getElementById(v + '-view').classList.add('active');
-        window.scrollTo(0, 0);
-    }
+/* ================== LIST ================== */
+function renderBranches(){
+  const box=document.getElementById('branches');
+  const lang=document.getElementById('langSelect').value;
+  box.innerHTML='';
 
-    function initApp() {
-        const lang = document.getElementById('langSelect').value;
-        const list = document.getElementById('branches-list');
-        list.innerHTML = '';
+  let nearestId=null,min=Infinity;
+  if(userLocation){
+    db.branches.forEach(b=>{
+      const d=distance(userLocation.lat,userLocation.lng,b.lat,b.lng);
+      if(d<min && isOpenNow()){min=d;nearestId=b.id;}
+    });
+  }
 
-        db.branches.forEach(branch => {
-            const name = lang === 'ar' ? branch.name_ar : branch.name_he;
-            const hours = lang === 'ar' ? branch.hours_ar : branch.hours_he;
-            
-            list.innerHTML += `
-                <div class="card">
-                    <div class="status-badge open"><span class="dot"></span> مفتوح الآن</div>
-                    <div class="branch-name">${name}</div>
-                    <div class="hours">${hours}</div>
-                    
-                    <div class="action-grid">
-                        <a href="${branch.waze_maps}" target="_blank" class="action-link waze-btn">
-                            <img src="https://upload.wikimedia.org/wikipedia/commons/6/66/Waze_logo.svg" width="18"> Waze
-                        </a>
-                        <a href="tel:*9935" class="action-link call-btn">
-                            <i class="fas fa-phone"></i> *9935
-                        </a>
-                    </div>
+  db.branches.forEach(b=>{
+    const open=isOpenNow();
+    box.innerHTML+=`
+      <div class="card">
+        ${b.id===nearestId?'<div class="nearest">📍 أقرب فرع لك</div>':''}
+        <div class="status ${open?'open':'closed'}">
+          ${open?'🟢 مفتوح الآن':'🔴 مغلق الآن'}
+        </div>
+        <h2>${lang==='ar'?b.name_ar:b.name_he}</h2>
+        <div class="actions">
+          <a href="${b.waze_maps}" target="_blank">Waze</a>
+          <a href="tel:${b.phone}">اتصال</a>
+        </div>
+      </div>`;
+  });
+}
 
-                    <div class="social-links">
-                        ${branch.social.instagram ? `<a href="${branch.social.instagram}" target="_blank"><i class="fab fa-instagram"></i></a>` : ''}
-                        ${branch.social.tiktok ? `<a href="${branch.social.tiktok}" target="_blank"><i class="fab fa-tiktok"></i></a>` : ''}
-                        ${branch.social.facebook ? `<a href="${branch.social.facebook}" target="_blank"><i class="fab fa-facebook-f"></i></a>` : ''}
-                        <a href="https://wa.me/${branch.whatsapp}" target="_blank"><i class="fab fa-whatsapp"></i></a>
-                    </div>
-
-                    <button class="btn-main" onclick="openStore(${branch.id})">تصفح المتجر</button>
-                </div>
-            `;
-        });
-    }
-
-    function openStore(branchId) {
-        const lang = document.getElementById('langSelect').value;
-        const branch = db.branches.find(b => b.id === branchId);
-        const catalog = lang === 'ar' ? db.productsAr : db.productsHe;
-        document.getElementById('store-title').innerText = lang === 'ar' ? branch.name_ar : branch.name_he;
-        
-        const container = document.getElementById('products-container');
-        container.innerHTML = '';
-
-        for (const [category, items] of Object.entries(catalog)) {
-            let section = `<h2 style="color:var(--mad-blue); margin-top:30px; border-right:4px solid;">${category}</h2><div class="products-grid">`;
-            items.forEach(item => {
-                section += `
-                    <div class="product-card">
-                        <img src="${item.image}" class="product-img" onerror="this.src='logo.png'">
-                        <div class="product-title">${item.title}</div>
-                        <div class="product-price">${item.price}</div>
-                        <button class="btn-main" style="padding:10px; font-size:14px;" onclick="window.open('${item.link}', '_blank')">طلب الآن</button>
-                    </div>`;
-            });
-            container.innerHTML += section + `</div>`;
-        }
-        showView('store');
-    }
-
-    loadData();
+loadData();
 </script>
+
 </body>
 </html>
