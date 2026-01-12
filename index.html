@@ -1,191 +1,174 @@
 <!DOCTYPE html>
-<html lang="he" dir="rtl" id="madApp">
+<html lang="ar" dir="rtl" id="madApp">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mad Parfumeur | רשת הבשמים הגדולה</title>
+    <title>Mad Parfumeur | النظام الشامل</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
             --mad-blue: #1d3a8a;
-            --mad-bg: #f8faff;
+            --mad-bg: #f4f7ff;
             --open-green: #22c55e;
             --closed-red: #ef4444;
-            --text-main: #1e293b;
         }
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, sans-serif;
-            background-color: var(--mad-bg);
-            margin: 0;
-            color: var(--text-main);
-        }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--mad-bg); margin: 0; padding: 0; }
+        
+        /* Header */
+        header { background: white; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 1000; }
+        .logo-section { display: flex; align-items: center; gap: 15px; }
+        .logo { height: 45px; cursor: pointer; }
+        .official-site { color: var(--mad-blue); text-decoration: none; font-weight: bold; font-size: 13px; border-right: 2px solid #eee; padding-right: 15px; }
+        
+        .view { display: none; }
+        .view.active { display: block; }
 
-        /* Header & Logo */
-        header {
-            background: white;
-            padding: 15px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-        }
-
-        .logo { height: 45px; }
-
-        .lang-btn {
-            border: 1px solid var(--mad-blue);
-            background: transparent;
-            color: var(--mad-blue);
-            padding: 5px 12px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-
-        .lang-btn.active {
-            background: var(--mad-blue);
-            color: white;
-        }
-
-        /* Hero Image */
-        .hero {
-            width: 100%;
-            height: 220px;
-            background: url('header.jpg') center/cover no-repeat;
-            margin-bottom: 25px;
-        }
-
-        .container { max-width: 500px; margin: 0 auto; padding: 0 15px; }
-
-        /* Branch Card */
-        .card {
-            background: white;
-            border-radius: 25px;
-            padding: 25px;
-            margin-bottom: 20px;
-            text-align: center;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.04);
-        }
-
-        .status-badge {
-            display: inline-flex;
-            align-items: center;
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 14px;
-            font-weight: bold;
-            margin-bottom: 15px;
-        }
-
-        .status-badge.is-open { background: #eefdf2; color: var(--open-green); }
-        .status-badge.is-closed { background: #fef2f2; color: var(--closed-red); }
-
+        /* Index View */
+        .hero { width: 100%; height: 250px; background: url('header.jpg') center/cover no-repeat; position: relative; }
+        .hero-overlay { position: absolute; bottom: 0; left: 0; right: 0; height: 50%; background: linear-gradient(transparent, var(--mad-bg)); }
+        
+        .container { max-width: 600px; margin: -60px auto 40px; padding: 0 15px; position: relative; z-index: 10; }
+        .card { background: white; border-radius: 30px; padding: 25px; margin-bottom: 25px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
+        
+        .status-badge { display: inline-flex; align-items: center; padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: bold; margin-bottom: 12px; }
+        .status-badge.open { background: #eefdf2; color: var(--open-green); }
         .dot { width: 8px; height: 8px; border-radius: 50%; margin-left: 8px; background: currentColor; }
 
-        .branch-name { font-size: 26px; font-weight: 800; color: var(--mad-blue); margin: 5px 0; }
-        .hours-text { font-size: 15px; color: #64748b; margin-bottom: 20px; line-height: 1.5; }
+        .branch-name { font-size: 28px; color: var(--mad-blue); font-weight: 800; margin: 5px 0; }
+        .hours { color: #1e293b; font-weight: 600; margin-bottom: 15px; }
 
-        .shop-btn {
-            background: var(--mad-blue);
-            color: white;
-            border: none;
-            width: 100%;
-            padding: 14px;
-            border-radius: 12px;
-            font-size: 17px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
+        /* Navigation & Call Grid */
+        .action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+        .action-link { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px; border-radius: 12px; text-decoration: none; font-weight: bold; font-size: 14px; }
+        .waze-btn { background: #f3f6ff; color: #333; border: 1px solid #e2e8f0; }
+        .call-btn { background: #eef2ff; color: var(--mad-blue); border: 1px solid var(--mad-blue); }
 
-        .shop-btn:active { transform: scale(0.98); }
+        /* Social Icons */
+        .social-links { display: flex; justify-content: center; gap: 18px; margin-bottom: 20px; }
+        .social-links a { color: var(--mad-blue); font-size: 24px; transition: 0.2s; }
+        .social-links a:hover { transform: scale(1.2); }
 
-        /* LTR Support */
-        [dir="ltr"] .dot { margin-left: 0; margin-right: 8px; }
+        .btn-main { background: var(--mad-blue); color: white; border: none; width: 100%; padding: 16px; border-radius: 18px; font-size: 18px; font-weight: bold; cursor: pointer; text-decoration: none; display: block; }
+
+        /* Store View */
+        .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 15px; margin-top: 25px; }
+        .product-card { background: white; border-radius: 20px; padding: 15px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.03); }
+        .product-img { width: 100%; border-radius: 15px; aspect-ratio: 1; object-fit: contain; }
     </style>
 </head>
 <body>
 
 <header>
-    <img src="logo.png" alt="Mad Parfumeur" class="logo">
-    <div class="lang-switch">
-        <button id="btn-he" class="lang-btn active" onclick="changeLang('he')">HE</button>
-        <button id="btn-ar" class="lang-btn" onclick="changeLang('ar')">AR</button>
+    <div class="logo-section">
+        <img src="logo.png" class="logo" onclick="showView('index')" alt="Mad Logo">
+        <a href="https://madperfume.co.il" target="_blank" class="official-site">الموقع الرسمي</a>
     </div>
+    <select id="langSelect" onchange="initApp()" style="padding: 5px; border-radius: 5px; border: 1px solid var(--mad-blue);">
+        <option value="he">עברית</option>
+        <option value="ar" selected>العربية</option>
+    </select>
 </header>
 
-<div class="hero"></div>
+<div id="index-view" class="view active">
+    <div class="hero"><div class="hero-overlay"></div></div>
+    <div class="container" id="branches-list">جاري التحميل...</div>
+</div>
 
-<div class="container" id="branches-list">
+<div id="store-view" class="view">
+    <div style="padding: 20px; max-width: 1100px; margin: 0 auto;">
+        <button onclick="showView('index')" style="background:none; border:none; color:var(--mad-blue); font-weight:bold; cursor:pointer; font-size: 18px;">⬅ عودة</button>
+        <h1 id="store-title" style="text-align:center; color:var(--mad-blue);"></h1>
+        <div id="products-container"></div>
     </div>
+</div>
 
 <script>
-    // נתונים שהוצאו מהג'ייסון שסיפקת
-    const branches = [
-        {
-            id: 12,
-            name_he: "חיפה", name_ar: "حيفا",
-            hours_he: "כל השבוע 10:00-22:00", hours_ar: "يومياً 10:00-22:00",
-            open: 10, close: 22
-        },
-        {
-            id: 4,
-            name_he: "תל אביב-יפו", name_ar: "تل أبيب - يافا",
-            hours_he: "א'-ד' 10:00-22:00 | ה'-ו' 10:00-00:00", hours_ar: "الأحد-الأربعاء 10:00-22:00",
-            open: 10, close: 22 
-        },
-        {
-            id: 3,
-            name_he: "רמלה", name_ar: "الرمله",
-            hours_he: "א'-ה' 09:00-21:00", hours_ar: "الأحد-الخميس 09:00-21:00",
-            open: 9, close: 21
-        }
-    ];
+    let db = { branches: [], productsHe: {}, productsAr: {} };
 
-    let lang = 'he';
-
-    function checkOpen(openH, closeH) {
-        const hour = new Date().getHours();
-        return hour >= openH && hour < closeH;
+    async function loadData() {
+        try {
+            const [bRes, pArRes, pHeRes] = await Promise.all([
+                fetch('branches (2).json'),
+                fetch('ar-products.json'),
+                fetch('he-products.json')
+            ]);
+            db.branches = await bRes.json();
+            db.productsAr = (await pArRes.json()).madperfume_catalog;
+            db.productsHe = (await pHeRes.json()).madperfume_catalog;
+            initApp();
+        } catch (err) { console.error("Error loading data:", err); }
     }
 
-    function changeLang(newLang) {
-        lang = newLang;
-        document.getElementById('madApp').dir = lang === 'ar' ? 'rtl' : 'rtl'; // Keeping RTL for both as requested
-        document.getElementById('btn-he').classList.toggle('active', lang === 'he');
-        document.getElementById('btn-ar').classList.toggle('active', lang === 'ar');
-        render();
+    function showView(v) {
+        document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
+        document.getElementById(v + '-view').classList.add('active');
+        window.scrollTo(0, 0);
     }
 
-    function render() {
+    function initApp() {
+        const lang = document.getElementById('langSelect').value;
         const list = document.getElementById('branches-list');
         list.innerHTML = '';
-        
-        branches.forEach(b => {
-            const isOpen = checkOpen(b.open, b.close);
-            const statusLabel = lang === 'he' ? (isOpen ? 'פתוח' : 'סגור') : (isOpen ? 'مفتوح' : 'مغلق');
-            const btnLabel = lang === 'he' ? 'צפה בבשמים' : 'تصفح العطور';
+
+        db.branches.forEach(branch => {
+            const name = lang === 'ar' ? branch.name_ar : branch.name_he;
+            const hours = lang === 'ar' ? branch.hours_ar : branch.hours_he;
             
             list.innerHTML += `
                 <div class="card">
-                    <div class="status-badge ${isOpen ? 'is-open' : 'is-closed'}">
-                        <span class="dot"></span>
-                        ${statusLabel}
+                    <div class="status-badge open"><span class="dot"></span> مفتوح الآن</div>
+                    <div class="branch-name">${name}</div>
+                    <div class="hours">${hours}</div>
+                    
+                    <div class="action-grid">
+                        <a href="${branch.waze_maps}" target="_blank" class="action-link waze-btn">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/6/66/Waze_logo.svg" width="18"> Waze
+                        </a>
+                        <a href="tel:*9935" class="action-link call-btn">
+                            <i class="fas fa-phone"></i> *9935
+                        </a>
                     </div>
-                    <div class="branch-name">${lang === 'he' ? b.name_he : b.name_ar}</div>
-                    <div class="hours-text">${lang === 'he' ? b.hours_he : b.hours_ar}</div>
-                    <button class="shop-btn" onclick="location.href='store.html?id=${b.id}'">
-                        ${btnLabel}
-                    </button>
+
+                    <div class="social-links">
+                        ${branch.social.instagram ? `<a href="${branch.social.instagram}" target="_blank"><i class="fab fa-instagram"></i></a>` : ''}
+                        ${branch.social.tiktok ? `<a href="${branch.social.tiktok}" target="_blank"><i class="fab fa-tiktok"></i></a>` : ''}
+                        ${branch.social.facebook ? `<a href="${branch.social.facebook}" target="_blank"><i class="fab fa-facebook-f"></i></a>` : ''}
+                        <a href="https://wa.me/${branch.whatsapp}" target="_blank"><i class="fab fa-whatsapp"></i></a>
+                    </div>
+
+                    <button class="btn-main" onclick="openStore(${branch.id})">تصفح المتجر</button>
                 </div>
             `;
         });
     }
 
-    render();
+    function openStore(branchId) {
+        const lang = document.getElementById('langSelect').value;
+        const branch = db.branches.find(b => b.id === branchId);
+        const catalog = lang === 'ar' ? db.productsAr : db.productsHe;
+        document.getElementById('store-title').innerText = lang === 'ar' ? branch.name_ar : branch.name_he;
+        
+        const container = document.getElementById('products-container');
+        container.innerHTML = '';
+
+        for (const [category, items] of Object.entries(catalog)) {
+            let section = `<h2 style="color:var(--mad-blue); margin-top:30px; border-right:4px solid;">${category}</h2><div class="products-grid">`;
+            items.forEach(item => {
+                section += `
+                    <div class="product-card">
+                        <img src="${item.image}" class="product-img" onerror="this.src='logo.png'">
+                        <div class="product-title">${item.title}</div>
+                        <div class="product-price">${item.price}</div>
+                        <button class="btn-main" style="padding:10px; font-size:14px;" onclick="window.open('${item.link}', '_blank')">طلب الآن</button>
+                    </div>`;
+            });
+            container.innerHTML += section + `</div>`;
+        }
+        showView('store');
+    }
+
+    loadData();
 </script>
 </body>
 </html>
