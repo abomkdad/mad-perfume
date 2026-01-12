@@ -10,123 +10,150 @@
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
 
     <style>
-        :root { --mad-blue: #1e3a8a; --mad-white: #ffffff; }
-        body { margin: 0; font-family: 'Cairo', sans-serif; background: #f8fbff; }
+        :root { --mad-blue: #1e3a8a; --mad-gold: #d4af37; }
+        body { margin: 0; font-family: 'Cairo', sans-serif; background: #f8fbff; color: #1d1d1f; }
         
-        nav { padding: 15px; background: rgba(255,255,255,0.9); backdrop-filter: blur(10px); position: sticky; top: 0; z-index: 1000; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; }
-        .logo { width: 50px; border-radius: 50%; border: 2px solid var(--mad-blue); }
-        
-        .container { max-width: 480px; margin: 0 auto; padding: 20px; }
-        .btn-geo { background: var(--mad-blue); color: #fff; width: 100%; padding: 14px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; margin-bottom: 20px; display: flex; align-items: center; justify-content: center; gap: 10px; }
-        
-        .card { background: #fff; border-radius: 24px; padding: 20px; margin-bottom: 15px; border: 1px solid #eee; box-shadow: 0 4px 15px rgba(0,0,0,0.03); }
-        .status-badge { font-size: 0.75rem; padding: 4px 12px; border-radius: 20px; font-weight: bold; }
-        .is-open { background: #e8f5e9; color: #2e7d32; }
-        .is-closed { background: #ffebee; color: #c62828; }
-        
-        .action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
-        .btn-icon { padding: 10px; border-radius: 10px; background: #f5f5f7; text-decoration: none; color: #333; font-size: 0.8rem; text-align: center; display: flex; align-items: center; justify-content: center; gap: 5px; }
-        .btn-enter { background: var(--mad-blue); color: #fff; width: 100%; padding: 12px; border-radius: 12px; border: none; font-weight: bold; margin-top: 10px; cursor: pointer; }
+        /* Navigation Style */
+        nav { padding: 15px; background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); position: sticky; top: 0; z-index: 1000; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; }
+        .logo { width: 50px; height: 50px; border-radius: 50%; border: 2px solid var(--mad-blue); }
+        .lang-btn { padding: 5px 10px; border-radius: 8px; border: 1px solid #ddd; background: #fff; cursor: pointer; font-size: 0.7rem; font-weight: bold; }
+        .lang-btn.active { background: var(--mad-blue); color: #fff; border: none; }
 
-        .lang-bar { display: flex; gap: 5px; }
-        .l-btn { padding: 4px 8px; border-radius: 6px; font-size: 0.7rem; border: 1px solid #ddd; background: #fff; cursor: pointer; }
-        .l-btn.active { background: var(--mad-blue); color: #fff; border: none; }
+        /* Content Layout */
+        .container { max-width: 500px; margin: 0 auto; padding: 20px; }
+        .btn-geo { background: var(--mad-blue); color: #fff; width: 100%; padding: 15px; border-radius: 15px; border: none; font-weight: bold; cursor: pointer; margin-bottom: 25px; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 1rem; }
+
+        /* Branch Card Style */
+        .card { background: #fff; border-radius: 24px; padding: 25px; margin-bottom: 20px; border: 1px solid #eee; box-shadow: 0 10px 20px rgba(0,0,0,0.03); transition: 0.3s; }
+        .status-badge { font-size: 0.75rem; padding: 5px 12px; border-radius: 20px; font-weight: bold; display: inline-flex; align-items: center; gap: 5px; }
+        .open { background: #e8f5e9; color: #2e7d32; }
+        .closed { background: #ffebee; color: #c62828; }
+        
+        .action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 20px; }
+        .btn-secondary { padding: 12px; border-radius: 12px; background: #f5f5f7; text-decoration: none; color: #333; font-size: 0.9rem; text-align: center; font-weight: bold; border: 1px solid #eee; }
+        .btn-primary { background: var(--mad-blue); color: #fff; width: 100%; padding: 14px; border-radius: 14px; border: none; font-weight: bold; margin-top: 15px; cursor: pointer; font-size: 1rem; }
+
+        .hidden { display: none !important; }
+        #loader { position: fixed; inset: 0; background: #fff; z-index: 5000; display: flex; align-items: center; justify-content: center; }
     </style>
 </head>
 <body>
 
+<div id="loader"><img src="logo.png" width="80" style="animation: pulse 1.5s infinite;"></div>
+
 <nav>
-    <div class="lang-bar">
-        <button class="l-btn active" id="btn-ar" onclick="setLanguage('ar')">AR</button>
-        <button class="l-btn" id="btn-he" onclick="setLanguage('he')">HE</button>
-        <button class="l-btn" id="btn-en" onclick="setLanguage('en')">EN</button>
-        <button class="l-btn" id="btn-ru" onclick="setLanguage('ru')">RU</button>
+    <div id="lang-selectors" style="display:flex; gap:5px;">
+        <button class="lang-btn active" onclick="setAppLang('ar')">AR</button>
+        <button class="lang-btn" onclick="setAppLang('he')">HE</button>
+        <button class="lang-btn" onclick="setAppLang('en')">EN</button>
+        <button class="lang-btn" onclick="setAppLang('ru')">RU</button>
     </div>
     <img src="logo.png" class="logo">
 </nav>
 
 <div class="container">
-    <button class="btn-geo" onclick="findNearest()"><i class="fas fa-location-arrow"></i> <span id="geo-txt">أقرب فرع</span></button>
-    <div id="list"></div>
+    <button class="btn-geo" onclick="sortBranchesByDistance()">
+        <i class="fas fa-location-arrow"></i> <span id="geo-label">أقرب فرع لي</span>
+    </button>
+    <div id="branches-container"></div>
 </div>
 
 <script>
-    let BRANCHES = [];
-    let LANG = 'ar';
+    let GLOBAL_DATA = [];
+    let CURRENT_LANG = 'ar';
 
-    const UI = {
+    const UI_TEXTS = {
         ar: { geo: "أقرب فرع لي", open: "مفتوح الآن", closed: "مغلق حالياً", map: "خريطة", wa: "واتساب", enter: "تصفح العطور" },
-        he: { geo: "הסניף הקרוב אלי", open: "פתוח עכשيو", closed: "סגור כעת", map: "מפה", wa: "וואטסאפ", enter: "צפה במוצרים" },
-        en: { geo: "Nearest Branch", open: "Open Now", closed: "Closed Now", map: "Map", wa: "WhatsApp", enter: "Browse Store" },
+        he: { geo: "הסنيף הקרוב אלי", open: "פתוח עכשיו", closed: "סגור כעת", map: "מפה", wa: "וואטסאפ", enter: "צפה במוצרים" },
+        en: { geo: "Nearest Store", open: "Open Now", closed: "Closed Now", map: "Map", wa: "WhatsApp", enter: "Shop Now" },
         ru: { geo: "Ближайший филиал", open: "Открыто", closed: "Закрыто", map: "Карта", wa: "WhatsApp", enter: "В магазин" }
     };
 
-    async function start() {
+    // 1. تشغيل النظام وتحميل البيانات
+    async function loadApp() {
         Papa.parse('branches.csv', {
-            download: true, header: true, skipEmptyLines: true,
-            complete: (res) => {
-                BRANCHES = res.data;
-                const auto = navigator.language.split('-')[0];
-                setLanguage(['ar','he','en','ru'].includes(auto) ? auto : 'ar');
+            download: true,
+            header: true,
+            skipEmptyLines: true,
+            complete: (results) => {
+                GLOBAL_DATA = results.data;
+                // اكتشاف لغة الهاتف تلقائياً
+                const deviceLang = navigator.language.split('-')[0];
+                setAppLang(['ar', 'he', 'en', 'ru'].includes(deviceLang) ? deviceLang : 'ar');
+                document.getElementById('loader').classList.add('hidden');
             }
         });
     }
 
-    function setLanguage(l) {
-        LANG = l;
-        document.querySelectorAll('.l-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById(`btn-${l}`).classList.add('active');
-        document.getElementById('geo-txt').innerText = UI[l].geo;
-        render();
+    // 2. تغيير اللغة وتحديث الواجهة
+    function setAppLang(lang) {
+        CURRENT_LANG = lang;
+        document.documentElement.dir = (lang === 'ar' || lang === 'he') ? 'rtl' : 'ltr';
+        document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+        // تفعيل الزر الصحيح
+        const activeBtn = Array.from(document.querySelectorAll('.lang-btn')).find(b => b.innerText.toLowerCase() === lang);
+        if(activeBtn) activeBtn.classList.add('active');
+        
+        document.getElementById('geo-label').innerText = UI_TEXTS[lang].geo;
+        renderBranches(GLOBAL_DATA);
     }
 
-    function isBranchOpen(h) {
-        if(!h || h.includes("مغلق") || h.includes("סגור")) return false;
+    // 3. فحص ساعات العمل بدقة
+    function getOpenStatus(hoursStr) {
+        if (!hoursStr || hoursStr.includes("مغلق") || hoursStr.includes("סגור")) return false;
         const now = new Date();
-        const cur = now.getHours() + (now.getMinutes()/60);
-        const t = h.match(/(\d+):(\d+)\s*-\s*(\d+):(\d+)/);
-        if(!t) return true;
-        return cur >= (parseInt(t[1]) + t[2]/60) && cur <= (parseInt(t[3]) + t[4]/60);
+        const currentTime = now.getHours() + (now.getMinutes() / 60);
+        const timeMatch = hoursStr.match(/(\d+):(\d+)\s*-\s*(\d+):(\d+)/);
+        if (!timeMatch) return true; // إذا لم يجد توقيت، يفترض أنه مفتوح
+        const startTime = parseInt(timeMatch[1]) + (parseInt(timeMatch[2]) / 60);
+        const endTime = parseInt(timeMatch[3]) + (parseInt(timeMatch[4]) / 60);
+        return currentTime >= startTime && currentTime <= endTime;
     }
 
-    function render(data = BRANCHES) {
-        const div = document.getElementById('list');
-        div.innerHTML = '';
-        data.forEach(b => {
-            if(!b.ID) return;
-            const open = isBranchOpen(b['ساعات الدوام عربي']);
-            const name = b[`اسم الفرع ${LANG === 'ar' ? 'عربي' : (LANG === 'he' ? 'عبري' : 'انجليزي')}`] || b['اسم الفرع عربي'];
-            const hours = b[`ساعات الدوام ${LANG === 'ar' ? 'عربي' : 'عبري'}`] || b['ساعات الدوام عربي'];
+    // 4. عرض الفروع
+    function renderBranches(data) {
+        const container = document.getElementById('branches-container');
+        container.innerHTML = '';
+        data.forEach(branch => {
+            if (!branch.ID) return;
+            const isOpen = getOpenStatus(branch['ساعات الدوام عربي']);
+            const name = branch[`اسم الفرع ${CURRENT_LANG === 'ar' ? 'عربي' : (CURRENT_LANG === 'he' ? 'عبري' : 'انجليزي')}`] || branch['اسم الفرع عربي'];
+            const hours = branch[`ساعات الدوام ${CURRENT_LANG === 'ar' ? 'عربي' : 'عبري'}`] || branch['ساعات الدوام عربي'];
             
-            div.innerHTML += `
+            container.innerHTML += `
                 <div class="card">
                     <div style="display:flex; justify-content:space-between; align-items:center;">
-                        <h2 style="margin:0; font-size:1.1rem; color:var(--mad-blue);">${name}</h2>
-                        <span class="status-badge ${open ? 'is-open' : 'is-closed'}">${open ? UI[LANG].open : UI[LANG].closed}</span>
+                        <h2 style="margin:0; font-size:1.3rem; color:var(--mad-blue);">${name}</h2>
+                        <span class="status-badge ${isOpen ? 'open' : 'closed'}">
+                            <i class="fas fa-circle"></i> ${isOpen ? UI_TEXTS[CURRENT_LANG].open : UI_TEXTS[CURRENT_LANG].closed}
+                        </span>
                     </div>
-                    <p style="font-size:0.8rem; color:#666; margin:8px 0;"><i class="far fa-clock"></i> ${hours}</p>
+                    <p style="font-size:0.9rem; color:#666; margin:12px 0;"><i class="far fa-clock"></i> ${hours}</p>
                     <div class="action-grid">
-                        <a href="${b['رابط Waze / Maps']}" class="btn-icon"><i class="fab fa-waze"></i> ${UI[LANG].map}</a>
-                        <a href="https://wa.me/${b['الهاتف']}" class="btn-icon"><i class="fab fa-whatsapp"></i> ${UI[LANG].wa}</a>
+                        <a href="${branch['رابط Waze / Maps']}" class="btn-secondary"><i class="fab fa-waze"></i> ${UI_TEXTS[CURRENT_LANG].map}</a>
+                        <a href="https://wa.me/${branch['الهاتف']}" class="btn-secondary"><i class="fab fa-whatsapp"></i> ${UI_TEXTS[CURRENT_LANG].wa}</a>
                     </div>
-                    <button class="btn-enter">${UI[LANG].enter}</button>
+                    <button class="btn-primary">${UI_TEXTS[CURRENT_LANG].enter}</button>
                 </div>`;
         });
     }
 
-    function findNearest() {
-        if (!navigator.geolocation) return;
-        navigator.geolocation.getCurrentPosition(p => {
-            const sorted = [...BRANCHES].sort((a,b) => {
-                const dA = Math.hypot(a.Lat - p.coords.latitude, a.Lng - p.coords.longitude);
-                const dB = Math.hypot(b.Lat - p.coords.latitude, b.Lng - p.coords.longitude);
-                return dA - dB;
+    // 5. ميزة الموقع الجغرافي
+    function sortBranchesByDistance() {
+        if (!navigator.geolocation) return alert("الموقع غير مدعوم في هذا المتصفح");
+        navigator.geolocation.getCurrentPosition(position => {
+            const userLat = position.coords.latitude;
+            const userLng = position.coords.longitude;
+            const sorted = [...GLOBAL_DATA].sort((a, b) => {
+                const distA = Math.hypot(a.Lat - userLat, a.Lng - userLng);
+                const distB = Math.hypot(b.Lat - userLat, b.Lng - userLng);
+                return distA - distB;
             });
-            render(sorted);
-        });
+            renderBranches(sorted);
+        }, () => alert("يرجى تفعيل إذن الموقع"));
     }
 
-    start();
+    loadApp();
 </script>
 </body>
 </html>
