@@ -3,41 +3,51 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MAD PARFUMEUR | Luxury Card</title>
+    <title>MAD PARFUMEUR | Digital Store</title>
     
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&family=Cinzel:wght@700&display=swap" rel="stylesheet">
 
     <style>
-        :root { --mad-blue: #1e3a8a; --bg: #f8fbff; }
+        :root { --mad-blue: #1e3a8a; --mad-gold: #d4af37; --bg: #f8fbff; }
         body { margin: 0; font-family: 'Cairo', sans-serif; background: var(--bg); color: #1d1d1f; overflow-x: hidden; }
         
+        /* Navigation */
         nav { padding: 12px 15px; background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); position: sticky; top: 0; z-index: 1000; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; }
-        .logo { width: 45px; height: 45px; border-radius: 50%; border: 2px solid var(--mad-blue); cursor: pointer; }
-        .lang-btn { padding: 5px 10px; border-radius: 8px; border: 1px solid #ddd; background: #fff; cursor: pointer; font-size: 0.7rem; font-weight: bold; }
+        .logo { width: 50px; height: 50px; border-radius: 50%; border: 2px solid var(--mad-blue); cursor: pointer; }
+        .lang-btn { padding: 6px 12px; border-radius: 8px; border: 1px solid #ddd; background: #fff; cursor: pointer; font-size: 0.75rem; font-weight: bold; }
         .lang-btn.active { background: var(--mad-blue); color: #fff; border: none; }
 
+        /* Header Image */
         .main-header-img { width: 100%; height: 200px; background: url('header.jpg') center/cover no-repeat; border-bottom: 3px solid var(--mad-blue); }
 
         .container { max-width: 500px; margin: 0 auto; padding: 20px; }
-        .btn-geo { background: var(--mad-blue); color: #fff; width: 100%; padding: 15px; border-radius: 15px; border: none; font-weight: bold; cursor: pointer; margin-bottom: 25px; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 1rem; box-shadow: 0 4px 15px rgba(30, 58, 138, 0.2); }
-
-        .card { background: #fff; border-radius: 24px; padding: 25px; margin-bottom: 20px; border: 1px solid #eee; box-shadow: 0 10px 20px rgba(0,0,0,0.03); text-align: center; }
-        .status-badge { font-size: 0.75rem; padding: 5px 12px; border-radius: 20px; font-weight: bold; display: inline-flex; align-items: center; gap: 5px; }
-        .open { background: #e8f5e9; color: #2e7d32; }
-        .closed { background: #ffebee; color: #c62828; }
         
-        .action-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 20px; }
-        .btn-secondary { padding: 10px; border-radius: 12px; background: #f5f5f7; text-decoration: none; color: #333; font-size: 0.8rem; text-align: center; font-weight: bold; border: 1px solid #eee; display: flex; flex-direction: column; align-items: center; gap: 5px; }
+        /* Category Tabs */
+        .category-wrapper { overflow-x: auto; white-space: nowrap; padding: 10px 0; margin-bottom: 15px; scrollbar-width: none; }
+        .category-wrapper::-webkit-scrollbar { display: none; }
+        .cat-btn { display: inline-block; padding: 8px 18px; margin-left: 8px; border-radius: 20px; background: #fff; border: 1px solid #ddd; font-size: 0.85rem; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .cat-btn.active { background: var(--mad-blue); color: #fff; border-color: var(--mad-blue); }
+
+        .search-box { width: 100%; padding: 12px 20px; border-radius: 15px; border: 1px solid #ddd; margin-bottom: 15px; box-sizing: border-box; }
         
-        .social-grid { display: flex; justify-content: center; gap: 15px; margin-top: 15px; border-top: 1px solid #eee; padding-top: 15px; }
-        .btn-social { font-size: 1.3rem; color: var(--mad-blue); text-decoration: none; transition: 0.3s; }
+        /* Product Card */
+        .product-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .p-card { background: #fff; border-radius: 20px; overflow: hidden; border: 1px solid #eee; transition: 0.3s; display: flex; flex-direction: column; }
+        .p-media { width: 100%; height: 160px; background: #fff; display: flex; align-items: center; justify-content: center; }
+        .p-media img, .p-media video { max-width: 100%; max-height: 100%; object-fit: contain; }
+        .p-info { padding: 12px; text-align: center; flex-grow: 1; }
+        .p-title { font-size: 0.85rem; font-weight: 700; color: var(--mad-blue); height: 35px; overflow: hidden; }
+        .p-price { font-size: 1rem; color: var(--mad-gold); font-weight: 800; margin-top: 5px; }
 
-        .btn-primary { background: var(--mad-blue); color: #fff; width: 100%; padding: 14px; border-radius: 14px; border: none; font-weight: bold; margin-top: 15px; cursor: pointer; font-size: 1rem; }
+        /* Branch Card */
+        .card { background: #fff; border-radius: 28px; padding: 25px; margin-bottom: 22px; border: 1px solid #eee; text-align: center; }
+        .action-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 15px 0; }
+        .btn-secondary { padding: 12px; border-radius: 14px; background: #f8f9fa; text-decoration: none; color: #333; font-size: 0.75rem; display: flex; flex-direction: column; align-items: center; gap: 5px; font-weight: bold; border: 1px solid #eee; }
+        .btn-primary { background: var(--mad-blue); color: #fff; width: 100%; padding: 14px; border-radius: 16px; border: none; font-weight: bold; cursor: pointer; }
 
-        #loader { position: fixed; inset: 0; background: #fff; z-index: 5000; display: flex; flex-direction: column; align-items: center; justify-content: center; }
         .hidden { display: none !important; }
+        #loader { position: fixed; inset: 0; background: #fff; z-index: 5000; display: flex; align-items: center; justify-content: center; }
     </style>
 </head>
 <body>
@@ -45,109 +55,156 @@
 <div id="loader"><img src="logo.png" width="80" style="animation: pulse 1.5s infinite;"></div>
 
 <nav>
-    <div id="lang-selectors" style="display:flex; gap:5px;">
-        <button class="lang-btn active" id="btn-ar" onclick="setAppLang('ar')">AR</button>
-        <button class="lang-btn" id="btn-he" onclick="setAppLang('he')">HE</button>
+    <div id="lang-selectors" style="display:flex; gap:8px;">
+        <button class="lang-btn active" id="btn-ar" onclick="changeLang('ar')">AR</button>
+        <button class="lang-btn" id="btn-he" onclick="changeLang('he')">HE</button>
     </div>
-    <img src="logo.png" class="logo" onclick="location.reload()">
+    <img src="logo.png" class="logo" onclick="goHome()">
 </nav>
 
-<div class="main-header-img"></div>
+<div id="view-branches">
+    <div class="main-header-img"></div>
+    <div class="container">
+        <div id="branches-container"></div>
+    </div>
+</div>
 
-<div class="container">
-    <button class="btn-geo" onclick="sortBranchesByDistance()">
-        <i class="fas fa-location-arrow"></i> <span id="geo-label">أقرب فرع لي</span>
-    </button>
-    <div id="branches-container"></div>
+<div id="view-store" class="hidden">
+    <div class="container">
+        <div onclick="goHome()" style="color:var(--mad-blue); font-weight:bold; cursor:pointer; margin-bottom:15px;"><i class="fas fa-arrow-right"></i> <span id="back-btn"></span></div>
+        <h2 id="store-name" style="text-align:center; color:var(--mad-blue); font-family:'Cinzel'; margin-bottom: 10px;"></h2>
+        
+        <input type="text" class="search-box" id="pSearch" onkeyup="filterProducts()" placeholder="بحث...">
+        
+        <div class="category-wrapper" id="category-bar"></div>
+
+        <div class="product-grid" id="products-container"></div>
+    </div>
 </div>
 
 <script>
-    let GLOBAL_DATA = [];
-    let CURRENT_LANG = 'ar';
+    let DATA = { branches: [], products: [] };
+    let LANG = 'ar';
+    let selectedBranch = null;
+    let currentCategory = 'all';
 
-    const UI_TEXTS = {
-        ar: { geo: "أقرب فرع لي", open: "مفتوح الآن", closed: "مغلق حالياً", map: "خرائط", wa: "واتساب", call: "اتصال", enter: "تصفح العطور" },
-        he: { geo: "הסניף הקרוב אלי", open: "פתוח עכשיו", closed: "סגור כעת", map: "מפה", wa: "וואטסאפ", call: "טלפון", enter: "צפה במוצרים" }
+    const UI = {
+        ar: { all: "الكل", map: "خرائط", wa: "واتساب", call: "اتصال", enter: "تصفح العطور", back: "العودة", buy: "اطلب الآن", search: "ابحث عن عطر..." },
+        he: { all: "הכל", map: "מפה", wa: "וואטסאפ", call: "טלפון", enter: "צפה במוצרים", back: "חזרה", buy: "הזמן עכשיו", search: "חפש בושם..." }
     };
 
-    async function loadApp() {
-        Papa.parse('branches.csv', {
-            download: true, header: true, skipEmptyLines: true,
-            complete: (results) => {
-                GLOBAL_DATA = results.data;
-                const deviceLang = navigator.language.split('-')[0];
-                setAppLang(['ar', 'he'].includes(deviceLang) ? deviceLang : 'ar');
-                document.getElementById('loader').classList.add('hidden');
-            }
-        });
+    async function loadData() {
+        try {
+            const bRes = await fetch('branches.json');
+            DATA.branches = await bRes.json();
+            await loadProducts();
+            renderBranches();
+            document.getElementById('loader').classList.add('hidden');
+        } catch (e) { console.error(e); }
     }
 
-    function setAppLang(lang) {
-        CURRENT_LANG = lang;
-        document.documentElement.dir = (lang === 'ar' || lang === 'he') ? 'rtl' : 'ltr';
+    async function loadProducts() {
+        const file = LANG === 'ar' ? 'ar-products.json' : 'he-products.json';
+        const pRes = await fetch(file);
+        DATA.products = await pRes.json();
+    }
+
+    async function changeLang(l) {
+        LANG = l;
+        document.documentElement.dir = l === 'ar' ? 'rtl' : 'ltr';
         document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById(`btn-${lang}`).classList.add('active');
-        document.getElementById('geo-label').innerText = UI_TEXTS[lang].geo;
-        renderBranches(GLOBAL_DATA);
+        document.getElementById(`btn-${l}`).classList.add('active');
+        await loadProducts();
+        if(!document.getElementById('view-store').classList.contains('hidden')) {
+            updateCategoryBar();
+            renderProducts(DATA.products);
+        }
+        renderBranches();
     }
 
-    function getOpenStatus(hoursStr) {
-        if (!hoursStr || hoursStr.includes("مغلق") || hoursStr.includes("סגור")) return false;
-        const now = new Date();
-        const cur = now.getHours() + (now.getMinutes() / 60);
-        const match = hoursStr.match(/(\d{1,2}):(\d{2})\s*-\s*(\d{1,2}):(\d{2})/);
-        if (!match) return true;
-        const start = parseInt(match[1]) + (parseInt(match[2]) / 60);
-        const end = parseInt(match[3]) + (parseInt(match[4]) / 60);
-        return cur >= start && cur <= end;
-    }
-
-    function renderBranches(data) {
+    function renderBranches() {
         const container = document.getElementById('branches-container');
         container.innerHTML = '';
-        data.forEach(b => {
-            if (!b.ID) return;
-            // إصلاح مشكلة undefined بربط اسم العمود الصحيح من ملفك
-            const isOpen = getOpenStatus(b['ساعات الدوام عربي']);
-            const name = b[CURRENT_LANG === 'ar' ? 'اسم الفرع عربي' : 'اسم الفرع عبري'];
-            const hours = b[CURRENT_LANG === 'ar' ? 'ساعات الدوام عربي' : 'ساعات الدوام عبري'];
-            
+        DATA.branches.forEach(b => {
+            const name = LANG === 'ar' ? b.name_ar : b.name_he;
+            const desc = LANG === 'ar' ? b.description_ar : b.description_he;
             container.innerHTML += `
                 <div class="card">
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                        <h2 style="margin:0; font-size:1.3rem; color:var(--mad-blue); font-weight:700;">${name}</h2>
-                        <span class="status-badge ${isOpen ? 'open' : 'closed'}">${isOpen ? UI_TEXTS[CURRENT_LANG].open : UI_TEXTS[CURRENT_LANG].closed}</span>
-                    </div>
-                    <div style="font-size:0.9rem; color:#666;"><i class="far fa-clock"></i> ${hours}</div>
-                    
+                    <h2 style="margin:0; color:var(--mad-blue);">${name}</h2>
+                    <p style="font-size:0.8rem; color:var(--mad-gold); font-weight:bold;">${desc}</p>
                     <div class="action-grid">
-                        <a href="${b.Waze_Maps}" class="btn-secondary"><i class="fas fa-map-marker-alt"></i><span>${UI_TEXTS[CURRENT_LANG].map}</span></a>
-                        <a href="https://wa.me/${b.WhatsApp}" class="btn-secondary"><i class="fab fa-whatsapp"></i><span>${UI_TEXTS[CURRENT_LANG].wa}</span></a>
-                        <a href="tel:${b.الهاتف}" class="btn-secondary"><i class="fas fa-phone"></i><span>${UI_TEXTS[CURRENT_LANG].call}</span></a>
+                        <a href="${b.waze_maps}" class="btn-secondary"><i class="fas fa-map-marker-alt"></i><span>${UI[LANG].map}</span></a>
+                        <a href="https://wa.me/${b.whatsapp}" class="btn-secondary"><i class="fab fa-whatsapp"></i><span>${UI[LANG].wa}</span></a>
+                        <a href="tel:${b.phone}" class="btn-secondary"><i class="fas fa-phone"></i><span>${UI[LANG].call}</span></a>
                     </div>
-
-                    <div class="social-grid">
-                        ${b.Instagram ? `<a href="${b.Instagram}" class="btn-social"><i class="fab fa-instagram"></i></a>` : ''}
-                        ${b.TikTok ? `<a href="${b.TikTok}" class="btn-social"><i class="fab fa-tiktok"></i></a>` : ''}
-                        ${b.Facebook ? `<a href="${b.Facebook}" class="btn-social"><i class="fab fa-facebook"></i></a>` : ''}
-                    </div>
-
-                    <button class="btn-primary">${UI_TEXTS[CURRENT_LANG].enter}</button>
+                    <button class="btn-primary" onclick="openStore(${b.id})">${UI[LANG].enter}</button>
                 </div>`;
         });
     }
 
-    function sortBranchesByDistance() {
-        if (!navigator.geolocation) return;
-        navigator.geolocation.getCurrentPosition(p => {
-            const sorted = [...GLOBAL_DATA].sort((a, b) => 
-                Math.hypot(a.Lat - p.coords.latitude, a.Lng - p.coords.longitude) - 
-                Math.hypot(b.Lat - p.coords.latitude, b.Lng - p.coords.longitude)
-            );
-            renderBranches(sorted);
+    function openStore(id) {
+        selectedBranch = DATA.branches.find(b => b.id == id);
+        document.getElementById('view-branches').classList.add('hidden');
+        document.getElementById('view-store').classList.remove('hidden');
+        document.getElementById('store-name').innerText = LANG === 'ar' ? selectedBranch.name_ar : selectedBranch.name_he;
+        document.getElementById('back-btn').innerText = UI[LANG].back;
+        document.getElementById('pSearch').placeholder = UI[LANG].search;
+        updateCategoryBar();
+        renderProducts(DATA.products);
+        window.scrollTo(0,0);
+    }
+
+    function updateCategoryBar() {
+        const bar = document.getElementById('category-bar');
+        const categories = [...new Set(DATA.products.map(p => p.category))];
+        bar.innerHTML = `<button class="cat-btn ${currentCategory === 'all' ? 'active' : ''}" onclick="filterByCategory('all')">${UI[LANG].all}</button>`;
+        categories.forEach(cat => {
+            bar.innerHTML += `<button class="cat-btn ${currentCategory === cat ? 'active' : ''}" onclick="filterByCategory('${cat}')">${cat}</button>`;
         });
     }
-    loadApp();
+
+    function filterByCategory(cat) {
+        currentCategory = cat;
+        updateCategoryBar();
+        filterProducts();
+    }
+
+    function renderProducts(list) {
+        const container = document.getElementById('products-container');
+        container.innerHTML = '';
+        list.forEach(p => {
+            const media = p.video ? `<video src="${p.video}" autoplay loop muted playsinline></video>` : `<img src="${p.image}" onerror="this.src='logo.png'">`;
+            container.innerHTML += `
+                <div class="p-card">
+                    <div class="p-media">${media}</div>
+                    <div class="p-info">
+                        <div class="p-title">${p.title}</div>
+                        <div class="p-price">${p.price}</div>
+                        <button class="btn-primary" style="margin-top:8px; padding:10px; font-size:0.75rem;" onclick="order('${p.title}')">${UI[LANG].buy}</button>
+                    </div>
+                </div>`;
+        });
+    }
+
+    function filterProducts() {
+        const val = document.getElementById('pSearch').value.toLowerCase();
+        let filtered = DATA.products;
+        if (currentCategory !== 'all') filtered = filtered.filter(p => p.category === currentCategory);
+        filtered = filtered.filter(p => p.title.toLowerCase().includes(val));
+        renderProducts(filtered);
+    }
+
+    function order(title) {
+        const msg = encodeURIComponent(`${LANG === 'ar' ? 'أود طلب عطر:' : 'אני רוצה להזמין בושם:'} ${title}`);
+        window.open(`https://wa.me/${selectedBranch.whatsapp}?text=${msg}`);
+    }
+
+    function goHome() {
+        document.getElementById('view-store').classList.add('hidden');
+        document.getElementById('view-branches').classList.remove('hidden');
+    }
+
+    loadData();
 </script>
 </body>
 </html>
