@@ -1,155 +1,191 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="he" dir="rtl" id="madApp">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MAD PARFUMEUR | Digital Store</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+    <title>Mad Parfumeur | רשת הבשמים הגדולה</title>
     <style>
-        :root { --mad-blue: #1e3a8a; --mad-gold: #d4af37; --bg: #f8fbff; }
-        body { margin: 0; font-family: 'Cairo', sans-serif; background: var(--bg); color: #1d1d1f; overflow-x: hidden; }
-        nav { padding: 12px 15px; background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); position: sticky; top: 0; z-index: 1000; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; }
-        .logo { width: 45px; height: 45px; border-radius: 50%; border: 2px solid var(--mad-blue); cursor: pointer; }
-        .lang-btn { padding: 6px 12px; border-radius: 8px; border: 1px solid #ddd; background: #fff; cursor: pointer; font-size: 0.7rem; font-weight: bold; }
-        .lang-btn.active { background: var(--mad-blue); color: #fff; border: none; }
-        .main-header-img { width: 100%; height: 200px; background: url('header.jpg') center/cover no-repeat; border-bottom: 3px solid var(--mad-blue); }
-        .container { max-width: 500px; margin: 0 auto; padding: 20px; }
-        .card { background: #fff; border-radius: 28px; padding: 20px; margin-bottom: 20px; border: 1px solid #eee; text-align: center; box-shadow: 0 10px 20px rgba(0,0,0,0.02); }
-        .status-badge { font-size: 0.65rem; padding: 4px 10px; border-radius: 20px; font-weight: bold; margin-bottom: 8px; display: inline-block; }
-        .open { background: #e8f5e9; color: #2e7d32; }
-        .closed { background: #ffebee; color: #c62828; }
-        .product-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .p-card { background: #fff; border-radius: 20px; border: 1px solid #eee; overflow: hidden; text-align: center; padding: 10px; }
-        .p-card img { width: 100%; height: 130px; object-fit: contain; }
-        .btn-primary { background: var(--mad-blue); color: #fff; width: 100%; padding: 12px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; margin-top: 10px; }
-        .hidden { display: none !important; }
-        #loader { position: fixed; inset: 0; background: #fff; z-index: 5000; display: flex; align-items: center; justify-content: center; }
+        :root {
+            --mad-blue: #1d3a8a;
+            --mad-bg: #f8faff;
+            --open-green: #22c55e;
+            --closed-red: #ef4444;
+            --text-main: #1e293b;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, sans-serif;
+            background-color: var(--mad-bg);
+            margin: 0;
+            color: var(--text-main);
+        }
+
+        /* Header & Logo */
+        header {
+            background: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .logo { height: 45px; }
+
+        .lang-btn {
+            border: 1px solid var(--mad-blue);
+            background: transparent;
+            color: var(--mad-blue);
+            padding: 5px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .lang-btn.active {
+            background: var(--mad-blue);
+            color: white;
+        }
+
+        /* Hero Image */
+        .hero {
+            width: 100%;
+            height: 220px;
+            background: url('header.jpg') center/cover no-repeat;
+            margin-bottom: 25px;
+        }
+
+        .container { max-width: 500px; margin: 0 auto; padding: 0 15px; }
+
+        /* Branch Card */
+        .card {
+            background: white;
+            border-radius: 25px;
+            padding: 25px;
+            margin-bottom: 20px;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .status-badge.is-open { background: #eefdf2; color: var(--open-green); }
+        .status-badge.is-closed { background: #fef2f2; color: var(--closed-red); }
+
+        .dot { width: 8px; height: 8px; border-radius: 50%; margin-left: 8px; background: currentColor; }
+
+        .branch-name { font-size: 26px; font-weight: 800; color: var(--mad-blue); margin: 5px 0; }
+        .hours-text { font-size: 15px; color: #64748b; margin-bottom: 20px; line-height: 1.5; }
+
+        .shop-btn {
+            background: var(--mad-blue);
+            color: white;
+            border: none;
+            width: 100%;
+            padding: 14px;
+            border-radius: 12px;
+            font-size: 17px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .shop-btn:active { transform: scale(0.98); }
+
+        /* LTR Support */
+        [dir="ltr"] .dot { margin-left: 0; margin-right: 8px; }
     </style>
 </head>
 <body>
 
-<div id="loader"><img src="logo.png" width="70"></div>
-
-<nav>
-    <div id="lang-selectors">
-        <button class="lang-btn active" id="btn-ar" onclick="changeLang('ar')">AR</button>
-        <button class="lang-btn" id="btn-he" onclick="changeLang('he')">HE</button>
+<header>
+    <img src="logo.png" alt="Mad Parfumeur" class="logo">
+    <div class="lang-switch">
+        <button id="btn-he" class="lang-btn active" onclick="changeLang('he')">HE</button>
+        <button id="btn-ar" class="lang-btn" onclick="changeLang('ar')">AR</button>
     </div>
-    <img src="logo.png" class="logo" onclick="goHome()">
-</nav>
+</header>
 
-<div id="view-branches">
-    <div class="main-header-img"></div>
-    <div class="container" id="branches-container"></div>
-</div>
+<div class="hero"></div>
 
-<div id="view-store" class="hidden">
-    <div class="container">
-        <div onclick="goHome()" style="color:var(--mad-blue); font-weight:bold; cursor:pointer; margin-bottom:15px;"><i class="fas fa-arrow-right"></i> <span id="back-label">العودة</span></div>
-        <h2 id="store-title" style="text-align:center; color:var(--mad-blue);"></h2>
-        <div class="product-grid" id="products-container"></div>
+<div class="container" id="branches-list">
     </div>
-</div>
 
 <script>
-    let DATA = { branches: [], products: [] };
-    let LANG = 'ar';
-    let selectedBranch = null;
-
-    async function init() {
-        try {
-            const bRes = await fetch('branches.json');
-            DATA.branches = await bRes.json();
-            await loadProducts();
-            renderBranches();
-            document.getElementById('loader').classList.add('hidden');
-        } catch (e) { 
-            console.error("Fetch Error:", e);
-            document.getElementById('loader').classList.add('hidden');
+    // נתונים שהוצאו מהג'ייסון שסיפקת
+    const branches = [
+        {
+            id: 12,
+            name_he: "חיפה", name_ar: "حيفا",
+            hours_he: "כל השבוע 10:00-22:00", hours_ar: "يومياً 10:00-22:00",
+            open: 10, close: 22
+        },
+        {
+            id: 4,
+            name_he: "תל אביב-יפו", name_ar: "تل أبيب - يافا",
+            hours_he: "א'-ד' 10:00-22:00 | ה'-ו' 10:00-00:00", hours_ar: "الأحد-الأربعاء 10:00-22:00",
+            open: 10, close: 22 
+        },
+        {
+            id: 3,
+            name_he: "רמלה", name_ar: "الرمله",
+            hours_he: "א'-ה' 09:00-21:00", hours_ar: "الأحد-الخميس 09:00-21:00",
+            open: 9, close: 21
         }
+    ];
+
+    let lang = 'he';
+
+    function checkOpen(openH, closeH) {
+        const hour = new Date().getHours();
+        return hour >= openH && hour < closeH;
     }
 
-    async function loadProducts() {
-        try {
-            const file = LANG === 'ar' ? 'ar-products.json' : 'he-products.json';
-            const pRes = await fetch(file);
-            DATA.products = await pRes.json();
-        } catch (e) { DATA.products = []; }
+    function changeLang(newLang) {
+        lang = newLang;
+        document.getElementById('madApp').dir = lang === 'ar' ? 'rtl' : 'rtl'; // Keeping RTL for both as requested
+        document.getElementById('btn-he').classList.toggle('active', lang === 'he');
+        document.getElementById('btn-ar').classList.toggle('active', lang === 'ar');
+        render();
     }
 
-    function checkOpen(hours) {
-        if (!hours || hours.includes("مغلق") || hours.includes("סגור")) return false;
-        const now = new Date();
-        const cur = now.getHours() + (now.getMinutes() / 60);
-        const match = hours.replace(/[؛;]/g, '-').match(/(\d{1,2}):(\d{2})\s*-\s*(\d{1,2}):(\d{2})/);
-        if (!match) return true;
-        const start = parseInt(match[1]) + (parseInt(match[2]) / 60);
-        const end = parseInt(match[3]) + (parseInt(match[4]) / 60);
-        return cur >= start && cur <= end;
-    }
-
-    function renderBranches() {
-        const cont = document.getElementById('branches-container');
-        cont.innerHTML = '';
-        DATA.branches.forEach(b => {
-            const isOpen = checkOpen(b.hours_ar || "");
-            const name = LANG === 'ar' ? b.name_ar : b.name_he;
-            const hours = LANG === 'ar' ? b.hours_ar : b.hours_he;
-            cont.innerHTML += `
+    function render() {
+        const list = document.getElementById('branches-list');
+        list.innerHTML = '';
+        
+        branches.forEach(b => {
+            const isOpen = checkOpen(b.open, b.close);
+            const statusLabel = lang === 'he' ? (isOpen ? 'פתוח' : 'סגור') : (isOpen ? 'مفتوح' : 'مغلق');
+            const btnLabel = lang === 'he' ? 'צפה בבשמים' : 'تصفح العطور';
+            
+            list.innerHTML += `
                 <div class="card">
-                    <span class="status-badge ${isOpen ? 'open' : 'closed'}">${isOpen ? (LANG=='ar'?'● مفتوح':'● פתוח') : (LANG=='ar'?'● مغلق':'● סגור')}</span>
-                    <h2 style="margin:0; color:var(--mad-blue); font-size:1.3rem;">${name}</h2>
-                    <p style="font-size:0.8rem; color:#666; margin:8px 0;">${hours}</p>
-                    <button class="btn-primary" onclick="openStore(${b.id})">${LANG=='ar'?'تصفح العطور':'צפה במוצרים'}</button>
-                </div>`;
+                    <div class="status-badge ${isOpen ? 'is-open' : 'is-closed'}">
+                        <span class="dot"></span>
+                        ${statusLabel}
+                    </div>
+                    <div class="branch-name">${lang === 'he' ? b.name_he : b.name_ar}</div>
+                    <div class="hours-text">${lang === 'he' ? b.hours_he : b.hours_ar}</div>
+                    <button class="shop-btn" onclick="location.href='store.html?id=${b.id}'">
+                        ${btnLabel}
+                    </button>
+                </div>
+            `;
         });
     }
 
-    function openStore(id) {
-        selectedBranch = DATA.branches.find(b => b.id == id);
-        document.getElementById('view-branches').classList.add('hidden');
-        document.getElementById('view-store').classList.remove('hidden');
-        document.getElementById('store-title').innerText = LANG === 'ar' ? selectedBranch.name_ar : selectedBranch.name_he;
-        renderProducts();
-        window.scrollTo(0,0);
-    }
-
-    function renderProducts() {
-        const cont = document.getElementById('products-container');
-        cont.innerHTML = '';
-        if (!Array.isArray(DATA.products)) return;
-        DATA.products.forEach(p => {
-            cont.innerHTML += `
-                <div class="p-card">
-                    <img src="${p.image}" onerror="this.src='logo.png'">
-                    <div style="font-size:0.8rem; font-weight:bold; height:35px; overflow:hidden; margin:8px 0;">${p.title}</div>
-                    <div style="color:var(--mad-gold); font-weight:bold;">${p.price}</div>
-                    <button class="btn-primary" style="padding:8px; font-size:0.7rem;" onclick="order('${p.title}')">${LANG=='ar'?'اطلب':'הזמן'}</button>
-                </div>`;
-        });
-    }
-
-    function order(item) {
-        window.open(`https://wa.me/${selectedBranch.whatsapp}?text=${encodeURIComponent("أريد: " + item)}`);
-    }
-
-    async function changeLang(l) {
-        LANG = l;
-        document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById(`btn-${l}`).classList.add('active');
-        document.documentElement.dir = l === 'ar' ? 'rtl' : 'ltr';
-        await loadProducts();
-        renderBranches();
-        if(!document.getElementById('view-store').classList.contains('hidden')) renderProducts();
-    }
-
-    function goHome() {
-        document.getElementById('view-store').classList.add('hidden');
-        document.getElementById('view-branches').classList.remove('hidden');
-    }
-
-    init();
+    render();
 </script>
 </body>
 </html>
