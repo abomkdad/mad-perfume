@@ -3,38 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MAD PARFUMEUR | Official Card</title>
+    <title>MAD PARFUMEUR | Luxury Card</title>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&family=Cinzel:wght@700&display=swap" rel="stylesheet">
 
     <style>
-        :root { --mad-blue: #1e3a8a; --mad-gold: #d4af37; --bg: #f8fbff; }
+        :root { --mad-blue: #1e3a8a; --bg: #f8fbff; }
         body { margin: 0; font-family: 'Cairo', sans-serif; background: var(--bg); color: #1d1d1f; overflow-x: hidden; }
         
-        /* Navigation */
         nav { padding: 12px 15px; background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); position: sticky; top: 0; z-index: 1000; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; }
         .logo { width: 45px; height: 45px; border-radius: 50%; border: 2px solid var(--mad-blue); cursor: pointer; }
         .lang-btn { padding: 5px 10px; border-radius: 8px; border: 1px solid #ddd; background: #fff; cursor: pointer; font-size: 0.7rem; font-weight: bold; }
         .lang-btn.active { background: var(--mad-blue); color: #fff; border: none; }
 
-        /* --- Header Image Style --- */
-        .main-header-img {
-            width: 100%;
-            height: 200px; /* يمكنك زيادة الارتفاع حسب الرغبة */
-            background-image: url('header.jpg'); /* تأكد من تسمية الصورة header.jpg */
-            background-size: cover;
-            background-position: center;
-            border-bottom: 3px solid var(--mad-blue);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        }
+        .main-header-img { width: 100%; height: 200px; background: url('header.jpg') center/cover no-repeat; border-bottom: 3px solid var(--mad-blue); }
 
         .container { max-width: 500px; margin: 0 auto; padding: 20px; }
-        .btn-geo { background: var(--mad-blue); color: #fff; width: 100%; padding: 15px; border-radius: 15px; border: none; font-weight: bold; cursor: pointer; margin-bottom: 25px; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 1rem; box-shadow: 0 4px 15px rgba(30, 58, 138, 0.2); transition: 0.3s; }
-        .btn-geo:active { transform: scale(0.98); }
+        .btn-geo { background: var(--mad-blue); color: #fff; width: 100%; padding: 15px; border-radius: 15px; border: none; font-weight: bold; cursor: pointer; margin-bottom: 25px; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 1rem; box-shadow: 0 4px 15px rgba(30, 58, 138, 0.2); }
 
-        /* Card Style */
         .card { background: #fff; border-radius: 24px; padding: 25px; margin-bottom: 20px; border: 1px solid #eee; box-shadow: 0 10px 20px rgba(0,0,0,0.03); text-align: center; }
         .status-badge { font-size: 0.75rem; padding: 5px 12px; border-radius: 20px; font-weight: bold; display: inline-flex; align-items: center; gap: 5px; }
         .open { background: #e8f5e9; color: #2e7d32; }
@@ -54,9 +42,7 @@
 </head>
 <body>
 
-<div id="loader">
-    <img src="logo.png" width="80" style="animation: pulse 1.5s infinite;">
-</div>
+<div id="loader"><img src="logo.png" width="80" style="animation: pulse 1.5s infinite;"></div>
 
 <nav>
     <div id="lang-selectors" style="display:flex; gap:5px;">
@@ -86,9 +72,7 @@
 
     async function loadApp() {
         Papa.parse('branches.csv', {
-            download: true,
-            header: true,
-            skipEmptyLines: true,
+            download: true, header: true, skipEmptyLines: true,
             complete: (results) => {
                 GLOBAL_DATA = results.data;
                 const deviceLang = navigator.language.split('-')[0];
@@ -123,17 +107,16 @@
         container.innerHTML = '';
         data.forEach(b => {
             if (!b.ID) return;
+            // إصلاح مشكلة undefined بربط اسم العمود الصحيح من ملفك
             const isOpen = getOpenStatus(b['ساعات الدوام عربي']);
-            const name = b[CURRENT_LANG === 'ar' ? 'اسم الفرع عربي' : 'اسم الفرع عبري'] || b['اسم الفرع عربي'];
-            const hours = b[CURRENT_LANG === 'ar' ? 'ساعات الدوام عربي' : 'ساعات الدوام عبري'] || b['ساعات الدوام عربي'];
+            const name = b[CURRENT_LANG === 'ar' ? 'اسم الفرع عربي' : 'اسم الفرع عبري'];
+            const hours = b[CURRENT_LANG === 'ar' ? 'ساعات الدوام عربي' : 'ساعات الدوام عبري'];
             
             container.innerHTML += `
                 <div class="card">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
                         <h2 style="margin:0; font-size:1.3rem; color:var(--mad-blue); font-weight:700;">${name}</h2>
-                        <span class="status-badge ${isOpen ? 'open' : 'closed'}">
-                            <i class="fas fa-circle"></i> ${isOpen ? UI_TEXTS[CURRENT_LANG].open : UI_TEXTS[CURRENT_LANG].closed}
-                        </span>
+                        <span class="status-badge ${isOpen ? 'open' : 'closed'}">${isOpen ? UI_TEXTS[CURRENT_LANG].open : UI_TEXTS[CURRENT_LANG].closed}</span>
                     </div>
                     <div style="font-size:0.9rem; color:#666;"><i class="far fa-clock"></i> ${hours}</div>
                     
@@ -164,7 +147,6 @@
             renderBranches(sorted);
         });
     }
-
     loadApp();
 </script>
 </body>
