@@ -3,458 +3,292 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MAD PARFUMEUR</title>
+    <title>MAD PARFUMEUR | Digital Card</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Cairo:wght@300;400;700&display=swap" rel="stylesheet">
     
     <style>
-        /* === 1. LUXURY THEME VARIABLES === */
         :root { 
-            --bg: #0a0a0a; 
-            --card-bg: #161616; 
-            --gold: #d4af37; 
-            --gold-gradient: linear-gradient(135deg, #d4af37 0%, #f3e5ab 50%, #b8860b 100%);
+            --bg: #050505; 
+            --card-bg: #111111; 
+            --gold: #c5a059; 
+            --gold-light: #e2c287;
+            --gold-gradient: linear-gradient(135deg, #c5a059 0%, #f3e5ab 50%, #8e6d2f 100%);
             --text: #ffffff; 
-            --sub-text: #888; 
-            --waze-bg: #1f2d3d; 
-            --wa-bg: #25D366;
+            --sub-text: #a0a0a0;
+            --glass: rgba(255, 255, 255, 0.03);
         }
         
-        body { margin: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg); color: var(--text); padding-bottom: 50px; }
-        a { text-decoration: none; }
+        body { 
+            margin: 0; 
+            font-family: 'Cairo', sans-serif; 
+            background: var(--bg); 
+            color: var(--text); 
+            padding-bottom: 50px;
+            overflow-x: hidden;
+        }
 
-        /* === 2. COMPACT HEADER (NEW DESIGN) === */
+        /* === Header & Branding === */
         header {
             text-align: center;
-            padding: 15px 10px 10px; /* تقليص المسافات */
-            background: rgba(0,0,0,0.95);
-            border-bottom: 1px solid #333;
+            padding: 20px 15px;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(15px);
+            border-bottom: 1px solid rgba(197, 160, 89, 0.2);
             position: sticky; top: 0; z-index: 1000;
-            backdrop-filter: blur(10px);
         }
-        
-        /* Flex container to organize header elements neatly */
-        .header-top-row {
+
+        .header-top {
             display: flex; justify-content: space-between; align-items: center;
-            max-width: 1000px; margin: 0 auto 10px; padding: 0 10px;
+            max-width: 800px; margin: 0 auto 15px;
         }
 
-        .logo-container {
-            width: 60px; height: 60px; /* تصغير اللوجو */
-            border-radius: 50%;
-            background: #000;
-            border: 1px solid var(--gold);
-            display: flex; align-items: center; justify-content: center;
-            overflow: hidden;
+        .logo-box {
+            width: 70px; height: 70px;
+            border: 2px solid var(--gold);
+            border-radius: 50%; padding: 5px;
+            background: #000; box-shadow: 0 0 20px rgba(197, 160, 89, 0.2);
         }
-        .header-logo { width: 90%; height: auto; object-fit: contain; }
+        .logo-box img { width: 100%; height: 100%; object-fit: contain; }
 
-        /* Luxury Visit Button */
-        .btn-visit-site {
+        .btn-main-store {
             background: var(--gold-gradient);
-            color: #000;
-            padding: 8px 15px;
-            border-radius: 4px; /* زوايا حادة قليلاً للفخامة */
-            font-size: 0.8rem;
-            font-weight: bold;
-            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.2);
-            transition: transform 0.2s;
-            border: none;
-            display: inline-flex; align-items: center; gap: 5px;
-        }
-        .btn-visit-site:active { transform: scale(0.95); }
-
-        /* Minimalist Lang Switch */
-        .lang-switch { display: flex; gap: 15px; font-size: 0.9rem; }
-        .lang-btn {
-            background: none; border: none; color: #666; 
-            cursor: pointer; font-weight: bold; padding: 0;
-            transition: 0.3s; position: relative;
-        }
-        .lang-btn.active { color: var(--gold); }
-        .lang-btn.active::after {
-            content: ''; position: absolute; bottom: -3px; left: 0; width: 100%; height: 2px; background: var(--gold);
+            color: #000; padding: 10px 20px; border-radius: 30px;
+            font-weight: bold; font-size: 0.8rem; text-transform: uppercase;
+            box-shadow: 0 4px 15px rgba(197, 160, 89, 0.3);
         }
 
-        /* Modern Search Bar */
-        .search-container { max-width: 600px; margin: 0 auto; position: relative; }
+        /* === Search === */
+        .search-wrapper { max-width: 500px; margin: 10px auto; position: relative; padding: 0 15px; }
         .search-input {
-            width: 100%; padding: 10px 40px 10px 15px;
-            background: #1a1a1a; 
-            border: 1px solid #333;
-            border-radius: 50px; 
-            color: #fff; font-size: 0.9rem;
-            box-sizing: border-box; outline: none; text-align: right;
-            transition: 0.3s;
+            width: 100%; padding: 12px 45px 12px 20px;
+            background: var(--glass); border: 1px solid #333;
+            border-radius: 12px; color: #fff; font-family: inherit;
+            outline: none; transition: 0.3s;
         }
-        .search-input:focus { border-color: var(--gold); box-shadow: 0 0 10px rgba(212, 175, 55, 0.1); }
-        .search-icon { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: var(--gold); }
+        .search-input:focus { border-color: var(--gold); background: #1a1a1a; }
+        .search-icon { position: absolute; right: 30px; top: 50%; transform: translateY(-50%); color: var(--gold); }
 
-        /* === 3. BRANCH CARDS === */
+        /* === Branch Cards === */
         .container { max-width: 600px; margin: 20px auto; padding: 0 15px; }
         
         .branch-card {
             background: var(--card-bg);
-            border-radius: 8px; /* Slightly sharper corners */
-            padding: 15px;
-            margin-bottom: 15px;
-            border: 1px solid #252525;
-            position: relative;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            border-radius: 15px; padding: 20px; margin-bottom: 20px;
+            border: 1px solid #222; position: relative;
+            transition: transform 0.3s, border-color 0.3s;
+            overflow: hidden;
         }
-
-        .card-header {
-            display: flex; justify-content: flex-end; align-items: center; gap: 10px;
-            margin-bottom: 10px; cursor: pointer;
-        }
-        .card-title { font-size: 1.1rem; font-weight: bold; color: #fff; letter-spacing: 0.5px; }
-        .gold-dot { width: 5px; height: 5px; background: var(--gold); border-radius: 50%; box-shadow: 0 0 5px var(--gold); }
-
-        .hours-box {
-            background: rgba(255,255,255,0.03); padding: 8px; border-radius: 4px;
-            text-align: right; color: #999; font-size: 0.8rem;
-            margin-bottom: 15px; display: flex; align-items: center; justify-content: flex-end; gap: 6px;
-            border-right: 2px solid var(--gold);
-        }
-
-        .card-actions-wrapper { display: flex; flex-direction: column; gap: 8px; }
-        .contact-row { display: flex; gap: 8px; }
-
-        .action-btn {
-            flex: 1; padding: 10px; border-radius: 4px; text-align: center;
-            font-weight: bold; font-size: 0.85rem;
-            display: flex; align-items: center; justify-content: center; gap: 6px;
-            transition: 0.2s; text-decoration: none; cursor: pointer; border: none;
-        }
+        .branch-card:hover { border-color: var(--gold); transform: translateY(-5px); }
         
-        /* New Shop Button Style */
-        .btn-shop { 
-            background: transparent; border: 1px solid var(--gold); color: var(--gold);
-            width: 100%; transition: 0.3s;
+        .branch-card::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%;
+            background: var(--gold-gradient);
         }
-        .btn-shop:hover { background: var(--gold); color: #000; }
 
-        .btn-waze { background: #1a2634; color: #33ccff; border: 1px solid rgba(51, 204, 255, 0.2); }
-        .btn-whatsapp { background: #132f20; color: #25D366; border: 1px solid rgba(37, 211, 102, 0.2); }
+        .card-info h3 { margin: 0 0 5px; font-size: 1.3rem; color: var(--gold-light); }
+        .card-info p { margin: 0; color: var(--sub-text); font-size: 0.85rem; display: flex; align-items: center; gap: 8px; }
 
-        /* Service Bar */
-        .cs-bar {
-            background: linear-gradient(90deg, #111, #1a1a1a); 
-            border: 1px solid #333; border-radius: 50px;
-            padding: 8px 20px; display: flex; justify-content: space-between; align-items: center;
-            margin-top: 20px; text-decoration: none; margin-bottom: 40px;
-        }
-        .cs-text { color: #fff; font-size: 0.9rem; }
-        .cs-num { color: var(--gold); font-weight: bold; }
+        .social-links { display: flex; gap: 15px; margin: 15px 0; }
+        .social-links a { color: var(--sub-text); font-size: 1.2rem; transition: 0.3s; }
+        .social-links a:hover { color: var(--gold); }
 
-        /* === 4. DETAIL VIEW === */
-        .detail-header-btn { margin-bottom: 15px; }
-        .back-link { 
-            color: #aaa; font-size: 0.9rem; display: inline-flex; align-items: center; gap: 5px; cursor: pointer; 
-            background: #222; padding: 5px 15px; border-radius: 20px;
-        }
-        .detail-hero {
-            text-align: center; margin-bottom: 25px;
-            background: var(--card-bg); padding: 20px; border-radius: 8px; border: 1px solid #333;
-        }
+        .card-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
         
-        .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
-        .product-card { background: #fff; border-radius: 6px; overflow: hidden; display: flex; flex-direction: column; }
-        .p-img-box { height: 160px; padding: 10px; display: flex; align-items: center; justify-content: center; background: #fff; }
-        .p-img { max-height: 100%; max-width: 100%; object-fit: contain; }
-        .p-info { padding: 12px; text-align: center; color: #333; flex-grow: 1; display: flex; flex-direction: column; }
-        .p-title { font-weight: bold; font-size: 0.85rem; margin-bottom: 5px; color: #000; flex-grow: 1; }
-        .p-price { color: #b8860b; font-weight: bold; margin-bottom: 10px; font-size: 0.95rem; }
+        .btn-action {
+            padding: 12px; border-radius: 8px; font-weight: bold; font-size: 0.85rem;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            text-decoration: none; transition: 0.3s;
+        }
+        .btn-view { background: #1a1a1a; color: #fff; border: 1px solid #333; grid-column: span 2; }
+        .btn-view:hover { background: var(--gold); color: #000; }
         
-        .btn-ask { 
-            background: #25D366; color: #fff; 
-            width: 100%; padding: 8px; border-radius: 4px; text-decoration: none; 
-            display: flex; align-items: center; justify-content: center; gap: 5px; font-size: 0.8rem;
-            margin-top: auto; font-weight: bold;
+        .btn-waze { background: rgba(51, 204, 255, 0.1); color: #33ccff; border: 1px solid rgba(51, 204, 255, 0.2); }
+        .btn-wa { background: rgba(37, 211, 102, 0.1); color: #25D366; border: 1px solid rgba(37, 211, 102, 0.2); }
+
+        /* === Detail View (The Luxury Shop) === */
+        .detail-view { animation: fadeIn 0.5s ease; }
+        .back-btn { color: var(--gold); cursor: pointer; display: inline-flex; align-items: center; gap: 8px; margin-bottom: 20px; font-weight: bold; }
+        
+        .shop-header {
+            text-align: center; padding: 30px 20px; background: var(--card-bg);
+            border-radius: 20px; border: 1px solid var(--gold); margin-bottom: 25px;
+        }
+        .shop-header h2 { font-family: 'Cinzel', serif; margin: 0; font-size: 1.8rem; letter-spacing: 2px; }
+
+        .products-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .product-card {
+            background: #fff; border-radius: 12px; overflow: hidden;
+            display: flex; flex-direction: column; color: #000;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+        .p-img-box { height: 180px; background: #f9f9f9; padding: 15px; display: flex; align-items: center; justify-content: center; }
+        .p-img-box img { max-height: 100%; max-width: 100%; object-fit: contain; }
+        .p-info { padding: 12px; text-align: center; flex-grow: 1; display: flex; flex-direction: column; }
+        .p-title { font-weight: 700; font-size: 0.85rem; height: 35px; overflow: hidden; margin-bottom: 8px; }
+        .p-price { font-size: 1.1rem; color: #8e6d2f; font-weight: 800; margin-bottom: 12px; }
+        .btn-check { 
+            background: #000; color: #fff; padding: 8px; border-radius: 6px; 
+            font-size: 0.75rem; font-weight: bold; text-decoration: none;
         }
 
-        .filters { display:flex; gap:8px; margin-bottom:15px; }
-        .filters select { flex:1; padding:10px; border-radius:6px; border:1px solid #444; background: #222; color: #fff; font-size: 0.9rem; }
-
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
         .hidden { display: none !important; }
-        #loader { position: fixed; inset: 0; background: #000; z-index: 2000; display: flex; align-items: center; justify-content: center; color: var(--gold); }
+        #loader { position: fixed; inset: 0; background: #000; z-index: 2000; display: flex; align-items: center; justify-content: center; color: var(--gold); font-family: 'Cinzel'; letter-spacing: 5px; }
     </style>
 </head>
 <body>
 
 <header>
-    <div class="header-top-row">
-        <a href="https://madperfume.co.il/" target="_blank" class="btn-visit-site">
-            <i class="fas fa-globe"></i> Website
+    <div class="header-top">
+        <a href="https://madperfume.co.il/" target="_blank" class="btn-main-store">
+            <i class="fas fa-shopping-cart"></i> المتجر الرئيسي
         </a>
-
-        <div class="logo-container">
-            <img src="https://abomkdad.github.io/Digital-Business-Card/logo.png" alt="MAD" class="header-logo">
+        <div class="logo-box">
+            <img src="https://abomkdad.github.io/Digital-Business-Card/logo.png" alt="MAD">
         </div>
-
-        <div class="lang-switch">
-            <button class="lang-btn" id="btn-lang-ar" onclick="setLang('ar')">AR</button>
-            <button class="lang-btn" id="btn-lang-he" onclick="setLang('he')">HE</button>
+        <div style="width: 80px;">
+            <button onclick="toggleLang()" id="lang-toggle" style="background:none; border:1px solid var(--gold); color:var(--gold); padding:4px 10px; border-radius:4px; cursor:pointer; font-weight:bold;">HE</button>
         </div>
     </div>
 
-    <div id="search-wrapper" class="search-container">
+    <div id="search-area" class="search-wrapper">
         <i class="fas fa-search search-icon"></i>
-        <input type="text" id="search-input" class="search-input" placeholder="ابحث..." onkeyup="filterBranches()">
+        <input type="text" id="search-input" class="search-input" placeholder="ابحث عن فرعك القريب..." onkeyup="filterBranches()">
     </div>
 </header>
 
-<div id="loader">LOADING...</div>
+<div id="loader">MAD PARFUMEUR</div>
 
 <div class="container">
-
     <div id="list-view">
         <div id="branches-container"></div>
-        
-        <a href="tel:*9935" class="cs-bar">
-            <span class="cs-num">*9935</span>
-            <span class="cs-text">
-                <i class="fas fa-headset" style="margin-left:8px; color:var(--gold)"></i> خدمة الزبائن
-            </span>
-        </a>
     </div>
 
-    <div id="detail-view" class="hidden">
-        <div class="detail-header-btn">
-            <div class="back-link" onclick="goHome()">
-                <i class="fas fa-arrow-right"></i> <span id="txt-back">عودة للفروع</span>
-            </div>
+    <div id="detail-view" class="hidden detail-view">
+        <div class="back-btn" onclick="goHome()">
+            <i class="fas fa-arrow-right"></i> <span id="txt-back">العودة لجميع الفروع</span>
         </div>
 
-        <div class="detail-hero">
-            <h2 id="d-title" style="margin:0; color:#fff; font-size:1.4rem;"></h2>
-            <div id="d-subtitle" style="color:var(--gold); margin-bottom:10px; font-size:0.9rem;"></div>
-            <div id="d-hours" style="color:#888; font-size:0.85rem;"></div>
-        </div>
-
-        <div class="filters">
-            <select id="cat-select"></select>
-            <select id="sort-select">
-                <option value="">ترتيب افتراضي</option>
-                <option value="asc">السعر: من الأقل</option>
-                <option value="desc">السعر: من الأعلى</option>
-            </select>
+        <div class="shop-header">
+            <h2 id="d-title"></h2>
+            <p id="d-hours" style="color:var(--sub-text); margin-top:10px; font-size:0.9rem;"></p>
+            <div id="d-social" class="social-links" style="justify-content: center; margin-top: 20px;"></div>
         </div>
 
         <div id="products-grid" class="products-grid"></div>
     </div>
-
 </div>
 
 <script>
-    // === CONFIG ===
-    const URLS = { b: 'branches.csv', p: 'products.csv' };
     let DATA = { b: [], p: [] };
-    let LANG = 'ar'; 
+    let LANG = 'ar';
+    const URLS = { b: 'branches.csv', p: 'products.csv' };
 
-    // === TRANSLATIONS ===
-    const T = {
-        ar: { placeholder: "ابحث عن المدينة...", back: "عودة للقائمة", daily: "يومياً", waze: "WAZE", wa: "WhatsApp", shop_btn: "تسوق من الفرع", check_stock: "افحص التوفر", all_cats: "كل الفئات" },
-        he: { placeholder: "חפש עיר...", back: "חזרה לרשימה", daily: "יומי", waze: "WAZE", wa: "WhatsApp", shop_btn: "קנה מהסניף", check_stock: "בדוק זמינות", all_cats: "כל הקטגוריות" }
-    };
-
-    // === INIT ===
     async function init() {
-        const p = new URLSearchParams(location.search);
-        if(p.get('lang') === 'he') LANG = 'he';
-        else {
-             const browserLang = navigator.language || navigator.userLanguage;
-             if (browserLang && browserLang.startsWith('he')) LANG = 'he';
-        }
-        updateLangUI();
-
         try {
             const [rb, rp] = await Promise.all([fetchCSV(URLS.b), fetchCSV(URLS.p)]);
-            DATA = { b: rb, p: rp };
-            
-            const id = p.get('id');
-            if(id) openBranch(id);
-            else renderList(DATA.b);
-            
-            document.getElementById('loader').classList.add('hidden');
-        } catch(e) { console.error(e); }
+            DATA.b = rb; DATA.p = rp;
+            renderList(DATA.b);
+            document.getElementById('loader').style.display = 'none';
+        } catch(e) { console.error("Data Load Error", e); }
     }
 
     function fetchCSV(u) {
-        return new Promise(r => Papa.parse(u, { download:true, header:true, skipEmptyLines:true, transformHeader:h=>h.trim(), complete:x=>r(x.data) }));
+        return new Promise(r => Papa.parse(u, { download:true, header:true, skipEmptyLines:true, complete:x=>r(x.data) }));
     }
 
-    function setLang(l) {
-        LANG = l;
-        const url = new URL(window.location);
-        url.searchParams.set('lang', l);
-        window.history.pushState({}, '', url);
-        updateLangUI();
-        renderList(DATA.b); 
-        const id = new URLSearchParams(location.search).get('id');
-        if(id) openBranch(id);
-    }
-
-    function updateLangUI() {
-        document.documentElement.lang = LANG;
-        document.documentElement.dir = LANG==='he'?'ltr':'rtl';
-        document.getElementById('btn-lang-ar').classList.toggle('active', LANG==='ar');
-        document.getElementById('btn-lang-he').classList.toggle('active', LANG==='he');
-        document.getElementById('search-input').placeholder = T[LANG].placeholder;
-        document.getElementById('txt-back').innerText = T[LANG].back;
-    }
-
-    // === LIST VIEW LOGIC ===
     function renderList(list) {
         const container = document.getElementById('branches-container');
         container.innerHTML = '';
-
         list.forEach(b => {
             if(!b.ID) return;
-            
-            let name = LANG==='he' ? b['اسم الفرع عبري'] : b['اسم الفرع عربي'];
-            let hours = LANG==='he' ? (b['ساعات الدوام عبري']||b['ساعات الدوام عربي']) : (b['ساعات الدوام عربي']||b['ساعات الدوام عبري']);
-            let ph = (b['الهاتف']||'').replace(/\D/g,'').replace(/^0/,'972');
-            let waLink = b['WhatsApp'] || `https://wa.me/${ph}`;
-            let wazeLink = b['رابط Waze / Maps'] || '#';
+            const name = LANG === 'ar' ? b['اسم الفرع عربي'] : b['اسم الفرع عبري'];
+            const hours = LANG === 'ar' ? b['ساعات الدوام عربي'] : b['ساعات الدوام عبري'];
+            const phone = b['الهاتف'].replace(/\D/g,'').replace(/^0/,'972');
 
-            const card = document.createElement('div');
-            card.className = 'branch-card';
-            card.innerHTML = `
-                <div class="card-header" onclick="nav('${b.ID}')">
-                    <span class="card-title">${name}</span>
-                    <span class="gold-dot"></span>
+            container.innerHTML += `
+                <div class="branch-card">
+                    <div class="card-info">
+                        <h3>${name}</h3>
+                        <p><i class="far fa-clock" style="color:var(--gold)"></i> ${hours}</p>
+                    </div>
+                    <div class="social-links">
+                        ${b.Instagram ? `<a href="${b.Instagram}" target="_blank"><i class="fab fa-instagram"></i></a>` : ''}
+                        ${b.TikTok ? `<a href="${b.TikTok}" target="_blank"><i class="fab fa-tiktok"></i></a>` : ''}
+                        ${b.Facebook ? `<a href="${b.Facebook}" target="_blank"><i class="fab fa-facebook"></i></a>` : ''}
+                    </div>
+                    <div class="card-btns">
+                        <button class="btn-action btn-view" onclick="openBranch('${b.ID}')">
+                            <i class="fas fa-shopping-bag"></i> عرض المنتجات والتوفر
+                        </button>
+                        <a href="${b['رابط Waze / Maps']}" class="btn-action btn-waze"><i class="fab fa-waze"></i> WAZE</a>
+                        <a href="https://wa.me/${phone}" class="btn-action btn-wa"><i class="fab fa-whatsapp"></i> واتساب</a>
+                    </div>
                 </div>
-                
-                <div class="hours-box">
-                     ${hours} <i class="far fa-clock" style="color:var(--gold)"></i>
-                </div>
+            `;
+        });
+    }
 
-                <div class="card-actions-wrapper">
-                    <button onclick="nav('${b.ID}')" class="action-btn btn-shop">
-                        ${T[LANG].shop_btn} <i class="fas fa-shopping-bag"></i>
-                    </button>
-
-                    <div class="contact-row">
-                        <a href="${wazeLink}" target="_blank" class="action-btn btn-waze">
-                            ${T[LANG].waze} <i class="fas fa-location-arrow"></i>
-                        </a>
-                        <a href="${waLink}" target="_blank" class="action-btn btn-whatsapp">
-                            ${T[LANG].wa} <i class="fab fa-whatsapp"></i>
+    function openBranch(id) {
+        const b = DATA.b.find(x => x.ID == id);
+        const phone = b['الهاتف'].replace(/\D/g,'').replace(/^0/,'972');
+        
+        document.getElementById('list-view').classList.add('hidden');
+        document.getElementById('search-area').classList.add('hidden');
+        document.getElementById('detail-view').classList.remove('hidden');
+        
+        document.getElementById('d-title').innerText = LANG === 'ar' ? b['اسم الفرع عربي'] : b['اسم الفرع عبري'];
+        document.getElementById('d-hours').innerText = LANG === 'ar' ? b['ساعات الدوام عربي'] : b['ساعات الدوام عبري'];
+        
+        // Render Products
+        const grid = document.getElementById('products-grid');
+        grid.innerHTML = '';
+        DATA.p.slice(0, 40).forEach(p => {
+            const waMsg = encodeURIComponent(`مرحباً، هل عطر ${p.Title} متوفر في فرع ${b['اسم الفرع عربي']}؟`);
+            grid.innerHTML += `
+                <div class="product-card">
+                    <div class="p-img-box"><img src="${p.Image.split('|')[0]}" loading="lazy"></div>
+                    <div class="p-info">
+                        <div class="p-title">${p.Title}</div>
+                        <div class="p-price">${p.Price} ₪</div>
+                        <a href="https://wa.me/${phone}?text=${waMsg}" target="_blank" class="btn-check">
+                            <i class="fab fa-whatsapp"></i> فحص التوفر
                         </a>
                     </div>
                 </div>
             `;
-            container.appendChild(card);
         });
+        window.scrollTo(0,0);
+    }
+
+    function goHome() {
+        document.getElementById('detail-view').classList.add('hidden');
+        document.getElementById('list-view').classList.remove('hidden');
+        document.getElementById('search-area').classList.remove('hidden');
     }
 
     function filterBranches() {
         const term = document.getElementById('search-input').value.toLowerCase();
-        const filtered = DATA.b.filter(b => {
-            const nAr = (b['اسم الفرع عربي']||'').toLowerCase();
-            const nHe = (b['اسم الفرع عبري']||'').toLowerCase();
-            return nAr.includes(term) || nHe.includes(term);
-        });
+        const filtered = DATA.b.filter(b => 
+            b['اسم الفرع عربي'].toLowerCase().includes(term) || 
+            b['اسم الفرع عبري'].toLowerCase().includes(term)
+        );
         renderList(filtered);
     }
 
-    // === DETAIL VIEW LOGIC ===
-    function nav(id) {
-        const url = new URL(window.location);
-        url.searchParams.set('id', id);
-        window.history.pushState({}, '', url);
-        openBranch(id);
-    }
-
-    function goHome() {
-        const url = new URL(window.location);
-        url.searchParams.delete('id');
-        window.history.pushState({}, '', url);
-        document.getElementById('detail-view').classList.add('hidden');
-        document.getElementById('list-view').classList.remove('hidden');
-        document.getElementById('search-wrapper').classList.remove('hidden');
-        window.scrollTo(0,0);
-    }
-
-    let currentProducts = [];
-    let currentBranchPhone = '';
-
-    function openBranch(id) {
-        const b = DATA.b.find(x => x.ID == id);
-        if(!b) { goHome(); return; }
-
-        document.getElementById('list-view').classList.add('hidden');
-        document.getElementById('search-wrapper').classList.add('hidden');
-        document.getElementById('detail-view').classList.remove('hidden');
-
-        if(LANG === 'he') {
-            document.getElementById('d-title').innerText = b['اسم الفرع عبري'];
-            document.getElementById('d-subtitle').innerText = b['اسم الفرع عربي'];
-            document.getElementById('d-hours').innerText = b['ساعات الدوام عبري']||'';
-        } else {
-            document.getElementById('d-title').innerText = b['اسم الفرع عربي'];
-            document.getElementById('d-subtitle').innerText = b['اسم الفرع عبري'];
-            document.getElementById('d-hours').innerText = b['ساعات الدوام عربي']||'';
-        }
-
-        currentBranchPhone = (b['الهاتف']||'').replace(/\D/g,'').replace(/^0/,'972');
-
-        // ALWAYS SHOW ALL PRODUCTS
-        currentProducts = DATA.p.filter(x => x['Title']);
-        
-        updateFilters();
-    }
-
-    function updateFilters() {
-        const cats = [...new Set(currentProducts.map(x => x['Category (g:product_type)']).filter(Boolean))];
-        const sel = document.getElementById('cat-select');
-        sel.innerHTML = `<option value="">${T[LANG].all_cats}</option>`;
-        cats.forEach(c => sel.innerHTML += `<option>${c}</option>`);
-        
-        sel.onchange = renderProducts;
-        document.getElementById('sort-select').onchange = renderProducts;
-        renderProducts();
-    }
-
-    function renderProducts() {
-        const grid = document.getElementById('products-grid');
-        grid.innerHTML = '';
-        
-        const cat = document.getElementById('cat-select').value;
-        const sort = document.getElementById('sort-select').value;
-
-        let list = currentProducts.filter(x => !cat || x['Category (g:product_type)'] === cat);
-        
-        if(sort === 'asc') list.sort((a,b) => parseFloat(a.Price)-parseFloat(b.Price));
-        if(sort === 'desc') list.sort((a,b) => parseFloat(b.Price)-parseFloat(a.Price));
-
-        list.slice(0, 50).forEach(p => {
-            let img = (p.Image||'').split('|')[0] || 'https://via.placeholder.com/200';
-            
-            // WA: Check Availability
-            let msg = LANG==='he' 
-                ? `שלום, האם הבושם ${p.Title} זמין בסניף?` 
-                : `مرحباً، هل العطر ${p.Title} متوفر في الفرع؟`;
-            let waLink = `https://wa.me/${currentBranchPhone}?text=${encodeURIComponent(msg)}`;
-
-            grid.innerHTML += `
-                <div class="product-card">
-                    <div class="p-img-box"><img src="${img}" class="p-img" loading="lazy"></div>
-                    <div class="p-info">
-                        <div class="p-title">${p.Title}</div>
-                        <div class="p-price">${p.Price} ₪</div>
-                        <a href="${waLink}" target="_blank" class="btn-ask">
-                            <i class="fab fa-whatsapp"></i> ${T[LANG].check_stock}
-                        </a>
-                    </div>
-                </div>
-            `;
-        });
+    function toggleLang() {
+        LANG = LANG === 'ar' ? 'he' : 'ar';
+        document.dir = LANG === 'ar' ? 'rtl' : 'ltr';
+        document.getElementById('lang-toggle').innerText = LANG === 'ar' ? 'HE' : 'AR';
+        document.getElementById('txt-back').innerText = LANG === 'ar' ? 'العودة لجميع الفروع' : 'חזרה לכל הסניפים';
+        document.getElementById('search-input').placeholder = LANG === 'ar' ? 'ابحث عن فرعك القريب...' : 'חפש סניף קרוב...';
+        renderList(DATA.b);
     }
 
     init();
 </script>
-
 </body>
 </html>
