@@ -13,24 +13,25 @@
         :root { --mad-blue: #1e3a8a; --mad-gold: #d4af37; }
         body { margin: 0; font-family: 'Cairo', sans-serif; background: #f8fbff; color: #1d1d1f; }
         
-        /* Navigation Style */
         nav { padding: 15px; background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); position: sticky; top: 0; z-index: 1000; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; }
         .logo { width: 50px; height: 50px; border-radius: 50%; border: 2px solid var(--mad-blue); }
         .lang-btn { padding: 5px 10px; border-radius: 8px; border: 1px solid #ddd; background: #fff; cursor: pointer; font-size: 0.7rem; font-weight: bold; }
         .lang-btn.active { background: var(--mad-blue); color: #fff; border: none; }
 
-        /* Content Layout */
         .container { max-width: 500px; margin: 0 auto; padding: 20px; }
         .btn-geo { background: var(--mad-blue); color: #fff; width: 100%; padding: 15px; border-radius: 15px; border: none; font-weight: bold; cursor: pointer; margin-bottom: 25px; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 1rem; }
 
-        /* Branch Card Style */
         .card { background: #fff; border-radius: 24px; padding: 25px; margin-bottom: 20px; border: 1px solid #eee; box-shadow: 0 10px 20px rgba(0,0,0,0.03); transition: 0.3s; }
         .status-badge { font-size: 0.75rem; padding: 5px 12px; border-radius: 20px; font-weight: bold; display: inline-flex; align-items: center; gap: 5px; }
         .open { background: #e8f5e9; color: #2e7d32; }
         .closed { background: #ffebee; color: #c62828; }
         
-        .action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 20px; }
-        .btn-secondary { padding: 12px; border-radius: 12px; background: #f5f5f7; text-decoration: none; color: #333; font-size: 0.9rem; text-align: center; font-weight: bold; border: 1px solid #eee; }
+        .action-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 20px; }
+        .social-grid { display: flex; justify-content: center; gap: 15px; margin-top: 15px; border-top: 1px solid #eee; padding-top: 15px; }
+        
+        .btn-secondary { padding: 10px; border-radius: 12px; background: #f5f5f7; text-decoration: none; color: #333; font-size: 0.8rem; text-align: center; font-weight: bold; border: 1px solid #eee; display: flex; flex-direction: column; align-items: center; gap: 5px; }
+        .btn-social { font-size: 1.2rem; color: var(--mad-blue); text-decoration: none; transition: 0.3s; }
+        .btn-social:hover { color: var(--mad-gold); }
         .btn-primary { background: var(--mad-blue); color: #fff; width: 100%; padding: 14px; border-radius: 14px; border: none; font-weight: bold; margin-top: 15px; cursor: pointer; font-size: 1rem; }
 
         .hidden { display: none !important; }
@@ -45,8 +46,6 @@
     <div id="lang-selectors" style="display:flex; gap:5px;">
         <button class="lang-btn active" onclick="setAppLang('ar')">AR</button>
         <button class="lang-btn" onclick="setAppLang('he')">HE</button>
-        <button class="lang-btn" onclick="setAppLang('en')">EN</button>
-        <button class="lang-btn" onclick="setAppLang('ru')">RU</button>
     </div>
     <img src="logo.png" class="logo">
 </nav>
@@ -63,13 +62,10 @@
     let CURRENT_LANG = 'ar';
 
     const UI_TEXTS = {
-        ar: { geo: "أقرب فرع لي", open: "مفتوح الآن", closed: "مغلق حالياً", map: "خريطة", wa: "واتساب", enter: "تصفح العطور" },
-        he: { geo: "הסنيף הקרוב אלי", open: "פתוח עכשיו", closed: "סגור כעת", map: "מפה", wa: "וואטסאפ", enter: "צפה במוצרים" },
-        en: { geo: "Nearest Store", open: "Open Now", closed: "Closed Now", map: "Map", wa: "WhatsApp", enter: "Shop Now" },
-        ru: { geo: "Ближайший филиал", open: "Открыто", closed: "Закрыто", map: "Карта", wa: "WhatsApp", enter: "В магазин" }
+        ar: { geo: "أقرب فرع لي", open: "مفتوح الآن", closed: "مغلق حالياً", map: "خرائط", wa: "واتساب", call: "اتصال", enter: "تصفح العطور" },
+        he: { geo: "הסניף הקרוב אלי", open: "פתוח עכשיו", closed: "סגור כעת", map: "מפה", wa: "וואטסאפ", call: "טלפון", enter: "צפה במוצרים" }
     };
 
-    // 1. تشغيل النظام وتحميل البيانات
     async function loadApp() {
         Papa.parse('branches.csv', {
             download: true,
@@ -77,20 +73,17 @@
             skipEmptyLines: true,
             complete: (results) => {
                 GLOBAL_DATA = results.data;
-                // اكتشاف لغة الهاتف تلقائياً
                 const deviceLang = navigator.language.split('-')[0];
-                setAppLang(['ar', 'he', 'en', 'ru'].includes(deviceLang) ? deviceLang : 'ar');
+                setAppLang(['ar', 'he'].includes(deviceLang) ? deviceLang : 'ar');
                 document.getElementById('loader').classList.add('hidden');
             }
         });
     }
 
-    // 2. تغيير اللغة وتحديث الواجهة
     function setAppLang(lang) {
         CURRENT_LANG = lang;
         document.documentElement.dir = (lang === 'ar' || lang === 'he') ? 'rtl' : 'ltr';
         document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
-        // تفعيل الزر الصحيح
         const activeBtn = Array.from(document.querySelectorAll('.lang-btn')).find(b => b.innerText.toLowerCase() === lang);
         if(activeBtn) activeBtn.classList.add('active');
         
@@ -98,27 +91,26 @@
         renderBranches(GLOBAL_DATA);
     }
 
-    // 3. فحص ساعات العمل بدقة
     function getOpenStatus(hoursStr) {
         if (!hoursStr || hoursStr.includes("مغلق") || hoursStr.includes("סגור")) return false;
         const now = new Date();
         const currentTime = now.getHours() + (now.getMinutes() / 60);
-        const timeMatch = hoursStr.match(/(\d+):(\d+)\s*-\s*(\d+):(\d+)/);
-        if (!timeMatch) return true; // إذا لم يجد توقيت، يفترض أنه مفتوح
+        // البحث عن التوقيت بصيغة 10:00-22:00
+        const timeMatch = hoursStr.match(/(\d{1,2}):(\d{2})\s*-\s*(\d{1,2}):(\d{2})/);
+        if (!timeMatch) return true; 
         const startTime = parseInt(timeMatch[1]) + (parseInt(timeMatch[2]) / 60);
         const endTime = parseInt(timeMatch[3]) + (parseInt(timeMatch[4]) / 60);
         return currentTime >= startTime && currentTime <= endTime;
     }
 
-    // 4. عرض الفروع
     function renderBranches(data) {
         const container = document.getElementById('branches-container');
         container.innerHTML = '';
         data.forEach(branch => {
             if (!branch.ID) return;
             const isOpen = getOpenStatus(branch['ساعات الدوام عربي']);
-            const name = branch[`اسم الفرع ${CURRENT_LANG === 'ar' ? 'عربي' : (CURRENT_LANG === 'he' ? 'عبري' : 'انجليزي')}`] || branch['اسم الفرع عربي'];
-            const hours = branch[`ساعات الدوام ${CURRENT_LANG === 'ar' ? 'عربي' : 'عبري'}`] || branch['ساعات الدوام عربي'];
+            const name = branch[CURRENT_LANG === 'ar' ? 'اسم الفرع عربي' : 'اسم الفرع عبري'] || branch['اسم الفرع عربي'];
+            const hours = branch[CURRENT_LANG === 'ar' ? 'ساعات الدوام عربي' : 'ساعات الدوام عبري'] || branch['ساعات الدوام عربي'];
             
             container.innerHTML += `
                 <div class="card">
@@ -129,18 +121,26 @@
                         </span>
                     </div>
                     <p style="font-size:0.9rem; color:#666; margin:12px 0;"><i class="far fa-clock"></i> ${hours}</p>
+                    
                     <div class="action-grid">
-                        <a href="${branch['رابط Waze / Maps']}" class="btn-secondary"><i class="fab fa-waze"></i> ${UI_TEXTS[CURRENT_LANG].map}</a>
-                        <a href="https://wa.me/${branch['الهاتف']}" class="btn-secondary"><i class="fab fa-whatsapp"></i> ${UI_TEXTS[CURRENT_LANG].wa}</a>
+                        <a href="${branch['Waze_Maps']}" class="btn-secondary"><i class="fas fa-map-marker-alt"></i><span>${UI_TEXTS[CURRENT_LANG].map}</span></a>
+                        <a href="https://wa.me/${branch['WhatsApp']}" class="btn-secondary"><i class="fab fa-whatsapp"></i><span>${UI_TEXTS[CURRENT_LANG].wa}</span></a>
+                        <a href="tel:${branch['الهاتف']}" class="btn-secondary"><i class="fas fa-phone"></i><span>${UI_TEXTS[CURRENT_LANG].call}</span></a>
                     </div>
+
+                    <div class="social-grid">
+                        ${branch.Instagram ? `<a href="${branch.Instagram}" class="btn-social"><i class="fab fa-instagram"></i></a>` : ''}
+                        ${branch.TikTok ? `<a href="${branch.TikTok}" class="btn-social"><i class="fab fa-tiktok"></i></a>` : ''}
+                        ${branch.Facebook ? `<a href="${branch.Facebook}" class="btn-social"><i class="fab fa-facebook"></i></a>` : ''}
+                    </div>
+
                     <button class="btn-primary">${UI_TEXTS[CURRENT_LANG].enter}</button>
                 </div>`;
         });
     }
 
-    // 5. ميزة الموقع الجغرافي
     function sortBranchesByDistance() {
-        if (!navigator.geolocation) return alert("الموقع غير مدعوم في هذا المتصفح");
+        if (!navigator.geolocation) return alert("الموقع غير مدعوم");
         navigator.geolocation.getCurrentPosition(position => {
             const userLat = position.coords.latitude;
             const userLng = position.coords.longitude;
