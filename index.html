@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MAD PARFUMEUR | Digital Store</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&family=Cinzel:wght@700&display=swap" rel="stylesheet">
     <style>
         :root { --mad-blue: #1e3a8a; --mad-gold: #d4af37; --bg: #f8fbff; }
         body { margin: 0; font-family: 'Cairo', sans-serif; background: var(--bg); color: #1d1d1f; overflow-x: hidden; }
@@ -15,17 +15,19 @@
         .lang-btn.active { background: var(--mad-blue); color: #fff; border: none; }
         .main-header-img { width: 100%; height: 200px; background: url('header.jpg') center/cover no-repeat; border-bottom: 3px solid var(--mad-blue); }
         .container { max-width: 500px; margin: 0 auto; padding: 20px; }
-        .card { background: #fff; border-radius: 28px; padding: 25px; margin-bottom: 22px; border: 1px solid #eee; text-align: center; box-shadow: 0 10px 20px rgba(0,0,0,0.02); }
-        .status-badge { font-size: 0.7rem; padding: 4px 10px; border-radius: 20px; font-weight: bold; margin-bottom: 10px; display: inline-block; }
+        .category-wrapper { overflow-x: auto; white-space: nowrap; padding: 10px 0; margin-bottom: 15px; }
+        .cat-btn { display: inline-block; padding: 8px 18px; margin-left: 8px; border-radius: 20px; background: #fff; border: 1px solid #ddd; font-size: 0.85rem; font-weight: bold; cursor: pointer; }
+        .cat-btn.active { background: var(--mad-blue); color: #fff; }
+        .product-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .p-card { background: #fff; border-radius: 20px; border: 1px solid #eee; overflow: hidden; text-align: center; padding: 10px; }
+        .p-card img, .p-card video { width: 100%; height: 140px; object-fit: contain; }
+        .card { background: #fff; border-radius: 28px; padding: 20px; margin-bottom: 20px; border: 1px solid #eee; text-align: center; }
+        .status-badge { font-size: 0.7rem; padding: 4px 10px; border-radius: 20px; font-weight: bold; margin-bottom: 8px; display: inline-block; }
         .open { background: #e8f5e9; color: #2e7d32; }
         .closed { background: #ffebee; color: #c62828; }
-        .action-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 15px 0; }
-        .btn-secondary { padding: 12px; border-radius: 14px; background: #f8f9fa; text-decoration: none; color: #333; font-size: 0.75rem; display: flex; flex-direction: column; align-items: center; gap: 5px; font-weight: bold; border: 1px solid #eee; }
-        .btn-primary { background: var(--mad-blue); color: #fff; width: 100%; padding: 14px; border-radius: 16px; border: none; font-weight: bold; cursor: pointer; font-size: 1rem; }
-        .social-grid { display: flex; justify-content: center; gap: 15px; margin-bottom: 15px; }
-        .social-grid a { color: var(--mad-blue); font-size: 1.2rem; }
-        #loader { position: fixed; inset: 0; background: #fff; z-index: 5000; display: flex; align-items: center; justify-content: center; }
+        .btn-primary { background: var(--mad-blue); color: #fff; width: 100%; padding: 12px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; margin-top: 10px; }
         .hidden { display: none !important; }
+        #loader { position: fixed; inset: 0; background: #fff; z-index: 5000; display: flex; align-items: center; justify-content: center; }
     </style>
 </head>
 <body>
@@ -34,91 +36,129 @@
 
 <nav>
     <div id="lang-selectors">
-        <button class="lang-btn active" onclick="changeLang('ar')">AR</button>
-        <button class="lang-btn" onclick="changeLang('he')">HE</button>
+        <button class="lang-btn active" id="btn-ar" onclick="changeLang('ar')">AR</button>
+        <button class="lang-btn" id="btn-he" onclick="changeLang('he')">HE</button>
     </div>
-    <img src="logo.png" class="logo">
+    <img src="logo.png" class="logo" onclick="goHome()">
 </nav>
 
 <div id="view-branches">
     <div class="main-header-img"></div>
+    <div class="container" id="branches-container"></div>
+</div>
+
+<div id="view-store" class="hidden">
     <div class="container">
-        <div id="branches-container"></div>
+        <div onclick="goHome()" style="color:var(--mad-blue); font-weight:bold; cursor:pointer; margin-bottom:15px;"><i class="fas fa-arrow-right"></i> <span id="back-btn"></span></div>
+        <h2 id="store-name" style="text-align:center; color:var(--mad-blue); margin-bottom:10px;"></h2>
+        <div class="category-wrapper" id="category-bar"></div>
+        <div class="product-grid" id="products-container"></div>
     </div>
 </div>
 
 <script>
-    let DATA = { branches: [] };
+    let DATA = { branches: [], products: [] };
     let LANG = 'ar';
+    let selectedBranch = null;
+    let currentCat = 'all';
 
-    async function loadData() {
+    const UI = {
+        ar: { all: "الكل", enter: "تصفح العطور", back: "العودة للفروع", buy: "اطلب الآن", open: "● مفتوح الآن", closed: "● مغلق حالياً" },
+        he: { all: "הכל", enter: "צפה במוצרים", back: "חזרה לסניפים", buy: "הזמן עכשיו", open: "● פתוח עכשיו", closed: "● סגור כעת" }
+    };
+
+    async function init() {
         try {
-            const res = await fetch('branches.json');
-            DATA.branches = await res.json();
+            const bRes = await fetch('branches.json');
+            DATA.branches = await bRes.json();
+            await loadProducts();
             renderBranches();
             document.getElementById('loader').classList.add('hidden');
-        } catch (e) {
-            console.error("Error:", e);
-            document.getElementById('loader').classList.add('hidden');
-            alert("خطأ في تحميل ملف branches.json");
-        }
+        } catch (e) { console.error(e); document.getElementById('loader').classList.add('hidden'); }
     }
 
-    function getStatus(hours) {
-        if (!hours || hours.includes("مغلق") || hours.includes("סגור")) return false;
+    async function loadProducts() {
+        const file = LANG === 'ar' ? 'ar-products.json' : 'he-products.json';
+        const pRes = await fetch(file);
+        DATA.products = await pRes.json();
+    }
+
+    function getOpenStatus(hoursAr) {
+        if (!hoursAr || hoursAr.includes("مغلق") || hoursAr.includes("סגור")) return false;
         const now = new Date();
-        const cur = now.getHours() + (now.getMinutes() / 60);
-        const match = hours.match(/(\d{1,2}):(\d{2})\s*-\s*(\d{1,2}):(\d{2})/);
-        if (!match) return true;
+        const time = now.getHours() + (now.getMinutes() / 60);
+        // تحسين التنقيب عن الوقت ليشمل الفواصل المختلفة
+        const match = hoursAr.replace(/؛/g, '-').replace(/;/g, '-').match(/(\d{1,2}):(\d{2})\s*-\s*(\d{1,2}):(\d{2})/);
+        if (!match) return true; 
         const start = parseInt(match[1]) + (parseInt(match[2]) / 60);
         const end = parseInt(match[3]) + (parseInt(match[4]) / 60);
-        return cur >= start && cur <= end;
+        return time >= start && time <= end;
     }
 
     function renderBranches() {
-        const container = document.getElementById('branches-container');
-        container.innerHTML = '';
+        const cont = document.getElementById('branches-container');
+        cont.innerHTML = '';
         DATA.branches.forEach(b => {
+            const isOpen = getOpenStatus(b.hours_ar);
             const name = LANG === 'ar' ? b.name_ar : b.name_he;
-            const hours = LANG === 'ar' ? b.hours_ar : b.hours_he;
             const desc = LANG === 'ar' ? (b.description_ar || "شركة العطور الأكبر في البلاد") : (b.description_he || "חברת הבשמים הגדולה בארץ");
-            const isOpen = getStatus(b.hours_ar);
-
-            container.innerHTML += `
+            cont.innerHTML += `
                 <div class="card">
-                    <span class="status-badge ${isOpen ? 'open' : 'closed'}">
-                        ${isOpen ? (LANG === 'ar' ? '● مفتوح الآن' : '● פתוח עכשיו') : (LANG === 'ar' ? '● مغلق حالياً' : '● סגור כעת')}
-                    </span>
+                    <span class="status-badge ${isOpen ? 'open' : 'closed'}">${isOpen ? UI[LANG].open : UI[LANG].closed}</span>
                     <h2 style="margin:0; color:var(--mad-blue);">${name}</h2>
                     <p style="font-size:0.8rem; color:var(--mad-gold); font-weight:bold; margin:5px 0;">${desc}</p>
-                    <p style="font-size:0.85rem; color:#666;"><i class="far fa-clock"></i> ${hours}</p>
-                    
-                    <div class="action-grid">
-                        <a href="${b.waze_maps}" class="btn-secondary"><i class="fas fa-map-marker-alt"></i><span>${LANG === 'ar' ? 'خرائط' : 'מפה'}</span></a>
-                        <a href="https://wa.me/${b.whatsapp}" class="btn-secondary"><i class="fab fa-whatsapp"></i><span>${LANG === 'ar' ? 'واتساب' : 'וואטסאפ'}</span></a>
-                        <a href="tel:${b.phone}" class="btn-secondary"><i class="fas fa-phone"></i><span>${LANG === 'ar' ? 'اتصال' : 'טלפון'}</span></a>
-                    </div>
-
-                    <div class="social-grid">
-                        ${b.social.instagram ? `<a href="${b.social.instagram}"><i class="fab fa-instagram"></i></a>` : ''}
-                        ${b.social.tiktok ? `<a href="${b.social.tiktok}"><i class="fab fa-tiktok"></i></a>` : ''}
-                        ${b.social.facebook ? `<a href="${b.social.facebook}"><i class="fab fa-facebook"></i></a>` : ''}
-                    </div>
-                    
-                    <button class="btn-primary">${LANG === 'ar' ? 'تصفح العطور' : 'צפה במוצרים'}</button>
+                    <button class="btn-primary" onclick="openStore(${b.id})">${UI[LANG].enter}</button>
                 </div>`;
         });
     }
 
-    function changeLang(l) {
-        LANG = l;
-        document.documentElement.dir = l === 'ar' ? 'rtl' : 'ltr';
-        document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
-        event.target.classList.add('active');
-        renderBranches();
+    function openStore(id) {
+        selectedBranch = DATA.branches.find(b => b.id == id);
+        document.getElementById('view-branches').classList.add('hidden');
+        document.getElementById('view-store').classList.remove('hidden');
+        document.getElementById('store-name').innerText = LANG === 'ar' ? selectedBranch.name_ar : selectedBranch.name_he;
+        document.getElementById('back-btn').innerText = UI[LANG].back;
+        renderProducts();
+        window.scrollTo(0,0);
     }
 
-    loadData();
+    function renderProducts() {
+        const cont = document.getElementById('products-container');
+        cont.innerHTML = '';
+        DATA.products.forEach(p => {
+            const media = p.video ? `<video src="${p.video}" autoplay loop muted playsinline></video>` : `<img src="${p.image}">`;
+            cont.innerHTML += `
+                <div class="p-card">
+                    ${media}
+                    <div class="p-info">
+                        <div class="p-title">${p.title}</div>
+                        <div class="p-price">${p.price}</div>
+                        <button class="btn-primary" style="font-size:0.8rem; padding:8px;" onclick="order('${p.title}')">${UI[LANG].buy}</button>
+                    </div>
+                </div>`;
+        });
+    }
+
+    function order(item) {
+        window.open(`https://wa.me/${selectedBranch.whatsapp}?text=${encodeURIComponent("أريد طلب: " + item)}`);
+    }
+
+    async function changeLang(l) {
+        LANG = l;
+        document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(`btn-${l}`).classList.add('active');
+        document.documentElement.dir = l === 'ar' ? 'rtl' : 'ltr';
+        await loadProducts();
+        renderBranches();
+        if(!document.getElementById('view-store').classList.contains('hidden')) renderProducts();
+    }
+
+    function goHome() {
+        document.getElementById('view-store').classList.add('hidden');
+        document.getElementById('view-branches').classList.remove('hidden');
+    }
+
+    init();
 </script>
 </body>
 </html>
