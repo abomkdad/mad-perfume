@@ -3,141 +3,176 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MAD PARFUMEUR - الدليل الذكي</title>
+    <title>MAD PARFUMEUR - دليل الفروع</title>
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
     
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-
     <style>
-        :root { --bg: #0a0a0a; --card: #141414; --gold: #d4af37; --text: #ffffff; }
-        body { margin: 0; background: var(--bg); color: var(--text); font-family: 'Cairo', sans-serif; overflow-x: hidden; }
+        :root { --bg: #0a0a0a; --card: #141414; --gold: #d4af37; --text: #ffffff; --muted: #aaaaaa; }
+        body { margin: 0; background: var(--bg); color: var(--text); font-family: 'Cairo', sans-serif; }
         
-        header { background: url("https://madparfumeurglobal.com/wp-content/uploads/2025/10/1920x600-BERGAY.jpg") center/cover; padding: 40px 15px; text-align: center; border-bottom: 3px solid var(--gold); position: relative; }
-        header::after { content: ""; position: absolute; inset: 0; background: rgba(0,0,0,0.7); }
-        header * { position: relative; z-index: 2; }
-        .logo img { width: 80px; }
-
-        #map { height: 350px; width: 100%; border-bottom: 3px solid var(--gold); }
-
-        .container { max-width: 900px; margin: auto; padding: 20px 15px; }
+        /* تصميم الهيدر الجديد */
+        header { 
+            background: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.8)), url("https://madparfumeurglobal.com/wp-content/uploads/2025/10/1920x600-BERGAY.jpg") center/cover;
+            padding: 40px 15px; 
+            text-align: center; 
+            border-bottom: 3px solid var(--gold);
+        }
+        .logo img { width: 90px; margin-bottom: 10px; }
+        .brand-name { color: #fff; font-size: 24px; font-weight: 900; letter-spacing: 2px; margin: 0; }
         
-        .nearest-badge { background: var(--gold); color: #000; font-weight: 800; padding: 4px 10px; border-radius: 5px; font-size: 12px; margin-bottom: 10px; display: inline-block; }
-        .status-open { color: #25D366; }
-        .status-closed { color: #ff4444; }
+        /* قسم الموظف المناوب الرئيسي (ميرال) */
+        .main-staff {
+            background: rgba(212, 175, 55, 0.1);
+            border: 1px solid var(--gold);
+            border-radius: 50px;
+            padding: 10px 25px;
+            display: inline-flex;
+            align-items: center;
+            gap: 15px;
+            margin-top: 20px;
+            cursor: pointer;
+        }
+        .main-staff img { width: 50px; height: 50px; border-radius: 50%; border: 2px solid var(--gold); object-fit: cover; }
+        .staff-text { text-align: right; }
+        .staff-title { font-size: 10px; color: var(--gold); display: block; }
+        .staff-name { font-size: 16px; font-weight: 700; color: #fff; }
 
-        .branch-card { background: var(--card); border: 1px solid #222; border-radius: 12px; padding: 20px; margin-bottom: 15px; position: relative; transition: 0.3s; }
-        .branch-card.nearest { border: 2px solid var(--gold); box-shadow: 0 0 15px rgba(212, 175, 55, 0.2); }
-        .branch-info h3 { margin: 0; color: var(--gold); font-size: 1.2rem; }
-        .distance-info { font-size: 13px; color: #aaa; margin: 5px 0; }
+        .container { max-width: 800px; margin: auto; padding: 20px 15px; }
 
-        .actions { display: flex; gap: 10px; margin-top: 15px; }
-        .btn { flex: 1; padding: 12px; border-radius: 8px; text-decoration: none; text-align: center; font-weight: 700; font-size: 13px; color: #fff; display: flex; align-items: center; justify-content: center; gap: 5px; }
-        .btn-wa { background: #25D366; }
-        .btn-map { background: #4285F4; }
-        .btn-page { background: #333; }
+        /* أزرار المواقع الرئيسية حسب اللغة */
+        .web-links { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 30px; }
+        .web-btn { 
+            background: var(--gold); 
+            color: #000; 
+            padding: 12px; 
+            border-radius: 8px; 
+            text-decoration: none; 
+            font-weight: 800; 
+            font-size: 14px; 
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .web-btn.il { background: #fff; color: #000; }
+
+        /* أيقونات التواصل الاجتماعي */
+        .social-bar { display: flex; justify-content: center; gap: 15px; margin-bottom: 30px; }
+        .social-bar a { color: var(--gold); font-size: 20px; transition: 0.3s; }
+        .social-bar a:hover { transform: scale(1.2); }
+
+        /* تصميم كروت الفروع */
+        .branch-card { 
+            background: var(--card); 
+            border: 1px solid #222; 
+            border-radius: 12px; 
+            padding: 15px; 
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .branch-info h3 { margin: 0; color: var(--gold); font-size: 18px; }
+        .branch-meta { font-size: 12px; color: var(--muted); margin-top: 5px; }
+        .status-tag { color: #25D366; font-size: 11px; font-weight: 700; }
+
+        .branch-btns { display: flex; gap: 8px; }
+        .circle-btn { 
+            width: 40px; height: 40px; 
+            border-radius: 50%; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            color: #fff; 
+            text-decoration: none;
+            font-size: 16px;
+        }
+        .bg-wa { background: #25D366; }
+        .bg-map { background: #4285F4; }
+        .bg-store { background: #333; }
     </style>
 </head>
 <body>
 
 <header>
     <div class="logo"><img src="https://abomkdad.github.io/Digital-Business-Card/logo.png" alt="MAD"></div>
-    <h1>MAD PARFUMEUR ISRAEL</h1>
+    <h1 class="brand-name">MAD PARFUMEUR ISRAEL</h1>
+    
+    <div class="main-staff" onclick="window.open('https://wa.me/972549634449')">
+        <img src="https://abomkdad.github.io/Digital-Business-Card/miral.png" alt="Miral">
+        <div class="staff-text">
+            <span class="staff-title">الموظف المناوب / נציג תורן</span>
+            <span class="staff-name">ميرال / מיראל</span>
+        </div>
+    </div>
 </header>
 
-<div id="map"></div>
-
 <div class="container">
-    <div id="branchesList"></div>
+    <div class="web-links">
+        <a href="https://madperfume.ps/" class="web-btn" id="arSite">
+            <i class="fa-solid fa-globe"></i> الموقع العربي
+        </a>
+        <a href="https://madperfume.co.il/" class="web-btn il" id="heSite">
+            <i class="fa-solid fa-globe"></i> אתר רשמי
+        </a>
+    </div>
+
+    <div class="social-bar">
+        <a href="https://www.facebook.com/MADPARFUMEURISRAEL/"><i class="fa-brands fa-facebook"></i></a>
+        <a href="https://www.instagram.com/perfume.mad/"><i class="fa-brands fa-instagram"></i></a>
+        <a href="https://www.tiktok.com/@mad.perfume"><i class="fa-brands fa-tiktok"></i></a>
+        <a href="https://snapchat.com/t/jbtN32Xe"><i class="fa-brands fa-snapchat"></i></a>
+        <a href="https://www.youtube.com/watch?v=NVCKAp2-6HM"><i class="fa-brands fa-youtube"></i></a>
+        <a href="mailto:info@madperfume.co.il"><i class="fa-solid fa-envelope"></i></a>
+    </div>
+
+    <div id="branchesList">
+        </div>
 </div>
 
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
 <script>
-const lang = navigator.language.startsWith("he") ? "he" : "ar";
-const staffNames = [
-    { ar: "ليان", he: "ליאן" }, { ar: "مايا", he: "מאיה" }, { ar: "نور", he: "נור" },
-    { ar: "سارة", he: "שרה" }, { ar: "ياسمين", he: "יסמין" }, { ar: "تالا", he: "טאלה" }
-    // يمكن استكمال القائمة لـ 36 اسماً
-];
+    const lang = navigator.language.startsWith("he") ? "he" : "ar";
+    
+    // إخفاء الموقع غير المناسب لتبسيط الواجهة (اختياري)
+    if (lang === "he") {
+        document.getElementById('arSite').style.display = 'none';
+        document.querySelector('.web-links').style.gridTemplateColumns = '1fr';
+    } else {
+        document.getElementById('heSite').style.display = 'none';
+        document.querySelector('.web-links').style.gridTemplateColumns = '1fr';
+    }
 
-// إعداد الخريطة التفاعلية
-const map = L.map('map').setView([32.0853, 34.7818], 8);
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-
-async function init() {
-    try {
+    async function loadBranches() {
         const response = await fetch('branches.json');
         const branches = await response.json();
+        const list = document.getElementById('branchesList');
         
-        // محاولة الحصول على موقع المستخدم
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(pos => {
-                const userLat = pos.coords.latitude;
-                const userLng = pos.coords.longitude;
-                
-                // حساب المسافة وترتيب الفروع
-                branches.forEach(b => {
-                    b.distance = calculateDistance(userLat, userLng, b.lat, b.lng);
-                });
-                branches.sort((a, b) => a.distance - b.distance);
-                render(branches, true);
-            }, () => render(branches, false));
-        } else {
-            render(branches, false);
-        }
-    } catch (e) { console.error(e); }
-}
-
-function calculateDistance(lat1, lon1, lat2, lon2) {
-    const R = 6371; // نصف قطر الأرض بالكيلومتر
-    const dLat = (lat2-lat1) * Math.PI / 180;
-    const dLon = (lon2-lon1) * Math.PI / 180;
-    const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-              Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon/2) * Math.sin(dLon/2);
-    return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)));
-}
-
-function render(branches, hasLocation) {
-    const list = document.getElementById('branchesList');
-    list.innerHTML = '';
-    
-    const now = new Date();
-    const isOpen = now.getHours() >= 10 && now.getHours() < 22;
-
-    branches.forEach((b, i) => {
-        // إضافة علامة على الخريطة
-        L.marker([b.lat, b.lng]).addTo(map)
-         .bindPopup(`${lang === 'he' ? b.name_he : b.name_ar}`);
-
-        const card = document.createElement('div');
-        card.className = `branch-card ${i === 0 && hasLocation ? 'nearest' : ''}`;
-        
-        const staff = staffNames[i % staffNames.length];
-        const staffDisplay = lang === 'he' ? staff.he : staff.ar;
-        const distText = hasLocation ? `على بعد ${b.distance.toFixed(1)} كم` : "";
-
-        card.innerHTML = `
-            ${i === 0 && hasLocation ? `<div class="nearest-badge">${lang === 'he' ? 'הסניף הקרוב ביותר' : 'الفرع الأقرب إليك'}</div>` : ''}
-            <div class="branch-info">
-                <h3>${lang === 'he' ? b.name_he : b.name_ar}</h3>
-                <div class="distance-info">${distText} | ${lang === 'he' ? 'נציגה:' : 'الموظفة:'} ${staffDisplay}</div>
-                <div class="${isOpen ? 'status-open' : 'status-closed'}">
-                    <i class="fa-solid fa-clock"></i> ${isOpen ? (lang === 'he' ? 'פתוח עכשיו' : 'مفتوح الآن') : (lang === 'he' ? 'סגור עכשיו' : 'مغلق الآن')}
+        branches.forEach(b => {
+            const name = lang === 'he' ? b.name_he : b.name_ar;
+            const card = document.createElement('div');
+            card.className = 'branch-card';
+            card.innerHTML = `
+                <div class="branch-info">
+                    <h3>${name}</h3>
+                    <div class="branch-meta">
+                        <span class="status-tag">● مفتوح الآن / פתוח</span>
+                    </div>
                 </div>
-            </div>
-            <div class="actions">
-                <a href="offer.html?branch=${b.id}" class="btn btn-page"><i class="fa-solid fa-shop"></i></a>
-                <a href="https://wa.me/${b.phone}" class="btn btn-wa"><i class="fa-brands fa-whatsapp"></i></a>
-                <a href="https://www.google.com/maps/dir/?api=1&destination=${b.lat},${b.lng}" class="btn btn-map"><i class="fa-solid fa-location-arrow"></i></a>
-            </div>
-        `;
-        list.appendChild(card);
-    });
-}
+                <div class="branch-btns">
+                    <a href="offer.html?branch=${b.id}" class="circle-btn bg-store"><i class="fa-solid fa-shop"></i></a>
+                    <a href="https://wa.me/${b.phone}" class="circle-btn bg-wa"><i class="fa-brands fa-whatsapp"></i></a>
+                    <a href="https://www.google.com/maps?q=${b.lat},${b.lng}" class="circle-btn bg-map"><i class="fa-solid fa-location-arrow"></i></a>
+                </div>
+            `;
+            list.appendChild(card);
+        });
+    }
 
-init();
+    loadBranches();
 </script>
+
 </body>
 </html>
