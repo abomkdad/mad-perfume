@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MAD PARFUMEUR - دليل الفروع الذكي</title>
+    <title>MAD PARFUMEUR - دليل الفروع</title>
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
@@ -49,7 +49,6 @@
         .branch-btns { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 15px; }
         .btn { padding: 15px 5px; border-radius: 12px; text-decoration: none; font-size: 12px; font-weight: 800; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 8px; color: #fff; transition: 0.3s; }
         .bg-wa { background: #25D366; } .bg-waze { background: #33CCFF; color: #000; } .bg-store { background: #333; }
-        .distance-tag { font-size: 11px; color: var(--muted); margin-top: 5px; display: block; }
     </style>
 </head>
 <body>
@@ -71,18 +70,17 @@
         <a href="https://www.instagram.com/perfume.mad/" onclick="trackLead('Social_Insta')"><i class="fa-brands fa-instagram"></i></a>
         <a href="https://www.tiktok.com/@mad.perfume" onclick="trackLead('Social_TikTok')"><i class="fa-brands fa-tiktok"></i></a>
         <a href="mailto:info@madperfume.co.il" onclick="trackLead('Email_Contact')"><i class="fa-solid fa-envelope"></i></a>
-        <a href="https://madperfume.ps/" onclick="trackLead('Web_Arabic')"><i class="fa-solid fa-globe"></i></a>
     </div>
     <div id="branchesList">
-        <p style="text-align:center; color:var(--muted)">جاري تحميل المواقع...</p>
+        <p style="text-align:center; color:var(--muted)">جاري تحميل الفروع...</p>
     </div>
 </div>
 
 <script>
     const lang = navigator.language.startsWith("he") ? "he" : "ar";
     const t = {
-        ar: { wa: "واتساب", waze: "Waze", page: "عرض", open: "مفتوح الآن", dist: "على بعد" },
-        he: { wa: "וואטסאפ", waze: "ניווט", page: "דף סניף", open: "פתוח עכשיו", dist: "מרחק" }
+        ar: { wa: "واتساب", waze: "Waze", page: "عرض", open: "مفتوح الآن" },
+        he: { wa: "וואטסאפ", waze: "ניווט", page: "דף סניף", open: "פתוח עכשיו" }
     }[lang];
 
     function trackLead(label) {
@@ -99,16 +97,15 @@
 
     async function loadBranches() {
         try {
+            // جلب البيانات من الملف الخارجي لتقليل حجم الـ HTML
             const response = await fetch('branches.json');
             const data = await response.json();
             let branches = data.branches; 
 
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition((pos) => {
-                    const userLat = pos.coords.latitude;
-                    const userLng = pos.coords.longitude;
                     branches.forEach(b => {
-                        b.dist = calculateDistance(userLat, userLng, b.lat, b.lng);
+                        b.dist = calculateDistance(pos.coords.latitude, pos.coords.longitude, b.lat, b.lng);
                     });
                     branches.sort((a,b) => (a.dist || Infinity) - (b.dist || Infinity));
                     render(branches);
@@ -116,9 +113,9 @@
             } else {
                 render(branches);
             }
-        } catch (error) {
-            console.error("Error:", error);
-            document.getElementById('branchesList').innerHTML = '<p style="text-align:center; color:red">حدث خطأ أثناء تحميل الفروع.</p>';
+        } catch (e) {
+            console.error(e);
+            document.getElementById('branchesList').innerHTML = '<p style="text-align:center; color:red">فشل تحميل البيانات.</p>';
         }
     }
 
@@ -127,15 +124,12 @@
         list.innerHTML = '';
         data.forEach(b => {
             const name = lang === 'he' ? b.name_he : b.name_ar;
-            const distText = b.dist ? `<span class="distance-tag">${t.dist} ${b.dist.toFixed(1)} كم</span>` : '';
             const phoneWA = b.phone.startsWith('0') ? '972' + b.phone.substring(1) : b.phone;
-            
             const card = document.createElement('div');
             card.className = 'branch-card';
             card.innerHTML = `
                 <div class="branch-info">
                     <h3>${name}</h3>
-                    ${distText}
                     <div style="margin:10px 0"><span class="status-dot"></span> <span style="color:#25D366">${t.open}</span></div>
                 </div>
                 <div class="branch-btns">
