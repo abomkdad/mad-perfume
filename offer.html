@@ -12,6 +12,27 @@
     
     <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
 
+    <script>
+        !function(f,b,e,v,n,t,s)
+        {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+        n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+        if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+        n.queue=[];t=b.createElement(e);t.async=!0;
+        t.src=v;s=b.getElementsByTagName(e)[0];
+        s.parentNode.insertBefore(t,s)}(window, document,'script',
+        'https://connect.facebook.net/en_US/fbevents.js');
+        fbq('init', '1072283127290819'); 
+        fbq('track', 'PageView');
+    </script>
+
+    <script>
+        !function (w, d, t) {
+            w.TTP = w.TTP || []; w.TTP.prepare = function (c) { w.TTP.push(c) };
+            var s = d.createElement(t); s.async = !0; s.src = "https://analytics.tiktok.com/i18n/pixel/events.js?sdkid=D2D02JBC77U4ENLN9SBG";
+            var a = d.getElementsByTagName(t)[0]; a.parentNode.insertBefore(s, a)
+        }(window, document, "script");
+    </script>
+
     <style>
         :root { --bg: #0a0a0a; --card: #141414; --gold: #d4af37; --text: #ffffff; --muted: #aaaaaa; }
         * { box-sizing: border-box; }
@@ -73,7 +94,7 @@
         <div class="branch-name" id="branchName"></div>
         <div id="statusArea"></div>
 
-        <div class="duty-staff" onclick="openWhatsAppDirect()">
+        <div class="duty-staff" onclick="trackAndOpenWA('Staff_Header')">
             <img src="https://lh3.googleusercontent.com/d/1H2G_bv5gNUBEECRJMa4BHSHfaAYPN9i-" class="staff-img" alt="Miral">
             <div class="staff-info">
                 <div class="staff-label" id="staffLabel"></div>
@@ -88,23 +109,23 @@
 <div class="categories" id="categories"></div>
 <div class="products" id="products"></div>
 
-<a class="miral-float" id="miralFloat" target="_blank">
+<a class="miral-float" id="miralFloat" target="_blank" onclick="trackLead('Floating_Miral_Click')">
     <img src="https://lh3.googleusercontent.com/d/1H2G_bv5gNUBEECRJMa4BHSHfaAYPN9i-" alt="Miral">
     <div class="wa-badge"><i class="fa-brands fa-whatsapp"></i></div>
 </a>
 
 <script>
-// تحديد اللغة
+// تحديد اللغة بناءً على المتصفح
 const lang = navigator.language.startsWith("he") ? "he" : "ar";
 document.documentElement.lang = lang;
 document.documentElement.dir = "rtl";
 
-// قاموس الترجمة
+// نصوص الواجهة
 const i18n = {
     ar: {
         staffLabel: "الموظف المناوب",
         all: "الكل",
-        map: "الخريطة", tiktok: "تيك توك", insta: "إنستجرام", fb: "فيسبوك", snap: "سناب", email: "إيميل", wa: "واتساب",
+        map: "الخريطة", tiktok: "تيك توك", insta: "إنستجرام", fb: "فيسبوك", snap: "سناب", email: "إيميل", wa: "واتساب", yt: "يوتيوب",
         open: "مفتوح الآن", closed: "مغلق الآن",
         waMsg: "مرحباً ميرال، أنا مهتم بـ: ",
         check: "افحص التوفر",
@@ -113,7 +134,7 @@ const i18n = {
     he: {
         staffLabel: "נציג תורן",
         all: "הכל",
-        map: "מפה", tiktok: "טיקטוק", insta: "אינסטגרם", fb: "פייסבוק", snap: "סנאפ", email: "מייל", wa: "וואטסאפ",
+        map: "מפה", tiktok: "טיקטוק", insta: "אינסטגרם", fb: "פייסבוק", snap: "סנאפ", email: "מייל", wa: "וואטסאפ", yt: "יוטיוב",
         open: "פתוח עכשיו", closed: "סגור עכשיו",
         waMsg: "היי מיראל, אני מעוניין במוצר: ",
         check: "בדיקת זמינות",
@@ -126,6 +147,17 @@ let currentBranch = null;
 let allProducts = [];
 const params = new URLSearchParams(window.location.search);
 const branchID = params.get("branch");
+
+// دالة التتبع (Pixel Lead)
+function trackLead(method) {
+    if (typeof fbq === 'function') fbq('track', 'Lead', { content_name: method });
+    if (typeof ttq === 'function') ttq.track('Contact', { contents: [{ content_name: method }] });
+}
+
+function trackAndOpenWA(method) {
+    trackLead(method);
+    window.open(document.getElementById("miralFloat").href, '_blank');
+}
 
 async function init() {
     try {
@@ -155,7 +187,6 @@ function renderHeader() {
     document.getElementById("branchName").textContent = lang === "he" ? currentBranch.name_he : currentBranch.name_ar;
     document.getElementById("staffLabel").textContent = t.staffLabel;
 
-    // حالة الفرع
     const hour = new Date().getHours();
     const isOpen = (hour >= 10 && hour < 22);
     document.getElementById("statusArea").innerHTML = `
@@ -163,26 +194,31 @@ function renderHeader() {
             <i class="fa-solid ${isOpen ? 'fa-door-open' : 'fa-door-closed'}"></i> ${isOpen ? t.open : t.closed}
         </div>`;
 
-    // السوشيال ميديا
-    const social = currentBranch.social || {};
-    const socialsGrid = document.getElementById("socialsGrid");
-    
     let phone = currentBranch.phone || "972549634449";
     if (phone.startsWith("0")) phone = "972" + phone.substring(1);
     const waLink = `https://wa.me/${phone}`;
     document.getElementById("miralFloat").href = waLink;
 
+    const socialsGrid = document.getElementById("socialsGrid");
+    const social = currentBranch.social || {};
+    
+    // قائمة شبكات التواصل (أضيفت يوتيوب والإيميل)
     const socialItems = [
-        { id: "map", icon: "location-dot", link: `https://www.google.com/maps?q=${currentBranch.lat},${currentBranch.lng}`, label: t.map },
-        { id: "tiktok", icon: "tiktok", link: social.tiktok, label: t.tiktok, type: 'brand' },
-        { id: "insta", icon: "instagram", link: social.instagram, label: t.insta, type: 'brand' },
-        { id: "fb", icon: "facebook-f", link: social.facebook, label: t.fb, type: 'brand' },
-        { id: "wa", icon: "whatsapp", link: waLink, label: t.wa, type: 'brand' }
+        { id: "map", icon: "location-dot", link: `https://www.google.com/maps/search/?api=1&query=${currentBranch.lat},${currentBranch.lng}`, label: t.map, track: 'Lead_Direction' },
+        { id: "tiktok", icon: "tiktok", link: social.tiktok, label: t.tiktok, type: 'brand', track: 'Lead_TikTok' },
+        { id: "insta", icon: "instagram", link: social.instagram, label: t.insta, type: 'brand', track: 'Lead_Insta' },
+        { id: "fb", icon: "facebook-f", link: social.facebook, label: t.fb, type: 'brand', track: 'Lead_FB' },
+        { id: "yt", icon: "youtube", link: social.youtube, label: t.yt, type: 'brand', track: 'Lead_YT' },
+        { id: "snap", icon: "snapchat", link: social.snapchat, label: t.snap, type: 'brand', track: 'Lead_Snap' },
+        { id: "email", icon: "envelope", link: social.email ? `mailto:${social.email}` : null, label: t.email, type: 'solid', track: 'Lead_Email' },
+        { id: "wa", icon: "whatsapp", link: waLink, label: t.wa, type: 'brand', track: 'Lead_WA_Icon' }
     ];
 
     socialsGrid.innerHTML = socialItems.map(item => item.link ? `
         <div class="social-item">
-            <a href="${item.link}" target="_blank"><i class="fa-${item.type === 'brand' ? 'brands' : 'solid'} fa-${item.icon}"></i></a>
+            <a href="${item.link}" target="_blank" onclick="trackLead('${item.track}')">
+                <i class="fa-${item.type === 'brand' ? 'brands' : 'solid'} fa-${item.icon}"></i>
+            </a>
             <span class="social-label">${item.label}</span>
         </div>` : '').join('');
 }
@@ -220,15 +256,11 @@ function renderProducts(filterCat) {
             <img src="${p["Image"] || ''}" loading="lazy">
             <div class="code">${p["Title"]}</div>
             <div class="price">${(p["Price"] || "").replace("ILS", "₪")}</div>
-            <a class="btn" href="https://wa.me/${phone}?text=${encodeURIComponent(t.waMsg + p["Title"])}" target="_blank">
+            <a class="btn" href="https://wa.me/${phone}?text=${encodeURIComponent(t.waMsg + p["Title"])}" target="_blank" onclick="trackLead('Lead_Product_Inquiry')">
                 <i class="fa-brands fa-whatsapp"></i> ${t.check}
             </a>`;
         grid.appendChild(card);
     });
-}
-
-function openWhatsAppDirect() {
-    window.open(document.getElementById("miralFloat").href, '_blank');
 }
 
 init();
