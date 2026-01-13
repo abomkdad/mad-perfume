@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MAD PARFUMEUR - دليل الفروع</title>
+    <title>MAD PARFUMEUR - دليل الفروع الذكي</title>
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
@@ -19,14 +19,6 @@
         'https://connect.facebook.net/en_US/fbevents.js');
         fbq('init', '1072283127290819'); 
         fbq('track', 'PageView');
-    </script>
-
-    <script>
-        !function (w, d, t) {
-            w.TTP = w.TTP || []; w.TTP.prepare = function (c) { w.TTP.push(c) };
-            var s = d.createElement(t); s.async = !0; s.src = "https://analytics.tiktok.com/i18n/pixel/events.js?sdkid=D2D02JBC77U4ENLN9SBG";
-            var a = d.getElementsByTagName(t)[0]; a.parentNode.insertBefore(s, a)
-        }(window, document, "script");
     </script>
 
     <style>
@@ -93,47 +85,40 @@
         he: { wa: "וואטסאפ", waze: "ניווט", page: "דף סניף", open: "פתוח עכשיו", dist: "מרחק" }
     }[lang];
 
-    // دالة التتبع
     function trackLead(label) {
         if (typeof fbq === 'function') fbq('track', 'Lead', { content_name: label });
-        if (typeof ttq === 'function') ttq.track('Contact', { content_name: label });
     }
 
-    // دالة حساب المسافة
     function calculateDistance(lat1, lon1, lat2, lon2) {
-        const R = 6371; // نصف قطر الأرض بالكيلومتر
+        const R = 6371; 
         const dLat = (lat2 - lat1) * Math.PI / 180;
         const dLon = (lon2 - lon1) * Math.PI / 180;
         const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)**2;
         return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
     }
 
-    // جلب البيانات من ملف branches.json
     async function loadBranches() {
         try {
             const response = await fetch('branches.json');
             const data = await response.json();
-            let branches = data.branches; // الدخول إلى قائمة الفروع داخل ملف الجيسن
+            let branches = data.branches; 
 
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition((pos) => {
                     const userLat = pos.coords.latitude;
                     const userLng = pos.coords.longitude;
-                    
                     branches.forEach(b => {
                         b.dist = calculateDistance(userLat, userLng, b.lat, b.lng);
                     });
-                    
-                    // ترتيب الفروع من الأقرب للأبعد
                     branches.sort((a,b) => (a.dist || Infinity) - (b.dist || Infinity));
                     render(branches);
-                }, () => render(branches)); // في حال رفض إذن الموقع، يتم العرض بالترتيب الأصلي
+                }, () => render(branches));
             } else {
                 render(branches);
             }
         } catch (error) {
-            console.error("Error loading branches:", error);
-            document.getElementById('branchesList').innerHTML = '<p style="text-align:center; color:red">فشل في تحميل بيانات الفروع.</p>';
+            console.error("Error:", error);
+            document.getElementById('branchesList').innerHTML = '<p style="text-align:center; color:red">حدث خطأ أثناء تحميل الفروع.</p>';
         }
     }
 
@@ -162,7 +147,6 @@
         });
     }
 
-    // بدء التحميل
     loadBranches();
 </script>
 </body>
