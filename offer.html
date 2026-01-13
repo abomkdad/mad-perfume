@@ -27,11 +27,11 @@
         .branch-name { font-size: 26px; font-weight: 800; color: #fff; margin-top: 10px; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
         .branch-hours { display: inline-flex; flex-direction: column; gap: 4px; margin-top: 10px; font-size: 14px; color: #ddd; background: rgba(0,0,0,0.4); padding: 8px; border-radius: 8px; }
 
-        .socials { display: flex; justify-content: center; gap: 15px; margin-top: 20px; }
-        .socials a { width: 48px; height: 48px; border-radius: 50%; background: rgba(255,255,255,0.05); border: 1px solid var(--gold); color: var(--gold); display: flex; align-items: center; justify-content: center; font-size: 20px; text-decoration: none; transition: 0.3s; }
+        .socials { display: flex; justify-content: center; gap: 10px; margin-top: 20px; flex-wrap: wrap; }
+        .socials a { width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,0.05); border: 1px solid var(--gold); color: var(--gold); display: flex; align-items: center; justify-content: center; font-size: 18px; text-decoration: none; transition: 0.3s; }
         .socials a:hover { background: var(--gold); color: #000; transform: translateY(-3px); }
 
-        .categories { display: flex; gap: 10px; overflow-x: auto; padding: 20px 15px; scrollbar-width: none; }
+        .categories { display: flex; gap: 10px; overflow-x: auto; padding: 20px 15px; scrollbar-width: none; position: sticky; top: 0; z-index: 10; background: var(--bg); }
         .categories::-webkit-scrollbar { display: none; }
         .categories button { background: transparent; color: var(--muted); border: 1px solid #333; border-radius: 30px; padding: 8px 18px; white-space: nowrap; cursor: pointer; font-family: inherit; font-size: 14px; font-weight: 600; transition: 0.3s; }
         .categories button.active, .categories button:hover { background: var(--gold); color: #000; border-color: var(--gold); }
@@ -61,11 +61,14 @@
         <div class="branch-name" id="branchName"></div>
         <div class="branch-hours" id="branchHours"></div>
         <div class="socials">
-            <a id="mapLink" target="_blank"><i class="fa-solid fa-location-dot"></i></a>
-            <a id="tiktokLink" target="_blank"><i class="fa-brands fa-tiktok"></i></a>
-            <a id="instaLink" target="_blank"><i class="fa-brands fa-instagram"></i></a>
-            <a id="fbLink" target="_blank"><i class="fa-brands fa-facebook-f"></i></a>
-            <a id="waHeaderLink" target="_blank"><i class="fa-brands fa-whatsapp"></i></a>
+            <a id="mapLink" target="_blank" title="Location"><i class="fa-solid fa-location-dot"></i></a>
+            <a id="tiktokLink" target="_blank" title="TikTok"><i class="fa-brands fa-tiktok"></i></a>
+            <a id="instaLink" target="_blank" title="Instagram"><i class="fa-brands fa-instagram"></i></a>
+            <a id="fbLink" target="_blank" title="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+            <a id="snapLink" target="_blank" title="Snapchat"><i class="fa-brands fa-snapchat"></i></a>
+            <a id="ytLink" target="_blank" title="YouTube"><i class="fa-brands fa-youtube"></i></a>
+            <a id="emailLink" href="" title="Email"><i class="fa-solid fa-envelope"></i></a>
+            <a id="waHeaderLink" target="_blank" title="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
         </div>
     </div>
 
@@ -93,21 +96,18 @@ let allProducts = [];
 const params = new URLSearchParams(window.location.search);
 const branchID = params.get("branch");
 
-// الدالة الأساسية لبدء الموقع
 async function init() {
     try {
-        // 1. تحميل الفروع من ملف JSON (تأكد من تسميته branches.json على السيرفر)
         const branchRes = await fetch("branches.json");
         if (branchRes.ok) {
             const branches = await branchRes.json();
             if (branchID) {
-                // البحث عن الفرع بناءً على id في ملف JSON
+                // البحث عن الفرع بناءً على id الرقمي كما في الـ JSON الجديد
                 currentBranch = branches.find(b => String(b.id) === String(branchID));
             }
         }
         renderHeader();
 
-        // 2. تحميل المنتجات من ملف CSV (يبقى كما هو)
         Papa.parse("products.csv", {
             download: true,
             header: true,
@@ -136,23 +136,42 @@ function renderHeader() {
         infoDiv.style.display = "block";
         defaultDiv.style.display = "none";
         
-        // ربط البيانات مع حقول JSON (name_ar, hours_ar, waze_maps, social)
+        // ربط الأسماء (عربي/عبري)
         document.getElementById("branchName").textContent = lang === "he" ? currentBranch.name_he : currentBranch.name_ar;
-        document.getElementById("branchHours").innerHTML = lang === "he" ? currentBranch.hours_he : currentBranch.hours_ar;
         
-        document.getElementById("mapLink").href = currentBranch.waze_maps || "#";
-        document.getElementById("instaLink").href = currentBranch.social?.instagram || "#";
-        document.getElementById("tiktokLink").href = currentBranch.social?.tiktok || "#";
-        document.getElementById("fbLink").href = currentBranch.social?.facebook || "#";
+        // ربط الساعات (في الـ JSON الجديد الحقل اسمه hours فقط)
+        document.getElementById("branchHours").innerHTML = currentBranch.hours || "";
         
-        // تكوين رابط الواتساب من رقم الهاتف في JSON
-        const waLink = `https://wa.me/${currentBranch.whatsapp}`;
+        // ربط اللوكيشن (استخدام lat/lng لإنشاء رابط جوجل ماب)
+        const mapUrl = `https://www.google.com/maps?q=${currentBranch.lat},${currentBranch.lng}`;
+        document.getElementById("mapLink").href = mapUrl;
+
+        // ربط السوشيال ميديا
+        const social = currentBranch.social || {};
+        document.getElementById("instaLink").href = social.instagram || "#";
+        document.getElementById("tiktokLink").href = social.tiktok || "#";
+        document.getElementById("fbLink").href = social.facebook || "#";
+        document.getElementById("snapLink").href = social.snapchat || "#";
+        document.getElementById("ytLink").href = social.youtube || "#";
+        document.getElementById("emailLink").href = `mailto:${social.email || ""}`;
+        
+        // إخفاء الأيقونات غير الموجودة في الـ JSON
+        if(!social.snapchat) document.getElementById("snapLink").style.display = 'none';
+        if(!social.youtube) document.getElementById("ytLink").style.display = 'none';
+        
+        // ربط الواتساب (استخدام حقل phone من الـ JSON الجديد)
+        let phone = currentBranch.phone;
+        // التأكد من الصيغة الدولية (إضافة 972 إذا بدأ بـ 0)
+        if (phone.startsWith("0")) phone = "972" + phone.substring(1);
+        
+        const waLink = `https://wa.me/${phone}`;
         document.getElementById("waHeaderLink").href = waLink;
         waFloat.href = waLink;
+
     } else {
         infoDiv.style.display = "none";
         defaultDiv.style.display = "block";
-        waFloat.href = "https://wa.me/972549634449"; // رقم افتراضي إذا لم يتم اختيار فرع
+        waFloat.href = "https://wa.me/972549634449"; 
     }
 }
 
@@ -188,14 +207,17 @@ function renderProducts(filterCat) {
     const filtered = filterCat === "ALL" ? allProducts : allProducts.filter(p => p[catKey] === filterCat);
 
     if (filtered.length === 0) {
-        grid.innerHTML = `<div class="loading">لا توجد منتجات حالياً</div>`;
+        grid.innerHTML = `<div class="loading">${lang === "he" ? "אין מוצרים" : "لا توجد منتجات حالياً"}</div>`;
         return;
     }
 
     filtered.forEach(p => {
-        const baseWa = currentBranch ? `https://wa.me/${currentBranch.whatsapp}` : "https://wa.me/972549634449";
+        // تحديد رقم الواتساب للرسالة
+        let phone = currentBranch ? currentBranch.phone : "972549634449";
+        if (phone.startsWith("0")) phone = "972" + phone.substring(1);
+
         const msg = lang === "he" ? `היי, אני מעוניין במוצר: ${p["Title"]}` : `مرحبا، أنا مهتم بالمنتج: ${p["Title"]}`;
-        const finalLink = `${baseWa}?text=${encodeURIComponent(msg)}`;
+        const finalLink = `https://wa.me/${phone}?text=${encodeURIComponent(msg)}`;
         const btnText = lang === "he" ? "בדיקת זמינות" : "افحص التوفر";
         const price = p["Price"] ? p["Price"].replace("ILS", "₪") : "";
 
