@@ -13,222 +13,181 @@
 
 <!-- META PIXEL -->
 <script>
-!function(f,b,e,v,n,t,s)
-{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-n.queue=[];t=b.createElement(e);t.async=!0;
-t.src=v;s=b.getElementsByTagName(e)[0];
-s.parentNode.insertBefore(t,s)}(window, document,'script',
-'https://connect.facebook.net/en_US/fbevents.js');
+!function(f,b,e,v,n,t,s){
+ if(f.fbq)return;
+ n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+ if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+ n.queue=[];
+ t=b.createElement(e);t.async=!0;
+ t.src=v;
+ s=b.getElementsByTagName(e)[0];
+ s.parentNode.insertBefore(t,s)
+}(window, document,'script','https://connect.facebook.net/en_US/fbevents.js');
 fbq('init','1072283127290819');
 fbq('track','PageView');
 </script>
 
-<!-- CONFIRM REAL LEADS -->
-<script>
-(function () {
-const ref = document.referrer || "";
-if (ref.includes("wa.me") || ref.includes("whatsapp.com")) {
-    fbq('track','Lead',{source:'WhatsApp',action:'message_sent'});
-}
-if (ref.includes("waze.com")) {
-    fbq('track','Lead',{source:'Waze',action:'navigation_started'});
-}
-})();
-</script>
-
 <style>
-:root{--bg:#0a0a0a;--card:#141414;--gold:#d4af37;--text:#fff;--muted:#aaa}
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--text);font-family:'Cairo','Heebo',sans-serif;padding-bottom:80px}
-
-header{background:#000;padding:40px 15px;text-align:center;border-bottom:4px solid var(--gold)}
-
-.categories{display:flex;gap:10px;overflow-x:auto;padding:20px}
-.categories button{background:transparent;color:var(--muted);border:1px solid #333;border-radius:30px;padding:8px 18px;font-weight:600}
-.categories button.active{background:var(--gold);color:#000}
-
-.products{display:grid;grid-template-columns:repeat(auto-fill,minmax(165px,1fr));gap:15px;padding:0 15px}
-.card{background:var(--card);border-radius:16px;padding:12px;text-align:center}
-.card img{width:100%;aspect-ratio:1/1;border-radius:12px}
-.code{margin-top:10px;font-weight:800}
-.price{color:var(--gold)}
-.btn{background:#25D366;color:#fff;border-radius:8px;padding:10px;margin-top:10px;display:flex;justify-content:center;gap:6px;text-decoration:none;font-weight:700}
-
-#dailyOffer{position:fixed;bottom:110px;left:50%;transform:translateX(-50%);z-index:98}
-.offer-box{background:#111;border:2px solid var(--gold);border-radius:14px;padding:10px;width:260px;text-align:center;position:relative}
-.offer-box img{width:100%;border-radius:10px}
-.offer-title{color:var(--gold);font-weight:800;margin-bottom:6px}
-.offer-timer{font-size:13px;font-weight:700}
-.offer-timer span{color:var(--gold)}
-.offer-btn{display:block;margin-top:10px;background:#25D366;color:#fff;padding:10px;border-radius:8px;text-decoration:none;font-weight:700}
-
-.offer-close-btn{
-position:absolute;
-top:6px;
-right:6px;
-background:#222;
-color:#fff;
-border:1px solid var(--gold);
-border-radius:6px;
-padding:3px 8px;
-font-size:12px;
-cursor:pointer;
+:root{
+ --bg:#0a0a0a;--card:#141414;--gold:#d4af37;--text:#fff;--muted:#aaa
 }
+*{box-sizing:border-box}
+body{
+ margin:0;background:var(--bg);color:var(--text);
+ font-family:'Cairo','Heebo',sans-serif;padding-bottom:90px
+}
+header{
+ padding:30px 15px;text-align:center;border-bottom:3px solid var(--gold)
+}
+.brand{color:var(--gold);font-weight:800;letter-spacing:2px}
+.branch-name{font-size:24px;font-weight:800;margin-top:5px}
+.status{margin-top:10px;font-weight:700}
+.open{color:#25D366}
+.closed{color:#ff4444}
+
+.products{
+ display:grid;
+ grid-template-columns:repeat(auto-fill,minmax(160px,1fr));
+ gap:15px;padding:15px
+}
+.card{
+ background:var(--card);border-radius:14px;padding:10px;text-align:center
+}
+.card img{width:100%;border-radius:12px}
+.price{color:var(--gold);font-weight:700}
+
+.btn{
+ display:block;margin-top:8px;
+ background:#25D366;color:#fff;
+ padding:10px;border-radius:8px;
+ text-decoration:none;font-weight:700
+}
+
+.popup{
+ position:fixed;inset:0;
+ background:rgba(0,0,0,.6);
+ display:none;align-items:center;justify-content:center;
+ z-index:999
+}
+.popup-box{
+ background:#111;border:2px solid var(--gold);
+ border-radius:16px;padding:15px;
+ width:90%;max-width:360px;
+ text-align:center;position:relative
+}
+.popup-box img{width:100%;border-radius:12px}
+.popup-close{
+ position:absolute;top:8px;left:8px;
+ color:#fff;font-size:14px;cursor:pointer
+}
+.popup-title{color:var(--gold);font-weight:800;margin:10px 0}
 </style>
 </head>
 
 <body>
 
 <header>
-<h2>MAD PARFUMEUR</h2>
+ <div class="brand">MAD PARFUMEUR</div>
+ <div class="branch-name" id="branchName"></div>
+ <div class="status" id="status"></div>
 </header>
 
-<div class="categories" id="categories"></div>
 <div class="products" id="products"></div>
 
-<!-- DAILY OFFER -->
-<div id="dailyOffer" style="display:none">
-<div class="offer-box">
-<button class="offer-close-btn" onclick="closeOffer()" id="closeText">إغلاق</button>
-<div class="offer-title" id="offerTitle">إعلان اليوم</div>
-<img src="sale.png">
-<div class="offer-timer">
-<span id="timerLabel">ينتهي خلال</span>
-<span id="offerCountdown">--:--:--</span>
-</div>
-<a id="offerWA" class="offer-btn" target="_blank">
-<i class="fa-brands fa-whatsapp"></i> <span id="offerBtnText">تحصل على العرض</span>
-</a>
-</div>
+<!-- POPUP -->
+<div class="popup" id="popup">
+ <div class="popup-box">
+  <div class="popup-close" onclick="closePopup()">✕ إغلاق</div>
+  <div class="popup-title" id="popupTitle"></div>
+  <img src="sale.png" alt="Sale">
+  <a id="popupWa" class="btn" target="_blank">🔥 احصل على العرض</a>
+ </div>
 </div>
 
 <script>
-/* LANGUAGE */
-const lang = navigator.language.startsWith("he") ? "he" : "ar";
-document.documentElement.lang = lang;
-document.documentElement.dir = "rtl";
+const lang=navigator.language.startsWith("he")?"he":"ar";
+document.documentElement.lang=lang;
 
-const TEXT = {
-ar:{
-title:"إعلان اليوم",
-btn:"تحصل على العرض",
-close:"إغلاق",
-timer:"ينتهي خلال",
-all:"الكل",
-waMsg:"أريد عرض اليوم: "
-},
-he:{
-title:"מבצע היום",
-btn:"קבל את המבצע",
-close:"סגירה",
-timer:"מסתיים בעוד",
-all:"הכל",
-waMsg:"אני מעוניין במבצע: "
-}
+const T={
+ ar:{open:"مفتوح الآن",closed:"مغلق الآن",today:"إعلان اليوم"},
+ he:{open:"פתוח עכשיו",closed:"סגור עכשיו",today:"מבצע היום"}
 };
 
-const t = TEXT[lang];
-document.getElementById("offerTitle").textContent = t.title;
-document.getElementById("offerBtnText").textContent = t.btn;
-document.getElementById("closeText").textContent = t.close;
-document.getElementById("timerLabel").textContent = t.timer;
+const params=new URLSearchParams(location.search);
+const branchID=params.get("branch");
+let branch=null;
 
-/* BRANCH */
-const params = new URLSearchParams(location.search);
-const branchID = params.get("branch");
-let branchPhone = "972549634449";
-
-fetch("branches.json")
-.then(r=>r.json())
-.then(d=>{
-const b = d.branches.find(x=>String(x.id)===String(branchID));
-if(b && b.phone){
-branchPhone = b.phone.startsWith("0") ? "972"+b.phone.slice(1) : b.phone;
-}
-});
-
-/* PRODUCTS */
-let allProducts=[];
-Papa.parse("products.csv",{
-download:true,
-header:true,
-skipEmptyLines:true,
-complete:r=>{
-allProducts=r.data.filter(p=>p["Title"]);
-extractCategories();
-renderProducts("ALL");
-}
-});
-
-function extractCategories(){
-const cats=[...new Set(allProducts.map(p=>p["Category (g:product_type)"]).filter(Boolean))];
-const c=document.getElementById("categories");
-c.innerHTML="";
-const btn=document.createElement("button");
-btn.textContent=t.all;
-btn.className="active";
-btn.onclick=()=>renderProducts("ALL");
-c.appendChild(btn);
-cats.forEach(cat=>{
-const b=document.createElement("button");
-b.textContent=cat;
-b.onclick=()=>renderProducts(cat);
-c.appendChild(b);
-});
+function trackLead(name){
+ if(typeof fbq==="function")fbq("track","Lead",{action:name,branch:branch?.id})
 }
 
-function renderProducts(cat){
-const g=document.getElementById("products");
-g.innerHTML="";
-const list=cat==="ALL"?allProducts:allProducts.filter(p=>p["Category (g:product_type)"]===cat);
-list.forEach(p=>{
-const d=document.createElement("div");
-d.className="card";
-d.innerHTML=`
-<img src="${p["Image"]}">
-<div class="code">${p["Title"]}</div>
-<div class="price">${(p["Price"]||"").replace("ILS","₪")}</div>
-<a class="btn" target="_blank"
-href="https://wa.me/${branchPhone}?text=${encodeURIComponent(t.waMsg+p["Title"])}">
-<i class="fa-brands fa-whatsapp"></i> ${t.btn}
-</a>`;
-g.appendChild(d);
-});
+function isOpenNow(schedule){
+ const d=new Date();
+ const days=["sun","mon","tue","wed","thu","fri","sat"];
+ const day=schedule[days[d.getDay()]];
+ if(!day||!day.length)return false;
+ const now=d.getHours()*60+d.getMinutes();
+ return day.some(r=>{
+  const s=parseInt(r[0].split(":")[0])*60+parseInt(r[0].split(":")[1]);
+  const e=parseInt(r[1].split(":")[0])*60+parseInt(r[1].split(":")[1]);
+  return now>=s && now<=e;
+ });
 }
 
-/* DAILY OFFER LOGIC */
-function todayKey(){
-const d=new Date();
-return d.getFullYear()+"-"+d.getMonth()+"-"+d.getDate();
-}
-function closeOffer(){
-document.getElementById("dailyOffer").style.display="none";
-sessionStorage.setItem("offerClosed",todayKey());
-}
-function startCountdown(){
-const el=document.getElementById("offerCountdown");
-setInterval(()=>{
-const now=new Date();
-const end=new Date();end.setHours(24,0,0,0);
-const d=end-now;
-if(d<=0)return;
-el.textContent=
-String(Math.floor(d/3600000)).padStart(2,"0")+":"+
-String(Math.floor(d%3600000/60000)).padStart(2,"0")+":"+
-String(Math.floor(d%60000/1000)).padStart(2,"0");
-},1000);
+async function init(){
+ const res=await fetch("test.json");
+ const data=await res.json();
+ branch=data.branches.find(b=>String(b.id)===branchID);
+ if(!branch)return;
+
+ document.getElementById("branchName").textContent=
+  lang==="he"?branch.name_he:branch.name_ar;
+
+ const open=isOpenNow(branch.schedule);
+ document.getElementById("status").innerHTML=
+  `<span class="${open?'open':'closed'}">${open?T[lang].open:T[lang].closed}</span>`;
+
+ loadProducts();
+ setupPopup();
 }
 
-setTimeout(()=>{
-if(sessionStorage.getItem("offerClosed")===todayKey())return;
-document.getElementById("offerWA").href=
-`https://wa.me/${branchPhone}?text=${encodeURIComponent(t.waMsg)}`;
-document.getElementById("dailyOffer").style.display="block";
-startCountdown();
-},1000);
+function loadProducts(){
+ Papa.parse("products.csv",{
+  download:true,header:true,
+  complete:r=>{
+   const grid=document.getElementById("products");
+   r.data.forEach(p=>{
+    if(!p.Title)return;
+    let phone=branch.phone.replace(/^0/,"972");
+    const div=document.createElement("div");
+    div.className="card";
+    div.innerHTML=`
+     <img src="${p.Image}">
+     <div>${p.Title}</div>
+     <div class="price">${p.Price}</div>
+     <a class="btn" target="_blank"
+      href="https://wa.me/${phone}?text=${encodeURIComponent(p.Title)}"
+      onclick="trackLead('product_whatsapp')">واتساب</a>`;
+    grid.appendChild(div);
+   })
+  }
+ });
+}
+
+function setupPopup(){
+ document.getElementById("popupTitle").textContent=T[lang].today;
+ let phone=branch.phone.replace(/^0/,"972");
+ const wa=document.getElementById("popupWa");
+ wa.href=`https://wa.me/${phone}?text=${encodeURIComponent(T[lang].today)}`;
+ wa.onclick=()=>trackLead("popup_offer");
+ setTimeout(()=>document.getElementById("popup").style.display="flex",1000);
+}
+
+function closePopup(){
+ document.getElementById("popup").style.display="none";
+}
+
+init();
 </script>
-
 </body>
 </html>
