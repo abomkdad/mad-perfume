@@ -25,7 +25,7 @@ fbq('init','1072283127290819');
 fbq('track','PageView');
 </script>
 
-<!-- CONFIRM REAL LEADS ONLY -->
+<!-- CONFIRM REAL LEADS -->
 <script>
 (function () {
 const ref = document.referrer || "";
@@ -43,13 +43,7 @@ if (ref.includes("waze.com")) {
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--text);font-family:'Cairo','Heebo',sans-serif;padding-bottom:80px}
 
-header{background:url("https://madparfumeurglobal.com/wp-content/uploads/2025/10/1920x600-BERGAY.jpg")center/cover no-repeat;padding:40px 15px 30px;text-align:center;position:relative;border-bottom:4px solid var(--gold)}
-header::after{content:"";position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,.7),var(--bg))}
-header *{position:relative;z-index:2}
-
-.logo{width:80px;margin:auto}
-.logo img{width:100%}
-.brand{color:var(--gold);font-weight:800;letter-spacing:2px;margin-top:10px}
+header{background:#000;padding:40px 15px;text-align:center;border-bottom:4px solid var(--gold)}
 
 .categories{display:flex;gap:10px;overflow-x:auto;padding:20px}
 .categories button{background:transparent;color:var(--muted);border:1px solid #333;border-radius:30px;padding:8px 18px;font-weight:600}
@@ -62,9 +56,6 @@ header *{position:relative;z-index:2}
 .price{color:var(--gold)}
 .btn{background:#25D366;color:#fff;border-radius:8px;padding:10px;margin-top:10px;display:flex;justify-content:center;gap:6px;text-decoration:none;font-weight:700}
 
-.miral-float{position:fixed;bottom:25px;right:25px;width:70px;height:70px;z-index:99}
-.miral-float img{width:100%;border-radius:50%;border:3px solid var(--gold)}
-
 #dailyOffer{position:fixed;bottom:110px;left:50%;transform:translateX(-50%);z-index:98}
 .offer-box{background:#111;border:2px solid var(--gold);border-radius:14px;padding:10px;width:260px;text-align:center;position:relative}
 .offer-box img{width:100%;border-radius:10px}
@@ -72,50 +63,100 @@ header *{position:relative;z-index:2}
 .offer-timer{font-size:13px;font-weight:700}
 .offer-timer span{color:var(--gold)}
 .offer-btn{display:block;margin-top:10px;background:#25D366;color:#fff;padding:10px;border-radius:8px;text-decoration:none;font-weight:700}
-.offer-close{position:absolute;top:5px;right:10px;cursor:pointer}
+
+.offer-close-btn{
+position:absolute;
+top:6px;
+right:6px;
+background:#222;
+color:#fff;
+border:1px solid var(--gold);
+border-radius:6px;
+padding:3px 8px;
+font-size:12px;
+cursor:pointer;
+}
 </style>
 </head>
 
 <body>
 
 <header>
-<div class="logo">
-<img src="https://abomkdad.github.io/Digital-Business-Card/logo.png">
-</div>
-<div class="brand">MAD PARFUMEUR</div>
+<h2>MAD PARFUMEUR</h2>
 </header>
 
 <div class="categories" id="categories"></div>
 <div class="products" id="products"></div>
 
-<a class="miral-float" href="https://wa.me/972549634449">
-<img src="https://madperfume.ps/upload/01-2026/page/6966930e9af7f.png">
-</a>
-
 <!-- DAILY OFFER -->
 <div id="dailyOffer" style="display:none">
 <div class="offer-box">
-<div class="offer-title">إعلان اليوم</div>
+<button class="offer-close-btn" onclick="closeOffer()" id="closeText">إغلاق</button>
+<div class="offer-title" id="offerTitle">إعلان اليوم</div>
 <img src="sale.png">
 <div class="offer-timer">
-ينتهي خلال <span id="offerCountdown">--:--:--</span>
+<span id="timerLabel">ينتهي خلال</span>
+<span id="offerCountdown">--:--:--</span>
 </div>
 <a id="offerWA" class="offer-btn" target="_blank">
-<i class="fa-brands fa-whatsapp"></i> تحصل على العرض
+<i class="fa-brands fa-whatsapp"></i> <span id="offerBtnText">تحصل على العرض</span>
 </a>
-<span class="offer-close" onclick="closeOffer()">×</span>
 </div>
 </div>
 
 <script>
-/* PRODUCTS — EXACT SAME LOGIC */
+/* LANGUAGE */
+const lang = navigator.language.startsWith("he") ? "he" : "ar";
+document.documentElement.lang = lang;
+document.documentElement.dir = "rtl";
+
+const TEXT = {
+ar:{
+title:"إعلان اليوم",
+btn:"تحصل على العرض",
+close:"إغلاق",
+timer:"ينتهي خلال",
+all:"الكل",
+waMsg:"أريد عرض اليوم: "
+},
+he:{
+title:"מבצע היום",
+btn:"קבל את המבצע",
+close:"סגירה",
+timer:"מסתיים בעוד",
+all:"הכל",
+waMsg:"אני מעוניין במבצע: "
+}
+};
+
+const t = TEXT[lang];
+document.getElementById("offerTitle").textContent = t.title;
+document.getElementById("offerBtnText").textContent = t.btn;
+document.getElementById("closeText").textContent = t.close;
+document.getElementById("timerLabel").textContent = t.timer;
+
+/* BRANCH */
+const params = new URLSearchParams(location.search);
+const branchID = params.get("branch");
+let branchPhone = "972549634449";
+
+fetch("branches.json")
+.then(r=>r.json())
+.then(d=>{
+const b = d.branches.find(x=>String(x.id)===String(branchID));
+if(b && b.phone){
+branchPhone = b.phone.startsWith("0") ? "972"+b.phone.slice(1) : b.phone;
+}
+});
+
+/* PRODUCTS */
 let allProducts=[];
 Papa.parse("products.csv",{
 download:true,
 header:true,
 skipEmptyLines:true,
-complete:function(res){
-allProducts=res.data.filter(p=>p["Title"]);
+complete:r=>{
+allProducts=r.data.filter(p=>p["Title"]);
 extractCategories();
 renderProducts("ALL");
 }
@@ -125,15 +166,15 @@ function extractCategories(){
 const cats=[...new Set(allProducts.map(p=>p["Category (g:product_type)"]).filter(Boolean))];
 const c=document.getElementById("categories");
 c.innerHTML="";
-const allBtn=document.createElement("button");
-allBtn.textContent="الكل";
-allBtn.className="active";
-allBtn.onclick=()=>{document.querySelectorAll(".categories button").forEach(b=>b.classList.remove("active"));allBtn.classList.add("active");renderProducts("ALL");};
-c.appendChild(allBtn);
+const btn=document.createElement("button");
+btn.textContent=t.all;
+btn.className="active";
+btn.onclick=()=>renderProducts("ALL");
+c.appendChild(btn);
 cats.forEach(cat=>{
 const b=document.createElement("button");
 b.textContent=cat;
-b.onclick=()=>{document.querySelectorAll(".categories button").forEach(x=>x.classList.remove("active"));b.classList.add("active");renderProducts(cat);};
+b.onclick=()=>renderProducts(cat);
 c.appendChild(b);
 });
 }
@@ -146,48 +187,44 @@ list.forEach(p=>{
 const d=document.createElement("div");
 d.className="card";
 d.innerHTML=`
-<img src="${p["Image"]}" loading="lazy">
+<img src="${p["Image"]}">
 <div class="code">${p["Title"]}</div>
 <div class="price">${(p["Price"]||"").replace("ILS","₪")}</div>
 <a class="btn" target="_blank"
-href="https://wa.me/972549634449?text=${encodeURIComponent("أريد عرض اليوم: "+p["Title"])}">
-<i class="fa-brands fa-whatsapp"></i> افحص التوفر
+href="https://wa.me/${branchPhone}?text=${encodeURIComponent(t.waMsg+p["Title"])}">
+<i class="fa-brands fa-whatsapp"></i> ${t.btn}
 </a>`;
 g.appendChild(d);
 });
 }
 
-/* DAILY OFFER — 24H + RESET AT 12:00 AM */
+/* DAILY OFFER LOGIC */
+function todayKey(){
+const d=new Date();
+return d.getFullYear()+"-"+d.getMonth()+"-"+d.getDate();
+}
 function closeOffer(){
 document.getElementById("dailyOffer").style.display="none";
-sessionStorage.setItem("offerClosed",getTodayKey());
+sessionStorage.setItem("offerClosed",todayKey());
 }
-
-function getTodayKey(){
-const d=new Date();
-return d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate();
-}
-
 function startCountdown(){
 const el=document.getElementById("offerCountdown");
 setInterval(()=>{
 const now=new Date();
-const end=new Date();
-end.setHours(24,0,0,0);
-const diff=end-now;
-if(diff<=0){el.textContent="00:00:00";return;}
-const h=String(Math.floor(diff/3600000)).padStart(2,"0");
-const m=String(Math.floor(diff%3600000/60000)).padStart(2,"0");
-const s=String(Math.floor(diff%60000/1000)).padStart(2,"0");
-el.textContent=`${h}:${m}:${s}`;
+const end=new Date();end.setHours(24,0,0,0);
+const d=end-now;
+if(d<=0)return;
+el.textContent=
+String(Math.floor(d/3600000)).padStart(2,"0")+":"+
+String(Math.floor(d%3600000/60000)).padStart(2,"0")+":"+
+String(Math.floor(d%60000/1000)).padStart(2,"0");
 },1000);
 }
 
 setTimeout(()=>{
-const today=getTodayKey();
-if(sessionStorage.getItem("offerClosed")===today)return;
+if(sessionStorage.getItem("offerClosed")===todayKey())return;
 document.getElementById("offerWA").href=
-"https://wa.me/972549634449?text="+encodeURIComponent("أريد عرض اليوم");
+`https://wa.me/${branchPhone}?text=${encodeURIComponent(t.waMsg)}`;
 document.getElementById("dailyOffer").style.display="block";
 startCountdown();
 },1000);
