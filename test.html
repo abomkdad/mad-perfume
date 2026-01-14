@@ -25,7 +25,7 @@ fbq('init','1072283127290819');
 fbq('track','PageView');
 </script>
 
-<!-- WHATSAPP + WAZE LEAD CONFIRMATION -->
+<!-- CONFIRM LEAD ONLY AFTER REAL ACTION -->
 <script>
 (function () {
 const ref = document.referrer || "";
@@ -56,11 +56,8 @@ header *{position:relative;z-index:2}
 .status-open{background:rgba(37,211,102,.2);color:#25D366}
 .status-closed{background:rgba(255,68,68,.2);color:#ff4444}
 
-.miral-float{position:fixed;bottom:25px;right:25px;width:70px;height:70px;z-index:99}
-.miral-float img{width:100%;border-radius:50%;border:3px solid var(--gold)}
-
 .categories{display:flex;gap:10px;overflow-x:auto;padding:20px}
-.categories button{background:transparent;color:var(--muted);border:1px solid #333;border-radius:30px;padding:8px 18px}
+.categories button{background:transparent;color:var(--muted);border:1px solid #333;border-radius:30px;padding:8px 18px;font-weight:600}
 .categories button.active{background:var(--gold);color:#000}
 
 .products{display:grid;grid-template-columns:repeat(auto-fill,minmax(165px,1fr));gap:15px;padding:0 15px}
@@ -68,9 +65,11 @@ header *{position:relative;z-index:2}
 .card img{width:100%;aspect-ratio:1/1;border-radius:12px}
 .code{margin-top:10px;font-weight:800}
 .price{color:var(--gold)}
-.btn{background:#25D366;color:#fff;border-radius:8px;padding:10px;margin-top:10px;display:flex;justify-content:center;gap:6px;text-decoration:none}
+.btn{background:#25D366;color:#fff;border-radius:8px;padding:10px;margin-top:10px;display:flex;justify-content:center;gap:6px;text-decoration:none;font-weight:700}
 
-/* DAILY OFFER POPUP */
+.miral-float{position:fixed;bottom:25px;right:25px;width:70px;height:70px;z-index:99}
+.miral-float img{width:100%;border-radius:50%;border:3px solid var(--gold)}
+
 #dailyOffer{position:fixed;bottom:110px;left:50%;transform:translateX(-50%);z-index:98}
 .offer-box{background:#111;border:2px solid var(--gold);border-radius:14px;padding:10px;width:260px;text-align:center;position:relative}
 .offer-box img{width:100%;border-radius:10px}
@@ -91,14 +90,13 @@ header *{position:relative;z-index:2}
 <div class="status-badge status-open">مفتوح الآن</div>
 </header>
 
-<div class="categories"><button class="active">الكل</button></div>
-<div class="products"></div>
+<div class="categories" id="categories"></div>
+<div class="products" id="products"></div>
 
 <a class="miral-float" href="https://wa.me/972549634449">
 <img src="https://madperfume.ps/upload/01-2026/page/6966930e9af7f.png">
 </a>
 
-<!-- DAILY OFFER -->
 <div id="dailyOffer" style="display:none">
 <div class="offer-box">
 <div class="offer-title">إعلان اليوم</div>
@@ -112,31 +110,80 @@ header *{position:relative;z-index:2}
 </div>
 
 <script>
+const lang="ar";
+const t={all:"الكل",check:"افحص التوفر",waMsg:"أريد عرض اليوم: "};
+let allProducts=[];
+
+/* IMPORT PRODUCTS — IDENTICAL TO YOUR ORIGINAL CODE */
+Papa.parse("products.csv",{
+download:true,
+header:true,
+skipEmptyLines:true,
+complete:function(results){
+allProducts=results.data.filter(p=>p["Title"]);
+extractCategories();
+renderProducts("ALL");
+}
+});
+
+function extractCategories(){
+const cats=[...new Set(allProducts.map(p=>p["Category (g:product_type)"]).filter(Boolean))];
+const c=document.getElementById("categories");
+c.innerHTML="";
+const allBtn=document.createElement("button");
+allBtn.textContent=t.all;
+allBtn.className="active";
+allBtn.onclick=()=>{document.querySelectorAll(".categories button").forEach(b=>b.classList.remove("active"));allBtn.classList.add("active");renderProducts("ALL");};
+c.appendChild(allBtn);
+cats.forEach(cat=>{
+const b=document.createElement("button");
+b.textContent=cat;
+b.onclick=()=>{document.querySelectorAll(".categories button").forEach(x=>x.classList.remove("active"));b.classList.add("active");renderProducts(cat);};
+c.appendChild(b);
+});
+}
+
+function renderProducts(cat){
+const grid=document.getElementById("products");
+grid.innerHTML="";
+const list=cat==="ALL"?allProducts:allProducts.filter(p=>p["Category (g:product_type)"]===cat);
+list.forEach(p=>{
+const card=document.createElement("div");
+card.className="card";
+card.innerHTML=`
+<img src="${p["Image"]}" loading="lazy">
+<div class="code">${p["Title"]}</div>
+<div class="price">${(p["Price"]||"").replace("ILS","₪")}</div>
+<a class="btn" target="_blank"
+href="https://wa.me/972549634449?text=${encodeURIComponent(t.waMsg+p["Title"])}">
+<i class="fa-brands fa-whatsapp"></i> ${t.check}
+</a>`;
+grid.appendChild(card);
+});
+}
+
+/* DAILY OFFER LOGIC */
 function closeOffer(){
 document.getElementById("dailyOffer").style.display="none";
 sessionStorage.setItem("offerClosed","1");
 }
-
 function withinHours(){
 const h=new Date().getHours();
 return h>=10&&h<22;
 }
-
 function startCountdown(){
 const el=document.getElementById("offerCountdown");
 setInterval(()=>{
 const now=new Date();
-const end=new Date();
-end.setHours(22,0,0,0);
-const diff=end-now;
-if(diff<=0)return el.textContent="00:00:00";
-const h=String(Math.floor(diff/3600000)).padStart(2,"0");
-const m=String(Math.floor(diff%3600000/60000)).padStart(2,"0");
-const s=String(Math.floor(diff%60000/1000)).padStart(2,"0");
-el.textContent=`${h}:${m}:${s}`;
+const end=new Date();end.setHours(22,0,0,0);
+const d=end-now;
+if(d<=0)return el.textContent="00:00:00";
+el.textContent=
+String(Math.floor(d/3600000)).padStart(2,"0")+":"+
+String(Math.floor(d%3600000/60000)).padStart(2,"0")+":"+
+String(Math.floor(d%60000/1000)).padStart(2,"0");
 },1000);
 }
-
 setTimeout(()=>{
 if(!withinHours())return;
 if(sessionStorage.getItem("offerClosed"))return;
