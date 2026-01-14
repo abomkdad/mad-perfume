@@ -5,14 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MAD PARFUMEUR</title>
 
-<!-- ===================== FONTS & ICONS ===================== -->
+<!-- ===== FONTS & ICONS ===== -->
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&family=Heebo:wght@400;600;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
 
-<!-- ========================================================= -->
-<!-- 🔴 META PIXEL – COPY HERE 🔴 -->
-<!-- ========================================================= -->
+<!-- ================= META PIXEL ================= -->
 <script>
 !function(f,b,e,v,n,t,s){
  if(f.fbq)return;
@@ -27,110 +25,137 @@
  s.parentNode.insertBefore(t,s)
 }(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
 
-/* 🔴 PUT META PIXEL ID HERE 🔴 */
+/* 🔴 ضع Meta Pixel ID هنا */
 fbq('init','META_PIXEL_ID_HERE');
 fbq('track','PageView');
 </script>
 
-<!-- ========================================================= -->
-<!-- 🔴 TIKTOK PIXEL – COPY HERE 🔴 -->
-<!-- ========================================================= -->
+<!-- ================= TIKTOK PIXEL ================= -->
 <script>
 !function (w, d, t) {
   w.TiktokAnalyticsObject = t;
   var ttq = w[t] = w[t] || [];
-  ttq.methods = [
-    "page","track","identify","instances","debug","on","off","once","ready",
-    "alias","group","enableCookie","disableCookie"
-  ];
-  ttq.setAndDefer = function (t, e) {
-    t[e] = function () {
-      t.push([e].concat(Array.prototype.slice.call(arguments, 0)));
-    };
-  };
-  for (var i = 0; i < ttq.methods.length; i++) {
-    ttq.setAndDefer(ttq, ttq.methods[i]);
-  }
-  ttq.load = function (e) {
-    var s = document.createElement("script");
-    s.async = true;
-    s.src = "https://analytics.tiktok.com/i18n/pixel/events.js?sdkid=" + e;
+  ttq.methods = ["page","track"];
+  ttq.methods.forEach(m=>ttq[m]=function(){
+    ttq.push([m].concat([].slice.call(arguments)));
+  });
+  ttq.load = function(id){
+    var s=document.createElement("script");
+    s.async=true;
+    s.src="https://analytics.tiktok.com/i18n/pixel/events.js?sdkid="+id;
     document.head.appendChild(s);
   };
-
-  /* 🔴 PUT TIKTOK PIXEL ID HERE 🔴 */
+  /* 🔴 ضع TikTok Pixel ID هنا */
   ttq.load('TIKTOK_PIXEL_ID_HERE');
   ttq.page();
-}(window, document, 'ttq');
+}(window,document,'ttq');
 </script>
 
-<!-- ===================== STYLE ===================== -->
 <style>
-:root{--bg:#0a0a0a;--gold:#d4af37;--text:#fff}
-body{margin:0;background:var(--bg);color:var(--text);font-family:Cairo,Heebo}
-header{text-align:center;padding:40px 15px;border-bottom:3px solid var(--gold)}
+:root{--bg:#0a0a0a;--card:#141414;--gold:#d4af37;--text:#fff;--muted:#aaa}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Cairo,Heebo;padding-bottom:80px}
+header{text-align:center;padding:30px 15px;border-bottom:3px solid var(--gold)}
 .logo{width:80px;margin:auto}
 .logo img{width:100%}
-.products{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:15px;padding:15px}
-.card{background:#141414;border-radius:16px;padding:12px;text-align:center}
-.card img{width:100%;border-radius:12px}
-.btn{background:#25D366;color:#fff;padding:10px;border-radius:8px;text-decoration:none;display:block;margin-top:10px}
-.popup-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center;z-index:999}
-.popup{width:90%;max-width:420px;background:#000;border:2px solid var(--gold);border-radius:18px;padding:12px}
+.branch-name{font-size:22px;font-weight:800;margin-top:8px}
+.products{
+ display:grid;
+ grid-template-columns:repeat(auto-fill,minmax(160px,1fr));
+ gap:15px;padding:15px
+}
+.card{background:var(--card);border-radius:16px;padding:12px;text-align:center}
+.card img{width:100%;border-radius:12px;background:#fff}
+.code{font-weight:800;margin-top:6px}
+.price{color:var(--gold);font-weight:700}
+.btn{
+ background:#25D366;color:#fff;padding:10px;
+ border-radius:8px;text-decoration:none;
+ display:block;margin-top:10px;font-weight:700
+}
+
+/* ===== POPUP ===== */
+.popup-overlay{
+ position:fixed;inset:0;
+ background:rgba(0,0,0,.75);
+ display:none;align-items:center;justify-content:center;
+ z-index:9999
+}
+.popup{
+ width:92%;max-width:420px;
+ background:#000;border:2px solid var(--gold);
+ border-radius:18px;padding:12px;position:relative
+}
+.popup-close{
+ position:absolute;top:8px;right:8px;
+ background:#000;color:#fff;
+ padding:6px 10px;border-radius:10px;
+ cursor:pointer;font-size:13px
+}
 .popup img{width:100%;border-radius:12px}
-.popup-cta{margin-top:12px;background:#22c55e;color:#000;font-weight:800;padding:14px;border-radius:14px;text-align:center;cursor:pointer}
+.popup-cta{
+ margin-top:10px;background:#22c55e;
+ color:#000;font-weight:800;
+ padding:14px;border-radius:14px;
+ text-align:center;cursor:pointer
+}
+.popup-timer{
+ margin-top:6px;text-align:center;
+ color:var(--gold);font-weight:700;font-size:14px
+}
 </style>
 </head>
 
 <body>
 
 <header>
-  <div class="logo">
-    <img src="https://abomkdad.github.io/Digital-Business-Card/logo.png">
-  </div>
-  <h2>MAD PARFUMEUR</h2>
+ <div class="logo">
+  <img src="https://abomkdad.github.io/Digital-Business-Card/logo.png">
+ </div>
+ <div id="branchName" class="branch-name"></div>
 </header>
 
 <div class="products" id="products"></div>
 
-<!-- ===================== POPUP ===================== -->
+<!-- ===== POPUP ===== -->
 <div class="popup-overlay" id="popup">
-  <div class="popup">
-    <img src="sale.png" alt="عرض اليوم">
-    <div class="popup-cta" id="popupBtn">🔥 احصل على عرض اليوم</div>
-  </div>
+ <div class="popup">
+  <div class="popup-close" onclick="closePopup()">✕</div>
+  <img src="sale.png" alt="عرض اليوم">
+  <div class="popup-timer" id="popupTimer"></div>
+  <div class="popup-cta" id="popupBtn"></div>
+ </div>
 </div>
 
-<!-- ===================== SCRIPT ===================== -->
 <script>
-/* ===================================================
-   🔥 EVENT LAYER – لا تلمسه بعد اليوم
-=================================================== */
-function trackEvent(eventName, data={}){
+/* ===== LANGUAGE ===== */
+const lang = navigator.language.startsWith("he") ? "he" : "ar";
+document.documentElement.lang = lang;
+document.documentElement.dir = "rtl";
 
-  /* META */
-  if(window.fbq){
-    if(eventName==="Lead") fbq("track","Lead",data);
-    else if(eventName==="ViewContent") fbq("track","ViewContent",data);
-    else fbq("trackCustom",eventName,data);
-  }
+const T={
+ ar:{cta:"🔥 احصل على عرض اليوم",ends:"ينتهي العرض خلال"},
+ he:{cta:"🔥 קבל את מבצע היום",ends:"ההצעה מסתיימת בעוד"}
+};
 
-  /* TIKTOK */
-  if(window.ttq){
-    if(eventName==="Lead") ttq.track("SubmitForm",data);
-    else if(eventName==="ViewContent") ttq.track("ViewContent",data);
-    else ttq.track(eventName,data);
-  }
-
-  console.log("📊 Event:",eventName,data);
+/* ===== EVENTS ===== */
+function trackEvent(name,data={}){
+ if(window.fbq){
+  if(name==="Lead") fbq("track","Lead",data);
+  else fbq("trackCustom",name,data);
+ }
+ if(window.ttq){
+  if(name==="Lead") ttq.track("SubmitForm",data);
+  else ttq.track(name,data);
+ }
 }
 
-/* ===================== DATA ===================== */
+/* ===== BRANCH ===== */
 const params=new URLSearchParams(location.search);
-const branchID=params.get("branch")||"general";
+const branchID=params.get("branch");
+
 let phone="972549634449";
 
-/* ===================== PRODUCTS ===================== */
+/* ===== PRODUCTS (CSV – نفس القديم) ===== */
 Papa.parse("products.csv",{
  download:true,header:true,
  complete:r=>{
@@ -139,8 +164,8 @@ Papa.parse("products.csv",{
    document.getElementById("products").innerHTML+=`
    <div class="card">
     <img src="${p.Image}">
-    <div>${p.Title}</div>
-    <div>${p.Price}</div>
+    <div class="code">${p.Title}</div>
+    <div class="price">${p.Price}</div>
     <a class="btn" href="https://wa.me/${phone}?text=${encodeURIComponent(p.Title)}"
      target="_blank"
      onclick="trackEvent('Lead',{source:'product',branch:'${branchID}'})">
@@ -151,19 +176,39 @@ Papa.parse("products.csv",{
  }
 });
 
-/* ===================== POPUP ===================== */
+/* ===== POPUP LOGIC ===== */
+function todayKey(){
+ const d=new Date();
+ return d.toISOString().split("T")[0];
+}
+function closePopup(){
+ document.getElementById("popup").style.display="none";
+ localStorage.setItem("popup_closed",todayKey());
+}
+
+function updateTimer(){
+ const now=new Date();
+ const end=new Date();
+ end.setHours(24,0,0,0);
+ const diff=end-now;
+ if(diff<=0)return;
+ const h=Math.floor(diff/3600000);
+ const m=Math.floor(diff/60000)%60;
+ const s=Math.floor(diff/1000)%60;
+ document.getElementById("popupTimer").textContent=
+ `${T[lang].ends} ${h}:${m.toString().padStart(2,"0")}:${s.toString().padStart(2,"0")}`;
+}
+
 setTimeout(()=>{
+ if(localStorage.getItem("popup_closed")===todayKey())return;
  document.getElementById("popup").style.display="flex";
-
- trackEvent("ViewContent",{
-  content_name:"Daily Offer",
-  branch:branchID
- });
-
+ document.getElementById("popupBtn").textContent=T[lang].cta;
  document.getElementById("popupBtn").onclick=()=>{
   trackEvent("Lead",{source:"popup_offer",branch:branchID});
   window.open(`https://wa.me/${phone}`,"_blank");
  };
+ updateTimer();
+ setInterval(updateTimer,1000);
 },1000);
 </script>
 
