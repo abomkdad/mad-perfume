@@ -28,166 +28,214 @@ fbq('track','PageView');
 </script>
 
 <style>
-:root{
- --bg:#0a0a0a;--card:#141414;--gold:#d4af37;--text:#fff;--muted:#aaa
-}
+:root{--bg:#0a0a0a;--card:#141414;--gold:#d4af37;--text:#fff;--muted:#aaa}
 *{box-sizing:border-box}
 body{
  margin:0;background:var(--bg);color:var(--text);
- font-family:'Cairo','Heebo',sans-serif;padding-bottom:90px
+ font-family:'Cairo','Heebo',sans-serif;overflow-x:hidden;padding-bottom:90px
 }
 header{
- padding:30px 15px;text-align:center;border-bottom:3px solid var(--gold)
+ background:url("https://madparfumeurglobal.com/wp-content/uploads/2025/10/1920x600-BERGAY.jpg") center/cover no-repeat;
+ padding:40px 15px 30px;
+ text-align:center;position:relative;border-bottom:4px solid var(--gold)
 }
-.brand{color:var(--gold);font-weight:800;letter-spacing:2px}
+header::after{
+ content:"";position:absolute;inset:0;
+ background:linear-gradient(to bottom,rgba(0,0,0,.7),var(--bg))
+}
+header *{position:relative;z-index:2}
+
+.logo{width:80px;margin:auto}
+.logo img{width:100%}
+.brand{color:var(--gold);font-weight:800;letter-spacing:2px;margin-top:10px}
 .branch-name{font-size:24px;font-weight:800;margin-top:5px}
-.status{margin-top:10px;font-weight:700}
-.open{color:#25D366}
-.closed{color:#ff4444}
+.status-badge{
+ display:inline-flex;align-items:center;gap:6px;
+ padding:4px 12px;border-radius:20px;
+ font-size:13px;font-weight:700;margin-top:8px;
+ border:1px solid rgba(255,255,255,.2)
+}
+.status-open{background:rgba(37,211,102,.2);color:#25D366;border-color:#25D366}
+.status-closed{background:rgba(255,68,68,.2);color:#ff4444;border-color:#ff4444}
+
+.duty-staff{
+ display:flex;align-items:center;justify-content:center;
+ gap:12px;margin:20px auto 10px;
+ background:rgba(255,255,255,.08);
+ padding:10px 20px;border-radius:50px;
+ border:1px solid var(--gold);max-width:fit-content;cursor:pointer
+}
+.staff-img{
+ width:55px;height:55px;border-radius:50%;
+ border:2px solid var(--gold)
+}
+.staff-label{font-size:10px;color:var(--gold);font-weight:800}
+.staff-name{font-size:15px;font-weight:700}
+
+.socials{
+ display:flex;justify-content:center;gap:12px;margin-top:20px;flex-wrap:wrap
+}
+.social-item{display:flex;flex-direction:column;align-items:center;gap:6px}
+.socials a{
+ width:42px;height:42px;border-radius:50%;
+ background:rgba(255,255,255,.05);
+ border:1px solid var(--gold);color:var(--gold);
+ display:flex;align-items:center;justify-content:center;
+ text-decoration:none;font-size:18px
+}
+.social-label{font-size:9px;color:var(--muted)}
 
 .products{
  display:grid;
- grid-template-columns:repeat(auto-fill,minmax(160px,1fr));
+ grid-template-columns:repeat(auto-fill,minmax(165px,1fr));
  gap:15px;padding:15px
 }
 .card{
- background:var(--card);border-radius:14px;padding:10px;text-align:center
+ background:var(--card);border-radius:16px;
+ padding:12px;text-align:center
 }
-.card img{width:100%;border-radius:12px}
+.card img{width:100%;border-radius:12px;background:#fff}
+.code{margin-top:8px;font-weight:800}
 .price{color:var(--gold);font-weight:700}
-
 .btn{
- display:block;margin-top:8px;
+ display:flex;justify-content:center;gap:8px;
  background:#25D366;color:#fff;
  padding:10px;border-radius:8px;
- text-decoration:none;font-weight:700
+ text-decoration:none;font-weight:700;margin-top:10px
 }
 
+/* POPUP */
 .popup{
- position:fixed;inset:0;
- background:rgba(0,0,0,.6);
- display:none;align-items:center;justify-content:center;
- z-index:999
+ position:fixed;inset:0;background:rgba(0,0,0,.6);
+ display:none;align-items:center;justify-content:center;z-index:999
 }
 .popup-box{
  background:#111;border:2px solid var(--gold);
- border-radius:16px;padding:15px;
- width:90%;max-width:360px;
+ border-radius:16px;padding:15px;width:90%;max-width:360px;
  text-align:center;position:relative
 }
-.popup-box img{width:100%;border-radius:12px}
 .popup-close{
  position:absolute;top:8px;left:8px;
- color:#fff;font-size:14px;cursor:pointer
+ font-size:14px;cursor:pointer
 }
-.popup-title{color:var(--gold);font-weight:800;margin:10px 0}
 </style>
 </head>
 
 <body>
 
 <header>
+ <div class="logo"><img src="https://abomkdad.github.io/Digital-Business-Card/logo.png"></div>
  <div class="brand">MAD PARFUMEUR</div>
- <div class="branch-name" id="branchName"></div>
- <div class="status" id="status"></div>
+
+ <div id="branchName" class="branch-name"></div>
+ <div id="statusArea"></div>
+
+ <div class="duty-staff" id="staffBtn">
+  <img src="https://madperfume.ps/upload/01-2026/page/6966930e9af7f.png" class="staff-img">
+  <div>
+   <div class="staff-label" id="staffLabel"></div>
+   <div class="staff-name">ميرال / מיראל</div>
+  </div>
+ </div>
+
+ <div class="socials" id="socials"></div>
 </header>
 
 <div class="products" id="products"></div>
 
-<!-- POPUP -->
 <div class="popup" id="popup">
  <div class="popup-box">
   <div class="popup-close" onclick="closePopup()">✕ إغلاق</div>
-  <div class="popup-title" id="popupTitle"></div>
-  <img src="sale.png" alt="Sale">
+  <img src="sale.png">
   <a id="popupWa" class="btn" target="_blank">🔥 احصل على العرض</a>
  </div>
 </div>
 
 <script>
 const lang=navigator.language.startsWith("he")?"he":"ar";
-document.documentElement.lang=lang;
-
 const T={
- ar:{open:"مفتوح الآن",closed:"مغلق الآن",today:"إعلان اليوم"},
- he:{open:"פתוח עכשיו",closed:"סגור עכשיו",today:"מבצע היום"}
+ ar:{staff:"الموظف المناوب",open:"مفتوح الآن",closed:"مغلق الآن"},
+ he:{staff:"נציג תורן",open:"פתוח עכשיו",closed:"סגור עכשיו"}
 };
 
 const params=new URLSearchParams(location.search);
 const branchID=params.get("branch");
 let branch=null;
 
-function trackLead(name){
- if(typeof fbq==="function")fbq("track","Lead",{action:name,branch:branch?.id})
-}
-
-function isOpenNow(schedule){
- const d=new Date();
- const days=["sun","mon","tue","wed","thu","fri","sat"];
- const day=schedule[days[d.getDay()]];
- if(!day||!day.length)return false;
+function isOpenNow(s){
+ const d=new Date(),days=["sun","mon","tue","wed","thu","fri","sat"];
+ const list=s?.[days[d.getDay()]]||[];
  const now=d.getHours()*60+d.getMinutes();
- return day.some(r=>{
-  const s=parseInt(r[0].split(":")[0])*60+parseInt(r[0].split(":")[1]);
-  const e=parseInt(r[1].split(":")[0])*60+parseInt(r[1].split(":")[1]);
-  return now>=s && now<=e;
+ return list.some(r=>{
+  const a=r[0].split(":"),b=r[1].split(":");
+  return now>=a[0]*60+ +a[1] && now<=b[0]*60+ +b[1];
  });
 }
 
-async function init(){
- const res=await fetch("test.json");
- const data=await res.json();
- branch=data.branches.find(b=>String(b.id)===branchID);
+function lead(n){if(typeof fbq==="function")fbq("track","Lead",{action:n,branch:branch.id})}
+
+fetch("test.json").then(r=>r.json()).then(d=>{
+ branch=d.branches.find(b=>String(b.id)===branchID);
  if(!branch)return;
 
  document.getElementById("branchName").textContent=
   lang==="he"?branch.name_he:branch.name_ar;
+ document.getElementById("staffLabel").textContent=T[lang].staff;
 
  const open=isOpenNow(branch.schedule);
- document.getElementById("status").innerHTML=
-  `<span class="${open?'open':'closed'}">${open?T[lang].open:T[lang].closed}</span>`;
+ document.getElementById("statusArea").innerHTML=
+  `<div class="status-badge ${open?'status-open':'status-closed'}">
+   ${open?T[lang].open:T[lang].closed}</div>`;
 
- loadProducts();
- setupPopup();
-}
+ const phone="972"+branch.phone.replace(/^0/,"");
+ document.getElementById("staffBtn").onclick=()=>{
+  lead("staff_whatsapp");
+  window.open(`https://wa.me/${phone}`,"_blank");
+ };
 
-function loadProducts(){
- Papa.parse("products.csv",{
-  download:true,header:true,
-  complete:r=>{
-   const grid=document.getElementById("products");
-   r.data.forEach(p=>{
-    if(!p.Title)return;
-    let phone=branch.phone.replace(/^0/,"972");
-    const div=document.createElement("div");
-    div.className="card";
-    div.innerHTML=`
-     <img src="${p.Image}">
-     <div>${p.Title}</div>
-     <div class="price">${p.Price}</div>
-     <a class="btn" target="_blank"
-      href="https://wa.me/${phone}?text=${encodeURIComponent(p.Title)}"
-      onclick="trackLead('product_whatsapp')">واتساب</a>`;
-    grid.appendChild(div);
-   })
-  }
- });
-}
+ const socials=[
+  ["waze","map-marker-alt",branch.social.waze],
+  ["whatsapp","whatsapp",`https://wa.me/${phone}`],
+  ["instagram","instagram",branch.social.instagram],
+  ["tiktok","tiktok",branch.social.tiktok],
+  ["facebook","facebook-f",branch.social.facebook],
+  ["envelope","envelope",`mailto:${branch.social.email}`]
+ ];
 
-function setupPopup(){
- document.getElementById("popupTitle").textContent=T[lang].today;
- let phone=branch.phone.replace(/^0/,"972");
- const wa=document.getElementById("popupWa");
- wa.href=`https://wa.me/${phone}?text=${encodeURIComponent(T[lang].today)}`;
- wa.onclick=()=>trackLead("popup_offer");
- setTimeout(()=>document.getElementById("popup").style.display="flex",1000);
-}
+ document.getElementById("socials").innerHTML=socials
+ .filter(s=>s[2])
+ .map(s=>`
+ <div class="social-item">
+  <a href="${s[2]}" target="_blank" onclick="lead('${s[0]}')">
+   <i class="fa-${s[0]==='envelope'?'solid':'brands'} fa-${s[1]}"></i>
+  </a>
+ </div>`).join("");
+
+ Papa.parse("products.csv",{download:true,header:true,complete:r=>{
+  r.data.forEach(p=>{
+   if(!p.Title)return;
+   document.getElementById("products").innerHTML+=`
+   <div class="card">
+    <img src="${p.Image}">
+    <div class="code">${p.Title}</div>
+    <div class="price">${p.Price}</div>
+    <a class="btn" href="https://wa.me/${phone}?text=${encodeURIComponent(p.Title)}"
+     target="_blank" onclick="lead('product')">واتساب</a>
+   </div>`;
+  });
+ }});
+
+ setTimeout(()=>{
+  document.getElementById("popup").style.display="flex";
+  document.getElementById("popupWa").href=`https://wa.me/${phone}`;
+  document.getElementById("popupWa").onclick=()=>lead("popup_offer");
+ },1000);
+});
 
 function closePopup(){
  document.getElementById("popup").style.display="none";
 }
-
-init();
 </script>
+
 </body>
 </html>
