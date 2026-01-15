@@ -24,12 +24,17 @@
         #categories{display:flex;gap:10px;overflow-x:auto;padding:20px 15px; scrollbar-width: none;}
         .cat{border:none;padding:10px 20px;border-radius:12px;background:var(--gold);color:#000;font-weight:800;cursor:pointer; white-space: nowrap;}
         
+        /* تسيق الإعلان */
         .popup-overlay{position:fixed;inset:0;background:rgba(0,0,0,.85);display:none;align-items:center;justify-content:center;z-index:9999}
         .popup{width:90%;max-width:380px;background:#000;border:1px solid var(--gold);border-radius:20px;padding:20px;position:relative; text-align: center;}
-        .popup img{width:100%; border-radius:15px; margin-bottom: 15px;}
-        .popup-close{position:absolute;top:-15px;right:-15px;cursor:pointer;font-size:20px;background:var(--gold);color:#000;width:35px;height:35px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:bold;}
-        .timer{color:var(--gold); font-family: monospace; font-size: 16px; margin: 10px 0;}
-        .popup-cta{background:#25D366;color:#fff;padding:15px;border-radius:12px;font-weight:800;cursor:pointer; font-size: 18px;}
+        .popup img{width:100%; border-radius:15px; margin-bottom: 15px; aspect-ratio: 1/1; object-fit: cover;}
+        .popup-close{position:absolute;top:-15px;right:-15px;cursor:pointer;font-size:20px;background:var(--gold);color:#000;width:35px;height:35px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:bold; border: 2px solid #000;}
+        .timer{color:var(--gold); font-family: monospace; font-size: 16px; margin: 10px 0; font-weight: bold;}
+        .popup-cta{background:#25D366;color:#fff;padding:15px;border-radius:12px;font-weight:800;cursor:pointer; font-size: 18px; text-decoration: none; display: block;}
+        
+        .products{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:15px;padding:15px}
+        .card{background:var(--card);border-radius:16px;padding:12px;text-align:center}
+        .card img{width:100%;border-radius:12px; aspect-ratio: 1/1; object-fit: cover;}
     </style>
 </head>
 <body>
@@ -37,23 +42,20 @@
 <header>
     <div class="logo"><img src="https://abomkdad.github.io/Digital-Business-Card/logo.png"></div>
     <div class="brand">MAD PARFUMEUR</div>
-    <div id="branchName" class="branch-name">حيفا</div>
+    <div id="branchName" class="branch-name">جاري التحميل...</div>
     <div id="status"><div class="status open">مفتوح الآن</div></div>
     <div class="socials" id="socials"></div>
 </header>
 
-<div id="categories">
-    <button class="cat">الكل</button>
-</div>
-
+<div id="categories"></div>
 <div class="products" id="products"></div>
 
 <div class="popup-overlay" id="popup">
     <div class="popup">
         <div class="popup-close" onclick="closePopup()">✕</div>
-        <img src="sale.png" onerror="this.src='https://via.placeholder.com/350x350/000000/d4af37?text=SPECIAL+OFFER'">
+        <img src="sale.png" onerror="this.src='https://via.placeholder.com/400x400/000000/d4af37?text=HOT+SALE'">
         <div class="timer" id="timer">00:00:00</div>
-        <div class="popup-cta" onclick="popupWhatsApp()">🔥 عرض اليوم</div>
+        <div class="popup-cta" onclick="popupWhatsApp()">🔥 احصل على عرض اليوم</div>
     </div>
 </div>
 
@@ -61,12 +63,10 @@
 const branchID = new URLSearchParams(location.search).get("branch");
 let phone = "";
 
-// إغلاق الإعلان
 function closePopup() {
     document.getElementById("popup").style.display = "none";
 }
 
-// مؤقت تنازلي لنهاية اليوم
 function startTimer() {
     const timerEl = document.getElementById("timer");
     setInterval(() => {
@@ -74,6 +74,7 @@ function startTimer() {
         const end = new Date();
         end.setHours(23, 59, 59);
         const diff = end - now;
+        if (diff <= 0) return;
         const h = Math.floor(diff / 3600000).toString().padStart(2, '0');
         const m = Math.floor((diff % 3600000) / 60000).toString().padStart(2, '0');
         const s = Math.floor((diff % 60000) / 1000).toString().padStart(2, '0');
@@ -81,9 +82,9 @@ function startTimer() {
     }, 1000);
 }
 
-// تحميل بيانات الفرع
+// جلب البيانات الأساسية
 fetch("test.json").then(r => r.json()).then(d => {
-    const b = d.branches.find(x => String(x.id) === branchID);
+    const b = d.branches.find(x => String(x.id) === String(branchID));
     if (!b) return;
 
     document.getElementById("branchName").textContent = b.name_ar;
@@ -104,11 +105,34 @@ fetch("test.json").then(r => r.json()).then(d => {
             <i class="${i.type} fa-${i.id}"></i>
         </a>`).join("");
 
-    // إظهار الإعلان فوراً للفحص
+    // إظهار الإعلان فوراً عند التحميل للفحص
     setTimeout(() => {
         document.getElementById("popup").style.display = "flex";
         startTimer();
-    }, 1000);
+    }, 800);
+});
+
+// جلب المنتجات
+Papa.parse("products.csv", {
+    download: true,
+    header: true,
+    complete: function(results) {
+        const products = results.data.filter(p => String(p.BranchID) === String(branchID));
+        const container = document.getElementById("products");
+        const catContainer = document.getElementById("categories");
+        
+        const categories = [...new Set(products.map(p => p.Category))];
+        catContainer.innerHTML = `<button class="cat">الكل</button>` + 
+            categories.map(c => c ? `<button class="cat" style="background:transparent; color:white; border:1px solid var(--gold)">${c}</button>` : '').join('');
+
+        container.innerHTML = products.map(p => `
+            <div class="card">
+                <img src="${p.Image}" onerror="this.src='https://via.placeholder.com/150'">
+                <div style="margin:10px 0; font-weight:600;">${p.Title}</div>
+                <div style="color:var(--gold); font-weight:800;">₪ ${p.Price}</div>
+            </div>
+        `).join('');
+    }
 });
 
 function popupWhatsApp() {
