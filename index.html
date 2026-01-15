@@ -62,12 +62,11 @@
         }
         .action-item i { font-size: 20px; color: var(--gold); margin-bottom: 6px; }
         .action-item span { font-size: 14px; font-weight: 900; }
-        .action-item small { font-size: 12px; font-weight: 700; opacity: 0.9; }
+        .action-item small { font-size: 11px; font-weight: 700; opacity: 0.8; }
         .action-item .hotline { font-size: 18px; color: var(--gold); font-weight: 900; margin-top: 4px; }
 
         .container { max-width: 800px; margin: -35px auto 50px; padding: 0 15px; }
         
-        /* دليل الفروع */
         .branch-card {
             background: var(--card-bg); border-radius: 20px; padding: 25px;
             margin-bottom: 20px; border-right: 5px solid var(--gold);
@@ -78,7 +77,6 @@
         .dist-info { font-size: 12px; color: #888; font-weight: bold; margin-top: 4px; }
         .status-pill { font-size: 11px; padding: 4px 10px; border-radius: 25px; font-weight: 800; display: flex; align-items: center; gap: 5px; border: 1px solid; }
 
-        /* متجر الفرع */
         .product-card {
             background: var(--card-bg); border-radius: 15px; padding: 15px;
             margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center;
@@ -95,7 +93,7 @@
         .bg-waze { background: var(--waze-blue); color: #000; }
         .bg-enter { background: var(--btn-gray); }
 
-        .hidden { display: none; }
+        .hidden { display: none !important; }
         [dir="ltr"] .branch-card, [dir="ltr"] .product-card { border-right: none; border-left: 5px solid var(--gold); }
     </style>
 </head>
@@ -111,26 +109,25 @@
         <a href="https://www.tiktok.com/@mad.perfume"><i class="fab fa-tiktok"></i></a>
         <a href="https://snapchat.com/t/jbtN32Xe"><i class="fab fa-snapchat"></i></a>
         <a href="https://www.youtube.com/watch?v=NVCKAp2-6HM"><i class="fab fa-youtube"></i></a>
-        <a href="mailto:info@madperume.co.il"><i class="fas fa-envelope"></i></a>
     </div>
 
     <div class="action-grid">
         <a href="tel:*9935" class="action-item">
             <i class="fas fa-phone-alt"></i>
             <span class="l-cs"></span>
-            <small class="l-cs-sub">שירות לקוחות</small>
+            <small>שירות לקוחות</small>
             <div class="hotline">*9935</div>
         </a>
         <a href="https://wa.me/972509787730" class="action-item">
             <i class="fab fa-whatsapp"></i>
             <span class="l-wa"></span>
-            <small class="l-wa-sub">וואטסאפ חברה</small>
+            <small>וואטסאפ חברה</small>
             <div class="hotline" style="font-size:11px">050-978-7730</div>
         </a>
         <a id="online-btn" href="#" class="action-item">
             <i class="fas fa-shopping-bag"></i>
             <span class="l-shop"></span>
-            <small class="l-shop-sub">הזמנה אונליין</small>
+            <small>הזמנה אונליין</small>
             <div class="hotline" style="font-size:12px">Shop Now</div>
         </a>
     </div>
@@ -138,14 +135,14 @@
 
 <div class="container">
     <div id="view-directory">
-        <div id="branchesList" style="text-align:center; color:#888;">جاري التحميل...</div>
+        <div id="branchesList" style="text-align:center; color:#888;">جاري تحميل الفروع...</div>
     </div>
 
     <div id="view-shop" class="hidden">
         <button onclick="window.location.href='test.html'" style="background:none; border:1px solid var(--gold); color:var(--gold); padding:8px 20px; border-radius:25px; cursor:pointer; margin-bottom:20px; font-weight:bold;">
-            <i class="fas fa-arrow-right"></i> <span class="l-back">العودة</span>
+            <i class="fas fa-arrow-right"></i> <span class="l-back"></span>
         </button>
-        <h2 id="shop-title" style="color:var(--gold); margin-bottom:20px;"></h2>
+        <h2 id="shop-title" style="color:var(--gold); margin-bottom:20px; text-align:center;"></h2>
         <div id="productsGrid"></div>
     </div>
 </div>
@@ -162,7 +159,6 @@
         he: { cs:"שירות לקוחות", wa:"וואטסאפ חברה", shop:"הזמנה אונליין", open:"פתוח עכשיו", closed:"סגור כעת", enter:"כניסה לסניף", waze:"ניווט", wa_btn:"וואטסאפ", km:'ק"מ', back:"חזרה לרשימה", order:"הזמנה בוואטסאפ" }
     }[userLang];
 
-    // تعبئة النصوص
     document.querySelector('.l-cs').textContent = t.cs;
     document.querySelector('.l-wa').textContent = t.wa;
     document.querySelector('.l-shop').textContent = t.shop;
@@ -171,7 +167,6 @@
 
     let allBranches = [];
 
-    // فحص حالة الفرع
     function isBranchOpen(b) {
         const now = new Date();
         const days = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
@@ -196,7 +191,8 @@
 
     async function init() {
         try {
-            const res = await fetch('branches.json');
+            // سحب البيانات من الملف الجديد مع منع التخزين المؤقت
+            const res = await fetch('branches.json?v=' + Date.now());
             const data = await res.json();
             allBranches = data.branches;
 
@@ -206,7 +202,7 @@
                 renderDirectoryView();
             }
             document.body.style.opacity = "1";
-        } catch(e) { console.error("Data Load Fail"); }
+        } catch(e) { console.error("Data Load Fail", e); }
     }
 
     function renderDirectoryView() {
@@ -219,7 +215,7 @@
                 list.forEach(b => { if(b.lat) b.dist = calcDist(uLat, uLng, b.lat, b.lng); });
                 list.sort((a,b) => (a.dist || 9999) - (b.dist || 9999));
                 renderBranches(list);
-            }, null, { timeout: 4000 });
+            }, null, { timeout: 3000 });
         }
     }
 
@@ -228,6 +224,9 @@
         container.innerHTML = '';
         list.forEach(b => {
             const open = isBranchOpen(b);
+            // سحب رابط الويز مباشرة من كائن social في الجيسون الجديد
+            const wazeLink = (b.social && b.social.waze) ? b.social.waze : `https://ul.waze.com/ul?ll=${b.lat},${b.lng}&navigate=yes`;
+            
             const card = document.createElement('div');
             card.className = 'branch-card';
             card.innerHTML = `
@@ -242,8 +241,8 @@
                 </div>
                 <div class="btn-group">
                     <a href="https://wa.me/${b.phone}" class="btn bg-wa"><i class="fab fa-whatsapp"></i>${t.wa_btn}</a>
-                    <a href="${b.social.waze}" target="_blank" class="btn bg-waze"><i class="fab fa-waze"></i>${t.waze}</a>
-                    <a href="test.html?branch=${b.id}" class="btn bg-enter"><i class="fas fa-door-open"></i>${t.enter}</a>
+                    <a href="${wazeLink}" target="_blank" class="btn bg-waze"><i class="fab fa-waze"></i>${t.waze}</a>
+                    <a href="?branch=${b.id}" class="btn bg-enter"><i class="fas fa-door-open"></i>${t.enter}</a>
                 </div>`;
             container.appendChild(card);
         });
@@ -258,10 +257,12 @@
         document.getElementById('shop-title').textContent = branch[`name_${userLang}`];
 
         try {
-            const res = await fetch('products.csv');
+            const res = await fetch('products.csv?v=' + Date.now());
             const csv = await res.text();
             const lines = csv.split('\n').slice(1);
             const grid = document.getElementById('productsGrid');
+            grid.innerHTML = ''; // تنظيف الشبكة
+            
             lines.forEach(line => {
                 const c = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
                 if(c[1]) {
@@ -271,13 +272,13 @@
                     pCard.innerHTML = `
                         <div>
                             <div style="font-weight:900; font-size:14px;">${name}</div>
-                            <div style="color:var(--gold); font-weight:bold; margin-top:5px;">${c[10]}</div>
+                            <div style="color:var(--gold); font-weight:bold; margin-top:5px;">${c[10] || ''} ₪</div>
                         </div>
-                        <a href="https://wa.me/${branch.phone}?text=${encodeURIComponent(t.order + ': ' + name)}" class="btn bg-wa" style="width:50px; height:50px; border-radius:50%; flex-direction:row;"><i class="fab fa-whatsapp" style="margin:0"></i></a>`;
+                        <a href="https://wa.me/${branch.phone}?text=${encodeURIComponent(t.order + ': ' + name)}" class="btn bg-wa" style="width:45px; height:45px; border-radius:50%;"><i class="fab fa-whatsapp" style="margin:0; font-size:18px;"></i></a>`;
                     grid.appendChild(pCard);
                 }
             });
-        } catch(e) {}
+        } catch(e) { console.error("CSV Load Fail", e); }
     }
 
     init();
