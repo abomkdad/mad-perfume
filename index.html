@@ -67,6 +67,7 @@
 
         .container { max-width: 800px; margin: -35px auto 50px; padding: 0 15px; }
         
+        /* Directory List Style */
         .branch-card {
             background: var(--card-bg); border-radius: 20px; padding: 25px;
             margin-bottom: 20px; border-right: 5px solid var(--gold);
@@ -77,6 +78,7 @@
         .dist-info { font-size: 12px; color: #888; font-weight: bold; margin-top: 4px; }
         .status-pill { font-size: 11px; padding: 4px 10px; border-radius: 25px; font-weight: 800; display: flex; align-items: center; gap: 5px; border: 1px solid; }
 
+        /* Shop Product Card Style */
         .product-card {
             background: var(--card-bg); border-radius: 15px; padding: 15px;
             margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center;
@@ -127,7 +129,7 @@
         <a id="online-btn" href="#" class="action-item">
             <i class="fas fa-shopping-bag"></i>
             <span class="l-shop"></span>
-            <small>הזמנה אונליין</small>
+            <small>הזמנה אונلיין</small>
             <div class="hotline" style="font-size:12px">Shop Now</div>
         </a>
     </div>
@@ -135,7 +137,7 @@
 
 <div class="container">
     <div id="view-directory">
-        <div id="branchesList" style="text-align:center; color:#888;">جاري تحميل الفروع...</div>
+        <div id="branchesList" style="text-align:center; color:#888;">جاري تحميل البيانات...</div>
     </div>
 
     <div id="view-shop" class="hidden">
@@ -191,7 +193,7 @@
 
     async function init() {
         try {
-            // سحب البيانات من الملف الجديد مع منع التخزين المؤقت
+            // جلب البيانات مع منع الكاش
             const res = await fetch('branches.json?v=' + Date.now());
             const data = await res.json();
             allBranches = data.branches;
@@ -206,7 +208,7 @@
     }
 
     function renderDirectoryView() {
-        let list = (userLang === "he") ? allBranches.filter(b => !b.is_west_bank) : allBranches;
+        let list = allBranches;
         renderBranches(list);
 
         if (navigator.geolocation) {
@@ -224,7 +226,7 @@
         container.innerHTML = '';
         list.forEach(b => {
             const open = isBranchOpen(b);
-            // سحب رابط الويز مباشرة من كائن social في الجيسون الجديد
+            // حل مشكلة فرع 17 وسحب الرابط المباشر من الجيسون
             const wazeLink = (b.social && b.social.waze) ? b.social.waze : `https://ul.waze.com/ul?ll=${b.lat},${b.lng}&navigate=yes`;
             
             const card = document.createElement('div');
@@ -242,7 +244,7 @@
                 <div class="btn-group">
                     <a href="https://wa.me/${b.phone}" class="btn bg-wa"><i class="fab fa-whatsapp"></i>${t.wa_btn}</a>
                     <a href="${wazeLink}" target="_blank" class="btn bg-waze"><i class="fab fa-waze"></i>${t.waze}</a>
-                    <a href="?branch=${b.id}" class="btn bg-enter"><i class="fas fa-door-open"></i>${t.enter}</a>
+                    <a href="offer.html?branch=${b.id}" class="btn bg-enter"><i class="fas fa-door-open"></i>${t.enter}</a>
                 </div>`;
             container.appendChild(card);
         });
@@ -261,7 +263,7 @@
             const csv = await res.text();
             const lines = csv.split('\n').slice(1);
             const grid = document.getElementById('productsGrid');
-            grid.innerHTML = ''; // تنظيف الشبكة
+            grid.innerHTML = '';
             
             lines.forEach(line => {
                 const c = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
