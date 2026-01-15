@@ -3,44 +3,97 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <title>MAD PARFUMEUR | Directory</title>
+    <title>MAD PARFUMEUR | Official Portal</title>
     <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;700;800&family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
     <style>
-        :root { --gold: #d4af37; --dark-bg: #0a0a0a; --card-bg: #161616; --wa-green: #25D366; --waze-blue: #33CCFF; --text-main: #ffffff; }
+        :root {
+            --gold: #d4af37;
+            --dark-bg: #0a0a0a;
+            --card-bg: #161616;
+            --wa-green: #25D366;
+            --waze-blue: #33CCFF;
+            --text-main: #ffffff;
+            --btn-gray: #333333;
+        }
+
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { background-color: var(--dark-bg); color: var(--text-main); font-family: 'Assistant', 'Cairo', sans-serif; direction: rtl; }
-        header { padding: 30px; text-align: center; border-bottom: 2px solid var(--gold); background: #000; }
-        .container { max-width: 800px; margin: 20px auto; padding: 0 15px; }
-        .branch-card { background: var(--card-bg); border-radius: 15px; padding: 20px; margin-bottom: 15px; border-right: 5px solid var(--gold); }
-        .br-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .br-title { font-size: 1.2rem; font-weight: 800; color: var(--gold); }
-        .btn-group { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
-        .btn { padding: 12px; border-radius: 10px; text-decoration: none; color: white; font-weight: bold; font-size: 12px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 5px; }
+
+        header {
+            background: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.9)), 
+                        url('header.jpg') center/cover;
+            padding: 30px 15px 60px; text-align: center; border-bottom: 2px solid var(--gold);
+        }
+        .logo img { width: 80px; margin-bottom: 10px; }
+
+        /* الخانات الثلاث العلوية - متوافقة مع الصورة */
+        .action-grid {
+            display: grid; grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px; max-width: 500px; margin: 0 auto;
+        }
+        .action-item {
+            background: var(--btn-gray); border: 1px solid rgba(212,175,55,0.3);
+            padding: 12px 5px; border-radius: 12px; text-decoration: none; color: white;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+        }
+        .action-item i { font-size: 18px; color: var(--gold); margin-bottom: 6px; }
+        .action-item span { font-size: 12px; font-weight: 800; }
+        .action-item .hotline { font-size: 13px; color: var(--gold); font-weight: 900; margin-top: 2px; }
+
+        /* بطاقات الفروع */
+        .container { max-width: 800px; margin: -30px auto 50px; padding: 0 15px; }
+        .branch-card {
+            background: var(--card-bg); border-radius: 20px; padding: 20px;
+            margin-bottom: 15px; border-right: 4px solid var(--gold);
+        }
+        .br-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; }
+        .br-title { font-size: 19px; font-weight: 800; color: var(--gold); }
+        .status-pill { font-size: 11px; padding: 4px 10px; border-radius: 20px; font-weight: 800; border: 1px solid var(--wa-green); color: var(--wa-green); }
+
+        .btn-group { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+        .btn { padding: 12px 5px; border-radius: 12px; text-decoration: none; color: white; font-weight: 800; font-size: 12px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 4px; }
         .bg-wa { background: var(--wa-green); }
         .bg-waze { background: var(--waze-blue); color: #000; }
-        .bg-enter { background: #333; }
+        .bg-enter { background: var(--btn-gray); }
     </style>
 </head>
 <body>
 
 <header>
-    <img src="https://abomkdad.github.io/Digital-Business-Card/logo.png" width="80">
-    <h1 style="font-size: 20px; margin-top:10px;">MAD PARFUMEUR</h1>
+    <div class="logo"><img src="logo.png"></div>
+    <div class="action-grid">
+        <a href="tel:*9935" class="action-item">
+            <i class="fas fa-phone-alt"></i>
+            <span id="cs-txt">خدمة الزبائن</span>
+            <div class="hotline">*9935</div>
+        </a>
+        <a href="https://wa.me/972509787730" class="action-item">
+            <i class="fab fa-whatsapp"></i>
+            <span id="wa-txt">واتساب الشركة</span>
+            <div class="hotline" style="font-size:10px">050-978-7730</div>
+        </a>
+        <a href="https://madperfume.co.il" class="action-item">
+            <i class="fas fa-shopping-bag"></i>
+            <span id="shop-txt">الطلب أونلاين</span>
+            <div class="hotline" style="font-size:10px">Shop Now</div>
+        </a>
+    </div>
 </header>
 
 <div class="container" id="branchesList"></div>
 
 <script>
-    const userLang = navigator.language.startsWith("he") ? "he" : "ar";
+    const userLang = navigator.language.startsWith("ar") ? "ar" : "he";
     const t = {
-        ar: { open:"مفتوح", enter:"دخول", waze:"Waze", wa:"واتساب" },
-        he: { open:"פתוח", enter:"כניסה", waze:"ניווט", wa:"וואטסאפ" }
+        ar: { open: "مفتوح الآن", wa: "واتساب", waze: "Waze", enter: "دخول الفرع" },
+        he: { open: "פתוח עכשיו", wa: "וואטסאפ", waze: "ניווט", enter: "כنيסה לסניף" }
     }[userLang];
 
-    async function loadBranches() {
+    async function load() {
         try {
-            const res = await fetch('branches.json'); // تأكد من اسم الملف لديك
+            const res = await fetch('branches.json');
             const data = await res.json();
             render(data.branches);
         } catch(e) { console.error("Error loading JSON"); }
@@ -50,38 +103,25 @@
         const container = document.getElementById('branchesList');
         container.innerHTML = '';
         list.forEach(b => {
-            // حل مشكلة فرع 17: التحقق من الرابط بذكاء
-            let finalWaze = "";
-            if (b.social && b.social.waze && b.social.waze !== "") {
-                // إذا كان الرابط موجوداً في الجيسون (مثل فرع 17)، نأخذه كما هو
-                finalWaze = b.social.waze;
-            } else {
-                // إذا لم يوجد، نقوم ببنائه من الإحداثيات
-                finalWaze = `https://www.waze.com/ul?ll=${b.lat},${b.lng}&navigate=yes`;
-            }
+            // منطق سحب رابط Waze: الأولوية للرابط الجاهز في social.waze
+            let wazeLink = (b.social && b.social.waze) ? b.social.waze : `https://ul.waze.com/ul?ll=${b.lat},${b.lng}&navigate=yes`;
 
             const card = document.createElement('div');
             card.className = 'branch-card';
             card.innerHTML = `
                 <div class="br-header">
                     <div class="br-title">${b[`name_${userLang}`]}</div>
-                    <div style="font-size:12px; color:var(--wa-green)">● ${t.open}</div>
+                    <div class="status-pill">● ${t.open}</div>
                 </div>
                 <div class="btn-group">
                     <a href="https://wa.me/${b.phone}" class="btn bg-wa"><i class="fab fa-whatsapp"></i>${t.wa}</a>
-                    
-                    <a href="${finalWaze}" target="_blank" class="btn bg-waze">
-                        <i class="fab fa-waze"></i>${t.waze}
-                    </a>
-                    
-                    <a href="test.html?branch=${b.id}" class="btn bg-enter"><i class="fas fa-door-open"></i>${t.enter}</a>
-                </div>
-            `;
+                    <a href="${wazeLink}" target="_blank" class="btn bg-waze"><i class="fab fa-waze"></i>${t.waze}</a>
+                    <a href="branch.html?branch=${b.id}" class="btn bg-enter"><i class="fas fa-door-open"></i>${t.enter}</a>
+                </div>`;
             container.appendChild(card);
         });
     }
-
-    loadBranches();
+    load();
 </script>
 </body>
 </html>
