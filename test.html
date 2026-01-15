@@ -5,16 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MAD PARFUMEUR</title>
 
-<!-- Fonts -->
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&family=Heebo:wght@400;600;800&display=swap" rel="stylesheet">
-
-<!-- Icons -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-
-<!-- CSV -->
 <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
 
-<!-- META PIXEL -->
 <script>
 !function(f,b,e,v,n,t,s){
  if(f.fbq)return;
@@ -29,7 +23,6 @@ fbq('init','1072283127290819');
 fbq('track','PageView');
 </script>
 
-<!-- TIKTOK PIXEL -->
 <script>
 !function(w,d,t){
  w.TiktokAnalyticsObject=t;
@@ -69,22 +62,23 @@ header{text-align:center;padding:40px 15px;border-bottom:3px solid var(--gold)}
 .socials{display:flex;justify-content:center;gap:12px;margin-top:20px}
 .socials a{width:42px;height:42px;border-radius:50%;border:1px solid var(--gold);display:flex;align-items:center;justify-content:center;color:var(--gold);font-size:18px;text-decoration:none}
 
-#categories{display:flex;gap:10px;overflow-x:auto;padding:15px}
-.cat{border:1px solid var(--gold);padding:8px 16px;border-radius:20px;background:#111;color:#fff;font-weight:700;cursor:pointer}
+#categories{display:flex;gap:10px;overflow-x:auto;padding:15px; scrollbar-width: none;}
+#categories::-webkit-scrollbar {display: none;}
+.cat{border:1px solid var(--gold);padding:8px 16px;border-radius:20px;background:#111;color:#fff;font-weight:700;cursor:pointer; white-space: nowrap;}
 .cat.active{background:var(--gold);color:#000}
 
 .products{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:15px;padding:15px}
-.card{background:var(--card);border-radius:16px;padding:12px;text-align:center}
-.card img{width:100%;border-radius:12px;background:#fff}
-.price{color:var(--gold);font-weight:700}
+.card{background:var(--card);border-radius:16px;padding:12px;text-align:center; display: flex; flex-direction: column; justify-content: space-between;}
+.card img{width:100%;border-radius:12px;background:#fff; aspect-ratio: 1/1; object-fit: cover;}
+.price{color:var(--gold);font-weight:700; margin: 8px 0;}
 .btn{background:#25D366;color:#fff;padding:10px;border-radius:8px;text-decoration:none;font-weight:700;display:block;margin-top:10px}
 
-.popup-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center;z-index:9999}
-.popup{width:90%;max-width:380px;background:#000;border:2px solid var(--gold);border-radius:18px;padding:12px;position:relative}
+.popup-overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);display:none;align-items:center;justify-content:center;z-index:9999}
+.popup{width:90%;max-width:380px;background:#000;border:2px solid var(--gold);border-radius:18px;padding:15px;position:relative; text-align: center;}
 .popup img{width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:12px}
-.popup-close{position:absolute;top:10px;right:10px;cursor:pointer;font-size:14px;background:#000;padding:6px 10px;border-radius:12px}
+.popup-close{position:absolute;top:10px;right:10px;cursor:pointer;font-size:18px;background:#000;color:var(--gold);padding:5px 10px;border-radius:12px; z-index: 10;}
 .popup-cta{margin-top:12px;background:#22c55e;color:#fff;padding:14px;border-radius:14px;font-weight:800;text-align:center;cursor:pointer}
-.timer{text-align:center;margin-top:8px;font-size:13px;color:var(--muted)}
+.timer{text-align:center;margin-top:8px;font-size:14px;color:var(--gold); font-family: monospace;}
 </style>
 </head>
 
@@ -92,10 +86,10 @@ header{text-align:center;padding:40px 15px;border-bottom:3px solid var(--gold)}
 
 <header>
  <div class="logo">
-  <img src="https://abomkdad.github.io/Digital-Business-Card/logo.png">
+  <img src="https://abomkdad.github.io/Digital-Business-Card/logo.png" alt="Logo">
  </div>
  <div class="brand">MAD PARFUMEUR</div>
- <div id="branchName" class="branch-name"></div>
+ <div id="branchName" class="branch-name">تحميل...</div>
  <div id="status"></div>
  <div class="socials" id="socials"></div>
 </header>
@@ -103,11 +97,10 @@ header{text-align:center;padding:40px 15px;border-bottom:3px solid var(--gold)}
 <div id="categories"></div>
 <div class="products" id="products"></div>
 
-<!-- POPUP -->
 <div class="popup-overlay" id="popup">
  <div class="popup">
   <div class="popup-close" onclick="closePopup()">✕</div>
-  <img src="sale.png" alt="عرض اليوم">
+  <img src="sale.png" alt="عرض اليوم" onerror="this.src='https://via.placeholder.com/300?text=Sale'">
   <div class="timer" id="timer"></div>
   <div class="popup-cta" onclick="popupWhatsApp()">🔥 عرض اليوم</div>
  </div>
@@ -120,8 +113,8 @@ document.documentElement.lang=lang;
 document.documentElement.dir=lang==="he"?"ltr":"rtl";
 
 const TXT={
- ar:{open:"مفتوح الآن",closed:"مغلق الآن",all:"الكل",ends:"ينتهي بعد"},
- he:{open:"פתוח עכשיו",closed:"סגור עכשיו",all:"הכל",ends:"מסתיים בעוד"}
+ ar:{open:"مفتوح الآن",closed:"مغلق الآن",all:"الكل",ends:"ينتهي بعد",wa_msg:"أهلاً، أود الاستفسار عن: "},
+ he:{open:"פתוח עכשיו",closed:"סגור עכשיו",all:"הכל",ends:"מסתיים בעוד",wa_msg:"שלום, אני מעוניין ב: "}
 };
 
 const branchID=new URLSearchParams(location.search).get("branch");
@@ -129,8 +122,8 @@ let phone="",popupTimer=null;
 
 /* EVENTS */
 function lead(action){
- fbq('track','Lead',{action,branch:branchID});
- ttq.track('SubmitForm',{action,branch:branchID});
+ if(window.fbq) fbq('track','Lead',{action,branch:branchID});
+ if(window.ttq) ttq.track('SubmitForm',{action,branch:branchID});
 }
 
 /* POPUP */
@@ -139,6 +132,7 @@ function closePopup(){
  document.getElementById("popup").style.display="none";
  clearInterval(popupTimer);
 }
+
 function popupWhatsApp(){
  lead("popup_whatsapp");
  window.open(`https://wa.me/${phone}`,"_blank");
@@ -146,45 +140,47 @@ function popupWhatsApp(){
 
 /* TIMER */
 function startTimer(){
- const end=new Date();end.setHours(24,0,0,0);
+ const end=new Date(); end.setHours(23, 59, 59, 999);
+ const pad = (n) => n < 10 ? '0'+n : n;
+
  popupTimer=setInterval(()=>{
   const diff=end-new Date();
-  if(diff<=0){closePopup();return;}
+  if(diff<=0){clearInterval(popupTimer); closePopup(); return;}
   const h=Math.floor(diff/36e5),
         m=Math.floor(diff%36e5/6e4),
         s=Math.floor(diff%6e4/1000);
-  document.getElementById("timer").textContent=
-   `${TXT[lang].ends} ${h}:${m}:${s}`;
+  document.getElementById("timer").textContent= `${TXT[lang].ends} ${pad(h)}:${pad(m)}:${pad(s)}`;
  },1000);
 }
 
 /* LOAD BRANCH */
 fetch("test.json").then(r=>r.json()).then(d=>{
- const b=d.branches.find(x=>String(x.id)===branchID);
- if(!b)return;
+ const b=d.branches.find(x=>String(x.id)===String(branchID));
+ if(!b) {
+     document.getElementById("branchName").textContent = "Branch Not Found";
+     return;
+ }
 
- document.getElementById("branchName").textContent=
-  lang==="he"?b.name_he:b.name_ar;
-
+ document.getElementById("branchName").textContent= lang==="he"?b.name_he:b.name_ar;
  phone="972"+b.phone.replace(/^0/,"");
 
- document.getElementById("status").innerHTML=
-  `<div class="status open">${TXT[lang].open}</div>`;
+ // ملاحظة: يمكنك هنا إضافة منطق isOpenNow إذا كان موجوداً في JSON
+ document.getElementById("status").innerHTML= `<div class="status open">${TXT[lang].open}</div>`;
 
  const s=b.social||{};
  const icons=[
-  ["location-dot",s.waze],
-  ["whatsapp",`https://wa.me/${phone}`],
-  ["instagram",s.instagram],
-  ["tiktok",s.tiktok],
-  ["facebook-f",s.facebook],
-  ["envelope",s.email?`mailto:${s.email}`:null]
+  {id:"location-dot", link:s.waze, type:"solid"},
+  {id:"whatsapp", link:`https://wa.me/${phone}`, type:"brands"},
+  {id:"instagram", link:s.instagram, type:"brands"},
+  {id:"tiktok", link:s.tiktok, type:"brands"},
+  {id:"facebook-f", link:s.facebook, type:"brands"},
+  {id:"envelope", link:s.email?`mailto:${s.email}`:null, type:"solid"}
  ];
 
  document.getElementById("socials").innerHTML=
- icons.filter(i=>i[1]).map(i=>`
-  <a href="${i[1]}" target="_blank" onclick="lead('${i[0]}')">
-   <i class="fa-${i[0]==='envelope'?'solid':'brands'} fa-${i[0]}"></i>
+ icons.filter(i=>i.link).map(i=>`
+  <a href="${i.link}" target="_blank" onclick="lead('${i.id}')">
+   <i class="fa-${i.type} fa-${i.id}"></i>
   </a>`).join("");
 
  if(localStorage.getItem("popupDate")!==new Date().toDateString()){
@@ -199,12 +195,12 @@ fetch("test.json").then(r=>r.json()).then(d=>{
 let products=[],cat="all";
 
 Papa.parse("products.csv",{download:true,header:true,complete:r=>{
- products=r.data.filter(p=>p.Title && String(p.BranchID)===branchID);
+ products=r.data.filter(p=>p.Title && String(p.BranchID)===String(branchID));
  buildCats();render();
 }});
 
 function buildCats(){
- const cats=[...new Set(products.map(p=>p.Category))];
+ const cats=[...new Set(products.map(p=>p.Category))].filter(c => c);
  document.getElementById("categories").innerHTML=
  `<button class="cat active" onclick="setCat('all',this)">${TXT[lang].all}</button>`+
  cats.map(c=>`<button class="cat" onclick="setCat('${c}',this)">${c}</button>`).join("");
@@ -222,13 +218,13 @@ function render(){
  products.filter(p=>cat==="all"||p.Category===cat).forEach(p=>{
   box.innerHTML+=`
   <div class="card">
-   <img src="${p.Image}">
-   <div>${p.Title}</div>
+   <img src="${p.Image}" onerror="this.src='https://via.placeholder.com/150?text=Product'">
+   <div style="font-weight:600; margin-top:5px;">${p.Title}</div>
    <div class="price">₪ ${p.Price}</div>
    <a class="btn"
-      href="https://wa.me/${phone}?text=${encodeURIComponent(p.Title)}"
+      href="https://wa.me/${phone}?text=${encodeURIComponent(TXT[lang].wa_msg + p.Title)}"
       target="_blank"
-      onclick="lead('product_whatsapp')">واتساب</a>
+      onclick="lead('product_whatsapp')">${lang === 'he' ? 'וואטסאפ' : 'واتساب'}</a>
   </div>`;
  });
 }
