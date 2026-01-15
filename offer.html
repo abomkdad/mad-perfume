@@ -18,6 +18,7 @@
             --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
         }
 
+        /* Base Reset */
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { 
             background-color: var(--black); 
@@ -31,7 +32,7 @@
 
         .container { max-width: 1200px; margin: 0 auto; padding: 0 15px; }
 
-        /* Header */
+        /* Header & Brand */
         header { padding: 40px 0 20px; text-align: center; border-bottom: 1px solid rgba(212, 175, 55, 0.2); }
         .logo { font-family: 'Cinzel', serif; color: var(--gold); font-size: 2.5rem; letter-spacing: 5px; text-transform: uppercase; margin-bottom: 5px; }
         .branch-title { font-size: 1.3rem; font-weight: 300; margin-bottom: 15px; }
@@ -44,12 +45,12 @@
         .status-open { background: rgba(37, 211, 102, 0.1); color: var(--whatsapp); border: 1px solid var(--whatsapp); }
         .status-closed { background: rgba(255, 77, 77, 0.1); color: #ff4d4d; border: 1px solid #ff4d4d; }
 
-        /* Social Icons */
+        /* Social Bar */
         .social-bar { display: flex; justify-content: center; gap: 20px; margin-top: 20px; }
         .social-bar a { color: var(--white); font-size: 1.5rem; transition: var(--transition); opacity: 0.8; }
         .social-bar a:hover { color: var(--gold); transform: translateY(-3px); opacity: 1; }
 
-        /* Navigation / Filters */
+        /* Filters Sticky Bar */
         .filter-nav {
             position: sticky; top: 0; background: var(--black); z-index: 100;
             padding: 15px 0; border-bottom: 1px solid #222; overflow-x: auto;
@@ -83,7 +84,7 @@
             align-items: center; justify-content: center; gap: 8px; font-size: 0.9rem;
         }
 
-        /* Daily Offer Popup */
+        /* Popup Daily Offer */
         #offer-popup { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 2000; display: none; align-items: center; justify-content: center; padding: 20px; }
         .popup-box { width: 100%; max-width: 450px; background: #000; border: 1px solid var(--gold); position: relative; animation: popIn 0.4s ease; }
         @keyframes popIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
@@ -96,15 +97,15 @@
         #loader { position: fixed; inset: 0; background: #000; z-index: 3000; display: flex; align-items: center; justify-content: center; font-family: 'Cinzel', serif; color: var(--gold); font-size: 2rem; }
     </style>
 </head>
-<body dir="rtl">
+<body>
 
 <div id="loader">MAD PARFUMEUR</div>
 
 <header>
     <div class="container">
         <h1 class="logo">MAD PARFUMEUR</h1>
-        <div id="br-display-name" class="branch-title"></div>
-        <div id="br-status-badge"></div>
+        <div id="br-name" class="branch-title"></div>
+        <div id="br-status"></div>
         <div id="br-socials" class="social-bar"></div>
     </div>
 </header>
@@ -122,33 +123,34 @@
 <div id="offer-popup">
     <div class="popup-box">
         <span class="popup-close" onclick="closePopup()">&times;</span>
-        <img src="sale.png" class="popup-img" alt="Special Offer">
+        <img src="sale.png" class="popup-img" alt="Offer">
         <div id="timer" class="popup-timer">00:00:00</div>
-        <a href="#" id="popup-wa-link" class="popup-cta">CLAIM OFFER</a>
+        <a href="#" id="popup-wa-link" class="popup-cta">قفل العرض الآن</a>
     </div>
 </div>
 
 <script>
+    /** State Management */
     const App = {
         branchId: new URLSearchParams(window.location.search).get('branch') || '1',
         lang: navigator.language.startsWith('ar') ? 'ar' : 'he',
         data: null,
         products: [],
         i18n: {
-            he: { dir: 'ltr', open: 'פתוח עכשיו', closed: 'סגור כעת', all: 'הכל', order: 'הזמנה ב-WhatsApp', msg: 'היי، אני מעוניין ב: ' },
+            he: { dir: 'ltr', open: 'פתוח עכשיו', closed: 'סגור כעת', all: 'הכל', order: 'הזמנה ב-WhatsApp', msg: 'היי, אני מעוניין ב: ' },
             ar: { dir: 'rtl', open: 'مفتوح الآن', closed: 'مغلق حالياً', all: 'الكل', order: 'طلب عبر واتساب', msg: 'مرحباً، أنا مهتم بـ: ' }
         }
     };
 
-    /** Tracking Engine */
+    /** Tracking Logic (Lead Event) */
     function trackLead(action, title = '') {
         const payload = { branch_id: App.branchId, action_label: action, item_title: title };
-        console.log('[Lead Event]:', payload);
         if (window.fbq) fbq('track', 'Lead', payload);
         if (window.ttq) ttq.track('SubmitForm', { contents: [{ content_name: action, content_id: title }] });
+        console.log('Lead Event Tracked:', payload);
     }
 
-    /** Normalize Phone for WhatsApp */
+    /** Normalize Branch Phone to International */
     function normWA(num) {
         let clean = num.replace(/\D/g, '');
         if (clean.startsWith('05')) clean = '972' + clean.substring(1);
@@ -170,7 +172,7 @@
         });
     }
 
-    /** UI Rendering */
+    /** UI Rendering: Product Grid */
     function renderGrid(filter = 'all') {
         const grid = document.getElementById('products-grid');
         grid.innerHTML = '';
@@ -188,14 +190,17 @@
                 <div class="p-info">
                     <div class="p-title">${p.Title}</div>
                     <div class="p-price">${p.Price}</div>
-                    <a href="${waUrl}" target="_blank" class="p-wa-btn" onclick="trackLead('WA_Click', '${p.Title}')">
+                    <a href="${waUrl}" target="_blank" class="p-wa-btn">
                         <i class="fab fa-whatsapp"></i> ${t.order}
                     </a>
                 </div>`;
+            
+            card.querySelector('.p-wa-btn').addEventListener('click', () => trackLead('WhatsApp_Order_Click', p.Title));
             frag.appendChild(card);
         });
         grid.appendChild(frag);
 
+        // IntersectionObserver for Lazy Loading
         const obs = new IntersectionObserver(entries => {
             entries.forEach(en => {
                 if (en.isIntersecting) {
@@ -209,50 +214,65 @@
         grid.querySelectorAll('img').forEach(i => obs.observe(i));
     }
 
+    /** Operational Logic: Open/Closed Calculation */
+    function checkStatus(schedule) {
+        const now = new Date();
+        const days = ['sun','mon','tue','wed','thu','fri','sat'];
+        const day = days[now.getDay()];
+        const ranges = schedule[day];
+        if (!ranges || ranges.length === 0) return false;
+
+        const currentMinutes = (now.getHours() * 60) + now.getMinutes();
+        return ranges.some(r => {
+            const [sh, sm] = r[0].split(':').map(Number);
+            const [eh, em] = r[1].split(':').map(Number);
+            return currentMinutes >= (sh * 60 + sm) && currentMinutes <= (eh * 60 + em);
+        });
+    }
+
+    /** Main Bootstrap */
     async function init() {
         try {
-            const [bRes, pRes] = await Promise.all([fetch('test.json'), fetch('products.csv')]);
+            const [bRes, pRes] = await Promise.all([
+                fetch('test.json'),
+                fetch('products.csv')
+            ]);
+
             const bJson = await bRes.json();
             App.data = bJson.branches.find(b => b.id == App.branchId) || bJson.branches[0];
             App.products = parseCSV(await pRes.text());
 
-            // Set Direction & Lang
+            // App Setup
             const ui = App.i18n[App.lang];
             document.body.dir = ui.dir;
             document.documentElement.lang = App.lang;
-
-            // Header Info
-            document.getElementById('br-display-name').textContent = App.data[`name_${App.lang}`];
+            document.getElementById('br-name').textContent = App.data[`name_${App.lang}`];
             
-            // Socials
+            // Socials & Leads
             const socMap = { tiktok:'fa-tiktok', instagram:'fa-instagram', facebook:'fa-facebook', snapchat:'fa-snapchat', youtube:'fa-youtube', email:'fa-envelope', waze:'fa-waze' };
             document.getElementById('br-socials').innerHTML = Object.entries(App.data.social)
-                .map(([k,v]) => v ? `<a href="${v}" target="_blank" onclick="trackLead('Social_Click', '${k}')"><i class="fab ${socMap[k]||'fa-link'}"></i></a>` : '').join('');
-
-            // Status Logic
-            const now = new Date();
-            const day = ['sun','mon','tue','wed','thu','fri','sat'][now.getDay()];
-            const sched = App.data.schedule[day];
-            const currentM = now.getHours() * 60 + now.getMinutes();
-            const isOpen = sched && sched.some(r => {
-                const [sH, sM] = r[0].split(':').map(Number);
-                const [eH, eM] = r[1].split(':').map(Number);
-                return currentM >= (sH*60+sM) && currentM < (eH*60+eM);
+                .map(([k,v]) => v ? `<a href="${v}" target="_blank" data-label="${k}"><i class="fab ${socMap[k]||'fa-link'}"></i></a>` : '').join('');
+            
+            document.querySelectorAll('.social-bar a').forEach(a => {
+                a.addEventListener('click', () => trackLead('Social_Link_Click', a.dataset.label));
             });
-            document.getElementById('br-status-badge').innerHTML = `<span class="status-badge ${isOpen?'status-open':'status-closed'}">${isOpen?ui.open:ui.closed}</span>`;
 
-            // Filters
+            // Live Status
+            const isOpen = checkStatus(App.data.schedule);
+            document.getElementById('br-status').innerHTML = `<span class="status-badge ${isOpen?'status-open':'status-closed'}">${isOpen?ui.open:ui.closed}</span>`;
+
+            // Dynamic Category Tabs
             const cats = [ui.all, ...new Set(App.products.map(p => p['Category (g:product_type)']))].filter(Boolean);
             const nav = document.getElementById('filter-tabs');
             cats.forEach(c => {
                 const btn = document.createElement('button');
                 btn.className = 'filter-btn' + (c === ui.all ? ' active' : '');
                 btn.textContent = c;
-                btn.onclick = (e) => {
+                btn.addEventListener('click', (e) => {
                     document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
                     btn.classList.add('active');
                     renderGrid(c === ui.all ? 'all' : c);
-                };
+                });
                 nav.appendChild(btn);
             });
 
@@ -261,19 +281,28 @@
 
             document.getElementById('loader').style.display = 'none';
             document.body.style.opacity = '1';
-        } catch (e) { console.error('Bootstrap Error:', e); }
+        } catch (e) {
+            console.error('Initialization Error:', e);
+        }
     }
 
+    /** Daily Offer Popup Logic */
     function initPopup() {
-        if (localStorage.getItem('mad_pop_' + new Date().toDateString())) return;
+        const storageKey = 'mad_pop_' + new Date().toDateString();
+        if (localStorage.getItem(storageKey)) return;
+
         setTimeout(() => {
             document.getElementById('offer-popup').style.display = 'flex';
-            document.getElementById('popup-wa-link').href = `https://wa.me/${normWA(App.data.phone)}?text=DailyOffer`;
-            document.getElementById('popup-wa-link').onclick = () => trackLead('Popup_CTA_Click');
+            document.getElementById('popup-wa-link').href = `https://wa.me/${normWA(App.data.phone)}?text=I want the Daily Offer!`;
+            document.getElementById('popup-wa-link').addEventListener('click', () => trackLead('Popup_CTA_Click'));
             
             const timerInt = setInterval(() => {
-                const diff = new Date().setHours(23,59,59) - new Date();
+                const now = new Date();
+                const midnight = new Date();
+                midnight.setHours(23,59,59,999);
+                const diff = midnight - now;
                 if (diff <= 0) { closePopup(); clearInterval(timerInt); }
+                
                 const h = Math.floor(diff/3600000).toString().padStart(2,'0');
                 const m = Math.floor((diff%3600000)/60000).toString().padStart(2,'0');
                 const s = Math.floor((diff%60000)/1000).toString().padStart(2,'0');
@@ -291,4 +320,3 @@
 </script>
 </body>
 </html>
-``` [cite: 1, 2, 3]
