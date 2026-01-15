@@ -33,7 +33,7 @@ header{
 .logo-img { max-width: 180px; margin-bottom: 15px; filter: drop-shadow(0 0 10px rgba(0,0,0,0.5)); }
 .branch-name{font-size:1.8rem; font-weight:700; text-shadow: 2px 2px 8px #000;}
 
-/* Duty & Live Indicator */
+/* Live Staff Indicator */
 .duty-container { display: flex; flex-direction: column; align-items: center; margin: 25px 0; }
 .staff-wrapper { position: relative; width: 90px; height: 90px; }
 .staff-img { width: 100%; height: 100%; border-radius: 50%; border: 2px solid var(--gold); object-fit: cover; box-shadow: 0 0 20px rgba(212, 175, 55, 0.4); }
@@ -46,17 +46,17 @@ header{
 @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
 .duty-btn { background: var(--wa); color: #fff; text-decoration: none; padding: 10px 22px; border-radius: 50px; font-weight: 700; display: flex; align-items: center; gap: 8px; transition: 0.3s; margin-top: 12px; }
 
-/* Categories Nav */
+/* Categories */
 .cats-wrapper { position: sticky; top: 0; background: rgba(0,0,0,0.92); z-index: 100; border-bottom: 1px solid #222; backdrop-filter: blur(10px); }
 .cats{display:flex; gap:10px; overflow-x:auto; padding:12px; scrollbar-width:none;}
 .cats::-webkit-scrollbar{display:none}
 .cats button{ background: #111; color: #ccc; border: 1px solid #333; padding: 10px 24px; border-radius: 50px; cursor: pointer; white-space: nowrap; transition: 0.3s; }
 .cats button.active{background: var(--gold); color: #000; border-color: var(--gold); font-weight: 700;}
 
-/* Products Grid */
+/* Grid */
 .grid{display:grid; grid-template-columns:repeat(2,1fr); gap:12px; padding:15px}
 @media(min-width:768px){.grid{grid-template-columns:repeat(4,1fr); gap:20px}}
-.card{background:#111; border:1px solid #222; border-radius:10px; overflow:hidden; transition: 0.3s;}
+.card{background:#card; border:1px solid #222; border-radius:10px; overflow:hidden; transition: 0.3s;}
 .card:hover{ border-color: var(--gold); }
 .img img{width:100%; aspect-ratio:1/1; object-fit:cover; opacity:0; transition:.5s}
 .img img.loaded{opacity:1}
@@ -64,13 +64,24 @@ header{
 .price{color:var(--gold); font-weight:700; margin:10px 0; font-size: 1.2rem}
 .wa-btn{background:var(--wa); color:#fff; text-decoration:none; padding:12px; font-weight:700; border-radius:8px; display:block;}
 
-/* Sale Popup Styling */
+/* Popups Styling */
 #popup-sale { position: fixed; inset: 0; background: rgba(0,0,0,0.95); display: none; align-items: center; justify-content: center; z-index: 10000; padding: 20px; }
 .sale-box { width: 100%; max-width: 400px; background: #000; border: 2px solid var(--gold); border-radius: 15px; overflow: hidden; position: relative; animation: slideUp 0.5s ease-out; }
 @keyframes slideUp { from { transform: translateY(100px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 .close-sale { position: absolute; top: 10px; right: 15px; font-size: 2.5rem; color: #fff; cursor: pointer; z-index: 10; }
 .countdown-bar { background: var(--gold); color: #000; padding: 12px; text-align: center; font-weight: 900; font-size: 1.4rem; font-family: 'Cinzel', serif; }
 .wa-order-btn { display: block; background: var(--wa); color: #fff; text-align: center; padding: 20px; text-decoration: none; font-weight: 900; font-size: 1.3rem; }
+
+/* Floating Reopen Widget */
+#reopen-sale {
+    position: fixed; bottom: 20px; left: 20px; width: 60px; height: 60px;
+    background: var(--gold); border-radius: 50%; display: none;
+    align-items: center; justify-content: center; z-index: 999;
+    cursor: pointer; box-shadow: 0 4px 15px rgba(212, 175, 55, 0.4);
+    animation: bounce 2s infinite;
+}
+@keyframes bounce { 0%, 20%, 50%, 80%, 100% {transform: translateY(0);} 40% {transform: translateY(-10px);} 60% {transform: translateY(-5px);} }
+.sale-badge { position: absolute; top: -5px; right: -5px; background: var(--live-red); color: white; font-size: 10px; padding: 2px 6px; border-radius: 10px; font-weight: bold; border: 1px solid #000; }
 </style>
 </head>
 
@@ -103,7 +114,13 @@ header{
     </div>
 </div>
 
+<div id="reopen-sale" onclick="openSale()">
+    <i class="fas fa-gift" style="color:#000; font-size:1.5rem"></i>
+    <span class="sale-badge">OFFER</span>
+</div>
+
 <script>
+/** 1. Global Setup **/
 const params = new URLSearchParams(window.location.search);
 const branchID = parseInt(params.get('branch')) || 1; 
 const lang = navigator.language.startsWith('ar') ? 'ar' : 'he';
@@ -119,15 +136,7 @@ function lead(action, label) {
     if(window.fbq) fbq('track', 'Lead', { branch: branchID, action, label });
 }
 
-function parseCSV(text) {
-    const lines = text.split('\n');
-    for(let i=1; i<lines.length; i++){
-        const c = lines[i].split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
-        if(!c[1]) continue;
-        STATE.products.push({ title: c[1].replace(/"/g,'').trim(), img: c[4], price: c[10].replace('ILS', '').trim() + ' ₪', cat: c[11] });
-    }
-}
-
+/** 2. Logic & Data **/
 async function start() {
     try {
         const [bj, pc] = await Promise.all([
@@ -139,6 +148,15 @@ async function start() {
         renderUI();
         initDailySale();
     } catch (e) { console.error(e); }
+}
+
+function parseCSV(text) {
+    const lines = text.split('\n');
+    for(let i=1; i<lines.length; i++){
+        const c = lines[i].split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+        if(!c[1]) continue;
+        STATE.products.push({ title: c[1].replace(/"/g,'').trim(), img: c[4], price: c[10].replace('ILS', '').trim() + ' ₪', cat: c[11] });
+    }
 }
 
 function renderUI() {
@@ -164,6 +182,7 @@ function renderUI() {
         if(v && icons[k]){
             const a = document.createElement('a'); a.href = k==='email'?'mailto:'+v:v; a.target="_blank";
             a.innerHTML = `<i class="${icons[k]}" style="color:white; font-size:1.5rem"></i>`;
+            a.onclick = () => lead('Social_Click', k);
             socialEl.appendChild(a);
         }
     });
@@ -201,32 +220,42 @@ function renderGrid(f) {
     });
 }
 
-/* Sale Popup Logic */
+/** 3. Popup & Widget Logic **/
+function openSale() {
+    document.getElementById('popup-sale').style.display = 'flex';
+    document.getElementById('reopen-sale').style.display = 'none';
+}
+
+function closeSale() {
+    document.getElementById('popup-sale').style.display = 'none';
+    document.getElementById('reopen-sale').style.display = 'flex';
+    localStorage.setItem('mad_sale_' + new Date().toDateString(), 'seen');
+}
+
 function initDailySale() {
     const saleKey = 'mad_sale_' + new Date().toDateString();
-    if (localStorage.getItem(saleKey)) return;
+    if (localStorage.getItem(saleKey)) {
+        document.getElementById('reopen-sale').style.display = 'flex';
+        return;
+    }
 
     setTimeout(() => {
-        const popup = document.getElementById('popup-sale');
-        popup.style.display = 'flex';
+        openSale();
         document.getElementById('sale-wa-link').textContent = TXT[lang].offer;
         document.getElementById('sale-wa-link').href = `https://wa.me/${STATE.branch.phone}?text=DailyOffer`;
         
-        const timer = setInterval(() => {
+        setInterval(() => {
             const diff = new Date().setHours(23, 59, 59) - new Date();
-            if (diff <= 0) { closeSale(); clearInterval(timer); }
+            if (diff <= 0) { 
+                document.getElementById('reopen-sale').style.display = 'none'; 
+                closeSale(); 
+            }
             const h = Math.floor(diff/3600000).toString().padStart(2,'0');
             const m = Math.floor((diff%3600000)/60000).toString().padStart(2,'0');
             const s = Math.floor((diff%60000)/1000).toString().padStart(2,'0');
             document.getElementById('sale-timer').textContent = `${h}:${m}:${s}`;
         }, 1000);
-        lead('Sale_Popup_View', STATE.branch.name_ar);
     }, 3000);
-}
-
-function closeSale() {
-    document.getElementById('popup-sale').style.display = 'none';
-    localStorage.setItem('mad_sale_' + new Date().toDateString(), 'seen');
 }
 
 start();
