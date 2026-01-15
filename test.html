@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MAD PARFUMEUR</title>
+    
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&family=Heebo:wght@400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
@@ -18,23 +19,208 @@
         :root{--bg:#0a0a0a;--card:#141414;--gold:#d4af37;--text:#fff;--muted:#aaa;--green:#25D366}
         *{box-sizing:border-box}
         body{margin:0;background:var(--bg);color:var(--text);font-family:'Cairo','Heebo',sans-serif;padding-bottom:90px; direction: inherit;}
-        header{text-align:center;padding:40px 15px;border-bottom:2px solid var(--gold)}
-        .logo img{width:80px;margin:auto; display: block;}
-        .brand{color:var(--gold);font-weight:800;margin-top:15px; font-size: 14px; letter-spacing: 1px;}
-        .branch-name{font-size:28px;font-weight:800; margin: 10px 0;}
-        .status{margin-top:5px;padding:6px 18px;border-radius:25px;font-weight:700;font-size:14px;display:inline-block}
-        .open{background:rgba(37,211,102,.15);color:var(--green)}
-        .closed{background:rgba(255,68,68,.15);color:#ff4444}
-        .socials{display:flex;justify-content:center;gap:15px;margin-top:25px}
-        .socials a{width:40px;height:40px;border-radius:50%;border:1px solid var(--gold);display:flex;align-items:center;justify-content:center;color:var(--gold);font-size:18px;text-decoration:none}
-        #categories{display:flex;gap:10px;overflow-x:auto;padding:20px 15px; scrollbar-width: none;}
+        
+        /* 1. إصلاح الهيدر (Compact Layout) */
+        header{text-align:center; padding: 25px 15px 20px; border-bottom: 2px solid var(--gold); position: relative;}
+        .logo img{width: 70px; margin: auto; display: block;}
+        .brand{color:var(--gold); font-weight:800; margin-top:8px; font-size: 13px; letter-spacing: 1px;}
+        .branch-name{font-size: 24px; font-weight: 800; margin: 5px 0;}
+        .status{margin-top: 5px; padding: 5px 15px; border-radius: 20px; font-weight: 700; font-size: 12px; display: inline-block;}
+        .open{background:rgba(37,211,102,.12); color:var(--green)}
+        .closed{background:rgba(255,68,68,.12); color:#ff4444}
+        .socials{display:flex; justify-content:center; gap:12px; margin-top: 15px;}
+        .socials a{width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--gold); display: flex; align-items: center; justify-content: center; color: var(--gold); font-size: 16px; text-decoration: none; transition: 0.3s;}
+        .socials a:hover{background: var(--gold); color: #000;}
+
+        /* 2. إصلاح التصنيفات والفلترة */
+        #categories{display:flex; gap:10px; overflow-x:auto; padding: 15px 15px 10px; scrollbar-width: none;}
         #categories::-webkit-scrollbar { display: none; }
-        .cat{border:1px solid var(--gold);padding:10px 20px;border-radius:12px;background:transparent;color:white;font-weight:800;cursor:pointer; white-space: nowrap;}
-        .cat.active{background:var(--gold); color:#000}
-        .products{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:15px;padding:15px}
-        .card{background:var(--card);border-radius:16px;padding:12px;text-align:center; display: flex; flex-direction: column;}
-        .card img{width:100%;border-radius:12px; aspect-ratio: 1/1; object-fit: cover;}
-        .card-title{margin:10px 0; font-weight:600; font-size: 14px; min-height: 40px;}
+        .cat{border: 1px solid var(--gold); padding: 8px 18px; border-radius: 20px; background: transparent; color: white; font-weight: 700; cursor: pointer; white-space: nowrap; opacity: 0.6; transition: 0.3s;}
+        .cat.active{background: var(--gold); color: #000; opacity: 1; transform: scale(1.05);}
+
+        /* 3. إصلاح عرض المنتجات */
+        .section-title{text-align: center; margin: 15px 0 5px; font-size: 18px; font-weight: 800; color: var(--gold);}
+        .products{display:grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; padding: 15px;}
+        .card{background: var(--card); border-radius: 16px; padding: 12px; text-align: center; display: flex; flex-direction: column; height: 100%;}
+        .card img{width: 100%; border-radius: 12px; aspect-ratio: 1/1; object-fit: cover; background: #fff;}
+        .card-title{margin: 10px 0 5px; font-weight: 600; font-size: 14px; min-height: 40px; display: flex; align-items: center; justify-content: center;}
+        .price{color: var(--gold); font-weight: 800; margin-bottom: 12px; font-size: 16px;}
+        
+        /* زر شراء فخم وواضح */
+        .buy-btn{background: var(--green); color: white; text-decoration: none; padding: 10px; border-radius: 10px; font-weight: 800; font-size: 13px; margin-top: auto; display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.2s;}
+        .buy-btn:active{transform: scale(0.95);}
+
+        /* Popup */
+        .popup-overlay{position: fixed; inset: 0; background: rgba(0,0,0,.85); display: none; align-items: center; justify-content: center; z-index: 9999;}
+        .popup{width: 90%; max-width: 360px; background: #000; border: 1px solid var(--gold); border-radius: 20px; padding: 20px; position: relative; text-align: center;}
+        .popup-close{position: absolute; top: -15px; right: -15px; cursor: pointer; background: var(--gold); color: #000; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; border: 2px solid #000;}
+        .timer{color: var(--gold); font-family: monospace; font-size: 15px; margin: 10px 0; font-weight: bold;}
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo"><img src="https://abomkdad.github.io/Digital-Business-Card/logo.png" alt="Logo"></div>
+    <div class="brand">MAD PARFUMEUR</div>
+    <div id="branchName" class="branch-name">...</div>
+    <div id="status"></div>
+    <div class="socials" id="socials"></div>
+</header>
+
+<div id="categories"></div>
+
+<h2 class="section-title" id="secTitle">...</h2>
+<div class="products" id="products"></div>
+
+<div class="popup-overlay" id="popup">
+    <div class="popup">
+        <div class="popup-close" onclick="closePopup()">✕</div>
+        <img src="sale.png" style="width:100%; border-radius:12px;" onerror="this.src='https://via.placeholder.com/400x400/000?text=HOT+SALE'">
+        <div class="timer" id="timer"></div>
+        <div class="popup-cta" style="background:var(--green); color:white; padding:15px; border-radius:12px; font-weight:800; cursor:pointer;" onclick="popupWhatsApp()">🔥 عرض اليوم</div>
+    </div>
+</div>
+
+<script>
+/* 1. CONFIG & I18N */
+const lang = navigator.language.startsWith("he") ? "he" : "ar";
+document.documentElement.lang = lang;
+document.documentElement.dir = lang === "he" ? "ltr" : "rtl";
+
+const TXT = {
+    ar: { open: "مفتوح الآن", closed: "مغلق الآن", all: "الكل", ends: "ينتهي العرض: ", buy: "اطلب عبر الواتساب", sec: "منتجاتنا", wa_p: "أهلاً، أود طلب: " },
+    he: { open: "פתוח עכשיו", closed: "סגור עכשיו", all: "הכל", ends: "ההצעה מסתיימת: ", buy: "הזמן בוואטסאפ", sec: "המוצרים שלנו", wa_p: "שלום, אני רוצה להזמין: " }
+};
+document.getElementById("secTitle").textContent = TXT[lang].sec;
+
+const branchID = new URLSearchParams(location.search).get("branch");
+let phone = "", timerInterval = null, allProducts = [];
+
+/* 2. TRACKING */
+function trackLead(action, label = "") {
+    if(window.fbq) fbq('track', 'Lead', { action, label, branch: branchID });
+}
+
+/* 3. MULTI-PERIOD SCHEDULE LOGIC */
+function checkStatus(schedule) {
+    if (!schedule) return true;
+    const now = new Date();
+    const day = ["sun","mon","tue","wed","thu","fri","sat"][now.getDay()];
+    const currentMins = (now.getHours() * 60) + now.getMinutes();
+    const dayPeriods = schedule[day] || [];
+    
+    const parseMins = (t) => {
+        const [h, m] = t.split(':').map(Number);
+        return (h * 60) + m;
+    };
+
+    return dayPeriods.some(range => {
+        return currentMins >= parseMins(range[0]) && currentMins <= parseMins(range[1]);
+    });
+}
+
+/* 4. POPUP CONTROL */
+function closePopup() {
+    document.getElementById("popup").style.display = "none";
+    if (timerInterval) clearInterval(timerInterval);
+    localStorage.setItem("popup_seen_" + new Date().toDateString(), "true");
+}
+
+function startTimer() {
+    const timerEl = document.getElementById("timer");
+    timerInterval = setInterval(() => {
+        const now = new Date();
+        const end = new Date(); end.setHours(23, 59, 59);
+        const diff = end - now;
+        if (diff <= 0) { closePopup(); return; }
+        const h = Math.floor(diff/3600000).toString().padStart(2,'0'),
+              m = Math.floor((diff%3600000)/60000).toString().padStart(2,'0'),
+              s = Math.floor((diff%60000)/1000).toString().padStart(2,'0');
+        timerEl.textContent = `${TXT[lang].ends} ${h}:${m}:${s}`;
+    }, 1000);
+}
+
+/* 5. LOAD BRANCH & SOCIALS */
+fetch("test.json").then(r => r.json()).then(d => {
+    const b = d.branches.find(x => String(x.id) === String(branchID));
+    if (!b) return;
+
+    document.getElementById("branchName").textContent = lang === "he" ? b.name_he : b.name_ar;
+    phone = "972" + b.phone.replace(/^0/, "");
+
+    const isOpen = checkStatus(b.schedule);
+    document.getElementById("status").innerHTML = `<div class="status ${isOpen ? 'open' : 'closed'}">${isOpen ? TXT[lang].open : TXT[lang].closed}</div>`;
+
+    const s = b.social || {};
+    const icons = [
+        {id: "whatsapp", link: `https://wa.me/${phone}`, type: "fab"},
+        {id: "location-dot", link: s.waze, type: "fas"},
+        {id: "instagram", link: s.instagram, type: "fab"},
+        {id: "tiktok", link: s.tiktok, type: "fab"},
+        {id: "facebook-f", link: s.facebook, type: "fab"},
+        {id: "envelope", link: s.email ? `mailto:${s.email}` : null, type: "fas"}
+    ];
+    document.getElementById("socials").innerHTML = icons.filter(i => i.link).map(i => `<a href="${i.link}" target="_blank" onclick="trackLead('social', '${i.id}')"><i class="${i.type} fa-${i.id}"></i></a>`).join("");
+
+    if (!localStorage.getItem("popup_seen_" + new Date().toDateString())) {
+        setTimeout(() => { document.getElementById("popup").style.display = "flex"; startTimer(); }, 1800);
+    }
+});
+
+/* 6. PRODUCTS ENGINE */
+Papa.parse("products.csv", {
+    download: true, header: true, skipEmptyLines: true,
+    complete: function(r) {
+        allProducts = r.data.filter(p => p.Title && String(p.BranchID).trim() === String(branchID).trim());
+        renderCategories();
+        renderProducts("all");
+    }
+});
+
+function renderCategories() {
+    const cats = [...new Set(allProducts.map(p => p.Category))].filter(c => c);
+    const container = document.getElementById("categories");
+    container.innerHTML = `<button class="cat active" onclick="filterBy('all', this)">${TXT[lang].all}</button>` +
+        cats.map(c => `<button class="cat" onclick="filterBy('${c}', this)">${c}</button>`).join("");
+}
+
+function filterBy(cat, btn) {
+    document.querySelectorAll('.cat').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderProducts(cat);
+}
+
+function renderProducts(filter) {
+    const container = document.getElementById("products");
+    const filtered = filter === "all" ? allProducts : allProducts.filter(p => p.Category === filter);
+    
+    if(filtered.length === 0) {
+        container.innerHTML = `<div style="grid-column: 1/-1; text-align:center; padding:50px; color:var(--muted)">No products found</div>`;
+        return;
+    }
+
+    container.innerHTML = filtered.map(p => `
+        <div class="card">
+            <img src="${p.Image}" loading="lazy" onerror="this.src='https://via.placeholder.com/150'">
+            <div class="card-title">${p.Title}</div>
+            <div class="price">₪ ${p.Price}</div>
+            <a href="https://wa.me/${phone}?text=${encodeURIComponent(TXT[lang].wa_p + p.Title)}" target="_blank" class="buy-btn" onclick="trackLead('purchase_intent', '${p.Title}')">
+                <i class="fab fa-whatsapp"></i> ${TXT[lang].buy}
+            </a>
+        </div>
+    `).join("");
+}
+
+function popupWhatsApp() {
+    const bName = document.getElementById("branchName").textContent;
+    const msg = lang === "he" ? `שלום, אני מעוניין במבצע של סניף ${bName}` : `أهلاً، مهتم بعرض فرع ${bName}`;
+    trackLead('popup_click', bName);
+    window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, "_blank");
+}
+</script>
+
+</body>
+</html>        .card-title{margin:10px 0; font-weight:600; font-size: 14px; min-height: 40px;}
         .price{color:var(--gold); font-weight:800; margin-bottom: 10px;}
         .buy-btn{background:var(--green); color:white; text-decoration: none; padding: 10px; border-radius: 8px; font-weight: bold;}
         .popup-overlay{position:fixed;inset:0;background:rgba(0,0,0,.85);display:none;align-items:center;justify-content:center;z-index:9999}
