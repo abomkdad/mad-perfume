@@ -11,11 +11,12 @@
     <style>
         :root {
             --gold: #D4AF37;
-            --black: #0a0a0a;
-            --dark-grey: #1a1a1a;
+            --black: #000000;
+            --dark-grey: #111111;
+            --light-grey: #1a1a1a;
             --white: #ffffff;
             --whatsapp: #25D366;
-            --transition: all 0.3s ease;
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -27,428 +28,401 @@
             line-height: 1.6;
         }
 
-        /* RTL/LTR Utils */
-        [dir="rtl"] { text-align: right; }
-        [dir="ltr"] { text-align: left; }
-
         .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
 
-        /* Header & Logo */
+        /* Header Styling */
         header {
-            padding: 30px 0;
+            padding: 40px 0 20px;
             text-align: center;
-            border-bottom: 1px solid rgba(212, 175, 55, 0.2);
-            background: linear-gradient(to bottom, #111, #0a0a0a);
+            background: linear-gradient(to bottom, #0a0a0a, var(--black));
+            border-bottom: 1px solid rgba(212, 175, 55, 0.15);
         }
 
-        .logo-area h1 {
+        .logo-main {
             font-family: 'Cinzel', serif;
-            letter-spacing: 4px;
+            letter-spacing: 6px;
             color: var(--gold);
-            font-size: 2rem;
+            font-size: 2.2rem;
             margin-bottom: 5px;
+            text-transform: uppercase;
         }
 
-        .branch-name { font-size: 1.2rem; font-weight: 300; margin-bottom: 15px; }
+        .branch-info-header { font-size: 1.1rem; font-weight: 300; margin-bottom: 10px; opacity: 0.9; }
 
         /* Status Badge */
         .status-badge {
             display: inline-block;
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: 600;
+            padding: 4px 12px;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
             margin-bottom: 20px;
         }
-        .status-open { background: rgba(37, 211, 102, 0.2); color: #25D366; border: 1px solid #25D366; }
-        .status-closed { background: rgba(255, 0, 0, 0.2); color: #ff4d4d; border: 1px solid #ff4d4d; }
+        .status-open { background: rgba(37, 211, 102, 0.1); color: var(--whatsapp); border: 1px solid var(--whatsapp); }
+        .status-closed { background: rgba(255, 77, 77, 0.1); color: #ff4d4d; border: 1px solid #ff4d4d; }
 
         /* Social Icons */
-        .social-row {
+        .social-links {
             display: flex;
             justify-content: center;
-            gap: 20px;
-            margin-top: 10px;
+            gap: 18px;
+            margin-top: 15px;
         }
-        .social-row a {
+        .social-links a {
             color: var(--white);
-            font-size: 1.5rem;
+            font-size: 1.4rem;
             transition: var(--transition);
+            opacity: 0.7;
         }
-        .social-row a:hover { color: var(--gold); }
+        .social-links a:hover { color: var(--gold); opacity: 1; }
 
-        /* Filters */
-        .filter-container {
-            padding: 20px 0;
+        /* Filter System */
+        .category-scroll {
             display: flex;
             overflow-x: auto;
-            gap: 10px;
+            gap: 12px;
+            padding: 25px 0;
             scrollbar-width: none;
             justify-content: center;
         }
-        .filter-btn {
-            background: transparent;
+        .category-scroll::-webkit-scrollbar { display: none; }
+        .filter-chip {
+            background: var(--light-grey);
             color: var(--white);
-            border: 1px solid var(--gold);
-            padding: 8px 20px;
-            white-space: nowrap;
-            cursor: pointer;
+            border: 1px solid #333;
+            padding: 8px 22px;
             border-radius: 4px;
-            font-family: inherit;
+            cursor: pointer;
+            white-space: nowrap;
+            font-size: 0.9rem;
             transition: var(--transition);
         }
-        .filter-btn.active { background: var(--gold); color: var(--black); }
+        .filter-chip.active { background: var(--gold); color: var(--black); border-color: var(--gold); font-weight: 600; }
 
         /* Product Grid */
         .products-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 25px;
-            padding: 20px 0 80px;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 20px;
+            padding-bottom: 60px;
         }
         .product-card {
             background: var(--dark-grey);
-            border: 1px solid #333;
-            border-radius: 8px;
+            border: 1px solid #222;
+            border-radius: 2px;
             overflow: hidden;
-            transition: var(--transition);
             display: flex;
             flex-direction: column;
+            transition: var(--transition);
         }
-        .product-card:hover { transform: translateY(-5px); border-color: var(--gold); }
-        .product-img {
-            width: 100%;
-            aspect-ratio: 1/1;
-            object-fit: cover;
-            border-bottom: 1px solid #333;
-        }
-        .product-info { padding: 20px; flex-grow: 1; display: flex; flex-direction: column; }
-        .product-title { font-family: 'Cinzel', serif; font-size: 1.1rem; margin-bottom: 10px; height: 3em; overflow: hidden; }
-        .product-price { color: var(--gold); font-weight: 700; font-size: 1.3rem; margin-bottom: 15px; }
+        .product-card:hover { border-color: var(--gold); }
+        .product-image-wrap { position: relative; width: 100%; aspect-ratio: 1/1; overflow: hidden; }
+        .product-image-wrap img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; }
+        .product-card:hover .product-image-wrap img { transform: scale(1.05); }
         
-        .whatsapp-btn {
+        .product-meta { padding: 18px; flex-grow: 1; display: flex; flex-direction: column; text-align: center; }
+        .product-title { font-family: 'Cinzel', serif; font-size: 1rem; margin-bottom: 8px; min-height: 2.4em; }
+        .product-price { color: var(--gold); font-weight: 700; font-size: 1.2rem; margin-bottom: 15px; }
+        
+        .btn-order {
             background: var(--whatsapp);
             color: white;
             text-decoration: none;
             padding: 12px;
-            text-align: center;
             border-radius: 4px;
             font-weight: 600;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
+            gap: 8px;
+            font-size: 0.95rem;
         }
 
-        /* Popup */
-        #offer-popup {
+        /* Popup Daily Offer */
+        #daily-popup {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.9);
+            background: rgba(0,0,0,0.95);
+            z-index: 9999;
             display: none;
-            z-index: 1000;
             align-items: center;
             justify-content: center;
             padding: 20px;
         }
-        .popup-content {
-            background: var(--black);
+        .popup-inner {
             width: 100%;
-            max-width: 500px;
+            max-width: 450px;
+            background: var(--black);
+            border: 1px solid var(--gold);
             position: relative;
-            border: 2px solid var(--gold);
-            text-align: center;
+            animation: modalFade 0.4s ease;
         }
-        .popup-img { width: 100%; aspect-ratio: 1/1; display: block; object-fit: cover; }
+        @keyframes modalFade { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        
         .popup-close {
             position: absolute;
             top: -40px; right: 0;
-            color: white; font-size: 2rem; cursor: pointer;
+            color: var(--white);
+            font-size: 2rem;
+            cursor: pointer;
         }
-        .timer-bar {
-            background: var(--gold);
-            color: var(--black);
-            padding: 10px;
-            font-weight: bold;
-            font-size: 1.1rem;
-        }
+        .popup-img { width: 100%; aspect-ratio: 1/1; display: block; object-fit: cover; }
+        .popup-timer { background: var(--gold); color: var(--black); padding: 10px; font-weight: 700; text-align: center; }
         .popup-cta {
             display: block;
             background: var(--whatsapp);
             color: white;
-            padding: 15px;
+            text-align: center;
+            padding: 18px;
             text-decoration: none;
-            font-weight: bold;
+            font-weight: 800;
+            font-size: 1.1rem;
         }
 
-        /* Loading Overlay */
-        #loader {
+        /* Loader */
+        #page-loader {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: var(--black); z-index: 2000;
+            background: var(--black); z-index: 10000;
             display: flex; align-items: center; justify-content: center;
         }
 
         @media (max-width: 600px) {
-            .products-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
-            .product-info { padding: 10px; }
-            .product-title { font-size: 0.9rem; }
-            .filter-container { justify-content: flex-start; }
+            .logo-main { font-size: 1.6rem; }
+            .products-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
+            .product-meta { padding: 12px; }
+            .product-title { font-size: 0.85rem; }
+            .category-scroll { justify-content: flex-start; padding: 15px 0; }
         }
     </style>
 </head>
 <body>
 
-    <div id="loader">
-        <h2 style="font-family: 'Cinzel', serif; color: var(--gold);">MAD PARFUMEUR</h2>
+    <div id="page-loader">
+        <div style="text-align: center;">
+            <h1 class="logo-main" style="margin-bottom: 20px;">MAD PARFUMEUR</h1>
+            <div class="status-badge status-open">Loading...</div>
+        </div>
     </div>
 
     <header>
         <div class="container">
-            <div class="logo-area">
-                <h1>MAD PARFUMEUR</h1>
-                <div id="branch-display-name" class="branch-name">...</div>
-                <div id="status-badge-container"></div>
-            </div>
-            <div class="social-row" id="social-links">
-                </div>
+            <h1 class="logo-main">MAD PARFUMEUR</h1>
+            <div id="br-name" class="branch-info-header"></div>
+            <div id="br-status"></div>
+            <div class="social-links" id="br-socials"></div>
         </div>
     </header>
 
     <main class="container">
-        <div class="filter-container" id="category-filters">
-            </div>
-
-        <div class="products-grid" id="products-container">
-            </div>
+        <nav class="category-scroll" id="cat-nav"></nav>
+        <div class="products-grid" id="prod-grid"></div>
     </main>
 
-    <div id="offer-popup">
-        <div class="popup-content">
-            <span class="popup-close" onclick="closePopup()">&times;</span>
+    <div id="daily-popup">
+        <div class="popup-inner">
+            <span class="popup-close" onclick="closeDailyPopup()">&times;</span>
             <img src="sale.png" alt="Daily Offer" class="popup-img">
-            <div class="timer-bar" id="countdown-timer">00:00:00</div>
-            <a href="#" class="popup-cta" id="popup-whatsapp-link" onclick="trackLead('Popup Offer')">
-                <i class="fab fa-whatsapp"></i> <span id="txt-claim-offer">Claim Now</span>
+            <div class="popup-timer" id="timer-display">00:00:00</div>
+            <a href="#" id="popup-wa-btn" class="popup-cta" onclick="handleTrack('Popup-Lead')">
+                <i class="fab fa-whatsapp"></i> <span id="txt-claim">CLAIM OFFER</span>
             </a>
         </div>
     </div>
 
     <script>
         /**
-         * CONFIGURATION & STATE
+         * APPLICATION STATE & CONFIG
          */
-        const CONFIG = {
+        const App = {
             branchId: new URLSearchParams(window.location.search).get('branch') || '1',
-            lang: navigator.language.startsWith('he') ? 'he' : (navigator.language.startsWith('ar') ? 'ar' : 'he'),
-            pixels: { meta: 'YOUR_PIXEL_ID', tiktok: 'YOUR_TIKTOK_ID' }
+            lang: navigator.language.startsWith('ar') ? 'ar' : 'he',
+            branchData: null,
+            allProducts: [],
+            pixels: { fb: '', tt: '' } // Replace with actual IDs if needed
         };
 
-        const STRINGS = {
+        const i18n = {
             he: {
-                open: "פתוח עכשיו", closed: "סגור כעת",
-                all: "הכל", order: "הזמנה ב-WhatsApp",
-                claim: "נצלו את ההטבה", timer: "ההטבה מסתיימת בעוד:",
-                waMsg: "היי, אני מעוניין במוצר: "
+                open: "פתוח עכשיו", closed: "סגור כעת", all: "הכל",
+                order: "הזמנה בוואטסאפ", claim: "קבלת ההטבה",
+                waPrefix: "היי, אני מעוניין בבושם: "
             },
             ar: {
-                open: "مفتوح الآن", closed: "مغلق حالياً",
-                all: "الكل", order: "طلب عبر واتساب",
-                claim: "احصل على العرض", timer: "ينتهي العرض خلال:",
-                waMsg: "مرحباً، أنا مهتم بمنتج: "
+                open: "مفتوح الآن", closed: "مغلق حالياً", all: "الكل",
+                order: "طلب عبر واتساب", claim: "احصل على العرض",
+                waPrefix: "مرحباً، أنا مهتم بـ: "
             }
         };
 
-        let currentBranch = null;
-        let allProducts = [];
-
         /**
-         * ANALYTICS ENGINE
+         * PIXEL TRACKING
          */
-        function trackLead(label, action = 'Click') {
-            console.log(`Tracking: ${action} - ${label}`);
-            // Meta Pixel Lead
-            if (typeof fbq !== 'undefined') fbq('track', 'Lead', { content_name: label, branch: CONFIG.branchId });
-            // TikTok Pixel Lead
-            if (typeof ttq !== 'undefined') ttq.track('SubmitForm', { contents: [{ content_name: label }], branch: CONFIG.branchId });
+        function handleTrack(action, label = '') {
+            console.log(`[Event] ${action} : ${label}`);
+            // Meta Lead
+            if (window.fbq) fbq('track', 'Lead', { content_name: action, content_category: label });
+            // TikTok Lead
+            if (window.ttq) ttq.track('SubmitForm', { contents: [{ content_name: action, content_id: label }] });
         }
 
         /**
-         * CORE LOGIC: TIME & STATUS
+         * TIME LOGIC
          */
-        function isBranchOpen(schedule) {
+        function checkStatus(schedule) {
             const now = new Date();
-            const days = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
-            const todayKey = days[now.getDay()];
-            const ranges = schedule[todayKey];
+            const dayNames = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
+            const todayKey = dayNames[now.getDay()];
+            const intervals = schedule[todayKey];
             
-            if (!ranges) return false;
+            if (!intervals) return false;
 
-            const currentTime = now.getHours() * 60 + now.getMinutes();
-
-            return ranges.some(range => {
+            const currentMinutes = now.getHours() * 60 + now.getMinutes();
+            return intervals.some(range => {
                 const [startH, startM] = range[0].split(':').map(Number);
                 const [endH, endM] = range[1].split(':').map(Number);
-                return currentTime >= (startH * 60 + startM) && currentTime < (endH * 60 + endM);
+                return currentMinutes >= (startH * 60 + startM) && currentMinutes < (endH * 60 + endM);
             });
         }
 
         /**
-         * UI GENERATORS
+         * DATA PARSING
          */
-        function renderHeader(branch) {
-            document.documentElement.dir = CONFIG.lang === 'he' ? 'rtl' : 'rtl'; // Both are RTL-dominant for these markets
-            document.getElementById('branch-display-name').textContent = branch[`name_${CONFIG.lang}`];
+        async function fetchCSV(url) {
+            const res = await fetch(url);
+            const text = await res.text();
+            const lines = text.split('\n').filter(l => l.trim() !== '');
+            const headers = lines[0].split(',').map(h => h.trim());
             
-            const isOpen = isBranchOpen(branch.schedule);
-            const statusBadge = document.getElementById('status-badge-container');
-            statusBadge.innerHTML = `<span class="status-badge ${isOpen ? 'status-open' : 'status-closed'}">
-                ${isOpen ? STRINGS[CONFIG.lang].open : STRINGS[CONFIG.lang].closed}
-            </span>`;
+            return lines.slice(1).map(line => {
+                const values = line.split(',');
+                let entry = {};
+                headers.forEach((h, i) => entry[h] = values[i]?.trim());
+                return entry;
+            });
+        }
+
+        /**
+         * UI RENDERING
+         */
+        function renderUI() {
+            const b = App.branchData;
+            const text = i18n[App.lang];
+
+            // Header
+            document.getElementById('br-name').textContent = b[`name_${App.lang}`];
+            const isOpen = checkStatus(b.schedule);
+            document.getElementById('br-status').innerHTML = `
+                <div class="status-badge ${isOpen ? 'status-open' : 'status-closed'}">
+                    ${isOpen ? text.open : text.closed}
+                </div>`;
 
             // Socials
-            const socialHtml = [];
-            const icons = {
-                whatsapp: 'fab fa-whatsapp',
-                waze: 'fab fa-waze',
-                instagram: 'fab fa-instagram',
-                tiktok: 'fab fa-tiktok',
-                facebook: 'fab fa-facebook',
-                email: 'fas fa-envelope'
+            const socialMap = {
+                whatsapp: 'fab fa-whatsapp', waze: 'fab fa-waze', 
+                instagram: 'fab fa-instagram', tiktok: 'fab fa-tiktok', 
+                facebook: 'fab fa-facebook', email: 'fas fa-envelope'
             };
+            let socHtml = '';
+            for (const [key, url] of Object.entries(b.social)) {
+                if (url) socHtml += `<a href="${url}" target="_blank" onclick="handleTrack('Social', '${key}')"><i class="${socialMap[key]}"></i></a>`;
+            }
+            document.getElementById('br-socials').innerHTML = socHtml;
 
-            Object.entries(branch.social).forEach(([key, url]) => {
-                if (url) {
-                    socialHtml.push(`<a href="${url}" target="_blank" onclick="trackLead('Social ${key}')"><i class="${icons[key] || 'fas fa-link'}"></i></a>`);
-                }
-            });
-            document.getElementById('social-links').innerHTML = socialHtml.join('');
-        }
-
-        function renderProducts(products, filter = 'all') {
-            const container = document.getElementById('products-container');
-            container.innerHTML = '';
-
-            const filtered = filter === 'all' ? products : products.filter(p => p.Category === filter);
-
-            filtered.forEach(p => {
-                const card = document.createElement('div');
-                card.className = 'product-card';
-                card.innerHTML = `
-                    <img src="${p.Image}" class="product-img" loading="lazy">
-                    <div class="product-info">
-                        <h3 class="product-title">${p.Title}</h3>
-                        <p class="product-price">${p.Price}</p>
-                        <a href="https://wa.me/${currentBranch.phone}?text=${encodeURIComponent(STRINGS[CONFIG.lang].waMsg + p.Title)}" 
-                           class="whatsapp-btn" target="_blank" onclick="trackLead('Product: ${p.Title}')">
-                            <i class="fab fa-whatsapp"></i> ${STRINGS[CONFIG.lang].order}
-                        </a>
-                    </div>
-                `;
-                container.appendChild(card);
-            });
-        }
-
-        function renderFilters(products) {
-            const categories = ['all', ...new Set(products.map(p => p.Category))];
-            const filterContainer = document.getElementById('category-filters');
-            
+            // Categories & Products
+            const categories = [text.all, ...new Set(App.allProducts.map(p => p.Category))];
+            const nav = document.getElementById('cat-nav');
             categories.forEach(cat => {
-                const btn = document.createElement('button');
-                btn.className = `filter-btn ${cat === 'all' ? 'active' : ''}`;
-                btn.textContent = cat === 'all' ? STRINGS[CONFIG.lang].all : cat;
-                btn.onclick = (e) => {
-                    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-                    e.target.classList.add('active');
-                    renderProducts(products, cat);
+                const chip = document.createElement('div');
+                chip.className = `filter-chip ${cat === text.all ? 'active' : ''}`;
+                chip.textContent = cat;
+                chip.onclick = () => {
+                    document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+                    chip.classList.add('active');
+                    filterProducts(cat === text.all ? 'all' : cat);
                 };
-                filterContainer.appendChild(btn);
+                nav.appendChild(chip);
+            });
+
+            filterProducts('all');
+        }
+
+        function filterProducts(category) {
+            const grid = document.getElementById('prod-grid');
+            grid.innerHTML = '';
+            const filtered = category === 'all' ? App.allProducts : App.allProducts.filter(p => p.Category === category);
+            
+            filtered.forEach(p => {
+                const waLink = `https://wa.me/${App.branchData.phone}?text=${encodeURIComponent(i18n[App.lang].waPrefix + p.Title)}`;
+                grid.innerHTML += `
+                    <div class="product-card">
+                        <div class="product-image-wrap"><img src="${p.Image}" loading="lazy"></div>
+                        <div class="product-meta">
+                            <h3 class="product-title">${p.Title}</h3>
+                            <div class="product-price">${p.Price}</div>
+                            <a href="${waLink}" target="_blank" class="btn-order" onclick="handleTrack('WA-Order', '${p.Title}')">
+                                <i class="fab fa-whatsapp"></i> ${i18n[App.lang].order}
+                            </a>
+                        </div>
+                    </div>`;
             });
         }
 
         /**
-         * POPUP LOGIC
+         * POPUP ENGINE
          */
         function initPopup() {
-            const today = new Date().toISOString().split('T')[0];
-            const hasSeen = localStorage.getItem('mad_popup_' + today);
-            
-            if (!hasSeen) {
-                setTimeout(() => {
-                    document.getElementById('offer-popup').style.display = 'flex';
-                    document.getElementById('txt-claim-offer').textContent = STRINGS[CONFIG.lang].claim;
-                    document.getElementById('popup-whatsapp-link').href = `https://wa.me/${currentBranch.phone}?text=I want the daily offer!`;
-                    startTimer();
-                }, 2000);
-            }
-        }
+            const today = new Date().toLocaleDateString();
+            if (localStorage.getItem('mad_offer_date') === today) return;
 
-        function closePopup() {
-            const today = new Date().toISOString().split('T')[0];
-            localStorage.setItem('mad_popup_' + today, 'true');
-            document.getElementById('offer-popup').style.display = 'none';
-        }
-
-        function startTimer() {
-            const timerEl = document.getElementById('countdown-timer');
-            setInterval(() => {
-                const now = new Date();
-                const end = new Date();
-                end.setHours(23, 59, 59);
+            setTimeout(() => {
+                document.getElementById('daily-popup').style.display = 'flex';
+                document.getElementById('txt-claim').textContent = i18n[App.lang].claim;
+                document.getElementById('popup-wa-btn').href = `https://wa.me/${App.branchData.phone}?text=I want the daily offer!`;
                 
-                const diff = end - now;
-                if (diff <= 0) {
-                    document.getElementById('offer-popup').style.display = 'none';
-                    return;
-                }
+                const timerInt = setInterval(() => {
+                    const now = new Date();
+                    const end = new Date();
+                    end.setHours(23, 59, 59);
+                    const diff = end - now;
+                    if (diff <= 0) { closeDailyPopup(); clearInterval(timerInt); }
+                    const h = Math.floor(diff/3600000).toString().padStart(2, '0');
+                    const m = Math.floor((diff%3600000)/60000).toString().padStart(2, '0');
+                    const s = Math.floor((diff%60000)/1000).toString().padStart(2, '0');
+                    document.getElementById('timer-display').textContent = `${h}:${m}:${s}`;
+                }, 1000);
+            }, 3000);
+        }
 
-                const h = Math.floor(diff / 3600000).toString().padStart(2, '0');
-                const m = Math.floor((diff % 3600000) / 60000).toString().padStart(2, '0');
-                const s = Math.floor((diff % 60000) / 1000).toString().padStart(2, '0');
-                timerEl.textContent = `${STRINGS[CONFIG.lang].timer} ${h}:${m}:${s}`;
-            }, 1000);
+        function closeDailyPopup() {
+            localStorage.setItem('mad_offer_date', new Date().toLocaleDateString());
+            document.getElementById('daily-popup').style.display = 'none';
         }
 
         /**
-         * DATA LOADING
+         * BOOTSTRAP
          */
         async function init() {
             try {
-                // 1. Load Branches
-                const branchRes = await fetch('test.json');
-                const branchData = await branchRes.json();
-                currentBranch = branchData.branches.find(b => b.id == CONFIG.branchId) || branchData.branches[0];
+                const [branchRes, prodData] = await Promise.all([
+                    fetch('test.json').then(r => r.json()),
+                    fetchCSV('products.csv')
+                ]);
 
-                // 2. Load Products (Manual CSV Parse)
-                const prodRes = await fetch('products.csv');
-                const csvText = await prodRes.text();
-                const rows = csvText.split('\n').map(r => r.split(','));
-                const headers = rows[0].map(h => h.trim());
-                
-                allProducts = rows.slice(1).filter(r => r.length > 1).map(row => {
-                    let obj = {};
-                    headers.forEach((h, i) => obj[h] = row[i]?.trim());
-                    return obj;
-                });
+                App.branchData = branchRes.branches.find(b => b.id == App.branchId) || branchRes.branches[0];
+                // Optional: Filter products by branch if a "BranchID" column is added to CSV
+                App.allProducts = prodData; 
 
-                // 3. Filter products for THIS branch
-                // Assuming BranchID column exists in CSV
-                const branchProducts = allProducts; // If filtering by BranchID is required, add logic here
-
-                // 4. Render UI
-                renderHeader(currentBranch);
-                renderFilters(branchProducts);
-                renderProducts(branchProducts);
+                renderUI();
                 initPopup();
-
-                // 5. Cleanup
-                document.getElementById('loader').style.display = 'none';
-
-            } catch (err) {
-                console.error("Critical Init Error:", err);
+                document.getElementById('page-loader').style.display = 'none';
+            } catch (e) {
+                console.error("Init Failed", e);
             }
         }
 
-        window.onload = init;
+        window.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
 </html>
