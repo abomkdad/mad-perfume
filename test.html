@@ -46,12 +46,14 @@ header{
 @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
 .duty-btn { background: var(--wa); color: #fff; text-decoration: none; padding: 10px 22px; border-radius: 50px; font-weight: 700; display: flex; align-items: center; gap: 8px; transition: 0.3s; margin-top: 12px; }
 
-/* Grid & Cats */
+/* Filter Tabs */
 .cats-wrapper { position: sticky; top: 0; background: rgba(0,0,0,0.92); z-index: 100; border-bottom: 1px solid #222; backdrop-filter: blur(10px); }
 .cats{display:flex; gap:10px; overflow-x:auto; padding:12px; scrollbar-width:none;}
 .cats::-webkit-scrollbar{display:none}
 .cats button{ background: #111; color: #ccc; border: 1px solid #333; padding: 10px 24px; border-radius: 50px; cursor: pointer; white-space: nowrap; transition: 0.3s; }
 .cats button.active{background: var(--gold); color: #000; border-color: var(--gold); font-weight: 700;}
+
+/* Grid */
 .grid{display:grid; grid-template-columns:repeat(2,1fr); gap:12px; padding:15px}
 @media(min-width:768px){.grid{grid-template-columns:repeat(4,1fr); gap:20px}}
 .card{background:#111; border:1px solid #222; border-radius:10px; overflow:hidden;}
@@ -61,7 +63,7 @@ header{
 .price{color:var(--gold); font-weight:700; margin:10px 0; font-size: 1.2rem}
 .wa-btn{background:var(--wa); color:#fff; text-decoration:none; padding:12px; font-weight:700; border-radius:8px; display:block;}
 
-/* Popup Full Image */
+/* Popup Design */
 #popup-sale { position: fixed; inset: 0; background: rgba(0,0,0,0.95); display: none; align-items: center; justify-content: center; z-index: 10000; padding: 20px; }
 .sale-box { width: 100%; max-width: 400px; background: #000; border: 2px solid var(--gold); border-radius: 15px; overflow: hidden; position: relative; }
 .close-sale { position: absolute; top: 10px; right: 15px; font-size: 2.5rem; color: #fff; cursor: pointer; z-index: 10; background: rgba(0,0,0,0.3); border-radius: 50%; width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; }
@@ -142,6 +144,10 @@ async function start() {
     } catch (e) { console.error(e); }
 }
 
+function lead(action, label) {
+    if(window.fbq) fbq('track', 'Lead', { branch: branchID, action, label });
+}
+
 function parseCSV(text) {
     const lines = text.split('\n');
     for(let i=1; i<lines.length; i++){
@@ -169,13 +175,14 @@ function renderUI() {
     });
     document.getElementById('br-status').innerHTML = `<span class="status ${isOpen?'open':'closed'}">${isOpen?t.open:t.closed}</span>`;
 
-    // Social Icons
+    // Socials
     const socialEl = document.getElementById('br-social'); socialEl.innerHTML = '';
     const icons = { tiktok:'fa-brands fa-tiktok', instagram:'fa-brands fa-instagram', facebook:'fa-brands fa-facebook', waze:'fa-brands fa-waze', email:'fa-solid fa-envelope', youtube:'fa-brands fa-youtube' };
     Object.entries(b.social).forEach(([k, v]) => {
         if(v && icons[k]){
             const a = document.createElement('a'); a.href = k==='email'?'mailto:'+v:v; a.target="_blank";
             a.innerHTML = `<i class="${icons[k]}" style="color:white; font-size:1.5rem"></i>`;
+            a.onclick = () => lead('Social_Click', k);
             socialEl.appendChild(a);
         }
     });
@@ -208,12 +215,12 @@ function renderGrid(f) {
         const d = document.createElement('div'); d.className = 'card';
         d.innerHTML = `<div class="img"><img data-src="${p.img}"></div>
             <div class="info"><div style="font-size:0.85rem; height:2.5em; overflow:hidden;">${p.title}</div><div class="price">${p.price}</div>
-            <a class="wa-btn" target="_blank" href="https://wa.me/${STATE.branch.phone}?text=${encodeURIComponent(t.msg+p.title)}">${t.order}</a></div>`;
+            <a class="wa-btn" target="_blank" href="https://wa.me/${STATE.branch.phone}?text=${encodeURIComponent(t.msg+p.title)}" onclick="lead('Product_Order', '${p.title}')">${t.order}</a></div>`;
         g.appendChild(d); obs.observe(d.querySelector('img'));
     });
 }
 
-/** Popup & Timer Logic **/
+/** Popup & Widget Logic **/
 function openSale() {
     document.getElementById('popup-sale').style.display = 'flex';
     document.getElementById('reopen-sale').style.display = 'none';
@@ -246,8 +253,17 @@ function startTimer() {
 
 function initDailySale() {
     const saleKey = 'mad_sale_' + new Date().toDateString();
-    document.getElementById('sale-wa-link').textContent = TXT[lang].offer;
-    document.getElementById('sale-wa-link').href = `https://wa.me/${STATE.branch.phone}?text=DailyOffer`;
+    const t = TXT[lang];
+    
+    // WhatsApp Message Logic
+    const whatsappMsg = lang === 'ar' 
+        ? 'مرحباً، أريد الحصول على عرض اليوم الخاص بفرع ' + STATE.branch.name_ar 
+        : 'שלום, אשמח לקבל את ההטבה היומית של סניף ' + STATE.branch.name_he;
+
+    const saleLink = document.getElementById('sale-wa-link');
+    saleLink.textContent = t.offer;
+    saleLink.href = `https://wa.me/${STATE.branch.phone}?text=${encodeURIComponent(whatsappMsg)}`;
+    saleLink.onclick = () => lead('Daily_Offer_Click', STATE.branch.name_ar);
 
     if (localStorage.getItem(saleKey)) {
         document.getElementById('reopen-sale').style.display = 'flex';
