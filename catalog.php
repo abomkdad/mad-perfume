@@ -1,64 +1,58 @@
 <?php
 header("Content-Type: application/xml; charset=utf-8");
 
-// إعدادات الملف الأساسية
+// إعدادات الملف
 $csvFile = 'products.csv';
+// تأكد من وضع رابط موقعك الصحيح هنا
 $siteUrl = 'https://mad-parfumeur.com/'; 
 
 echo '<?xml version="1.0" encoding="UTF-8"?>';
 echo '<rss xmlns:g="http://base.google.com/ns/1.0" version="2.0">';
 echo '<channel>';
-echo '<title>MAD Parfumeur Official Catalog</title>';
+echo '<title>MAD Parfumeur Product Feed</title>';
 echo '<link>' . $siteUrl . '</link>';
-echo '<description>Professional Product Feed for Meta &amp; TikTok Ads</description>';
+echo '<description>Official product feed for Meta and TikTok Catalog Ads</description>';
 
 if (($handle = fopen($csvFile, "r")) !== FALSE) {
-    // تخطي السطر الأول (العناوين)
+    // قراءة السطر الأول (العناوين) وتجاوزه
     $headers = fgetcsv($handle, 1000, ",");
     
     while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
-        // التحقق من البيانات الأساسية (الاسم، السعر الحالي، الصورة)
+        // التحقق من وجود اسم المنتج والسعر ورابط الصورة
         if (empty($data[1]) || empty($data[10]) || empty($data[4])) continue;
 
         echo '<item>';
-        // 1. المعرف الفريد للمنتج
+        // معرف المنتج (ID)
         echo '<g:id>' . htmlspecialchars(trim($data[0])) . '</g:id>'; 
         
-        // 2. اسم المنتج
+        // عنوان المنتج
         echo '<g:title>' . htmlspecialchars(trim($data[1])) . '</g:title>'; 
         
-        // 3. الوصف (ميتا تتطلب وصفاً، سنستخدم حقل الوصف أو نصاً ترويجياً)
-        $desc = !empty($data[2]) ? $data[2] : $data[1] . " - عطر فاخر وحصري من تشكيلة ماد بارفيومير الأصلية، ثبات عالي ورائحة جذابة.";
-        echo '<g:description>' . htmlspecialchars(trim($desc)) . '</g:description>';
+        // وصف المنتج (إجباري لميتا)
+        $description = !empty($data[2]) ? $data[2] : $data[1] . " - عطر فاخر من تشكيلة ماد بارفيومير الأصلية.";
+        echo '<g:description>' . htmlspecialchars(trim($description)) . '</g:description>';
         
-        // 4. رابط المنتج (يوجه الزبون لصفحة offer.html)
+        // رابط المنتج على الموقع
         echo '<g:link>' . $siteUrl . 'offer.html?id=' . trim($data[0]) . '</g:link>';
         
-        // 5. رابط الصورة
+        // رابط الصورة (يجب أن يبدأ بـ https://)
         echo '<g:image_link>' . htmlspecialchars(trim($data[4])) . '</g:image_link>';
         
-        // 6. تفاصيل الحالة والتوفر
+        // حالة المنتج وتوفره
         echo '<g:condition>new</g:condition>';
         echo '<g:availability>in stock</g:availability>';
         
-        // 7. معالجة الأسعار (إظهار السعر قبل وبعد الخصم)
-        // لنفترض أن السعر الحالي في العمود 10 والسعر الأصلي في العمود 9 (إذا توفر)
-        // إذا لم يتوفر سعر أصلي، سنعرض السعر الحالي فقط
-        $currentPrice = preg_replace('/[^0-9.]/', '', $data[10]);
-        echo '<g:price>' . $currentPrice . ' ILS</g:price>';
+        // السعر الحالي (مع العملة ILS)
+        $priceNum = preg_replace('/[^0-9.]/', '', $data[10]);
+        echo '<g:price>' . $priceNum . ' ILS</g:price>';
         
-        // إذا كان هناك سعر أعلى (قبل الخصم) في العمود رقم 9 مثلاً، قم بتفعيل السطر أدناه:
-        // if(!empty($data[9])) {
-        //    $oldPrice = preg_replace('/[^0-9.]/', '', $data[9]);
-        //    echo '<g:sale_price>' . $currentPrice . ' ILS</g:sale_price>';
-        //    echo '<g:price>' . $oldPrice . ' ILS</g:price>';
-        // }
-
-        // 8. الماركة والتصنيف الدولي (ضروري جداً لخوارزميات الاستهداف)
+        // الماركة (إجبارية)
         echo '<g:brand>MAD Parfumeur</g:brand>';
+        
+        // تصنيف جوجل للمنتجات (يساعد في دقة الإعلانات)
         echo '<g:google_product_category>Health &amp; Beauty &gt; Personal Care &gt; Cosmetics &gt; Perfume &amp; Cologne</g:google_product_category>';
         
-        // 9. نوع المنتج (التصنيف الداخلي الخاص بك من العمود 11)
+        // نوع المنتج حسب تصنيفك (العمود 11)
         if (!empty($data[11])) {
             echo '<g:product_type>' . htmlspecialchars(trim($data[11])) . '</g:product_type>';
         }
@@ -69,5 +63,5 @@ if (($handle = fopen($csvFile, "r")) !== FALSE) {
 }
 
 echo '</channel>';
-rss>';
+echo '</rss>';
 ?>
