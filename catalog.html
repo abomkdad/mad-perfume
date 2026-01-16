@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>MAD PARFUMEUR | Catalog</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body{
+  margin:0;
+  font-family:Arial;
+  background:#000;
+  color:#fff;
+}
+header{
+  text-align:center;
+  padding:20px;
+  font-size:26px;
+  font-weight:bold;
+  color:#d4af37;
+}
+.catalog{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(180px,1fr));
+  gap:15px;
+  padding:15px;
+}
+.card{
+  background:#111;
+  border:1px solid #222;
+  border-radius:10px;
+  overflow:hidden;
+  text-align:center;
+}
+.card img{
+  width:100%;
+  height:220px;
+  object-fit:cover;
+}
+.card h3{
+  margin:10px 5px;
+  font-size:16px;
+}
+.card span{
+  color:#d4af37;
+  font-weight:bold;
+}
+</style>
+</head>
+
+<body>
+
+<header>MAD PARFUMEUR – Catalog</header>
+
+<div class="catalog" id="catalog"></div>
+
+<script>
+const lang = navigator.language.includes('he') ? 'he' : 'ar';
+
+fetch('Product.csv')
+.then(res => res.text())
+.then(text => {
+  const rows = text.split('\n').slice(1);
+  const catalog = document.getElementById('catalog');
+
+  rows.forEach(r=>{
+    if(!r.trim()) return;
+    const [id,ar,he,price,img,cat] = r.split(',');
+    const name = lang==='he' ? he : ar;
+
+    catalog.innerHTML += `
+      <div class="card">
+        <img src="${img}">
+        <h3>${name}</h3>
+        <span>${price} ₪</span>
+      </div>
+    `;
+  });
+});
+</script>
+
+</body>
+</html>
