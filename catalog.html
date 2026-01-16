@@ -2,48 +2,76 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<title>MAD PARFUMEUR | Catalog</title>
+<title>MAD PARFUMEUR – Catalog</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
+:root{
+  --gold:#d4af37;
+  --bg:#000;
+  --card:#111;
+  --border:#222;
+}
+
 body{
   margin:0;
-  font-family:Arial;
-  background:#000;
+  background:var(--bg);
   color:#fff;
+  font-family:Arial, sans-serif;
 }
+
 header{
   text-align:center;
-  padding:20px;
+  padding:25px 10px;
   font-size:26px;
   font-weight:bold;
-  color:#d4af37;
+  color:var(--gold);
 }
+
 .catalog{
   display:grid;
   grid-template-columns:repeat(auto-fill,minmax(180px,1fr));
-  gap:15px;
-  padding:15px;
+  gap:16px;
+  padding:16px;
 }
+
 .card{
-  background:#111;
-  border:1px solid #222;
-  border-radius:10px;
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:12px;
   overflow:hidden;
   text-align:center;
+  transition:transform .2s ease, box-shadow .2s ease;
 }
+
+.card:hover{
+  transform:translateY(-4px);
+  box-shadow:0 10px 25px rgba(0,0,0,.6);
+}
+
+.card a{
+  display:block;
+}
+
 .card img{
   width:100%;
-  height:220px;
+  height:230px;
   object-fit:cover;
+  background:#000;
 }
+
 .card h3{
-  margin:10px 5px;
-  font-size:16px;
+  margin:10px 6px 4px;
+  font-size:15px;
+  font-weight:600;
 }
+
 .card span{
-  color:#d4af37;
+  display:block;
+  margin-bottom:12px;
+  color:var(--gold);
   font-weight:bold;
+  font-size:14px;
 }
 </style>
 </head>
@@ -55,27 +83,66 @@ header{
 <div class="catalog" id="catalog"></div>
 
 <script>
+/*
+CSV STRUCTURE (as provided):
+
+0  ID
+1  Name / Code (AR)
+2  Name / Code (HE)
+3  Product URL
+4  Cover Image
+5  Gallery Images ( | separated )
+6  Video URL
+7  Domain
+8  Stock
+9  Status
+10 Price
+11 Category
+12 Category (duplicate)
+*/
+
 const lang = navigator.language.includes('he') ? 'he' : 'ar';
+if(lang === 'he'){
+  document.documentElement.lang = 'he';
+  document.documentElement.dir = 'rtl';
+}
 
 fetch('Product.csv')
 .then(res => res.text())
-.then(text => {
-  const rows = text.split('\n').slice(1);
+.then(csv => {
+
+  const lines = csv.trim().split(/\r?\n/);
   const catalog = document.getElementById('catalog');
 
-  rows.forEach(r=>{
-    if(!r.trim()) return;
-    const [id,ar,he,price,img,cat] = r.split(',');
-    const name = lang==='he' ? he : ar;
+  lines.forEach(line => {
+    if(!line.trim()) return;
 
-    catalog.innerHTML += `
+    const cols = line.split(',');
+
+    const name_ar = cols[1]?.trim();
+    const name_he = cols[2]?.trim();
+    const productUrl = cols[3]?.trim();
+    const image = cols[4]?.trim();
+    const price = cols[10]?.trim();
+
+    const name = lang === 'he' ? name_he : name_ar;
+
+    if(!name || !image) return;
+
+    catalog.insertAdjacentHTML('beforeend', `
       <div class="card">
-        <img src="${img}">
+        <a href="${productUrl}" target="_blank" rel="noopener">
+          <img src="${image}" loading="lazy" alt="${name}">
+        </a>
         <h3>${name}</h3>
-        <span>${price} ₪</span>
+        <span>${price}</span>
       </div>
-    `;
+    `);
   });
+
+})
+.catch(err=>{
+  console.error('CSV load error:', err);
 });
 </script>
 
