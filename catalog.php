@@ -1,58 +1,56 @@
 <?php
 header("Content-Type: application/xml; charset=utf-8");
 
-// إعدادات الملف
+// إعدادات الملف - تأكد من صحة الرابط
 $csvFile = 'products.csv';
-// تأكد من وضع رابط موقعك الصحيح هنا
 $siteUrl = 'https://mad-parfumeur.com/'; 
 
 echo '<?xml version="1.0" encoding="UTF-8"?>';
 echo '<rss xmlns:g="http://base.google.com/ns/1.0" version="2.0">';
 echo '<channel>';
-echo '<title>MAD Parfumeur Product Feed</title>';
+echo '<title>MAD Parfumeur Catalog Feed</title>';
 echo '<link>' . $siteUrl . '</link>';
-echo '<description>Official product feed for Meta and TikTok Catalog Ads</description>';
+echo '<description>High-quality product feed for Meta Advantage+ Ads</description>';
 
 if (($handle = fopen($csvFile, "r")) !== FALSE) {
-    // قراءة السطر الأول (العناوين) وتجاوزه
+    // قراءة سطر العناوين
     $headers = fgetcsv($handle, 1000, ",");
     
     while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
-        // التحقق من وجود اسم المنتج والسعر ورابط الصورة
+        // التحقق من الأعمدة الأساسية: ID (0), Title (1), Image (4), Price (10)
         if (empty($data[1]) || empty($data[10]) || empty($data[4])) continue;
 
         echo '<item>';
-        // معرف المنتج (ID)
+        // المعرف الفريد
         echo '<g:id>' . htmlspecialchars(trim($data[0])) . '</g:id>'; 
         
-        // عنوان المنتج
+        // العنوان
         echo '<g:title>' . htmlspecialchars(trim($data[1])) . '</g:title>'; 
         
-        // وصف المنتج (إجباري لميتا)
-        $description = !empty($data[2]) ? $data[2] : $data[1] . " - عطر فاخر من تشكيلة ماد بارفيومير الأصلية.";
+        // الوصف (إلزامي لميتا)
+        $description = !empty($data[2]) ? $data[2] : $data[1] . " - اكتشف التشكيلة الحصرية من عطور ماد بارفيومير. جودة عالية وثبات يدوم طويلاً.";
         echo '<g:description>' . htmlspecialchars(trim($description)) . '</g:description>';
         
-        // رابط المنتج على الموقع
+        // رابط المنتج
         echo '<g:link>' . $siteUrl . 'offer.html?id=' . trim($data[0]) . '</g:link>';
         
-        // رابط الصورة (يجب أن يبدأ بـ https://)
-        echo '<g:image_link>' . htmlspecialchars(trim($data[4])) . '</g:image_link>';
+        // رابط الصورة - تأكد أنه يبدأ بـ https://
+        $imageUrl = trim($data[4]);
+        echo '<g:image_link>' . htmlspecialchars($imageUrl) . '</g:image_link>';
         
-        // حالة المنتج وتوفره
+        // البيانات اللوجستية
         echo '<g:condition>new</g:condition>';
         echo '<g:availability>in stock</g:availability>';
+        echo '<g:brand>MAD Parfumeur</g:brand>';
         
-        // السعر الحالي (مع العملة ILS)
+        // السعر الحالي (تنظيف الرقم وإضافة العملة)
         $priceNum = preg_replace('/[^0-9.]/', '', $data[10]);
         echo '<g:price>' . $priceNum . ' ILS</g:price>';
         
-        // الماركة (إجبارية)
-        echo '<g:brand>MAD Parfumeur</g:brand>';
-        
-        // تصنيف جوجل للمنتجات (يساعد في دقة الإعلانات)
+        // التصنيف الدولي (مهم جداً للذكاء الاصطناعي Advantage+)
         echo '<g:google_product_category>Health &amp; Beauty &gt; Personal Care &gt; Cosmetics &gt; Perfume &amp; Cologne</g:google_product_category>';
         
-        // نوع المنتج حسب تصنيفك (العمود 11)
+        // تصنيف المنتج الداخلي (العمود 11)
         if (!empty($data[11])) {
             echo '<g:product_type>' . htmlspecialchars(trim($data[11])) . '</g:product_type>';
         }
