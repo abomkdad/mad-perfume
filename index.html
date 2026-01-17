@@ -77,7 +77,6 @@
 
         .container { max-width: 800px; margin: -35px auto 50px; padding: 0 15px; }
         
-        /* Directory List Style */
         .branch-card {
             background: var(--card-bg); border-radius: 20px; padding: 25px;
             margin-bottom: 20px; border-right: 5px solid var(--gold);
@@ -88,7 +87,6 @@
         .dist-info { font-size: 12px; color: #888; font-weight: bold; margin-top: 4px; }
         .status-pill { font-size: 11px; padding: 4px 10px; border-radius: 25px; font-weight: 800; display: flex; align-items: center; gap: 5px; border: 1px solid; }
 
-        /* Shop Product Card Style */
         .product-card {
             background: var(--card-bg); border-radius: 15px; padding: 15px;
             margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center;
@@ -130,7 +128,7 @@
             <small>שירות לקוחות</small>
             <div class="hotline">*9935</div>
         </a>
-        <a href="https://wa.me/972509787730" class="action-item">
+        <a id="wa-corp-btn" href="#" class="action-item">
             <i class="fab fa-whatsapp"></i>
             <span class="l-wa"></span>
             <small>וואטסאפ חברה</small>
@@ -171,10 +169,23 @@
         he: { cs:"שירות לקוחות", wa:"וואטסאפ חברה", shop:"הזמנה אונליין", open:"פתוח עכשיו", closed:"סגור כעת", enter:"כניסה לסניף", waze:"ניווט", wa_btn:"וואטסאפ", km:'ק"מ', back:"חזרה לרשימה", order:"הזמנה בוואטסאפ" }
     }[userLang];
 
+    // وظيفة معالجة الرقم وتحويل الصفر إلى 972
+    function buildWaUrl(phone, text = '') {
+        let cleanPhone = phone.replace(/\D/g, ''); 
+        if (cleanPhone.startsWith('0')) {
+            cleanPhone = '972' + cleanPhone.substring(1);
+        }
+        return `https://api.whatsapp.com/send/?phone=${cleanPhone}&text=${encodeURIComponent(text)}&type=phone_number&app_absent=0`;
+    }
+
     document.querySelector('.l-cs').textContent = t.cs;
     document.querySelector('.l-wa').textContent = t.wa;
     document.querySelector('.l-shop').textContent = t.shop;
     document.querySelector('.l-back').textContent = t.back;
+    
+    // تحديث رابط واتساب الشركة في الهيدر
+    document.getElementById('wa-corp-btn').href = buildWaUrl('0509787730');
+    
     document.getElementById('online-btn').href = (userLang === "he") ? "https://madperfume.co.il" : "https://madperfume.ps";
 
     let allBranches = [];
@@ -203,7 +214,6 @@
 
     async function init() {
         try {
-            // جلب البيانات مع منع الكاش
             const res = await fetch('branches.json?v=' + Date.now());
             const data = await res.json();
             allBranches = data.branches;
@@ -236,9 +246,11 @@
         container.innerHTML = '';
         list.forEach(b => {
             const open = isBranchOpen(b);
-            // حل مشكلة فرع 17 وسحب الرابط المباشر من الجيسون
             const wazeLink = (b.social && b.social.waze) ? b.social.waze : `https://ul.waze.com/ul?ll=${b.lat},${b.lng}&navigate=yes`;
             
+            // استخدام الصيغة الدولية للواتساب لكل فرع
+            const waBranchLink = buildWaUrl(b.phone);
+
             const card = document.createElement('div');
             card.className = 'branch-card';
             card.innerHTML = `
@@ -252,7 +264,7 @@
                     </div>
                 </div>
                 <div class="btn-group">
-                    <a href="https://wa.me/${b.phone}" class="btn bg-wa"><i class="fab fa-whatsapp"></i>${t.wa_btn}</a>
+                    <a href="${waBranchLink}" class="btn bg-wa"><i class="fab fa-whatsapp"></i>${t.wa_btn}</a>
                     <a href="${wazeLink}" target="_blank" class="btn bg-waze"><i class="fab fa-waze"></i>${t.waze}</a>
                     <a href="offer.html?branch=${b.id}" class="btn bg-enter"><i class="fas fa-door-open"></i>${t.enter}</a>
                 </div>`;
@@ -279,6 +291,9 @@
                 const c = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
                 if(c[1]) {
                     const name = c[1].replace(/"/g,'').trim();
+                    // استخدام الصيغة الدولية للواتساب لطلب المنتج
+                    const waOrderLink = buildWaUrl(branch.phone, t.order + ': ' + name);
+
                     const pCard = document.createElement('div');
                     pCard.className = 'product-card';
                     pCard.innerHTML = `
@@ -286,7 +301,7 @@
                             <div style="font-weight:900; font-size:14px;">${name}</div>
                             <div style="color:var(--gold); font-weight:bold; margin-top:5px;">${c[10] || ''} ₪</div>
                         </div>
-                        <a href="https://wa.me/${branch.phone}?text=${encodeURIComponent(t.order + ': ' + name)}" class="btn bg-wa" style="width:45px; height:45px; border-radius:50%;"><i class="fab fa-whatsapp" style="margin:0; font-size:18px;"></i></a>`;
+                        <a href="${waOrderLink}" class="btn bg-wa" style="width:45px; height:45px; border-radius:50%;"><i class="fab fa-whatsapp" style="margin:0; font-size:18px;"></i></a>`;
                     grid.appendChild(pCard);
                 }
             });
