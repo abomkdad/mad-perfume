@@ -2,7 +2,7 @@
 <html lang="he" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>MAD PARFUMEUR | Official Portal</title>
 
     <script>
@@ -86,12 +86,6 @@
         .br-title { font-size: 20px; font-weight: 800; color: var(--gold); }
         .status-pill { font-size: 11px; padding: 4px 10px; border-radius: 25px; font-weight: 800; display: flex; align-items: center; gap: 5px; border: 1px solid; }
 
-        .product-card {
-            background: var(--card-bg); border-radius: 15px; padding: 15px;
-            margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center;
-            border-right: 4px solid var(--gold);
-        }
-
         .btn-group { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
         .btn { padding: 12px 5px; border-radius: 12px; text-decoration: none; color: white; font-weight: 800; font-size: 12px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 4px; }
         .bg-wa { background: var(--wa-green); }
@@ -119,46 +113,56 @@
         /* --- IPHONE 17 PRO MAX CENTERED MODAL FIXED --- */
         #frag-modal {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.9); z-index: 100000; backdrop-filter: blur(5px);
+            background: rgba(0,0,0,0.9); z-index: 100000; backdrop-filter: blur(8px);
             align-items: center; justify-content: center;
         }
         .modal-content {
             position: relative;
+            /* iPhone 17 Pro Max Exact Screen Dimensions */
             width: 440px; 
             height: 954px; 
-            max-width: 95vw; 
-            max-height: 92vh;
-            background: #000; /* خلفية سوداء لمنع البياض */
-            border-radius: 40px; 
+            max-width: 98vw; 
+            max-height: 96vh;
+            background: #000; /* Prevent white flash */
+            border-radius: 45px; 
             overflow: hidden; 
-            box-shadow: 0 0 50px rgba(0,0,0,0.8);
+            box-shadow: 0 0 60px rgba(0,0,0,1);
             border: 3px solid var(--gold);
-            transform: translateY(100vh);
-            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.1);
+            transform: translateY(110vh);
+            transition: transform 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+            display: flex;
+            flex-direction: column;
         }
         #frag-modal.show .modal-content { transform: translateY(0); }
         
+        #frag-frame-wrapper {
+            flex: 1;
+            width: 100%;
+            height: 100%;
+            position: relative;
+            background: #fff;
+        }
+
         #frag-frame { 
             width: 100%; 
             height: 100%; 
             border: none; 
             display: block;
-            opacity: 0; /* مخفي حتى يجهز */
-            transition: opacity 0.3s;
+            opacity: 0;
+            transition: opacity 0.4s ease;
         }
         
-        /* مؤشر تحميل بسيط */
-        .loader {
-            position: absolute; top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
-            color: var(--gold); font-size: 30px;
+        .loader-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: #000; display: flex; align-items: center; justify-content: center;
+            z-index: 10;
         }
 
         .close-modal {
-            position: absolute; top: 20px; right: 20px; background: rgba(0,0,0,0.7);
-            color: var(--gold); border: 2px solid var(--gold); width: 40px; height: 40px;
-            border-radius: 50%; font-weight: bold; cursor: pointer; z-index: 100001;
-            display: flex; align-items: center; justify-content: center; font-size: 20px;
+            position: absolute; top: 25px; right: 25px; background: rgba(0,0,0,0.8);
+            color: var(--gold); border: 2px solid var(--gold); width: 42px; height: 42px;
+            border-radius: 50%; font-weight: bold; cursor: pointer; z-index: 100002;
+            display: flex; align-items: center; justify-content: center; font-size: 22px;
         }
     </style>
 </head>
@@ -202,6 +206,14 @@
     <div id="view-directory">
         <div id="branchesList" style="text-align:center; color:#888;">جاري تحميل البيانات...</div>
     </div>
+
+    <div id="view-shop" class="hidden">
+        <button onclick="window.location.href='index.html'" style="background:none; border:1px solid var(--gold); color:var(--gold); padding:8px 20px; border-radius:25px; cursor:pointer; margin-bottom:20px; font-weight:bold;">
+            <i class="fas fa-arrow-right"></i> <span class="l-back"></span>
+        </button>
+        <h2 id="shop-title" style="color:var(--gold); margin-bottom:20px; text-align:center;"></h2>
+        <div id="productsGrid"></div>
+    </div>
 </div>
 
 <div class="sticky-fragrantica">
@@ -214,9 +226,11 @@
 
 <div id="frag-modal" onclick="closeFragModal()">
     <div class="modal-content" onclick="event.stopPropagation()">
-        <div class="loader"><i class="fas fa-spinner fa-spin"></i></div>
+        <div class="loader-overlay"><i class="fas fa-spinner fa-spin" style="color:var(--gold); font-size:40px;"></i></div>
         <button class="close-modal" onclick="closeFragModal()">×</button>
-        <iframe id="frag-frame" src=""></iframe>
+        <div id="frag-frame-wrapper">
+            <iframe id="frag-frame" src=""></iframe>
+        </div>
     </div>
 </div>
 
@@ -226,8 +240,8 @@
     document.documentElement.dir = "rtl";
 
     const t = {
-        ar: { cs:"خدمة الزبائن", wa:"واتساب الشركة", shop:"الطلب أونلاين", open:"مفتوح", closed:"مغلق", back:"عودة", s_h:"موسوعة العطور", s_p:"التقييمات والمكونات", s_b:"عرض" },
-        he: { cs:"שירות לקוחות", wa:"וואטסאפ חברה", shop:"הזמנה אונליין", open:"פתוח", closed:"סגור", back:"חזרה", s_h:"אנציקלופדיית בשמים", s_p:"מרכיבים וביקורות", s_b:"צפייה" }
+        ar: { cs:"خدمة الزبائن", wa:"واتساب الشركة", shop:"الطلب أونلاين", open:"مفتوح", closed:"مغلق", back:"عودة", s_h:"موسوعة العطور العالميّة", s_p:"اكتشف المكونات والتقييمات", s_b:"عرض الموسوعة" },
+        he: { cs:"שירות לקוחות", wa:"וואטסאפ חברה", shop:"הזמנה אונליין", open:"פתוח", closed:"סגור", back:"חזרה", s_h:"אנציקלופדיית בשמים", s_p:"מרכיבים וביקורות מלאות", s_b:"צפייה במותג" }
     }[userLang];
 
     document.getElementById('s-title').textContent = t.s_h;
@@ -237,10 +251,10 @@
     document.querySelector('.l-wa').textContent = t.wa;
     document.querySelector('.l-shop').textContent = t.shop;
 
-    function buildWaUrl(phone) {
+    function buildWaUrl(phone, text = '') {
         let p = phone.replace(/\D/g, ''); 
         if (p.startsWith('0')) p = '972' + p.substring(1);
-        return `https://api.whatsapp.com/send/?phone=${p}`;
+        return `https://api.whatsapp.com/send/?phone=${p}&text=${encodeURIComponent(text)}`;
     }
 
     document.getElementById('wa-corp-btn').href = buildWaUrl('0509787730');
@@ -250,17 +264,21 @@
         const url = (userLang === "he") ? "https://www.fragrantica.co.il/designers/Mad-Parfumeur.html" : "https://www.fragranticarabia.com/designers/Mad-Parfumeur.html";
         const modal = document.getElementById('frag-modal');
         const frame = document.getElementById('frag-frame');
+        const loader = document.querySelector('.loader-overlay');
         
-        frame.style.opacity = "0"; // إخفاء حتى يجهز
+        loader.style.display = 'flex';
+        frame.style.opacity = "0";
         frame.src = url;
         modal.style.display = 'flex';
         
         frame.onload = function() {
-            frame.style.opacity = "1"; // إظهار عند الجاهزية
-            document.querySelector('.loader').style.display = 'none';
+            setTimeout(() => {
+                frame.style.opacity = "1";
+                loader.style.display = 'none';
+            }, 500);
         };
 
-        setTimeout(() => { modal.classList.add('show'); }, 50);
+        setTimeout(() => { modal.classList.add('show'); }, 10);
         document.body.style.overflow = 'hidden';
     }
 
@@ -270,9 +288,8 @@
         setTimeout(() => {
             modal.style.display = 'none';
             document.getElementById('frag-frame').src = '';
-            document.querySelector('.loader').style.display = 'block';
             document.body.style.overflow = 'auto';
-        }, 400);
+        }, 500);
     }
 
     async function init() {
@@ -290,7 +307,7 @@
                     <div class="btn-group">
                         <a href="${buildWaUrl(b.phone)}" class="btn bg-wa"><i class="fab fa-whatsapp"></i>${t.wa}</a>
                         <a href="${(b.social && b.social.waze) ? b.social.waze : `https://ul.waze.com/ul?ll=${b.lat},${b.lng}&navigate=yes`}" target="_blank" class="btn bg-waze"><i class="fab fa-waze"></i>ניווט</a>
-                        <a href="?branch=${b.id}" class="btn bg-enter"><i class="fas fa-door-open"></i>${t.enter || 'כניסה'}</a>
+                        <a href="?branch=${b.id}" class="btn bg-enter"><i class="fas fa-door-open"></i>כניסה</a>
                     </div>`;
                 container.appendChild(card);
             });
