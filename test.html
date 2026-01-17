@@ -87,12 +87,6 @@
         .dist-info { font-size: 12px; color: #888; font-weight: bold; margin-top: 4px; }
         .status-pill { font-size: 11px; padding: 4px 10px; border-radius: 25px; font-weight: 800; display: flex; align-items: center; gap: 5px; border: 1px solid; }
 
-        .product-card {
-            background: var(--card-bg); border-radius: 15px; padding: 15px;
-            margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center;
-            border-right: 4px solid var(--gold);
-        }
-
         .btn-group { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
         .btn { padding: 12px 5px; border-radius: 12px; text-decoration: none; color: white; font-weight: 800; font-size: 12px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 4px; }
         .bg-wa { background: var(--wa-green); }
@@ -100,56 +94,21 @@
         .bg-enter { background: var(--btn-gray); }
 
         .hidden { display: none !important; }
-        [dir="ltr"] .branch-card, [dir="ltr"] .product-card { border-right: none; border-left: 5px solid var(--gold); }
 
-        /* --- STICKY FOOTER PREMIUM --- */
-        .sticky-footer {
+        /* --- STICKY FOOTER --- */
+        .sticky-fragrantica {
             position: fixed; bottom: 0; left: 0; width: 100%;
             background: #111; border-top: 2px solid var(--gold);
-            padding: 15px 25px; display: flex; justify-content: space-between;
+            padding: 12px 15px; display: flex; justify-content: space-between;
             align-items: center; z-index: 9999; box-shadow: 0 -5px 15px rgba(0,0,0,0.5);
         }
-        .sticky-footer .footer-info { text-align: right; }
-        .sticky-footer h5 { color: var(--gold); font-size: 15px; margin-bottom: 2px; }
-        .sticky-footer p { font-size: 11px; opacity: 0.7; }
-        .footer-cta {
+        .sticky-fragrantica .txt-side { flex: 1; text-align: right; }
+        .sticky-fragrantica h5 { color: var(--gold); font-size: 14px; margin-bottom: 2px; }
+        .sticky-fragrantica p { font-size: 11px; opacity: 0.7; }
+        .open-frag-btn {
             background: var(--gold); color: #000; padding: 10px 20px;
-            border-radius: 25px; font-weight: 900; border: none; cursor: pointer;
-        }
-
-        /* --- IPHONE 17 PRO MAX CENTERED MODAL --- */
-        #frag-modal {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.9); z-index: 100000; backdrop-filter: blur(8px);
-            align-items: center; justify-content: center;
-        }
-        .modal-iphone-frame {
-            position: relative;
-            width: 440px; height: 954px; /* iPhone 17 Pro Max Size */
-            max-width: 92vw; max-height: 92vh;
-            background: #000; border-radius: 50px; overflow: hidden;
-            box-shadow: 0 0 50px rgba(0,0,0,1);
-            border: 3px solid var(--gold);
-            transform: translateY(110%);
-            transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.15);
-            display: flex; flex-direction: column;
-        }
-        #frag-modal.active .modal-iphone-frame { transform: translateY(0); }
-
-        /* Browser Header Style */
-        .modal-header {
-            background: #1a1a1a; padding: 15px 20px; display: flex;
-            justify-content: space-between; align-items: center; border-bottom: 1px solid #333;
-        }
-        .browser-url { font-size: 11px; color: #888; font-weight: 600; }
-        .close-modal-btn { background: #ff3b30; color: #fff; border: none; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; font-weight: bold; }
-
-        .frame-wrapper { flex: 1; position: relative; background: #fff; }
-        #frag-frame { width: 100%; height: 100%; border: none; opacity: 0; transition: opacity 0.5s; }
-        
-        .loading-mask {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: #000; display: flex; align-items: center; justify-content: center; z-index: 5;
+            border-radius: 25px; font-weight: 900; font-size: 12px;
+            border: none; cursor: pointer; white-space: nowrap; margin-right: 10px;
         }
     </style>
 </head>
@@ -203,26 +162,12 @@
     </div>
 </div>
 
-<div class="sticky-footer">
-    <div class="footer-info">
+<div class="sticky-fragrantica">
+    <div class="txt-side">
         <h5 id="s-title"></h5>
         <p id="s-desc"></p>
     </div>
-    <button class="footer-cta" onclick="openFragModal()" id="s-btn"></button>
-</div>
-
-<div id="frag-modal" onclick="closeFragModal()">
-    <div class="modal-iphone-frame" onclick="event.stopPropagation()">
-        <div class="modal-header">
-            <button class="close-modal-btn" onclick="closeFragModal()">×</button>
-            <span class="browser-url">fragrantica.com</span>
-            <i class="fas fa-lock" style="color:#555; font-size:10px;"></i>
-        </div>
-        <div class="frame-wrapper">
-            <div class="loading-mask" id="frame-loader"><i class="fas fa-spinner fa-spin" style="color:var(--gold); font-size:30px;"></i></div>
-            <iframe id="frag-frame" src=""></iframe>
-        </div>
-    </div>
+    <button class="open-frag-btn" onclick="openFragModal()" id="s-btn"></button>
 </div>
 
 <script>
@@ -233,8 +178,16 @@
     document.documentElement.dir = (userLang === "ar") ? "rtl" : "ltr";
 
     const t = {
-        ar: { cs:"خدمة الزبائن", wa:"واتساب الشركة", shop:"الطلب أونلاين", open:"مفتوح", closed:"مغلق", back:"عودة", s_h:"موسوعة العطور", s_p:"المكونات والتقييمات", s_b:"عرض" },
-        he: { cs:"שירות לקוחות", wa:"וואטסאפ חברה", shop:"הזמנה אונליין", open:"פתוח", closed:"סגור", back:"חזרה", s_h:"אנציקלופדיית בשמים", s_p:"מרכיבים וביקורות", s_b:"צפייה" }
+        ar: { 
+            cs:"خدمة الزبائن", wa:"واتساب الشركة", shop:"الطلب أونلاين", open:"مفتوح الآن", closed:"مغلق حالياً", 
+            enter:"دخول الفرع", waze:"Waze", wa_btn:"واتساب", km:"كم", back:"العودة للقائمة", order:"طلب عبر واتساب",
+            s_h: "موسوعة عطور Fragrantica", s_p: "المكونات والتقييمات الكاملة", s_b: "عرض العطور"
+        },
+        he: { 
+            cs:"שירות לקוחות", wa:"וואטסאפ חברה", shop:"הזמנה אונליין", open:"פתוח עכשיו", closed:"סגור כעת", 
+            enter:"כניסה לסניף", waze:"ניווט", wa_btn:"וואטסאפ", km:'ק"מ', back:"חזרה לרשימה", order:"הזמנה בוואטסאפ",
+            s_h: "אנציקלופדיית Fragrantica", s_p: "פירוט מרכיבים וביקורות", s_b: "צפה בבשמים"
+        }
     }[userLang];
 
     document.getElementById('s-title').textContent = t.s_h;
@@ -246,68 +199,123 @@
     document.querySelector('.l-back').textContent = t.back;
 
     function buildWaUrl(phone, text = '') {
-        let p = phone.replace(/\D/g, ''); 
-        if (p.startsWith('0')) p = '972' + p.substring(1);
-        return `https://api.whatsapp.com/send/?phone=${p}&text=${encodeURIComponent(text)}`;
+        let cleanPhone = phone.replace(/\D/g, ''); 
+        if (cleanPhone.startsWith('0')) cleanPhone = '972' + cleanPhone.substring(1);
+        return `https://api.whatsapp.com/send/?phone=${cleanPhone}&text=${encodeURIComponent(text)}`;
     }
 
     document.getElementById('wa-corp-btn').href = buildWaUrl('0509787730');
     document.getElementById('online-btn').href = (userLang === "he") ? "https://madperfume.co.il" : "https://madperfume.ps";
 
+    // الحل الاحترافي بفتح نافذة جديدة بدلاً من Iframe
     function openFragModal() {
-        const url = (userLang === "he") ? "https://www.fragrantica.co.il/designers/Mad-Parfumeur.html" : "https://www.fragranticarabia.com/designers/Mad-Parfumeur.html";
-        const modal = document.getElementById('frag-modal');
-        const frame = document.getElementById('frag-frame');
-        const loader = document.getElementById('frame-loader');
+        const url = (userLang === "he") 
+            ? "https://www.fragrantica.co.il/designers/Mad-Parfumeur.html" 
+            : "https://www.fragranticarabia.com/designers/Mad-Parfumeur.html";
         
-        frame.src = url;
-        modal.style.display = 'flex';
-        loader.style.display = 'flex';
-        frame.style.opacity = '0';
-        
-        frame.onload = () => {
-            setTimeout(() => {
-                loader.style.display = 'none';
-                frame.style.opacity = '1';
-            }, 800);
-        };
-        
-        setTimeout(() => { modal.classList.add('active'); }, 10);
-        document.body.style.overflow = 'hidden';
+        window.open(url, '_blank', 'noopener,noreferrer');
     }
 
-    function closeFragModal() {
-        const modal = document.getElementById('frag-modal');
-        modal.classList.remove('active');
-        setTimeout(() => {
-            modal.style.display = 'none';
-            document.getElementById('frag-frame').src = '';
-            document.body.style.overflow = 'auto';
-        }, 500);
+    let allBranches = [];
+
+    function isBranchOpen(b) {
+        const now = new Date();
+        const days = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
+        const today = days[now.getDay()];
+        const currentTime = now.getHours() * 60 + now.getMinutes();
+        if (!b.schedule || !b.schedule[today]) return false;
+        return b.schedule[today].some(r => {
+            const [sH, sM] = r[0].split(':').map(Number);
+            const [eH, eM] = r[1].split(':').map(Number);
+            return currentTime >= (sH * 60 + sM) && currentTime < (eH * 60 + eM);
+        });
+    }
+
+    function calcDist(lat1, lon1, lat2, lon2) {
+        if (!lat1 || !lon1) return null;
+        const R = 6371;
+        const dLat = (lat2 - lat1) * Math.PI / 180;
+        const dLon = (lon2 - lon1) * Math.PI / 180;
+        const a = Math.sin(dLat / 2) ** 2 + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon / 2) ** 2;
+        return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     }
 
     async function init() {
         try {
             const res = await fetch('branches.json?v=' + Date.now());
             const data = await res.json();
-            const list = data.branches;
-            const container = document.getElementById('branchesList');
-            container.innerHTML = '';
-            list.forEach(b => {
-                const card = document.createElement('div');
-                card.className = 'branch-card';
-                card.innerHTML = `
-                    <div class="br-header"><div class="br-title" style="color:var(--gold);">${b[`name_${userLang}`]}</div></div>
-                    <div class="btn-group">
-                        <a href="${buildWaUrl(b.phone)}" class="btn bg-wa"><i class="fab fa-whatsapp"></i></a>
-                        <a href="${b.social?.waze || '#'}" class="btn bg-waze">Waze</a>
-                        <a href="?branch=${b.id}" class="btn bg-enter">כניסה</a>
-                    </div>`;
-                container.appendChild(card);
-            });
+            allBranches = data.branches;
+            if (branchID) { renderShopView(branchID); } else { renderDirectoryView(); }
             document.body.style.opacity = "1";
+        } catch(e) { console.error("Data Load Fail", e); }
+    }
+
+    function renderDirectoryView() {
+        let list = allBranches;
+        renderBranches(list);
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(pos => {
+                const {latitude: uLat, longitude: uLng} = pos.coords;
+                list.forEach(b => { if(b.lat) b.dist = calcDist(uLat, uLng, b.lat, b.lng); });
+                list.sort((a,b) => (a.dist || 9999) - (b.dist || 9999));
+                renderBranches(list);
+            }, null, { timeout: 3000 });
+        }
+    }
+
+    function renderBranches(list) {
+        const container = document.getElementById('branchesList');
+        container.innerHTML = '';
+        list.forEach(b => {
+            const open = isBranchOpen(b);
+            const card = document.createElement('div');
+            card.className = 'branch-card';
+            card.innerHTML = `
+                <div class="br-header">
+                    <div>
+                        <div class="br-title">${b[`name_${userLang}`]}</div>
+                        <div class="dist-info">${b.dist ? b.dist.toFixed(1) + ' ' + t.km : ''}</div>
+                    </div>
+                    <div class="status-pill" style="border-color:${open ? 'var(--wa-green)' : '#ff4d4d'}; color:${open ? 'var(--wa-green)' : '#ff4d4d'}">
+                        ● ${open ? t.open : t.closed}
+                    </div>
+                </div>
+                <div class="btn-group">
+                    <a href="${buildWaUrl(b.phone)}" class="btn bg-wa"><i class="fab fa-whatsapp"></i>${t.wa_btn}</a>
+                    <a href="${(b.social && b.social.waze) ? b.social.waze : `https://ul.waze.com/ul?ll=${b.lat},${b.lng}&navigate=yes`}" target="_blank" class="btn bg-waze"><i class="fab fa-waze"></i>${t.waze}</a>
+                    <a href="?branch=${b.id}" class="btn bg-enter"><i class="fas fa-door-open"></i>${t.enter}</a>
+                </div>`;
+            container.appendChild(card);
+        });
+    }
+
+    async function renderShopView(id) {
+        const branch = allBranches.find(b => b.id == id);
+        if (!branch) return;
+        document.getElementById('view-directory').classList.add('hidden');
+        document.getElementById('view-shop').classList.remove('hidden');
+        document.getElementById('shop-title').textContent = branch[`name_${userLang}`];
+        try {
+            const res = await fetch('products.csv?v=' + Date.now());
+            const csv = await res.text();
+            const lines = csv.split('\n').slice(1);
+            const grid = document.getElementById('productsGrid');
+            grid.innerHTML = '';
+            lines.forEach(line => {
+                const c = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+                if(c[1]) {
+                    const name = c[1].replace(/"/g,'').trim();
+                    const pCard = document.createElement('div');
+                    pCard.className = 'product-card';
+                    pCard.innerHTML = `
+                        <div><div style="font-weight:900;">${name}</div><div style="color:var(--gold);">${c[10] || ''} ₪</div></div>
+                        <a href="${buildWaUrl(branch.phone, t.order + ': ' + name)}" class="btn bg-wa" style="width:45px; height:45px; border-radius:50%;"><i class="fab fa-whatsapp"></i></a>`;
+                    grid.appendChild(pCard);
+                }
+            });
         } catch(e) { console.error(e); }
     }
+
     init();
 </script>
 </body>
