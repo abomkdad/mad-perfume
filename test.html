@@ -8,6 +8,27 @@
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Assistant:wght@400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
+<script>
+!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];
+s.parentNode.insertBefore(t,s)}(window,document,'script',
+'https://connect.facebook.net/en_US/fbevents.js');
+fbq('init','1072283127290819'); fbq('track', 'PageView');
+</script>
+
+<script>
+    !function (w, d, t) {
+      w.TiktokAnalyticsObject=t;var ttq=w[t]=w[t]||[];ttq.methods=["page","track","identify","instances","debug","on","off","once","ready","alias","group","enableCookie","disableCookie","holdConsent","revokeConsent","grantConsent"],ttq.setAndDefer=function(t,e){t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}};for(var i=0;i<ttq.methods.length;i++)ttq.setAndDefer(ttq,ttq.methods[i]);ttq.instance=function(t){for(
+    var e=ttq._i[t]||[],n=0;n<ttq.methods.length;n++)ttq.setAndDefer(e,ttq.methods[n]);return e},ttq.load=function(e,n){var r="https://analytics.tiktok.com/i18n/pixel/events.js",o=n&&n.partner;ttq._i=ttq._i||{},ttq._i[e]=[],ttq._i[e]._u=r,ttq._t=ttq._t||{},ttq._t[e]=+new Date,ttq._o=ttq._o||{},ttq._o[e]=n||{};n=document.createElement("script")
+    ;n.type="text/javascript",n.async=!0,n.src=r+"?sdkid="+e+"&lib="+t;e=document.getElementsByTagName("script")[0];e.parentNode.insertBefore(n,e)};
+      ttq.load('D2D02JBC77U4ENLN9SBG');
+      ttq.page();
+    }(window, document, 'ttq');
+</script>
+    
 <style>
 :root{ --gold:#D4AF37; --black:#000; --card:#111; --white:#fff; --wa:#25D366; --live-red:#ff0000; }
 *{box-sizing:border-box; margin:0; padding:0}
@@ -113,9 +134,15 @@ const TXT = {
 let STATE = { branch: null, products: [] };
 let timerInterval;
 
-// وظيفة لبناء الرابط بالصيغة المطلوبة
+// وظيفة لبناء الرابط وتصحيح الصفر إلى 972
 function buildWaUrl(phone, text) {
-    const cleanPhone = phone.replace(/\D/g, ''); // تنظيف الرقم من أي رموز
+    let cleanPhone = phone.replace(/\D/g, ''); 
+    
+    // استبدال الصفر الأول بـ 972
+    if (cleanPhone.startsWith('0')) {
+        cleanPhone = '972' + cleanPhone.substring(1);
+    }
+    
     return `https://api.whatsapp.com/send/?phone=${cleanPhone}&text=${encodeURIComponent(text)}&type=phone_number&app_absent=0`;
 }
 
@@ -135,7 +162,7 @@ async function start() {
 function parseCSV(text) {
     const lines = text.split('\n');
     for(let i=1; i<lines.length; i++){
-        const c = lines[i].split(/,(?=(?:(?:[^["]*"){2})*[^"]*$)/);
+        const c = lines[i].split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
         if(!c[1]) continue;
         STATE.products.push({ 
             title: c[1].replace(/"/g,'').trim(), 
@@ -152,7 +179,7 @@ function renderUI() {
     document.getElementById('br-hours').textContent = b.hours;
     document.getElementById('duty-text').textContent = t.duty;
     
-    // تحديث رابط المدير المناوب بالصيغة الجديدة
+    // تحديث رابط المدير المناوب بالصيغة الدولية المصلحة 972
     document.getElementById('duty-link').href = buildWaUrl(b.phone, t.duty);
     
     document.getElementById('widget-text').textContent = t.badge;
@@ -207,7 +234,7 @@ function renderGrid(f) {
     });
     list.forEach(p => {
         const d = document.createElement('div'); d.className = 'card';
-        // تحديث رابط الواتساب لكل منتج بالصيغة المطلوبة
+        // رابط المنتج بالصيغة الدولية المصلحة 972
         const waProductUrl = buildWaUrl(STATE.branch.phone, t.msg + p.title);
         
         d.innerHTML = `<div class="img"><img data-src="${p.img}"></div>
@@ -257,7 +284,7 @@ function initDailySale() {
     const saleLink = document.getElementById('sale-wa-link');
     saleLink.textContent = t.offer;
     
-    // تحديث رابط العرض اليومي بالصيغة المطلوبة
+    // رابط العرض بالصيغة الدولية المصلحة 972
     saleLink.href = buildWaUrl(STATE.branch.phone, whatsappMsg);
 
     if (localStorage.getItem(saleKey)) {
