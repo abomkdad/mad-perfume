@@ -116,37 +116,49 @@
             border: none; cursor: pointer; white-space: nowrap; margin-right: 10px;
         }
 
-        /* --- IPHONE 17 PRO MAX CENTERED MODAL --- */
+        /* --- IPHONE 17 PRO MAX CENTERED MODAL FIXED --- */
         #frag-modal {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.85); z-index: 100000; backdrop-filter: blur(5px);
+            background: rgba(0,0,0,0.9); z-index: 100000; backdrop-filter: blur(5px);
             align-items: center; justify-content: center;
         }
         .modal-content {
             position: relative;
-            /* iPhone 17 Pro Max Dimensions */
             width: 440px; 
             height: 954px; 
-            max-width: 92vw; 
+            max-width: 95vw; 
             max-height: 92vh;
-            background: #fff; 
-            border-radius: 50px; 
+            background: #000; /* خلفية سوداء لمنع البياض */
+            border-radius: 40px; 
             overflow: hidden; 
             box-shadow: 0 0 50px rgba(0,0,0,0.8);
-            border: 4px solid var(--gold);
-            transform: translateY(100vh); /* Start from bottom */
-            transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.15);
+            border: 3px solid var(--gold);
+            transform: translateY(100vh);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.1);
         }
-        /* Class to trigger animation */
-        #frag-modal.show .modal-content {
-            transform: translateY(0);
+        #frag-modal.show .modal-content { transform: translateY(0); }
+        
+        #frag-frame { 
+            width: 100%; 
+            height: 100%; 
+            border: none; 
+            display: block;
+            opacity: 0; /* مخفي حتى يجهز */
+            transition: opacity 0.3s;
         }
-        #frag-frame { width: 100%; height: 100%; border: none; display: block; }
+        
+        /* مؤشر تحميل بسيط */
+        .loader {
+            position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            color: var(--gold); font-size: 30px;
+        }
+
         .close-modal {
-            position: absolute; top: 25px; right: 25px; background: #000;
-            color: var(--gold); border: 2px solid var(--gold); width: 45px; height: 45px;
+            position: absolute; top: 20px; right: 20px; background: rgba(0,0,0,0.7);
+            color: var(--gold); border: 2px solid var(--gold); width: 40px; height: 40px;
             border-radius: 50%; font-weight: bold; cursor: pointer; z-index: 100001;
-            display: flex; align-items: center; justify-content: center; font-size: 24px;
+            display: flex; align-items: center; justify-content: center; font-size: 20px;
         }
     </style>
 </head>
@@ -180,7 +192,7 @@
         <a id="online-btn" href="#" class="action-item">
             <i class="fas fa-shopping-bag"></i>
             <span class="l-shop"></span>
-            <small>הזمנה אונליין</small>
+            <small>הזמנה אונلיין</small>
             <div class="hotline" style="font-size:12px">Shop Now</div>
         </a>
     </div>
@@ -189,14 +201,6 @@
 <div class="container">
     <div id="view-directory">
         <div id="branchesList" style="text-align:center; color:#888;">جاري تحميل البيانات...</div>
-    </div>
-
-    <div id="view-shop" class="hidden">
-        <button onclick="window.location.href='index.html'" style="background:none; border:1px solid var(--gold); color:var(--gold); padding:8px 20px; border-radius:25px; cursor:pointer; margin-bottom:20px; font-weight:bold;">
-            <i class="fas fa-arrow-right"></i> <span class="l-back"></span>
-        </button>
-        <h2 id="shop-title" style="color:var(--gold); margin-bottom:20px; text-align:center;"></h2>
-        <div id="productsGrid"></div>
     </div>
 </div>
 
@@ -210,29 +214,20 @@
 
 <div id="frag-modal" onclick="closeFragModal()">
     <div class="modal-content" onclick="event.stopPropagation()">
+        <div class="loader"><i class="fas fa-spinner fa-spin"></i></div>
         <button class="close-modal" onclick="closeFragModal()">×</button>
         <iframe id="frag-frame" src=""></iframe>
     </div>
 </div>
 
 <script>
-    const params = new URLSearchParams(window.location.search);
-    const branchID = params.get('branch');
     const userLang = navigator.language.startsWith("he") ? "he" : "ar";
     document.documentElement.lang = userLang;
-    document.documentElement.dir = (userLang === "ar") ? "rtl" : "ltr";
+    document.documentElement.dir = "rtl";
 
     const t = {
-        ar: { 
-            cs:"خدمة الزبائن", wa:"واتساب الشركة", shop:"الطلب أونلاين", open:"مفتوح الآن", closed:"مغلق حالياً", 
-            enter:"دخول الفرع", waze:"Waze", wa_btn:"واتساب", km:"كم", back:"العودة للقائمة", order:"طلب",
-            s_h: "موسوعة Fragrantica", s_p: "المكونات والتقييمات الكاملة", s_b: "عرض العطور"
-        },
-        he: { 
-            cs:"שירות לקוחות", wa:"וואטסאפ חברה", shop:"הזמנה אונליין", open:"פתוח עכשיו", closed:"סגור כעת", 
-            enter:"כניסה לסניף", waze:"ניווט", wa_btn:"וואטסאפ", km:'ק"מ', back:"חזרה לרשימה", order:"הזמנה",
-            s_h: "אנציקלופדיית Fragrantica", s_p: "פירוט מרכיבים וביקורות", s_b: "צפה בבשמים"
-        }
+        ar: { cs:"خدمة الزبائن", wa:"واتساب الشركة", shop:"الطلب أونلاين", open:"مفتوح", closed:"مغلق", back:"عودة", s_h:"موسوعة العطور", s_p:"التقييمات والمكونات", s_b:"عرض" },
+        he: { cs:"שירות לקוחות", wa:"וואטסאפ חברה", shop:"הזמנה אונליין", open:"פתוח", closed:"סגור", back:"חזרה", s_h:"אנציקלופדיית בשמים", s_p:"מרכיבים וביקורות", s_b:"צפייה" }
     }[userLang];
 
     document.getElementById('s-title').textContent = t.s_h;
@@ -241,12 +236,11 @@
     document.querySelector('.l-cs').textContent = t.cs;
     document.querySelector('.l-wa').textContent = t.wa;
     document.querySelector('.l-shop').textContent = t.shop;
-    document.querySelector('.l-back').textContent = t.back;
 
-    function buildWaUrl(phone, text = '') {
-        let cleanPhone = phone.replace(/\D/g, ''); 
-        if (cleanPhone.startsWith('0')) cleanPhone = '972' + cleanPhone.substring(1);
-        return `https://api.whatsapp.com/send/?phone=${cleanPhone}&text=${encodeURIComponent(text)}`;
+    function buildWaUrl(phone) {
+        let p = phone.replace(/\D/g, ''); 
+        if (p.startsWith('0')) p = '972' + p.substring(1);
+        return `https://api.whatsapp.com/send/?phone=${p}`;
     }
 
     document.getElementById('wa-corp-btn').href = buildWaUrl('0509787730');
@@ -257,123 +251,52 @@
         const modal = document.getElementById('frag-modal');
         const frame = document.getElementById('frag-frame');
         
+        frame.style.opacity = "0"; // إخفاء حتى يجهز
         frame.src = url;
         modal.style.display = 'flex';
-        // Trigger animation after a tiny delay
-        setTimeout(() => { modal.classList.add('show'); }, 10);
+        
+        frame.onload = function() {
+            frame.style.opacity = "1"; // إظهار عند الجاهزية
+            document.querySelector('.loader').style.display = 'none';
+        };
+
+        setTimeout(() => { modal.classList.add('show'); }, 50);
         document.body.style.overflow = 'hidden';
     }
 
     function closeFragModal() {
         const modal = document.getElementById('frag-modal');
         modal.classList.remove('show');
-        // Wait for animation to finish before hiding
         setTimeout(() => {
             modal.style.display = 'none';
             document.getElementById('frag-frame').src = '';
+            document.querySelector('.loader').style.display = 'block';
             document.body.style.overflow = 'auto';
-        }, 500);
-    }
-
-    let allBranches = [];
-
-    function isBranchOpen(b) {
-        const now = new Date();
-        const days = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
-        const today = days[now.getDay()];
-        const currentTime = now.getHours() * 60 + now.getMinutes();
-        if (!b.schedule || !b.schedule[today]) return false;
-        return b.schedule[today].some(r => {
-            const [sH, sM] = r[0].split(':').map(Number);
-            const [eH, eM] = r[1].split(':').map(Number);
-            return currentTime >= (sH * 60 + sM) && currentTime < (eH * 60 + eM);
-        });
-    }
-
-    function calcDist(lat1, lon1, lat2, lon2) {
-        if (!lat1 || !lon1) return null;
-        const R = 6371;
-        const dLat = (lat2 - lat1) * Math.PI / 180;
-        const dLon = (lon2 - lon1) * Math.PI / 180;
-        const a = Math.sin(dLat / 2) ** 2 + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon / 2) ** 2;
-        return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        }, 400);
     }
 
     async function init() {
         try {
             const res = await fetch('branches.json?v=' + Date.now());
             const data = await res.json();
-            allBranches = data.branches;
-            if (branchID) renderShopView(branchID); else renderDirectoryView();
-            document.body.style.opacity = "1";
-        } catch(e) { console.error("Data Load Error", e); }
-    }
-
-    function renderDirectoryView() {
-        let list = allBranches;
-        renderBranches(list);
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(pos => {
-                const {latitude: uLat, longitude: uLng} = pos.coords;
-                list.forEach(b => { if(b.lat) b.dist = calcDist(uLat, uLng, b.lat, b.lng); });
-                list.sort((a,b) => (a.dist || 9999) - (b.dist || 9999));
-                renderBranches(list);
-            }, null, { timeout: 3000 });
-        }
-    }
-
-    function renderBranches(list) {
-        const container = document.getElementById('branchesList');
-        container.innerHTML = '';
-        list.forEach(b => {
-            const open = isBranchOpen(b);
-            const card = document.createElement('div');
-            card.className = 'branch-card';
-            card.innerHTML = `
-                <div class="br-header">
-                    <div>
-                        <div class="br-title">${b[`name_${userLang}`]}</div>
-                        <div class="dist-info">${b.dist ? b.dist.toFixed(1) + ' ' + t.km : ''}</div>
-                    </div>
-                    <div class="status-pill" style="border-color:${open ? 'var(--wa-green)' : '#ff4d4d'}; color:${open ? 'var(--wa-green)' : '#ff4d4d'}">
-                        ● ${open ? t.open : t.closed}
-                    </div>
-                </div>
-                <div class="btn-group">
-                    <a href="${buildWaUrl(b.phone)}" class="btn bg-wa"><i class="fab fa-whatsapp"></i>${t.wa_btn}</a>
-                    <a href="${(b.social && b.social.waze) ? b.social.waze : `https://ul.waze.com/ul?ll=${b.lat},${b.lng}&navigate=yes`}" target="_blank" class="btn bg-waze"><i class="fab fa-waze"></i>${t.waze}</a>
-                    <a href="?branch=${b.id}" class="btn bg-enter"><i class="fas fa-door-open"></i>${t.enter}</a>
-                </div>`;
-            container.appendChild(card);
-        });
-    }
-
-    async function renderShopView(id) {
-        const branch = allBranches.find(b => b.id == id);
-        if (!branch) return;
-        document.getElementById('view-directory').classList.add('hidden');
-        document.getElementById('view-shop').classList.remove('hidden');
-        document.getElementById('shop-title').textContent = branch[`name_${userLang}`];
-        try {
-            const res = await fetch('products.csv?v=' + Date.now());
-            const csv = await res.text();
-            const lines = csv.split('\n').slice(1);
-            const grid = document.getElementById('productsGrid');
-            grid.innerHTML = '';
-            lines.forEach(line => {
-                const c = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
-                if(c[1]) {
-                    const name = c[1].replace(/"/g,'').trim();
-                    const pCard = document.createElement('div');
-                    pCard.className = 'product-card';
-                    pCard.innerHTML = `<div><div style="font-weight:900;">${name}</div><div style="color:var(--gold);">${c[10] || ''} ₪</div></div>
-                    <a href="${buildWaUrl(branch.phone, t.order + ': ' + name)}" class="btn bg-wa" style="width:45px; height:45px; border-radius:50%;"><i class="fab fa-whatsapp"></i></a>`;
-                    grid.appendChild(pCard);
-                }
+            const list = data.branches;
+            const container = document.getElementById('branchesList');
+            container.innerHTML = '';
+            list.forEach(b => {
+                const card = document.createElement('div');
+                card.className = 'branch-card';
+                card.innerHTML = `
+                    <div class="br-header"><div class="br-title">${b[`name_${userLang}`]}</div></div>
+                    <div class="btn-group">
+                        <a href="${buildWaUrl(b.phone)}" class="btn bg-wa"><i class="fab fa-whatsapp"></i>${t.wa}</a>
+                        <a href="${(b.social && b.social.waze) ? b.social.waze : `https://ul.waze.com/ul?ll=${b.lat},${b.lng}&navigate=yes`}" target="_blank" class="btn bg-waze"><i class="fab fa-waze"></i>ניווט</a>
+                        <a href="?branch=${b.id}" class="btn bg-enter"><i class="fas fa-door-open"></i>${t.enter || 'כניסה'}</a>
+                    </div>`;
+                container.appendChild(card);
             });
-        } catch(e) { console.error("CSV Load Error", e); }
+            document.body.style.opacity = "1";
+        } catch(e) { console.error(e); }
     }
-
     init();
 </script>
 </body>
