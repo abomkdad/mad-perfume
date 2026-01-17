@@ -268,14 +268,22 @@ function startTimer() {
 function initDailySale() {
     const saleKey = 'mad_sale_' + new Date().toDateString();
     const t = TXT[lang];
+
     const whatsappMsg = lang === 'ar' 
         ? 'مرحباً، أريد الحصول على عرض اليوم الخاص بفرع ' + STATE.branch.name_ar 
         : 'שלום, אשמח לקבל את ההטבה היומית של סניף ' + STATE.branch.name_he;
 
     const saleLink = document.getElementById('sale-wa-link');
     saleLink.textContent = t.offer;
-    saleLink.href = `https://wa.me/${STATE.branch.phone}?text=${encodeURIComponent(whatsappMsg)}`;
-    saleLink.onclick = () => lead('Daily_Offer_Click', STATE.branch.name_ar);
+
+    // ✅ WhatsApp Correct Format
+    const waPhone = formatPhone(STATE.branch.phone);
+
+    saleLink.href = `https://wa.me/${waPhone}?text=${encodeURIComponent(whatsappMsg)}`;
+
+    saleLink.onclick = () => {
+        lead('Daily_Offer_Click', STATE.branch.name_ar);
+    };
 
     if (localStorage.getItem(saleKey)) {
         document.getElementById('reopen-sale').style.display = 'flex';
@@ -283,7 +291,6 @@ function initDailySale() {
         setTimeout(openSale, 3000);
     }
 }
-
 start();
 </script>
 </body>
