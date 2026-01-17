@@ -8,6 +8,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Assistant:wght@400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
+<!-- META PIXEL -->
 <script>
 !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
 n.callMethod.apply(n,arguments):n.queue.push(arguments)};
@@ -16,110 +17,136 @@ n.queue=[];t=b.createElement(e);t.async=!0;
 t.src=v;s=b.getElementsByTagName(e)[0];
 s.parentNode.insertBefore(t,s)}(window,document,'script',
 'https://connect.facebook.net/en_US/fbevents.js');
-fbq('init','1072283127290819'); fbq('track', 'PageView');
+fbq('init','1072283127290819');
+fbq('track','PageView');
 </script>
 
+<!-- TIKTOK PIXEL -->
 <script>
 !function (w, d, t) {
-w.TiktokAnalyticsObject=t;var ttq=w[t]=w[t]||[];ttq.methods=["page","track","identify","instances","debug","on","off","once","ready","alias","group","enableCookie","disableCookie","holdConsent","revokeConsent","grantConsent"],ttq.setAndDefer=function(t,e){t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}};for(var i=0;i<ttq.methods.length;i++)ttq.setAndDefer(ttq,ttq.methods[i]);ttq.instance=function(t){for(
-var e=ttq._i[t]||[],n=0;n<ttq.methods.length;n++)ttq.setAndDefer(e,ttq.methods[n]);return e},ttq.load=function(e,n){var r="https://analytics.tiktok.com/i18n/pixel/events.js";ttq._i=ttq._i||{},ttq._i[e]=[],ttq._i[e]._u=r,ttq._t=ttq._t||{},ttq._t[e]=+new Date;var s=document.createElement("script");s.type="text/javascript";s.async=!0;s.src=r+"?sdkid="+e+"&lib="+t;var a=document.getElementsByTagName("script")[0];a.parentNode.insertBefore(s,a)};
+w.TiktokAnalyticsObject=t;
+var ttq=w[t]=w[t]||[];
+ttq.methods=["page","track","identify","instances","debug","on","off","once","ready","alias","group","enableCookie","disableCookie","holdConsent","revokeConsent","grantConsent"];
+ttq.setAndDefer=function(t,e){t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}};
+for(var i=0;i<ttq.methods.length;i++)ttq.setAndDefer(ttq,ttq.methods[i]);
+ttq.load=function(e){
+var s=document.createElement("script");
+s.type="text/javascript";s.async=!0;
+s.src="https://analytics.tiktok.com/i18n/pixel/events.js?sdkid="+e+"&lib="+t;
+var a=document.getElementsByTagName("script")[0];
+a.parentNode.insertBefore(s,a)
+};
 ttq.load('D2D02JBC77U4ENLN9SBG');
 ttq.page();
 }(window, document, 'ttq');
 </script>
 
+<style>
+body{background:#000;color:#fff;font-family:'Assistant',sans-serif;margin:0}
+#popup-sale{position:fixed;inset:0;background:rgba(0,0,0,.95);display:none;align-items:center;justify-content:center;z-index:9999}
+.sale-box{background:#000;border:2px solid gold;border-radius:12px;max-width:400px;width:100%;overflow:hidden}
+.close-sale{position:absolute;right:15px;top:10px;font-size:32px;cursor:pointer;color:#fff}
+.countdown-bar{background:gold;color:#000;padding:12px;text-align:center;font-weight:900}
+.wa-order-btn{display:block;background:#25D366;color:#fff;padding:18px;text-align:center;text-decoration:none;font-weight:900}
+#reopen-sale{position:fixed;bottom:20px;left:20px;width:60px;height:60px;border-radius:50%;background:gold;display:none;align-items:center;justify-content:center;cursor:pointer}
+</style>
 </head>
 
 <body dir="rtl">
 
-<script>
-const params = new URLSearchParams(window.location.search);
-const branchID = parseInt(params.get('branch')) || 1; 
-const lang = navigator.language.startsWith('ar') ? 'ar' : 'he';
+<!-- DAILY SALE POPUP -->
+<div id="popup-sale">
+<div class="sale-box">
+<span class="close-sale" onclick="closeSale()">&times;</span>
+<img src="sale.png" style="width:100%">
+<div id="sale-timer" class="countdown-bar">00:00:00</div>
+<a id="sale-wa-link" class="wa-order-btn" target="_blank"></a>
+</div>
+</div>
 
-/* ✅ WhatsApp Phone Formatter */
+<!-- FLOATING REOPEN BUTTON -->
+<div id="reopen-sale" onclick="openSale()">
+<i class="fas fa-gift"></i>
+</div>
+
+<script>
+const params=new URLSearchParams(location.search);
+const branchID=parseInt(params.get('branch'))||1;
+const lang=navigator.language.startsWith('ar')?'ar':'he';
+
+/* ✅ WhatsApp Formatter */
 function formatPhone(phone){
-    phone = phone.replace(/\D/g,'');
-    if(phone.startsWith('0')){
-        return '972' + phone.substring(1);
-    }
-    return phone;
+phone=phone.replace(/\D/g,'');
+if(phone.startsWith('0')) return '972'+phone.substring(1);
+return phone;
 }
 
-const TXT = {
-    he: { open:'פתוח עכשיו', closed:'סגור כעת', all:'הכל', order:'הזמנה', msg:'היי, אני מעוניין ב: ', offer:'קבלת ההטבה', duty:'המנהל בתורנות', badge:'מבצע' },
-    ar: { open:'مفتوح الآن', closed:'مغلق حالياً', all:'الكل', order:'طلب', msg:'مرحباً، أنا مهتم بـ: ', offer:'احصل على العرض', duty:'الموظف المناوب', badge:'عرض اليوم' }
+const TXT={
+he:{offer:'קבלת ההטבה'},
+ar:{offer:'احصل على العرض'}
 };
 
-let STATE = { branch: null, products: [] };
+let STATE={branch:null};
 let timerInterval;
 
-async function start() {
-    const [bj, pc] = await Promise.all([
-        fetch('branches.json').then(r => r.json()),
-        fetch('products.csv').then(r => r.text())
-    ]);
-    STATE.branch = bj.branches.find(b => b.id === branchID) || bj.branches[0];
-    parseCSV(pc);
-    renderUI();
-    initDailySale();
+/* ===== LOAD DATA ===== */
+async function start(){
+const bj=await fetch('branches.json').then(r=>r.json());
+STATE.branch=bj.branches.find(b=>b.id===branchID)||bj.branches[0];
+initDailySale();
 }
 
-function lead(action, label) {
-    if(window.fbq) fbq('track', 'Lead', { branch: branchID, action, label });
+/* ===== DAILY SALE ===== */
+
+function openSale(){
+document.getElementById('popup-sale').style.display='flex';
+document.getElementById('reopen-sale').style.display='none';
+startTimer();
 }
 
-function parseCSV(text) {
-    const lines = text.split('\n');
-    for(let i=1;i<lines.length;i++){
-        const c = lines[i].split(',');
-        if(!c[1]) continue;
-        STATE.products.push({
-            title:c[1],
-            img:c[4],
-            price:c[10]+' ₪',
-            cat:c[11]
-        });
-    }
+function closeSale(){
+document.getElementById('popup-sale').style.display='none';
+document.getElementById('reopen-sale').style.display='flex';
+localStorage.setItem('mad_sale_'+new Date().toDateString(),'seen');
+clearInterval(timerInterval);
 }
 
-function renderUI() {
-    const b = STATE.branch;
-    const t = TXT[lang];
-
-    document.getElementById('duty-link').href =
-    `https://wa.me/${formatPhone(b.phone)}?text=${encodeURIComponent(t.duty)}`;
+function startTimer(){
+clearInterval(timerInterval);
+timerInterval=setInterval(()=>{
+const diff=new Date().setHours(23,59,59)-new Date();
+if(diff<=0){closeSale();return;}
+const h=String(Math.floor(diff/3600000)).padStart(2,'0');
+const m=String(Math.floor((diff%3600000)/60000)).padStart(2,'0');
+const s=String(Math.floor((diff%60000)/1000)).padStart(2,'0');
+document.getElementById('sale-timer').textContent=`${h}:${m}:${s}`;
+},1000);
 }
 
-function renderGrid() {
-    const t = TXT[lang];
-    document.querySelectorAll('.wa-btn').forEach(btn=>{
-        const title = btn.dataset.title;
-        btn.href = `https://wa.me/${formatPhone(STATE.branch.phone)}?text=${encodeURIComponent(t.msg+title)}`;
-    });
+function initDailySale(){
+
+const saleKey='mad_sale_'+new Date().toDateString();
+const t=TXT[lang];
+
+const msg=lang==='ar'
+?'مرحباً، أريد الحصول على عرض اليوم الخاص بفرع '+STATE.branch.name_ar
+:'שלום, אשמח לקבל את ההטבה היומית של סניף '+STATE.branch.name_he;
+
+const saleLink=document.getElementById('sale-wa-link');
+
+saleLink.textContent=t.offer;
+
+/* ✅ WhatsApp FIX */
+saleLink.href=
+`https://wa.me/${formatPhone(STATE.branch.phone)}?text=${encodeURIComponent(msg)}`;
+
+saleLink.onclick=()=>fbq('track','Lead',{branch:branchID,action:'Daily_Offer'});
+
+if(localStorage.getItem(saleKey)){
+document.getElementById('reopen-sale').style.display='flex';
+}else{
+setTimeout(openSale,3000);
 }
-
-function initDailySale() {
-
-    const saleKey = 'mad_sale_' + new Date().toDateString();
-    const t = TXT[lang];
-
-    const whatsappMsg = lang === 'ar' 
-        ? 'مرحباً، أريد الحصول على عرض اليوم الخاص بفرع ' + STATE.branch.name_ar 
-        : 'שלום, אשמח לקבל את ההטבה היומית של סניף ' + STATE.branch.name_he;
-
-    const saleLink = document.getElementById('sale-wa-link');
-
-    saleLink.textContent = t.offer;
-
-    saleLink.href =
-    `https://wa.me/${formatPhone(STATE.branch.phone)}?text=${encodeURIComponent(whatsappMsg)}`;
-
-    saleLink.onclick = () => lead('Daily_Offer_Click', STATE.branch.name_ar);
-
-    if (!localStorage.getItem(saleKey)) {
-        setTimeout(openSale,3000);
-    }
 }
 
 start();
