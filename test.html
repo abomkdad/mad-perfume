@@ -2,7 +2,7 @@
 <html lang="he" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>MAD PARFUMEUR | Official Portal</title>
 
     <script>
@@ -103,6 +103,8 @@
         .bg-waze { background: var(--waze-blue); color: #000; }
         .bg-enter { background: var(--btn-gray); }
 
+        .hidden { display: none !important; }
+
         /* --- STICKY FOOTER --- */
         .sticky-fragrantica {
             position: fixed; bottom: 0; left: 0; width: 100%;
@@ -146,7 +148,6 @@
         .btn-enter { background: var(--gold); color: black; }
         .btn-back { background: transparent; color: white; border: 1px solid rgba(255,255,255,0.3); }
 
-        .hidden { display: none !important; }
         [dir="ltr"] .branch-card, [dir="ltr"] .product-card { border-right: none; border-left: 5px solid var(--gold); }
     </style>
 </head>
@@ -192,7 +193,7 @@
     </div>
 
     <div id="view-shop" class="hidden">
-        <button onclick="window.location.href='offer.html'" style="background:none; border:1px solid var(--gold); color:var(--gold); padding:8px 20px; border-radius:25px; cursor:pointer; margin-bottom:20px; font-weight:bold;">
+        <button onclick="window.location.href='index.html'" style="background:none; border:1px solid var(--gold); color:var(--gold); padding:8px 20px; border-radius:25px; cursor:pointer; margin-bottom:20px; font-weight:bold;">
             <i class="fas fa-arrow-right"></i> <span class="l-back"></span>
         </button>
         <h2 id="shop-title" style="color:var(--gold); margin-bottom:20px; text-align:center;"></h2>
@@ -202,7 +203,7 @@
 
 <div class="sticky-fragrantica">
     <div style="text-align:right;">
-        <h5 id="s-title"></h5>
+        <h5 id="s-title" style="color:var(--gold); font-size:14px;"></h5>
         <p id="s-desc"></p>
     </div>
     <button class="open-frag-btn" onclick="toggleGateway(true)" id="s-btn"></button>
@@ -220,7 +221,7 @@
             <h2>الأعلى تقييماً عالمياً</h2>
             <p>انتقل الآن لتكتشف لماذا تُعد <b>MAD</b> أكبر دار عطور نيش حاصلة على تقييمات عالمية في موسوعة <b>Fragrantica</b>. استكشف فخامة <b>العطور الأصلية</b> وآراء الخبراء.</p>
             <div class="gateway-stars">★★★★★</div>
-            <button class="gateway-btn btn-enter" onclick="openExternal()">استكشف عطورنا الأصلية</button>
+            <button class="gateway-btn btn-enter" onclick="openOffer()">استكشف عطورنا الأصلية</button>
             <button class="gateway-btn btn-back" onclick="toggleGateway(false)">العودة للموقع</button>
         </div>
 
@@ -228,7 +229,7 @@
             <h2>המותג המדורג ביותר בעולם</h2>
             <p>גלו עכשיו מדוע <b>MAD</b> היא חברת בשמי הניש הגדולה ביותר עם הדירוגים הגבוהים ביותר באנציקלופדיית <b>Fragrantica</b> העולמית. הצטרפו לעולם של <b>בשמים מקוריים</b> ויוקרתיים.</p>
             <div class="gateway-stars">★★★★★</div>
-            <button class="gateway-btn btn-enter" onclick="openExternal()">לצפייה בבשמים המקוריים</button>
+            <button class="gateway-btn btn-enter" onclick="openOffer()">לצפייה בבשמים המקוריים</button>
             <button class="gateway-btn btn-back" onclick="toggleGateway(false)">חזרה לאתר</button>
         </div>
     </div>
@@ -248,7 +249,7 @@
             s_h: "MAD: الصدارة العالمية", s_p: "أكبر دار نيش تقييماً في Fragrantica", s_b: "استكشف"
         },
         he: { 
-            cs:"שירות לקוחות", wa:"וואטסאפ חברה", shop:"הזמנה אונליין", open:"פתוח עכשיו", closed:"סגור כעת", 
+            cs:"שירות לקוחות", wa:"וואטסאפ حברה", shop:"הזמנה אונליין", open:"פתוח עכשיו", closed:"סגור כעת", 
             enter:"כניסה לסניף", waze:"ניווט", wa_btn:"וואטסאפ", km:'ק"מ', back:"חזרה לרשימה", order:"הזמנה בוואטסאפ",
             s_h: "MAD: המובילה בעולם", s_p: "המותג המדורג ביותר ב-Fragrantica", s_b: "גלה עכשיו"
         }
@@ -263,8 +264,8 @@
     document.querySelector('.l-back').textContent = t.back;
 
     if (userLang === "he") {
-        document.getElementById('content-ar').classList.add('hidden');
-        document.getElementById('content-he').classList.remove('hidden');
+        document.getElementById('content-ar').style.display = 'none';
+        document.getElementById('content-he').style.display = 'block';
     }
 
     function toggleGateway(show) {
@@ -272,10 +273,9 @@
         document.body.style.overflow = show ? 'hidden' : 'auto';
     }
 
-    function openExternal() {
-        const url = (userLang === "he") ? "https://www.fragrantica.co.il/designers/Mad-Parfumeur.html" : "https://www.fragranticarabia.com/designers/Mad-Parfumeur.html";
-        window.open(url, '_blank', 'noopener,noreferrer');
-        toggleGateway(false);
+    // تعديل الوظيفة لفتح صفحة offer.html
+    function openOffer() {
+        window.location.href = "offer.html";
     }
 
     function buildWaUrl(phone, text = '') {
