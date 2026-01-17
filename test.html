@@ -2,8 +2,8 @@
 <html lang="he" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MAD PARFUMEUR | Premium Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>MAD PARFUMEUR | Official Portal</title>
 
     <script>
     !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){
@@ -26,202 +26,117 @@
       ttq.page();
     }(window, document, 'ttq');
     </script>
-    
-    <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;700;800&family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
     <style>
-        :root {
-            --gold: #d4af37;
-            --dark-bg: #0a0a0a;
-            --glass-bg: rgba(15, 15, 15, 0.95);
-            --text-main: #ffffff;
-        }
-
+        :root { --gold: #d4af37; --dark-bg: #0a0a0a; }
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { background-color: var(--dark-bg); color: var(--text-main); font-family: 'Assistant', 'Cairo', sans-serif; direction: rtl; padding-bottom: 100px; overflow-x: hidden; }
+        body { background-color: var(--dark-bg); color: white; font-family: sans-serif; direction: rtl; overflow-x: hidden; }
 
-        header {
-            background: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.9)), 
-                        url('https://madparfumeurglobal.com/wp-content/uploads/2025/10/1920x600-BERGAY.jpg') center/cover;
-            padding: 40px 15px 70px; text-align: center; border-bottom: 2px solid var(--gold);
+        /* الشريط السفلي */
+        .sticky-bar {
+            position: fixed; bottom: 0; width: 100%; background: #111; 
+            border-top: 2px solid var(--gold); padding: 15px;
+            display: flex; justify-content: space-between; align-items: center; z-index: 1000;
         }
+        .open-btn { background: var(--gold); color: black; padding: 10px 20px; border-radius: 25px; font-weight: 900; border: none; cursor: pointer; }
 
-        .container { max-width: 800px; margin: -35px auto 50px; padding: 0 15px; }
-        .branch-card { background: #161616; border-radius: 20px; padding: 25px; margin-bottom: 20px; border-right: 5px solid var(--gold); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        .btn-group { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 15px; }
-        .btn { padding: 12px 5px; border-radius: 12px; text-decoration: none; color: white; font-weight: 800; font-size: 12px; text-align: center; background: #333; }
-
-        /* --- INNOVATIVE STICKY FOOTER --- */
-        .premium-footer {
-            position: fixed; bottom: 0; left: 0; width: 100%;
-            background: var(--glass-bg); backdrop-filter: blur(20px);
-            border-top: 1px solid rgba(212, 175, 55, 0.4);
-            padding: 18px 25px; display: flex; justify-content: space-between;
-            align-items: center; z-index: 9999;
-        }
-        .footer-info h5 { color: var(--gold); font-size: 15px; font-weight: 900; }
-        .footer-info p { color: #ccc; font-size: 11px; }
-        .footer-btn { 
-            background: var(--gold); color: #000; padding: 10px 22px; 
-            border-radius: 30px; font-weight: 900; border: none; 
-            cursor: pointer; display: flex; align-items: center; gap: 8px;
-            box-shadow: 0 0 15px rgba(212,175,55,0.3);
-        }
-
-        /* --- THE IPHONE BROWSER SOLUTION --- */
-        #app-overlay {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.9); z-index: 10000; align-items: center; justify-content: center;
+        /* نافذة iPhone 17 Pro Max الإجبارية */
+        #browser-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(0,0,0,0.95); z-index: 10000; align-items: center; justify-content: center;
         }
         
-        .iphone-frame {
+        .iphone-wrapper {
             position: relative;
-            width: 440px; height: 954px; /* iPhone 17 Pro Max */
-            max-width: 95vw; max-height: 94vh;
-            background: #000; border-radius: 50px; overflow: hidden;
-            display: flex; flex-direction: column;
-            transform: translateY(100vh);
-            transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
-            border: 3px solid #333;
+            width: 440px; height: 954px; /* أبعاد آيفون 17 برو ماكس */
+            max-width: 95vw; max-height: 90vh;
+            background: #1a1a1a; border-radius: 50px; 
+            border: 4px solid #333; overflow: hidden;
+            box-shadow: 0 0 40px rgba(212,175,55,0.3);
+            transform: translateY(100%); transition: transform 0.5s ease-out;
         }
+        #browser-overlay.active .iphone-wrapper { transform: translateY(0); }
 
-        #app-overlay.active .iphone-frame { transform: translateY(0); }
-
-        /* Custom Header (Dynamic Island Style) */
-        .app-header {
-            background: #1a1a1a; padding: 15px 25px; display: flex;
-            justify-content: space-between; align-items: center; border-bottom: 1px solid #333;
+        /* الجزء العلوي للإغلاق */
+        .browser-nav {
+            height: 60px; background: #222; border-bottom: 1px solid #444;
+            display: flex; justify-content: space-between; align-items: center; padding: 0 25px;
         }
-        .url-box { background: #000; padding: 6px 15px; border-radius: 20px; font-size: 11px; color: #aaa; font-weight: 600; }
-        .btn-close { background: #ff3b30; color: #fff; border: none; width: 28px; height: 28px; border-radius: 50%; cursor: pointer; font-size: 14px; font-weight: bold; }
+        .close-x { color: var(--gold); font-size: 24px; cursor: pointer; font-weight: bold; }
+        .site-url { color: #888; font-size: 12px; }
 
-        /* The Frame Container Fix */
-        .frame-body {
-            flex: 1; width: 100%; height: 100%;
-            position: relative; background: #fff;
-            overflow: hidden;
+        /* معالجة مشكلة البياض */
+        .frame-container {
+            flex: 1; width: 100%; height: calc(100% - 60px); position: relative; background: #fff;
         }
-
-        /* تقنية الـ Zoom للتخلص من البياض */
-        #frag-iframe { 
-            width: 100%; height: 100%; 
-            border: none; opacity: 0; 
-            transition: opacity 0.5s;
-            /* تجبر الموقع على التمدد */
-            transform-origin: 0 0;
+        #frag-frame {
+            width: 100%; height: 100%; border: none; display: block;
         }
-
-        .app-loader { 
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
-            background: #000; display: flex; flex-direction: column; 
-            align-items: center; justify-content: center; z-index: 5; 
+        .loading-mask {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: #1a1a1a; display: flex; align-items: center; justify-content: center; z-index: 5;
         }
     </style>
 </head>
 <body>
 
-<header>
-    <div class="logo"><img src="https://abomkdad.github.io/Digital-Business-Card/logo.png" style="width:80px;"></div>
-    <div style="margin-top:15px; font-weight:900; font-size:24px; color:var(--gold);">MAD PARFUMEUR</div>
-</header>
-
-<div class="container">
-    <div id="branches-list"></div>
-</div>
-
-<div class="premium-footer">
-    <div class="footer-info">
-        <h5 id="h-txt"></h5>
-        <p id="p-txt"></p>
+<div class="sticky-bar">
+    <div style="text-align:right">
+        <h5 style="color:var(--gold)">MAD PARFUMEUR</h5>
+        <p style="font-size:11px; opacity:0.7">Fragrantica Encyclopedia</p>
     </div>
-    <button class="footer-btn" onclick="openApp(true)">
-        <i class="fas fa-search"></i>
-        <span id="b-txt"></span>
-    </button>
+    <button class="open-btn" onclick="openBrowser()">Explore Now</button>
 </div>
 
-<div id="app-overlay" onclick="openApp(false)">
-    <div class="iphone-frame" onclick="event.stopPropagation()">
-        <div class="app-header">
-            <button class="btn-close" onclick="openApp(false)">×</button>
-            <div class="url-box">fragrantica.com</div>
-            <i class="fas fa-share-alt" style="color:var(--gold);"></i>
+<div id="browser-overlay" onclick="closeBrowser()">
+    <div class="iphone-wrapper" onclick="event.stopPropagation()">
+        <div class="browser-nav">
+            <span class="site-url">fragrantica.com</span>
+            <div class="close-x" onclick="closeBrowser()">×</div>
         </div>
-        <div class="frame-body">
-            <div class="app-loader" id="app-loader">
-                <i class="fas fa-spinner fa-spin" style="color:var(--gold); font-size:40px; margin-bottom:15px;"></i>
-                <p style="color:#fff; font-size:12px; font-weight:bold;">Loading Experience...</p>
+        <div class="frame-container">
+            <div id="loader" class="loading-mask">
+                <i class="fas fa-spinner fa-spin" style="color:var(--gold); font-size:30px"></i>
             </div>
-            <iframe id="frag-iframe" src=""></iframe>
+            <iframe id="frag-frame" src=""></iframe>
         </div>
     </div>
 </div>
 
 <script>
     const userLang = navigator.language.startsWith("he") ? "he" : "ar";
-    document.documentElement.lang = userLang;
-    document.documentElement.dir = "rtl";
-
-    const dict = {
-        ar: { h:"الموسوعة العطرية", p:"مكونات وتقييمات عطورنا العالمية", b:"تصفح الآن" },
-        he: { h:"אנציקלופדיית בשמים", p:"מרכיבים וביקורות על הבשמים שלנו", b:"גלה עכשיו" }
-    }[userLang];
-
-    document.getElementById('h-txt').textContent = dict.h;
-    document.getElementById('p-txt').textContent = dict.p;
-    document.getElementById('b-txt').textContent = dict.b;
-
-    function openApp(show) {
-        const overlay = document.getElementById('app-overlay');
-        const iframe = document.getElementById('frag-iframe');
-        const loader = document.getElementById('app-loader');
-        const url = (userLang === "he") ? "https://www.fragrantica.co.il/designers/Mad-Parfumeur.html" : "https://www.fragranticarabia.com/designers/Mad-Parfumeur.html";
-
-        if (show) {
-            iframe.src = url;
-            overlay.style.display = 'flex';
-            loader.style.display = 'flex';
+    
+    function openBrowser() {
+        const url = (userLang === "he") 
+            ? "https://www.fragrantica.co.il/designers/Mad-Parfumeur.html" 
+            : "https://www.fragranticarabia.com/designers/Mad-Parfumeur.html";
             
-            iframe.onload = () => {
-                // تقنية لإزالة أي بياض: جعل الإطار يظهر فقط بعد التحميل
-                setTimeout(() => {
-                    loader.style.display = 'none';
-                    iframe.style.opacity = '1';
-                }, 800);
-            };
-            
-            setTimeout(() => { overlay.classList.add('active'); }, 10);
-            document.body.style.overflow = 'hidden';
-        } else {
-            overlay.classList.remove('active');
-            setTimeout(() => {
-                overlay.style.display = 'none';
-                iframe.src = '';
-                document.body.style.overflow = 'auto';
-            }, 600);
-        }
+        const overlay = document.getElementById('browser-overlay');
+        const frame = document.getElementById('frag-frame');
+        const loader = document.getElementById('loader');
+
+        overlay.style.display = 'flex';
+        loader.style.display = 'flex';
+        frame.src = url;
+
+        frame.onload = function() {
+            setTimeout(() => { loader.style.display = 'none'; }, 1000);
+        };
+
+        setTimeout(() => { overlay.classList.add('active'); }, 10);
+        document.body.style.overflow = 'hidden';
     }
 
-    async function load() {
-        try {
-            const res = await fetch('branches.json?v=' + Date.now());
-            const data = await res.json();
-            const container = document.getElementById('branches-list');
-            data.branches.forEach(b => {
-                const card = document.createElement('div');
-                card.className = 'branch-card';
-                card.innerHTML = `<div style="font-weight:900; color:var(--gold);">${b[`name_${userLang}`]}</div>
-                    <div class="btn-group">
-                        <a href="https://wa.me/${b.phone.replace(/\D/g,'')}" class="btn">WhatsApp</a>
-                        <a href="${b.social?.waze || '#'}" class="btn">Waze</a>
-                        <a href="?branch=${b.id}" class="btn" style="background:var(--gold); color:#000;">Enter</a>
-                    </div>`;
-                container.appendChild(card);
-            });
-        } catch(e) {}
+    function closeBrowser() {
+        const overlay = document.getElementById('browser-overlay');
+        overlay.classList.remove('active');
+        setTimeout(() => {
+            overlay.style.display = 'none';
+            document.getElementById('frag-frame').src = '';
+            document.body.style.overflow = 'auto';
+        }, 500);
     }
-    load();
 </script>
 </body>
 </html>
