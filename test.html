@@ -29,89 +29,129 @@
     </script>
 
     <style>
-        :root{ --gold:#D4AF37; --black:#000; --card:#111; --white:#fff; --wa:#25D366; --live-red:#ff0000; }
+        :root{ --gold:#D4AF37; --black:#000; --card:#111; --white:#fff; --wa:#25D366; --live-red:#ff0000; --glass: rgba(255, 255, 255, 0.05); }
         *{box-sizing:border-box; margin:0; padding:0}
         body{background:#000; color:#fff; font-family:'Assistant', 'Cairo', sans-serif; opacity:0; transition: opacity 0.5s; padding-bottom: 120px;}
 
         header {
             position: relative; text-align: center; padding: 40px 20px;
-            background: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.9)), url('https://madparfumeurglobal.com/wp-content/uploads/2025/10/1920x600-BERGAY.jpg') center/cover;
-            border-bottom: 2px solid var(--gold);
+            background: linear-gradient(rgba(0,0,0,0.85), rgba(0,0,0,0.95)), url('https://madparfumeurglobal.com/wp-content/uploads/2025/10/1920x600-BERGAY.jpg') center/cover;
+            border-bottom: 1px solid rgba(212, 175, 55, 0.3);
         }
         .logo-img { max-width: 120px; margin-bottom: 15px; }
-        .action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; max-width: 500px; margin: 20px auto 0; }
-        .action-item {
-            background: #111; border: 1px solid rgba(212,175,55,0.4);
-            padding: 12px; border-radius: 12px; text-decoration: none; color: white;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-        }
 
-        /* --- شريط التصنيفات المتحرك اللانهائي --- */
+        /* --- تحسين شريط التصنيفات المتحرك --- */
         .cats-wrapper { 
             position: sticky; 
             top: 0; 
-            background: rgba(0,0,0,0.95); 
+            background: rgba(10, 10, 10, 0.95); 
             z-index: 1000; 
             border-bottom: 2px solid var(--gold);
             padding: 15px 0;
-            overflow: hidden; /* لإخفاء العناصر الخارجة عن الشريط */
-            backdrop-filter: blur(10px);
+            overflow: hidden;
+            backdrop-filter: blur(15px);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.8);
         }
+
+        /* تأثير التلاشي على الجوانب لزيادة العمق */
+        .cats-wrapper::before, .cats-wrapper::after {
+            content: "";
+            position: absolute;
+            top: 0; width: 50px; height: 100%;
+            z-index: 2;
+            pointer-events: none;
+        }
+        .cats-wrapper::before { left: 0; background: linear-gradient(to right, #0a0a0a, transparent); }
+        .cats-wrapper::after { right: 0; background: linear-gradient(to left, #0a0a0a, transparent); }
 
         .marquee-container {
             display: flex;
             width: max-content;
-            animation: scroll-right 25s linear infinite; /* حركة مستمرة */
+            animation: scroll-left 35s linear infinite; /* تنعيم الحركة */
         }
 
-        /* إيقاف الحركة عند تمرير الماوس أو اللمس للتمكن من الضغط */
         .cats-wrapper:hover .marquee-container {
             animation-play-state: paused;
         }
 
-        @keyframes scroll-right {
+        @keyframes scroll-left {
             0% { transform: translateX(0); }
-            100% { transform: translateX(50%); } /* التحرك لنصف العرض المكرر */
+            100% { transform: translateX(-50%); } /* اتجاه الحركة لليسار ليناسب القراءة العبرية/العربية */
         }
 
         .cats button { 
-            background: #222; 
-            color: #ccc; 
-            border: 1px solid #333; 
-            padding: 10px 22px; 
-            border-radius: 50px; 
-            cursor: pointer; 
-            white-space: nowrap; 
-            font-weight: 700; 
-            margin: 0 10px; /* مسافة بين الأزرار */
+            background: var(--glass);
+            color: #e0e0e0;
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            padding: 12px 28px;
+            border-radius: 12px; /* زوايا منحنية بشكل عصري */
+            cursor: pointer;
+            white-space: nowrap;
+            font-weight: 700;
+            font-size: 14px;
+            margin: 0 8px;
+            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            letter-spacing: 0.5px;
+        }
+
+        /* شكل الزر عند التفعيل */
+        .cats button.active { 
+            background: linear-gradient(135deg, var(--gold), #b8860b);
+            color: #000;
+            border-color: #fff;
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .cats button:hover:not(.active) {
+            background: rgba(212, 175, 55, 0.1);
+            border-color: var(--gold);
+            color: var(--gold);
+        }
+
+        /* --- شبكة المنتجات --- */
+        .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 15px; }
+        @media(min-width: 768px){ .grid { grid-template-columns: repeat(4, 1fr); gap: 20px; } }
+        
+        .card { 
+            background: #111; 
+            border: 1px solid #222; 
+            border-radius: 20px; 
+            overflow: hidden; 
+            display: flex; 
+            flex-direction: column; 
+            transition: 0.4s;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        .card:hover { transform: translateY(-8px); border-color: var(--gold); }
+        .card img { width: 100%; aspect-ratio: 1/1; object-fit: cover; }
+        
+        .info { padding: 15px; text-align: center; flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between; }
+        .price { color: var(--gold); font-weight: 900; font-size: 1.3rem; margin: 10px 0; font-family: 'Cinzel', serif; }
+        
+        .wa-btn { 
+            background: var(--wa); 
+            color: #fff; 
+            text-decoration: none; 
+            padding: 12px; 
+            border-radius: 12px; 
+            font-weight: 800;
             transition: 0.3s;
         }
-        .cats button.active { background: var(--gold); color: #000; border-color: var(--gold); }
+        .wa-btn:active { transform: scale(0.95); }
 
-        /* Grid & Cards */
-        .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 15px; }
-        @media(min-width: 768px){ .grid { grid-template-columns: repeat(4, 1fr); } }
-        .card { background: #111; border: 1px solid #222; border-radius: 15px; overflow: hidden; display: flex; flex-direction: column; transition: 0.3s; }
-        .card img { width: 100%; aspect-ratio: 1/1; object-fit: cover; }
-        .info { padding: 12px; text-align: center; flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between; }
-        .price { color: var(--gold); font-weight: 900; font-size: 1.2rem; margin: 8px 0; }
-        .wa-btn { background: var(--wa); color: #fff; text-decoration: none; padding: 10px; border-radius: 8px; font-weight: 800; }
-
-        /* Sticky Footer */
+        /* Footer & Sale Widget */
         .frag-footer {
             position: fixed; bottom: 0; left: 0; width: 100%;
-            background: #111; border-top: 2px solid var(--gold);
-            padding: 12px 15px; display: flex; justify-content: space-between;
-            align-items: center; z-index: 999;
+            background: rgba(17, 17, 17, 0.98); border-top: 1px solid var(--gold);
+            padding: 15px 20px; display: flex; justify-content: space-between;
+            align-items: center; z-index: 999; backdrop-filter: blur(10px);
         }
-        .open-frag-btn { background: var(--gold); color: #000; padding: 8px 18px; border-radius: 25px; font-weight: 900; border: none; cursor: pointer; font-size: 12px; }
-
-        /* Popup Sale */
-        #popup-sale { position: fixed; inset: 0; background: rgba(0,0,0,0.95); display: none; align-items: center; justify-content: center; z-index: 10001; padding: 20px; }
-        .sale-box { width: 100%; max-width: 380px; background: #000; border: 2px solid var(--gold); border-radius: 20px; overflow: hidden; position: relative; }
-        .countdown-bar { background: var(--gold); color: #000; padding: 12px; text-align: center; font-weight: 900; font-size: 1.5rem; font-family: 'Cinzel', serif; }
-        #reopen-sale { position: fixed; bottom: 85px; left: 20px; width: 60px; height: 60px; background: var(--gold); border-radius: 50%; display: none; align-items: center; justify-content: center; z-index: 998; cursor: pointer; animation: bounce 2s infinite; }
-        @keyframes bounce { 0%, 20%, 50%, 80%, 100% {transform: translateY(0);} 40% {transform: translateY(-10px);} }
+        .open-frag-btn { background: var(--gold); color: #000; padding: 10px 22px; border-radius: 50px; font-weight: 900; border: none; cursor: pointer; }
+        
+        #popup-sale { position: fixed; inset: 0; background: rgba(0,0,0,0.96); display: none; align-items: center; justify-content: center; z-index: 10001; padding: 20px; }
+        .sale-box { width: 100%; max-width: 400px; background: #000; border: 2px solid var(--gold); border-radius: 30px; overflow: hidden; position: relative; }
+        #reopen-sale { position: fixed; bottom: 85px; left: 20px; width: 65px; height: 65px; background: var(--gold); border-radius: 50%; display: none; align-items: center; justify-content: center; z-index: 998; cursor: pointer; animation: bounce 2s infinite; }
     </style>
 </head>
 
@@ -119,31 +159,31 @@
 
 <header>
     <img src="logo.png" alt="MAD" class="logo-img">
-    <div class="brand-name" style="font-family:'Cinzel'; color:var(--gold); font-size: 1.5rem; font-weight: 900;">MAD PARFUMEUR</div>
-    <div class="action-grid">
-        <a href="tel:*9935" class="action-item">
-            <i class="fas fa-phone-alt"></i>
-            <span id="cs-text"></span>
-            <strong style="color:var(--gold); margin-top:3px">*9935</strong>
+    <div class="brand-name" style="font-family:'Cinzel'; color:var(--gold); font-size: 1.8rem; font-weight: 900; letter-spacing: 2px;">MAD PARFUMEUR</div>
+    
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; max-width: 500px; margin: 25px auto 0;">
+        <a href="tel:*9935" style="background: #111; border: 1px solid rgba(212,175,55,0.4); padding: 15px; border-radius: 15px; text-decoration: none; color: white; display: flex; flex-direction: column; align-items: center;">
+            <i class="fas fa-phone-alt" style="color: var(--gold); margin-bottom: 8px;"></i>
+            <span style="font-size: 13px; font-weight: 800;">שירות לקוחות</span>
+            <strong style="color:var(--gold); margin-top:5px; font-size: 16px;">*9935</strong>
         </a>
-        <a id="wa-corp-btn" href="#" class="action-item" onclick="trackConversion('Corporate Contact')">
-            <i class="fab fa-whatsapp"></i>
-            <span id="wa-text"></span>
-            <strong style="color:var(--gold); margin-top:3px">WhatsApp</strong>
+        <a id="wa-corp-btn" href="#" style="background: #111; border: 1px solid rgba(212,175,55,0.4); padding: 15px; border-radius: 15px; text-decoration: none; color: white; display: flex; flex-direction: column; align-items: center;" onclick="trackConversion('Corporate Contact')">
+            <i class="fab fa-whatsapp" style="color: var(--gold); margin-bottom: 8px;"></i>
+            <span style="font-size: 13px; font-weight: 800;">WhatsApp</span>
+            <strong style="color:var(--gold); margin-top:5px; font-size: 16px;">צ'אט מהיר</strong>
         </a>
     </div>
 </header>
 
 <div class="cats-wrapper">
-    <div id="cats" class="marquee-container">
-        </div>
+    <div id="cats" class="marquee-container"></div>
 </div>
 
 <main id="grid" class="grid"></main>
 
 <div class="frag-footer">
     <div class="txt-side">
-        <h5 id="foot-h"></h5>
+        <h5 id="foot-h" style="font-family: 'Cairo';"></h5>
         <p id="foot-p"></p>
     </div>
     <button class="open-frag-btn" onclick="openFrag()" id="foot-b"></button>
@@ -151,15 +191,15 @@
 
 <div id="popup-sale">
     <div class="sale-box">
-        <span style="position: absolute; top: 10px; right: 15px; font-size: 2.5rem; color: #fff; cursor: pointer; z-index: 10;" onclick="closeSale()">&times;</span>
-        <img src="sale.png" style="width:100%; display:block">
-        <div id="sale-timer" class="countdown-bar">00:00:00</div>
-        <a id="sale-wa-link" class="wa-order-btn" style="display:block; background:var(--wa); color:white; text-align:center; padding:18px; text-decoration:none; font-weight:900;" target="_blank" onclick="trackConversion('Daily Offer')"></a>
+        <span style="position: absolute; top: 15px; right: 20px; font-size: 2.8rem; color: #fff; cursor: pointer; z-index: 10;" onclick="closeSale()">&times;</span>
+        <img src="sale.png" style="width:100%; display:block" alt="Daily Sale">
+        <div id="sale-timer" style="background: var(--gold); color: #000; padding: 15px; text-align: center; font-weight: 900; font-size: 1.8rem; font-family: 'Cinzel';">00:00:00</div>
+        <a id="sale-wa-link" style="display:block; background:var(--wa); color:white; text-align:center; padding:22px; text-decoration:none; font-weight: 900; font-size: 1.2rem;" target="_blank" onclick="trackConversion('Daily Offer')"></a>
     </div>
 </div>
 
 <div id="reopen-sale" onclick="openSale()">
-    <i class="fas fa-gift" style="color:#000; font-size:1.5rem"></i>
+    <i class="fas fa-gift" style="color:#000; font-size:1.8rem"></i>
 </div>
 
 <script>
@@ -169,12 +209,12 @@ let timerInterval;
 
 const TXT = {
     he: { 
-        cs: 'שירות לקוחות', wa: 'וואטסאפ חברה', all: 'הכל', order: 'הזמנה מהירה', 
+        all: 'הכל', order: 'הזמנה מהירה', 
         msg: 'היי, אני מעוניין להזמין: ', offer: 'קבלת ההטבה עכשיו',
         f_h: 'MAD: המותג המדורג בעולם', f_p: 'אנציקלופדיית Fragrantica העולמית', f_b: 'גלה עכשיו'
     },
     ar: { 
-        cs: 'خدمة العملاء', wa: 'واتساب الشركة', all: 'الكل', order: 'طلب سريع', 
+        all: 'الكل', order: 'طلب سريع', 
         msg: 'مرحباً، أود الطلب: ', offer: 'احصل على العرض الآن',
         f_h: 'MAD: الأعلى تقييماً عالمياً', f_p: 'عبر موسوعة Fragrantica العالمية', f_b: 'استكشف'
     }
@@ -216,8 +256,6 @@ async function start() {
 
 function renderUI(products) {
     const t = TXT[lang];
-    document.getElementById('cs-text').textContent = t.cs;
-    document.getElementById('wa-text').textContent = t.wa;
     document.getElementById('wa-corp-btn').href = buildWaUrl(CORP_PHONE, t.msg);
     document.getElementById('foot-h').textContent = t.f_h;
     document.getElementById('foot-p').textContent = t.f_p;
@@ -226,13 +264,11 @@ function renderUI(products) {
     const uniqueCats = [t.all, ...new Set(products.map(p => p.cat))].filter(Boolean);
     const nav = document.getElementById('cats');
     
-    // إنشاء الأزرار ومضاعفتها لضمان الحركة اللانهائية
     const createBtn = (c) => {
         const btn = document.createElement('button');
         btn.textContent = c;
-        btn.onclick = (e) => {
+        btn.onclick = () => {
             document.querySelectorAll('.marquee-container button').forEach(b => b.classList.remove('active'));
-            // تفعيل جميع الأزرار التي تحمل نفس الاسم (لأنها مكررة)
             document.querySelectorAll('.marquee-container button').forEach(b => {
                 if(b.textContent === c) b.classList.add('active');
             });
@@ -241,8 +277,8 @@ function renderUI(products) {
         return btn;
     };
 
-    // إضافة الأزرار مرتين للتكرار
-    [...uniqueCats, ...uniqueCats].forEach(c => nav.appendChild(createBtn(c)));
+    // مضاعفة العناصر 3 مرات لضمان سلاسة الحركة في الشاشات العريضة
+    [...uniqueCats, ...uniqueCats, ...uniqueCats].forEach(c => nav.appendChild(createBtn(c)));
 
     renderGrid(products, 'all');
     document.body.style.opacity = "1";
@@ -256,9 +292,9 @@ function renderGrid(products, filter) {
         const card = document.createElement('div');
         card.className = 'card';
         card.innerHTML = `
-            <img src="${p.img}">
+            <img src="${p.img}" loading="lazy">
             <div class="info">
-                <div style="font-weight:700; font-size:0.9rem;">${p.title}</div>
+                <div style="font-weight:700; font-size:15px; margin-bottom: 8px;">${p.title}</div>
                 <div class="price">${p.price}</div>
                 <a class="wa-btn" href="${buildWaUrl(CORP_PHONE, TXT[lang].msg + p.title)}" 
                    target="_blank" onclick="trackConversion('${p.title}')">${TXT[lang].order}</a>
@@ -283,7 +319,7 @@ function startTimer() {
 function initDailySale() {
     document.getElementById('sale-wa-link').textContent = TXT[lang].offer;
     document.getElementById('sale-wa-link').href = buildWaUrl(CORP_PHONE, TXT[lang].offer);
-    if (!localStorage.getItem('mad_sale_' + new Date().toDateString())) setTimeout(openSale, 2000);
+    if (!localStorage.getItem('mad_sale_' + new Date().toDateString())) setTimeout(openSale, 2500);
     else document.getElementById('reopen-sale').style.display = 'flex';
 }
 start();
