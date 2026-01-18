@@ -33,7 +33,6 @@
         *{box-sizing:border-box; margin:0; padding:0}
         body{background:#000; color:#fff; font-family:'Assistant', 'Cairo', sans-serif; opacity:0; transition: opacity 0.5s; padding-bottom: 120px;}
 
-        /* Header */
         header {
             position: relative; text-align: center; padding: 40px 20px;
             background: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.9)), url('https://madparfumeurglobal.com/wp-content/uploads/2025/10/1920x600-BERGAY.jpg') center/cover;
@@ -46,32 +45,35 @@
             padding: 12px; border-radius: 12px; text-decoration: none; color: white;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
         }
-        .action-item i { font-size: 20px; color: var(--gold); margin-bottom: 5px; }
 
-        /* --- شريط التصنيفات المتحرك والعائم --- */
+        /* --- شريط التصنيفات المتحرك اللانهائي --- */
         .cats-wrapper { 
             position: sticky; 
             top: 0; 
             background: rgba(0,0,0,0.95); 
             z-index: 1000; 
             border-bottom: 2px solid var(--gold);
-            padding: 10px 0;
+            padding: 15px 0;
+            overflow: hidden; /* لإخفاء العناصر الخارجة عن الشريط */
             backdrop-filter: blur(10px);
         }
-        .cats { 
-            display: flex; 
-            gap: 12px; 
-            overflow-x: auto; 
-            padding: 5px 15px; 
-            scrollbar-width: none; 
-            animation: pulse-border 2s infinite; 
+
+        .marquee-container {
+            display: flex;
+            width: max-content;
+            animation: scroll-right 25s linear infinite; /* حركة مستمرة */
         }
-        .cats::-webkit-scrollbar { display: none; }
-        @keyframes pulse-border {
-            0% { box-shadow: 0 0 0px var(--gold); }
-            50% { box-shadow: 0 0 15px rgba(212, 175, 55, 0.4); }
-            100% { box-shadow: 0 0 0px var(--gold); }
+
+        /* إيقاف الحركة عند تمرير الماوس أو اللمس للتمكن من الضغط */
+        .cats-wrapper:hover .marquee-container {
+            animation-play-state: paused;
         }
+
+        @keyframes scroll-right {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(50%); } /* التحرك لنصف العرض المكرر */
+        }
+
         .cats button { 
             background: #222; 
             color: #ccc; 
@@ -81,11 +83,12 @@
             cursor: pointer; 
             white-space: nowrap; 
             font-weight: 700; 
+            margin: 0 10px; /* مسافة بين الأزرار */
             transition: 0.3s;
         }
-        .cats button.active { background: var(--gold); color: #000; border-color: var(--gold); transform: scale(1.05); }
+        .cats button.active { background: var(--gold); color: #000; border-color: var(--gold); }
 
-        /* Grid */
+        /* Grid & Cards */
         .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 15px; }
         @media(min-width: 768px){ .grid { grid-template-columns: repeat(4, 1fr); } }
         .card { background: #111; border: 1px solid #222; border-radius: 15px; overflow: hidden; display: flex; flex-direction: column; transition: 0.3s; }
@@ -103,7 +106,7 @@
         }
         .open-frag-btn { background: var(--gold); color: #000; padding: 8px 18px; border-radius: 25px; font-weight: 900; border: none; cursor: pointer; font-size: 12px; }
 
-        /* Sale Popup */
+        /* Popup Sale */
         #popup-sale { position: fixed; inset: 0; background: rgba(0,0,0,0.95); display: none; align-items: center; justify-content: center; z-index: 10001; padding: 20px; }
         .sale-box { width: 100%; max-width: 380px; background: #000; border: 2px solid var(--gold); border-radius: 20px; overflow: hidden; position: relative; }
         .countdown-bar { background: var(--gold); color: #000; padding: 12px; text-align: center; font-weight: 900; font-size: 1.5rem; font-family: 'Cinzel', serif; }
@@ -132,7 +135,8 @@
 </header>
 
 <div class="cats-wrapper">
-    <nav id="cats" class="cats"></nav>
+    <div id="cats" class="marquee-container">
+        </div>
 </div>
 
 <main id="grid" class="grid"></main>
@@ -192,7 +196,6 @@ async function start() {
         const res = await fetch('products.csv');
         const text = await res.text();
         const lines = text.split('\n');
-        // عمود الفئة: 10 للعبري، 11 للعربي (حسب الترتيب البرمجي للأعمدة)
         const catColIndex = (lang === 'ar') ? 11 : 10; 
 
         const products = lines.slice(1).map(line => {
@@ -222,18 +225,25 @@ function renderUI(products) {
 
     const uniqueCats = [t.all, ...new Set(products.map(p => p.cat))].filter(Boolean);
     const nav = document.getElementById('cats');
-    uniqueCats.forEach(c => {
+    
+    // إنشاء الأزرار ومضاعفتها لضمان الحركة اللانهائية
+    const createBtn = (c) => {
         const btn = document.createElement('button');
         btn.textContent = c;
-        btn.className = (c === t.all) ? 'active' : '';
         btn.onclick = (e) => {
-            document.querySelectorAll('.cats button').forEach(b => b.classList.remove('active'));
-            e.target.classList.add('active');
+            document.querySelectorAll('.marquee-container button').forEach(b => b.classList.remove('active'));
+            // تفعيل جميع الأزرار التي تحمل نفس الاسم (لأنها مكررة)
+            document.querySelectorAll('.marquee-container button').forEach(b => {
+                if(b.textContent === c) b.classList.add('active');
+            });
             renderGrid(products, c === t.all ? 'all' : c);
-            window.scrollTo({ top: document.querySelector('header').offsetHeight, behavior: 'smooth' });
         };
-        nav.appendChild(btn);
-    });
+        return btn;
+    };
+
+    // إضافة الأزرار مرتين للتكرار
+    [...uniqueCats, ...uniqueCats].forEach(c => nav.appendChild(createBtn(c)));
+
     renderGrid(products, 'all');
     document.body.style.opacity = "1";
 }
