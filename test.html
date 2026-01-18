@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <title>MAD PARFUMEUR | Official Online Shop</title>
+    <title>MAD PARFUMEUR | Infinite Official Shop</title>
 
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Assistant:wght@400;700&family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
-        :root{ --gold:#D4AF37; --black:#000; --card:#111; --white:#fff; --wa:#25D366; --live-red:#ff0000; }
-        *{box-sizing:border-box; margin:0; padding:0}
-        body{background:#000; color:#fff; font-family:'Assistant', 'Cairo', sans-serif; opacity:0; transition: opacity 0.5s; padding-bottom: 120px;}
+        :root { --gold: #D4AF37; --black: #000; --card: #111; --wa: #25D366; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background: #000; color: #fff; font-family: 'Assistant', 'Cairo', sans-serif; opacity: 0; transition: opacity 0.5s; padding-bottom: 120px; overflow-x: hidden; }
 
         /* --- Header --- */
         header {
@@ -21,27 +21,29 @@
         }
         .logo-img { max-width: 120px; margin-bottom: 15px; }
 
-        /* --- شريط التصنيفات المطور مع الصور --- */
+        /* --- شريط التصنيفات (Infinite Loop Fix) --- */
         .cats-wrapper { 
             position: sticky; 
             top: 0; 
-            background: rgba(10, 10, 10, 0.95); 
+            background: rgba(10, 10, 10, 0.98); 
             z-index: 1000; 
             border-bottom: 2px solid var(--gold);
-            padding: 12px 0;
+            padding: 15px 0;
             overflow: hidden;
-            backdrop-filter: blur(15px);
+            width: 100vw;
         }
 
         .marquee-container {
             display: flex;
-            width: max-content;
-            animation: scroll-loop 45s linear infinite;
+            width: max-content; /* هام جداً للحركة */
+            will-change: transform;
+            animation: scroll-loop 40s linear infinite;
         }
 
+        /* الحركة تعتمد على تحريك نصف العرض بالضبط لأننا سنضاعف العناصر */
         @keyframes scroll-loop {
-            from { transform: translateX(0); }
-            to { transform: translateX(calc(-50%)); }
+            0% { transform: translateX(0); }
+            100% { transform: translateX(calc(-50%)); }
         }
 
         .cats-wrapper:hover .marquee-container { animation-play-state: paused; }
@@ -52,74 +54,54 @@
             background: rgba(255,255,255,0.05);
             color: #ddd;
             border: 1px solid rgba(212, 175, 55, 0.2);
-            padding: 8px 20px 8px 8px; /* مساحة للطلب من اليمين وللصورة من اليسار */
+            padding: 6px 18px 6px 6px;
             border-radius: 50px;
             cursor: pointer;
             white-space: nowrap;
             font-weight: 700;
-            font-size: 13px;
-            margin: 0 10px;
-            transition: all 0.3s ease;
+            margin-right: 20px; /* مسافة ثابتة بين العناصر */
+            transition: 0.3s;
             gap: 10px;
         }
 
-        .cat-thumb {
-            width: 35px;
-            height: 35px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 1px solid var(--gold);
-            background: #000;
-        }
+        .cat-thumb { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 1px solid var(--gold); }
 
         .cat-item.active { 
-            background: var(--gold);
-            color: #000;
-            border-color: #fff;
+            background: var(--gold); color: #000; border-color: #fff;
             box-shadow: 0 0 15px rgba(212, 175, 55, 0.5);
         }
 
-        /* --- Grid System --- */
+        /* --- Grid --- */
         .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 15px; }
         @media(min-width: 768px){ .grid { grid-template-columns: repeat(4, 1fr); gap: 20px; } }
-        
-        .card { 
-            background: #111; border: 1px solid #222; border-radius: 20px; 
-            overflow: hidden; display: flex; flex-direction: column; transition: 0.4s;
-        }
-        .card:hover { border-color: var(--gold); transform: translateY(-5px); }
+        .card { background: #111; border: 1px solid #222; border-radius: 20px; overflow: hidden; display: flex; flex-direction: column; }
         .card img { width: 100%; aspect-ratio: 1/1; object-fit: cover; }
-        
         .info { padding: 15px; text-align: center; flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between; }
-        .price { color: var(--gold); font-weight: 900; font-size: 1.3rem; margin: 10px 0; font-family: 'Cinzel', serif; }
-        
+        .price { color: var(--gold); font-weight: 900; font-size: 1.2rem; margin: 8px 0; font-family: 'Cinzel', serif; }
         .wa-btn { background: var(--wa); color: #fff; text-decoration: none; padding: 12px; border-radius: 12px; font-weight: 800; }
 
         /* Footer */
         .frag-footer {
             position: fixed; bottom: 0; left: 0; width: 100%;
-            background: rgba(17, 17, 17, 0.98); border-top: 1px solid var(--gold);
-            padding: 15px 20px; display: flex; justify-content: space-between;
-            align-items: center; z-index: 999; backdrop-filter: blur(10px);
+            background: #111; border-top: 1px solid var(--gold);
+            padding: 12px 20px; display: flex; justify-content: space-between;
+            align-items: center; z-index: 999;
         }
-        .open-frag-btn { background: var(--gold); color: #000; padding: 10px 22px; border-radius: 50px; font-weight: 900; border: none; cursor: pointer; }
+        .open-frag-btn { background: var(--gold); color: #000; padding: 10px 20px; border-radius: 50px; font-weight: 900; border: none; cursor: pointer; }
     </style>
 </head>
 
 <body dir="rtl">
 
 <header>
-    <img src="logo.png" alt="MAD" class="logo-img">
+    <img src="logo.png" class="logo-img">
     <div class="brand-name" style="font-family:'Cinzel'; color:var(--gold); font-size: 1.8rem; font-weight: 900;">MAD PARFUMEUR</div>
-    
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; max-width: 500px; margin: 25px auto 0;">
-        <a href="tel:*9935" style="background: #111; border: 1px solid rgba(212,175,55,0.4); padding: 12px; border-radius: 15px; text-decoration: none; color: white;">
-            <i class="fas fa-phone-alt" style="color: var(--gold); margin-bottom: 5px;"></i><br>
-            <span style="font-size: 12px; font-weight: 800;">שירות לקוחות</span>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; max-width: 400px; margin: 20px auto 0;">
+        <a href="tel:*9935" style="background: #111; border: 1px solid rgba(212,175,55,0.3); padding: 10px; border-radius: 12px; text-decoration: none; color: white; font-size: 12px;">
+            <i class="fas fa-phone-alt" style="color: var(--gold);"></i> שירות לקוחות
         </a>
-        <a id="wa-corp-btn" href="#" style="background: #111; border: 1px solid rgba(212,175,55,0.4); padding: 12px; border-radius: 15px; text-decoration: none; color: white;">
-            <i class="fab fa-whatsapp" style="color: var(--gold); margin-bottom: 5px;"></i><br>
-            <span style="font-size: 12px; font-weight: 800;">WhatsApp</span>
+        <a id="wa-corp" href="#" style="background: #111; border: 1px solid rgba(212,175,55,0.3); padding: 10px; border-radius: 12px; text-decoration: none; color: white; font-size: 12px;">
+            <i class="fab fa-whatsapp" style="color: var(--gold);"></i> WhatsApp
         </a>
     </div>
 </header>
@@ -131,10 +113,7 @@
 <main id="grid" class="grid"></main>
 
 <div class="frag-footer">
-    <div class="txt-side">
-        <h5 id="foot-h" style="font-family: 'Cairo';"></h5>
-        <p id="foot-p"></p>
-    </div>
+    <div class="txt-side"><h5 id="foot-h"></h5><p id="foot-p"></p></div>
     <button class="open-frag-btn" onclick="openFrag()" id="foot-b"></button>
 </div>
 
@@ -143,18 +122,14 @@ const lang = navigator.language.startsWith('ar') ? 'ar' : 'he';
 const CORP_PHONE = "0509787730"; 
 
 const TXT = {
-    he: { all: 'הכל', order: 'הזמנה מהירה', msg: 'היי, אשמח להזמין: ', f_h: 'MAD: המוביلة בעולם', f_p: 'מדורג ב-Fragrantica', f_b: 'גלה' },
-    ar: { all: 'الكل', order: 'طلب سريع', msg: 'مرحباً، أود طلب: ', f_h: 'MAD: الأعلى تقييماً', f_p: 'عبر Fragrantica العالمية', f_b: 'استكشف' }
+    he: { all: 'הכל', order: 'הזמנה', msg: 'היי, אשמח להזמין: ', f_h: 'MAD: המובילה בעולם', f_b: 'גלה' },
+    ar: { all: 'الكل', order: 'طلب سريع', msg: 'مرحباً، أود طلب: ', f_h: 'MAD: الأعلى تقييماً', f_b: 'استكشف' }
 };
 
 function buildWaUrl(phone, text) {
     let cleanPhone = phone.replace(/\D/g, ''); 
     if (cleanPhone.startsWith('0')) cleanPhone = '972' + cleanPhone.substring(1);
     return `https://api.whatsapp.com/send/?phone=${cleanPhone}&text=${encodeURIComponent(text)}`;
-}
-
-function openFrag() {
-    window.open((lang === "he") ? "https://www.fragrantica.co.il/designers/Mad-Parfumeur.html" : "https://www.fragranticarabia.com/designers/Mad-Parfumeur.html", '_blank');
 }
 
 async function start() {
@@ -177,44 +152,42 @@ async function start() {
 
 function renderUI(products) {
     const t = TXT[lang];
-    document.getElementById('wa-corp-btn').href = buildWaUrl(CORP_PHONE, t.msg);
+    document.getElementById('wa-corp').href = buildWaUrl(CORP_PHONE, t.msg);
     document.getElementById('foot-h').textContent = t.f_h;
-    document.getElementById('foot-p').textContent = t.f_p;
     document.getElementById('foot-b').textContent = t.f_b;
 
     const uniqueCats = [...new Set(products.map(p => p.cat))].filter(Boolean);
     const nav = document.getElementById('cats');
     
-    // إنشاء بيانات الأزرار مع صورة أول منتج لكل فئة
-    const catData = [{ name: t.all, img: 'logo.png' }]; // "الكل" نضع لها اللوجو
-    uniqueCats.forEach(catName => {
-        const firstProd = products.find(p => p.cat === catName);
-        catData.push({ name: catName, img: firstProd ? firstProd.img : 'logo.png' });
+    // إعداد البيانات (الكل + الفئات)
+    const catData = [{ name: t.all, img: 'logo.png' }];
+    uniqueCats.forEach(name => {
+        const p = products.find(prod => prod.cat === name);
+        catData.push({ name: name, img: p ? p.img : 'logo.png' });
     });
 
-    const content = catData.map(cat => {
-        const activeClass = (cat.name === t.all) ? 'active' : '';
-        return `
-            <div class="cat-item ${activeClass}" onclick="filterBy('${cat.name}')">
-                <span>${cat.name}</span>
-                <img src="${cat.img}" class="cat-thumb" onerror="this.src='logo.png'">
-            </div>
-        `;
-    }).join('');
+    // إنشاء كود الـ HTML للأزرار
+    const createHtml = (data) => data.map(cat => `
+        <div class="cat-item ${cat.name === t.all ? 'active' : ''}" onclick="filterBy('${cat.name.replace(/'/g, "\\'")}')">
+            <span>${cat.name}</span>
+            <img src="${cat.img}" class="cat-thumb" onerror="this.src='logo.png'">
+        </div>
+    `).join('');
 
-    nav.innerHTML = content + content; // تكرار مرتين للحركة اللانهائية
+    // تكرار المحتوى مرتين للـ Infinite Loop
+    const buttonsHtml = createHtml(catData);
+    nav.innerHTML = buttonsHtml + buttonsHtml;
 
     renderGrid(products, 'all');
     document.body.style.opacity = "1";
 }
 
 function filterBy(catName) {
-    const t = TXT[lang];
-    document.querySelectorAll('.marquee-container .cat-item').forEach(btn => {
-        btn.classList.remove('active');
-        if(btn.querySelector('span').textContent === catName) btn.classList.add('active');
+    // تحديث الحالة النشطة في كل النسخ المكررة
+    document.querySelectorAll('.cat-item').forEach(el => {
+        el.classList.toggle('active', el.querySelector('span').textContent === catName);
     });
-    renderGrid(window.allProducts, catName === t.all ? 'all' : catName);
+    renderGrid(window.allProducts, catName === TXT[lang].all ? 'all' : catName);
 }
 
 function renderGrid(products, filter) {
@@ -227,6 +200,10 @@ function renderGrid(products, filter) {
         card.innerHTML = `<img src="${p.img}" loading="lazy"><div class="info"><div>${p.title}</div><div class="price">${p.price}</div><a class="wa-btn" href="${buildWaUrl(CORP_PHONE, TXT[lang].msg + p.title)}" target="_blank">${TXT[lang].order}</a></div>`;
         g.appendChild(card);
     });
+}
+
+function openFrag() {
+    window.open((lang === "he") ? "https://www.fragrantica.co.il/designers/Mad-Parfumeur.html" : "https://www.fragranticarabia.com/designers/Mad-Parfumeur.html", '_blank');
 }
 
 start();
