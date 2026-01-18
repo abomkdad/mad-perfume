@@ -8,23 +8,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Assistant:wght@400;700&family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    <script>
-    !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];
-    s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
-    fbq('init','1072283127290819'); fbq('track', 'PageView');
-
-    !function (w, d, t) {
-      w.TiktokAnalyticsObject=t;var ttq=w[t]=w[t]||[];ttq.methods=["page","track","identify","instances","debug","on","off","once","ready","alias","group","enableCookie","disableCookie","holdConsent","revokeConsent","grantConsent"],ttq.setAndDefer=function(t,e){t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}};for(var i=0;i<ttq.methods.length;i++)ttq.setAndDefer(ttq,ttq.methods[i]);ttq.instance=function(t){for(var e=ttq._i[t]||[],n=0;n<ttq.methods.length;n++)ttq.setAndDefer(e,ttq.methods[n]);return e},ttq.load=function(e,n){var r="https://analytics.tiktok.com/i18n/pixel/events.js",o=n&&n.partner;ttq._i=ttq._i||{},ttq._i[e]=[],ttq._i[e]._u=r,ttq._t=ttq._t||{},ttq._t[e]=+new Date,ttq._o=ttq._o||{},ttq._o[e]=n||{};n=document.createElement("script");n.type="text/javascript",n.async=!0,n.src=r+"?sdkid="+e+"&lib="+t;e=document.getElementsByTagName("script")[0];e.parentNode.insertBefore(n,e)};
-      ttq.load('D2D02JBC77U4ENLN9SBG'); ttq.page();
-    }(window, document, 'ttq');
-
-    function trackConversion(productName = 'General Inquiry') {
-        if (typeof fbq !== 'undefined') fbq('track', 'Lead', { content_name: productName });
-        if (typeof ttq !== 'undefined') ttq.track('Contact', { content_name: productName });
-    }
-    </script>
-
     <style>
         :root { --gold: #D4AF37; --black: #000; --card: #111; --wa: #25D366; }
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -37,28 +20,49 @@
         }
         .logo-img { max-width: 120px; margin-bottom: 15px; }
 
-        /* شريط التصنيفات - Infinite Loop Logic */
+        /* --- تثبيت الشريط ومنع الفراغ --- */
         .cats-wrapper { 
-            position: sticky; top: 0; background: rgba(10, 10, 10, 0.98); 
-            z-index: 1000; border-bottom: 2px solid var(--gold);
-            padding: 15px 0; overflow: hidden; width: 100vw;
+            position: sticky; 
+            top: 0; 
+            background: rgba(10, 10, 10, 0.98); 
+            z-index: 1000; 
+            border-bottom: 2px solid var(--gold);
+            padding: 15px 0; 
+            overflow: hidden; 
+            width: 100%;
         }
+
         .marquee-container {
-            display: flex; width: max-content; will-change: transform;
-            animation: scroll-loop 45s linear infinite; /* سرعة انسيابية */
+            display: flex;
+            width: max-content; /* هام جداً للحسابات */
+            will-change: transform;
+            animation: scroll-loop 40s linear infinite;
         }
+
+        /* الربط اللامتناهي: نتحرك لنصف العرض المكرر فقط */
         @keyframes scroll-loop {
             0% { transform: translateX(0); }
-            100% { transform: translateX(calc(-50%)); } /* العودة عند المنتصف بالضبط لمنع الفراغ */
+            100% { transform: translateX(-50%); }
         }
+
         .cats-wrapper:hover .marquee-container { animation-play-state: paused; }
 
         .cat-item {
-            display: flex; align-items: center; background: rgba(255,255,255,0.05);
-            color: #ddd; border: 1px solid rgba(212, 175, 55, 0.2);
-            padding: 6px 18px 6px 6px; border-radius: 50px; cursor: pointer;
-            white-space: nowrap; font-weight: 700; margin-right: 25px; gap: 12px; transition: 0.3s;
+            display: flex;
+            align-items: center;
+            background: rgba(255,255,255,0.05);
+            color: #ddd;
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            padding: 6px 18px 6px 6px;
+            border-radius: 50px;
+            cursor: pointer;
+            white-space: nowrap;
+            font-weight: 700;
+            margin: 0 10px; /* مسافة متساوية بين العناصر */
+            transition: 0.3s;
+            gap: 10px;
         }
+
         .cat-thumb { width: 35px; height: 35px; border-radius: 50%; object-fit: cover; border: 1px solid var(--gold); }
         .cat-item.active { background: var(--gold); color: #000; border-color: #fff; box-shadow: 0 0 15px rgba(212, 175, 55, 0.5); }
 
@@ -70,12 +74,6 @@
         .info { padding: 15px; text-align: center; flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between; }
         .price { color: var(--gold); font-weight: 900; font-size: 1.2rem; margin: 8px 0; font-family: 'Cinzel', serif; }
         .wa-btn { background: var(--wa); color: #fff; text-decoration: none; padding: 12px; border-radius: 12px; font-weight: 800; text-align: center; }
-
-        /* عرض اليوم Popup */
-        #popup-sale { position: fixed; inset: 0; background: rgba(0,0,0,0.95); display: none; align-items: center; justify-content: center; z-index: 10001; padding: 20px; }
-        .sale-box { width: 100%; max-width: 380px; background: #000; border: 2px solid var(--gold); border-radius: 20px; overflow: hidden; position: relative; }
-        .countdown-bar { background: var(--gold); color: #000; padding: 12px; text-align: center; font-weight: 900; font-size: 1.5rem; font-family: 'Cinzel', serif; }
-        #reopen-sale { position: fixed; bottom: 85px; left: 20px; width: 60px; height: 60px; background: var(--gold); border-radius: 50%; display: none; align-items: center; justify-content: center; z-index: 998; cursor: pointer; animation: bounce 2s infinite; }
     </style>
 </head>
 
@@ -84,43 +82,22 @@
 <header>
     <img src="logo.png" class="logo-img">
     <div class="brand-name" style="font-family:'Cinzel'; color:var(--gold); font-size: 1.8rem; font-weight: 900;">MAD PARFUMEUR</div>
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; max-width: 400px; margin: 20px auto 0;">
-        <a href="tel:*9935" style="background:#111; border:1px solid rgba(212,175,55,0.3); padding:10px; border-radius:12px; text-decoration:none; color:white; font-size:12px;">
-            <i class="fas fa-phone-alt" style="color:var(--gold);"></i> שירות לקוחות
-        </a>
-        <a id="wa-corp" href="#" style="background:#111; border:1px solid rgba(212,175,55,0.3); padding:10px; border-radius:12px; text-decoration:none; color:white; font-size:12px;" onclick="trackConversion('Corporate chat')">
-            <i class="fab fa-whatsapp" style="color:var(--gold);"></i> WhatsApp
-        </a>
-    </div>
 </header>
 
 <div class="cats-wrapper">
-    <div id="cats" class="marquee-container"></div>
+    <div id="cats" class="marquee-container">
+        </div>
 </div>
 
 <main id="grid" class="grid"></main>
 
-<div id="popup-sale">
-    <div class="sale-box">
-        <span style="position: absolute; top: 10px; right: 15px; font-size: 2.5rem; color: #fff; cursor: pointer; z-index: 10;" onclick="closeSale()">&times;</span>
-        <img src="sale.png" style="width:100%; display:block" alt="Daily Sale">
-        <div id="sale-timer" class="countdown-bar">00:00:00</div>
-        <a id="sale-wa-link" style="display:block; background:var(--wa); color:white; text-align:center; padding:18px; text-decoration:none; font-weight:900;" target="_blank" onclick="trackConversion('Daily Offer')"></a>
-    </div>
-</div>
-
-<div id="reopen-sale" onclick="openSale()">
-    <i class="fas fa-gift" style="color:#000; font-size:1.5rem"></i>
-</div>
-
 <script>
 const lang = navigator.language.startsWith('ar') ? 'ar' : 'he';
 const CORP_PHONE = "0509787730"; 
-let timerInterval;
 
 const TXT = {
-    he: { all: 'הכל', order: 'הזמנה', msg: 'היי, אשמח להזמין: ', offer: 'קבלת ההטבה' },
-    ar: { all: 'الكل', order: 'طلب سريع', msg: 'مرحباً، أود طلب: ', offer: 'احصل على العرض' }
+    he: { all: 'הכל', order: 'הזמנה', msg: 'היי, אשمح להזמין: ' },
+    ar: { all: 'الكل', order: 'طلب سريع', msg: 'مرحباً، أود طلب: ' }
 };
 
 function buildWaUrl(phone, text) {
@@ -144,25 +121,21 @@ async function start() {
 
         window.allProducts = products;
         renderUI(products);
-        initDailySale();
     } catch (e) { console.error(e); }
 }
 
 function renderUI(products) {
     const t = TXT[lang];
-    document.getElementById('wa-corp').href = buildWaUrl(CORP_PHONE, t.msg);
-
     const uniqueCats = [...new Set(products.map(p => p.cat))].filter(Boolean);
     const nav = document.getElementById('cats');
     
-    // إعداد البيانات وصور الفئات
     const catData = [{ name: t.all, img: 'logo.png' }];
     uniqueCats.forEach(name => {
         const p = products.find(prod => prod.cat === name);
         catData.push({ name: name, img: p ? p.img : 'logo.png' });
     });
 
-    // إنشاء الأزرار
+    // إنشاء محتوى الأزرار
     const buttonsHtml = catData.map(cat => `
         <div class="cat-item ${cat.name === t.all ? 'active' : ''}" onclick="filterBy('${cat.name.replace(/'/g, "\\'")}')">
             <span>${cat.name}</span>
@@ -170,7 +143,7 @@ function renderUI(products) {
         </div>
     `).join('');
 
-    // تكرار المحتوى مرتين بالضبط لعمل Loop لانهائي حقيقي
+    // تكرار المحتوى مرتين بالضبط لضمان الربط اللامتناهي
     nav.innerHTML = buttonsHtml + buttonsHtml; 
 
     renderGrid(products, 'all');
@@ -178,6 +151,7 @@ function renderUI(products) {
 }
 
 function filterBy(catName) {
+    // تحديث الحالة النشطة في كلا المجموعتين
     document.querySelectorAll('.cat-item').forEach(el => {
         el.classList.toggle('active', el.querySelector('span').textContent === catName);
     });
@@ -191,30 +165,9 @@ function renderGrid(products, filter) {
     filtered.forEach(p => {
         const card = document.createElement('div');
         card.className = 'card';
-        card.innerHTML = `<img src="${p.img}" loading="lazy"><div class="info"><div>${p.title}</div><div class="price">${p.price}</div><a class="wa-btn" href="${buildWaUrl(CORP_PHONE, TXT[lang].msg + p.title)}" target="_blank" onclick="trackConversion('${p.title}')">${TXT[lang].order}</a></div>`;
+        card.innerHTML = `<img src="${p.img}" loading="lazy"><div class="info"><div>${p.title}</div><div class="price">${p.price}</div><a class="wa-btn" href="${buildWaUrl(CORP_PHONE, TXT[lang].msg + p.title)}" target="_blank">${TXT[lang].order}</a></div>`;
         g.appendChild(card);
     });
-}
-
-// Sale Popup Logic
-function openSale() { document.getElementById('popup-sale').style.display = 'flex'; document.getElementById('reopen-sale').style.display = 'none'; startTimer(); }
-function closeSale() { document.getElementById('popup-sale').style.display = 'none'; document.getElementById('reopen-sale').style.display = 'flex'; localStorage.setItem('mad_sale_' + new Date().toDateString(), 'seen'); clearInterval(timerInterval); }
-function startTimer() {
-    clearInterval(timerInterval);
-    timerInterval = setInterval(() => {
-        const diff = new Date().setHours(23, 59, 59) - new Date();
-        if (diff <= 0) { closeSale(); return; }
-        const h = Math.floor(diff/3600000).toString().padStart(2,'0');
-        const m = Math.floor((diff%3600000)/60000).toString().padStart(2,'0');
-        const s = Math.floor((diff%60000)/1000).toString().padStart(2,'0');
-        document.getElementById('sale-timer').textContent = `${h}:${m}:${s}`;
-    }, 1000);
-}
-function initDailySale() {
-    document.getElementById('sale-wa-link').textContent = TXT[lang].offer;
-    document.getElementById('sale-wa-link').href = buildWaUrl(CORP_PHONE, TXT[lang].offer);
-    if (!localStorage.getItem('mad_sale_' + new Date().toDateString())) setTimeout(openSale, 2000);
-    else document.getElementById('reopen-sale').style.display = 'flex';
 }
 
 start();
