@@ -87,12 +87,6 @@
         .dist-info { font-size: 12px; color: #888; font-weight: bold; margin-top: 4px; }
         .status-pill { font-size: 11px; padding: 4px 10px; border-radius: 25px; font-weight: 800; display: flex; align-items: center; gap: 5px; border: 1px solid; }
 
-        .product-card {
-            background: var(--card-bg); border-radius: 15px; padding: 15px;
-            margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center;
-            border-right: 4px solid var(--gold);
-        }
-
         .btn-group { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
         .btn {
             padding: 12px 5px; border-radius: 12px; text-decoration: none; color: white;
@@ -102,8 +96,6 @@
         .bg-wa { background: var(--wa-green); }
         .bg-waze { background: var(--waze-blue); color: #000; }
         .bg-enter { background: var(--btn-gray); }
-
-        .hidden { display: none !important; }
 
         /* --- STICKY FOOTER --- */
         .sticky-fragrantica {
@@ -147,8 +139,6 @@
         }
         .btn-enter { background: var(--gold); color: black; }
         .btn-back { background: transparent; color: white; border: 1px solid rgba(255,255,255,0.3); }
-
-        [dir="ltr"] .branch-card, [dir="ltr"] .product-card { border-right: none; border-left: 5px solid var(--gold); }
     </style>
 </head>
 <body>
@@ -188,22 +178,12 @@
 </header>
 
 <div class="container">
-    <div id="view-directory">
-        <div id="branchesList" style="text-align:center; color:#888;">جاري تحميل البيانات...</div>
-    </div>
-
-    <div id="view-shop" class="hidden">
-        <button onclick="window.location.href='index.html'" style="background:none; border:1px solid var(--gold); color:var(--gold); padding:8px 20px; border-radius:25px; cursor:pointer; margin-bottom:20px; font-weight:bold;">
-            <i class="fas fa-arrow-right"></i> <span class="l-back"></span>
-        </button>
-        <h2 id="shop-title" style="color:var(--gold); margin-bottom:20px; text-align:center;"></h2>
-        <div id="productsGrid"></div>
-    </div>
+    <div id="branchesList">جاري تحميل البيانات...</div>
 </div>
 
 <div class="sticky-fragrantica">
     <div style="text-align:right;">
-        <h5 id="s-title" style="color:var(--gold); font-size:14px;"></h5>
+        <h5 id="s-title"></h5>
         <p id="s-desc"></p>
     </div>
     <button class="open-frag-btn" onclick="toggleGateway(true)" id="s-btn"></button>
@@ -217,42 +197,32 @@
             <img src="https://abomkdad.github.io/Digital-Business-Card/logo.png" style="height:60px;">
         </div>
 
-        <div id="content-ar" class="lang-section">
+        <div id="content-ar" style="display:none;">
             <h2>الأعلى تقييماً عالمياً</h2>
             <p>انتقل الآن لتكتشف لماذا تُعد <b>MAD</b> أكبر دار عطور نيش حاصلة على تقييمات عالمية في موسوعة <b>Fragrantica</b>. استكشف فخامة <b>العطور الأصلية</b> وآراء الخبراء.</p>
             <div class="gateway-stars">★★★★★</div>
-            <button class="gateway-btn btn-enter" onclick="openOffer()">استكشف عطورنا الأصلية</button>
+            <button class="gateway-btn btn-enter" onclick="openFragranticaDirect()">استكشف عطورنا الأصلية</button>
             <button class="gateway-btn btn-back" onclick="toggleGateway(false)">العودة للموقع</button>
         </div>
 
-        <div id="content-he" class="lang-section hidden">
+        <div id="content-he" style="display:none;">
             <h2>המותג המדורג ביותר בעולם</h2>
             <p>גלו עכשיו מדוע <b>MAD</b> היא חברת בשמי הניש הגדולה ביותר עם הדירוגים הגבוהים ביותר באנציקלופדיית <b>Fragrantica</b> העולמית. הצטרפו לעולם של <b>בשמים מקוריים</b> ויוקרתיים.</p>
             <div class="gateway-stars">★★★★★</div>
-            <button class="gateway-btn btn-enter" onclick="openOffer()">לצפייה בבשמים המקוריים</button>
+            <button class="gateway-btn btn-enter" onclick="openFragranticaDirect()">לצפייה בבשמים המקוריים</button>
             <button class="gateway-btn btn-back" onclick="toggleGateway(false)">חזרה לאתר</button>
         </div>
     </div>
 </div>
 
 <script>
-    const params = new URLSearchParams(window.location.search);
-    const branchID = params.get('branch');
     const userLang = navigator.language.startsWith("he") ? "he" : "ar";
     document.documentElement.lang = userLang;
     document.documentElement.dir = (userLang === "ar") ? "rtl" : "ltr";
 
     const t = {
-        ar: { 
-            cs:"خدمة الزبائن", wa:"واتساب الشركة", shop:"الطلب أونلاين", open:"مفتوح الآن", closed:"مغلق حالياً", 
-            enter:"دخول الفرع", waze:"Waze", wa_btn:"واتساب", km:"كم", back:"العودة للقائمة", order:"طلب عبر واتساب",
-            s_h: "MAD: الصدارة العالمية", s_p: "أكبر دار نيش تقييماً في Fragrantica", s_b: "استكشف"
-        },
-        he: { 
-            cs:"שירות לקוחות", wa:"וואטסאפ حברה", shop:"הזמנה אונליין", open:"פתוח עכשיו", closed:"סגור כעת", 
-            enter:"כניסה לסניף", waze:"ניווט", wa_btn:"וואטסאפ", km:'ק"מ', back:"חזרה לרשימה", order:"הזמנה בוואטסאפ",
-            s_h: "MAD: המובילה בעולם", s_p: "המותג המדורג ביותר ב-Fragrantica", s_b: "גלה עכשיו"
-        }
+        ar: { cs:"خدمة الزبائن", wa:"واتساب الشركة", shop:"الطلب أونلاين", open:"مفتوح الآن", closed:"مغلق حالياً", enter:"دخول الفرع", wa_btn:"واتساب", km:"كم", s_h:"MAD: الصدارة العالمية", s_p:"أكبر دار نيش تقييماً في Fragrantica", s_b:"استكشف" },
+        he: { cs:"שירות לקוחות", wa:"וואטסאפ חברה", shop:"הזמנה אונליין", open:"פתוח עכשיו", closed:"סגור כעת", enter:"כניסה לסניף", wa_btn:"וואטסאפ", km:'ק"מ', s_h:"MAD: המובילה בעולם", s_p:"המותג המדורג ביותר ב-Fragrantica", s_b:"גלה עכשيو" }
     }[userLang];
 
     document.getElementById('s-title').textContent = t.s_h;
@@ -261,33 +231,31 @@
     document.querySelector('.l-cs').textContent = t.cs;
     document.querySelector('.l-wa').textContent = t.wa;
     document.querySelector('.l-shop').textContent = t.shop;
-    document.querySelector('.l-back').textContent = t.back;
 
-    if (userLang === "he") {
-        document.getElementById('content-ar').style.display = 'none';
-        document.getElementById('content-he').style.display = 'block';
-    }
+    document.getElementById(`content-${userLang}`).style.display = 'block';
 
     function toggleGateway(show) {
         document.getElementById('gateway-modal').style.display = show ? 'flex' : 'none';
         document.body.style.overflow = show ? 'hidden' : 'auto';
     }
 
-    // تعديل الوظيفة لفتح صفحة offer.html
-    function openOffer() {
-        window.location.href = "offer.html";
+    // الضغط على الموسوعة يفتح Fragrantica مباشرة بحسب اللغة
+    function openFragranticaDirect() {
+        const url = (userLang === "he") 
+            ? "https://www.fragrantica.co.il/designers/Mad-Parfumeur.html" 
+            : "https://www.fragranticarabia.com/designers/Mad-Parfumeur.html";
+        window.open(url, '_blank', 'noopener,noreferrer');
+        toggleGateway(false);
     }
 
-    function buildWaUrl(phone, text = '') {
+    function buildWaUrl(phone) {
         let p = phone.replace(/\D/g, ''); 
         if (p.startsWith('0')) p = '972' + p.substring(1);
-        return `https://api.whatsapp.com/send/?phone=${p}&text=${encodeURIComponent(text)}`;
+        return `https://api.whatsapp.com/send/?phone=${p}`;
     }
 
     document.getElementById('wa-corp-btn').href = buildWaUrl('0509787730');
     document.getElementById('online-btn').href = (userLang === "he") ? "https://madperfume.co.il" : "https://madperfume.ps";
-
-    let allBranches = [];
 
     function isBranchOpen(b) {
         const now = new Date();
@@ -302,89 +270,32 @@
         });
     }
 
-    function calcDist(lat1, lon1, lat2, lon2) {
-        if (!lat1 || !lon1) return null;
-        const R = 6371;
-        const dLat = (lat2 - lat1) * Math.PI / 180;
-        const dLon = (lon2 - lon1) * Math.PI / 180;
-        const a = Math.sin(dLat / 2) ** 2 + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon / 2) ** 2;
-        return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    }
-
     async function init() {
         try {
             const res = await fetch('branches.json?v=' + Date.now());
             const data = await res.json();
-            allBranches = data.branches;
-            if (branchID) { renderShopView(branchID); } else { renderDirectoryView(); }
-            document.body.style.opacity = "1";
-        } catch(e) { console.error("Data Load Fail", e); }
-    }
-
-    function renderDirectoryView() {
-        let list = allBranches;
-        renderBranches(list);
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(pos => {
-                const {latitude: uLat, longitude: uLng} = pos.coords;
-                list.forEach(b => { if(b.lat) b.dist = calcDist(uLat, uLng, b.lat, b.lng); });
-                list.sort((a,b) => (a.dist || 9999) - (b.dist || 9999));
-                renderBranches(list);
-            }, null, { timeout: 3000 });
-        }
-    }
-
-    function renderBranches(list) {
-        const container = document.getElementById('branchesList');
-        container.innerHTML = '';
-        list.forEach(b => {
-            const open = isBranchOpen(b);
-            const card = document.createElement('div');
-            card.className = 'branch-card';
-            card.innerHTML = `
-                <div class="br-header">
-                    <div>
+            const container = document.getElementById('branchesList');
+            container.innerHTML = '';
+            data.branches.forEach(b => {
+                const open = isBranchOpen(b);
+                const card = document.createElement('div');
+                card.className = 'branch-card';
+                card.innerHTML = `
+                    <div class="br-header">
                         <div class="br-title">${b[`name_${userLang}`]}</div>
-                        <div class="dist-info">${b.dist ? b.dist.toFixed(1) + ' ' + t.km : ''}</div>
+                        <div class="status-pill" style="border-color:${open ? 'var(--wa-green)' : '#ff4d4d'}; color:${open ? 'var(--wa-green)' : '#ff4d4d'}">
+                            ● ${open ? t.open : t.closed}
+                        </div>
                     </div>
-                    <div class="status-pill" style="border-color:${open ? 'var(--wa-green)' : '#ff4d4d'}; color:${open ? 'var(--wa-green)' : '#ff4d4d'}">
-                        ● ${open ? t.open : t.closed}
-                    </div>
-                </div>
-                <div class="btn-group">
-                    <a href="${buildWaUrl(b.phone)}" class="btn bg-wa"><i class="fab fa-whatsapp"></i>${t.wa_btn}</a>
-                    <a href="${(b.social && b.social.waze) ? b.social.waze : `https://ul.waze.com/ul?ll=${b.lat},${b.lng}&navigate=yes`}" target="_blank" class="btn bg-waze"><i class="fab fa-waze"></i>${t.waze}</a>
-                    <a href="?branch=${b.id}" class="btn bg-enter"><i class="fas fa-door-open"></i>${t.enter}</a>
-                </div>`;
-            container.appendChild(card);
-        });
-    }
-
-    async function renderShopView(id) {
-        const branch = allBranches.find(b => b.id == id);
-        if (!branch) return;
-        document.getElementById('view-directory').classList.add('hidden');
-        document.getElementById('view-shop').classList.remove('hidden');
-        document.getElementById('shop-title').textContent = branch[`name_${userLang}`];
-        try {
-            const res = await fetch('products.csv?v=' + Date.now());
-            const csv = await res.text();
-            const lines = csv.split('\n').slice(1);
-            const grid = document.getElementById('productsGrid');
-            grid.innerHTML = '';
-            lines.forEach(line => {
-                const c = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
-                if(c[1]) {
-                    const name = c[1].replace(/"/g,'').trim();
-                    const pCard = document.createElement('div');
-                    pCard.className = 'product-card';
-                    pCard.innerHTML = `
-                        <div><div style="font-weight:900;">${name}</div><div style="color:var(--gold);">${c[10] || ''} ₪</div></div>
-                        <a href="${buildWaUrl(branch.phone, t.order + ': ' + name)}" class="btn bg-wa" style="width:45px; height:45px; border-radius:50%;"><i class="fab fa-whatsapp"></i></a>`;
-                    grid.appendChild(pCard);
-                }
+                    <div class="btn-group">
+                        <a href="${buildWaUrl(b.phone)}" class="btn bg-wa"><i class="fab fa-whatsapp"></i>${t.wa_btn}</a>
+                        <a href="https://ul.waze.com/ul?ll=${b.lat},${b.lng}&navigate=yes" target="_blank" class="btn bg-waze"><i class="fab fa-waze"></i>Waze</a>
+                        <a href="offer.html?branch=${b.id}" class="btn bg-enter"><i class="fas fa-gift"></i>${t.enter}</a>
+                    </div>`;
+                container.appendChild(card);
             });
-        } catch(e) { console.error("CSV Load Fail", e); }
+            document.body.style.opacity = "1";
+        } catch(e) { console.error(e); }
     }
     init();
 </script>
