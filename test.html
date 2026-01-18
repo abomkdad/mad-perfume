@@ -3,14 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <title>MAD PARFUMEUR | Infinite Shop</title>
+    <title>MAD PARFUMEUR | Official Online Shop</title>
 
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Assistant:wght@400;700&family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <script>
-    !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];
+    !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+    n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+    n.queue=[];t=b.createElement(e);t.async=!0;
+    t.src=v;s=b.getElementsByTagName(e)[0];
     s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
     fbq('init','1072283127290819'); fbq('track', 'PageView');
 
@@ -26,7 +29,7 @@
     </script>
 
     <style>
-        :root { --gold: #D4AF37; --black: #000; --wa: #25D366; }
+        :root { --gold: #D4AF37; --black: #000; --card: #111; --wa: #25D366; }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { background: #000; color: #fff; font-family: 'Assistant', 'Cairo', sans-serif; opacity: 0; transition: opacity 0.5s; padding-bottom: 120px; overflow-x: hidden; }
 
@@ -37,7 +40,7 @@
         }
         .logo-img { max-width: 120px; margin-bottom: 15px; }
 
-        /* --- شريط "الأخبار" اللانهائي الملتصق --- */
+        /* شريط التصنيفات اللانهائي (الرأس بالذيل) */
         .cats-wrapper { 
             position: sticky; top: 0; background: rgba(10, 10, 10, 0.98); 
             z-index: 1000; border-bottom: 2px solid var(--gold);
@@ -49,11 +52,11 @@
             display: flex;
             width: max-content; 
             will-change: transform;
-            animation: scroll-news 35s linear infinite; /* حركة انسيابية مستمرة */
+            animation: scroll-loop 35s linear infinite; /* حركة مستمرة دون توقف */
         }
 
-        /* لضمان التصاق المجموعة الأولى بالثانية دون فراغ */
-        @keyframes scroll-news {
+        /* الربط اللانهائي: نتحرك للنصف بالضبط لأننا نكرر العناصر مرتين */
+        @keyframes scroll-loop {
             0% { transform: translateX(0); }
             100% { transform: translateX(-50%); }
         }
@@ -65,13 +68,13 @@
             color: #ddd; border: 1px solid rgba(212, 175, 55, 0.2);
             padding: 6px 18px 6px 6px; border-radius: 50px; cursor: pointer;
             white-space: nowrap; font-weight: 700; font-size: 13px;
-            margin-right: 15px; /* المسافة بين التصنيفات */
-            gap: 10px; transition: 0.3s;
+            margin-right: 15px; /* المسافة بين التصنيفات المترابطة */
+            gap: 12px; transition: 0.3s;
         }
-        .cat-thumb { width: 34px; height: 34px; border-radius: 50%; object-fit: cover; border: 1px solid var(--gold); }
+        .cat-thumb { width: 35px; height: 35px; border-radius: 50%; object-fit: cover; border: 1px solid var(--gold); }
         .cat-item.active { background: var(--gold); color: #000; border-color: #fff; box-shadow: 0 0 15px rgba(212, 175, 55, 0.5); }
 
-        /* Grid */
+        /* شبكة المنتجات */
         .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 15px; }
         @media(min-width: 768px){ .grid { grid-template-columns: repeat(4, 1fr); gap: 20px; } }
         .card { background: #111; border: 1px solid #222; border-radius: 20px; overflow: hidden; display: flex; flex-direction: column; }
@@ -80,7 +83,10 @@
         .price { color: var(--gold); font-weight: 900; font-size: 1.2rem; margin: 8px 0; font-family: 'Cinzel', serif; }
         .wa-btn { background: var(--wa); color: #fff; text-decoration: none; padding: 12px; border-radius: 12px; font-weight: 800; text-align: center; }
 
-        /* عرض اليوم Popup */
+        /* الفوتر وعرض اليوم */
+        .frag-footer { position: fixed; bottom: 0; left: 0; width: 100%; background: #111; border-top: 1px solid var(--gold); padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; z-index: 999; }
+        .open-frag-btn { background: var(--gold); color: #000; padding: 10px 20px; border-radius: 50px; font-weight: 900; border: none; cursor: pointer; }
+        
         #popup-sale { position: fixed; inset: 0; background: rgba(0,0,0,0.95); display: none; align-items: center; justify-content: center; z-index: 10001; padding: 20px; }
         .sale-box { width: 100%; max-width: 380px; background: #000; border: 2px solid var(--gold); border-radius: 20px; overflow: hidden; position: relative; }
         .countdown-bar { background: var(--gold); color: #000; padding: 12px; text-align: center; font-weight: 900; font-size: 1.5rem; font-family: 'Cinzel', serif; }
@@ -95,11 +101,11 @@
     <img src="logo.png" class="logo-img">
     <div class="brand-name" style="font-family:'Cinzel'; color:var(--gold); font-size: 1.8rem; font-weight: 900;">MAD PARFUMEUR</div>
     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; max-width: 400px; margin: 20px auto 0;">
-        <a href="tel:*9935" style="background:#111; border:1px solid rgba(212,175,55,0.3); padding:10px; border-radius:12px; text-decoration:none; color:white; font-size:12px;">
-            <i class="fas fa-phone-alt"></i> خدمة العملاء
+        <a href="tel:*9935" class="action-btn" style="background:#111; border:1px solid rgba(212,175,55,0.3); padding:10px; border-radius:12px; text-decoration:none; color:white; font-size:12px;">
+            <i class="fas fa-phone-alt" style="color:var(--gold);"></i> خدمة العملاء
         </a>
-        <a id="wa-corp" href="#" style="background:#111; border:1px solid rgba(212,175,55,0.3); padding:10px; border-radius:12px; text-decoration:none; color:white; font-size:12px;" onclick="trackLead('General Shop Contact')">
-            <i class="fab fa-whatsapp"></i> WhatsApp
+        <a id="wa-corp" href="#" class="action-btn" style="background:#111; border:1px solid rgba(212,175,55,0.3); padding:10px; border-radius:12px; text-decoration:none; color:white; font-size:12px;" onclick="trackLead('Corporate chat')">
+            <i class="fab fa-whatsapp" style="color:var(--gold);"></i> WhatsApp
         </a>
     </div>
 </header>
@@ -110,6 +116,11 @@
 </div>
 
 <main id="grid" class="grid"></main>
+
+<div class="frag-footer">
+    <div class="txt-side"><h5 id="foot-h" style="color:var(--gold)"></h5><p id="foot-p" style="font-size:10px; opacity:0.7;"></p></div>
+    <button class="open-frag-btn" onclick="openFrag()" id="foot-b"></button>
+</div>
 
 <div id="popup-sale">
     <div class="sale-box">
@@ -130,8 +141,8 @@ const CORP_PHONE = "0509787730";
 let timerInterval;
 
 const TXT = {
-    he: { all: 'הכל', order: 'הזמנה', msg: 'היי, אשמח להזמין: ', offer: 'קבלת ההטבה' },
-    ar: { all: 'الكل', order: 'طلب سريع', msg: 'مرحباً، أود طلب: ', offer: 'احصل على العرض' }
+    he: { all: 'הכל', order: 'הזמנה', msg: 'היי, אשמח להזמין: ', f_h: 'MAD: המובילה בעולם', f_b: 'גלה', offer: 'קבלת ההטבה' },
+    ar: { all: 'الكل', order: 'طلب سريع', msg: 'مرحباً، أود طلب: ', f_h: 'MAD: الأعلى تقييماً', f_b: 'استكشف', offer: 'احصل على العرض' }
 };
 
 function buildWaUrl(phone, text) {
@@ -162,11 +173,12 @@ async function start() {
 function renderUI(products) {
     const t = TXT[lang];
     document.getElementById('wa-corp').href = buildWaUrl(CORP_PHONE, t.msg);
+    document.getElementById('foot-h').textContent = t.f_h;
+    document.getElementById('foot-b').textContent = t.f_b;
 
     const uniqueCats = [...new Set(products.map(p => p.cat))].filter(Boolean);
     const nav = document.getElementById('cats');
     
-    // إنشاء بيانات الشريط (الكل + الفئات)
     const catData = [{ name: t.all, img: 'logo.png' }];
     uniqueCats.forEach(name => {
         const p = products.find(prod => prod.cat === name);
@@ -180,20 +192,17 @@ function renderUI(products) {
         </div>
     `).join('');
 
-    // تكرار المحتوى لضمان الربط اللامتناهي دون فراغات
+    // تكرار المحتوى مرتين للـ Loop اللانهائي دون فراغات
     nav.innerHTML = buttonsHtml + buttonsHtml; 
-
     renderGrid(products, 'all');
     document.body.style.opacity = "1";
 }
 
 function filterBy(catName) {
-    // تفعيل الزر في كل المجموعات المكررة
     document.querySelectorAll('.cat-item').forEach(el => {
         el.classList.toggle('active', el.querySelector('span').textContent === catName);
     });
     renderGrid(window.allProducts, catName === TXT[lang].all ? 'all' : catName);
-    // تمرير للأعلى قليلاً لرؤية المنتجات
     window.scrollTo({ top: document.querySelector('header').offsetHeight - 50, behavior: 'smooth' });
 }
 
@@ -209,7 +218,11 @@ function renderGrid(products, filter) {
     });
 }
 
-// Sale Popup Logic
+function openFrag() {
+    window.open((lang === "he") ? "https://www.fragrantica.co.il/designers/Mad-Parfumeur.html" : "https://www.fragranticarabia.com/designers/Mad-Parfumeur.html", '_blank');
+}
+
+// Sale logic
 function openSale() { document.getElementById('popup-sale').style.display = 'flex'; document.getElementById('reopen-sale').style.display = 'none'; startTimer(); }
 function closeSale() { document.getElementById('popup-sale').style.display = 'none'; document.getElementById('reopen-sale').style.display = 'flex'; localStorage.setItem('mad_sale_' + new Date().toDateString(), 'seen'); clearInterval(timerInterval); }
 function startTimer() {
