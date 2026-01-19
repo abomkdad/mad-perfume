@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MAD PARFUMEUR | Official Portal</title>
+    <title>MAD PARFUMEUR | Elite Smart Portal</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -133,7 +133,7 @@
 
     const t = {
         ar: { cs:"خدمة الزبائن", wa:"واتساب الشركة", shop:"المتجر أونلاين", agent:"وكيل جديد / شريك", open:"مفتوح الآن", closed:"مغلق حالياً", enter:"دخول الفرع", f1:"MAD العالمية", f2:"الأعلى تقييماً في Fragrantica", f3:"استكشف", agent_msg:"أرغب في الحصول على تفاصيل حول الوكالة" },
-        he: { cs:"שירות לקוחות", wa:"וואטסאפ חברה", shop:"חנות אונליין", agent:"سוכן חדש / שותף", open:"פתוח עכשיו", closed:"סגור כעת", enter:"כניסה לסניף", f1:"MAD העולמית", f2:"המדורגת ביותר ב-Fragrantica", f3:"גלה עכשיו", agent_msg:"אני מעוניין בפרטים על הצטרפות כסוכן" }
+        he: { cs:"שירות לקוחות", wa:"וואטסאפ חברה", shop:"חנות אונליין", agent:"סוכן חדש / שותף", open:"החנות פתוחה עכשיו", closed:"סגור כעת", enter:"כניסה לסניף", f1:"MAD העולמית", f2:"המדורגת ביותר ב-Fragrantica", f3:"גלה עכשיו", agent_msg:"אני מעוניין בפרטים על הצטרפות כסוכן" }
     }[userLang];
 
     document.getElementById('txt-cs').innerText = t.cs;
@@ -168,7 +168,7 @@
         });
     }
 
-    // ترتيب الفروع حسب المسافة بناءً على إحداثيات GPS
+    // حساب المسافة بين المستخدم وإحداثيات GPS في الجيسون
     function getDist(lat1, lon1, lat2, lon2) {
         const R = 6371;
         const dLat = (lat2-lat1) * Math.PI/180;
@@ -185,7 +185,7 @@
 
             navigator.geolocation.getCurrentPosition(pos => {
                 const uLat = pos.coords.latitude, uLon = pos.coords.longitude;
-                // الفرع الأقرب حسب GPS يظهر أولاً
+                // استخدام الإحداثيات lat و lng الموجودة في الجيسون للترتيب فقط
                 branches.sort((a, b) => getDist(uLat, uLon, a.lat, a.lng) - getDist(uLat, uLon, b.lat, b.lng));
                 render(branches);
             }, () => render(branches));
@@ -196,7 +196,7 @@
         let html = '';
         list.forEach(b => {
             const open = checkStatus(b.schedule);
-            // لاحظ هنا: b.waze_url يتم سحبه مباشرة من الجيسون كما طلبت
+            // لاحظ هنا: b.social.waze هو الرابط الحقيقي من الجيسون
             html += `
             <div class="branch-card">
                 <div class="br-header">
@@ -207,8 +207,8 @@
                 </div>
                 <div class="btn-group">
                     <a href="${formatWa(b.phone)}" class="btn bg-wa"><i class="fab fa-whatsapp"></i>WhatsApp</a>
-                    <a href="${b.waze_url}" class="btn bg-waze"><i class="fab fa-waze"></i>Waze</a>
-                    <a href="offer.html?branch=${b.id}" class="btn bg-enter"><i class="fas fa-gift"></i>${t.enter}</a>
+                    <a href="${b.social.waze}" class="btn bg-waze"><i class="fab fa-waze"></i>Waze</a>
+                    <a href="offer.html?branch=${b.id}" class="btn bg-enter"><i class="fas fa-gift"></i>${userLang === 'he' ? 'כניסה' : 'دخول'}</a>
                 </div>
             </div>`;
         });
