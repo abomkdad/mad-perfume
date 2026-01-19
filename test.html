@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>MAD PARFUMEUR | Infinite Shop</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Assistant:wght@400;700&family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Assistant:wght@400;700&family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
 <script>
@@ -43,15 +43,14 @@ if(window.ttq) ttq.track('Contact',{content_name:name});
 <style>
 :root{--gold:#D4AF37;--wa:#25D366}
 *{box-sizing:border-box;margin:0;padding:0}
-
 body{
 background:#000;color:#fff;
 font-family:'Assistant','Cairo',sans-serif;
-padding-bottom:120px;overflow-x:hidden;
+padding-bottom:140px;overflow-x:hidden;
 opacity:0;transition:.4s
 }
 
-/* ===== HEADER ===== */
+/* HEADER */
 header{
 text-align:center;padding:40px 20px;
 background:linear-gradient(rgba(0,0,0,.85),rgba(0,0,0,.95)),
@@ -60,7 +59,18 @@ border-bottom:1px solid rgba(212,175,55,.3)
 }
 .logo-img{max-width:120px;margin-bottom:15px}
 
-/* ===== CATEGORY BAR ===== */
+/* CONTACT BUTTONS */
+.header-actions{
+display:grid;grid-template-columns:1fr 1fr;
+gap:10px;max-width:400px;margin:20px auto 0
+}
+.header-actions a{
+background:#111;border:1px solid rgba(212,175,55,.3);
+padding:10px;border-radius:12px;
+text-decoration:none;color:white;font-size:12px
+}
+
+/* CATEGORY BAR */
 .cats-wrapper{
 position:sticky;top:0;z-index:1000;
 background:#0a0a0a;
@@ -68,41 +78,26 @@ border-bottom:2px solid var(--gold);
 overflow:hidden;width:100vw;
 padding:12px 0
 }
-
-.marquee{
-display:flex;
-width:max-content;
-will-change:transform
-}
-
+.marquee{display:flex;width:max-content;will-change:transform}
 .cat-item{
-display:flex;align-items:center;
-gap:10px;margin-right:15px;
-padding:6px 18px 6px 6px;
+display:flex;align-items:center;gap:10px;
+margin-right:15px;padding:6px 18px 6px 6px;
 border-radius:50px;cursor:pointer;
-white-space:nowrap;
-font-size:13px;font-weight:700;
+white-space:nowrap;font-weight:700;font-size:13px;
 background:rgba(255,255,255,.05);
-border:1px solid rgba(212,175,55,.2);
-transition:.3s
+border:1px solid rgba(212,175,55,.2)
 }
 .cat-thumb{
-width:34px;height:34px;
-border-radius:50%;
-object-fit:cover;
-border:1px solid var(--gold)
+width:34px;height:34px;border-radius:50%;
+object-fit:cover;border:1px solid var(--gold)
 }
 .cat-item.active{
 background:var(--gold);color:#000;
 box-shadow:0 0 15px rgba(212,175,55,.5)
 }
 
-/* ===== GRID ===== */
-.grid{
-display:grid;
-grid-template-columns:repeat(2,1fr);
-gap:12px;padding:15px
-}
+/* GRID */
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;padding:15px}
 @media(min-width:768px){
 .grid{grid-template-columns:repeat(4,1fr);gap:20px}
 }
@@ -112,20 +107,36 @@ border-radius:20px;overflow:hidden;
 display:flex;flex-direction:column
 }
 .card img{width:100%;aspect-ratio:1/1;object-fit:cover}
-.info{
-padding:15px;text-align:center;
-flex-grow:1;display:flex;
-flex-direction:column;justify-content:space-between
-}
-.price{
-color:var(--gold);
-font-weight:900;font-size:1.2rem;
-font-family:'Cinzel',serif
-}
+.info{padding:15px;text-align:center;flex-grow:1}
+.price{color:var(--gold);font-weight:900;font-size:1.2rem;font-family:'Cinzel'}
 .wa-btn{
 background:var(--wa);color:#fff;
 text-decoration:none;padding:12px;
-border-radius:12px;font-weight:800
+border-radius:12px;font-weight:800;display:block
+}
+
+/* DAILY SALE */
+#popup-sale{
+position:fixed;inset:0;background:rgba(0,0,0,.95);
+display:none;align-items:center;justify-content:center;
+z-index:10001
+}
+.sale-box{
+max-width:380px;width:100%;
+border:2px solid var(--gold);
+border-radius:20px;overflow:hidden
+}
+.countdown-bar{
+background:var(--gold);color:#000;
+padding:12px;text-align:center;
+font-weight:900;font-size:1.4rem
+}
+#reopen-sale{
+position:fixed;bottom:85px;left:20px;
+width:60px;height:60px;background:var(--gold);
+border-radius:50%;display:none;
+align-items:center;justify-content:center;
+z-index:999;cursor:pointer
 }
 </style>
 </head>
@@ -134,25 +145,33 @@ border-radius:12px;font-weight:800
 
 <header>
 <img src="logo.png" class="logo-img">
-<div style="font-family:'Cinzel';color:var(--gold);font-size:1.8rem;font-weight:900">
-MAD PARFUMEUR
+<div style="font-family:'Cinzel';color:var(--gold);font-size:1.8rem;font-weight:900">MAD PARFUMEUR</div>
+
+<div class="header-actions">
+<a href="tel:*9935"><i class="fas fa-phone"></i> خدمة العملاء</a>
+<a id="wa-corp" onclick="trackLead('General Contact')"><i class="fab fa-whatsapp"></i> WhatsApp</a>
 </div>
 </header>
 
-<!-- ===== CATEGORY BAR ===== -->
-<div class="cats-wrapper">
-  <div id="cats" class="marquee"></div>
+<div class="cats-wrapper"><div id="cats" class="marquee"></div></div>
+<main id="grid" class="grid"></main>
+
+<div id="popup-sale">
+<div class="sale-box">
+<img src="sale.png" style="width:100%">
+<div id="sale-timer" class="countdown-bar">00:00:00</div>
+<a id="sale-wa" class="wa-btn" target="_blank" onclick="trackLead('Daily Offer')"></a>
+</div>
 </div>
 
-<main id="grid" class="grid"></main>
+<div id="reopen-sale" onclick="openSale()"><i class="fas fa-gift"></i></div>
 
 <script>
 const lang=navigator.language.startsWith('ar')?'ar':'he';
 const CORP_PHONE="0509787730";
-
 const TXT={
-he:{all:'הכל',order:'הזמנה',msg:'היי, אשמח להזמין: '},
-ar:{all:'الكل',order:'طلب سريع',msg:'مرحباً، أود طلب: '}
+he:{all:'הכל',order:'הזמנה',msg:'היי, אשמח להזמין: ',offer:'קבלת ההטבה'},
+ar:{all:'الكل',order:'طلب سريع',msg:'مرحباً، أود طلب: ',offer:'احصل على العرض'}
 };
 
 function wa(phone,text){
@@ -161,53 +180,39 @@ if(p.startsWith('0'))p='972'+p.slice(1);
 return `https://api.whatsapp.com/send/?phone=${p}&text=${encodeURIComponent(text)}`;
 }
 
-/* ===== MARQUEE SAFE LOOP ===== */
-let marqueeX=0;
-let marqueeSpeed=0.6;
-
-function startMarqueeSafe(){
+/* MARQUEE SAFE */
+let mx=0;
+function startMarquee(){
 const m=document.getElementById('cats');
-
-function waitForWidth(){
+function wait(){
 const half=m.scrollWidth/2;
-if(!half || half<50){
-requestAnimationFrame(waitForWidth);
-return;
+if(!half||half<50){requestAnimationFrame(wait);return;}
+(function loop(){
+mx-=0.6;if(Math.abs(mx)>=half)mx=0;
+m.style.transform=`translateX(${mx}px)`;
+requestAnimationFrame(loop);
+})();
+}
+wait();
 }
 
-function animate(){
-marqueeX-=marqueeSpeed;
-if(Math.abs(marqueeX)>=half) marqueeX=0;
-m.style.transform=`translateX(${marqueeX}px)`;
-requestAnimationFrame(animate);
-}
-animate();
-}
-waitForWidth();
-}
-
-/* ===== DATA ===== */
 async function start(){
+document.getElementById('wa-corp').href=wa(CORP_PHONE,TXT[lang].msg);
 const res=await fetch('products.csv');
-const text=await res.text();
-const lines=text.split('\n');
+const lines=(await res.text()).split('\n');
 const catCol=lang==='ar'?11:10;
 
 const products=lines.slice(1).map(l=>{
 const c=l.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
 if(!c[0])return null;
-return{
-title:c[0].replace(/"/g,''),
-img:c[3],
-price:c[9]?.replace('ILS','')+' ₪',
-cat:c[catCol]?.replace(/"/g,'')
-};
+return{title:c[0],img:c[3],price:c[9]+' ₪',cat:c[catCol]};
 }).filter(Boolean);
 
 window.allProducts=products;
 renderCats(products);
 renderGrid(products,'all');
-startMarqueeSafe();
+startMarquee();
+initSale();
 document.body.style.opacity=1;
 }
 
@@ -229,23 +234,28 @@ renderGrid(window.allProducts,cat===TXT[lang].all?'all':cat);
 }
 
 function renderGrid(products,filter){
-const g=document.getElementById('grid');
-g.innerHTML='';
-(products.filter(p=>filter==='all'||p.cat===filter)).forEach(p=>{
+const g=document.getElementById('grid');g.innerHTML='';
+products.filter(p=>filter==='all'||p.cat===filter).forEach(p=>{
 g.innerHTML+=`
 <div class="card">
 <img src="${p.img}">
 <div class="info">
 <div>${p.title}</div>
 <div class="price">${p.price}</div>
-<a class="wa-btn" onclick="trackLead('${p.title}')" target="_blank"
-href="${wa(CORP_PHONE,TXT[lang].msg+p.title)}">
-${TXT[lang].order}
-</a>
+<a class="wa-btn" href="${wa(CORP_PHONE,TXT[lang].msg+p.title)}"
+onclick="trackLead('${p.title}')" target="_blank">${TXT[lang].order}</a>
 </div></div>`;
 });
 }
 
+/* SALE */
+function initSale(){
+document.getElementById('sale-wa').textContent=TXT[lang].offer;
+document.getElementById('sale-wa').href=wa(CORP_PHONE,TXT[lang].offer);
+if(!localStorage.getItem('sale_'+new Date().toDateString()))
+setTimeout(openSale,2000);
+}
+function openSale(){document.getElementById('popup-sale').style.display='flex'}
 start();
 </script>
 
