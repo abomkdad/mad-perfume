@@ -7,6 +7,7 @@
 
 <title>MAD PARFUMEUR | Elite Branch Portal</title>
 
+<!-- PERFORMANCE -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
@@ -16,13 +17,18 @@
 <!-- META PIXEL -->
 <script defer>
 !function(f,b,e,v,n,t,s){
-if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-n.queue=[];t=b.createElement(e);t.async=!0;
-t.src=v;s=b.getElementsByTagName(e)[0];
+if(f.fbq)return;n=f.fbq=function(){
+n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)
+};
+if(!f._fbq)f._fbq=n;
+n.push=n;n.loaded=!0;n.version='2.0';
+n.queue=[];
+t=b.createElement(e);t.async=!0;
+t.src=v;
+s=b.getElementsByTagName(e)[0];
 s.parentNode.insertBefore(t,s)
 }(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
+
 fbq('init','1072283127290819');
 fbq('track','PageView');
 </script>
@@ -33,13 +39,17 @@ fbq('track','PageView');
 w.TiktokAnalyticsObject=t;
 var ttq=w[t]=w[t]||[];
 ttq.methods=["page","track"];
-ttq.setAndDefer=function(t,e){t[e]=function(){t.push([e].concat([].slice.call(arguments)))}};
-for(var i=0;i<ttq.methods.length;i++)ttq.setAndDefer(ttq,ttq.methods[i]);
+ttq.setAndDefer=function(t,e){
+t[e]=function(){t.push([e].concat([].slice.call(arguments)))}
+};
+for(var i=0;i<ttq.methods.length;i++){
+ttq.setAndDefer(ttq,ttq.methods[i]);
+}
 ttq.load=function(e){
 var s=d.createElement("script");
 s.async=true;
 s.src="https://analytics.tiktok.com/i18n/pixel/events.js?sdkid="+e;
-d.getElementsByTagName("head")[0].appendChild(s);
+d.head.appendChild(s);
 };
 ttq.load('D2D02JBC77U4ENLN9SBG');
 ttq.page();
@@ -48,13 +58,15 @@ ttq.page();
 
 <style>
 
+/* ===== ROOT ===== */
+
 :root{
 --gold:#D4AF37;
 --wa:#25D366;
---black:#000;
---bg:#fff;
---border:#e6e6e6;
+--border:#e5e5e5;
 }
+
+/* ===== GLOBAL ===== */
 
 *{
 box-sizing:border-box;
@@ -65,14 +77,14 @@ touch-action:manipulation;
 
 body{
 font-family:Assistant,Cairo,sans-serif;
-background:var(--bg);
+background:#fff;
 color:#000;
 padding-bottom:130px;
 scroll-behavior:smooth;
 -webkit-overflow-scrolling:touch;
 }
 
-/* WhatsApp Bar */
+/* ===== TOP BAR ===== */
 
 .top-wa-bar{
 background:var(--wa);
@@ -85,12 +97,11 @@ gap:8px;
 text-decoration:none;
 }
 
-/* Header */
+/* ===== HEADER ===== */
 
 header{
-background:#fff;
-border-bottom:1px solid var(--border);
 padding:20px;
+border-bottom:1px solid var(--border);
 text-align:center;
 }
 
@@ -108,7 +119,7 @@ font-weight:700;
 margin-top:5px;
 }
 
-/* Social */
+/* ===== SOCIAL ===== */
 
 .social-icons{
 display:flex;
@@ -131,9 +142,8 @@ font-size:18px;
 .facebook{background:#1877F2}
 .instagram{background:#E1306C}
 .tiktok{background:#000}
-.whatsapp{background:#25D366}
 
-/* Categories */
+/* ===== CATEGORIES ===== */
 
 .cats-wrapper{
 position:sticky;
@@ -158,9 +168,8 @@ border-radius:30px;
 padding:6px 14px;
 font-size:13px;
 font-weight:700;
-white-space:nowrap;
 cursor:pointer;
-background:#fff;
+white-space:nowrap;
 }
 
 .cat-pill.active{
@@ -168,7 +177,7 @@ background:var(--gold);
 color:#000;
 }
 
-/* Grid */
+/* ===== GRID ===== */
 
 .shop-grid{
 display:grid;
@@ -213,7 +222,7 @@ background:#000;
 color:#fff;
 }
 
-/* Skeleton */
+/* ===== SKELETON ===== */
 
 .skeleton{
 height:220px;
@@ -228,7 +237,7 @@ animation:skeleton 1.2s infinite;
 100%{background-position:0}
 }
 
-/* Cart Button */
+/* ===== CART ===== */
 
 #cart-fab{
 position:fixed;
@@ -261,7 +270,7 @@ align-items:center;
 justify-content:center;
 }
 
-/* Drawer */
+/* ===== DRAWER ===== */
 
 .drawer{
 position:fixed;
@@ -289,6 +298,16 @@ border-radius:12px;
 font-weight:900;
 margin-top:12px;
 }
+
+.overlay{
+position:fixed;
+inset:0;
+background:rgba(0,0,0,.6);
+display:none;
+z-index:2500;
+}
+
+.overlay.show{display:block}
 
 </style>
 </head>
@@ -318,6 +337,8 @@ margin-top:12px;
 <div id="cart-count">0</div>
 </div>
 
+<div id="overlay" class="overlay" onclick="toggleCart(false)"></div>
+
 <div id="cart-drawer" class="drawer">
 <h2 id="cart-title"></h2>
 <div id="cart-list" style="flex:1;overflow:auto"></div>
@@ -330,21 +351,21 @@ margin-top:12px;
 
 <script>
 
-/* SETTINGS */
+/* ===== SETTINGS ===== */
 
 const params=new URLSearchParams(location.search);
 const branchID=parseInt(params.get("branch"))||1;
 const lang=navigator.language.startsWith("ar")?"ar":"he";
 const LOW_RAM=navigator.deviceMemory && navigator.deviceMemory<4;
 
-/* TEXT */
+/* ===== TEXT ===== */
 
 const TXT={
-ar:{all:"الكل",add:"إضافة للسلة",added:"في السلة",check:"إرسال الطلب",cart:"سلة المشتريات",wa_top:"تواصل معنا واتساب"},
-he:{all:"הכל",add:"הוסף לסל",added:"בסל",check:"שלח הזמנה",cart:"עגלה",wa_top:"צור קשר בוואטסאפ"}
+ar:{all:"الكل",add:"إضافة للسلة",added:"في السلة",check:"إرسال الطلب",cart:"سلة المشتريات",wa_top:"تواصل واتساب"},
+he:{all:"הכל",add:"הוסף לסל",added:"בסל",check:"שליחת הזמנה",cart:"עגלה",wa_top:"צור קשר בוואטסאפ"}
 };
 
-/* STATE */
+/* ===== STATE ===== */
 
 let STATE={
 branch:null,
@@ -356,7 +377,7 @@ chunk:LOW_RAM?10:20,
 loading:false
 };
 
-/* INIT */
+/* ===== INIT ===== */
 
 async function init(){
 
@@ -382,15 +403,18 @@ renderGrid("all");
 
 }
 
-/* CSV */
+/* ===== CSV ===== */
 
 function parseData(text){
+
 const rows=text.split("\n");
 const catIdx=lang==="ar"?11:10;
 
 for(let i=1;i<rows.length;i++){
+
 const c=rows[i].split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
-if(!c[0])continue;
+
+if(!c[0]) continue;
 
 STATE.products.push({
 id:i,
@@ -401,9 +425,10 @@ price:parseFloat(c[9])||0,
 cat:c[catIdx]
 });
 }
+
 }
 
-/* HEADER */
+/* ===== HEADER ===== */
 
 function renderHeader(){
 
@@ -416,12 +441,13 @@ document.getElementById("top-wa-btn").href=`https://wa.me/972${STATE.branch.phon
 
 const soc=document.getElementById("br-social");
 
-if(STATE.branch.social?.facebook) soc.innerHTML+=`<a class="facebook" href="${STATE.branch.social.facebook}"><i class="fab fa-facebook-f"></i></a>`;
-if(STATE.branch.social?.instagram) soc.innerHTML+=`<a class="instagram" href="${STATE.branch.social.instagram}"><i class="fab fa-instagram"></i></a>`;
-if(STATE.branch.social?.tiktok) soc.innerHTML+=`<a class="tiktok" href="${STATE.branch.social.tiktok}"><i class="fab fa-tiktok"></i></a>`;
+if(STATE.branch.social?.facebook) soc.innerHTML+=`<a class="facebook" href="${STATE.branch.social.facebook}" target="_blank"><i class="fab fa-facebook-f"></i></a>`;
+if(STATE.branch.social?.instagram) soc.innerHTML+=`<a class="instagram" href="${STATE.branch.social.instagram}" target="_blank"><i class="fab fa-instagram"></i></a>`;
+if(STATE.branch.social?.tiktok) soc.innerHTML+=`<a class="tiktok" href="${STATE.branch.social.tiktok}" target="_blank"><i class="fab fa-tiktok"></i></a>`;
+
 }
 
-/* STATUS */
+/* ===== STATUS ===== */
 
 function updateBranchStatus(){
 
@@ -434,8 +460,8 @@ let open=false;
 
 if(STATE.branch.schedule?.[d]){
 STATE.branch.schedule[d].forEach(t=>{
-const s=parseInt(t[0].split(":")[0])*60;
-const e=parseInt(t[1].split(":")[0])*60;
+const s=parseInt(t[0])*60;
+const e=parseInt(t[1])*60;
 if(mins>=s && mins<e) open=true;
 });
 }
@@ -444,9 +470,10 @@ const el=document.getElementById("open-status-display");
 
 el.textContent=open?"OPEN ● פתוח":"CLOSED ● مغلق";
 el.style.color=open?"green":"red";
+
 }
 
-/* CATEGORIES */
+/* ===== CATEGORIES ===== */
 
 function renderCats(){
 
@@ -467,9 +494,10 @@ document.querySelectorAll(".cat-pill").forEach(p=>p.classList.remove("active"));
 el.classList.add("active");
 
 renderGrid(name);
+
 }
 
-/* GRID ENGINE */
+/* ===== GRID ENGINE ===== */
 
 function renderGrid(filter){
 
@@ -482,12 +510,15 @@ STATE.view=filter==="all"
 const g=document.getElementById("main-grid");
 g.innerHTML="";
 
-for(let i=0;i<6;i++) g.innerHTML+=`<div class="skeleton"></div>`;
-
-loadChunk();
+for(let i=0;i<6;i++){
+g.innerHTML+=`<div class="skeleton"></div>`;
 }
 
-/* CHUNK LOAD */
+loadChunk();
+
+}
+
+/* ===== CHUNK LOAD ===== */
 
 function loadChunk(){
 
@@ -508,15 +539,12 @@ g.insertAdjacentHTML("beforeend",`
 
 <div class="p-card">
 <img loading="lazy" decoding="async"
-onload="this.style.filter='blur(0)'"
 style="filter:blur(6px);transition:.25s"
+onload="this.style.filter='blur(0)'"
 src="${p.img}?v=1">
 
 <div class="p-info">
-<div style="font-size:.85rem;font-weight:700;height:2.3em;overflow:hidden">
-${p.title}
-</div>
-
+<div style="font-size:.85rem;font-weight:700;height:2.4em;overflow:hidden">${p.title}</div>
 <div style="color:var(--gold);font-weight:900">${p.priceStr}</div>
 
 <button class="add-btn ${inCart?'added':''}" onclick="addToCart(${p.id},this)">
@@ -534,7 +562,7 @@ STATE.loading=false;
 
 }
 
-/* INFINITE SCROLL */
+/* ===== INFINITE SCROLL ===== */
 
 window.addEventListener("scroll",()=>{
 
@@ -544,21 +572,26 @@ loadChunk();
 
 });
 
-/* CART */
+/* ===== CART ===== */
 
 function addToCart(id,btn){
 
-if(STATE.cart.some(i=>i.id===id))return;
+if(STATE.cart.some(i=>i.id===id)) return;
 
 STATE.cart.push(STATE.products.find(p=>p.id===id));
+
 btn.classList.add("added");
 btn.textContent=TXT[lang].added;
 
 document.getElementById("cart-count").textContent=STATE.cart.length;
+
 }
 
-function toggleCart(s){
-document.getElementById("cart-drawer").classList.toggle("open",s);
+function toggleCart(open){
+
+document.getElementById("cart-drawer").classList.toggle("open",open);
+document.getElementById("overlay").classList.toggle("show",open);
+
 }
 
 function sendOrder(){
@@ -569,14 +602,16 @@ STATE.cart.forEach((p,i)=>{
 txt+=(i+1)+". "+p.title+"\n";
 });
 
-fbq('track','Lead');
-ttq.track('Contact');
+/* SAFE TRACKING */
+
+if(window.fbq) fbq('track','Lead');
+if(window.ttq) ttq.track('Contact');
 
 window.open(`https://wa.me/972${STATE.branch.phone.substring(1)}?text=${encodeURIComponent(txt)}`);
 
 }
 
-/* START */
+/* ===== START ===== */
 
 init();
 
