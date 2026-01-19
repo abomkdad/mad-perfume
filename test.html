@@ -1,243 +1,381 @@
 <!DOCTYPE html>
-<html id="html-tag" lang="ar" dir="rtl">
+<html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MAD Parfumeur | Elite Portal</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Alexandria:wght@300;400;700&family=Montserrat:wght@300;400;700&display=swap');
-        
-        :root { --gold: #c5a059; --dark: #0a0a0a; --glass: rgba(255, 255, 255, 0.03); }
-        body { font-family: 'Alexandria', 'Montserrat', sans-serif; background-color: var(--dark); color: #ffffff; }
-        
-        .luxury-card { background: var(--glass); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.05); transition: 0.3s; }
-        .luxury-card:hover { border-color: var(--gold); transform: translateY(-3px); }
-        
-        .gold-gradient { background: linear-gradient(135deg, #c5a059 0%, #ecd399 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .bg-gold { background: linear-gradient(135deg, #c5a059 0%, #ecd399 100%); }
-        
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .active-lang { border-bottom: 2px solid var(--gold); color: var(--gold); }
-    </style>
-</head>
-<body class="antialiased overflow-x-hidden">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>MAD PARFUMEUR | Elite Branch Portal</title>
 
-    <header class="relative h-72 w-full flex flex-col items-center justify-center p-6 text-center border-b border-white/5 shadow-2xl overflow-hidden">
-        <div class="absolute inset-0 z-0">
-            <img id="header-bg-img" src="https://images.unsplash.com/photo-1615485245834-4bc6ca255959?q=80&w=1200" class="w-full h-full object-cover opacity-30 scale-105 transition-transform duration-700">
-        </div>
-        <div class="relative z-10 flex flex-col items-center">
-            <img src="logo.png" class="w-24 mb-4 drop-shadow-2xl" onerror="this.src='https://via.placeholder.com/150?text=MAD'">
-            <h1 id="branch-title" class="text-3xl font-bold tracking-widest gold-gradient italic uppercase">MAD PARFUMEUR</h1>
-            <div id="status-badge" class="mt-4 px-5 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest luxury-card border-gold/30 text-gold animate-pulse">
-                Checking Status...
-            </div>
-        </div>
-    </header>
-
-    <div class="sticky top-0 z-50 luxury-card border-x-0 backdrop-blur-xl">
-        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
-            <div class="flex gap-4 text-[10px] font-bold tracking-widest uppercase">
-                <button onclick="setLang('ar')" id="btn-ar" class="active-lang">AR</button>
-                <button onclick="setLang('he')" id="btn-he">HE</button>
-            </div>
-            
-            <div class="flex gap-4 items-center">
-                <a id="link-instagram" href="#" target="_blank" class="hover:text-pink-500 transition"><i data-lucide="instagram" class="w-5 h-5"></i></a>
-                <a id="link-tiktok" href="#" target="_blank" class="hover:text-gray-400 transition"><i data-lucide="music-2" class="w-5 h-5"></i></a>
-                <a id="link-waze" href="#" target="_blank" class="hover:text-blue-400 transition"><i data-lucide="navigation" class="w-5 h-5"></i></a>
-                <button onclick="toggleCart()" class="relative ml-2">
-                    <i data-lucide="shopping-bag" class="w-6 h-6 text-gold"></i>
-                    <span id="cart-count" class="absolute -top-2 -right-2 bg-white text-black text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center">0</span>
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <div id="cat-bar" class="flex gap-3 p-6 overflow-x-auto no-scrollbar scroll-smooth">
-        </div>
-
-    <main class="container mx-auto px-6 pb-20">
-        <div id="products-grid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6">
-            </div>
-    </main>
-
-    <div id="cart-sidebar" class="fixed inset-y-0 left-0 w-full md:w-96 bg-black z-[100] transform -translate-x-full transition-transform duration-500 flex flex-col border-r border-white/10 shadow-2xl">
-        <div class="p-8 border-b border-white/5 flex justify-between items-center">
-            <h2 class="text-xl font-bold gold-gradient uppercase tracking-widest">Shopping Bag</h2>
-            <button onclick="toggleCart()" class="hover:rotate-90 transition duration-300"><i data-lucide="x" class="w-8 h-8"></i></button>
-        </div>
-        <div id="cart-items" class="flex-grow overflow-y-auto p-8 space-y-6">
-            </div>
-        <div class="p-8 bg-white/5 backdrop-blur-md">
-            <div class="flex justify-between items-center mb-6">
-                <span class="text-white/40 uppercase tracking-widest text-xs">Total</span>
-                <span id="total-price" class="text-2xl font-bold text-gold">0 ILS</span>
-            </div>
-            <button onclick="sendOrder()" class="w-full h-16 bg-gold text-black font-black uppercase tracking-widest rounded-xl hover:opacity-90 transition active:scale-95 flex items-center justify-center gap-3">
-                <i data-lucide="message-circle" class="w-6 h-6"></i> Checkout WhatsApp
-            </button>
-        </div>
-    </div>
-
-    <div id="sale-popup" class="fixed inset-0 z-[200] hidden items-center justify-center p-8 bg-black/90 backdrop-blur-md">
-        <div class="relative max-w-sm w-full animate-in fade-in zoom-in duration-500">
-            <button onclick="closePopup()" class="absolute -top-12 right-0 text-white"><i data-lucide="x-circle" class="w-10 h-10"></i></button>
-            <img src="sale.png" class="rounded-2xl border border-white/10 shadow-2xl">
-        </div>
-    </div>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Assistant:wght@400;700&family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <script>
-        let currentLang = 'ar';
-        let branch = {};
-        let allProducts = [];
-        let cart = [];
+        // Meta Pixel
+        !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+        n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+        if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+        n.queue=[];t=b.createElement(e);t.async=!0;
+        t.src=v;s=b.getElementsByTagName(e)[0];
+        s.parentNode.insertBefore(t,s)}(window,document,'script',
+        'https://connect.facebook.net/en_US/fbevents.js');
+        fbq('init', '1072283127290819'); fbq('track', 'PageView');
 
-        async function init() {
-            const params = new URLSearchParams(window.location.search);
-            const id = params.get('branch') || 1;
+        // TikTok Pixel
+        !function (w, d, t) {
+            w.TiktokAnalyticsObject=t;var ttq=w[t]=w[t]||[];ttq.methods=["page","track","identify","instances","debug","on","off","once","ready","alias","group","enableCookie","disableCookie","holdConsent","revokeConsent","grantConsent"],ttq.setAndDefer=function(t,e){t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}};for(var i=0;i<ttq.methods.length;i++)ttq.setAndDefer(ttq,ttq.methods[i]);ttq.instance=function(t){for(var e=ttq._i[t]||[],n=0;n<ttq.methods.length;n++)ttq.setAndDefer(e,ttq.methods[n]);return e},ttq.load=function(e,n){var r="https://analytics.tiktok.com/i18n/pixel/events.js",o=n&&n.partner;ttq._i=ttq._i||{},ttq._i[e]=[],ttq._i[e]._u=r,ttq._t=ttq._t||{},ttq._t[e]=+new Date,ttq._o=ttq._o||{},ttq._o[e]=n||{};n=document.createElement("script");n.type="text/javascript",n.async=!0,n.src=r+"?sdkid="+e+"&lib="+t;e=document.getElementsByTagName("script")[0];e.parentNode.insertBefore(n,e)};
+            ttq.load('D2D02JBC77U4ENLN9SBG'); ttq.page();
+        }(window, document, 'ttq');
 
-            try {
-                // 1. Fetch Branch Data
-                const res = await fetch('branches.json');
-                const data = await res.json();
-                branch = data.branches.find(b => b.id == id) || data.branches[0];
-                
-                // 2. Fetch Products
-                const pRes = await fetch('products.csv');
-                const pText = await pRes.text();
-                parseCSV(pText);
-
-                updateUI();
-                setTimeout(showSale, 3000);
-            } catch (err) { console.error("System Error", err); }
+        function trackLead(name) {
+            if(window.fbq) fbq('track', 'Lead', {content_name: name});
+            if(window.ttq) ttq.track('Contact', {content_name: name});
         }
-
-        function setLang(lang) {
-            currentLang = lang;
-            const html = document.getElementById('html-tag');
-            html.dir = lang === 'ar' ? 'rtl' : 'ltr';
-            html.lang = lang;
-            
-            document.getElementById('btn-ar').className = lang === 'ar' ? 'active-lang' : '';
-            document.getElementById('btn-he').className = lang === 'he' ? 'active-lang' : '';
-            
-            updateUI();
-            renderProducts(allProducts);
-            renderCats();
-        }
-
-        function updateUI() {
-            document.getElementById('branch-title').innerText = currentLang === 'ar' ? branch.name_ar : branch.name_he;
-            document.getElementById('status-badge').innerText = branch.hours;
-            
-            // Social Links Mapping
-            document.getElementById('link-instagram').href = branch.social.instagram || '#';
-            document.getElementById('link-tiktok').href = branch.social.tiktok || '#';
-            document.getElementById('link-waze').href = branch.social.waze || '#';
-            
-            lucide.createIcons();
-        }
-
-        function parseCSV(text) {
-            const rows = text.split('\n').slice(1);
-            allProducts = rows.map(r => {
-                const c = r.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
-                if (c.length < 11) return null;
-                return {
-                    name: c[0].replace(/"/g, '').trim(),
-                    img: c[3].trim(),
-                    price: c[9].trim(),
-                    catAr: c[11].trim(),
-                    catHe: c[10].trim()
-                };
-            }).filter(p => p);
-            renderProducts(allProducts);
-            renderCats();
-        }
-
-        function renderProducts(list) {
-            const grid = document.getElementById('products-grid');
-            grid.innerHTML = list.map(p => `
-                <div class="luxury-card rounded-[2.5rem] p-5 flex flex-col justify-between group">
-                    <div>
-                        <div class="relative aspect-square rounded-[2rem] overflow-hidden mb-5 bg-[#141414]">
-                            <img src="${p.img}" class="w-full h-full object-cover transition duration-700 group-hover:scale-110" onerror="this.src='logo.png'">
-                            <button onclick="addToCart('${p.name}', '${p.price}')" class="absolute bottom-4 right-4 w-12 h-12 bg-gold text-black rounded-full flex items-center justify-center shadow-2xl active:scale-90 transition">
-                                <i data-lucide="plus" class="w-6 h-6"></i>
-                            </button>
-                        </div>
-                        <h3 class="text-[10px] text-white/30 uppercase tracking-[0.2em] mb-2 font-bold">${currentLang === 'ar' ? p.catAr : p.catHe}</h3>
-                        <h2 class="text-sm font-bold tracking-tight h-10 overflow-hidden text-white/90">${p.name}</h2>
-                    </div>
-                    <div class="mt-4 flex justify-between items-end">
-                        <span class="text-gold font-black text-lg">${p.price} <span class="text-[10px]">ILS</span></span>
-                    </div>
-                </div>
-            `).join('');
-            lucide.createIcons();
-        }
-
-        function renderCats() {
-            const uniqueCats = ['الكل', ...new Set(allProducts.map(p => currentLang === 'ar' ? p.catAr : p.catHe))];
-            const bar = document.getElementById('cat-bar');
-            bar.innerHTML = uniqueCats.map(c => `
-                <button onclick="filter('${c}')" class="px-8 py-3 rounded-full luxury-card text-[11px] font-bold uppercase tracking-widest whitespace-nowrap active:bg-gold active:text-black transition">
-                    ${c}
-                </button>
-            `).join('');
-        }
-
-        function filter(c) {
-            if (c === 'الكل' || c === 'All') renderProducts(allProducts);
-            else renderProducts(allProducts.filter(p => (currentLang === 'ar' ? p.catAr : p.catHe) === c));
-        }
-
-        function addToCart(n, p) {
-            cart.push({n, p});
-            document.getElementById('cart-count').innerText = cart.length;
-            updateCartUI();
-        }
-
-        function updateCartUI() {
-            const items = document.getElementById('cart-items');
-            items.innerHTML = cart.map((item, i) => `
-                <div class="flex justify-between items-center p-5 luxury-card rounded-2xl border-white/5">
-                    <div class="w-2/3">
-                        <h4 class="text-sm font-bold truncate">${item.n}</h4>
-                        <p class="text-gold font-bold text-xs mt-1">${item.p}</p>
-                    </div>
-                    <button onclick="removeItem(${i})" class="text-white/20 hover:text-red-500 transition"><i data-lucide="trash-2" class="w-5 h-5"></i></button>
-                </div>
-            `).join('');
-            
-            const total = cart.reduce((s, i) => s + parseFloat(i.p.replace(/[^0-9.]/g, '')), 0);
-            document.getElementById('total-price').innerText = `${total} ILS`;
-            lucide.createIcons();
-        }
-
-        function removeItem(i) { cart.splice(i, 1); document.getElementById('cart-count').innerText = cart.length; updateCartUI(); }
-
-        function toggleCart() {
-            const sidebar = document.getElementById('cart-sidebar');
-            const isOpen = sidebar.style.transform === 'translateX(0px)';
-            sidebar.style.transform = isOpen ? 'translateX(-100%)' : 'translateX(0px)';
-        }
-
-        function sendOrder() {
-            if (!cart.length) return;
-            let msg = `New Order from MAD ${branch.name_ar}:\n`;
-            cart.forEach(i => msg += `• ${i.n} (${i.p})\n`);
-            msg += `\nTotal: ${document.getElementById('total-price').innerText}`;
-            window.open(`https://wa.me/${branch.phone.replace(/^0/, '972')}?text=${encodeURIComponent(msg)}`);
-        }
-
-        function showSale() { document.getElementById('sale-popup').style.display = 'flex'; }
-        function closePopup() { document.getElementById('sale-popup').style.display = 'none'; }
-
-        init();
     </script>
+
+    <style>
+        :root { --gold: #D4AF37; --black: #080808; --wa: #25D366; --live-red: #ff0000; --live-green: #00FF00; }
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+        body { background: var(--black); color: #fff; font-family: 'Assistant', 'Cairo', sans-serif; overflow-x: hidden; padding-bottom: 140px; opacity: 0; transition: 0.5s; }
+
+        /* شريط الواتساب العلوي */
+        .top-wa-bar { background: var(--wa); color: #fff; text-align: center; padding: 12px; font-weight: 900; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 10px; position: sticky; top: 0; z-index: 2001; font-size: 1.1rem; }
+
+        header { text-align: center; padding: 30px 20px; background: linear-gradient(rgba(0,0,0,0.8), #000), url('https://madparfumeurglobal.com/wp-content/uploads/2025/10/1920x600-BERGAY.jpg') center/cover; border-bottom: 2px solid var(--gold); }
+        .logo-img { max-width: 120px; margin-bottom: 15px; }
+        
+        /* حالة الفرع */
+        .staff-wrapper { position: relative; width: 100px; height: 100px; margin: 0 auto 15px; }
+        .staff-img { width: 100%; height: 100%; border-radius: 50%; border: 3px solid var(--gold); object-fit: cover; }
+        .status-dot { position: absolute; bottom: 5px; right: 5px; width: 20px; height: 20px; border-radius: 50%; border: 3px solid #000; animation: pulseStatus 1.5s infinite; }
+        @keyframes pulseStatus { 0% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.4); } 70% { box-shadow: 0 0 0 12px rgba(255, 255, 255, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); } }
+
+        .branch-title { font-family: 'Cinzel', serif; font-size: 1.7rem; color: var(--gold); font-weight: 900; margin-top: 10px; }
+        .open-status-text { font-weight: 900; font-size: 1.1rem; margin-top: 5px; }
+
+        /* أيقونات التواصل */
+        .social-icons { display: flex; justify-content: center; gap: 15px; margin: 20px 0; }
+        .social-icons a { width: 45px; height: 45px; background: rgba(255,255,255,0.15); display: flex; align-items: center; justify-content: center; border-radius: 50%; color: #fff; font-size: 1.4rem; border: 1px solid rgba(255,255,255,0.2); }
+
+        /* الفئات المنسدلة */
+        .cats-wrapper { position: sticky; top: 48px; z-index: 1000; background: rgba(8, 8, 8, 0.98); border-bottom: 1px solid #222; backdrop-filter: blur(10px); display: flex; align-items: center; overflow: hidden; height: 80px; }
+        .cats-wrapper::before { content: "\f105"; font-family: "Font Awesome 6 Free"; font-weight: 900; position: absolute; left: 0; height: 100%; width: 45px; background: linear-gradient(to right, var(--gold), transparent); display: flex; align-items: center; justify-content: center; color: #000; animation: swipeHint 1.5s infinite; z-index: 101; pointer-events: none; }
+        .cats-container { display: flex; gap: 10px; overflow-x: auto; padding: 12px 15px 12px 55px; scrollbar-width: none; width: 100%; direction: rtl; }
+        .cat-pill { display: flex; align-items: center; background: #1a1a1a; border: 1px solid #333; padding: 4px 15px 4px 4px; border-radius: 50px; cursor: pointer; white-space: nowrap; gap: 10px; flex-shrink: 0; }
+        .cat-pill img { width: 38px; height: 38px; border-radius: 50%; object-fit: cover; border: 1.5px solid var(--gold); }
+        .cat-pill.active { background: var(--gold); color: #000; }
+
+        /* شبكة المنتجات */
+        .shop-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 15px; }
+        .p-card { background: #121212; border-radius: 15px; overflow: hidden; border: 1px solid #1a1a1a; display: flex; flex-direction: column; }
+        .p-card img { width: 100%; aspect-ratio: 1/1; object-fit: cover; }
+        .p-info { padding: 12px; text-align: center; flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between; }
+        .add-btn { background: var(--gold); color: #000; border: none; padding: 10px; border-radius: 8px; font-weight: 900; cursor: pointer; margin-top: 8px; }
+        .add-btn.added { background: #333; color: #fff; }
+
+        /* أزرار عائمة (Fabs) */
+        #cart-fab { position: fixed; bottom: 100px; right: 20px; width: 60px; height: 60px; background: var(--gold); border-radius: 50%; display: flex; align-items: center; justify-content: center; z-index: 2000; cursor: pointer; }
+        #cart-count { position: absolute; top: -2px; right: -2px; background: var(--live-red); color: #fff; width: 22px; height: 22px; border-radius: 50%; font-size: 11px; display: flex; align-items: center; justify-content: center; font-weight: 900; border: 2px solid #000; }
+        #sale-fab { position: fixed; bottom: 100px; left: 20px; width: 60px; height: 60px; background: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; z-index: 2000; cursor: pointer; animation: bounce 2s infinite; border: 3px solid var(--gold); }
+        @keyframes bounce { 0%, 20%, 50%, 80%, 100% {transform: translateY(0);} 40% {transform: translateY(-10px);} }
+
+        /* السلة المنزلقة */
+        .drawer { position: fixed; bottom: -100%; left: 0; width: 100%; height: 80%; background: #0a0a0a; border-top: 3px solid var(--gold); z-index: 10001; transition: 0.4s; padding: 25px; border-radius: 25px 25px 0 0; display: flex; flex-direction: column; }
+        .drawer.open { bottom: 0; }
+        .checkout-btn { background: var(--wa); color: #fff; border: none; width: 100%; padding: 20px; border-radius: 12px; font-weight: 900; font-size: 1.1rem; cursor: pointer; margin-top: 15px; }
+
+        /* الفوتر المميز */
+        .frag-footer { position: fixed; bottom: 0; left: 0; width: 100%; background: #111; border-top: 2px solid var(--gold); padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; z-index: 2000; }
+        .frag-btn { background: var(--gold); color: #000; padding: 8px 18px; border-radius: 20px; font-weight: 900; border: none; cursor: pointer; font-size: 12px; }
+
+        /* النوافذ المنبثقة */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.95); display: none; align-items: center; justify-content: center; z-index: 10005; padding: 20px; }
+        .sale-box { width: 100%; max-width: 380px; background: #000; border: 2px solid var(--gold); border-radius: 20px; overflow: hidden; position: relative; }
+        .timer-box { background: var(--gold); color: #000; text-align: center; padding: 15px; font-size: 1.8rem; font-weight: 900; }
+    </style>
+</head>
+
+<body dir="rtl">
+
+<a id="top-wa-btn" href="#" class="top-wa-bar" target="_blank" onclick="trackLead('Top WhatsApp Bar')">
+    <i class="fab fa-whatsapp"></i> <span id="top-wa-txt"></span>
+</a>
+
+<header>
+    <img src="logo.png" class="logo-img" onerror="this.src='https://via.placeholder.com/150?text=MAD'">
+    <div class="staff-wrapper">
+        <img src="https://madperfume.ps/upload/01-2026/page/6966930e9af7f.png" class="staff-img">
+        <div id="status-dot" class="status-dot"></div>
+    </div>
+    <div id="br-name" class="branch-title">MAD PARFUMEUR</div>
+    <div id="open-status-display" class="open-status-text"></div>
+    <div id="br-social" class="social-icons"></div>
+</header>
+
+<div class="cats-wrapper"><div id="cats-box" class="cats-container"></div></div>
+<main id="main-grid" class="shop-grid"></main>
+
+<div id="cart-fab" onclick="toggleCart(true)"><i class="fas fa-shopping-bag" style="color:#000; font-size:1.8rem"></i><div id="cart-count">0</div></div>
+<div id="sale-fab" onclick="toggleSale(true)"><i class="fas fa-gift" style="color:var(--gold); font-size: 1.8rem;"></i></div>
+
+<div class="frag-footer">
+    <div style="text-align:right">
+        <h5 style="color:var(--gold); font-size:13px; font-weight:900;" id="f-h"></h5>
+        <p style="font-size:10px; opacity:0.8;" id="f-p"></p>
+    </div>
+    <button class="frag-btn" onclick="toggleFrag(true)" id="f-b"></button>
+</div>
+
+<div id="cart-drawer" class="drawer">
+    <h2 style="font-family:'Cinzel'; color:var(--gold); margin-bottom:20px; text-align:center;" id="cart-title"></h2>
+    <div id="cart-list" style="flex-grow:1; overflow-y:auto;"></div>
+    <div id="cart-total" style="text-align:center; font-size:1.6rem; font-weight:900; color:var(--gold); padding:20px 0;"></div>
+    <button class="checkout-btn" onclick="sendOrder()">
+        <i class="fab fa-whatsapp"></i> <span id="check-txt"></span>
+    </button>
+</div>
+
+<div id="frag-modal" class="modal-overlay">
+    <div style="width:100%; max-width:380px; background:#111; border:1.5px solid var(--gold); border-radius:25px; padding:35px 25px; text-align:center;">
+        <img src="https://www.fragrantica.com/favicon.ico" style="height:45px; margin-bottom:20px;">
+        <h2 id="gate-h" style="color:var(--gold); margin-bottom:10px;"></h2>
+        <p id="gate-p" style="font-size:14px; margin-bottom:30px; line-height:1.7; color:#ddd;"></p>
+        <button class="checkout-btn" style="background:var(--gold); color:#000;" onclick="openFrag()"><span id="gate-b"></span></button>
+        <button class="checkout-btn" style="background:transparent; border:1px solid #444; margin-top:15px;" onclick="toggleFrag(false)"><span id="gate-c"></span></button>
+    </div>
+</div>
+
+<div id="sale-popup" class="modal-overlay">
+    <div class="sale-box">
+        <span style="position:absolute; top:15px; right:20px; font-size:2.8rem; color:#fff; cursor:pointer; z-index:10;" onclick="toggleSale(false)">&times;</span>
+        <img src="sale.png" style="width:100%;" onerror="this.src='https://via.placeholder.com/500x800?text=Sale+Image'">
+        <div id="timer" class="timer-box">00:00:00</div>
+        <button class="checkout-btn" style="margin:0; border-radius:0;" onclick="claimOffer()"><span id="off-txt"></span></button>
+    </div>
+</div>
+
+<div id="overlay" style="position:fixed; inset:0; background:rgba(0,0,0,0.7); display:none; z-index:10000;" onclick="toggleCart(false)"></div>
+
+<script>
+const params = new URLSearchParams(window.location.search);
+const branchID = parseInt(params.get('branch')) || 1;
+// تحديد اللغة بناءً على إعدادات المتصفح أو بشكل افتراضي
+const lang = navigator.language.startsWith('he') ? 'he' : 'ar';
+
+const TXT = {
+    ar: { all: 'الكل', add: 'إضافة للسلة', added: 'في السلة', total: 'المجموع:', check: 'إرسال الطلب عبر واتساب', f_h: 'MAD: الأعلى تقييماً', f_p: 'بناءً على موسوعة Fragrantica', f_b: 'اكتشف', g_h: 'الأعلى تقييماً عالمياً', g_p: 'اكتشف لماذا تُعد MAD أكبر دار عطور نيش حاصلة على تقييمات عالمية.', g_b: 'استكشف عطورنا الأصلية', g_c: 'العودة للموقع', off: 'احصل على العرض', cart: 'سلة المشتريات', prefix: 'فرع ', wa_top: 'تحدث معنا مباشرة عبر الواتساب', open: 'مفتوح الآن ● OPEN NOW', closed: 'مغلق حالياً ● CLOSED NOW' },
+    he: { all: 'הכל', add: 'הוסף לסל', added: 'בסל', total: 'סה"כ:', check: 'שליחת הזמנה בוואטסאפ', f_h: 'MAD: המוביلة בעולם', f_p: 'לפי דירוג Fragrantica', f_b: 'גלה', g_h: 'המותג המדורג בעולם', g_p: 'גלו מדוע MAD היא חברת בשמי הניש עם הדירוגים הגבוהים ביותר.', g_b: 'לצפייה בבשמים המקוריים', g_c: 'חזרה לאתר', off: 'קבל הצעה', cart: 'סל קניות', prefix: 'סניף ', wa_top: 'דברו איתנו עכשיו בווטסאפ', open: 'פתוח עכשיו ● פתוח עכשיו', closed: 'סגור כעת ● סגור כעת' }
+};
+
+let STATE = { branch: null, products: [], cart: [] };
+
+async function init() {
+    try {
+        const [bj, pc] = await Promise.all([
+            fetch('branches.json').then(r => r.json()),
+            fetch('products.csv').then(r => r.text())
+        ]);
+        
+        STATE.branch = bj.branches.find(b => b.id === branchID) || bj.branches[0];
+        parseData(pc);
+        renderHeader();
+        updateBranchStatus();
+        renderCats();
+        renderGrid('all');
+        
+        // إظهار العرض تلقائياً بعد 3 ثوانٍ
+        setTimeout(() => toggleSale(true), 3000);
+    } catch(e) { console.error("Initial load error:", e); }
+}
+
+function updateBranchStatus() {
+    const b = STATE.branch;
+    const now = new Date();
+    const days = ['sun','mon','tue','wed','thu','fri','sat'];
+    const currentDay = days[now.getDay()];
+    const currentTime = now.getHours() * 60 + now.getMinutes();
+    
+    let isOpen = false;
+    if (b.schedule && b.schedule[currentDay]) {
+        b.schedule[currentDay].forEach(slot => {
+            const start = parseInt(slot[0].split(':')[0]) * 60 + parseInt(slot[0].split(':')[1]);
+            const end = parseInt(slot[1].split(':')[0]) * 60 + parseInt(slot[1].split(':')[1]);
+            if (currentTime >= start && currentTime < end) isOpen = true;
+        });
+    }
+
+    const dot = document.getElementById('status-dot');
+    const statusText = document.getElementById('open-status-display');
+    const t = TXT[lang];
+
+    if (isOpen) {
+        dot.style.background = 'var(--live-green)';
+        statusText.textContent = t.open;
+        statusText.style.color = 'var(--live-green)';
+    } else {
+        dot.style.background = 'var(--live-red)';
+        statusText.textContent = t.closed;
+        statusText.style.color = 'var(--live-red)';
+    }
+}
+
+function renderHeader() {
+    const b = STATE.branch; const t = TXT[lang];
+    document.getElementById('br-name').textContent = t.prefix + (lang === 'ar' ? b.name_ar : b.name_he);
+    document.getElementById('top-wa-txt').textContent = t.wa_top;
+    document.getElementById('top-wa-btn').href = `https://api.whatsapp.com/send/?phone=972${b.phone.substring(1)}`;
+    document.getElementById('check-txt').textContent = t.check;
+    document.getElementById('off-txt').textContent = t.off;
+    document.getElementById('f-h').textContent = t.f_h;
+    document.getElementById('f-p').textContent = t.f_p;
+    document.getElementById('f-b').textContent = t.f_b;
+    document.getElementById('gate-h').textContent = t.g_h;
+    document.getElementById('gate-p').textContent = t.g_p;
+    document.getElementById('gate-b').textContent = t.g_b;
+    document.getElementById('gate-c').textContent = t.g_c;
+    document.getElementById('cart-title').textContent = t.cart;
+
+    const soc = document.getElementById('br-social');
+    const icons = { tiktok:'fa-tiktok', instagram:'fa-instagram', facebook:'fa-facebook', waze:'fa-waze', snapchat:'fa-snapchat', youtube:'fa-youtube' };
+    
+    soc.innerHTML = '';
+    Object.entries(b.social || {}).forEach(([k,v]) => { 
+        if(v && icons[k]) soc.innerHTML += `<a href="${v}" target="_blank"><i class="fa-brands ${icons[k]}"></i></a>`; 
+    });
+    document.body.style.opacity = "1";
+}
+
+function parseData(text) {
+    const lines = text.split('\n');
+    const catIdx = lang === 'ar' ? 11 : 10;
+    for(let i=1; i<lines.length; i++) {
+        const c = lines[i].split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+        if(!c[0]) continue;
+        STATE.products.push({ 
+            id: i, 
+            title: c[0].replace(/"/g,'').trim(), 
+            img: c[3]?.trim() || 'logo.png', 
+            price: parseFloat(c[9]?.replace(/[^\d.]/g,'')) || 0, 
+            priceStr: c[9]?.replace('ILS','').trim() + ' ₪', 
+            cat: c[catIdx]?.trim() || '' 
+        });
+    }
+}
+
+function renderCats() {
+    const cats = [...new Set(STATE.products.map(p => p.cat))].filter(Boolean);
+    const box = document.getElementById('cats-box');
+    const data = [{name: TXT[lang].all, img: 'logo.png'}, ...cats.map(c => ({
+        name: c, 
+        img: STATE.products.find(p=>p.cat===c).img
+    }))];
+    box.innerHTML = data.map(c => `<div class="cat-pill ${c.name===TXT[lang].all?'active':''}" onclick="filterCats(this, '${c.name.replace(/'/g,"\\'")}')"><img src="${c.img}"><span>${c.name}</span></div>`).join('');
+}
+
+function filterCats(el, name) {
+    document.querySelectorAll('.cat-pill').forEach(p => p.classList.remove('active'));
+    el.classList.add('active'); 
+    el.scrollIntoView({ behavior: 'smooth', inline: 'center' });
+    renderGrid(name === TXT[lang].all ? 'all' : name);
+}
+
+function renderGrid(f) {
+    const g = document.getElementById('main-grid'); g.innerHTML = '';
+    const list = f === 'all' ? STATE.products : STATE.products.filter(p => p.cat === f);
+    list.forEach(p => {
+        const inCart = STATE.cart.some(i => i.id === p.id);
+        g.innerHTML += `
+            <div class="p-card">
+                <img src="${p.img}">
+                <div class="p-info">
+                    <div>
+                        <div style="font-size:0.85rem; font-weight:700; height:2.4em; overflow:hidden;">${p.title}</div>
+                        <div style="color:var(--gold); font-weight:900; margin:5px 0;">${p.priceStr}</div>
+                    </div>
+                    <button class="add-btn ${inCart?'added':''}" onclick="addToCart(${p.id}, this)">
+                        ${inCart ? TXT[lang].added : TXT[lang].add}
+                    </button>
+                </div>
+            </div>`;
+    });
+}
+
+function addToCart(id, btn) {
+    if(STATE.cart.some(i => i.id === id)) return;
+    const p = STATE.products.find(x => x.id === id);
+    STATE.cart.push(p);
+    btn.classList.add('added'); 
+    btn.textContent = TXT[lang].added;
+    updateCartUI();
+}
+
+function updateCartUI() {
+    document.getElementById('cart-count').textContent = STATE.cart.length;
+    const list = document.getElementById('cart-list'); list.innerHTML = ''; let total = 0;
+    STATE.cart.forEach(i => { 
+        total += i.price; 
+        list.innerHTML += `
+            <div style="display:flex; align-items:center; gap:12px; padding:10px; border-bottom:1px solid #222;">
+                <img src="${i.img}" style="width:45px; border-radius:8px;">
+                <div style="flex-grow:1; font-size:13px; font-weight:700;">${i.title}</div>
+                <div style="color:var(--gold); font-weight:900;">${i.priceStr}</div>
+                <i class="fas fa-trash" style="color:#ff4444;" onclick="removeItem(${i.id})"></i>
+            </div>`; 
+    });
+    document.getElementById('cart-total').textContent = `${TXT[lang].total} ${total} ₪`;
+}
+
+function removeItem(id) { 
+    STATE.cart = STATE.cart.filter(i => i.id !== id); 
+    updateCartUI(); 
+    // تحديث الأزرار في الشبكة الرئيسية
+    const activeCat = document.querySelector('.cat-pill.active span').textContent;
+    renderGrid(activeCat === TXT[lang].all ? 'all' : activeCat); 
+}
+
+function toggleCart(s) { 
+    document.getElementById('cart-drawer').classList.toggle('open', s); 
+    document.getElementById('overlay').style.display = s ? 'block' : 'none'; 
+}
+
+function toggleFrag(s) { document.getElementById('frag-modal').style.display = s ? 'flex' : 'none'; }
+function toggleSale(s) { document.getElementById('sale-popup').style.display = s ? 'flex' : 'none'; if(s) startTimer(); }
+
+function sendOrder() {
+    if (STATE.cart.length === 0) return alert(lang === 'ar' ? 'السلة فارغة' : 'הסל ריק');
+    let m = "*" + (lang === 'ar' ? "طلب جديد" : "הזמנה חדשה") + "*\n\n";
+    STATE.cart.forEach((i, idx) => m += `${idx+1}. ${i.title} (${i.priceStr})\n`);
+    m += `\n*${document.getElementById('cart-total').textContent}*`;
+    
+    trackLead('Cart Checkout');
+    window.open(`https://api.whatsapp.com/send/?phone=972${STATE.branch.phone.substring(1)}&text=${encodeURIComponent(m)}`, '_blank');
+}
+
+let tInt;
+function startTimer() {
+    clearInterval(tInt);
+    tInt = setInterval(() => {
+        const d = new Date().setHours(23,59,59) - new Date();
+        if(d<0) return toggleSale(false);
+        const h = Math.floor(d/3600000).toString().padStart(2,'0'), 
+              m = Math.floor((d%3600000)/60000).toString().padStart(2,'0'), 
+              s = Math.floor((d%60000)/1000).toString().padStart(2,'0');
+        document.getElementById('timer').textContent = `${h}:${m}:${s}`;
+    }, 1000);
+}
+
+function openFrag() { 
+    const url = lang === 'ar' 
+        ? 'https://www.fragranticarabia.com/designers/Mad-Parfumeur.html' 
+        : 'https://www.fragrantica.co.il/designers/Mad-Parfumeur.html';
+    window.open(url, '_blank'); 
+}
+
+function claimOffer() { 
+    trackLead('Claim Daily Offer');
+    const msg = lang === 'ar' ? 'أود الاستفسار عن عرض اليوم' : 'שלום, רציתי לדעת על ההצעה היומית';
+    window.open(`https://api.whatsapp.com/send/?phone=972${STATE.branch.phone.substring(1)}&text=${encodeURIComponent(msg)}`, '_blank'); 
+}
+
+init();
+</script>
 </body>
 </html>
