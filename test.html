@@ -5,9 +5,40 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>MAD Parfumeur | Elite Portal</title>
 
-<!-- PERFORMANCE -->
+<!-- ================= PERFORMANCE ================= -->
 <link rel="preload" href="logo.svg" as="image">
 <link rel="preload" href="heder.svg" as="image">
+
+<!-- ================= META PIXEL ================= -->
+<script>
+!function(f,b,e,v,n,t,s){
+if(f.fbq)return;n=f.fbq=function(){
+n.callMethod? n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];
+s.parentNode.insertBefore(t,s)
+}(window, document,'script','https://connect.facebook.net/en_US/fbevents.js');
+fbq('init','1072283127290819');
+fbq('track','PageView');
+</script>
+<noscript>
+<img height="1" width="1" style="display:none"
+src="https://www.facebook.com/tr?id=1072283127290819&ev=PageView&noscript=1"/>
+</noscript>
+
+<!-- ================= TIKTOK PIXEL ================= -->
+<script>
+!function (w, d, t) {
+  w.TiktokAnalyticsObject=t;
+  var ttq=w[t]=w[t]||[];
+  ttq.methods=["page","track","ready"];
+  ttq.setAndDefer=function(t,e){t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}; 
+  for(var i=0;i<ttq.methods.length;i++)ttq.setAndDefer(ttq,ttq.methods[i]);
+  ttq.load('D2D02JBC77U4ENLN9SBG');
+  ttq.page();
+}(window, document, 'ttq');
+</script>
 
 <style>
 :root{
@@ -19,7 +50,6 @@
   --muted:#64748b;
   --wa:#25D366;
 }
-
 *{box-sizing:border-box;margin:0;padding:0}
 body{
   font-family: system-ui, -apple-system, Arial, sans-serif;
@@ -33,10 +63,9 @@ header{
   background:#fff url("heder.svg") center/cover no-repeat;
   padding:30px 16px 50px;
   text-align:center;
+  position:relative;
 }
-header img{
-  width:110px;
-}
+header img{width:110px}
 
 /* LANG */
 .lang{
@@ -56,11 +85,7 @@ header img{
   box-shadow:0 10px 25px rgba(0,0,0,.08);
 }
 .branch h1{font-size:18px}
-.status{
-  margin-top:6px;
-  font-size:13px;
-  font-weight:700;
-}
+.status{margin-top:6px;font-size:13px;font-weight:700}
 .open{color:#16a34a}
 .closed{color:#dc2626}
 
@@ -106,9 +131,7 @@ header img{
   aspect-ratio:1/1;
   object-fit:cover;
 }
-.card div{
-  padding:10px;
-}
+.card div{padding:10px}
 .card h3{
   font-size:14px;
   font-weight:700;
@@ -179,7 +202,9 @@ header img{
 <nav class="cats" id="cats"></nav>
 <main class="grid" id="grid"></main>
 
-<a id="wa" class="wa" href="#" target="_blank">WhatsApp Order</a>
+<a id="wa" class="wa" href="#" target="_blank" onclick="trackLead('WhatsApp Click')">
+  WhatsApp Order
+</a>
 
 <div class="popup" id="popup">
   <div class="close" onclick="popup(false)">✕</div>
@@ -187,6 +212,13 @@ header img{
 </div>
 
 <script>
+/* =============== LEAD TRACKING =============== */
+function trackLead(label){
+  if(window.fbq) fbq('track','Lead',{content_name:label});
+  if(window.ttq) ttq.track('Lead',{content_name:label});
+}
+
+/* =============== INIT =============== */
 const q=new URLSearchParams(location.search);
 const lang=q.get("lang")||"he";
 const branchID=parseInt(q.get("branch"))||1;
@@ -283,7 +315,9 @@ function renderGrid(f){
  });
 }
 
-function popup(s){document.getElementById("popup").style.display=s?"flex":"none";}
+function popup(s){
+ document.getElementById("popup").style.display=s?"flex":"none";
+}
 
 init();
 </script>
