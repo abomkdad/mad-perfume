@@ -48,19 +48,19 @@
       border-bottom:2px solid var(--gold)}
     .logo{max-width:120px;margin-bottom:10px}
     .staff{width:96px;height:96px;border-radius:50%;border:3px solid var(--gold);object-fit:cover}
+    .branch{font-family:'Cinzel';color:var(--gold);font-size:1.6rem;margin-top:6px}
     .status{margin-top:8px;font-weight:900}
     .open{color:var(--green)} .closed{color:var(--red)}
-    .branch{font-family:'Cinzel';color:var(--gold);font-size:1.6rem;margin-top:6px}
 
     .cats{position:sticky;top:48px;background:#0b0b0b;border-bottom:1px solid #222;
-      display:flex;gap:10px;overflow-x:auto;padding:12px}
+      display:flex;gap:10px;overflow-x:auto;padding:12px 16px}
     .cat{background:#1a1a1a;border:1px solid #333;border-radius:999px;
       padding:6px 14px;white-space:nowrap;cursor:pointer}
     .cat.active{background:var(--gold);color:#000}
 
     .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;padding:14px}
     .card{background:#121212;border-radius:14px;border:1px solid #1a1a1a;overflow:hidden}
-    .card img{width:100%;aspect-ratio:1/1;object-fit:cover}
+    .card img{width:100%;aspect-ratio:1/1;object-fit:cover;background:#fff}
     .info{padding:10px;text-align:center}
     .price{color:var(--gold);font-weight:900;margin:6px 0}
     .btn{width:100%;border:none;border-radius:8px;padding:10px;font-weight:900;cursor:pointer}
@@ -109,7 +109,7 @@
 </div>
 
 <script>
-/* ========= Language (Arabic / Hebrew only) ========= */
+/* ===== Language: Arabic / Hebrew only ===== */
 const lang = navigator.language.startsWith('ar') ? 'ar' : 'he';
 const TXT = {
   ar:{all:'الكل',add:'إضافة للسلة',added:'في السلة',send:'إرسال الطلب عبر واتساب',
@@ -118,12 +118,12 @@ const TXT = {
       open:'פתוח עכשיו',closed:'סגור כעת',wa:'דברו איתנו בוואטסאפ',cart:'סל קניות'}
 };
 
-/* ========= State ========= */
+/* ===== State ===== */
 const params=new URLSearchParams(location.search);
 const branchID=parseInt(params.get('branch'))||1;
 const STATE={branch:null,products:[],cart:[]};
 
-/* ========= Init ========= */
+/* ===== Init ===== */
 init();
 async function init(){
   try{
@@ -137,7 +137,7 @@ async function init(){
   }finally{document.body.style.opacity=1}
 }
 
-/* ========= Header ========= */
+/* ===== Header ===== */
 function renderHeader(){
   document.getElementById('branch').textContent =
     (lang==='ar'?STATE.branch.name_ar:STATE.branch.name_he);
@@ -148,7 +148,7 @@ function renderHeader(){
   document.getElementById('sendTxt').textContent=TXT[lang].send;
 }
 
-/* ========= Status ========= */
+/* ===== Status ===== */
 function updateStatus(){
   const d=new Date(); const day=['sun','mon','tue','wed','thu','fri','sat'][d.getDay()];
   const now=d.getHours()*60+d.getMinutes();
@@ -163,7 +163,7 @@ function updateStatus(){
   el.className='status '+(open?'open':'closed');
 }
 
-/* ========= CSV ========= */
+/* ===== CSV ===== */
 function parseCSV(t){
   const lines=t.split('\n');
   const catIdx=lang==='ar'?11:10;
@@ -181,7 +181,7 @@ function parseCSV(t){
   }
 }
 
-/* ========= Categories ========= */
+/* ===== Categories ===== */
 function renderCats(){
   const set=[...new Set(STATE.products.map(p=>p.cat))].filter(Boolean);
   const box=document.getElementById('cats');
@@ -194,7 +194,7 @@ function filter(el,c){
   el.classList.add('active'); renderGrid(c);
 }
 
-/* ========= Grid ========= */
+/* ===== Grid ===== */
 function renderGrid(c){
   const g=document.getElementById('grid'); g.innerHTML='';
   const list=c==='all'?STATE.products:STATE.products.filter(p=>p.cat===c);
@@ -213,7 +213,7 @@ function renderGrid(c){
   });
 }
 
-/* ========= Cart ========= */
+/* ===== Cart ===== */
 function add(id,btn){
   if(STATE.cart.some(i=>i.id===id))return;
   STATE.cart.push(STATE.products.find(p=>p.id===id));
