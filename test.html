@@ -2,234 +2,206 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MAD Parfumeur – Elite Branch Portal</title>
-    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>MAD Parfumeur | Elite</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;700&display=swap');
-        :root { --gold: #d4af37; --black: #111111; }
-        body { font-family: 'Cairo', sans-serif; background-color: #f9f9f9; }
-        .header-gradient { 
-            background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1594035910387-fea47794261f?q=80&w=1500'); 
-            background-size: cover; background-position: center;
-        }
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;700&family=Noto+Sans+Arabic:wght@300;500;800&display=swap');
+        
+        :root { --accent: #C5A059; } /* لون ذهبي مطفي فخم */
+        body { font-family: 'Noto Sans Arabic', 'Plus Jakarta Sans', sans-serif; background-color: #0a0a0a; color: #ffffff; }
+        
+        /* تأثيرات الزجاج */
+        .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.05); }
+        .product-card { background: #141414; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+        .product-card:active { transform: scale(0.96); }
+        
+        /* إخفاء السكرول بار */
         .no-scrollbar::-webkit-scrollbar { display: none; }
-        .product-card:hover { transform: translateY(-5px); transition: 0.3s; }
+        
+        /* أنيميشن الدخول */
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .fade-in { animation: fadeInUp 0.6s ease forwards; }
     </style>
 </head>
-<body class="text-gray-900 overflow-x-hidden">
+<body class="antialiased">
 
-    <script>
-        const META_PIXEL_ID = 'YOUR_META_ID';
-        const TIKTOK_PIXEL_ID = 'YOUR_TIKTOK_ID';
-        // Logic for Pixel tracking goes here
-    </script>
+    <div id="loader" class="fixed inset-0 z-[200] bg-black flex items-center justify-center">
+        <div class="w-12 h-12 border-2 border-t-transparent border-[var(--accent)] rounded-full animate-spin"></div>
+    </div>
 
-    <header class="header-gradient h-64 flex flex-col items-center justify-center text-white relative">
-        <img src="logo.png" alt="MAD Logo" id="main-logo" class="w-28 mb-4 drop-shadow-2xl">
-        <h1 id="branch-title" class="text-3xl font-bold tracking-widest uppercase">MAD PARFUMEUR</h1>
-        <div id="status-badge" class="mt-2 px-4 py-1 rounded-full text-xs font-bold uppercase bg-gray-600">
-            جاري التحقق من الحالة...
+    <header class="relative h-[45vh] w-full flex flex-col items-center justify-end pb-12 px-6 overflow-hidden">
+        <div class="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-transparent to-black/40 z-10"></div>
+        <img src="header_bg.jpg" id="header-img" class="absolute inset-0 w-full h-full object-cover scale-110" onerror="this.src='https://images.unsplash.com/photo-1616948055599-9694602f901c?q=80&w=1000'">
+        
+        <div class="relative z-20 text-center fade-in">
+            <img src="logo.png" class="w-24 mx-auto mb-6 drop-shadow-2xl" onerror="this.src='https://via.placeholder.com/150?text=MAD'">
+            <h1 id="branch-name" class="text-2xl font-extrabold tracking-[0.2em] uppercase mb-2">MAD PARFUMEUR</h1>
+            <div id="status-badge" class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass text-[10px] tracking-widest uppercase">
+                <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span> Open Now
+            </div>
         </div>
     </header>
 
-    <div class="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-100 shadow-sm">
-        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
-            <div class="flex gap-4">
-                <a id="waze-btn" href="#" class="flex flex-col items-center text-blue-600">
-                    <i data-lucide="map-pin" class="w-5 h-5"></i>
-                    <span class="text-[10px] font-bold">Waze</span>
-                </a>
-                <a id="call-btn" href="#" class="flex flex-col items-center text-green-600">
-                    <i data-lucide="phone" class="w-5 h-5"></i>
-                    <span class="text-[10px] font-bold">اتصال</span>
-                </a>
-            </div>
-            <div class="flex items-center gap-6">
-                <button onclick="toggleCart()" class="relative">
-                    <i data-lucide="shopping-bag" class="w-6 h-6"></i>
-                    <span id="cart-count" class="absolute -top-2 -right-2 bg-red-600 text-white text-[10px] w-5 h-5 rounded-full flex items-center justify-center">0</span>
-                </button>
-            </div>
-        </div>
+    <div class="flex justify-center gap-4 -mt-6 relative z-30 px-6">
+        <a id="waze-btn" href="#" class="w-14 h-14 glass rounded-2xl flex items-center justify-center text-white hover:text-[var(--accent)]">
+            <i data-lucide="navigation"></i>
+        </a>
+        <a id="call-btn" href="#" class="w-14 h-14 glass rounded-2xl flex items-center justify-center text-white">
+            <i data-lucide="phone"></i>
+        </a>
+        <button onclick="toggleCart()" class="px-8 h-14 glass rounded-2xl flex items-center gap-3 font-bold relative">
+            <i data-lucide="shopping-bag" class="text-[var(--accent)]"></i>
+            <span id="cart-count">0</span>
+        </button>
     </div>
 
-    <div id="category-bar" class="flex gap-2 p-4 overflow-x-auto no-scrollbar bg-gray-50">
+    <div id="category-container" class="mt-10 px-6 flex gap-3 overflow-x-auto no-scrollbar">
         </div>
 
-    <main class="container mx-auto px-4 py-6">
-        <div id="products-container" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
+    <main class="px-6 py-8">
+        <div id="product-grid" class="grid grid-cols-2 gap-4">
             </div>
     </main>
 
-    <div id="sale-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center bg-black/80 p-6 backdrop-blur-sm">
-        <div class="relative max-w-sm w-full bg-white rounded-2xl overflow-hidden shadow-2xl">
-            <button onclick="closeSale()" class="absolute top-4 right-4 bg-black/20 text-white rounded-full p-1"><i data-lucide="x"></i></button>
-            <img src="sale.png" alt="Sale Offer" class="w-full object-cover">
-        </div>
-    </div>
+    <div id="cart-sheet" class="fixed inset-x-0 bottom-0 z-[150] translate-y-full transition-transform duration-500 ease-out h-[85vh] glass rounded-t-[3rem] p-8 flex flex-col border-t border-white/10">
+        <div class="w-12 h-1.5 bg-white/20 rounded-full mx-auto mb-8" onclick="toggleCart()"></div>
+        <h2 class="text-2xl font-extrabold mb-6 tracking-tight">Shopping Bag</h2>
+        
+        <div id="cart-items" class="flex-grow overflow-y-auto space-y-6">
+            </div>
 
-    <div id="cart-sidebar" class="fixed inset-y-0 left-0 w-80 bg-white shadow-2xl z-[110] transform -translate-x-full transition-transform duration-300 flex flex-col">
-        <div class="p-4 border-b flex justify-between items-center bg-black text-white">
-            <h2 class="font-bold uppercase tracking-tighter">حقيبة التسوق</h2>
-            <button onclick="toggleCart()"><i data-lucide="x"></i></button>
-        </div>
-        <div id="cart-items" class="flex-grow p-4 overflow-y-auto space-y-4 text-sm">
+        <div class="pt-8 border-t border-white/5 space-y-4">
+            <div class="flex justify-between items-center px-2">
+                <span class="text-white/50">Total Amount</span>
+                <span id="cart-total" class="text-2xl font-bold text-[var(--accent)]">0 ILS</span>
             </div>
-        <div class="p-4 border-t space-y-3">
-            <div class="flex justify-between font-bold text-lg">
-                <span>الإجمالي:</span>
-                <span id="total-price">0 ILS</span>
-            </div>
-            <button onclick="checkoutWhatsApp()" class="w-full bg-green-600 text-white py-4 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-green-700 transition">
-                <i data-lucide="send"></i> اطلب عبر واتساب
+            <button onclick="sendOrder()" class="w-full h-16 bg-[var(--accent)] text-black rounded-2xl font-extrabold text-lg flex items-center justify-center gap-3 active:scale-95 transition">
+                Checkout via WhatsApp <i data-lucide="arrow-right" class="w-5 h-5"></i>
             </button>
         </div>
     </div>
 
     <script>
-        let branchData = {};
-        let allProducts = [];
+        let branch = {};
+        let products = [];
         let cart = [];
 
-        async function init() {
-            const params = new URLSearchParams(window.location.search);
-            const branchId = params.get('branch') || 1;
+        // تشغيل التطبيق
+        async function start() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const id = urlParams.get('branch') || 1;
 
             try {
-                // 1. Load Branch Info
                 const bRes = await fetch('branches.json');
-                const bJson = await bRes.json();
-                branchData = bJson.branches.find(b => b.id == branchId) || bJson.branches[0];
-                updateBranchUI();
-
-                // 2. Load Products CSV
+                const bData = await bRes.json();
+                branch = bData.branches.find(x => x.id == id) || bData.branches[0];
+                
                 const pRes = await fetch('products.csv');
                 const pText = await pRes.text();
-                parseCSV(pText);
+                parseProducts(pText);
 
-                lucide.createIcons();
-                setTimeout(showSale, 2000);
-            } catch (err) { console.error("Initialization Failed:", err); }
+                updateUI();
+                document.getElementById('loader').style.display = 'none';
+            } catch (e) { console.error(e); }
         }
 
-        function updateBranchUI() {
-            document.getElementById('branch-title').innerText = branchData.name_ar;
-            document.getElementById('waze-btn').href = branchData.social.waze;
-            document.getElementById('call-btn').href = `tel:${branchData.phone}`;
-            document.title = `MAD Parfumeur - ${branchData.name_ar}`;
-            
-            // Basic Open/Close Status
-            const now = new Date();
-            const dayNames = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
-            const today = dayNames[now.getDay()];
-            const badge = document.getElementById('status-badge');
-            badge.innerText = branchData.hours || "مفتوح الآن";
-            badge.className = "mt-2 px-4 py-1 rounded-full text-xs font-bold uppercase bg-green-600 text-white animate-pulse";
+        function updateUI() {
+            document.getElementById('branch-name').innerText = branch.name_ar;
+            document.getElementById('waze-btn').href = branch.social.waze;
+            document.getElementById('call-btn').href = `tel:${branch.phone}`;
+            lucide.createIcons();
         }
 
-        function parseCSV(text) {
-            const rows = text.split('\n').slice(1);
-            allProducts = rows.map(row => {
-                const cols = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
-                if (cols.length < 11) return null;
-                return {
-                    name: cols[0].replace(/"/g, '').trim(),
-                    image: cols[3].trim(),
-                    price: cols[9].trim(),
-                    cat: cols[11].trim() // Arabic Category
-                };
+        function parseProducts(csv) {
+            const rows = csv.split('\n').slice(1);
+            products = rows.map(r => {
+                const c = r.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+                if (c.length < 11) return null;
+                return { name: c[0].replace(/"/g, ''), img: c[3].trim(), price: c[9].trim(), cat: c[11].trim() };
             }).filter(p => p);
             
-            renderProducts(allProducts);
-            renderCategories();
+            render(products);
+            renderCats();
         }
 
-        function renderProducts(list) {
-            const container = document.getElementById('products-container');
-            container.innerHTML = list.map(p => `
-                <div class="product-card bg-white rounded-xl shadow-sm border border-gray-50 p-3 flex flex-col justify-between">
-                    <div>
-                        <img src="${p.image}" alt="${p.name}" class="w-full aspect-square object-cover rounded-lg mb-3" onerror="this.src='logo.png'">
-                        <h3 class="text-xs font-bold leading-tight h-8 overflow-hidden">${p.name}</h3>
-                        <p class="text-gray-400 text-[10px] mt-1 uppercase">${p.cat}</p>
-                    </div>
-                    <div class="mt-4 flex justify-between items-center">
-                        <span class="font-bold text-sm">${p.price}</span>
-                        <button onclick="addToCart('${p.name}', '${p.price}')" class="bg-black text-white p-2 rounded-lg">
-                            <i data-lucide="plus" class="w-4 h-4"></i>
+        function render(list) {
+            const grid = document.getElementById('product-grid');
+            grid.innerHTML = list.map(p => `
+                <div class="product-card rounded-[2rem] p-4 flex flex-col justify-between fade-in">
+                    <div class="relative aspect-square mb-4 rounded-2xl overflow-hidden bg-[#1a1a1a]">
+                        <img src="${p.img}" class="w-full h-full object-cover" onerror="this.src='logo.png'">
+                        <button onclick="addToCart('${p.name}', '${p.price}')" class="absolute bottom-3 right-3 w-10 h-10 bg-white text-black rounded-full flex items-center justify-center shadow-xl active:scale-125 transition">
+                            <i data-lucide="plus" class="w-5 h-5"></i>
                         </button>
+                    </div>
+                    <div>
+                        <h3 class="text-[11px] font-medium text-white/40 mb-1 uppercase tracking-wider">${p.cat}</h3>
+                        <h2 class="text-[13px] font-bold leading-tight h-8 overflow-hidden">${p.name}</h2>
+                        <p class="mt-2 text-[var(--accent)] font-bold text-sm">${p.price} ILS</p>
                     </div>
                 </div>
             `).join('');
             lucide.createIcons();
         }
 
-        function renderCategories() {
-            const cats = ['الكل', ...new Set(allProducts.map(p => p.cat))];
-            const bar = document.getElementById('category-bar');
-            bar.innerHTML = cats.map(c => `
-                <button onclick="filterProducts('${c}')" class="px-6 py-2 rounded-full bg-white border border-gray-200 text-xs font-bold whitespace-nowrap hover:bg-black hover:text-white transition">
+        function renderCats() {
+            const cats = ['الكل', ...new Set(products.map(p => p.cat))];
+            document.getElementById('category-container').innerHTML = cats.map(c => `
+                <button onclick="filter('${c}')" class="px-6 py-2.5 rounded-full glass text-xs font-bold whitespace-nowrap active:bg-[var(--accent)] active:text-black transition">
                     ${c}
                 </button>
             `).join('');
         }
 
-        function filterProducts(cat) {
-            const filtered = cat === 'الكل' ? allProducts : allProducts.filter(p => p.cat === cat);
-            renderProducts(filtered);
+        function filter(c) {
+            render(c === 'الكل' ? products : products.filter(p => p.cat === c));
         }
 
-        function addToCart(name, price) {
-            cart.push({ name, price });
+        function addToCart(n, p) {
+            cart.push({ n, p });
+            document.getElementById('cart-count').innerText = cart.length;
             updateCartUI();
-            if (window.fbq) fbq('track', 'AddToCart', { content_name: name, value: parseFloat(price), currency: 'ILS' });
         }
 
         function updateCartUI() {
-            document.getElementById('cart-count').innerText = cart.length;
-            const itemsCont = document.getElementById('cart-items');
-            itemsCont.innerHTML = cart.map((item, idx) => `
-                <div class="flex justify-between items-center bg-gray-50 p-2 rounded-lg">
-                    <span>${item.name}</span>
-                    <div class="flex items-center gap-2">
-                        <span class="font-bold">${item.price}</span>
-                        <button onclick="removeFromCart(${idx})" class="text-red-500"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+            const container = document.getElementById('cart-items');
+            container.innerHTML = cart.map((item, i) => `
+                <div class="flex justify-between items-center p-4 rounded-2xl bg-white/5 border border-white/5">
+                    <span class="text-sm font-medium w-3/4">${item.n}</span>
+                    <div class="text-right">
+                        <div class="font-bold text-[var(--accent)] text-sm">${item.p}</div>
+                        <button onclick="removeItem(${i})" class="text-[10px] text-white/30 uppercase mt-1">Remove</button>
                     </div>
                 </div>
             `).join('');
             
-            const total = cart.reduce((acc, item) => acc + parseFloat(item.price.replace(/[^0-9.]/g, '')), 0);
-            document.getElementById('total-price').innerText = `${total} ILS`;
-            lucide.createIcons();
+            const total = cart.reduce((sum, item) => sum + parseFloat(item.p), 0);
+            document.getElementById('cart-total').innerText = `${total} ILS`;
         }
 
-        function removeFromCart(idx) {
-            cart.splice(idx, 1);
+        function removeItem(i) {
+            cart.splice(i, 1);
+            document.getElementById('cart-count').innerText = cart.length;
             updateCartUI();
         }
 
         function toggleCart() {
-            const sb = document.getElementById('cart-sidebar');
-            sb.classList.toggle('-translate-x-full');
+            const sheet = document.getElementById('cart-sheet');
+            const isOpen = sheet.style.transform === 'translateY(0%)';
+            sheet.style.transform = isOpen ? 'translateY(100%)' : 'translateY(0%)';
         }
 
-        function checkoutWhatsApp() {
-            if (cart.length === 0) return alert('سلتك فارغة!');
-            let message = `مرحباً MAD ${branchData.name_ar}، أرغب في طلب:\n`;
-            cart.forEach(i => message += `- ${i.name} (${i.price})\n`);
-            message += `\n*الإجمالي: ${document.getElementById('total-price').innerText}*`;
-            
-            const waUrl = `https://wa.me/${branchData.phone.replace(/^0/, '972')}?text=${encodeURIComponent(message)}`;
-            window.open(waUrl, '_blank');
+        function sendOrder() {
+            if (!cart.length) return;
+            let msg = `New Order from MAD ${branch.name_ar}:\n`;
+            cart.forEach(item => msg += `• ${item.n} (${item.p} ILS)\n`);
+            msg += `\nTotal: ${document.getElementById('cart-total').innerText}`;
+            window.open(`https://wa.me/${branch.phone.replace(/^0/, '972')}?text=${encodeURIComponent(msg)}`);
         }
 
-        function showSale() { document.getElementById('sale-modal').classList.replace('hidden', 'flex'); }
-        function closeSale() { document.getElementById('sale-modal').classList.replace('flex', 'hidden'); }
-
-        init();
+        start();
     </script>
 </body>
 </html>
