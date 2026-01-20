@@ -1,15 +1,21 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8" />
   <title>عربة التسوق</title>
+
   <style>
     body {
-      direction: rtl;
       font-family: Arial, sans-serif;
       background-color: #1e1e1e;
       color: #f5f5f5;
       padding: 20px;
+      margin: 0;
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
     }
 
     #products {
@@ -26,73 +32,91 @@
       box-sizing: border-box;
       cursor: pointer;
       box-shadow: 0 0 10px rgba(0,0,0,0.3);
+      transition: transform .2s;
+    }
+
+    .product:hover {
+      transform: scale(1.03);
     }
 
     .product img {
       width: 100%;
       border-radius: 8px;
+      height: 220px;
+      object-fit: cover;
     }
 
     .product h3 {
       margin: 10px 0 5px;
+      font-size: 17px;
     }
 
     .product p {
       margin: 4px 0;
+      font-weight: bold;
+      color: #00e676;
     }
 
+    /* MODAL */
     .modal {
       display: none;
       position: fixed;
       z-index: 999;
-      left: 0;
-      top: 0;
-      width: 100%;
-      height: 100%;
+      inset: 0;
       background-color: rgba(0,0,0,0.7);
     }
 
     .modal-content {
       background: #2c2c2c;
-      color: #fff;
       padding: 30px;
       border-radius: 20px;
-      width: 500px;
-      margin: 10% auto;
-      position: relative;
+      width: 420px;
+      margin: 12% auto;
       text-align: center;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.6);
     }
 
+    .modal-content h3 {
+      margin-top: 0;
+    }
+
+    .modal-content button {
+      margin-top: 15px;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      cursor: pointer;
+      background: linear-gradient(45deg, #00c853, #64dd17);
+      color: #fff;
+      width: 100%;
+    }
+
+    /* CART */
     #cart {
       margin-top: 30px;
       background: #292929;
       padding: 25px;
       border-radius: 16px;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
       border: 1px solid #444;
+      display: none;
     }
 
     #cart h3 {
-      font-size: 22px;
-      margin-bottom: 15px;
-      color: #fff;
       text-align: center;
+      margin-top: 0;
     }
 
     .cart-item {
-      background-color: #1e1e1e;
+      background: #1e1e1e;
       border-radius: 10px;
-      padding: 10px 15px;
+      padding: 10px;
       margin-bottom: 10px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       border: 1px solid #444;
-    }
-
-    .cart-item span {
-      font-size: 15px;
-      color: #ddd;
+      font-size: 14px;
     }
 
     .remove-btn {
@@ -103,242 +127,215 @@
       cursor: pointer;
     }
 
-    #cart .summary {
-      margin-top: 20px;
-      font-size: 17px;
-      color: #eee;
+    .summary {
+      margin-top: 15px;
       line-height: 1.8;
-    }
-
-    #cart .summary strong {
-      color: #fff;
+      font-size: 15px;
     }
 
     #cart button {
-      background: linear-gradient(45deg, #00c853, #64dd17);
+      margin-top: 12px;
+      padding: 12px;
       border: none;
-      color: white;
-      padding: 12px 24px;
-      margin-top: 20px;
-      font-size: 18px;
       border-radius: 12px;
+      font-size: 16px;
       cursor: pointer;
-      display: block;
       width: 100%;
-    }
-
-    #cart button:hover {
-      background: linear-gradient(45deg, #43a047, #76ff03);
+      background: linear-gradient(45deg, #2196f3, #64b5f6);
+      color: #fff;
     }
 
     #branch {
-      padding: 12px;
-      font-size: 16px;
-      border-radius: 8px;
       width: 100%;
-      background: #333;
-      color: white;
-      margin-top: 20px;
+      padding: 12px;
+      border-radius: 10px;
       border: 1px solid #555;
+      background: #333;
+      color: #fff;
+      margin-top: 25px;
+      font-size: 16px;
+    }
+
+    @media (max-width: 900px) {
+      .product {
+        width: calc(50% - 10px);
+      }
+    }
+
+    @media (max-width: 500px) {
+      .product {
+        width: 100%;
+      }
     }
   </style>
 </head>
+
 <body>
 
-  <h2>🛒 المنتجات المتوفرة</h2>
-  <div id="products"></div>
+<h2>🛒 المنتجات المتوفرة</h2>
+<div id="products"></div>
 
-  <input type="text" id="branch" placeholder="🏪 أدخل اسم الفرع" />
+<input id="branch" placeholder="🏪 أدخل اسم الفرع">
 
-  <div id="cart" style="display:none;">
-    <h3>🧾 الفاتورة</h3>
-    <div id="cart-items"></div>
-    <div class="summary" id="cart-summary"></div>
-    <button onclick="confirmOrder()">✔️ تأكيد الطلب</button>
-    <button onclick="downloadPDF()">📄 تحميل / طباعة PDF</button>
+<div id="cart">
+  <h3>🧾 الفاتورة</h3>
+  <div id="cart-items"></div>
+  <div id="cart-summary" class="summary"></div>
+  <button onclick="downloadPDF()">📄 تحميل / طباعة PDF</button>
+</div>
+
+<div id="productModal" class="modal" onclick="closeModal()">
+  <div class="modal-content" onclick="event.stopPropagation()">
+    <div id="modalContent"></div>
   </div>
+</div>
 
-  <div id="productModal" class="modal">
-    <div class="modal-content" id="modalContent"></div>
-  </div>
+<script>
+let cart = [];
+let selectedProduct = null;
 
-  <script>
-    let cart = [];
-    let allProducts = [];
-    let selectedProduct = null;
+/* 🔗 رابط Google Sheets JSON */
+const SHEET_URL =
+"https://docs.google.com/spreadsheets/d/1g3_D2NBwT27O2OI-v1R5tAB2QCfF3_ZCUL9sSLoCv54/gviz/tq?tqx=out:json";
 
-    // جلب المنتجات من Google Sheets
-    google.script.run.withSuccessHandler(renderProducts).getProducts();
+/* جلب المنتجات */
+fetch(SHEET_URL)
+  .then(res => res.text())
+  .then(text => {
+    const json = JSON.parse(text.substring(47).slice(0, -2));
+    const rows = json.table.rows;
 
-    function renderProducts(products) {
-      allProducts = products;
-      const container = document.getElementById("products");
-      container.innerHTML = "";
-      products.forEach(product => {
-        const div = document.createElement("div");
-        div.className = "product";
-        div.onclick = () => openModal(product);
-        div.innerHTML = `
-          <img src="${product.image}" alt="${product.name}">
-          <h3>${product.name}</h3>
-          <p><strong>₪${product.price}</strong></p>
-        `;
-        container.appendChild(div);
-      });
-    }
+    const products = rows.map(r => ({
+      code: r.c[0]?.v || "",
+      name: r.c[1]?.v || "",
+      price: Number(r.c[2]?.v || 0),
+      image: r.c[3]?.v || ""
+    }));
 
-    function openModal(product) {
-      selectedProduct = product;
-      document.getElementById("modalContent").innerHTML = `
-        <h3>${product.name}</h3>
-        <p>₪${product.price}</p>
-<input type="number" id="modalQty" value="6" min="1" style="padding: 10px; font-size: 16px; width: 80%; margin-top: 10px;">
-        <br><br>
-        <button onclick="confirmAddToCart()">أضف إلى السلة</button>
-      `;
-      document.getElementById("productModal").style.display = "block";
-    }
+    renderProducts(products);
+  })
+  .catch(() => alert("فشل تحميل المنتجات"));
 
-    function closeModal() {
-      document.getElementById("productModal").style.display = "none";
-    }
+function renderProducts(products) {
+  const container = document.getElementById("products");
+  container.innerHTML = "";
+  products.forEach(p => {
+    const div = document.createElement("div");
+    div.className = "product";
+    div.onclick = () => openModal(p);
+    div.innerHTML = `
+      <img src="${p.image}">
+      <h3>${p.name}</h3>
+      <p>₪${p.price}</p>
+    `;
+    container.appendChild(div);
+  });
+}
 
-    function confirmAddToCart() {
-      const qty = parseInt(document.getElementById("modalQty").value);
-      if (!qty || qty <= 0) return alert("يرجى إدخال كمية صحيحة.");
-      const existing = cart.find(item => item.code === selectedProduct.code);
-      if (existing) {
-        existing.quantity += qty;
-      } else {
-        cart.push({ ...selectedProduct, quantity: qty });
-      }
-      updateCart();
-      closeModal();
-    }
+function openModal(product) {
+  selectedProduct = product;
+  document.getElementById("modalContent").innerHTML = `
+    <h3>${product.name}</h3>
+    <p>₪${product.price}</p>
+    <input type="number" id="qty" value="1" min="1" style="width:100%;padding:10px;border-radius:8px;border:none;margin-top:10px">
+    <button onclick="addToCart()">أضف إلى السلة</button>
+  `;
+  document.getElementById("productModal").style.display = "block";
+}
 
-    function updateCart() {
-      const cartBox = document.getElementById("cart");
-      const cartItems = document.getElementById("cart-items");
-      const summaryBox = document.getElementById("cart-summary");
-      cartBox.style.display = "block";
-      cartItems.innerHTML = "";
-      summaryBox.innerHTML = "";
-      let subtotal = 0;
+function closeModal() {
+  document.getElementById("productModal").style.display = "none";
+}
 
-      cart.forEach(item => {
-        const lineTotal = item.price * item.quantity;
-        subtotal += lineTotal;
-        cartItems.innerHTML += `
-          <div class="cart-item">
-            <span>${item.name} | ${item.quantity} × ₪${item.price} = ₪${lineTotal.toFixed(2)}</span>
-            <button class="remove-btn" onclick="removeFromCart('${item.code}')">✖</button>
-          </div>
-        `;
-      });
+function addToCart() {
+  const qty = Number(document.getElementById("qty").value);
+  const found = cart.find(i => i.code === selectedProduct.code);
 
-      const tax = subtotal * 0.18;
-      const total = subtotal + tax;
+  if (found) found.quantity += qty;
+  else cart.push({...selectedProduct, quantity: qty});
 
-      summaryBox.innerHTML = `
-        <p><strong>المجموع بدون ضريبة:</strong> ₪${subtotal.toFixed(2)}</p>
-        <p><strong>الضريبة (18٪):</strong> ₪${tax.toFixed(2)}</p>
-        <p><strong>المجموع الكلي:</strong> ₪${total.toFixed(2)}</p>
-      `;
-    }
+  updateCart();
+  closeModal();
+}
 
-    function removeFromCart(code) {
-      cart = cart.filter(item => item.code !== code);
-      updateCart();
-    }
+function updateCart() {
+  const box = document.getElementById("cart");
+  const items = document.getElementById("cart-items");
+  const sum = document.getElementById("cart-summary");
+  items.innerHTML = "";
+  let total = 0;
 
-    function confirmOrder() {
-      const branch = document.getElementById("branch").value.trim();
-      if (!branch) return alert("يرجى إدخال اسم الفرع!");
-      if (cart.length === 0) return alert("السلة فارغة!");
+  cart.forEach(i => {
+    const t = i.price * i.quantity;
+    total += t;
+    items.innerHTML += `
+      <div class="cart-item">
+        <span>${i.name} | ${i.quantity} × ₪${i.price}</span>
+        <button class="remove-btn" onclick="removeItem('${i.code}')">✖</button>
+      </div>
+    `;
+  });
 
-      google.script.run
-        .withSuccessHandler(function (response) {
-          alert(response);
-          location.reload();
-        })
-        .withFailureHandler(function (error) {
-          alert(error.message);
-        })
-        .submitCart(cart, branch);
-    }
+  const tax = total * 0.18;
 
-    function downloadPDF() {
-      if (cart.length === 0) return alert("السلة فارغة!");
-      const branch = document.getElementById("branch").value || "غير محدد";
-      const now = new Date().toLocaleString('ar-EG');
+  sum.innerHTML = `
+    <p>المجموع: ₪${total.toFixed(2)}</p>
+    <p>الضريبة 18٪: ₪${tax.toFixed(2)}</p>
+    <p><strong>الإجمالي: ₪${(total + tax).toFixed(2)}</strong></p>
+  `;
 
-      let content = `
-        <html>
-          <head>
-            <title>فاتورة الطلب</title>
-            <style>
-              body { font-family: Arial; direction: rtl; padding: 40px; background: #fff; color: #333; }
-              .invoice-box { max-width: 800px; margin: auto; border: 1px solid #eee; padding: 30px; border-radius: 12px; }
-              h2 { text-align: center; color: #2c3e50; }
-              table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-              th, td { padding: 12px; border: 1px solid #ccc; text-align: center; }
-              th { background: #f0f0f0; }
-              .summary { margin-top: 20px; }
-              .footer { text-align: center; margin-top: 30px; font-size: 16px; color: #888; }
-            </style>
-          </head>
-          <body>
-            <div class="invoice-box">
-              <h2>🧾 فاتورة الشراء</h2>
-              <p><strong>الفرع:</strong> ${branch}</p>
-              <p><strong>التاريخ:</strong> ${now}</p>
-              <table>
-                <tr>
-                  <th>المنتج</th>
-                  <th>الكمية</th>
-                  <th>السعر</th>
-                  <th>الإجمالي</th>
-                </tr>
-      `;
+  box.style.display = "block";
+}
 
-      cart.forEach(item => {
-        const total = item.price * item.quantity;
-        content += `
-          <tr>
-            <td>${item.name}</td>
-            <td>${item.quantity}</td>
-            <td>₪${item.price.toFixed(2)}</td>
-            <td>₪${total.toFixed(2)}</td>
-          </tr>
-        `;
-      });
+function removeItem(code) {
+  cart = cart.filter(i => i.code !== code);
+  updateCart();
+}
 
-      const totalAmount = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-      const tax = totalAmount * 0.18;
-      const grandTotal = totalAmount + tax;
+function downloadPDF() {
+  if (!cart.length) return alert("السلة فارغة");
+  const branch = document.getElementById("branch").value || "غير محدد";
 
-      content += `
-              </table>
-              <div class="summary">
-                <p><strong>المجموع بدون ضريبة:</strong> ₪${totalAmount.toFixed(2)}</p>
-                <p><strong>الضريبة (18٪):</strong> ₪${tax.toFixed(2)}</p>
-                <p><strong>المجموع الكلي:</strong> ₪${grandTotal.toFixed(2)}</p>
-              </div>
-              <div class="footer">شكراً لتعاملكم معنا ❤</div>
-            </div>
-          </body>
-        </html>
-      `;
+  let html = `
+  <html><head><style>
+  body{font-family:Arial;direction:rtl;padding:40px}
+  table{width:100%;border-collapse:collapse}
+  th,td{border:1px solid #ccc;padding:10px;text-align:center}
+  th{background:#eee}
+  </style></head><body>
+  <h2>فاتورة الطلب</h2>
+  <p><strong>الفرع:</strong> ${branch}</p>
+  <table>
+  <tr><th>المنتج</th><th>الكمية</th><th>السعر</th><th>الإجمالي</th></tr>
+  `;
 
-      const printWindow = window.open('', '_blank', 'width=800,height=600');
-      printWindow.document.open();
-      printWindow.document.write(content);
-      printWindow.document.close();
-      printWindow.onload = () => {
-        printWindow.focus();
-        printWindow.print();
-      };
-    }
-  </script>
+  let total = 0;
+  cart.forEach(i => {
+    const t = i.price * i.quantity;
+    total += t;
+    html += `<tr>
+      <td>${i.name}</td>
+      <td>${i.quantity}</td>
+      <td>₪${i.price}</td>
+      <td>₪${t.toFixed(2)}</td>
+    </tr>`;
+  });
+
+  const tax = total * 0.18;
+
+  html += `
+  </table>
+  <p>المجموع: ₪${total.toFixed(2)}</p>
+  <p>الضريبة: ₪${tax.toFixed(2)}</p>
+  <h3>الإجمالي: ₪${(total + tax).toFixed(2)}</h3>
+  </body></html>
+  `;
+
+  const w = window.open();
+  w.document.write(html);
+  w.print();
+}
+</script>
+
 </body>
 </html>
