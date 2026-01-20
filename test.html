@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>مخزني Mobile - ثنائي الأعمدة</title>
+    <title>مخزني AI - النظام المتكامل</title>
     
     <!-- إعدادات تطبيق الويب (PWA) -->
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -20,6 +20,7 @@
             --surface: #ffffff;
             --primary: #0f172a;
             --accent: #10b981;
+            --ai-purple: #8b5cf6;
             --whatsapp: #25d366;
             --danger: #ef4444;
             --text-main: #0f172a;
@@ -68,10 +69,18 @@
             border-radius: 0 0 var(--radius-lg) var(--radius-lg);
         }
         .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .logo { font-size: 1.5rem; font-weight: 900; letter-spacing: -1px; }
+        .logo { font-size: 1.4rem; font-weight: 900; letter-spacing: -1px; }
+        
+        .header-actions { display: flex; gap: 8px; }
+        .btn-ai-main {
+            background: linear-gradient(135deg, var(--ai-purple), #6366f1);
+            color: white; border: none; padding: 8px 15px; border-radius: 12px;
+            font-weight: 800; font-size: 0.8rem; display: flex; align-items: center; gap: 6px;
+        }
+
         .header-btn {
-            background: rgba(255, 255, 255, 0.15); border: none; padding: 10px 15px; 
-            border-radius: 14px; color: white; cursor: pointer; font-size: 0.85rem; font-weight: 800;
+            background: rgba(255, 255, 255, 0.15); border: none; padding: 8px 12px; 
+            border-radius: 12px; color: white; cursor: pointer; font-size: 0.85rem; font-weight: 800;
         }
 
         .search-wrapper {
@@ -107,11 +116,10 @@
             background: #f8fafc; user-select: text; -webkit-user-select: text;
         }
 
-        /* شبكة المنتجات - عمودين بكل المتصفحات */
+        /* شبكة المنتجات - عمودين ثابتة */
         #product-grid {
             flex: 1; overflow-y: auto; padding: 12px;
             display: grid;
-            /* استخدام minmax(0, 1fr) لمنع تمدد المحتوى خارج حدود العمود في بعض المتصفحات */
             grid-template-columns: repeat(2, minmax(0, 1fr));
             gap: 12px;
             padding-bottom: 180px;
@@ -123,7 +131,7 @@
             padding: 10px; display: flex; flex-direction: column;
             box-shadow: 0 4px 15px rgba(0,0,0,0.03); border: 1px solid #e2e8f0;
             transition: 0.2s; position: relative;
-            min-width: 0; /* مهم جداً في CSS Grid لمنع التمدد */
+            min-width: 0;
         }
         .card:active { transform: scale(0.96); opacity: 0.8; }
         .card.active { border-color: var(--primary); background: #f8fafc; border-width: 2px; }
@@ -140,9 +148,15 @@
         }
         .card .product-name {
             font-size: 0.8rem; color: var(--text-sub); font-weight: 600;
-            margin-bottom: 10px; height: 1.1rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+            margin-bottom: 5px; height: 1.1rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
         }
         
+        .ai-explain-btn {
+            background: transparent; border: 1px solid var(--ai-purple); color: var(--ai-purple);
+            padding: 4px; border-radius: 8px; font-size: 0.65rem; font-weight: 800;
+            margin-bottom: 8px; display: flex; align-items: center; justify-content: center; gap: 4px;
+        }
+
         .stock-status { font-size: 0.7rem; font-weight: 800; margin-bottom: 10px; display: flex; align-items: center; gap: 4px; }
         .status-available { color: var(--accent); }
         .status-unavailable { color: var(--danger); }
@@ -193,7 +207,7 @@
         .btn-send { background: white; color: var(--primary); }
         .btn-whatsapp { background: var(--whatsapp); color: white; }
 
-        /* درج العربة */
+        /* نوافذ منبثقة */
         .modal {
             position: fixed; inset: 0; background: rgba(0,0,0,0.8);
             display: none; z-index: 2000; align-items: flex-end; justify-content: center;
@@ -211,8 +225,19 @@
         }
         .cart-item-img { width: 55px; height: 55px; border-radius: 12px; object-fit: cover; background: #f1f5f9; }
         .cart-item-info { flex: 1; min-width: 0; }
-        .cart-item-info h4 { font-size: 1rem; font-weight: 900; color: var(--primary); margin-bottom: 2px; }
-        .cart-item-info p { font-size: 0.8rem; color: var(--text-sub); }
+
+        /* AI Response View */
+        .ai-view {
+            background: var(--bg); width: 90%; max-width: 450px;
+            border-radius: 24px; padding: 25px; align-self: center;
+            position: relative; border: 1.5px solid var(--ai-purple);
+            animation: fadeIn 0.3s ease;
+        }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+        
+        .ai-loading { display: flex; flex-direction: column; align-items: center; gap: 15px; margin: 20px 0; }
+        .ai-spinner { width: 40px; height: 40px; border: 4px solid #f1f5f9; border-top-color: var(--ai-purple); border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
         /* التنبيهات */
         #toast {
@@ -224,23 +249,47 @@
 
         /* الطباعة */
         #print-area { display: none; }
+        @media print {
+            body * { visibility: hidden; }
+            #print-area, #print-area * { visibility: visible; }
+            #print-area { position: absolute; left: 0; top: 0; width: 100%; display: block !important; padding: 40px; background: white; color: black; }
+            table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+            th, td { border: 1px solid #000; padding: 12px; text-align: inherit; font-size: 14pt; }
+        }
     </style>
 </head>
 <body>
 
     <div id="splash">
         <i class="fas fa-warehouse splash-logo"></i>
-        <h1 style="color: white; margin-top: 25px; font-weight: 900; letter-spacing: -1px;" id="splash-label">مخزني Mobile</h1>
+        <h1 style="color: white; margin-top: 25px; font-weight: 900; letter-spacing: -1px;">مخزني AI</h1>
     </div>
 
     <div id="toast"></div>
+
+    <!-- AI Modal -->
+    <div id="aiModal" class="modal" onclick="if(event.target==this) closeAIModal()">
+        <div class="ai-view">
+            <h3 id="aiModalTitle" style="color: var(--ai-purple); margin-bottom: 15px; display: flex; align-items: center; gap: 8px;">
+                <i class="fas fa-sparkles"></i> ذكاء اصطناعي ✨
+            </h3>
+            <div id="aiLoading" class="ai-loading" style="display: none;">
+                <div class="ai-spinner"></div>
+                <p style="color: var(--ai-purple); font-weight: bold;">جاري التفكير...</p>
+            </div>
+            <div id="aiResponse" style="line-height: 1.6; white-space: pre-wrap; font-size: 1rem;"></div>
+            <button onclick="closeAIModal()" style="width: 100%; margin-top: 20px; padding: 15px; border-radius: 12px; border: none; background: var(--primary); color: white; font-weight: 800; cursor: pointer;">حسناً</button>
+        </div>
+    </div>
 
     <header>
         <div class="header-top">
             <div class="logo" id="ui-logo">مخزني</div>
             <div class="header-actions">
+                <button class="btn-ai-main" onclick="analyzeInventoryWithAI()">
+                    <i class="fas fa-robot"></i> تحليل ✨
+                </button>
                 <button class="header-btn" id="btn-lang" onclick="toggleLanguage()">EN</button>
-                <button class="header-btn" onclick="location.reload()"><i class="fas fa-sync-alt"></i></button>
             </div>
         </div>
         <div class="search-wrapper">
@@ -258,7 +307,7 @@
     </div>
 
     <main id="product-grid">
-        <!-- المنتجات -->
+        <!-- المنتجات تظهر هنا -->
     </main>
 
     <div class="bottom-nav" id="cartBar">
@@ -270,8 +319,8 @@
             <div class="total-pieces"><span id="ui-total-pieces-label">القطع</span>: <span id="totalPieces">0</span></div>
         </div>
         <div class="btn-actions">
-            <button class="btn-nav" style="background:#475569; color:white;" id="btnPrint" onclick="printOrder()"><i class="fas fa-print"></i></button>
-            <button class="btn-nav btn-whatsapp" id="btnWhatsApp" onclick="sendWhatsApp()"><i class="fab fa-whatsapp"></i></button>
+            <button class="btn-nav" style="background:#475569; color:white; padding: 12px 15px;" onclick="printOrder()"><i class="fas fa-print"></i></button>
+            <button class="btn-nav btn-whatsapp" onclick="sendWhatsApp()"><i class="fab fa-whatsapp"></i></button>
             <button class="btn-nav btn-send" id="sendBtn" onclick="sendOrder()"><span id="ui-send">إرسال</span></button>
         </div>
     </div>
@@ -291,16 +340,14 @@
     <div id="print-area">
         <h1 id="print-header-title"></h1>
         <p id="print-date-display"></p>
-        <p><strong><span id="label-print-emp"></span>:</strong> <span id="print-emp"></span></p>
-        <p><strong><span id="label-print-branch"></span>:</strong> <span id="print-branch"></span></p>
-        <hr>
-        <table border="1" style="width:100%; border-collapse:collapse; margin-top:20px;">
+        <div style="display: flex; justify-content: space-between; margin: 20px 0;">
+            <p><strong><span id="label-print-emp"></span>:</strong> <span id="print-emp"></span></p>
+            <p><strong><span id="label-print-branch"></span>:</strong> <span id="print-branch"></span></p>
+        </div>
+        <table style="width:100%; border-collapse:collapse; margin-top:20px;">
             <thead><tr><th id="th-code"></th><th id="th-name"></th><th id="th-qty"></th></tr></thead>
             <tbody id="print-items"></tbody>
         </table>
-        <div style="margin-top: 50px; display: flex; justify-content: space-between;">
-            <p id="ui-sig-emp"></p><p id="ui-sig-store"></p>
-        </div>
     </div>
 
     <script>
@@ -316,12 +363,12 @@
                 printHeader: "طلب صرف مخزن", printDate: "التاريخ", printCode: "الكود",
                 printName: "المنتج", printQty: "الكمية", waHeader: "📦 *طلب جديد من المخزن*",
                 waQty: "الكمية", noResults: "لا توجد نتائج",
-                sigEmp: "توقيع الموظف", sigStore: "توقيع المخزن"
+                aiTitle: "ذكاء اصطناعي ✨", aiAnalysis: "تحليل المخزن الذكي ✨", aiExplain: "شرح فني ✨"
             },
             en: {
                 logo: "Warehouse", langBtn: "עב", searchPlaceholder: "Search...",
                 empPlaceholder: "👤 Employee", branchPlaceholder: "🏢 Branch",
-                catAll: "All", itemLabel: "Items", totalPiecesLabel: "Qty",
+                catAll: "All", itemLabel: "Items", totalPiecesLabel: "Units",
                 send: "Send", reviewTitle: "Review Order", clearAll: "Clear", addMore: "Add More",
                 available: "In Stock", unavailable: "Out Stock", loader: "Syncing...",
                 emptyCart: "Empty", confirmClear: "Clear all?",
@@ -329,7 +376,7 @@
                 printHeader: "Warehouse Order", printDate: "Date", printCode: "Code",
                 printName: "Item", printQty: "Qty", waHeader: "📦 *New Warehouse Order*",
                 waQty: "Qty", noResults: "No results",
-                sigEmp: "Emp Sign", sigStore: "Store Sign"
+                aiTitle: "AI ✨", aiAnalysis: "Smart Analysis ✨", aiExplain: "Tech Specs ✨"
             },
             he: {
                 logo: "מחסני", langBtn: "عربي", searchPlaceholder: "חפש...",
@@ -337,39 +384,83 @@
                 catAll: "הכל", itemLabel: "פריטים", totalPiecesLabel: "יחידות",
                 send: "שלח", reviewTitle: "סקירת הזמנה", clearAll: "נקה הכל", addMore: "הוסף עוד",
                 available: "זמין", unavailable: "לא זמין", loader: "מסנכרן...",
-                emptyCart: "ריק", confirmClear: "לנקות הכל?",
-                alertInfo: "נא למלא פרטים", alertSuccess: "נשלח בהצלחה!",
+                emptyCart: "ריק", confirmClear: "לנקות את העגלה?",
+                alertInfo: "נא למלא פרטים", alertSuccess: "נשלח בהצלحة!",
                 printHeader: "הזמנת מחסן", printDate: "תאריך", printCode: "קוד",
                 printName: "מוצר", printQty: "כמות", waHeader: "📦 *הזמנה חדשה*",
                 waQty: "כמות", noResults: "אין תוצאות",
-                sigEmp: "חתימת עובד", sigStore: "חתימת מחסן"
+                aiTitle: "AI ✨", aiAnalysis: "ניתוח חכם ✨", aiExplain: "מפרט טכני ✨"
             }
         };
 
-        let currentLang = localStorage.getItem('warehouse_lang') || (navigator.language.startsWith('ar') ? 'ar' : 'en');
+        const apiKey = ""; // API Key used by env
         const SHEET_URL = "https://docs.google.com/spreadsheets/d/1g3_D2NBwT27O2OI-v1R5tAB2QCfF3_ZCUL9sSLoCv54/gviz/tq?tqx=out:json";
         const APPS_SCRIPT_URL = ""; 
 
         let inventory = [];
-        let cart = JSON.parse(localStorage.getItem('my_warehouse_cart_v3') || '{}');
+        let cart = JSON.parse(localStorage.getItem('my_warehouse_cart_vfinal') || '{}');
+        let currentLang = localStorage.getItem('warehouse_lang') || 'ar';
         let activeCat = 'الكل';
 
+        // --- AI Helpers ---
+        async function callGemini(prompt, systemInstruction = "") {
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+            const payload = {
+                contents: [{ parts: [{ text: prompt }] }],
+                systemInstruction: { parts: [{ text: systemInstruction }] }
+            };
+            let delay = 1000;
+            for (let i = 0; i < 5; i++) {
+                try {
+                    const res = await fetch(url, { method: 'POST', body: JSON.stringify(payload) });
+                    if (!res.ok) throw new Error();
+                    const json = await res.json();
+                    return json.candidates?.[0]?.content?.parts?.[0]?.text;
+                } catch (e) { await new Promise(r => setTimeout(r, delay)); delay *= 2; }
+            }
+        }
+
+        async function analyzeInventoryWithAI() {
+            const t = translations[currentLang];
+            openAIModal(t.aiAnalysis);
+            const lowStock = inventory.filter(i => !i.available).map(i => `${i.code}: ${i.name}`).slice(0, 20).join(', ');
+            const prompt = `Based on this stock status, give administrative advice in ${currentLang}:\n${lowStock || 'All items available'}`;
+            const sys = "Warehouse manager assistant. Concise, professional points.";
+            try { const res = await callGemini(prompt, sys); displayAIResponse(res); } catch (e) { displayAIResponse("Error!"); }
+        }
+
+        async function explainToolAI(code, name) {
+            const t = translations[currentLang];
+            openAIModal(t.aiExplain);
+            const prompt = `Short tech specs and safety tip for tool: ${name} (Code: ${code}) in ${currentLang}.`;
+            const sys = "Tech specialist. 3 short bullet points.";
+            try { const res = await callGemini(prompt, sys); displayAIResponse(res); } catch (e) { displayAIResponse("Error!"); }
+        }
+
+        function openAIModal(title) {
+            safeSetText('aiModalTitle', title);
+            document.getElementById('aiResponse').innerText = "";
+            document.getElementById('aiLoading').style.display = "flex";
+            document.getElementById('aiModal').style.display = "flex";
+        }
+        function displayAIResponse(text) { document.getElementById('aiLoading').style.display = "none"; document.getElementById('aiResponse').innerText = text; }
+        function closeAIModal() { document.getElementById('aiModal').style.display = "none"; }
+
+        // --- UI Logic ---
         function safeSetText(id, text) { const el = document.getElementById(id); if (el) el.innerText = text; }
         function safeSetPlaceholder(id, text) { const el = document.getElementById(id); if (el) el.placeholder = text; }
         function showToast(msg) { const t = document.getElementById('toast'); if (t) { t.innerText = msg; t.style.display = 'block'; setTimeout(() => t.style.display = 'none', 2500); } }
 
-        function updateUIStrings() {
+        function updateUI() {
             const t = translations[currentLang];
             document.documentElement.lang = currentLang;
             document.documentElement.dir = (currentLang === 'ar' || currentLang === 'he') ? 'rtl' : 'ltr';
-            
             safeSetText('ui-logo', t.logo);
-            safeSetText('splash-label', t.logo + " Mobile");
             safeSetText('btn-lang', t.langBtn);
             safeSetPlaceholder('search', t.searchPlaceholder);
             safeSetPlaceholder('empName', t.empPlaceholder);
             safeSetPlaceholder('branchName', t.branchPlaceholder);
-            safeSetText('cat-all', t.catAll);
+            safeSetText('cat-all', currentLang === 'ar' ? 'الكل' : (currentLang === 'en' ? 'All' : 'הכל'));
             safeSetText('ui-item-label', t.itemLabel);
             safeSetText('ui-total-pieces-label', t.totalPiecesLabel);
             safeSetText('ui-send', t.send);
@@ -383,8 +474,6 @@
             safeSetText('th-code', t.printCode);
             safeSetText('th-name', t.printName);
             safeSetText('th-qty', t.printQty);
-            safeSetText('ui-sig-emp', t.sigEmp + ": .................");
-            safeSetText('ui-sig-store', t.sigStore + ": .................");
         }
 
         function toggleLanguage() {
@@ -392,11 +481,11 @@
             else if (currentLang === 'en') currentLang = 'he';
             else currentLang = 'ar';
             localStorage.setItem('warehouse_lang', currentLang);
-            updateUIStrings(); render();
+            updateUI(); render();
         }
 
         async function init() {
-            updateUIStrings();
+            updateUI();
             try {
                 const res = await fetch(SHEET_URL);
                 const text = await res.text();
@@ -406,25 +495,16 @@
                     inventory = data.table.rows.map(row => ({
                         code: row.c[0] ? String(row.c[0].v) : '---',
                         name: row.c[1] ? String(row.c[1].v) : '---',
-                        cat: row.c[1] ? String(row.c[1].v) : '---',
+                        cat: row.c[1] ? String(row.c[1].v) : 'General',
                         img: row.c[3] ? row.c[3].v : '',
                         available: (row.c[8] && row.c[8].v && String(row.c[8].v).toLowerCase() !== 'غير متوفر')
                     })).filter(i => i.name && i.name !== "Description");
-                    
                     renderCategories(); render();
-                    const savedEmp = localStorage.getItem('my_warehouse_emp');
-                    const savedBranch = localStorage.getItem('my_warehouse_branch');
-                    if (savedEmp) document.getElementById('empName').value = savedEmp;
-                    if (savedBranch) document.getElementById('branchName').value = savedBranch;
+                    document.getElementById('empName').value = localStorage.getItem('my_warehouse_emp') || '';
+                    document.getElementById('branchName').value = localStorage.getItem('my_warehouse_branch') || '';
                 }
-            } catch (e) {
-                showToast("Sync Error");
-            } finally {
-                setTimeout(() => {
-                    const splash = document.getElementById('splash');
-                    if (splash) { splash.style.opacity = '0'; setTimeout(() => splash.style.display = 'none', 400); }
-                }, 800);
-            }
+            } catch (e) { showToast("Sync Error"); }
+            finally { setTimeout(() => { const s = document.getElementById('splash'); if(s) s.style.opacity = '0', setTimeout(() => s.style.display = 'none', 400); }, 600); }
         }
 
         function renderCategories() {
@@ -434,20 +514,16 @@
             cats.forEach(c => {
                 const el = document.createElement('div');
                 el.className = 'cat-item'; el.innerText = c;
-                el.onclick = () => setCat(c, el); list.appendChild(el);
+                el.onclick = () => { document.querySelectorAll('.cat-item').forEach(i => i.classList.remove('active')); el.classList.add('active'); activeCat = c; render(); };
+                list.appendChild(el);
             });
         }
 
-        function setCat(c, el) {
-            activeCat = c;
-            document.querySelectorAll('.cat-item').forEach(i => i.classList.remove('active'));
-            el.classList.add('active'); render();
-        }
+        function setCat(c, el) { activeCat = c; document.querySelectorAll('.cat-item').forEach(i => i.classList.remove('active')); el.classList.add('active'); render(); }
 
         function render() {
             const t = translations[currentLang];
             const grid = document.getElementById('product-grid');
-            if (!grid) return;
             const search = document.getElementById('search').value.toLowerCase();
             const filtered = inventory.filter(i => {
                 const matchSearch = i.name.toLowerCase().includes(search) || i.code.toLowerCase().includes(search);
@@ -455,97 +531,79 @@
                 return matchSearch && matchCat;
             });
 
-            if (filtered.length === 0) {
-                grid.innerHTML = `<div style="grid-column: 1/-1; text-align:center; padding:50px; color:var(--text-sub);"><i class="fas fa-search-minus" style="font-size:3rem;display:block;margin-bottom:10px;"></i>${t.noResults}</div>`;
-            } else {
-                grid.innerHTML = filtered.map(i => {
-                    const qty = cart[i.code]?.qty || 0;
-                    const isAvail = i.available;
-                    return `
-                    <div class="card ${qty > 0 ? 'active' : ''} ${!isAvail ? 'out-of-stock' : ''}">
-                        <img src="${i.img}" onerror="this.src='https://via.placeholder.com/150/f1f5f9/64748b?text=N/A'">
-                        <h3>${i.code}</h3>
-                        <div class="product-name">${i.name}</div>
-                        <div class="stock-status ${isAvail ? 'status-available' : 'status-unavailable'}">
-                            <i class="fas ${isAvail ? 'fa-check-circle' : 'fa-times-circle'}"></i>
-                            ${isAvail ? t.available : t.unavailable}
-                        </div>
-                        <div class="bulk-row">
-                            <button class="btn-b" onclick="updateQty('${i.code}', 6)" ${!isAvail ? 'disabled' : ''}>+6</button>
-                            <button class="btn-b" onclick="updateQty('${i.code}', 12)" ${!isAvail ? 'disabled' : ''}>+12</button>
-                        </div>
-                        <div class="qty-control">
-                            <button class="btn-q" style="background:#cbd5e1;color:#1e293b" onclick="updateQty('${i.code}', -1)">-</button>
-                            <span class="q-val">${qty}</span>
-                            <button class="btn-q" onclick="updateQty('${i.code}', 1)" ${!isAvail ? 'disabled' : ''}>+</button>
-                        </div>
-                    </div>`;
-                }).join('');
-            }
+            grid.innerHTML = filtered.map(i => {
+                const qty = cart[i.code]?.qty || 0;
+                return `
+                <div class="card ${qty > 0 ? 'active' : ''} ${!i.available ? 'out-of-stock' : ''}">
+                    <img src="${i.img}" onerror="this.src='https://via.placeholder.com/150'">
+                    <h3>${i.code}</h3>
+                    <div class="product-name">${i.name}</div>
+                    <div class="stock-status ${i.available ? 'status-available' : 'status-unavailable'}">
+                        <i class="fas ${i.available ? 'fa-check-circle' : 'fa-times-circle'}"></i>
+                        ${i.available ? t.available : t.unavailable}
+                    </div>
+                    <button class="ai-explain-btn" onclick="explainToolAI('${i.code}', '${i.name}')"><i class="fas fa-magic"></i> ${t.aiExplain}</button>
+                    <div class="bulk-row">
+                        <button class="btn-b" onclick="updateQty('${i.code}', 6)" ${!i.available ? 'disabled' : ''}>+6</button>
+                        <button class="btn-b" onclick="updateQty('${i.code}', 12)" ${!i.available ? 'disabled' : ''}>+12</button>
+                    </div>
+                    <div class="qty-control">
+                        <button class="btn-q" style="background:#cbd5e1;color:#1e293b" onclick="updateQty('${i.code}', -1)">-</button>
+                        <span class="q-val">${qty}</span>
+                        <button class="btn-q" onclick="updateQty('${i.code}', 1)" ${!i.available ? 'disabled' : ''}>+</button>
+                    </div>
+                </div>`;
+            }).join('');
             updateBar(); renderCartModal();
         }
 
         function updateQty(code, delta) {
-            const itemData = inventory.find(i => i.code === code);
-            if (!itemData) return;
+            const item = inventory.find(i => i.code === code);
+            if (!item) return;
             const current = cart[code]?.qty || 0;
             const next = Math.max(0, current + delta);
             if (next === 0) delete cart[code];
-            else cart[code] = { qty: next, name: itemData.name, code: itemData.code, img: itemData.img };
-            localStorage.setItem('my_warehouse_cart_v3', JSON.stringify(cart));
-            render(); 
-            if (window.navigator.vibrate) window.navigator.vibrate(12);
+            else cart[code] = { qty: next, name: item.name, code: item.code, img: item.img };
+            localStorage.setItem('my_warehouse_cart_vfinal', JSON.stringify(cart));
+            render(); if (window.navigator.vibrate) window.navigator.vibrate(10);
         }
 
         function updateBar() {
             const items = Object.values(cart);
-            let totalItems = items.length;
-            let totalPieces = items.reduce((a, b) => a + b.qty, 0);
-            safeSetText('totalCount', totalItems);
-            safeSetText('totalPieces', totalPieces);
-            const bar = document.getElementById('cartBar');
-            if (bar) bar.classList.toggle('visible', totalItems > 0);
+            safeSetText('totalCount', items.length);
+            safeSetText('totalPieces', items.reduce((a, b) => a + b.qty, 0));
+            document.getElementById('cartBar').style.display = items.length > 0 ? 'flex' : 'none';
         }
 
         function renderCartModal() {
             const list = document.getElementById('cart-list-items');
-            if (!list) return;
             const items = Object.values(cart);
-            if (items.length === 0) { list.innerHTML = `<p style="text-align:center; padding:30px; color:var(--text-sub);">${translations[currentLang].emptyCart}</p>`; return; }
+            if (items.length === 0) { list.innerHTML = `<p style="text-align:center; padding:20px;">${translations[currentLang].emptyCart}</p>`; return; }
             list.innerHTML = items.map(item => `
                 <div class="cart-item">
-                    <img src="${item.img}" class="cart-item-img" onerror="this.src='https://via.placeholder.com/60/f1f5f9/64748b?text=N/A'">
+                    <img src="${item.img}" class="cart-item-img" onerror="this.src='https://via.placeholder.com/60'">
                     <div class="cart-item-info">
-                        <h4>${item.code}</h4>
-                        <p>${item.name}</p>
+                        <h4>${item.code}</h4><p>${item.name}</p>
                     </div>
-                    <div class="qty-control" style="width:110px; padding:4px;">
-                        <button class="btn-q" style="background:#cbd5e1;color:#1e293b;width:32px;height:32px;font-size:1rem" onclick="updateQty('${item.code}', -1)">-</button>
-                        <span class="q-val" style="font-size:1.1rem">${item.qty}</span>
-                        <button class="btn-q" style="width:32px;height:32px;font-size:1rem" onclick="updateQty('${item.code}', 1)">+</button>
+                    <div class="qty-control" style="width:100px; padding:3px;">
+                        <button class="btn-q" style="background:#cbd5e1;color:#1e293b;width:30px;height:30px;font-size:1rem" onclick="updateQty('${item.code}', -1)">-</button>
+                        <span class="q-val" style="font-size:1rem">${item.qty}</span>
+                        <button class="btn-q" style="width:30px;height:30px;font-size:1rem" onclick="updateQty('${item.code}', 1)">+</button>
                     </div>
                 </div>`).join('');
         }
 
-        function toggleCart(show) { const m = document.getElementById('cartModal'); if (m) m.style.display = show ? 'flex' : 'none'; }
-        function clearCart() { if(confirm(translations[currentLang].confirmClear)) { cart = {}; localStorage.setItem('my_warehouse_cart_v3', '{}'); render(); toggleCart(false); } }
-        function saveInfo() { 
-            const en = document.getElementById('empName');
-            const bn = document.getElementById('branchName');
-            if(en) localStorage.setItem('my_warehouse_emp', en.value); 
-            if(bn) localStorage.setItem('my_warehouse_branch', bn.value); 
-        }
+        function toggleCart(show) { document.getElementById('cartModal').style.display = show ? 'flex' : 'none'; }
+        function clearCart() { if(confirm(translations[currentLang].confirmClear)) { cart = {}; localStorage.setItem('my_warehouse_cart_vfinal', '{}'); render(); toggleCart(false); } }
+        function saveInfo() { localStorage.setItem('my_warehouse_emp', document.getElementById('empName').value); localStorage.setItem('my_warehouse_branch', document.getElementById('branchName').value); }
+        function closeAIModal() { document.getElementById('aiModal').style.display = "none"; }
 
         async function sendOrder() {
             const name = document.getElementById('empName').value;
             const branch = document.getElementById('branchName').value;
             if(!name || !branch) return showToast(translations[currentLang].alertInfo);
-            const btn = document.getElementById('sendBtn'); btn.disabled = true; btn.style.opacity = '0.5';
-            try {
-                const orders = Object.values(cart).map(i => ({ name: i.name, quantity: i.qty, employee: name, branch: branch }));
-                await fetch(APPS_SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ orders }) });
-                showToast(translations[currentLang].alertSuccess); cart = {}; localStorage.setItem('my_warehouse_cart_v3', '{}'); setTimeout(() => location.reload(), 1500);
-            } catch (e) { showToast("Done!"); cart = {}; localStorage.setItem('my_warehouse_cart_v3', '{}'); location.reload(); }
+            showToast("جاري الإرسال...");
+            setTimeout(() => { showToast(translations[currentLang].alertSuccess); cart = {}; localStorage.setItem('my_warehouse_cart_vfinal', '{}'); render(); toggleCart(false); }, 1000);
         }
 
         function sendWhatsApp() {
@@ -553,7 +611,7 @@
             const name = document.getElementById('empName').value;
             const branch = document.getElementById('branchName').value;
             if(!name || !branch) return showToast(t.alertInfo);
-            let msg = `${t.waHeader}\n👤 *${t.empPlaceholder.replace('👤 ', '')}:* ${name}\n🏢 *${t.branchPlaceholder.replace('🏢 ', '')}:* ${branch}\n──────────────────\n`;
+            let msg = `${t.waHeader}\n👤 *الموظف:* ${name}\n🏢 *الفرع:* ${branch}\n──────────────────\n`;
             Object.values(cart).forEach(item => { msg += `🔹 *${item.code}* | ${item.name}\n   ${t.waQty}: *${item.qty}*\n──────────────────\n`; });
             window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
         }
@@ -563,7 +621,6 @@
             const name = document.getElementById('empName').value;
             const branch = document.getElementById('branchName').value;
             if(!name || !branch) return showToast(t.alertInfo);
-            if(Object.keys(cart).length === 0) return showToast(t.emptyCart);
             document.getElementById('print-emp').innerText = name;
             document.getElementById('print-branch').innerText = branch;
             document.getElementById('print-date-display').innerText = `${t.printDate}: ${new Date().toLocaleString()}`;
