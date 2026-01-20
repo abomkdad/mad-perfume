@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>مخزني Mobile</title>
+    <title>مخزني Mobile - ثنائي الأعمدة</title>
     
     <!-- إعدادات تطبيق الويب (PWA) -->
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -41,7 +41,6 @@
         body {
             background-color: var(--bg);
             color: var(--text-main);
-            height: 100vh; /* Fallback */
             height: 100dvh;
             display: flex;
             flex-direction: column;
@@ -50,11 +49,11 @@
             padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom) 0;
         }
 
-        /* شاشة الترحيب (Splash Screen) */
+        /* شاشة الترحيب */
         #splash {
             position: fixed; inset: 0; background: var(--primary); z-index: 9999;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            transition: opacity 0.5s ease;
+            transition: opacity 0.4s ease;
         }
         .splash-logo { font-size: 4rem; color: white; animation: splashPulse 2s infinite; }
         @keyframes splashPulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
@@ -62,22 +61,22 @@
         /* الهيدر */
         header {
             background: var(--primary);
-            padding: 12px 20px 20px;
+            padding: 12px 15px 20px;
             box-shadow: var(--shadow);
             z-index: 100;
             color: white;
             border-radius: 0 0 var(--radius-lg) var(--radius-lg);
         }
         .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .logo { font-size: 1.6rem; font-weight: 900; letter-spacing: -1px; }
+        .logo { font-size: 1.5rem; font-weight: 900; letter-spacing: -1px; }
         .header-btn {
-            background: rgba(255, 255, 255, 0.15); border: none; padding: 10px 18px; 
-            border-radius: 14px; color: white; cursor: pointer; font-size: 0.9rem; font-weight: 800;
+            background: rgba(255, 255, 255, 0.15); border: none; padding: 10px 15px; 
+            border-radius: 14px; color: white; cursor: pointer; font-size: 0.85rem; font-weight: 800;
         }
 
         .search-wrapper {
-            background: rgba(255, 255, 255, 0.12); border-radius: 16px; padding: 12px 16px;
-            display: flex; align-items: center; gap: 12px; margin-bottom: 15px;
+            background: rgba(255, 255, 255, 0.12); border-radius: 16px; padding: 12px;
+            display: flex; align-items: center; gap: 10px; margin-bottom: 15px;
         }
         .search-wrapper input {
             background: transparent; border: none; outline: none; width: 100%;
@@ -86,40 +85,45 @@
         .search-wrapper input::placeholder { color: rgba(255, 255, 255, 0.4); }
 
         .categories {
-            display: flex; overflow-x: auto; gap: 10px; scrollbar-width: none;
-            scroll-snap-type: x mandatory; padding-bottom: 5px;
+            display: flex; overflow-x: auto; gap: 8px; padding-bottom: 5px;
+            scrollbar-width: none; scroll-snap-type: x mandatory;
         }
         .categories::-webkit-scrollbar { display: none; }
         .cat-item {
-            white-space: nowrap; padding: 10px 22px; border-radius: 50px;
+            white-space: nowrap; padding: 10px 20px; border-radius: 50px;
             background: rgba(255, 255, 255, 0.1); color: rgba(255, 255, 255, 0.7); 
-            font-size: 0.85rem; font-weight: 800; scroll-snap-align: start; transition: 0.2s;
+            font-size: 0.8rem; font-weight: 800; scroll-snap-align: start;
         }
-        .cat-item.active { background: white; color: var(--primary); transform: scale(1.05); }
+        .cat-item.active { background: white; color: var(--primary); }
 
         /* معلومات المستخدم */
         .info-box { 
-            padding: 15px 20px; background: var(--surface); display: grid; 
-            grid-template-columns: 1fr 1fr; gap: 12px; border-bottom: 1px solid #e2e8f0;
+            padding: 12px 15px; background: var(--surface); display: grid; 
+            grid-template-columns: 1fr 1fr; gap: 10px; border-bottom: 1px solid #e2e8f0;
         }
         .info-box input {
-            width: 100%; padding: 14px; border-radius: 14px;
-            border: 1.5px solid #cbd5e1; outline: none; font-size: 0.95rem;
+            width: 100%; padding: 12px; border-radius: 12px;
+            border: 1.5px solid #cbd5e1; outline: none; font-size: 0.9rem;
             background: #f8fafc; user-select: text; -webkit-user-select: text;
         }
 
-        /* شبكة المنتجات */
+        /* شبكة المنتجات - عمودين بكل المتصفحات */
         #product-grid {
-            flex: 1; overflow-y: auto; padding: 15px;
-            display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;
+            flex: 1; overflow-y: auto; padding: 12px;
+            display: grid;
+            /* استخدام minmax(0, 1fr) لمنع تمدد المحتوى خارج حدود العمود في بعض المتصفحات */
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
             padding-bottom: 180px;
+            width: 100%;
         }
 
         .card {
             background: var(--surface); border-radius: var(--radius-md);
-            padding: 12px; display: flex; flex-direction: column;
+            padding: 10px; display: flex; flex-direction: column;
             box-shadow: 0 4px 15px rgba(0,0,0,0.03); border: 1px solid #e2e8f0;
             transition: 0.2s; position: relative;
+            min-width: 0; /* مهم جداً في CSS Grid لمنع التمدد */
         }
         .card:active { transform: scale(0.96); opacity: 0.8; }
         .card.active { border-color: var(--primary); background: #f8fafc; border-width: 2px; }
@@ -127,106 +131,99 @@
 
         .card img {
             width: 100%; aspect-ratio: 1/1; object-fit: cover; 
-            background: #f1f5f9; display: block; border-radius: 12px;
+            background: #f1f5f9; display: block; border-radius: 10px;
         }
 
         .card h3 { 
-            font-size: 1.15rem; font-weight: 900; color: var(--primary);
-            margin: 10px 0 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+            font-size: 1rem; font-weight: 900; color: var(--primary);
+            margin: 8px 0 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
         }
         .card .product-name {
-            font-size: 0.85rem; color: var(--text-sub); font-weight: 600;
-            margin-bottom: 12px; height: 1.1rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+            font-size: 0.8rem; color: var(--text-sub); font-weight: 600;
+            margin-bottom: 10px; height: 1.1rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
         }
         
-        .stock-status { font-size: 0.75rem; font-weight: 800; margin-bottom: 12px; display: flex; align-items: center; gap: 5px; }
+        .stock-status { font-size: 0.7rem; font-weight: 800; margin-bottom: 10px; display: flex; align-items: center; gap: 4px; }
         .status-available { color: var(--accent); }
         .status-unavailable { color: var(--danger); }
 
         .qty-control {
             display: flex; align-items: center; justify-content: space-between;
-            background: #f1f5f9; border-radius: 14px; padding: 5px; margin-top: auto;
+            background: #f1f5f9; border-radius: 12px; padding: 4px; margin-top: auto;
         }
         .btn-q {
-            width: 40px; height: 40px; border-radius: 12px; border: none;
-            background: var(--primary); color: white; font-size: 1.4rem; 
+            width: 34px; height: 34px; border-radius: 10px; border: none;
+            background: var(--primary); color: white; font-size: 1.3rem; 
             display: flex; align-items: center; justify-content: center;
         }
-        .q-val { font-weight: 900; font-size: 1.2rem; }
+        .q-val { font-weight: 900; font-size: 1.1rem; }
 
-        .bulk-row { display: flex; gap: 6px; margin-bottom: 10px; }
+        .bulk-row { display: flex; gap: 5px; margin-bottom: 8px; }
         .btn-b {
-            flex: 1; background: white; border: 1.5px solid #cbd5e1;
-            font-size: 0.8rem; font-weight: 800; padding: 10px; border-radius: 12px;
+            flex: 1; background: white; border: 1.2px solid #cbd5e1;
+            font-size: 0.75rem; font-weight: 800; padding: 8px 2px; border-radius: 10px;
             color: var(--primary);
         }
 
         /* شريط العربة السفلي */
         .bottom-nav {
-            position: fixed; bottom: 25px; left: 15px; right: 15px;
-            background: var(--primary); color: white; padding: 15px 20px;
-            border-radius: 30px; display: none; justify-content: space-between;
+            position: fixed; bottom: 25px; left: 12px; right: 12px;
+            background: var(--primary); color: white; padding: 12px 15px;
+            border-radius: 25px; display: none; justify-content: space-between;
             align-items: center; box-shadow: 0 15px 35px rgba(0,0,0,0.4);
             z-index: 1000; animation: bounceUp 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
         @keyframes bounceUp { from { transform: translateY(120%); } to { transform: translateY(0); } }
         .bottom-nav.visible { display: flex; }
         
-        .cart-trigger { flex: 1; display: flex; flex-direction: column; cursor: pointer; }
-        .cart-summary { display: flex; align-items: center; gap: 12px; }
+        .cart-trigger { flex: 1; display: flex; flex-direction: column; cursor: pointer; overflow: hidden;}
+        .cart-summary { display: flex; align-items: center; gap: 8px; }
         .count-badge {
-            background: var(--accent); width: 34px; height: 34px;
+            background: var(--accent); width: 30px; height: 30px;
             border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            font-weight: 900; font-size: 0.9rem; color: white;
+            font-weight: 900; font-size: 0.85rem; color: white;
         }
-        .total-pieces { font-size: 0.75rem; color: rgba(255,255,255,0.5); font-weight: bold; margin-top: 2px; }
+        .total-pieces { font-size: 0.7rem; color: rgba(255,255,255,0.5); font-weight: bold; margin-top: 2px; }
 
-        .btn-actions { display: flex; gap: 10px; }
+        .btn-actions { display: flex; gap: 6px; }
         .btn-nav {
-            border: none; padding: 12px 20px; border-radius: 18px; font-weight: 800;
-            font-size: 1rem; display: flex; align-items: center; gap: 8px; cursor: pointer;
+            border: none; padding: 10px 15px; border-radius: 15px; font-weight: 800;
+            font-size: 0.9rem; display: flex; align-items: center; gap: 6px; cursor: pointer;
         }
         .btn-send { background: white; color: var(--primary); }
         .btn-whatsapp { background: var(--whatsapp); color: white; }
 
-        /* نافذة مراجعة الطلب */
+        /* درج العربة */
         .modal {
             position: fixed; inset: 0; background: rgba(0,0,0,0.8);
             display: none; z-index: 2000; align-items: flex-end; justify-content: center;
         }
         .modal-content {
             background: var(--bg); width: 100%; max-width: 500px;
-            border-radius: 32px 32px 0 0; padding: 25px; max-height: 90dvh; 
+            border-radius: 30px 30px 0 0; padding: 20px; max-height: 85dvh; 
             overflow-y: auto; animation: drawerSlide 0.3s ease-out;
         }
         @keyframes drawerSlide { from { transform: translateY(100%); } to { transform: translateY(0); } }
         
         .cart-item { 
-            background: white; padding: 15px; border-radius: 22px; margin-bottom: 12px; 
-            display: flex; gap: 15px; align-items: center; box-shadow: 0 4px 8px rgba(0,0,0,0.03);
+            background: white; padding: 12px; border-radius: 20px; margin-bottom: 10px; 
+            display: flex; gap: 12px; align-items: center; box-shadow: 0 4px 8px rgba(0,0,0,0.03);
         }
-        .cart-item-img { width: 65px; height: 65px; border-radius: 16px; object-fit: cover; background: #f1f5f9; }
+        .cart-item-img { width: 55px; height: 55px; border-radius: 12px; object-fit: cover; background: #f1f5f9; }
         .cart-item-info { flex: 1; min-width: 0; }
-        .cart-item-info h4 { font-size: 1.05rem; font-weight: 900; color: var(--primary); margin-bottom: 3px; }
-        .cart-item-info p { font-size: 0.85rem; color: var(--text-sub); font-weight: 600; }
+        .cart-item-info h4 { font-size: 1rem; font-weight: 900; color: var(--primary); margin-bottom: 2px; }
+        .cart-item-info p { font-size: 0.8rem; color: var(--text-sub); }
 
         /* التنبيهات */
         #toast {
             position: fixed; top: 40px; left: 50%; transform: translateX(-50%);
-            background: var(--primary); color: white; padding: 14px 35px;
+            background: var(--primary); color: white; padding: 12px 30px;
             border-radius: 50px; z-index: 5000; display: none; font-weight: 800;
-            box-shadow: var(--shadow); font-size: 1rem;
+            box-shadow: var(--shadow); font-size: 0.95rem; text-align: center;
         }
 
         /* الطباعة */
         #print-area { display: none; }
-        @media print {
-            body * { visibility: hidden; }
-            #print-area, #print-area * { visibility: visible; }
-            #print-area { position: absolute; left: 0; top: 0; width: 100%; display: block !important; padding: 40px; background: white; color: black; }
-            table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-            th, td { border: 1px solid #000; padding: 12px; text-align: inherit; }
-        }
     </style>
 </head>
 <body>
@@ -261,19 +258,19 @@
     </div>
 
     <main id="product-grid">
-        <!-- المنتجات تظهر هنا -->
+        <!-- المنتجات -->
     </main>
 
     <div class="bottom-nav" id="cartBar">
         <div class="cart-trigger" onclick="toggleCart(true)">
             <div class="cart-summary">
                 <div class="count-badge" id="totalCount">0</div>
-                <span id="ui-item-label" style="font-weight: 900; font-size: 1rem;">صنف</span>
+                <span id="ui-item-label" style="font-weight: 900; font-size: 0.9rem;">صنف</span>
             </div>
             <div class="total-pieces"><span id="ui-total-pieces-label">القطع</span>: <span id="totalPieces">0</span></div>
         </div>
         <div class="btn-actions">
-            <button class="btn-nav" style="background:#475569; color:white; padding: 12px 15px;" id="btnPrint" onclick="printOrder()"><i class="fas fa-print"></i></button>
+            <button class="btn-nav" style="background:#475569; color:white;" id="btnPrint" onclick="printOrder()"><i class="fas fa-print"></i></button>
             <button class="btn-nav btn-whatsapp" id="btnWhatsApp" onclick="sendWhatsApp()"><i class="fab fa-whatsapp"></i></button>
             <button class="btn-nav btn-send" id="sendBtn" onclick="sendOrder()"><span id="ui-send">إرسال</span></button>
         </div>
@@ -281,13 +278,13 @@
 
     <div class="modal" id="cartModal" onclick="if(event.target==this) toggleCart(false)">
         <div class="modal-content">
-            <div style="width:45px; height:6px; background:#cbd5e1; border-radius:10px; margin: 0 auto 20px;"></div>
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:25px;">
-                <h3 id="ui-review-title" style="color: var(--primary); font-weight: 900; font-size: 1.4rem;">مراجعة الطلب</h3>
-                <button id="ui-clear-all" onclick="clearCart()" style="color:var(--danger); border:none; background:none; font-weight:800; font-size:0.95rem;">مسح الكل</button>
+            <div style="width:40px; height:5px; background:#cbd5e1; border-radius:10px; margin: 0 auto 15px;"></div>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                <h3 id="ui-review-title" style="color: var(--primary); font-weight: 900; font-size: 1.3rem;">مراجعة الطلب</h3>
+                <button id="ui-clear-all" onclick="clearCart()" style="color:var(--danger); border:none; background:none; font-weight:800; font-size:0.9rem;">مسح الكل</button>
             </div>
             <div id="cart-list-items"></div>
-            <button id="ui-add-more" onclick="toggleCart(false)" style="width:100%; margin-top:20px; padding:22px; border-radius:22px; border:none; background:var(--primary); color:white; font-weight:900; font-size:1.15rem;">إضافة المزيد</button>
+            <button id="ui-add-more" onclick="toggleCart(false)" style="width:100%; margin-top:15px; padding:20px; border-radius:20px; border:none; background:var(--primary); color:white; font-weight:900; font-size:1.1rem;">إضافة المزيد</button>
         </div>
     </div>
 
@@ -302,8 +299,7 @@
             <tbody id="print-items"></tbody>
         </table>
         <div style="margin-top: 50px; display: flex; justify-content: space-between;">
-            <p id="ui-sig-emp"></p>
-            <p id="ui-sig-store"></p>
+            <p id="ui-sig-emp"></p><p id="ui-sig-store"></p>
         </div>
     </div>
 
@@ -325,15 +321,15 @@
             en: {
                 logo: "Warehouse", langBtn: "עב", searchPlaceholder: "Search...",
                 empPlaceholder: "👤 Employee", branchPlaceholder: "🏢 Branch",
-                catAll: "All", itemLabel: "Items", totalPiecesLabel: "Total Qty",
-                send: "Send", reviewTitle: "Order Review", clearAll: "Clear", addMore: "Add More",
+                catAll: "All", itemLabel: "Items", totalPiecesLabel: "Qty",
+                send: "Send", reviewTitle: "Review Order", clearAll: "Clear", addMore: "Add More",
                 available: "In Stock", unavailable: "Out Stock", loader: "Syncing...",
                 emptyCart: "Empty", confirmClear: "Clear all?",
                 alertInfo: "Fill all info", alertSuccess: "Sent!",
                 printHeader: "Warehouse Order", printDate: "Date", printCode: "Code",
                 printName: "Item", printQty: "Qty", waHeader: "📦 *New Warehouse Order*",
                 waQty: "Qty", noResults: "No results",
-                sigEmp: "Employee Sign", sigStore: "Store Sign"
+                sigEmp: "Emp Sign", sigStore: "Store Sign"
             },
             he: {
                 logo: "מחסני", langBtn: "عربي", searchPlaceholder: "חפש...",
@@ -422,10 +418,8 @@
                     if (savedBranch) document.getElementById('branchName').value = savedBranch;
                 }
             } catch (e) {
-                console.error(e);
                 showToast("Sync Error");
             } finally {
-                // دائماً نخفي شاشة الترحيب مهما كانت النتيجة
                 setTimeout(() => {
                     const splash = document.getElementById('splash');
                     if (splash) { splash.style.opacity = '0'; setTimeout(() => splash.style.display = 'none', 400); }
