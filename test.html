@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>مخزني AI - النظام المتكامل</title>
+    <title>madperfume - نظام الطلبات</title>
     
-    <!-- إعدادات تطبيق الويب (PWA) -->
+    <!-- PWA Settings -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#0f172a">
-    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/583/583344.png">
+    <link rel="apple-touch-icon" href="https://abomkdad.github.io/Digital-Business-Card/logo.png">
 
-    <!-- أيقونات Font Awesome -->
+    <!-- Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
@@ -20,14 +20,13 @@
             --surface: #ffffff;
             --primary: #0f172a;
             --accent: #10b981;
-            --ai-purple: #8b5cf6;
             --whatsapp: #25d366;
             --danger: #ef4444;
             --text-main: #0f172a;
             --text-sub: #64748b;
-            --radius-lg: 28px;
-            --radius-md: 18px;
-            --shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.1);
+            --radius-lg: 24px;
+            --radius-md: 16px;
+            --shadow-float: 0 10px 25px rgba(0,0,0,0.2);
         }
 
         * {
@@ -50,301 +49,239 @@
             padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom) 0;
         }
 
-        /* شاشة الترحيب */
+        /* Splash Screen */
         #splash {
             position: fixed; inset: 0; background: var(--primary); z-index: 9999;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             transition: opacity 0.4s ease;
         }
-        .splash-logo { font-size: 4rem; color: white; animation: splashPulse 2s infinite; }
-        @keyframes splashPulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
+        .splash-logo { width: 120px; height: 120px; object-fit: contain; animation: splashPulse 2s infinite; }
+        @keyframes splashPulse { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.1); opacity: 0.8; } 100% { transform: scale(1); opacity: 1; } }
 
-        /* الهيدر */
+        /* Compact Header */
         header {
             background: var(--primary);
-            padding: 12px 15px 20px;
-            box-shadow: var(--shadow);
+            padding: 10px 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
             z-index: 100;
             color: white;
-            border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+            border-radius: 0 0 15px 15px;
         }
-        .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .logo { font-size: 1.4rem; font-weight: 900; letter-spacing: -1px; }
+        .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .logo-container { display: flex; align-items: center; gap: 8px; }
+        .logo-img { width: 30px; height: 30px; object-fit: contain; }
+        .logo-text { font-size: 1.2rem; font-weight: 900; letter-spacing: 0.5px; }
         
-        .header-actions { display: flex; gap: 8px; }
-        .btn-ai-main {
-            background: linear-gradient(135deg, var(--ai-purple), #6366f1);
-            color: white; border: none; padding: 8px 15px; border-radius: 12px;
-            font-weight: 800; font-size: 0.8rem; display: flex; align-items: center; gap: 6px;
-        }
-
         .header-btn {
-            background: rgba(255, 255, 255, 0.15); border: none; padding: 8px 12px; 
-            border-radius: 12px; color: white; cursor: pointer; font-size: 0.85rem; font-weight: 800;
+            background: rgba(255, 255, 255, 0.1); border: none; padding: 6px 12px; 
+            border-radius: 10px; color: white; cursor: pointer; font-size: 0.75rem; font-weight: 800;
         }
 
         .search-wrapper {
-            background: rgba(255, 255, 255, 0.12); border-radius: 16px; padding: 12px;
-            display: flex; align-items: center; gap: 10px; margin-bottom: 15px;
+            background: rgba(255, 255, 255, 0.1); border-radius: 10px; padding: 8px 12px;
+            display: flex; align-items: center; gap: 8px; margin-bottom: 8px;
         }
         .search-wrapper input {
             background: transparent; border: none; outline: none; width: 100%;
-            font-size: 1rem; color: white; user-select: text; -webkit-user-select: text;
+            font-size: 0.9rem; color: white; user-select: text; -webkit-user-select: text;
         }
-        .search-wrapper input::placeholder { color: rgba(255, 255, 255, 0.4); }
+        .search-wrapper input::placeholder { color: rgba(255,255,255,0.4); }
 
         .categories {
-            display: flex; overflow-x: auto; gap: 8px; padding-bottom: 5px;
+            display: flex; overflow-x: auto; gap: 6px;
             scrollbar-width: none; scroll-snap-type: x mandatory;
         }
         .categories::-webkit-scrollbar { display: none; }
         .cat-item {
-            white-space: nowrap; padding: 10px 20px; border-radius: 50px;
-            background: rgba(255, 255, 255, 0.1); color: rgba(255, 255, 255, 0.7); 
-            font-size: 0.8rem; font-weight: 800; scroll-snap-align: start;
+            white-space: nowrap; padding: 6px 14px; border-radius: 50px;
+            background: rgba(255, 255, 255, 0.1); color: rgba(255, 255, 255, 0.6); 
+            font-size: 0.75rem; font-weight: 800;
         }
         .cat-item.active { background: white; color: var(--primary); }
 
-        /* معلومات المستخدم */
-        .info-box { 
-            padding: 12px 15px; background: var(--surface); display: grid; 
-            grid-template-columns: 1fr 1fr; gap: 10px; border-bottom: 1px solid #e2e8f0;
-        }
-        .info-box input {
-            width: 100%; padding: 12px; border-radius: 12px;
-            border: 1.5px solid #cbd5e1; outline: none; font-size: 0.9rem;
-            background: #f8fafc; user-select: text; -webkit-user-select: text;
-        }
-
-        /* شبكة المنتجات - عمودين ثابتة */
+        /* Product Grid */
         #product-grid {
-            flex: 1; overflow-y: auto; padding: 12px;
+            flex: 1; overflow-y: auto; padding: 10px;
             display: grid;
             grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 12px;
-            padding-bottom: 180px;
+            gap: 10px;
             width: 100%;
         }
 
         .card {
-            background: var(--surface); border-radius: var(--radius-md);
-            padding: 10px; display: flex; flex-direction: column;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.03); border: 1px solid #e2e8f0;
-            transition: 0.2s; position: relative;
-            min-width: 0;
+            background: var(--surface); border-radius: 18px;
+            padding: 8px; display: flex; flex-direction: column;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.02); border: 1px solid #edf2f7;
+            position: relative;
         }
-        .card:active { transform: scale(0.96); opacity: 0.8; }
-        .card.active { border-color: var(--primary); background: #f8fafc; border-width: 2px; }
+        .card.active { border-color: var(--primary); border-width: 1.5px; }
         .card.out-of-stock { opacity: 0.5; filter: grayscale(1); }
-
-        .card img {
-            width: 100%; aspect-ratio: 1/1; object-fit: cover; 
-            background: #f1f5f9; display: block; border-radius: 10px;
-        }
-
-        .card h3 { 
-            font-size: 1rem; font-weight: 900; color: var(--primary);
-            margin: 8px 0 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-        }
-        .card .product-name {
-            font-size: 0.8rem; color: var(--text-sub); font-weight: 600;
-            margin-bottom: 5px; height: 1.1rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-        }
+        .card img { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 12px; background: #f1f5f9; }
+        .card h3 { font-size: 0.9rem; font-weight: 800; color: var(--primary); margin: 6px 0 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .card .product-name { font-size: 0.7rem; color: var(--text-sub); font-weight: 600; margin-bottom: 8px; height: 1rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         
-        .ai-explain-btn {
-            background: transparent; border: 1px solid var(--ai-purple); color: var(--ai-purple);
-            padding: 4px; border-radius: 8px; font-size: 0.65rem; font-weight: 800;
-            margin-bottom: 8px; display: flex; align-items: center; justify-content: center; gap: 4px;
-        }
-
-        .stock-status { font-size: 0.7rem; font-weight: 800; margin-bottom: 10px; display: flex; align-items: center; gap: 4px; }
+        .stock-status { font-size: 0.6rem; font-weight: 800; margin-bottom: 8px; display: flex; align-items: center; gap: 3px; }
         .status-available { color: var(--accent); }
         .status-unavailable { color: var(--danger); }
 
         .qty-control {
             display: flex; align-items: center; justify-content: space-between;
-            background: #f1f5f9; border-radius: 12px; padding: 4px; margin-top: auto;
+            background: #f1f5f9; border-radius: 10px; padding: 3px; margin-top: auto;
         }
-        .btn-q {
-            width: 34px; height: 34px; border-radius: 10px; border: none;
-            background: var(--primary); color: white; font-size: 1.3rem; 
-            display: flex; align-items: center; justify-content: center;
-        }
-        .q-val { font-weight: 900; font-size: 1.1rem; }
+        .btn-q { width: 30px; height: 30px; border-radius: 8px; border: none; background: var(--primary); color: white; font-size: 1rem; }
+        .q-val { font-weight: 900; font-size: 0.9rem; }
 
-        .bulk-row { display: flex; gap: 5px; margin-bottom: 8px; }
-        .btn-b {
-            flex: 1; background: white; border: 1.2px solid #cbd5e1;
-            font-size: 0.75rem; font-weight: 800; padding: 8px 2px; border-radius: 10px;
-            color: var(--primary);
-        }
+        .bulk-row { display: flex; gap: 4px; margin-bottom: 5px; }
+        .btn-b { flex: 1; background: white; border: 1px solid #e2e8f0; font-size: 0.65rem; font-weight: 800; padding: 6px 0; border-radius: 8px; color: var(--primary); }
 
-        /* شريط العربة السفلي */
-        .bottom-nav {
-            position: fixed; bottom: 25px; left: 12px; right: 12px;
-            background: var(--primary); color: white; padding: 12px 15px;
-            border-radius: 25px; display: none; justify-content: space-between;
-            align-items: center; box-shadow: 0 15px 35px rgba(0,0,0,0.4);
-            z-index: 1000; animation: bounceUp 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        /* Floating Cart Bubble */
+        #cartBubble {
+            position: fixed; bottom: 30px; left: 30px;
+            width: 65px; height: 65px; border-radius: 50%;
+            background: var(--primary); color: white;
+            display: none; flex-direction: column; align-items: center; justify-content: center;
+            box-shadow: var(--shadow-float); z-index: 1000;
+            animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-        @keyframes bounceUp { from { transform: translateY(120%); } to { transform: translateY(0); } }
-        .bottom-nav.visible { display: flex; }
+        @keyframes popIn { from { transform: scale(0); } to { transform: scale(1); } }
         
-        .cart-trigger { flex: 1; display: flex; flex-direction: column; cursor: pointer; overflow: hidden;}
-        .cart-summary { display: flex; align-items: center; gap: 8px; }
-        .count-badge {
-            background: var(--accent); width: 30px; height: 30px;
-            border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            font-weight: 900; font-size: 0.85rem; color: white;
+        #cartBubble .count {
+            position: absolute; top: -5px; right: -5px;
+            background: var(--accent); color: white;
+            min-width: 24px; height: 24px; border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 900; font-size: 0.75rem; border: 2px solid var(--primary);
         }
-        .total-pieces { font-size: 0.7rem; color: rgba(255,255,255,0.5); font-weight: bold; margin-top: 2px; }
 
-        .btn-actions { display: flex; gap: 6px; }
-        .btn-nav {
-            border: none; padding: 10px 15px; border-radius: 15px; font-weight: 800;
-            font-size: 0.9rem; display: flex; align-items: center; gap: 6px; cursor: pointer;
-        }
-        .btn-send { background: white; color: var(--primary); }
-        .btn-whatsapp { background: var(--whatsapp); color: white; }
-
-        /* نوافذ منبثقة */
+        /* Popup Modal Style */
         .modal {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.8);
-            display: none; z-index: 2000; align-items: flex-end; justify-content: center;
+            position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+            display: none; z-index: 2000; align-items: center; justify-content: center;
+            padding: 20px;
         }
         .modal-content {
-            background: var(--bg); width: 100%; max-width: 500px;
-            border-radius: 30px 30px 0 0; padding: 20px; max-height: 85dvh; 
-            overflow-y: auto; animation: drawerSlide 0.3s ease-out;
+            background: var(--bg); width: 100%; max-width: 380px;
+            border-radius: 24px; padding: 20px; max-height: 80dvh; 
+            overflow-y: auto; box-shadow: var(--shadow-float);
+            animation: popupScale 0.3s ease-out;
         }
-        @keyframes drawerSlide { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        @keyframes popupScale { from { opacity:0; transform: scale(0.9); } to { opacity:1; transform: scale(1); } }
         
+        .info-box-compact { 
+            display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 15px;
+        }
+        .info-box-compact input {
+            width: 100%; padding: 10px; border-radius: 10px;
+            border: 1px solid #cbd5e1; outline: none; font-size: 0.85rem;
+            background: white; user-select: text; -webkit-user-select: text;
+        }
+
         .cart-item { 
-            background: white; padding: 12px; border-radius: 20px; margin-bottom: 10px; 
-            display: flex; gap: 12px; align-items: center; box-shadow: 0 4px 8px rgba(0,0,0,0.03);
+            background: white; padding: 10px; border-radius: 14px; margin-bottom: 8px; 
+            display: flex; gap: 10px; align-items: center; border: 1px solid #edf2f7;
         }
-        .cart-item-img { width: 55px; height: 55px; border-radius: 12px; object-fit: cover; background: #f1f5f9; }
+        .cart-item-img { width: 45px; height: 45px; border-radius: 8px; object-fit: cover; }
         .cart-item-info { flex: 1; min-width: 0; }
+        .cart-item-info h4 { font-size: 0.85rem; font-weight: 800; margin-bottom: 1px; }
 
-        /* AI Response View */
-        .ai-view {
-            background: var(--bg); width: 90%; max-width: 450px;
-            border-radius: 24px; padding: 25px; align-self: center;
-            position: relative; border: 1.5px solid var(--ai-purple);
-            animation: fadeIn 0.3s ease;
-        }
-        @keyframes fadeIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
-        
-        .ai-loading { display: flex; flex-direction: column; align-items: center; gap: 15px; margin: 20px 0; }
-        .ai-spinner { width: 40px; height: 40px; border: 4px solid #f1f5f9; border-top-color: var(--ai-purple); border-radius: 50%; animation: spin 1s linear infinite; }
-        @keyframes spin { to { transform: rotate(360deg); } }
+        .popup-actions { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-top: 15px; }
+        .btn-p { border: none; border-radius: 12px; padding: 12px 5px; font-weight: 800; font-size: 0.8rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; }
+        .btn-p-send { background: var(--primary); color: white; grid-column: span 3; margin-top: 5px; padding: 15px; }
+        .btn-p-wa { background: var(--whatsapp); color: white; }
+        .btn-p-print { background: #475569; color: white; }
+        .btn-p-clear { background: #fee2e2; color: var(--danger); }
 
-        /* التنبيهات */
         #toast {
             position: fixed; top: 40px; left: 50%; transform: translateX(-50%);
-            background: var(--primary); color: white; padding: 12px 30px;
+            background: var(--primary); color: white; padding: 10px 20px;
             border-radius: 50px; z-index: 5000; display: none; font-weight: 800;
-            box-shadow: var(--shadow); font-size: 0.95rem; text-align: center;
+            font-size: 0.85rem; text-align: center; box-shadow: var(--shadow-float);
         }
 
-        /* الطباعة */
+        /* Print Area */
         #print-area { display: none; }
         @media print {
             body * { visibility: hidden; }
             #print-area, #print-area * { visibility: visible; }
-            #print-area { position: absolute; left: 0; top: 0; width: 100%; display: block !important; padding: 40px; background: white; color: black; }
+            #print-area { position: absolute; left: 0; top: 0; width: 100%; display: block !important; padding: 40px; background: white; }
             table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-            th, td { border: 1px solid #000; padding: 12px; text-align: inherit; font-size: 14pt; }
+            th, td { border: 1px solid #000; padding: 10px; text-align: inherit; }
         }
     </style>
 </head>
 <body>
 
     <div id="splash">
-        <i class="fas fa-warehouse splash-logo"></i>
-        <h1 style="color: white; margin-top: 25px; font-weight: 900; letter-spacing: -1px;">مخزني AI</h1>
+        <img src="https://abomkdad.github.io/Digital-Business-Card/logo.png" class="splash-logo" alt="Logo">
+        <h1 style="color: white; margin-top: 15px; font-weight: 900; font-size: 1.5rem;" id="splash-label">madperfume</h1>
     </div>
 
     <div id="toast"></div>
 
-    <!-- AI Modal -->
-    <div id="aiModal" class="modal" onclick="if(event.target==this) closeAIModal()">
-        <div class="ai-view">
-            <h3 id="aiModalTitle" style="color: var(--ai-purple); margin-bottom: 15px; display: flex; align-items: center; gap: 8px;">
-                <i class="fas fa-sparkles"></i> ذكاء اصطناعي ✨
-            </h3>
-            <div id="aiLoading" class="ai-loading" style="display: none;">
-                <div class="ai-spinner"></div>
-                <p style="color: var(--ai-purple); font-weight: bold;">جاري التفكير...</p>
-            </div>
-            <div id="aiResponse" style="line-height: 1.6; white-space: pre-wrap; font-size: 1rem;"></div>
-            <button onclick="closeAIModal()" style="width: 100%; margin-top: 20px; padding: 15px; border-radius: 12px; border: none; background: var(--primary); color: white; font-weight: 800; cursor: pointer;">حسناً</button>
-        </div>
-    </div>
-
     <header>
         <div class="header-top">
-            <div class="logo" id="ui-logo">مخزني</div>
+            <div class="logo-container">
+                <img src="https://abomkdad.github.io/Digital-Business-Card/logo.png" class="logo-img" alt="logo">
+                <div class="logo-text" id="ui-logo">madperfume</div>
+            </div>
             <div class="header-actions">
-                <button class="btn-ai-main" onclick="analyzeInventoryWithAI()">
-                    <i class="fas fa-robot"></i> تحليل ✨
-                </button>
                 <button class="header-btn" id="btn-lang" onclick="toggleLanguage()">EN</button>
+                <button class="header-btn" onclick="location.reload()"><i class="fas fa-sync-alt"></i></button>
             </div>
         </div>
         <div class="search-wrapper">
-            <i class="fas fa-search" style="opacity: 0.5;"></i>
-            <input type="text" id="search" oninput="render()" placeholder="بحث...">
+            <i class="fas fa-search" style="opacity: 0.5; font-size: 0.8rem;"></i>
+            <input type="text" id="search" oninput="render()" placeholder="بحث سريع...">
         </div>
         <div class="categories" id="cat-list">
             <div class="cat-item active" id="cat-all" onclick="setCat('الكل', this)">الكل</div>
         </div>
     </header>
 
-    <div class="info-box">
-        <input type="text" id="empName" oninput="saveInfo()" placeholder="👤 الموظف" autocomplete="off">
-        <input type="text" id="branchName" oninput="saveInfo()" placeholder="🏢 الفرع" autocomplete="off">
-    </div>
-
     <main id="product-grid">
-        <!-- المنتجات تظهر هنا -->
+        <!-- Products load here -->
     </main>
 
-    <div class="bottom-nav" id="cartBar">
-        <div class="cart-trigger" onclick="toggleCart(true)">
-            <div class="cart-summary">
-                <div class="count-badge" id="totalCount">0</div>
-                <span id="ui-item-label" style="font-weight: 900; font-size: 0.9rem;">صنف</span>
-            </div>
-            <div class="total-pieces"><span id="ui-total-pieces-label">القطع</span>: <span id="totalPieces">0</span></div>
-        </div>
-        <div class="btn-actions">
-            <button class="btn-nav" style="background:#475569; color:white; padding: 12px 15px;" onclick="printOrder()"><i class="fas fa-print"></i></button>
-            <button class="btn-nav btn-whatsapp" onclick="sendWhatsApp()"><i class="fab fa-whatsapp"></i></button>
-            <button class="btn-nav btn-send" id="sendBtn" onclick="sendOrder()"><span id="ui-send">إرسال</span></button>
-        </div>
+    <!-- Floating Cart Bubble -->
+    <div id="cartBubble" onclick="toggleCart(true)">
+        <i class="fas fa-shopping-basket" style="font-size: 1.4rem;"></i>
+        <div class="count" id="totalCount">0</div>
+        <span style="font-size: 0.6rem; font-weight: 800; margin-top: 2px;" id="ui-bubble-label">طلب</span>
     </div>
 
+    <!-- Centered Popup Modal -->
     <div class="modal" id="cartModal" onclick="if(event.target==this) toggleCart(false)">
         <div class="modal-content">
-            <div style="width:40px; height:5px; background:#cbd5e1; border-radius:10px; margin: 0 auto 15px;"></div>
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-                <h3 id="ui-review-title" style="color: var(--primary); font-weight: 900; font-size: 1.3rem;">مراجعة الطلب</h3>
-                <button id="ui-clear-all" onclick="clearCart()" style="color:var(--danger); border:none; background:none; font-weight:800; font-size:0.9rem;">مسح الكل</button>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; border-bottom: 1px solid #e2e8f0; padding-bottom: 10px;">
+                <h3 id="ui-review-title" style="color: var(--primary); font-weight: 900; font-size: 1.1rem;">تأكيد الطلب</h3>
+                <i class="fas fa-times" onclick="toggleCart(false)" style="color:var(--text-sub); cursor:pointer;"></i>
             </div>
-            <div id="cart-list-items"></div>
-            <button id="ui-add-more" onclick="toggleCart(false)" style="width:100%; margin-top:15px; padding:20px; border-radius:20px; border:none; background:var(--primary); color:white; font-weight:900; font-size:1.1rem;">إضافة المزيد</button>
+            
+            <div class="info-box-compact">
+                <input type="text" id="empName" oninput="saveInfo()" placeholder="👤 الموظف" autocomplete="off">
+                <input type="text" id="branchName" oninput="saveInfo()" placeholder="🏢 الفرع" autocomplete="off">
+            </div>
+
+            <div id="cart-list-items" style="max-height: 300px; overflow-y: auto;"></div>
+            
+            <div class="popup-actions">
+                <button class="btn-p btn-p-wa" onclick="sendWhatsApp()"><i class="fab fa-whatsapp"></i></button>
+                <button class="btn-p btn-p-print" onclick="printOrder()"><i class="fas fa-print"></i></button>
+                <button class="btn-p btn-p-clear" onclick="clearCart()"><i class="fas fa-trash"></i></button>
+                <button class="btn-p btn-p-send" id="sendBtn" onclick="sendOrder()">
+                    <i class="fas fa-paper-plane"></i> <span id="ui-send">إرسال الطلب الآن</span>
+                </button>
+            </div>
         </div>
     </div>
 
     <div id="print-area">
         <h1 id="print-header-title"></h1>
         <p id="print-date-display"></p>
-        <div style="display: flex; justify-content: space-between; margin: 20px 0;">
-            <p><strong><span id="label-print-emp"></span>:</strong> <span id="print-emp"></span></p>
-            <p><strong><span id="label-print-branch"></span>:</strong> <span id="print-branch"></span></p>
-        </div>
-        <table style="width:100%; border-collapse:collapse; margin-top:20px;">
+        <p><strong><span id="label-print-emp"></span>:</strong> <span id="print-emp"></span></p>
+        <p><strong><span id="label-print-branch"></span>:</strong> <span id="print-branch"></span></p>
+        <hr>
+        <table border="1" style="width:100%; border-collapse:collapse; margin-top:20px;">
             <thead><tr><th id="th-code"></th><th id="th-name"></th><th id="th-qty"></th></tr></thead>
             <tbody id="print-items"></tbody>
         </table>
@@ -353,120 +290,64 @@
     <script>
         const translations = {
             ar: {
-                logo: "مخزني", langBtn: "EN", searchPlaceholder: "ابحث عن كود أو أداة...",
+                logo: "madperfume", langBtn: "EN", searchPlaceholder: "بحث سريع...",
                 empPlaceholder: "👤 الموظف", branchPlaceholder: "🏢 الفرع",
-                catAll: "الكل", itemLabel: "صنف", totalPiecesLabel: "القطع",
-                send: "إرسال", reviewTitle: "مراجعة الطلب", clearAll: "مسح الكل", addMore: "إضافة المزيد",
-                available: "متوفر", unavailable: "غير متوفر", loader: "جاري المزامنة...",
-                emptyCart: "العربة فارغة", confirmClear: "هل تريد إفراغ العربة؟",
-                alertInfo: "يرجى إكمال البيانات", alertSuccess: "تم الإرسال بنجاح!",
-                printHeader: "طلب صرف مخزن", printDate: "التاريخ", printCode: "الكود",
-                printName: "المنتج", printQty: "الكمية", waHeader: "📦 *طلب جديد من المخزن*",
-                waQty: "الكمية", noResults: "لا توجد نتائج",
-                aiTitle: "ذكاء اصطناعي ✨", aiAnalysis: "تحليل المخزن الذكي ✨", aiExplain: "شرح فني ✨"
+                catAll: "الكل", itemLabel: "صنف", bubbleLabel: "طلب",
+                send: "إرسال الطلب الآن", reviewTitle: "تأكيد الطلب", emptyCart: "العربة فارغة",
+                confirmClear: "إفراغ العربة؟", alertInfo: "يرجى كتابة الاسم والفرع",
+                alertSuccess: "تم الإرسال بنجاح!", printHeader: "طلب صرف مخزن",
+                printDate: "التاريخ", printCode: "الكود", printName: "المنتج", printQty: "الكمية", noResults: "لا توجد نتائج"
             },
             en: {
-                logo: "Warehouse", langBtn: "עב", searchPlaceholder: "Search...",
-                empPlaceholder: "👤 Employee", branchPlaceholder: "🏢 Branch",
-                catAll: "All", itemLabel: "Items", totalPiecesLabel: "Units",
-                send: "Send", reviewTitle: "Review Order", clearAll: "Clear", addMore: "Add More",
-                available: "In Stock", unavailable: "Out Stock", loader: "Syncing...",
-                emptyCart: "Empty", confirmClear: "Clear all?",
-                alertInfo: "Fill all info", alertSuccess: "Sent!",
-                printHeader: "Warehouse Order", printDate: "Date", printCode: "Code",
-                printName: "Item", printQty: "Qty", waHeader: "📦 *New Warehouse Order*",
-                waQty: "Qty", noResults: "No results",
-                aiTitle: "AI ✨", aiAnalysis: "Smart Analysis ✨", aiExplain: "Tech Specs ✨"
+                logo: "madperfume", langBtn: "עב", searchPlaceholder: "Quick search...",
+                empPlaceholder: "👤 Name", branchPlaceholder: "🏢 Branch",
+                catAll: "All", itemLabel: "Items", bubbleLabel: "Order",
+                send: "Send Order Now", reviewTitle: "Confirm Order", emptyCart: "Empty",
+                confirmClear: "Clear all?", alertInfo: "Enter name & branch",
+                alertSuccess: "Sent!", printHeader: "Warehouse Order",
+                printDate: "Date", printCode: "Code", printName: "Item", printQty: "Qty", noResults: "No results"
             },
             he: {
-                logo: "מחסני", langBtn: "عربي", searchPlaceholder: "חפש...",
-                empPlaceholder: "👤 שם עובד", branchPlaceholder: "🏢 שם סניף",
-                catAll: "הכל", itemLabel: "פריטים", totalPiecesLabel: "יחידות",
-                send: "שלח", reviewTitle: "סקירת הזמנה", clearAll: "נקה הכל", addMore: "הוסף עוד",
-                available: "זמין", unavailable: "לא זמין", loader: "מסנכרן...",
-                emptyCart: "ריק", confirmClear: "לנקות את העגלה?",
-                alertInfo: "נא למלא פרטים", alertSuccess: "נשלח בהצלحة!",
-                printHeader: "הזמנת מחסן", printDate: "תאריך", printCode: "קוד",
-                printName: "מוצר", printQty: "כמות", waHeader: "📦 *הזמנה חדשה*",
-                waQty: "כמות", noResults: "אין תוצאות",
-                aiTitle: "AI ✨", aiAnalysis: "ניתוח חכם ✨", aiExplain: "מפרט טכני ✨"
+                logo: "madperfume", langBtn: "عربي", searchPlaceholder: "חיפוש...",
+                empPlaceholder: "👤 שם", branchPlaceholder: "🏢 סניף",
+                catAll: "הכל", itemLabel: "פריטים", bubbleLabel: "הזמנה",
+                send: "שלח הזמנה עכשיו", reviewTitle: "אישור הזמנה", emptyCart: "ריק",
+                confirmClear: "לנקות הכל?", alertInfo: "נא لملا פרטים",
+                alertSuccess: "נשלח בהצלחה!", printHeader: "הזמנת מחסן",
+                printDate: "תאריך", printCode: "קוד", printName: "מוצר", printQty: "כמות", noResults: "אין תוצאות"
             }
         };
 
-        const apiKey = ""; // API Key used by env
         const SHEET_URL = "https://docs.google.com/spreadsheets/d/1g3_D2NBwT27O2OI-v1R5tAB2QCfF3_ZCUL9sSLoCv54/gviz/tq?tqx=out:json";
         const APPS_SCRIPT_URL = ""; 
 
         let inventory = [];
-        let cart = JSON.parse(localStorage.getItem('my_warehouse_cart_vfinal') || '{}');
+        let cart = JSON.parse(localStorage.getItem('my_warehouse_cart_v3') || '{}');
         let currentLang = localStorage.getItem('warehouse_lang') || 'ar';
         let activeCat = 'الكل';
 
-        // --- AI Helpers ---
-        async function callGemini(prompt, systemInstruction = "") {
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
-            const payload = {
-                contents: [{ parts: [{ text: prompt }] }],
-                systemInstruction: { parts: [{ text: systemInstruction }] }
-            };
-            let delay = 1000;
-            for (let i = 0; i < 5; i++) {
-                try {
-                    const res = await fetch(url, { method: 'POST', body: JSON.stringify(payload) });
-                    if (!res.ok) throw new Error();
-                    const json = await res.json();
-                    return json.candidates?.[0]?.content?.parts?.[0]?.text;
-                } catch (e) { await new Promise(r => setTimeout(r, delay)); delay *= 2; }
-            }
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            if (t) { t.innerText = msg; t.style.display = 'block'; setTimeout(() => t.style.display = 'none', 2500); }
         }
 
-        async function analyzeInventoryWithAI() {
-            const t = translations[currentLang];
-            openAIModal(t.aiAnalysis);
-            const lowStock = inventory.filter(i => !i.available).map(i => `${i.code}: ${i.name}`).slice(0, 20).join(', ');
-            const prompt = `Based on this stock status, give administrative advice in ${currentLang}:\n${lowStock || 'All items available'}`;
-            const sys = "Warehouse manager assistant. Concise, professional points.";
-            try { const res = await callGemini(prompt, sys); displayAIResponse(res); } catch (e) { displayAIResponse("Error!"); }
-        }
-
-        async function explainToolAI(code, name) {
-            const t = translations[currentLang];
-            openAIModal(t.aiExplain);
-            const prompt = `Short tech specs and safety tip for tool: ${name} (Code: ${code}) in ${currentLang}.`;
-            const sys = "Tech specialist. 3 short bullet points.";
-            try { const res = await callGemini(prompt, sys); displayAIResponse(res); } catch (e) { displayAIResponse("Error!"); }
-        }
-
-        function openAIModal(title) {
-            safeSetText('aiModalTitle', title);
-            document.getElementById('aiResponse').innerText = "";
-            document.getElementById('aiLoading').style.display = "flex";
-            document.getElementById('aiModal').style.display = "flex";
-        }
-        function displayAIResponse(text) { document.getElementById('aiLoading').style.display = "none"; document.getElementById('aiResponse').innerText = text; }
-        function closeAIModal() { document.getElementById('aiModal').style.display = "none"; }
-
-        // --- UI Logic ---
         function safeSetText(id, text) { const el = document.getElementById(id); if (el) el.innerText = text; }
         function safeSetPlaceholder(id, text) { const el = document.getElementById(id); if (el) el.placeholder = text; }
-        function showToast(msg) { const t = document.getElementById('toast'); if (t) { t.innerText = msg; t.style.display = 'block'; setTimeout(() => t.style.display = 'none', 2500); } }
 
-        function updateUI() {
+        function updateUIStrings() {
             const t = translations[currentLang];
             document.documentElement.lang = currentLang;
             document.documentElement.dir = (currentLang === 'ar' || currentLang === 'he') ? 'rtl' : 'ltr';
+            
             safeSetText('ui-logo', t.logo);
             safeSetText('btn-lang', t.langBtn);
             safeSetPlaceholder('search', t.searchPlaceholder);
             safeSetPlaceholder('empName', t.empPlaceholder);
             safeSetPlaceholder('branchName', t.branchPlaceholder);
             safeSetText('cat-all', currentLang === 'ar' ? 'الكل' : (currentLang === 'en' ? 'All' : 'הכל'));
-            safeSetText('ui-item-label', t.itemLabel);
-            safeSetText('ui-total-pieces-label', t.totalPiecesLabel);
             safeSetText('ui-send', t.send);
             safeSetText('ui-review-title', t.reviewTitle);
-            safeSetText('ui-clear-all', t.clearAll);
-            safeSetText('ui-add-more', t.addMore);
+            safeSetText('ui-bubble-label', t.bubbleLabel);
             
             safeSetText('print-header-title', t.printHeader);
             safeSetText('label-print-emp', t.empPlaceholder.replace('👤 ', ''));
@@ -477,15 +358,13 @@
         }
 
         function toggleLanguage() {
-            if (currentLang === 'ar') currentLang = 'en';
-            else if (currentLang === 'en') currentLang = 'he';
-            else currentLang = 'ar';
+            currentLang = currentLang === 'ar' ? 'en' : (currentLang === 'en' ? 'he' : 'ar');
             localStorage.setItem('warehouse_lang', currentLang);
-            updateUI(); render();
+            updateUIStrings(); render();
         }
 
         async function init() {
-            updateUI();
+            updateUIStrings();
             try {
                 const res = await fetch(SHEET_URL);
                 const text = await res.text();
@@ -495,16 +374,22 @@
                     inventory = data.table.rows.map(row => ({
                         code: row.c[0] ? String(row.c[0].v) : '---',
                         name: row.c[1] ? String(row.c[1].v) : '---',
-                        cat: row.c[1] ? String(row.c[1].v) : 'General',
+                        cat: row.c[1] ? String(row.c[1].v) : '---',
                         img: row.c[3] ? row.c[3].v : '',
                         available: (row.c[8] && row.c[8].v && String(row.c[8].v).toLowerCase() !== 'غير متوفر')
                     })).filter(i => i.name && i.name !== "Description");
+                    
                     renderCategories(); render();
                     document.getElementById('empName').value = localStorage.getItem('my_warehouse_emp') || '';
                     document.getElementById('branchName').value = localStorage.getItem('my_warehouse_branch') || '';
                 }
             } catch (e) { showToast("Sync Error"); }
-            finally { setTimeout(() => { const s = document.getElementById('splash'); if(s) s.style.opacity = '0', setTimeout(() => s.style.display = 'none', 400); }, 600); }
+            finally {
+                setTimeout(() => {
+                    const splash = document.getElementById('splash');
+                    if (splash) { splash.style.opacity = '0'; setTimeout(() => splash.style.display = 'none', 400); }
+                }, 800);
+            }
         }
 
         function renderCategories() {
@@ -514,12 +399,21 @@
             cats.forEach(c => {
                 const el = document.createElement('div');
                 el.className = 'cat-item'; el.innerText = c;
-                el.onclick = () => { document.querySelectorAll('.cat-item').forEach(i => i.classList.remove('active')); el.classList.add('active'); activeCat = c; render(); };
+                el.onclick = () => {
+                    document.querySelectorAll('.cat-item').forEach(i => i.classList.remove('active'));
+                    el.classList.add('active');
+                    activeCat = c;
+                    render();
+                };
                 list.appendChild(el);
             });
         }
 
-        function setCat(c, el) { activeCat = c; document.querySelectorAll('.cat-item').forEach(i => i.classList.remove('active')); el.classList.add('active'); render(); }
+        function setCat(c, el) {
+            activeCat = c;
+            document.querySelectorAll('.cat-item').forEach(i => i.classList.remove('active'));
+            el.classList.add('active'); render();
+        }
 
         function render() {
             const t = translations[currentLang];
@@ -527,7 +421,7 @@
             const search = document.getElementById('search').value.toLowerCase();
             const filtered = inventory.filter(i => {
                 const matchSearch = i.name.toLowerCase().includes(search) || i.code.toLowerCase().includes(search);
-                const matchCat = activeCat === 'الكل' || activeCat === 'All' || activeCat === 'הכל' || i.cat === activeCat;
+                const matchCat = activeCat === 'الكل' || activeCat === 'All' || activeCat === 'הكل' || i.cat === activeCat;
                 return matchSearch && matchCat;
             });
 
@@ -542,7 +436,6 @@
                         <i class="fas ${i.available ? 'fa-check-circle' : 'fa-times-circle'}"></i>
                         ${i.available ? t.available : t.unavailable}
                     </div>
-                    <button class="ai-explain-btn" onclick="explainToolAI('${i.code}', '${i.name}')"><i class="fas fa-magic"></i> ${t.aiExplain}</button>
                     <div class="bulk-row">
                         <button class="btn-b" onclick="updateQty('${i.code}', 6)" ${!i.available ? 'disabled' : ''}>+6</button>
                         <button class="btn-b" onclick="updateQty('${i.code}', 12)" ${!i.available ? 'disabled' : ''}>+12</button>
@@ -564,15 +457,14 @@
             const next = Math.max(0, current + delta);
             if (next === 0) delete cart[code];
             else cart[code] = { qty: next, name: item.name, code: item.code, img: item.img };
-            localStorage.setItem('my_warehouse_cart_vfinal', JSON.stringify(cart));
+            localStorage.setItem('my_warehouse_cart_v3', JSON.stringify(cart));
             render(); if (window.navigator.vibrate) window.navigator.vibrate(10);
         }
 
         function updateBar() {
             const items = Object.values(cart);
             safeSetText('totalCount', items.length);
-            safeSetText('totalPieces', items.reduce((a, b) => a + b.qty, 0));
-            document.getElementById('cartBar').style.display = items.length > 0 ? 'flex' : 'none';
+            document.getElementById('cartBubble').style.display = items.length > 0 ? 'flex' : 'none';
         }
 
         function renderCartModal() {
@@ -585,25 +477,27 @@
                     <div class="cart-item-info">
                         <h4>${item.code}</h4><p>${item.name}</p>
                     </div>
-                    <div class="qty-control" style="width:100px; padding:3px;">
-                        <button class="btn-q" style="background:#cbd5e1;color:#1e293b;width:30px;height:30px;font-size:1rem" onclick="updateQty('${item.code}', -1)">-</button>
-                        <span class="q-val" style="font-size:1rem">${item.qty}</span>
-                        <button class="btn-q" style="width:30px;height:30px;font-size:1rem" onclick="updateQty('${item.code}', 1)">+</button>
+                    <div class="qty-control" style="width:90px; padding:2px;">
+                        <button class="btn-q" style="background:#cbd5e1;color:#1e293b;width:26px;height:26px;font-size:0.9rem" onclick="updateQty('${item.code}', -1)">-</button>
+                        <span class="q-val" style="font-size:0.9rem">${item.qty}</span>
+                        <button class="btn-q" style="width:26px;height:26px;font-size:0.9rem" onclick="updateQty('${item.code}', 1)">+</button>
                     </div>
                 </div>`).join('');
         }
 
         function toggleCart(show) { document.getElementById('cartModal').style.display = show ? 'flex' : 'none'; }
-        function clearCart() { if(confirm(translations[currentLang].confirmClear)) { cart = {}; localStorage.setItem('my_warehouse_cart_vfinal', '{}'); render(); toggleCart(false); } }
-        function saveInfo() { localStorage.setItem('my_warehouse_emp', document.getElementById('empName').value); localStorage.setItem('my_warehouse_branch', document.getElementById('branchName').value); }
-        function closeAIModal() { document.getElementById('aiModal').style.display = "none"; }
+        function clearCart() { if(confirm(translations[currentLang].confirmClear)) { cart = {}; localStorage.setItem('my_warehouse_cart_v3', '{}'); render(); toggleCart(false); } }
+        function saveInfo() { 
+            localStorage.setItem('my_warehouse_emp', document.getElementById('empName').value); 
+            localStorage.setItem('my_warehouse_branch', document.getElementById('branchName').value); 
+        }
 
         async function sendOrder() {
             const name = document.getElementById('empName').value;
             const branch = document.getElementById('branchName').value;
             if(!name || !branch) return showToast(translations[currentLang].alertInfo);
             showToast("جاري الإرسال...");
-            setTimeout(() => { showToast(translations[currentLang].alertSuccess); cart = {}; localStorage.setItem('my_warehouse_cart_vfinal', '{}'); render(); toggleCart(false); }, 1000);
+            setTimeout(() => { showToast(translations[currentLang].alertSuccess); cart = {}; localStorage.setItem('my_warehouse_cart_v3', '{}'); render(); toggleCart(false); }, 1000);
         }
 
         function sendWhatsApp() {
