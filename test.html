@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>MADPERUME - نظام الطلبات</title>
+    <title>MAD PERFUME - نظام الطلبات</title>
     
-    <!-- إعدادات تطبيق الويب (PWA) -->
+    <!-- PWA Settings -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#0f172a">
     <link rel="apple-touch-icon" href="https://abomkdad.github.io/Digital-Business-Card/logo.png">
 
-    <!-- أيقونات Font Awesome -->
+    <!-- Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
@@ -49,16 +49,16 @@
             padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom) 0;
         }
 
-        /* شاشة الترحيب */
+        /* Splash Screen */
         #splash {
             position: fixed; inset: 0; background: var(--primary); z-index: 9999;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             transition: opacity 0.4s ease;
         }
-        .splash-logo { width: 100px; height: 100px; object-fit: contain; animation: splashPulse 2s infinite; }
+        .splash-logo { width: 120px; height: 120px; object-fit: contain; animation: splashPulse 2s infinite; }
         @keyframes splashPulse { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.1); opacity: 0.8; } 100% { transform: scale(1); opacity: 1; } }
 
-        /* هيدر مدمج جداً */
+        /* Header */
         header {
             background: var(--primary);
             padding: 12px 15px;
@@ -68,15 +68,14 @@
             border-radius: 0 0 15px 15px;
         }
         .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-        .logo-container { display: flex; align-items: center; gap: 8px; }
-        .logo-img { width: 28px; height: 28px; object-fit: contain; }
-        .logo-text { font-size: 1.1rem; font-weight: 900; letter-spacing: 0.5px; }
+        .logo-container { display: flex; align-items: center; gap: 10px; }
+        .logo-img { width: 32px; height: 32px; object-fit: contain; }
+        .logo-text { font-size: 1.1rem; font-weight: 900; letter-spacing: 1px; color: #fff; text-transform: uppercase; }
         
         .header-actions { display: flex; gap: 8px; }
         .header-btn {
             background: rgba(255, 255, 255, 0.1); border: none; padding: 8px 12px; 
             border-radius: 10px; color: white; cursor: pointer; font-size: 0.85rem; font-weight: 800;
-            display: flex; align-items: center; gap: 5px;
         }
 
         .categories {
@@ -91,7 +90,7 @@
         }
         .cat-item.active { background: white; color: var(--primary); }
 
-        /* شبكة المنتجات */
+        /* Product Grid */
         #product-grid {
             flex: 1; overflow-y: auto; padding: 10px;
             display: grid;
@@ -107,13 +106,29 @@
             position: relative;
         }
         .card.active { border-color: var(--primary); border-width: 1.5px; }
+        .card.out-of-stock { opacity: 0.7; filter: grayscale(0.5); }
         
         .img-container { position: relative; width: 100%; aspect-ratio: 1/1; cursor: zoom-in; }
         .card img { width: 100%; height: 100%; object-fit: cover; border-radius: 12px; background: #f1f5f9; }
 
         .card h3 { font-size: 0.85rem; font-weight: 800; color: var(--primary); margin: 6px 0 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        .card .product-name { font-size: 0.7rem; color: var(--text-sub); font-weight: 600; margin-bottom: 8px; height: 1rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .card .product-name { font-size: 0.7rem; color: var(--text-sub); font-weight: 600; margin-bottom: 5px; height: 1rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
+        /* Stock Status */
+        .stock-status { 
+            font-size: 0.65rem; 
+            font-weight: 800; 
+            margin-bottom: 8px; 
+            display: flex; 
+            align-items: center; 
+            gap: 4px; 
+            cursor: pointer;
+            padding: 2px 0;
+        }
+        .status-available { color: var(--accent); }
+        .status-unavailable { color: var(--danger); }
+
+        /* Quantity Buttons Grid */
         .qty-grid {
             display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; margin-bottom: 8px;
         }
@@ -122,7 +137,9 @@
             font-size: 0.7rem; font-weight: 800; color: var(--primary); cursor: pointer;
         }
         .btn-qty-fix.selected { background: var(--primary); color: white; }
+        .btn-qty-fix:disabled { opacity: 0.3; cursor: not-allowed; }
 
+        /* Manual Input */
         .custom-qty {
             display: flex; gap: 5px; align-items: center;
             background: #f1f5f9; padding: 4px; border-radius: 10px; margin-top: auto;
@@ -132,43 +149,25 @@
             font-size: 0.85rem; font-weight: 800; text-align: center; outline: none;
             width: 100%; user-select: text; -webkit-user-select: text;
         }
+        .custom-qty input:disabled { opacity: 0.5; }
 
-        /* النوافذ المنبثقة العامة */
-        .modal {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.7);
-            display: none; z-index: 2000; align-items: center; justify-content: center;
-            padding: 20px;
+        /* Image Popup */
+        #imagePopup {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.95);
+            z-index: 5000; display: none; align-items: center; justify-content: center;
+            flex-direction: column; cursor: zoom-out;
         }
-        .modal-content {
-            background: var(--bg); width: 100%; max-width: 380px;
-            border-radius: 24px; padding: 20px; max-height: 80dvh; 
-            overflow-y: auto; box-shadow: var(--shadow-float);
-            animation: popupScale 0.3s ease-out;
-        }
-        @keyframes popupScale { from { opacity:0; transform: scale(0.9); } to { opacity:1; transform: scale(1); } }
+        #imagePopup img { max-width: 95%; max-height: 80%; border-radius: 10px; box-shadow: 0 0 30px rgba(255,255,255,0.1); }
 
-        /* نافذة البحث المنبثقة */
-        #searchModal .modal-content {
-            align-self: flex-start; margin-top: 50px;
-        }
+        /* Search Popup */
+        #searchModal .modal-content { align-self: flex-start; margin-top: 50px; }
         .search-popup-wrapper {
             background: white; border-radius: 12px; padding: 12px;
             display: flex; align-items: center; gap: 10px; border: 1.5px solid #cbd5e1;
         }
-        .search-popup-wrapper input {
-            flex: 1; border: none; outline: none; font-size: 1rem;
-            user-select: text; -webkit-user-select: text;
-        }
+        .search-popup-wrapper input { flex: 1; border: none; outline: none; font-size: 1rem; user-select: text; -webkit-user-select: text; }
 
-        /* نافذة تكبير الصورة */
-        #imagePopup {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.9);
-            z-index: 5000; display: none; align-items: center; justify-content: center;
-            flex-direction: column; cursor: zoom-out;
-        }
-        #imagePopup img { max-width: 90%; max-height: 80%; border-radius: 15px; box-shadow: 0 0 30px rgba(255,255,255,0.1); }
-
-        /* العربة العائمة */
+        /* Floating Cart Bubble */
         #cartBubble {
             position: fixed; bottom: 30px; left: 30px;
             width: 65px; height: 65px; border-radius: 50%;
@@ -184,13 +183,26 @@
             font-weight: 900; font-size: 0.75rem; border: 2px solid var(--primary);
         }
 
+        /* Popup Modals */
+        .modal {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+            display: none; z-index: 2000; align-items: center; justify-content: center;
+            padding: 20px;
+        }
+        .modal-content {
+            background: var(--bg); width: 100%; max-width: 380px;
+            border-radius: 24px; padding: 20px; max-height: 80dvh; 
+            overflow-y: auto; box-shadow: var(--shadow-float);
+            animation: popupScale 0.3s ease-out;
+        }
+        @keyframes popupScale { from { opacity:0; transform: scale(0.9); } to { opacity:1; transform: scale(1); } }
+        
         .info-box-compact { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 15px; }
         .info-box-compact input { width: 100%; padding: 10px; border-radius: 10px; border: 1px solid #cbd5e1; outline: none; font-size: 0.85rem; background: white; user-select: text; -webkit-user-select: text;}
 
         .cart-item { background: white; padding: 10px; border-radius: 14px; margin-bottom: 8px; display: flex; gap: 10px; align-items: center; border: 1px solid #edf2f7; }
-        .cart-item-img { width: 45px; height: 45px; border-radius: 8px; object-fit: cover; }
+        .cart-item-img { width: 50px; height: 50px; border-radius: 8px; object-fit: cover; }
         .cart-item-info { flex: 1; min-width: 0; }
-        .cart-item-info h4 { font-size: 0.85rem; font-weight: 800; margin-bottom: 1px; }
 
         .popup-actions { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-top: 15px; }
         .btn-p { border: none; border-radius: 12px; padding: 15px 5px; font-weight: 800; font-size: 0.85rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; }
@@ -200,7 +212,7 @@
 
         #toast { position: fixed; top: 40px; left: 50%; transform: translateX(-50%); background: var(--primary); color: white; padding: 10px 20px; border-radius: 50px; z-index: 5000; display: none; font-weight: 800; font-size: 0.85rem; box-shadow: var(--shadow-float); }
 
-        /* الطباعة */
+        /* Print Template */
         #print-area { display: none; }
         @media print {
             body * { visibility: hidden; }
@@ -213,24 +225,24 @@
 </head>
 <body>
 
-    <!-- شاشة الترحيب -->
+    <!-- Splash Screen -->
     <div id="splash">
-        <img src="https://abomkdad.github.io/Digital-Business-Card/logo.png" class="splash-logo" alt="Logo">
-        <h1 style="color: white; margin-top: 15px; font-weight: 900; font-size: 1.5rem;" id="splash-label">MADPERUME</h1>
+        <img src="https://abomkdad.github.io/Digital-Business-Card/logo.png" class="splash-logo" alt="MAD PERFUME">
+        <h1 style="color: white; margin-top: 15px; font-weight: 900; font-size: 1.5rem; letter-spacing: 2px;" id="splash-label">MAD PERFUME</h1>
     </div>
 
-    <!-- تكبير الصورة -->
+    <!-- Zoom Image Popup -->
     <div id="imagePopup" onclick="closeZoom()">
         <img id="popupImg" src="">
         <p style="color: white; margin-top: 15px; font-weight: bold;">اضغط للإغلاق</p>
     </div>
 
-    <!-- نافذة البحث المنبثقة -->
+    <!-- Search Popup -->
     <div class="modal" id="searchModal" onclick="if(event.target==this) toggleSearch(false)">
         <div class="modal-content">
             <div class="search-popup-wrapper">
                 <i class="fas fa-search" style="color:var(--text-sub)"></i>
-                <input type="text" id="searchInput" oninput="render()" placeholder="ابحث عن اسم أو كود...">
+                <input type="text" id="searchInput" oninput="render()" placeholder="ابحث عن عطر أو كود...">
                 <i class="fas fa-times-circle" onclick="clearSearch()" style="color:var(--danger); cursor:pointer;"></i>
             </div>
             <p style="margin-top:10px; font-size:0.75rem; color:var(--text-sub); text-align:center;">النتائج تتحدث تلقائياً بالخلفية</p>
@@ -243,7 +255,7 @@
         <div class="header-top">
             <div class="logo-container">
                 <img src="https://abomkdad.github.io/Digital-Business-Card/logo.png" class="logo-img" alt="logo">
-                <div class="logo-text" id="ui-logo">MADPERUME</div>
+                <div class="logo-text" id="ui-logo">MAD PERFUME</div>
             </div>
             <div class="header-actions">
                 <button class="header-btn" onclick="toggleSearch(true)">
@@ -259,17 +271,17 @@
     </header>
 
     <main id="product-grid">
-        <!-- المنتجات -->
+        <!-- Products -->
     </main>
 
-    <!-- فقاعة العربة -->
+    <!-- Cart Bubble -->
     <div id="cartBubble" onclick="toggleCart(true)">
         <i class="fas fa-shopping-basket" style="font-size: 1.4rem;"></i>
         <div class="count" id="totalCount">0</div>
         <span style="font-size: 0.6rem; font-weight: 800; margin-top: 2px;" id="ui-bubble-label">طلب</span>
     </div>
 
-    <!-- المودال المنبثق للطلب -->
+    <!-- Order Review Modal -->
     <div class="modal" id="cartModal" onclick="if(event.target==this) toggleCart(false)">
         <div class="modal-content">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; border-bottom: 1px solid #e2e8f0; padding-bottom: 10px;">
@@ -293,7 +305,7 @@
         </div>
     </div>
 
-    <!-- كشف الطباعة -->
+    <!-- Print Template -->
     <div id="print-area">
         <h1 id="print-header-title"></h1>
         <p id="print-date-display"></p>
@@ -308,47 +320,50 @@
     <script>
         const translations = {
             ar: {
-                logo: "MADPERUME", langBtn: "EN", searchPlaceholder: "بحث سريع...",
+                logo: "MAD PERFUME", langBtn: "EN", searchPlaceholder: "بحث سريع...",
                 empPlaceholder: "👤 الموظف", branchPlaceholder: "🏢 الفرع",
                 catAll: "الكل", bubbleLabel: "طلب",
                 reviewTitle: "تأكيد الطلب", emptyCart: "العربة فارغة", confirmClear: "إفراغ العربة؟",
                 alertInfo: "يرجى كتابة الاسم والفرع", alertSuccess: "تمت العملية!",
-                printHeader: "طلب صرف مخزن", printDate: "التاريخ", printCode: "الكود",
-                printName: "المنتج", printQty: "الكمية", waHeader: "📦 *طلب جديد من MADPERUME*",
-                waQty: "الكمية", noResults: "لا توجد نتائج"
+                printHeader: "طلب صرف مخزن - MAD PERFUME", printDate: "التاريخ", printCode: "الكود",
+                printName: "المنتج", printQty: "الكمية", waHeader: "📦 *طلب جديد من MAD PERFUME*",
+                waQty: "الكمية", noResults: "لا توجد نتائج",
+                available: "متوفر", unavailable: "غير متوفر"
             },
             en: {
-                logo: "MADPERUME", langBtn: "עب", searchPlaceholder: "Search...",
+                logo: "MAD PERFUME", langBtn: "עب", searchPlaceholder: "Search...",
                 empPlaceholder: "👤 Name", branchPlaceholder: "🏢 Branch",
                 catAll: "All", bubbleLabel: "Order",
                 reviewTitle: "Confirm Order", emptyCart: "Empty", confirmClear: "Clear all?",
                 alertInfo: "Enter name & branch", alertSuccess: "Done!",
-                printHeader: "Warehouse Order", printDate: "Date", printCode: "Code",
-                printName: "Item", printQty: "Qty", waHeader: "📦 *New MADPERUME Order*",
-                waQty: "Qty", noResults: "No results"
+                printHeader: "Warehouse Order - MAD PERFUME", printDate: "Date", printCode: "Code",
+                printName: "Item", printQty: "Qty", waHeader: "📦 *New MAD PERFUME Order*",
+                waQty: "Qty", noResults: "No results",
+                available: "Available", unavailable: "Out of stock"
             },
             he: {
-                logo: "MADPERUME", langBtn: "عربي", searchPlaceholder: "חיפוש...",
+                logo: "MAD PERFUME", langBtn: "عربي", searchPlaceholder: "חיפוש...",
                 empPlaceholder: "👤 שם", branchPlaceholder: "🏢 סניף",
                 catAll: "הכל", bubbleLabel: "הזמנה",
                 reviewTitle: "אישור הזמנה", emptyCart: "ריק", confirmClear: "לנקות הכל?",
                 alertInfo: "נא لملا פרטים", alertSuccess: "בוצע!",
-                printHeader: "הזמנת מחסן", printDate: "תאריך", printCode: "קוד",
+                printHeader: "הזמנת מחסן - MAD PERFUME", printDate: "תאריך", printCode: "קוד",
                 printName: "מוצר", printQty: "כמות", waHeader: "📦 *הזמנה חדשה*",
-                waQty: "כמות", noResults: "אין תוצאות"
+                waQty: "כמות", noResults: "אין תוצאות",
+                available: "זמין במלאי", unavailable: "חסר במלאי"
             }
         };
 
         const SHEET_URL = "https://docs.google.com/spreadsheets/d/1g3_D2NBwT27O2OI-v1R5tAB2QCfF3_ZCUL9sSLoCv54/gviz/tq?tqx=out:json";
 
         let inventory = [];
-        let cart = JSON.parse(localStorage.getItem('my_warehouse_cart_v4') || '{}');
+        let cart = JSON.parse(localStorage.getItem('my_warehouse_cart_v5') || '{}');
         let currentLang = localStorage.getItem('warehouse_lang') || 'ar';
         let activeCat = 'الكل';
 
         const quickQtys = [6, 12, 18, 24, 30, 36, 42, 48];
 
-        // --- نظام الصوت ---
+        // --- Sound Engine ---
         let audioCtx = null;
         function playClickSound() {
             try {
@@ -367,21 +382,36 @@
             } catch (e) {}
         }
 
+        // صوت التنبيه للمواد غير المتوفرة (أقل حدة وأكثر غلظة)
+        function playErrorSound() {
+            try {
+                if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioCtx.createOscillator();
+                const gainNode = audioCtx.createGain();
+                oscillator.type = 'sawtooth';
+                oscillator.frequency.setValueAtTime(150, audioCtx.currentTime);
+                oscillator.frequency.linearRampToValueAtTime(100, audioCtx.currentTime + 0.2);
+                gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
+                oscillator.connect(gainNode);
+                gainNode.connect(audioCtx.destination);
+                oscillator.start();
+                oscillator.stop(audioCtx.currentTime + 0.2);
+            } catch (e) {}
+        }
+
+        function handleStatusClick(isAvailable) {
+            if (!isAvailable) {
+                playErrorSound();
+                showToast(translations[currentLang].unavailable);
+            } else {
+                playClickSound();
+            }
+        }
+
         function showToast(msg) {
             const t = document.getElementById('toast');
             if (t) { t.innerText = msg; t.style.display = 'block'; setTimeout(() => t.style.display = 'none', 2500); }
-        }
-
-        function toggleSearch(show) {
-            playClickSound();
-            document.getElementById('searchModal').style.display = show ? 'flex' : 'none';
-            if (show) setTimeout(() => document.getElementById('searchInput').focus(), 100);
-        }
-
-        function clearSearch() {
-            document.getElementById('searchInput').value = "";
-            render();
-            toggleSearch(false);
         }
 
         function zoomImage(src) {
@@ -464,6 +494,7 @@
         function setCat(c, el) { playClickSound(); activeCat = c; document.querySelectorAll('.cat-item').forEach(i => i.classList.remove('active')); el.classList.add('active'); render(); }
 
         function render() {
+            const t = translations[currentLang];
             const grid = document.getElementById('product-grid');
             const searchVal = document.getElementById('searchInput').value.toLowerCase();
             const filtered = inventory.filter(i => {
@@ -481,6 +512,12 @@
                     </div>
                     <h3>${i.code}</h3>
                     <div class="product-name">${i.name}</div>
+                    
+                    <div class="stock-status ${i.available ? 'status-available' : 'status-unavailable'}" 
+                         onclick="handleStatusClick(${i.available})">
+                        <i class="fas ${i.available ? 'fa-check-circle' : 'fa-times-circle'}"></i>
+                        ${i.available ? t.available : t.unavailable}
+                    </div>
                     
                     <div class="qty-grid">
                         ${quickQtys.map(num => `
@@ -509,7 +546,7 @@
             const current = cart[code]?.qty || 0;
             if (current === val) delete cart[code];
             else cart[code] = { qty: val, name: item.name, code: item.code, img: item.img };
-            localStorage.setItem('my_warehouse_cart_v4', JSON.stringify(cart));
+            localStorage.setItem('my_warehouse_cart_v5', JSON.stringify(cart));
             render();
             if (window.navigator.vibrate) window.navigator.vibrate(10);
         }
@@ -520,7 +557,7 @@
             if (!item) return;
             if (isNaN(num) || num <= 0) delete cart[code];
             else cart[code] = { qty: num, name: item.name, code: item.code, img: item.img };
-            localStorage.setItem('my_warehouse_cart_v4', JSON.stringify(cart));
+            localStorage.setItem('my_warehouse_cart_v5', JSON.stringify(cart));
             updateBar();
         }
 
@@ -548,7 +585,7 @@
         }
 
         function toggleCart(show) { playClickSound(); document.getElementById('cartModal').style.display = show ? 'flex' : 'none'; }
-        function clearCart() { playClickSound(); if(confirm(translations[currentLang].confirmClear)) { cart = {}; localStorage.setItem('my_warehouse_cart_v4', '{}'); render(); toggleCart(false); } }
+        function clearCart() { playClickSound(); if(confirm(translations[currentLang].confirmClear)) { cart = {}; localStorage.setItem('my_warehouse_cart_v5', '{}'); render(); toggleCart(false); } }
         function saveInfo() { localStorage.setItem('my_warehouse_emp', document.getElementById('empName').value); localStorage.setItem('my_warehouse_branch', document.getElementById('branchName').value); }
 
         function sendWhatsApp() {
