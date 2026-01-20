@@ -5,13 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>مخزني Mobile</title>
     
-    <!-- PWA Meta Tags -->
+    <!-- إعدادات تطبيق الويب (PWA) -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#0f172a">
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/583/583344.png">
 
-    <!-- Icons -->
+    <!-- أيقونات Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
@@ -41,7 +41,7 @@
         body {
             background-color: var(--bg);
             color: var(--text-main);
-            /* dvh لضمان ملء الشاشة بدقة على الهواتف */
+            height: 100vh; /* Fallback */
             height: 100dvh;
             display: flex;
             flex-direction: column;
@@ -50,16 +50,16 @@
             padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom) 0;
         }
 
-        /* Splash Screen */
+        /* شاشة الترحيب (Splash Screen) */
         #splash {
             position: fixed; inset: 0; background: var(--primary); z-index: 9999;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            transition: opacity 0.4s ease;
+            transition: opacity 0.5s ease;
         }
         .splash-logo { font-size: 4rem; color: white; animation: splashPulse 2s infinite; }
         @keyframes splashPulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
 
-        /* Header */
+        /* الهيدر */
         header {
             background: var(--primary);
             padding: 12px 20px 20px;
@@ -97,7 +97,7 @@
         }
         .cat-item.active { background: white; color: var(--primary); transform: scale(1.05); }
 
-        /* User Info */
+        /* معلومات المستخدم */
         .info-box { 
             padding: 15px 20px; background: var(--surface); display: grid; 
             grid-template-columns: 1fr 1fr; gap: 12px; border-bottom: 1px solid #e2e8f0;
@@ -108,7 +108,7 @@
             background: #f8fafc; user-select: text; -webkit-user-select: text;
         }
 
-        /* Product Grid - Mobile optimized 2 columns */
+        /* شبكة المنتجات */
         #product-grid {
             flex: 1; overflow-y: auto; padding: 15px;
             display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;
@@ -161,7 +161,7 @@
             color: var(--primary);
         }
 
-        /* Floating App-like Bar */
+        /* شريط العربة السفلي */
         .bottom-nav {
             position: fixed; bottom: 25px; left: 15px; right: 15px;
             background: var(--primary); color: white; padding: 15px 20px;
@@ -189,7 +189,7 @@
         .btn-send { background: white; color: var(--primary); }
         .btn-whatsapp { background: var(--whatsapp); color: white; }
 
-        /* Full Screen Drawer Modal */
+        /* نافذة مراجعة الطلب */
         .modal {
             position: fixed; inset: 0; background: rgba(0,0,0,0.8);
             display: none; z-index: 2000; align-items: flex-end; justify-content: center;
@@ -210,7 +210,7 @@
         .cart-item-info h4 { font-size: 1.05rem; font-weight: 900; color: var(--primary); margin-bottom: 3px; }
         .cart-item-info p { font-size: 0.85rem; color: var(--text-sub); font-weight: 600; }
 
-        /* Toast */
+        /* التنبيهات */
         #toast {
             position: fixed; top: 40px; left: 50%; transform: translateX(-50%);
             background: var(--primary); color: white; padding: 14px 35px;
@@ -218,7 +218,7 @@
             box-shadow: var(--shadow); font-size: 1rem;
         }
 
-        /* Print Area */
+        /* الطباعة */
         #print-area { display: none; }
         @media print {
             body * { visibility: hidden; }
@@ -231,10 +231,9 @@
 </head>
 <body>
 
-    <!-- Native Splash Screen -->
     <div id="splash">
         <i class="fas fa-warehouse splash-logo"></i>
-        <h1 style="color: white; margin-top: 25px; font-weight: 900; letter-spacing: -1px;">مخزني Mobile</h1>
+        <h1 style="color: white; margin-top: 25px; font-weight: 900; letter-spacing: -1px;" id="splash-label">مخزني Mobile</h1>
     </div>
 
     <div id="toast"></div>
@@ -262,7 +261,7 @@
     </div>
 
     <main id="product-grid">
-        <!-- Products load here -->
+        <!-- المنتجات تظهر هنا -->
     </main>
 
     <div class="bottom-nav" id="cartBar">
@@ -274,13 +273,12 @@
             <div class="total-pieces"><span id="ui-total-pieces-label">القطع</span>: <span id="totalPieces">0</span></div>
         </div>
         <div class="btn-actions">
-            <button class="btn-nav" style="background:#475569; color:white; padding: 12px 15px;" onclick="printOrder()"><i class="fas fa-print"></i></button>
-            <button class="btn-nav btn-whatsapp" onclick="sendWhatsApp()"><i class="fab fa-whatsapp"></i></button>
+            <button class="btn-nav" style="background:#475569; color:white; padding: 12px 15px;" id="btnPrint" onclick="printOrder()"><i class="fas fa-print"></i></button>
+            <button class="btn-nav btn-whatsapp" id="btnWhatsApp" onclick="sendWhatsApp()"><i class="fab fa-whatsapp"></i></button>
             <button class="btn-nav btn-send" id="sendBtn" onclick="sendOrder()"><span id="ui-send">إرسال</span></button>
         </div>
     </div>
 
-    <!-- Mobile Cart Drawer -->
     <div class="modal" id="cartModal" onclick="if(event.target==this) toggleCart(false)">
         <div class="modal-content">
             <div style="width:45px; height:6px; background:#cbd5e1; border-radius:10px; margin: 0 auto 20px;"></div>
@@ -293,7 +291,6 @@
         </div>
     </div>
 
-    <!-- Hidden Print View -->
     <div id="print-area">
         <h1 id="print-header-title"></h1>
         <p id="print-date-display"></p>
@@ -304,6 +301,10 @@
             <thead><tr><th id="th-code"></th><th id="th-name"></th><th id="th-qty"></th></tr></thead>
             <tbody id="print-items"></tbody>
         </table>
+        <div style="margin-top: 50px; display: flex; justify-content: space-between;">
+            <p id="ui-sig-emp"></p>
+            <p id="ui-sig-store"></p>
+        </div>
     </div>
 
     <script>
@@ -318,7 +319,8 @@
                 alertInfo: "يرجى إكمال البيانات", alertSuccess: "تم الإرسال بنجاح!",
                 printHeader: "طلب صرف مخزن", printDate: "التاريخ", printCode: "الكود",
                 printName: "المنتج", printQty: "الكمية", waHeader: "📦 *طلب جديد من المخزن*",
-                waQty: "الكمية", noResults: "لا توجد نتائج"
+                waQty: "الكمية", noResults: "لا توجد نتائج",
+                sigEmp: "توقيع الموظف", sigStore: "توقيع المخزن"
             },
             en: {
                 logo: "Warehouse", langBtn: "עב", searchPlaceholder: "Search...",
@@ -330,7 +332,8 @@
                 alertInfo: "Fill all info", alertSuccess: "Sent!",
                 printHeader: "Warehouse Order", printDate: "Date", printCode: "Code",
                 printName: "Item", printQty: "Qty", waHeader: "📦 *New Warehouse Order*",
-                waQty: "Qty", noResults: "No results"
+                waQty: "Qty", noResults: "No results",
+                sigEmp: "Employee Sign", sigStore: "Store Sign"
             },
             he: {
                 logo: "מחסני", langBtn: "عربي", searchPlaceholder: "חפש...",
@@ -338,11 +341,12 @@
                 catAll: "הכל", itemLabel: "פריטים", totalPiecesLabel: "יחידות",
                 send: "שלח", reviewTitle: "סקירת הזמנה", clearAll: "נקה הכל", addMore: "הוסף עוד",
                 available: "זמין", unavailable: "לא זמין", loader: "מסנכרן...",
-                emptyCart: "ריק", confirmClear: "לנקות את העגלה?",
-                alertInfo: "נא لملا פרטים", alertSuccess: "נשלח בהצלחה!",
+                emptyCart: "ריק", confirmClear: "לנקות הכל?",
+                alertInfo: "נא למלא פרטים", alertSuccess: "נשלח בהצלחה!",
                 printHeader: "הזמנת מחסן", printDate: "תאריך", printCode: "קוד",
                 printName: "מוצר", printQty: "כמות", waHeader: "📦 *הזמנה חדשה*",
-                waQty: "כמות", noResults: "אין תוצאות"
+                waQty: "כמות", noResults: "אין תוצאות",
+                sigEmp: "חתימת עובד", sigStore: "חתימת מחסן"
             }
         };
 
@@ -354,34 +358,37 @@
         let cart = JSON.parse(localStorage.getItem('my_warehouse_cart_v3') || '{}');
         let activeCat = 'الكل';
 
-        function showToast(msg) {
-            const t = document.getElementById('toast');
-            if (t) { t.innerText = msg; t.style.display = 'block'; setTimeout(() => t.style.display = 'none', 2500); }
-        }
+        function safeSetText(id, text) { const el = document.getElementById(id); if (el) el.innerText = text; }
+        function safeSetPlaceholder(id, text) { const el = document.getElementById(id); if (el) el.placeholder = text; }
+        function showToast(msg) { const t = document.getElementById('toast'); if (t) { t.innerText = msg; t.style.display = 'block'; setTimeout(() => t.style.display = 'none', 2500); } }
 
         function updateUIStrings() {
             const t = translations[currentLang];
             document.documentElement.lang = currentLang;
             document.documentElement.dir = (currentLang === 'ar' || currentLang === 'he') ? 'rtl' : 'ltr';
-            document.getElementById('ui-logo').innerText = t.logo;
-            document.getElementById('btn-lang').innerText = t.langBtn;
-            document.getElementById('search').placeholder = t.searchPlaceholder;
-            document.getElementById('empName').placeholder = t.empPlaceholder;
-            document.getElementById('branchName').placeholder = t.branchPlaceholder;
-            document.getElementById('cat-all').innerText = t.catAll;
-            document.getElementById('ui-item-label').innerText = t.itemLabel;
-            document.getElementById('ui-total-pieces-label').innerText = t.totalPiecesLabel;
-            document.getElementById('ui-send').innerText = t.send;
-            document.getElementById('ui-review-title').innerText = t.reviewTitle;
-            document.getElementById('ui-clear-all').innerText = t.clearAll;
-            document.getElementById('ui-add-more').innerText = t.addMore;
             
-            document.getElementById('print-header-title').innerText = t.printHeader;
-            document.getElementById('label-print-emp').innerText = t.empPlaceholder.replace('👤 ', '');
-            document.getElementById('label-print-branch').innerText = t.branchPlaceholder.replace('🏢 ', '');
-            document.getElementById('th-code').innerText = t.printCode;
-            document.getElementById('th-name').innerText = t.printName;
-            document.getElementById('th-qty').innerText = t.printQty;
+            safeSetText('ui-logo', t.logo);
+            safeSetText('splash-label', t.logo + " Mobile");
+            safeSetText('btn-lang', t.langBtn);
+            safeSetPlaceholder('search', t.searchPlaceholder);
+            safeSetPlaceholder('empName', t.empPlaceholder);
+            safeSetPlaceholder('branchName', t.branchPlaceholder);
+            safeSetText('cat-all', t.catAll);
+            safeSetText('ui-item-label', t.itemLabel);
+            safeSetText('ui-total-pieces-label', t.totalPiecesLabel);
+            safeSetText('ui-send', t.send);
+            safeSetText('ui-review-title', t.reviewTitle);
+            safeSetText('ui-clear-all', t.clearAll);
+            safeSetText('ui-add-more', t.addMore);
+            
+            safeSetText('print-header-title', t.printHeader);
+            safeSetText('label-print-emp', t.empPlaceholder.replace('👤 ', ''));
+            safeSetText('label-print-branch', t.branchPlaceholder.replace('🏢 ', ''));
+            safeSetText('th-code', t.printCode);
+            safeSetText('th-name', t.printName);
+            safeSetText('th-qty', t.printQty);
+            safeSetText('ui-sig-emp', t.sigEmp + ": .................");
+            safeSetText('ui-sig-store', t.sigStore + ": .................");
         }
 
         function toggleLanguage() {
@@ -407,15 +414,23 @@
                         img: row.c[3] ? row.c[3].v : '',
                         available: (row.c[8] && row.c[8].v && String(row.c[8].v).toLowerCase() !== 'غير متوفر')
                     })).filter(i => i.name && i.name !== "Description");
+                    
                     renderCategories(); render();
-                    document.getElementById('empName').value = localStorage.getItem('my_warehouse_emp') || '';
-                    document.getElementById('branchName').value = localStorage.getItem('my_warehouse_branch') || '';
+                    const savedEmp = localStorage.getItem('my_warehouse_emp');
+                    const savedBranch = localStorage.getItem('my_warehouse_branch');
+                    if (savedEmp) document.getElementById('empName').value = savedEmp;
+                    if (savedBranch) document.getElementById('branchName').value = savedBranch;
                 }
+            } catch (e) {
+                console.error(e);
+                showToast("Sync Error");
+            } finally {
+                // دائماً نخفي شاشة الترحيب مهما كانت النتيجة
                 setTimeout(() => {
                     const splash = document.getElementById('splash');
                     if (splash) { splash.style.opacity = '0'; setTimeout(() => splash.style.display = 'none', 400); }
                 }, 800);
-            } catch (e) { showToast("Sync Error"); }
+            }
         }
 
         function renderCategories() {
@@ -492,9 +507,10 @@
             const items = Object.values(cart);
             let totalItems = items.length;
             let totalPieces = items.reduce((a, b) => a + b.qty, 0);
-            document.getElementById('totalCount').innerText = totalItems;
-            document.getElementById('totalPieces').innerText = totalPieces;
-            document.getElementById('cartBar').classList.toggle('visible', totalItems > 0);
+            safeSetText('totalCount', totalItems);
+            safeSetText('totalPieces', totalPieces);
+            const bar = document.getElementById('cartBar');
+            if (bar) bar.classList.toggle('visible', totalItems > 0);
         }
 
         function renderCartModal() {
@@ -519,7 +535,12 @@
 
         function toggleCart(show) { const m = document.getElementById('cartModal'); if (m) m.style.display = show ? 'flex' : 'none'; }
         function clearCart() { if(confirm(translations[currentLang].confirmClear)) { cart = {}; localStorage.setItem('my_warehouse_cart_v3', '{}'); render(); toggleCart(false); } }
-        function saveInfo() { localStorage.setItem('my_warehouse_emp', document.getElementById('empName').value); localStorage.setItem('my_warehouse_branch', document.getElementById('branchName').value); }
+        function saveInfo() { 
+            const en = document.getElementById('empName');
+            const bn = document.getElementById('branchName');
+            if(en) localStorage.setItem('my_warehouse_emp', en.value); 
+            if(bn) localStorage.setItem('my_warehouse_branch', bn.value); 
+        }
 
         async function sendOrder() {
             const name = document.getElementById('empName').value;
