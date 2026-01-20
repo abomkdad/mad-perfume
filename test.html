@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>MADPERFUME - نظام الطلبات المتطور</title>
+    <title>madperfume - نظام الطلبات</title>
     
     <!-- إعدادات تطبيق الويب (PWA) -->
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -58,10 +58,10 @@
         .splash-logo { width: 100px; height: 100px; object-fit: contain; animation: splashPulse 2s infinite; }
         @keyframes splashPulse { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.1); opacity: 0.8; } 100% { transform: scale(1); opacity: 1; } }
 
-        /* هيدر مدمج */
+        /* هيدر مدمج جداً */
         header {
             background: var(--primary);
-            padding: 10px 15px;
+            padding: 12px 15px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
             z-index: 100;
             color: white;
@@ -72,22 +72,15 @@
         .logo-img { width: 28px; height: 28px; object-fit: contain; }
         .logo-text { font-size: 1.1rem; font-weight: 900; letter-spacing: 0.5px; }
         
+        .header-actions { display: flex; gap: 8px; }
         .header-btn {
-            background: rgba(255, 255, 255, 0.1); border: none; padding: 6px 12px; 
-            border-radius: 10px; color: white; cursor: pointer; font-size: 0.75rem; font-weight: 800;
-        }
-
-        .search-wrapper {
-            background: rgba(255, 255, 255, 0.1); border-radius: 10px; padding: 8px 12px;
-            display: flex; align-items: center; gap: 8px; margin-bottom: 8px;
-        }
-        .search-wrapper input {
-            background: transparent; border: none; outline: none; width: 100%;
-            font-size: 0.9rem; color: white; user-select: text; -webkit-user-select: text;
+            background: rgba(255, 255, 255, 0.1); border: none; padding: 8px 12px; 
+            border-radius: 10px; color: white; cursor: pointer; font-size: 0.85rem; font-weight: 800;
+            display: flex; align-items: center; gap: 5px;
         }
 
         .categories {
-            display: flex; overflow-x: auto; gap: 6px;
+            display: flex; overflow-x: auto; gap: 6px; padding-top: 5px;
             scrollbar-width: none; scroll-snap-type: x mandatory;
         }
         .categories::-webkit-scrollbar { display: none; }
@@ -115,14 +108,12 @@
         }
         .card.active { border-color: var(--primary); border-width: 1.5px; }
         
-        /* الصورة المنبثقة في الكارد */
         .img-container { position: relative; width: 100%; aspect-ratio: 1/1; cursor: zoom-in; }
         .card img { width: 100%; height: 100%; object-fit: cover; border-radius: 12px; background: #f1f5f9; }
 
         .card h3 { font-size: 0.85rem; font-weight: 800; color: var(--primary); margin: 6px 0 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         .card .product-name { font-size: 0.7rem; color: var(--text-sub); font-weight: 600; margin-bottom: 8px; height: 1rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-        /* أزرار الكمية السريعة */
         .qty-grid {
             display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; margin-bottom: 8px;
         }
@@ -132,7 +123,6 @@
         }
         .btn-qty-fix.selected { background: var(--primary); color: white; }
 
-        /* إدخال رقم يدوي */
         .custom-qty {
             display: flex; gap: 5px; align-items: center;
             background: #f1f5f9; padding: 4px; border-radius: 10px; margin-top: auto;
@@ -141,6 +131,33 @@
             flex: 1; border: none; background: transparent; padding: 4px;
             font-size: 0.85rem; font-weight: 800; text-align: center; outline: none;
             width: 100%; user-select: text; -webkit-user-select: text;
+        }
+
+        /* النوافذ المنبثقة العامة */
+        .modal {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+            display: none; z-index: 2000; align-items: center; justify-content: center;
+            padding: 20px;
+        }
+        .modal-content {
+            background: var(--bg); width: 100%; max-width: 380px;
+            border-radius: 24px; padding: 20px; max-height: 80dvh; 
+            overflow-y: auto; box-shadow: var(--shadow-float);
+            animation: popupScale 0.3s ease-out;
+        }
+        @keyframes popupScale { from { opacity:0; transform: scale(0.9); } to { opacity:1; transform: scale(1); } }
+
+        /* نافذة البحث المنبثقة */
+        #searchModal .modal-content {
+            align-self: flex-start; margin-top: 50px;
+        }
+        .search-popup-wrapper {
+            background: white; border-radius: 12px; padding: 12px;
+            display: flex; align-items: center; gap: 10px; border: 1.5px solid #cbd5e1;
+        }
+        .search-popup-wrapper input {
+            flex: 1; border: none; outline: none; font-size: 1rem;
+            user-select: text; -webkit-user-select: text;
         }
 
         /* نافذة تكبير الصورة */
@@ -167,18 +184,6 @@
             font-weight: 900; font-size: 0.75rem; border: 2px solid var(--primary);
         }
 
-        /* المودال المنبثق */
-        .modal {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.7);
-            display: none; z-index: 2000; align-items: center; justify-content: center;
-            padding: 20px;
-        }
-        .modal-content {
-            background: var(--bg); width: 100%; max-width: 380px;
-            border-radius: 24px; padding: 20px; max-height: 80dvh; 
-            overflow-y: auto; box-shadow: var(--shadow-float);
-        }
-        
         .info-box-compact { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 15px; }
         .info-box-compact input { width: 100%; padding: 10px; border-radius: 10px; border: 1px solid #cbd5e1; outline: none; font-size: 0.85rem; background: white; user-select: text; -webkit-user-select: text;}
 
@@ -188,8 +193,7 @@
         .cart-item-info h4 { font-size: 0.85rem; font-weight: 800; margin-bottom: 1px; }
 
         .popup-actions { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-top: 15px; }
-        .btn-p { border: none; border-radius: 12px; padding: 12px 5px; font-weight: 800; font-size: 0.8rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; }
-        .btn-p-send { background: var(--primary); color: white; grid-column: span 3; margin-top: 5px; padding: 15px; }
+        .btn-p { border: none; border-radius: 12px; padding: 15px 5px; font-weight: 800; font-size: 0.85rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; }
         .btn-p-wa { background: var(--whatsapp); color: white; }
         .btn-p-print { background: #475569; color: white; }
         .btn-p-clear { background: #fee2e2; color: var(--danger); }
@@ -216,9 +220,21 @@
     </div>
 
     <!-- تكبير الصورة -->
-    <div id="imagePopup" onclick="this.style.display='none'">
+    <div id="imagePopup" onclick="closeZoom()">
         <img id="popupImg" src="">
         <p style="color: white; margin-top: 15px; font-weight: bold;">اضغط للإغلاق</p>
+    </div>
+
+    <!-- نافذة البحث المنبثقة -->
+    <div class="modal" id="searchModal" onclick="if(event.target==this) toggleSearch(false)">
+        <div class="modal-content">
+            <div class="search-popup-wrapper">
+                <i class="fas fa-search" style="color:var(--text-sub)"></i>
+                <input type="text" id="searchInput" oninput="render()" placeholder="ابحث عن اسم أو كود...">
+                <i class="fas fa-times-circle" onclick="clearSearch()" style="color:var(--danger); cursor:pointer;"></i>
+            </div>
+            <p style="margin-top:10px; font-size:0.75rem; color:var(--text-sub); text-align:center;">النتائج تتحدث تلقائياً بالخلفية</p>
+        </div>
     </div>
 
     <div id="toast"></div>
@@ -230,13 +246,12 @@
                 <div class="logo-text" id="ui-logo">madperfume</div>
             </div>
             <div class="header-actions">
+                <button class="header-btn" onclick="toggleSearch(true)">
+                    <i class="fas fa-search"></i>
+                </button>
                 <button class="header-btn" id="btn-lang" onclick="toggleLanguage()">EN</button>
                 <button class="header-btn" onclick="location.reload()"><i class="fas fa-sync-alt"></i></button>
             </div>
-        </div>
-        <div class="search-wrapper">
-            <i class="fas fa-search" style="opacity: 0.5; font-size: 0.8rem;"></i>
-            <input type="text" id="search" oninput="render()" placeholder="بحث سريع...">
         </div>
         <div class="categories" id="cat-list">
             <div class="cat-item active" id="cat-all" onclick="setCat('الكل', this)">الكل</div>
@@ -273,10 +288,8 @@
                 <button class="btn-p btn-p-wa" onclick="sendWhatsApp()"><i class="fab fa-whatsapp"></i></button>
                 <button class="btn-p btn-p-print" onclick="printOrder()"><i class="fas fa-print"></i></button>
                 <button class="btn-p btn-p-clear" onclick="clearCart()"><i class="fas fa-trash"></i></button>
-                <button class="btn-p btn-p-send" id="sendBtn" onclick="sendOrder()">
-                    <i class="fas fa-paper-plane"></i> <span id="ui-send">إرسال الطلب</span>
-                </button>
             </div>
+            <button onclick="toggleCart(false)" style="width:100%; margin-top:10px; padding:12px; border-radius:12px; border:none; background:var(--primary); color:white; font-weight:800;">إضافة المزيد</button>
         </div>
     </div>
 
@@ -297,19 +310,19 @@
             ar: {
                 logo: "madperfume", langBtn: "EN", searchPlaceholder: "بحث سريع...",
                 empPlaceholder: "👤 الموظف", branchPlaceholder: "🏢 الفرع",
-                catAll: "الكل", bubbleLabel: "طلب", send: "إرسال الطلب",
+                catAll: "الكل", bubbleLabel: "طلب",
                 reviewTitle: "تأكيد الطلب", emptyCart: "العربة فارغة", confirmClear: "إفراغ العربة؟",
-                alertInfo: "يرجى كتابة الاسم والفرع", alertSuccess: "تم الإرسال بنجاح!",
+                alertInfo: "يرجى كتابة الاسم والفرع", alertSuccess: "تمت العملية!",
                 printHeader: "طلب صرف مخزن", printDate: "التاريخ", printCode: "الكود",
                 printName: "المنتج", printQty: "الكمية", waHeader: "📦 *طلب جديد من madperfume*",
                 waQty: "الكمية", noResults: "لا توجد نتائج"
             },
             en: {
-                logo: "madperfume", langBtn: "עב", searchPlaceholder: "Search...",
+                logo: "madperfume", langBtn: "עب", searchPlaceholder: "Search...",
                 empPlaceholder: "👤 Name", branchPlaceholder: "🏢 Branch",
-                catAll: "All", bubbleLabel: "Order", send: "Send Order",
+                catAll: "All", bubbleLabel: "Order",
                 reviewTitle: "Confirm Order", emptyCart: "Empty", confirmClear: "Clear all?",
-                alertInfo: "Enter name & branch", alertSuccess: "Sent!",
+                alertInfo: "Enter name & branch", alertSuccess: "Done!",
                 printHeader: "Warehouse Order", printDate: "Date", printCode: "Code",
                 printName: "Item", printQty: "Qty", waHeader: "📦 *New madperfume Order*",
                 waQty: "Qty", noResults: "No results"
@@ -317,9 +330,9 @@
             he: {
                 logo: "madperfume", langBtn: "عربي", searchPlaceholder: "חיפוש...",
                 empPlaceholder: "👤 שם", branchPlaceholder: "🏢 סניף",
-                catAll: "הכל", bubbleLabel: "הזמנה", send: "שלח הזמנה",
+                catAll: "הכל", bubbleLabel: "הזמנה",
                 reviewTitle: "אישור הזמנה", emptyCart: "ריק", confirmClear: "לנקות הכל?",
-                alertInfo: "נא لملا פרטים", alertSuccess: "נשלח בהצלחה!",
+                alertInfo: "נא لملا פרטים", alertSuccess: "בוצע!",
                 printHeader: "הזמנת מחסן", printDate: "תאריך", printCode: "קוד",
                 printName: "מוצר", printQty: "כמות", waHeader: "📦 *הזמנה חדשה*",
                 waQty: "כמות", noResults: "אין תוצאות"
@@ -327,7 +340,6 @@
         };
 
         const SHEET_URL = "https://docs.google.com/spreadsheets/d/1g3_D2NBwT27O2OI-v1R5tAB2QCfF3_ZCUL9sSLoCv54/gviz/tq?tqx=out:json";
-        const APPS_SCRIPT_URL = ""; 
 
         let inventory = [];
         let cart = JSON.parse(localStorage.getItem('my_warehouse_cart_v4') || '{}');
@@ -336,15 +348,52 @@
 
         const quickQtys = [6, 12, 18, 24, 30, 36, 42, 48];
 
+        // --- نظام الصوت ---
+        let audioCtx = null;
+        function playClickSound() {
+            try {
+                if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioCtx.createOscillator();
+                const gainNode = audioCtx.createGain();
+                oscillator.type = 'sine';
+                oscillator.frequency.setValueAtTime(800, audioCtx.currentTime);
+                oscillator.frequency.exponentialRampToValueAtTime(400, audioCtx.currentTime + 0.1);
+                gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+                oscillator.connect(gainNode);
+                gainNode.connect(audioCtx.destination);
+                oscillator.start();
+                oscillator.stop(audioCtx.currentTime + 0.1);
+            } catch (e) {}
+        }
+
         function showToast(msg) {
             const t = document.getElementById('toast');
             if (t) { t.innerText = msg; t.style.display = 'block'; setTimeout(() => t.style.display = 'none', 2500); }
         }
 
+        function toggleSearch(show) {
+            playClickSound();
+            document.getElementById('searchModal').style.display = show ? 'flex' : 'none';
+            if (show) setTimeout(() => document.getElementById('searchInput').focus(), 100);
+        }
+
+        function clearSearch() {
+            document.getElementById('searchInput').value = "";
+            render();
+            toggleSearch(false);
+        }
+
         function zoomImage(src) {
+            playClickSound();
             const popup = document.getElementById('imagePopup');
             document.getElementById('popupImg').src = src;
             popup.style.display = 'flex';
+        }
+
+        function closeZoom() {
+            playClickSound();
+            document.getElementById('imagePopup').style.display = 'none';
         }
 
         function updateUIStrings() {
@@ -353,11 +402,10 @@
             document.documentElement.dir = (currentLang === 'ar' || currentLang === 'he') ? 'rtl' : 'ltr';
             safeSetText('ui-logo', t.logo);
             safeSetText('btn-lang', t.langBtn);
-            safeSetPlaceholder('search', t.searchPlaceholder);
+            document.getElementById('searchInput').placeholder = t.searchPlaceholder;
             safeSetPlaceholder('empName', t.empPlaceholder);
             safeSetPlaceholder('branchName', t.branchPlaceholder);
             safeSetText('cat-all', currentLang === 'ar' ? 'الكل' : (currentLang === 'en' ? 'All' : 'הכל'));
-            safeSetText('ui-send', t.send);
             safeSetText('ui-review-title', t.reviewTitle);
             safeSetText('ui-bubble-label', t.bubbleLabel);
             safeSetText('print-header-title', t.printHeader);
@@ -372,6 +420,7 @@
         function safeSetPlaceholder(id, text) { const el = document.getElementById(id); if (el) el.placeholder = text; }
 
         function toggleLanguage() {
+            playClickSound();
             currentLang = currentLang === 'ar' ? 'en' : (currentLang === 'en' ? 'he' : 'ar');
             localStorage.setItem('warehouse_lang', currentLang);
             updateUIStrings(); render();
@@ -407,20 +456,19 @@
             cats.forEach(c => {
                 const el = document.createElement('div');
                 el.className = 'cat-item'; el.innerText = c;
-                el.onclick = () => { document.querySelectorAll('.cat-item').forEach(i => i.classList.remove('active')); el.classList.add('active'); activeCat = c; render(); };
+                el.onclick = () => { playClickSound(); document.querySelectorAll('.cat-item').forEach(i => i.classList.remove('active')); el.classList.add('active'); activeCat = c; render(); };
                 list.appendChild(el);
             });
         }
 
-        function setCat(c, el) { activeCat = c; document.querySelectorAll('.cat-item').forEach(i => i.classList.remove('active')); el.classList.add('active'); render(); }
+        function setCat(c, el) { playClickSound(); activeCat = c; document.querySelectorAll('.cat-item').forEach(i => i.classList.remove('active')); el.classList.add('active'); render(); }
 
         function render() {
-            const t = translations[currentLang];
             const grid = document.getElementById('product-grid');
-            const search = document.getElementById('search').value.toLowerCase();
+            const searchVal = document.getElementById('searchInput').value.toLowerCase();
             const filtered = inventory.filter(i => {
-                const matchSearch = i.name.toLowerCase().includes(search) || i.code.toLowerCase().includes(search);
-                const matchCat = activeCat === 'الكل' || activeCat === 'All' || activeCat === 'הכל' || i.cat === activeCat;
+                const matchSearch = i.name.toLowerCase().includes(searchVal) || i.code.toLowerCase().includes(searchVal);
+                const matchCat = activeCat === 'الكل' || activeCat === 'All' || activeCat === 'הكل' || i.cat === activeCat;
                 return matchSearch && matchCat;
             });
 
@@ -444,7 +492,7 @@
 
                     <div class="custom-qty">
                         <i class="fas fa-edit" style="font-size:0.7rem; color:var(--text-sub)"></i>
-                        <input type="number" placeholder="رقم مخصص" 
+                        <input type="number" placeholder="رقم" 
                             value="${(qty > 0 && !quickQtys.includes(qty)) ? qty : ''}"
                             oninput="updateQtyCustom('${i.code}', this.value)"
                             ${!i.available ? 'disabled' : ''}>
@@ -455,10 +503,11 @@
         }
 
         function updateQtyDirect(code, val) {
+            playClickSound();
             const item = inventory.find(i => i.code === code);
             if (!item) return;
             const current = cart[code]?.qty || 0;
-            if (current === val) delete cart[code]; // إلغاء التحديد إذا ضغطت نفس الرقم
+            if (current === val) delete cart[code];
             else cart[code] = { qty: val, name: item.name, code: item.code, img: item.img };
             localStorage.setItem('my_warehouse_cart_v4', JSON.stringify(cart));
             render();
@@ -469,14 +518,10 @@
             const item = inventory.find(i => i.code === code);
             const num = parseInt(val);
             if (!item) return;
-            if (isNaN(num) || num <= 0) {
-                delete cart[code];
-            } else {
-                cart[code] = { qty: num, name: item.name, code: item.code, img: item.img };
-            }
+            if (isNaN(num) || num <= 0) delete cart[code];
+            else cart[code] = { qty: num, name: item.name, code: item.code, img: item.img };
             localStorage.setItem('my_warehouse_cart_v4', JSON.stringify(cart));
             updateBar();
-            // لا نعيد الرندرة هنا لكي لا يفقد الحقل الـ focus
         }
 
         function updateBar() {
@@ -502,19 +547,12 @@
                 </div>`).join('');
         }
 
-        function toggleCart(show) { document.getElementById('cartModal').style.display = show ? 'flex' : 'none'; }
-        function clearCart() { if(confirm(translations[currentLang].confirmClear)) { cart = {}; localStorage.setItem('my_warehouse_cart_v4', '{}'); render(); toggleCart(false); } }
+        function toggleCart(show) { playClickSound(); document.getElementById('cartModal').style.display = show ? 'flex' : 'none'; }
+        function clearCart() { playClickSound(); if(confirm(translations[currentLang].confirmClear)) { cart = {}; localStorage.setItem('my_warehouse_cart_v4', '{}'); render(); toggleCart(false); } }
         function saveInfo() { localStorage.setItem('my_warehouse_emp', document.getElementById('empName').value); localStorage.setItem('my_warehouse_branch', document.getElementById('branchName').value); }
 
-        async function sendOrder() {
-            const name = document.getElementById('empName').value;
-            const branch = document.getElementById('branchName').value;
-            if(!name || !branch) return showToast(translations[currentLang].alertInfo);
-            showToast("جاري الإرسال...");
-            setTimeout(() => { showToast(translations[currentLang].alertSuccess); cart = {}; localStorage.setItem('my_warehouse_cart_v4', '{}'); render(); toggleCart(false); }, 1000);
-        }
-
         function sendWhatsApp() {
+            playClickSound();
             const t = translations[currentLang];
             const name = document.getElementById('empName').value;
             const branch = document.getElementById('branchName').value;
@@ -525,6 +563,7 @@
         }
 
         function printOrder() {
+            playClickSound();
             const t = translations[currentLang];
             const name = document.getElementById('empName').value;
             const branch = document.getElementById('branchName').value;
