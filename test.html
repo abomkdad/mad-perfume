@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>madperfume - نظام الطلبات</title>
+    <title>MADPERFUME - نظام الطلبات المتطور</title>
     
-    <!-- PWA Settings -->
+    <!-- إعدادات تطبيق الويب (PWA) -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#0f172a">
     <link rel="apple-touch-icon" href="https://abomkdad.github.io/Digital-Business-Card/logo.png">
 
-    <!-- Icons -->
+    <!-- أيقونات Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
@@ -49,16 +49,16 @@
             padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom) 0;
         }
 
-        /* Splash Screen */
+        /* شاشة الترحيب */
         #splash {
             position: fixed; inset: 0; background: var(--primary); z-index: 9999;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             transition: opacity 0.4s ease;
         }
-        .splash-logo { width: 120px; height: 120px; object-fit: contain; animation: splashPulse 2s infinite; }
+        .splash-logo { width: 100px; height: 100px; object-fit: contain; animation: splashPulse 2s infinite; }
         @keyframes splashPulse { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.1); opacity: 0.8; } 100% { transform: scale(1); opacity: 1; } }
 
-        /* Compact Header */
+        /* هيدر مدمج */
         header {
             background: var(--primary);
             padding: 10px 15px;
@@ -69,8 +69,8 @@
         }
         .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
         .logo-container { display: flex; align-items: center; gap: 8px; }
-        .logo-img { width: 30px; height: 30px; object-fit: contain; }
-        .logo-text { font-size: 1.2rem; font-weight: 900; letter-spacing: 0.5px; }
+        .logo-img { width: 28px; height: 28px; object-fit: contain; }
+        .logo-text { font-size: 1.1rem; font-weight: 900; letter-spacing: 0.5px; }
         
         .header-btn {
             background: rgba(255, 255, 255, 0.1); border: none; padding: 6px 12px; 
@@ -85,7 +85,6 @@
             background: transparent; border: none; outline: none; width: 100%;
             font-size: 0.9rem; color: white; user-select: text; -webkit-user-select: text;
         }
-        .search-wrapper input::placeholder { color: rgba(255,255,255,0.4); }
 
         .categories {
             display: flex; overflow-x: auto; gap: 6px;
@@ -99,7 +98,7 @@
         }
         .cat-item.active { background: white; color: var(--primary); }
 
-        /* Product Grid */
+        /* شبكة المنتجات */
         #product-grid {
             flex: 1; overflow-y: auto; padding: 10px;
             display: grid;
@@ -115,36 +114,51 @@
             position: relative;
         }
         .card.active { border-color: var(--primary); border-width: 1.5px; }
-        .card.out-of-stock { opacity: 0.5; filter: grayscale(1); }
-        .card img { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 12px; background: #f1f5f9; }
-        .card h3 { font-size: 0.9rem; font-weight: 800; color: var(--primary); margin: 6px 0 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        .card .product-name { font-size: 0.7rem; color: var(--text-sub); font-weight: 600; margin-bottom: 8px; height: 1rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         
-        .stock-status { font-size: 0.6rem; font-weight: 800; margin-bottom: 8px; display: flex; align-items: center; gap: 3px; }
-        .status-available { color: var(--accent); }
-        .status-unavailable { color: var(--danger); }
+        /* الصورة المنبثقة في الكارد */
+        .img-container { position: relative; width: 100%; aspect-ratio: 1/1; cursor: zoom-in; }
+        .card img { width: 100%; height: 100%; object-fit: cover; border-radius: 12px; background: #f1f5f9; }
 
-        .qty-control {
-            display: flex; align-items: center; justify-content: space-between;
-            background: #f1f5f9; border-radius: 10px; padding: 3px; margin-top: auto;
+        .card h3 { font-size: 0.85rem; font-weight: 800; color: var(--primary); margin: 6px 0 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .card .product-name { font-size: 0.7rem; color: var(--text-sub); font-weight: 600; margin-bottom: 8px; height: 1rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+        /* أزرار الكمية السريعة */
+        .qty-grid {
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; margin-bottom: 8px;
         }
-        .btn-q { width: 30px; height: 30px; border-radius: 8px; border: none; background: var(--primary); color: white; font-size: 1rem; }
-        .q-val { font-weight: 900; font-size: 0.9rem; }
+        .btn-qty-fix {
+            background: #f1f5f9; border: none; padding: 6px 0; border-radius: 6px;
+            font-size: 0.7rem; font-weight: 800; color: var(--primary); cursor: pointer;
+        }
+        .btn-qty-fix.selected { background: var(--primary); color: white; }
 
-        .bulk-row { display: flex; gap: 4px; margin-bottom: 5px; }
-        .btn-b { flex: 1; background: white; border: 1px solid #e2e8f0; font-size: 0.65rem; font-weight: 800; padding: 6px 0; border-radius: 8px; color: var(--primary); }
+        /* إدخال رقم يدوي */
+        .custom-qty {
+            display: flex; gap: 5px; align-items: center;
+            background: #f1f5f9; padding: 4px; border-radius: 10px; margin-top: auto;
+        }
+        .custom-qty input {
+            flex: 1; border: none; background: transparent; padding: 4px;
+            font-size: 0.85rem; font-weight: 800; text-align: center; outline: none;
+            width: 100%; user-select: text; -webkit-user-select: text;
+        }
 
-        /* Floating Cart Bubble */
+        /* نافذة تكبير الصورة */
+        #imagePopup {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.9);
+            z-index: 5000; display: none; align-items: center; justify-content: center;
+            flex-direction: column; cursor: zoom-out;
+        }
+        #imagePopup img { max-width: 90%; max-height: 80%; border-radius: 15px; box-shadow: 0 0 30px rgba(255,255,255,0.1); }
+
+        /* العربة العائمة */
         #cartBubble {
             position: fixed; bottom: 30px; left: 30px;
             width: 65px; height: 65px; border-radius: 50%;
             background: var(--primary); color: white;
             display: none; flex-direction: column; align-items: center; justify-content: center;
             box-shadow: var(--shadow-float); z-index: 1000;
-            animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-        @keyframes popIn { from { transform: scale(0); } to { transform: scale(1); } }
-        
         #cartBubble .count {
             position: absolute; top: -5px; right: -5px;
             background: var(--accent); color: white;
@@ -153,7 +167,7 @@
             font-weight: 900; font-size: 0.75rem; border: 2px solid var(--primary);
         }
 
-        /* Popup Modal Style */
+        /* المودال المنبثق */
         .modal {
             position: fixed; inset: 0; background: rgba(0,0,0,0.7);
             display: none; z-index: 2000; align-items: center; justify-content: center;
@@ -163,23 +177,12 @@
             background: var(--bg); width: 100%; max-width: 380px;
             border-radius: 24px; padding: 20px; max-height: 80dvh; 
             overflow-y: auto; box-shadow: var(--shadow-float);
-            animation: popupScale 0.3s ease-out;
         }
-        @keyframes popupScale { from { opacity:0; transform: scale(0.9); } to { opacity:1; transform: scale(1); } }
         
-        .info-box-compact { 
-            display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 15px;
-        }
-        .info-box-compact input {
-            width: 100%; padding: 10px; border-radius: 10px;
-            border: 1px solid #cbd5e1; outline: none; font-size: 0.85rem;
-            background: white; user-select: text; -webkit-user-select: text;
-        }
+        .info-box-compact { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 15px; }
+        .info-box-compact input { width: 100%; padding: 10px; border-radius: 10px; border: 1px solid #cbd5e1; outline: none; font-size: 0.85rem; background: white; user-select: text; -webkit-user-select: text;}
 
-        .cart-item { 
-            background: white; padding: 10px; border-radius: 14px; margin-bottom: 8px; 
-            display: flex; gap: 10px; align-items: center; border: 1px solid #edf2f7;
-        }
+        .cart-item { background: white; padding: 10px; border-radius: 14px; margin-bottom: 8px; display: flex; gap: 10px; align-items: center; border: 1px solid #edf2f7; }
         .cart-item-img { width: 45px; height: 45px; border-radius: 8px; object-fit: cover; }
         .cart-item-info { flex: 1; min-width: 0; }
         .cart-item-info h4 { font-size: 0.85rem; font-weight: 800; margin-bottom: 1px; }
@@ -191,29 +194,31 @@
         .btn-p-print { background: #475569; color: white; }
         .btn-p-clear { background: #fee2e2; color: var(--danger); }
 
-        #toast {
-            position: fixed; top: 40px; left: 50%; transform: translateX(-50%);
-            background: var(--primary); color: white; padding: 10px 20px;
-            border-radius: 50px; z-index: 5000; display: none; font-weight: 800;
-            font-size: 0.85rem; text-align: center; box-shadow: var(--shadow-float);
-        }
+        #toast { position: fixed; top: 40px; left: 50%; transform: translateX(-50%); background: var(--primary); color: white; padding: 10px 20px; border-radius: 50px; z-index: 5000; display: none; font-weight: 800; font-size: 0.85rem; box-shadow: var(--shadow-float); }
 
-        /* Print Area */
+        /* الطباعة */
         #print-area { display: none; }
         @media print {
             body * { visibility: hidden; }
             #print-area, #print-area * { visibility: visible; }
             #print-area { position: absolute; left: 0; top: 0; width: 100%; display: block !important; padding: 40px; background: white; }
             table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-            th, td { border: 1px solid #000; padding: 10px; text-align: inherit; }
+            th, td { border: 1px solid #000; padding: 12px; text-align: inherit; }
         }
     </style>
 </head>
 <body>
 
+    <!-- شاشة الترحيب -->
     <div id="splash">
         <img src="https://abomkdad.github.io/Digital-Business-Card/logo.png" class="splash-logo" alt="Logo">
         <h1 style="color: white; margin-top: 15px; font-weight: 900; font-size: 1.5rem;" id="splash-label">madperfume</h1>
+    </div>
+
+    <!-- تكبير الصورة -->
+    <div id="imagePopup" onclick="this.style.display='none'">
+        <img id="popupImg" src="">
+        <p style="color: white; margin-top: 15px; font-weight: bold;">اضغط للإغلاق</p>
     </div>
 
     <div id="toast"></div>
@@ -239,17 +244,17 @@
     </header>
 
     <main id="product-grid">
-        <!-- Products load here -->
+        <!-- المنتجات -->
     </main>
 
-    <!-- Floating Cart Bubble -->
+    <!-- فقاعة العربة -->
     <div id="cartBubble" onclick="toggleCart(true)">
         <i class="fas fa-shopping-basket" style="font-size: 1.4rem;"></i>
         <div class="count" id="totalCount">0</div>
         <span style="font-size: 0.6rem; font-weight: 800; margin-top: 2px;" id="ui-bubble-label">طلب</span>
     </div>
 
-    <!-- Centered Popup Modal -->
+    <!-- المودال المنبثق للطلب -->
     <div class="modal" id="cartModal" onclick="if(event.target==this) toggleCart(false)">
         <div class="modal-content">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; border-bottom: 1px solid #e2e8f0; padding-bottom: 10px;">
@@ -262,26 +267,26 @@
                 <input type="text" id="branchName" oninput="saveInfo()" placeholder="🏢 الفرع" autocomplete="off">
             </div>
 
-            <div id="cart-list-items" style="max-height: 300px; overflow-y: auto;"></div>
+            <div id="cart-list-items" style="max-height: 250px; overflow-y: auto;"></div>
             
             <div class="popup-actions">
                 <button class="btn-p btn-p-wa" onclick="sendWhatsApp()"><i class="fab fa-whatsapp"></i></button>
                 <button class="btn-p btn-p-print" onclick="printOrder()"><i class="fas fa-print"></i></button>
                 <button class="btn-p btn-p-clear" onclick="clearCart()"><i class="fas fa-trash"></i></button>
                 <button class="btn-p btn-p-send" id="sendBtn" onclick="sendOrder()">
-                    <i class="fas fa-paper-plane"></i> <span id="ui-send">إرسال الطلب الآن</span>
+                    <i class="fas fa-paper-plane"></i> <span id="ui-send">إرسال الطلب</span>
                 </button>
             </div>
         </div>
     </div>
 
+    <!-- كشف الطباعة -->
     <div id="print-area">
         <h1 id="print-header-title"></h1>
         <p id="print-date-display"></p>
         <p><strong><span id="label-print-emp"></span>:</strong> <span id="print-emp"></span></p>
         <p><strong><span id="label-print-branch"></span>:</strong> <span id="print-branch"></span></p>
-        <hr>
-        <table border="1" style="width:100%; border-collapse:collapse; margin-top:20px;">
+        <table border="1">
             <thead><tr><th id="th-code"></th><th id="th-name"></th><th id="th-qty"></th></tr></thead>
             <tbody id="print-items"></tbody>
         </table>
@@ -292,29 +297,32 @@
             ar: {
                 logo: "madperfume", langBtn: "EN", searchPlaceholder: "بحث سريع...",
                 empPlaceholder: "👤 الموظف", branchPlaceholder: "🏢 الفرع",
-                catAll: "الكل", itemLabel: "صنف", bubbleLabel: "طلب",
-                send: "إرسال الطلب الآن", reviewTitle: "تأكيد الطلب", emptyCart: "العربة فارغة",
-                confirmClear: "إفراغ العربة؟", alertInfo: "يرجى كتابة الاسم والفرع",
-                alertSuccess: "تم الإرسال بنجاح!", printHeader: "طلب صرف مخزن",
-                printDate: "التاريخ", printCode: "الكود", printName: "المنتج", printQty: "الكمية", noResults: "لا توجد نتائج"
+                catAll: "الكل", bubbleLabel: "طلب", send: "إرسال الطلب",
+                reviewTitle: "تأكيد الطلب", emptyCart: "العربة فارغة", confirmClear: "إفراغ العربة؟",
+                alertInfo: "يرجى كتابة الاسم والفرع", alertSuccess: "تم الإرسال بنجاح!",
+                printHeader: "طلب صرف مخزن", printDate: "التاريخ", printCode: "الكود",
+                printName: "المنتج", printQty: "الكمية", waHeader: "📦 *طلب جديد من madperfume*",
+                waQty: "الكمية", noResults: "لا توجد نتائج"
             },
             en: {
-                logo: "madperfume", langBtn: "עב", searchPlaceholder: "Quick search...",
+                logo: "madperfume", langBtn: "עב", searchPlaceholder: "Search...",
                 empPlaceholder: "👤 Name", branchPlaceholder: "🏢 Branch",
-                catAll: "All", itemLabel: "Items", bubbleLabel: "Order",
-                send: "Send Order Now", reviewTitle: "Confirm Order", emptyCart: "Empty",
-                confirmClear: "Clear all?", alertInfo: "Enter name & branch",
-                alertSuccess: "Sent!", printHeader: "Warehouse Order",
-                printDate: "Date", printCode: "Code", printName: "Item", printQty: "Qty", noResults: "No results"
+                catAll: "All", bubbleLabel: "Order", send: "Send Order",
+                reviewTitle: "Confirm Order", emptyCart: "Empty", confirmClear: "Clear all?",
+                alertInfo: "Enter name & branch", alertSuccess: "Sent!",
+                printHeader: "Warehouse Order", printDate: "Date", printCode: "Code",
+                printName: "Item", printQty: "Qty", waHeader: "📦 *New madperfume Order*",
+                waQty: "Qty", noResults: "No results"
             },
             he: {
                 logo: "madperfume", langBtn: "عربي", searchPlaceholder: "חיפוש...",
                 empPlaceholder: "👤 שם", branchPlaceholder: "🏢 סניף",
-                catAll: "הכל", itemLabel: "פריטים", bubbleLabel: "הזמנה",
-                send: "שלח הזמנה עכשיו", reviewTitle: "אישור הזמנה", emptyCart: "ריק",
-                confirmClear: "לנקות הכל?", alertInfo: "נא لملا פרטים",
-                alertSuccess: "נשלח בהצלחה!", printHeader: "הזמנת מחסן",
-                printDate: "תאריך", printCode: "קוד", printName: "מוצר", printQty: "כמות", noResults: "אין תוצאות"
+                catAll: "הכל", bubbleLabel: "הזמנה", send: "שלח הזמנה",
+                reviewTitle: "אישור הזמנה", emptyCart: "ריק", confirmClear: "לנקות הכל?",
+                alertInfo: "נא لملا פרטים", alertSuccess: "נשלח בהצלחה!",
+                printHeader: "הזמנת מחסן", printDate: "תאריך", printCode: "קוד",
+                printName: "מוצר", printQty: "כמות", waHeader: "📦 *הזמנה חדשה*",
+                waQty: "כמות", noResults: "אין תוצאות"
             }
         };
 
@@ -322,23 +330,27 @@
         const APPS_SCRIPT_URL = ""; 
 
         let inventory = [];
-        let cart = JSON.parse(localStorage.getItem('my_warehouse_cart_v3') || '{}');
+        let cart = JSON.parse(localStorage.getItem('my_warehouse_cart_v4') || '{}');
         let currentLang = localStorage.getItem('warehouse_lang') || 'ar';
         let activeCat = 'الكل';
+
+        const quickQtys = [6, 12, 18, 24, 30, 36, 42, 48];
 
         function showToast(msg) {
             const t = document.getElementById('toast');
             if (t) { t.innerText = msg; t.style.display = 'block'; setTimeout(() => t.style.display = 'none', 2500); }
         }
 
-        function safeSetText(id, text) { const el = document.getElementById(id); if (el) el.innerText = text; }
-        function safeSetPlaceholder(id, text) { const el = document.getElementById(id); if (el) el.placeholder = text; }
+        function zoomImage(src) {
+            const popup = document.getElementById('imagePopup');
+            document.getElementById('popupImg').src = src;
+            popup.style.display = 'flex';
+        }
 
         function updateUIStrings() {
             const t = translations[currentLang];
             document.documentElement.lang = currentLang;
             document.documentElement.dir = (currentLang === 'ar' || currentLang === 'he') ? 'rtl' : 'ltr';
-            
             safeSetText('ui-logo', t.logo);
             safeSetText('btn-lang', t.langBtn);
             safeSetPlaceholder('search', t.searchPlaceholder);
@@ -348,7 +360,6 @@
             safeSetText('ui-send', t.send);
             safeSetText('ui-review-title', t.reviewTitle);
             safeSetText('ui-bubble-label', t.bubbleLabel);
-            
             safeSetText('print-header-title', t.printHeader);
             safeSetText('label-print-emp', t.empPlaceholder.replace('👤 ', ''));
             safeSetText('label-print-branch', t.branchPlaceholder.replace('🏢 ', ''));
@@ -356,6 +367,9 @@
             safeSetText('th-name', t.printName);
             safeSetText('th-qty', t.printQty);
         }
+
+        function safeSetText(id, text) { const el = document.getElementById(id); if (el) el.innerText = text; }
+        function safeSetPlaceholder(id, text) { const el = document.getElementById(id); if (el) el.placeholder = text; }
 
         function toggleLanguage() {
             currentLang = currentLang === 'ar' ? 'en' : (currentLang === 'en' ? 'he' : 'ar');
@@ -374,22 +388,16 @@
                     inventory = data.table.rows.map(row => ({
                         code: row.c[0] ? String(row.c[0].v) : '---',
                         name: row.c[1] ? String(row.c[1].v) : '---',
-                        cat: row.c[1] ? String(row.c[1].v) : '---',
+                        cat: row.c[1] ? String(row.c[1].v) : 'General',
                         img: row.c[3] ? row.c[3].v : '',
                         available: (row.c[8] && row.c[8].v && String(row.c[8].v).toLowerCase() !== 'غير متوفر')
                     })).filter(i => i.name && i.name !== "Description");
-                    
                     renderCategories(); render();
                     document.getElementById('empName').value = localStorage.getItem('my_warehouse_emp') || '';
                     document.getElementById('branchName').value = localStorage.getItem('my_warehouse_branch') || '';
                 }
             } catch (e) { showToast("Sync Error"); }
-            finally {
-                setTimeout(() => {
-                    const splash = document.getElementById('splash');
-                    if (splash) { splash.style.opacity = '0'; setTimeout(() => splash.style.display = 'none', 400); }
-                }, 800);
-            }
+            finally { setTimeout(() => { const s = document.getElementById('splash'); if(s) s.style.opacity = '0', setTimeout(() => s.style.display = 'none', 400); }, 600); }
         }
 
         function renderCategories() {
@@ -399,21 +407,12 @@
             cats.forEach(c => {
                 const el = document.createElement('div');
                 el.className = 'cat-item'; el.innerText = c;
-                el.onclick = () => {
-                    document.querySelectorAll('.cat-item').forEach(i => i.classList.remove('active'));
-                    el.classList.add('active');
-                    activeCat = c;
-                    render();
-                };
+                el.onclick = () => { document.querySelectorAll('.cat-item').forEach(i => i.classList.remove('active')); el.classList.add('active'); activeCat = c; render(); };
                 list.appendChild(el);
             });
         }
 
-        function setCat(c, el) {
-            activeCat = c;
-            document.querySelectorAll('.cat-item').forEach(i => i.classList.remove('active'));
-            el.classList.add('active'); render();
-        }
+        function setCat(c, el) { activeCat = c; document.querySelectorAll('.cat-item').forEach(i => i.classList.remove('active')); el.classList.add('active'); render(); }
 
         function render() {
             const t = translations[currentLang];
@@ -421,7 +420,7 @@
             const search = document.getElementById('search').value.toLowerCase();
             const filtered = inventory.filter(i => {
                 const matchSearch = i.name.toLowerCase().includes(search) || i.code.toLowerCase().includes(search);
-                const matchCat = activeCat === 'الكل' || activeCat === 'All' || activeCat === 'הكل' || i.cat === activeCat;
+                const matchCat = activeCat === 'الكل' || activeCat === 'All' || activeCat === 'הכל' || i.cat === activeCat;
                 return matchSearch && matchCat;
             });
 
@@ -429,36 +428,55 @@
                 const qty = cart[i.code]?.qty || 0;
                 return `
                 <div class="card ${qty > 0 ? 'active' : ''} ${!i.available ? 'out-of-stock' : ''}">
-                    <img src="${i.img}" onerror="this.src='https://via.placeholder.com/150'">
+                    <div class="img-container" onclick="zoomImage('${i.img}')">
+                        <img src="${i.img}" onerror="this.src='https://via.placeholder.com/150'">
+                    </div>
                     <h3>${i.code}</h3>
                     <div class="product-name">${i.name}</div>
-                    <div class="stock-status ${i.available ? 'status-available' : 'status-unavailable'}">
-                        <i class="fas ${i.available ? 'fa-check-circle' : 'fa-times-circle'}"></i>
-                        ${i.available ? t.available : t.unavailable}
+                    
+                    <div class="qty-grid">
+                        ${quickQtys.map(num => `
+                            <button class="btn-qty-fix ${qty === num ? 'selected' : ''}" 
+                                onclick="updateQtyDirect('${i.code}', ${num})" 
+                                ${!i.available ? 'disabled' : ''}>${num}</button>
+                        `).join('')}
                     </div>
-                    <div class="bulk-row">
-                        <button class="btn-b" onclick="updateQty('${i.code}', 6)" ${!i.available ? 'disabled' : ''}>+6</button>
-                        <button class="btn-b" onclick="updateQty('${i.code}', 12)" ${!i.available ? 'disabled' : ''}>+12</button>
-                    </div>
-                    <div class="qty-control">
-                        <button class="btn-q" style="background:#cbd5e1;color:#1e293b" onclick="updateQty('${i.code}', -1)">-</button>
-                        <span class="q-val">${qty}</span>
-                        <button class="btn-q" onclick="updateQty('${i.code}', 1)" ${!i.available ? 'disabled' : ''}>+</button>
+
+                    <div class="custom-qty">
+                        <i class="fas fa-edit" style="font-size:0.7rem; color:var(--text-sub)"></i>
+                        <input type="number" placeholder="رقم مخصص" 
+                            value="${(qty > 0 && !quickQtys.includes(qty)) ? qty : ''}"
+                            oninput="updateQtyCustom('${i.code}', this.value)"
+                            ${!i.available ? 'disabled' : ''}>
                     </div>
                 </div>`;
             }).join('');
             updateBar(); renderCartModal();
         }
 
-        function updateQty(code, delta) {
+        function updateQtyDirect(code, val) {
             const item = inventory.find(i => i.code === code);
             if (!item) return;
             const current = cart[code]?.qty || 0;
-            const next = Math.max(0, current + delta);
-            if (next === 0) delete cart[code];
-            else cart[code] = { qty: next, name: item.name, code: item.code, img: item.img };
-            localStorage.setItem('my_warehouse_cart_v3', JSON.stringify(cart));
-            render(); if (window.navigator.vibrate) window.navigator.vibrate(10);
+            if (current === val) delete cart[code]; // إلغاء التحديد إذا ضغطت نفس الرقم
+            else cart[code] = { qty: val, name: item.name, code: item.code, img: item.img };
+            localStorage.setItem('my_warehouse_cart_v4', JSON.stringify(cart));
+            render();
+            if (window.navigator.vibrate) window.navigator.vibrate(10);
+        }
+
+        function updateQtyCustom(code, val) {
+            const item = inventory.find(i => i.code === code);
+            const num = parseInt(val);
+            if (!item) return;
+            if (isNaN(num) || num <= 0) {
+                delete cart[code];
+            } else {
+                cart[code] = { qty: num, name: item.name, code: item.code, img: item.img };
+            }
+            localStorage.setItem('my_warehouse_cart_v4', JSON.stringify(cart));
+            updateBar();
+            // لا نعيد الرندرة هنا لكي لا يفقد الحقل الـ focus
         }
 
         function updateBar() {
@@ -477,27 +495,23 @@
                     <div class="cart-item-info">
                         <h4>${item.code}</h4><p>${item.name}</p>
                     </div>
-                    <div class="qty-control" style="width:90px; padding:2px;">
-                        <button class="btn-q" style="background:#cbd5e1;color:#1e293b;width:26px;height:26px;font-size:0.9rem" onclick="updateQty('${item.code}', -1)">-</button>
-                        <span class="q-val" style="font-size:0.9rem">${item.qty}</span>
-                        <button class="btn-q" style="width:26px;height:26px;font-size:0.9rem" onclick="updateQty('${item.code}', 1)">+</button>
+                    <div style="font-weight:900; color:var(--primary); font-size:1.1rem; min-width:40px; text-align:center;">
+                        ${item.qty}
                     </div>
+                    <i class="fas fa-times-circle" style="color:var(--danger); font-size:1.2rem;" onclick="updateQtyDirect('${item.code}', ${item.qty})"></i>
                 </div>`).join('');
         }
 
         function toggleCart(show) { document.getElementById('cartModal').style.display = show ? 'flex' : 'none'; }
-        function clearCart() { if(confirm(translations[currentLang].confirmClear)) { cart = {}; localStorage.setItem('my_warehouse_cart_v3', '{}'); render(); toggleCart(false); } }
-        function saveInfo() { 
-            localStorage.setItem('my_warehouse_emp', document.getElementById('empName').value); 
-            localStorage.setItem('my_warehouse_branch', document.getElementById('branchName').value); 
-        }
+        function clearCart() { if(confirm(translations[currentLang].confirmClear)) { cart = {}; localStorage.setItem('my_warehouse_cart_v4', '{}'); render(); toggleCart(false); } }
+        function saveInfo() { localStorage.setItem('my_warehouse_emp', document.getElementById('empName').value); localStorage.setItem('my_warehouse_branch', document.getElementById('branchName').value); }
 
         async function sendOrder() {
             const name = document.getElementById('empName').value;
             const branch = document.getElementById('branchName').value;
             if(!name || !branch) return showToast(translations[currentLang].alertInfo);
             showToast("جاري الإرسال...");
-            setTimeout(() => { showToast(translations[currentLang].alertSuccess); cart = {}; localStorage.setItem('my_warehouse_cart_v3', '{}'); render(); toggleCart(false); }, 1000);
+            setTimeout(() => { showToast(translations[currentLang].alertSuccess); cart = {}; localStorage.setItem('my_warehouse_cart_v4', '{}'); render(); toggleCart(false); }, 1000);
         }
 
         function sendWhatsApp() {
