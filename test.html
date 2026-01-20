@@ -3,39 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>مخزني App</title>
+    <title>مخزني Pro</title>
     
-    <!-- PWA Meta Tags -->
+    <!-- PWA & Mobile Meta -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#0f172a">
-    <meta name="mobile-web-app-capable" content="yes">
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/583/583344.png">
 
-    <!-- Font Awesome for Icons -->
+    <!-- Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
         :root {
-            --bg: #f8fafc;
+            --bg: #f1f5f9;
             --surface: #ffffff;
             --primary: #0f172a;
-            --primary-dark: #000000;
-            --accent: #059669;
+            --accent: #10b981;
             --whatsapp: #25d366;
-            --print: #475569;
-            --text-main: #1e293b;
+            --danger: #ef4444;
+            --text-main: #0f172a;
             --text-sub: #64748b;
-            --danger: #e11d48;
-            --radius: 16px;
-            --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            --radius-lg: 24px;
+            --radius-md: 16px;
+            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
         }
 
         * {
             box-sizing: border-box;
             -webkit-tap-highlight-color: transparent;
             margin: 0; padding: 0;
-            font-family: 'Segoe UI', system-ui, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             -webkit-user-select: none;
             user-select: none;
         }
@@ -43,100 +41,199 @@
         body {
             background-color: var(--bg);
             color: var(--text-main);
-            height: 100vh;
+            /* استخدام dvh لضمان دقة الطول على الجوال */
+            height: 100dvh;
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            padding-top: env(safe-area-inset-top);
-            padding-bottom: env(safe-area-inset-bottom);
+            overscroll-behavior: none;
+            padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom) 0;
         }
 
         /* Splash Screen */
         #splash {
             position: fixed; inset: 0; background: var(--primary); z-index: 9999;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            transition: opacity 0.5s ease;
+            transition: opacity 0.4s ease;
         }
-        .splash-logo { font-size: 3.5rem; color: white; animation: pulse 2s infinite; }
-        @keyframes pulse { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.1); opacity: 0.8; } 100% { transform: scale(1); opacity: 1; } }
+        .splash-logo { font-size: 4rem; color: white; animation: zoomPulse 2s infinite; }
+        @keyframes zoomPulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
 
-        /* Header UI */
-        header { background: var(--primary); padding: 10px 20px 15px; box-shadow: var(--shadow); z-index: 100; color: white; }
-        .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-        .logo { font-size: 1.4rem; font-weight: 900; letter-spacing: -1px; }
-        .header-actions { display: flex; gap: 8px; }
-        .header-btn { background: rgba(255, 255, 255, 0.1); border: none; padding: 10px 14px; border-radius: 12px; color: white; cursor: pointer; font-size: 0.85rem; font-weight: 700; }
-        .search-wrapper { background: rgba(255, 255, 255, 0.12); border-radius: 12px; padding: 12px 15px; display: flex; align-items: center; gap: 10px; }
-        .search-wrapper input { background: transparent; border: none; outline: none; width: 100%; font-size: 1rem; color: white; user-select: text; -webkit-user-select: text;}
-        .search-wrapper input::placeholder { color: rgba(255, 255, 255, 0.5); }
-        .categories { display: flex; overflow-x: auto; gap: 8px; padding: 12px 0 5px; scrollbar-width: none; }
+        /* Header Area */
+        header {
+            background: var(--primary);
+            padding: 12px 20px 20px;
+            box-shadow: var(--shadow);
+            z-index: 100;
+            color: white;
+            border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+        }
+
+        .header-top {
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;
+        }
+
+        .logo { font-size: 1.5rem; font-weight: 900; letter-spacing: -0.5px; }
+        
+        .header-actions { display: flex; gap: 10px; }
+        .header-btn {
+            background: rgba(255, 255, 255, 0.15); border: none; padding: 10px 15px; 
+            border-radius: 12px; color: white; cursor: pointer; font-size: 0.9rem; font-weight: 700;
+        }
+
+        .search-wrapper {
+            background: rgba(255, 255, 255, 0.12); border-radius: 14px; padding: 12px 16px;
+            display: flex; align-items: center; gap: 12px; margin-bottom: 15px;
+        }
+        .search-wrapper input {
+            background: transparent; border: none; outline: none; width: 100%;
+            font-size: 1rem; color: white; user-select: text; -webkit-user-select: text;
+        }
+        .search-wrapper input::placeholder { color: rgba(255, 255, 255, 0.4); }
+
+        .categories {
+            display: flex; overflow-x: auto; gap: 10px; scrollbar-width: none;
+            scroll-snap-type: x mandatory; padding-bottom: 5px;
+        }
         .categories::-webkit-scrollbar { display: none; }
-        .cat-item { white-space: nowrap; padding: 8px 18px; border-radius: 20px; background: rgba(255, 255, 255, 0.1); color: rgba(255, 255, 255, 0.7); font-size: 0.85rem; font-weight: 700; cursor: pointer; transition: 0.2s; }
+        .cat-item {
+            white-space: nowrap; padding: 8px 20px; border-radius: 50px;
+            background: rgba(255, 255, 255, 0.1); color: rgba(255, 255, 255, 0.7); 
+            font-size: 0.85rem; font-weight: 700; scroll-snap-align: start; transition: 0.2s;
+        }
         .cat-item.active { background: white; color: var(--primary); transform: scale(1.05); }
 
-        /* Form Info */
-        .info-box { padding: 15px 20px; background: var(--surface); display: grid; grid-template-columns: 1fr 1fr; gap: 12px; border-bottom: 1px solid #e2e8f0; }
-        .info-box input { width: 100%; padding: 14px; border-radius: 12px; border: 1.5px solid #cbd5e1; outline: none; font-size: 0.9rem; background: #f8fafc; -webkit-appearance: none; user-select: text; -webkit-user-select: text;}
+        /* User Info Box */
+        .info-box { 
+            padding: 15px 20px; background: var(--surface); display: grid; 
+            grid-template-columns: 1fr 1fr; gap: 12px; border-bottom: 1px solid #e2e8f0;
+        }
+        .info-box input {
+            width: 100%; padding: 14px; border-radius: 12px;
+            border: 1.5px solid #cbd5e1; outline: none; font-size: 0.9rem;
+            background: #f8fafc; user-select: text; -webkit-user-select: text;
+        }
 
         /* Product Grid */
-        #product-grid { flex: 1; overflow-y: auto; padding: 15px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding-bottom: 160px; }
-        .card { background: var(--surface); border-radius: 20px; padding: 12px; display: flex; flex-direction: column; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; transition: 0.2s; position: relative; }
-        .card:active { transform: scale(0.97); }
+        #product-grid {
+            flex: 1; overflow-y: auto; padding: 15px;
+            display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;
+            padding-bottom: 180px; /* مساحة أكبر للشريط السفلي */
+        }
+
+        .card {
+            background: var(--surface); border-radius: var(--radius-md);
+            padding: 12px; display: flex; flex-direction: column;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03); border: 1px solid #e2e8f0;
+            transition: 0.2s; position: relative;
+        }
+        .card:active { transform: scale(0.96); opacity: 0.8; }
         .card.active { border-color: var(--primary); background: #f8fafc; border-width: 2px; }
         .card.out-of-stock { opacity: 0.5; filter: grayscale(1); }
-        .card img { width: 100%; aspect-ratio: 1/1; object-fit: cover; background: #f1f5f9; display: block; border-radius: 12px; }
-        .card h3 { font-size: 1.1rem; font-weight: 900; color: var(--primary); margin: 8px 0 2px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
-        .card .product-name { font-size: 0.8rem; color: var(--text-sub); font-weight: 600; margin-bottom: 8px; height: 1.1rem; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
-        .stock-status { font-size: 0.75rem; font-weight: 800; margin-bottom: 10px; display: flex; align-items: center; gap: 4px; }
+
+        .card img {
+            width: 100%; aspect-ratio: 1/1; object-fit: cover; 
+            background: #f1f5f9; display: block; border-radius: 10px;
+        }
+
+        .card h3 { 
+            font-size: 1.1rem; font-weight: 800; color: var(--primary);
+            margin: 10px 0 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+        }
+        .card .product-name {
+            font-size: 0.8rem; color: var(--text-sub); font-weight: 600;
+            margin-bottom: 10px; height: 1.1rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+        }
+        
+        .stock-status { font-size: 0.75rem; font-weight: 800; margin-bottom: 12px; display: flex; align-items: center; gap: 5px; }
         .status-available { color: var(--accent); }
         .status-unavailable { color: var(--danger); }
-        .qty-control { display: flex; align-items: center; justify-content: space-between; background: #f1f5f9; border-radius: 12px; padding: 5px; margin-top: auto; }
-        .btn-q { width: 36px; height: 36px; border-radius: 10px; border: none; background: var(--primary); color: white; font-size: 1.2rem; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-        .q-val { font-weight: 900; font-size: 1.1rem; }
-        .bulk-row { display: flex; gap: 6px; margin-bottom: 10px; }
-        .btn-b { flex: 1; background: white; border: 1px solid #cbd5e1; font-size: 0.75rem; font-weight: 800; padding: 6px; border-radius: 8px; color: var(--primary); cursor: pointer; }
 
-        /* Bottom Nav */
-        .bottom-nav { position: fixed; bottom: 20px; left: 10px; right: 10px; background: var(--primary); color: white; padding: 12px 10px; border-radius: 24px; display: none; justify-content: space-between; align-items: center; box-shadow: 0 20px 40px rgba(0,0,0,0.4); z-index: 1000; animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1); gap: 5px; }
-        @keyframes slideUp { from { transform: translateY(100px); } to { transform: translateY(0); } }
+        .qty-control {
+            display: flex; align-items: center; justify-content: space-between;
+            background: #f1f5f9; border-radius: 12px; padding: 4px; margin-top: auto;
+        }
+        .btn-q {
+            width: 38px; height: 38px; border-radius: 10px; border: none;
+            background: var(--primary); color: white; font-size: 1.3rem; 
+            display: flex; align-items: center; justify-content: center;
+        }
+        .q-val { font-weight: 900; font-size: 1.2rem; }
+
+        .bulk-row { display: flex; gap: 6px; margin-bottom: 10px; }
+        .btn-b {
+            flex: 1; background: white; border: 1.5px solid #cbd5e1;
+            font-size: 0.75rem; font-weight: 800; padding: 8px; border-radius: 10px;
+            color: var(--primary);
+        }
+
+        /* Floating Bottom Nav - Mobile Centric */
+        .bottom-nav {
+            position: fixed; bottom: 25px; left: 15px; right: 15px;
+            background: var(--primary); color: white; padding: 15px 20px;
+            border-radius: 28px; display: none; justify-content: space-between;
+            align-items: center; box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+            z-index: 1000; animation: bounceUp 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes bounceUp { from { transform: translateY(120%); } to { transform: translateY(0); } }
         .bottom-nav.visible { display: flex; }
-        .cart-trigger { flex: 1; display: flex; flex-direction: column; cursor: pointer; overflow: hidden;}
-        .cart-summary { display: flex; align-items: center; gap: 8px; }
-        .count-badge { background: var(--accent); width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 0.8rem; color: white; flex-shrink: 0; }
-        .total-pieces { font-size: 0.7rem; color: rgba(255,255,255,0.6); font-weight: bold; margin-top: 2px; white-space: nowrap;}
-        .btn-actions { display: flex; gap: 4px; }
-        .btn-nav { border: none; padding: 10px 12px; border-radius: 12px; font-weight: 800; font-size: 0.85rem; display: flex; align-items: center; gap: 5px; cursor: pointer; }
+        
+        .cart-trigger { flex: 1; display: flex; flex-direction: column; cursor: pointer; }
+        .cart-summary { display: flex; align-items: center; gap: 12px; }
+        .count-badge {
+            background: var(--accent); width: 34px; height: 34px;
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-weight: 900; font-size: 0.9rem; color: white; box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3);
+        }
+        .total-pieces { font-size: 0.75rem; color: rgba(255,255,255,0.5); font-weight: bold; margin-top: 2px; }
+
+        .btn-actions { display: flex; gap: 8px; }
+        .btn-nav {
+            border: none; padding: 12px 18px; border-radius: 16px; font-weight: 800;
+            font-size: 0.95rem; display: flex; align-items: center; gap: 8px; cursor: pointer;
+        }
         .btn-send { background: white; color: var(--primary); }
         .btn-whatsapp { background: var(--whatsapp); color: white; }
 
-        /* Modal */
-        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: none; z-index: 2000; align-items: flex-end; justify-content: center; }
-        .modal-content { background: var(--bg); width: 100%; max-width: 500px; border-radius: 30px 30px 0 0; padding: 25px; max-height: 85vh; overflow-y: auto; animation: slideInModal 0.3s ease; }
-        @keyframes slideInModal { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        /* Full Screen Modal */
+        .modal {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.8);
+            display: none; z-index: 2000; align-items: flex-end; justify-content: center;
+        }
+        .modal-content {
+            background: var(--bg); width: 100%; max-width: 500px;
+            border-radius: 30px 30px 0 0; padding: 25px; max-height: 90dvh; 
+            overflow-y: auto; animation: slideUpModal 0.3s ease-out;
+        }
+        @keyframes slideUpModal { from { transform: translateY(100%); } to { transform: translateY(0); } }
         
-        .cart-item { background: white; padding: 12px; border-radius: 18px; margin-bottom: 12px; display: flex; gap: 12px; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-        .cart-item-img { width: 50px; height: 50px; border-radius: 10px; object-fit: cover; background: #f1f5f9; }
+        .cart-item { 
+            background: white; padding: 15px; border-radius: 20px; margin-bottom: 12px; 
+            display: flex; gap: 15px; align-items: center; box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+        .cart-item-img { width: 60px; height: 60px; border-radius: 14px; object-fit: cover; }
         .cart-item-info { flex: 1; min-width: 0; }
+        .cart-item-info h4 { font-size: 1rem; font-weight: 800; color: var(--primary); margin-bottom: 2px; }
+        .cart-item-info p { font-size: 0.8rem; color: var(--text-sub); }
 
         /* Toast */
-        #toast { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%); background: #1e293b; color: white; padding: 14px 28px; border-radius: 50px; z-index: 5000; display: none; font-weight: bold; box-shadow: 0 10px 20px rgba(0,0,0,0.2); font-size: 0.9rem; }
+        #toast {
+            position: fixed; top: 30px; left: 50%; transform: translateX(-50%);
+            background: var(--primary); color: white; padding: 12px 30px;
+            border-radius: 50px; z-index: 5000; display: none; font-weight: 800;
+            box-shadow: var(--shadow); border: 1px solid rgba(255,255,255,0.1); font-size: 0.95rem;
+        }
 
         /* Print Area */
         #print-area { display: none; }
-        @media print {
-            body * { visibility: hidden; }
-            #print-area, #print-area * { visibility: visible; }
-            #print-area { position: absolute; left: 0; top: 0; width: 100%; display: block !important; padding: 40px; background: white; color: black; }
-            .print-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-            .print-table th, .print-table td { border: 1px solid #000; padding: 12px; text-align: inherit; font-size: 14pt; }
-        }
     </style>
 </head>
 <body>
 
+    <!-- Native-like Splash -->
     <div id="splash">
         <i class="fas fa-warehouse splash-logo"></i>
-        <h2 style="color: white; margin-top: 20px; font-weight: 900;" id="splash-title">مخزني</h2>
+        <h1 style="color: white; margin-top: 25px; font-weight: 900; letter-spacing: -1px;">مخزني Pro</h1>
     </div>
 
     <div id="toast"></div>
@@ -145,13 +242,13 @@
         <div class="header-top">
             <div class="logo" id="ui-logo">مخزني</div>
             <div class="header-actions">
-                <button class="header-btn" id="btn-lang" onclick="toggleLanguage()">English</button>
-                <button class="header-btn" onclick="location.reload()"><i class="fas fa-redo-alt"></i></button>
+                <button class="header-btn" id="btn-lang" onclick="toggleLanguage()">EN</button>
+                <button class="header-btn" onclick="location.reload()"><i class="fas fa-sync-alt"></i></button>
             </div>
         </div>
         <div class="search-wrapper">
-            <i class="fas fa-search"></i>
-            <input type="text" id="search" oninput="render()" placeholder="ابحث...">
+            <i class="fas fa-search" style="opacity: 0.5;"></i>
+            <input type="text" id="search" oninput="render()" placeholder="بحث...">
         </div>
         <div class="categories" id="cat-list">
             <div class="cat-item active" id="cat-all" onclick="setCat('الكل', this)">الكل</div>
@@ -159,92 +256,91 @@
     </header>
 
     <div class="info-box">
-        <input type="text" id="empName" oninput="saveInfo()" placeholder="👤 الموظف">
-        <input type="text" id="branchName" oninput="saveInfo()" placeholder="🏢 الفرع">
+        <input type="text" id="empName" oninput="saveInfo()" placeholder="👤 الموظف" autocomplete="off">
+        <input type="text" id="branchName" oninput="saveInfo()" placeholder="🏢 الفرع" autocomplete="off">
     </div>
 
-    <main id="product-grid"></main>
+    <main id="product-grid">
+        <!-- Products load here -->
+    </main>
 
     <div class="bottom-nav" id="cartBar">
         <div class="cart-trigger" onclick="toggleCart(true)">
             <div class="cart-summary">
                 <div class="count-badge" id="totalCount">0</div>
-                <span id="ui-item-label" style="font-weight: 900; font-size: 0.85rem;">صنف</span>
+                <span id="ui-item-label" style="font-weight: 900; font-size: 0.95rem;">صنف</span>
             </div>
             <div class="total-pieces"><span id="ui-total-pieces-label">القطع</span>: <span id="totalPieces">0</span></div>
         </div>
         <div class="btn-actions">
-            <button class="btn-nav btn-print" onclick="printOrder()"><i class="fas fa-print"></i></button>
+            <button class="btn-nav" style="background:#475569; color:white;" onclick="printOrder()"><i class="fas fa-print"></i></button>
             <button class="btn-nav btn-whatsapp" onclick="sendWhatsApp()"><i class="fab fa-whatsapp"></i></button>
             <button class="btn-nav btn-send" id="sendBtn" onclick="sendOrder()"><span id="ui-send">إرسال</span></button>
         </div>
     </div>
 
+    <!-- Mobile Drawer for Cart -->
     <div class="modal" id="cartModal" onclick="if(event.target==this) toggleCart(false)">
         <div class="modal-content">
+            <div style="width:40px; height:5px; background:#cbd5e1; border-radius:10px; margin: 0 auto 20px;"></div>
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:25px;">
-                <h3 id="ui-review-title" style="color: var(--primary); font-weight: 900;">مراجعة الطلبات</h3>
-                <button id="ui-clear-all" onclick="clearCart()" style="color:var(--danger); border:none; background:none; font-weight:800; cursor:pointer;">مسح الكل</button>
+                <h3 id="ui-review-title" style="color: var(--primary); font-weight: 900; font-size: 1.3rem;">مراجعة الطلب</h3>
+                <button id="ui-clear-all" onclick="clearCart()" style="color:var(--danger); border:none; background:none; font-weight:800; font-size:0.9rem;">مسح الكل</button>
             </div>
             <div id="cart-list-items"></div>
-            <button id="ui-add-more" onclick="toggleCart(false)" style="width:100%; margin-top:20px; padding:18px; border-radius:18px; border:none; background:var(--primary); color:white; font-weight:900; cursor:pointer;">إضافة المزيد</button>
+            <button id="ui-add-more" onclick="toggleCart(false)" style="width:100%; margin-top:20px; padding:20px; border-radius:20px; border:none; background:var(--primary); color:white; font-weight:900; font-size:1.1rem;">إضافة المزيد</button>
         </div>
     </div>
 
+    <!-- Hidden Print Area -->
     <div id="print-area">
-        <div class="print-header">
-            <h1 id="print-header-title"></h1>
-            <p id="print-date-display"></p>
-        </div>
-        <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
-            <p><strong><span id="label-print-emp"></span>:</strong> <span id="print-emp"></span></p>
-            <p><strong><span id="label-print-branch"></span>:</strong> <span id="print-branch"></span></p>
-        </div>
-        <table class="print-table">
+        <h1 id="print-header-title"></h1>
+        <p id="print-date-display"></p>
+        <p><strong><span id="label-print-emp"></span>:</strong> <span id="print-emp"></span></p>
+        <p><strong><span id="label-print-branch"></span>:</strong> <span id="print-branch"></span></p>
+        <hr>
+        <table border="1" style="width:100%; border-collapse:collapse; margin-top:20px;">
             <thead><tr><th id="th-code"></th><th id="th-name"></th><th id="th-qty"></th></tr></thead>
             <tbody id="print-items"></tbody>
         </table>
-        <div style="margin-top: 50px; display: flex; justify-content: space-between;">
-            <p id="ui-sig-emp"></p><p id="ui-sig-store"></p>
-        </div>
     </div>
 
     <script>
         const translations = {
             ar: {
-                logo: "مخزني", langBtn: "English", searchPlaceholder: "ابحث عن كود أو أداة...",
-                empPlaceholder: "👤 اسم الموظف", branchPlaceholder: "🏢 اسم الفرع",
+                logo: "مخزني", langBtn: "EN", searchPlaceholder: "ابحث عن كود أو أداة...",
+                empPlaceholder: "👤 الموظف", branchPlaceholder: "🏢 الفرع",
                 catAll: "الكل", itemLabel: "صنف", totalPiecesLabel: "القطع",
-                send: "إرسال", reviewTitle: "مراجعة الطلبات", clearAll: "مسح الكل", addMore: "إضافة المزيد",
+                send: "إرسال", reviewTitle: "مراجعة الطلب", clearAll: "مسح الكل", addMore: "إضافة المزيد",
                 available: "متوفر", unavailable: "غير متوفر", loader: "جاري المزامنة...",
                 emptyCart: "العربة فارغة", confirmClear: "هل تريد إفراغ العربة؟",
-                alertInfo: "يرجى إدخال البيانات", alertSuccess: "تم الإرسال!",
+                alertInfo: "يرجى إكمال البيانات", alertSuccess: "تم الإرسال بنجاح!",
                 printHeader: "طلب صرف مخزن", printDate: "التاريخ", printCode: "الكود",
                 printName: "المنتج", printQty: "الكمية", waHeader: "📦 *طلب جديد من المخزن*",
                 waQty: "الكمية", noResults: "لا توجد نتائج",
                 sigEmp: "توقيع الموظف", sigStore: "توقيع المخزن"
             },
             en: {
-                logo: "My Warehouse", langBtn: "עברית", searchPlaceholder: "Search...",
+                logo: "My Warehouse", langBtn: "עב", searchPlaceholder: "Search...",
                 empPlaceholder: "👤 Employee", branchPlaceholder: "🏢 Branch",
-                catAll: "All", itemLabel: "Items", totalPiecesLabel: "Qty",
-                send: "Send", reviewTitle: "Order Review", clearAll: "Clear", addMore: "Add More",
-                available: "Available", unavailable: "Unavailable", loader: "Syncing...",
-                emptyCart: "Empty", confirmClear: "Clear all?",
-                alertInfo: "Fill all fields", alertSuccess: "Sent!",
+                catAll: "All", itemLabel: "Items", totalPiecesLabel: "Units",
+                send: "Send", reviewTitle: "Review Order", clearAll: "Clear", addMore: "Add More",
+                available: "In Stock", unavailable: "Out of Stock", loader: "Syncing...",
+                emptyCart: "Empty", confirmClear: "Clear cart?",
+                alertInfo: "Complete your info", alertSuccess: "Sent!",
                 printHeader: "Warehouse Order", printDate: "Date", printCode: "Code",
-                printName: "Name", printQty: "Qty", waHeader: "📦 *New Order*",
+                printName: "Item", printQty: "Qty", waHeader: "📦 *New Warehouse Order*",
                 waQty: "Qty", noResults: "No results",
-                sigEmp: "Employee Signature", sigStore: "Store Signature"
+                sigEmp: "Emp Sign", sigStore: "Store Sign"
             },
             he: {
-                logo: "מחסני", langBtn: "العربية", searchPlaceholder: "חפש...",
+                logo: "מחסני", langBtn: "عربي", searchPlaceholder: "חפש...",
                 empPlaceholder: "👤 שם עובד", branchPlaceholder: "🏢 שם סניף",
                 catAll: "הכל", itemLabel: "פריטים", totalPiecesLabel: "יחידות",
-                send: "שלח", reviewTitle: "סקירה", clearAll: "נקה", addMore: "הוסף",
+                send: "שלח", reviewTitle: "סקירת הזמנה", clearAll: "נקה הכל", addMore: "הוסף עוד",
                 available: "זמין", unavailable: "לא זמין", loader: "מסנכרן...",
-                emptyCart: "ריק", confirmClear: "לנקות הכל?",
-                alertInfo: "נא למלא פרטים", alertSuccess: "נשלח!",
+                emptyCart: "העגלה ריקה", confirmClear: "לנקות את העגלה?",
+                alertInfo: "נא למלא פרטים", alertSuccess: "נשלח בהצלחה!",
                 printHeader: "הזמנת מחסן", printDate: "תאריך", printCode: "קוד",
                 printName: "מוצר", printQty: "כמות", waHeader: "📦 *הזמנה חדשה*",
                 waQty: "כמות", noResults: "אין תוצאות",
@@ -269,7 +365,6 @@
             document.documentElement.lang = currentLang;
             document.documentElement.dir = (currentLang === 'ar' || currentLang === 'he') ? 'rtl' : 'ltr';
             safeSetText('ui-logo', t.logo);
-            safeSetText('splash-title', t.logo);
             safeSetText('btn-lang', t.langBtn);
             safeSetPlaceholder('search', t.searchPlaceholder);
             safeSetPlaceholder('empName', t.empPlaceholder);
@@ -281,15 +376,13 @@
             safeSetText('ui-review-title', t.reviewTitle);
             safeSetText('ui-clear-all', t.clearAll);
             safeSetText('ui-add-more', t.addMore);
-            safeSetText('loader-text', t.loader);
+            
             safeSetText('print-header-title', t.printHeader);
             safeSetText('label-print-emp', t.empPlaceholder.replace('👤 ', ''));
             safeSetText('label-print-branch', t.branchPlaceholder.replace('🏢 ', ''));
             safeSetText('th-code', t.printCode);
             safeSetText('th-name', t.printName);
             safeSetText('th-qty', t.printQty);
-            safeSetText('ui-sig-emp', t.sigEmp + ": .................");
-            safeSetText('ui-sig-store', t.sigStore + ": .................");
         }
 
         function toggleLanguage() {
@@ -355,7 +448,7 @@
             });
 
             if (filtered.length === 0) {
-                grid.innerHTML = `<div class="no-results" style="grid-column: 1/-1; text-align:center; padding:50px; color:var(--text-sub);"><i class="fas fa-search-minus" style="font-size:3rem;display:block;margin-bottom:10px;"></i>${t.noResults}</div>`;
+                grid.innerHTML = `<div style="grid-column: 1/-1; text-align:center; padding:50px; color:var(--text-sub);"><i class="fas fa-search-minus" style="font-size:3rem;display:block;margin-bottom:10px;"></i>${t.noResults}</div>`;
             } else {
                 grid.innerHTML = filtered.map(i => {
                     const qty = cart[i.code]?.qty || 0;
@@ -392,7 +485,8 @@
             if (next === 0) delete cart[code];
             else cart[code] = { qty: next, name: itemData.name, code: itemData.code, img: itemData.img };
             localStorage.setItem('my_warehouse_cart_v3', JSON.stringify(cart));
-            render(); if (window.navigator.vibrate) window.navigator.vibrate(10);
+            render(); 
+            if (window.navigator.vibrate) window.navigator.vibrate(15);
         }
 
         function updateBar() {
@@ -412,15 +506,15 @@
             if (items.length === 0) { list.innerHTML = `<p style="text-align:center; padding:30px; color:var(--text-sub);">${translations[currentLang].emptyCart}</p>`; return; }
             list.innerHTML = items.map(item => `
                 <div class="cart-item">
-                    <img src="${item.img}" class="cart-item-img" onerror="this.src='https://via.placeholder.com/50/f1f5f9/64748b?text=N/A'">
+                    <img src="${item.img}" class="cart-item-img" onerror="this.src='https://via.placeholder.com/60/f1f5f9/64748b?text=N/A'">
                     <div class="cart-item-info">
-                        <h4 style="font-size:0.95rem; color:var(--primary); font-weight:900; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${item.code}</h4>
-                        <p style="font-size:0.75rem; color:var(--text-sub); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${item.name}</p>
+                        <h4>${item.code}</h4>
+                        <p>${item.name}</p>
                     </div>
-                    <div class="qty-control" style="width:100px; padding:3px; gap:5px;">
-                        <button class="btn-q" style="background:#cbd5e1;color:#1e293b;width:28px;height:28px;font-size:1rem" onclick="updateQty('${item.code}', -1)">-</button>
-                        <span class="q-val" style="font-size:0.9rem">${item.qty}</span>
-                        <button class="btn-q" style="width:28px;height:28px;font-size:1rem" onclick="updateQty('${item.code}', 1)">+</button>
+                    <div class="qty-control" style="width:100px; padding:3px;">
+                        <button class="btn-q" style="background:#cbd5e1;color:#1e293b;width:30px;height:30px;font-size:1rem" onclick="updateQty('${item.code}', -1)">-</button>
+                        <span class="q-val" style="font-size:1rem">${item.qty}</span>
+                        <button class="btn-q" style="width:30px;height:30px;font-size:1rem" onclick="updateQty('${item.code}', 1)">+</button>
                     </div>
                 </div>`).join('');
         }
