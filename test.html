@@ -32,14 +32,15 @@
 
         .container { max-width: 800px; margin: -35px auto 50px; padding: 0 15px; }
         
-        /* زر تحديد الموقع الصغير */
+        /* زر تحديد الموقع الذكي */
         .gps-trigger {
-            background: var(--gold); color: #000; border: none; padding: 10px 15px;
-            border-radius: 30px; font-weight: 900; font-size: 13px; cursor: pointer;
-            display: flex; align-items: center; gap: 8px; margin: 0 auto 20px;
-            box-shadow: 0 4px 15px rgba(212,175,55,0.3);
+            background: var(--gold); color: #000; border: none; padding: 12px 20px;
+            border-radius: 30px; font-weight: 900; font-size: 14px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; gap: 10px; 
+            margin: 0 auto 25px; box-shadow: 0 6px 20px rgba(212,175,55,0.4);
+            transition: transform 0.2s;
         }
-        .gps-trigger i { font-size: 16px; }
+        .gps-trigger:active { transform: scale(0.96); }
 
         .branch-card {
             background: var(--card-bg); border-radius: 20px; padding: 25px;
@@ -87,25 +88,26 @@
 
 <div class="container">
     <button class="gps-trigger" onclick="requestLocation()">
-        <i class="fas fa-location-arrow"></i>
-        <span id="l-gps-btn">عرض الفرع الأقرب لي</span>
+        <i id="gps-icon" class="fas fa-location-arrow"></i>
+        <span id="l-gps-btn"></span>
     </button>
 
-    <div id="branchesList">جاري تحميل الفروع...</div>
+    <div id="branchesList">...</div>
 </div>
 
 <div class="trust-bar" id="trustBar" onclick="toggleOverlay(true)">
     <div class="btn bg-wa" style="padding: 5px 15px; font-size:10px; flex-direction: row; gap:8px; height: auto;">
-        <span id="l-cta">اكتشف الفرق</span> <i class="fas fa-chevron-left"></i>
+        <span id="l-cta"></span> 
+        <i id="cta-icon" class="fas"></i>
     </div>
     <div style="text-align: right;">
         <div style="color:var(--gold); font-size:14px;">★★★★★</div>
-        <div id="l-bar-main" style="font-size: 12px; font-weight: 900; color: var(--gold);">MAD: عطور أصلية بمعايير عالمية</div>
+        <div id="l-bar-main" style="font-size: 12px; font-weight: 900; color: var(--gold);"></div>
     </div>
 </div>
 
 <div id="trust-overlay">
-    <button class="overlay-close" onclick="toggleOverlay(false)" id="l-close">סגור ✕</button>
+    <button class="overlay-close" onclick="toggleOverlay(false)" id="l-close"></button>
     <div class="overlay-content">
         <iframe src="https://www.mad-parfumeur.com/ifra.html"></iframe>
     </div>
@@ -114,26 +116,37 @@
 <script>
     const userLang = navigator.language.startsWith("he") ? "he" : "ar";
     document.documentElement.lang = userLang;
+    // تحديد الاتجاه العام (الكل RTL في حالتنا)
+    document.documentElement.dir = "rtl";
 
     const t = {
         ar: {
-            gps_btn: "عرض الفروع حسب الأقرب لي",
+            gps_btn: "عرض الفروع الأقرب لي الآن",
+            bar_main: "MAD: عطور أصلية بمعايير عالمية",
+            cta: "اكتشف الفرق",
             open: "مفتوح الآن", closed: "مغلق حالياً", enter: "دخول الفرع", wa_btn: "واتساب",
-            close: "إغلاق ✕", dist: "يبعد عنك {d} كم", loading: "جاري تحديد موقعك..."
+            close: "إغلاق ✕", dist: "يبعد عنك {d} كم", loading: "جاري البحث...",
+            cta_icon: "fa-chevron-left" // السهم يشير لليسار في العربية
         },
         he: {
-            gps_btn: "הצג סניפים קרובים אלי",
+            gps_btn: "הצג את הסניפים הקרובים אלי",
+            bar_main: "MAD: בשמים מקوريים בסטנדרט עולמי",
+            cta: "גלה את ההבדل",
             open: "פתוח עכשיו", closed: "סגור כעת", enter: "כניסה לסניף", wa_btn: "וואטסאפ",
-            close: "סגור ✕", dist: "מרחק: {d} ק\"מ", loading: "מאתר את המיקום שלך..."
+            close: "סגור ✕", dist: "מרחק: {d} ק\"מ", loading: "מאתר מיקום...",
+            cta_icon: "fa-chevron-left" // السهم يشير لليسار في العبرية (RTL)
         }
     }[userLang];
 
+    // تطبيق النصوص والأيقونات تلقائياً
     document.getElementById('l-gps-btn').textContent = t.gps_btn;
+    document.getElementById('l-bar-main').textContent = t.bar_main;
+    document.getElementById('l-cta').textContent = t.cta;
     document.getElementById('l-close').textContent = t.close;
+    document.getElementById('cta-icon').classList.add(t.cta_icon);
 
     let allBranches = [];
 
-    // 1. تحميل الفروع عند فتح الصفحة بدون طلب موقع
     async function loadInitial() {
         try {
             const res = await fetch('branches.json?v=' + Date.now());
@@ -143,24 +156,20 @@
         } catch(e) { console.error(e); }
     }
 
-    // 2. دالة تفعيل الجي بي اس عند الضغط على الزر
     function requestLocation() {
         if (navigator.geolocation) {
             document.getElementById('l-gps-btn').textContent = t.loading;
             navigator.geolocation.getCurrentPosition(pos => {
                 const userLat = pos.coords.latitude;
                 const userLng = pos.coords.longitude;
-
                 allBranches.forEach(b => {
                     b.dist = calculateDistance(userLat, userLng, b.lat, b.lng);
                 });
-
-                // ترتيب من الأقرب للأبعد
                 allBranches.sort((a, b) => a.dist - b.dist);
                 render(allBranches);
                 document.getElementById('l-gps-btn').textContent = t.gps_btn;
-            }, (err) => {
-                alert(userLang === 'ar' ? "يرجى تفعيل الجي بي اس في هاتفك" : "יש להפעיל GPS במכשיר");
+            }, () => {
+                alert(userLang === 'ar' ? "يرجى تفعيل GPS" : "נא להפעיל GPS");
                 document.getElementById('l-gps-btn').textContent = t.gps_btn;
             });
         }
@@ -179,7 +188,7 @@
         container.innerHTML = '';
         list.forEach(b => {
             const isOpen = isBranchOpen(b);
-            const distHtml = b.dist ? `<span class="distance-tag"><i class="fas fa-map-marker-alt"></i> ${t.dist.replace('{d}', b.dist.toFixed(1))}</span>` : '';
+            const distHtml = b.dist ? `<span class="distance-tag"><i class="fas fa-street-view"></i> ${t.dist.replace('{d}', b.dist.toFixed(1))}</span>` : '';
             const card = document.createElement('div');
             card.className = 'branch-card';
             card.innerHTML = `
