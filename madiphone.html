@@ -2,7 +2,7 @@
 <html lang="he" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>MAD Parfumeur - iPhone Giveaway</title>
     <!-- مكتبة القصاصات الملونة للاحتفال -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
@@ -32,180 +32,161 @@
             --blue-soft: #e3f2fd;
             --white-pure: #ffffff;
             --glass-bg: rgba(255, 255, 255, 0.85);
-            --accent-glow: rgba(0, 74, 173, 0.3);
         }
 
         body {
             font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-            background: radial-gradient(circle at top right, #ffffff, #f0f4f8, #d9e2ec);
+            background: radial-gradient(circle at center, #ffffff, #f0f4f8, #d9e2ec);
             color: #102a43;
             margin: 0;
+            padding: 0;
             display: flex;
             flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-            overflow-x: hidden;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden; /* لمنع التمرير على الجوال */
         }
 
         header {
+            position: absolute;
+            top: 10px;
+            width: 100%;
             text-align: center;
-            padding: 40px 20px;
-            z-index: 5;
+            z-index: 100;
+            pointer-events: none;
         }
 
         header h1 {
             color: var(--blue-main);
-            font-size: 3.2rem;
+            font-size: 1.5rem;
             margin: 0;
             text-transform: uppercase;
-            letter-spacing: 6px;
-            font-weight: 900;
-            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
-        }
-
-        header p {
-            color: var(--blue-deep);
-            font-size: 1.2rem;
-            margin-top: 10px;
             letter-spacing: 2px;
-            opacity: 0.8;
+            font-weight: 900;
         }
 
         .main-content {
             display: flex;
-            flex-direction: row-reverse;
-            gap: 60px;
-            padding: 20px;
-            max-width: 1400px;
+            flex-direction: row-reverse; /* العجلة يمين واللوحة يسار */
             width: 100%;
-            justify-content: center;
+            height: 100%;
+            justify-content: space-around;
             align-items: center;
-            flex-wrap: wrap;
+            padding: 0 20px;
+            box-sizing: border-box;
         }
 
-        /* لوحة التحكم بتصميم زجاجي فاخر */
+        /* لوحة التحكم الجانبية */
         .admin-panel {
             position: relative;
             background: var(--glass-bg);
             backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            padding: 40px;
-            border-radius: 35px;
-            width: 420px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.1);
+            padding: 20px;
+            border-radius: 25px;
+            width: 30%; /* عرض اللوحة بالوضع العرضي */
+            height: 85vh;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
             border: 1px solid rgba(255, 255, 255, 0.5);
-            overflow: hidden;
             display: flex;
             flex-direction: column;
             background-image: linear-gradient(rgba(255,255,255,0.4), rgba(255,255,255,0.4)), url('https://madperfume.ps/upload/01-2026/page/69710fafb2c6f.png');
             background-size: cover;
             background-position: center;
+            z-index: 10;
         }
 
         .admin-content-inner {
             position: relative;
             z-index: 2;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #namesInput {
+            flex: 1;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.7);
+            border: 2px solid rgba(0, 74, 173, 0.1);
+            border-radius: 15px;
+            padding: 10px;
+            font-size: 0.9rem;
+            resize: none;
+            margin-bottom: 10px;
+            box-sizing: border-box;
+            text-align: right;
+            color: var(--blue-deep);
         }
 
         .stats {
             background: rgba(255, 255, 255, 0.9);
-            padding: 18px;
-            border-radius: 20px;
-            margin-bottom: 25px;
-            border-left: 6px solid var(--blue-main);
+            padding: 10px;
+            border-radius: 15px;
+            margin-bottom: 10px;
+            border-left: 4px solid var(--blue-main);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
-        }
-
-        #namesInput {
-            width: 100%;
-            height: 250px;
-            background: rgba(255, 255, 255, 0.7);
-            border: 2px solid rgba(0, 74, 173, 0.1);
-            border-radius: 20px;
-            padding: 20px;
-            font-size: 1.1rem;
-            resize: none;
-            margin-bottom: 25px;
-            box-sizing: border-box;
-            text-align: right;
-            color: var(--blue-deep);
-            transition: 0.3s;
-        }
-
-        #namesInput:focus {
-            outline: none;
-            border-color: var(--blue-main);
-            background: #fff;
-            box-shadow: 0 0 20px rgba(0, 74, 173, 0.1);
+            font-size: 0.8rem;
         }
 
         .btn {
-            padding: 18px;
-            border-radius: 18px;
+            padding: 12px;
+            border-radius: 12px;
             border: none;
-            font-size: 1.3rem;
+            font-size: 1rem;
             font-weight: 800;
             cursor: pointer;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transition: 0.3s;
             width: 100%;
         }
 
         #spinBtn {
             background: linear-gradient(135deg, var(--blue-deep), var(--blue-main));
             color: white;
-            box-shadow: 0 10px 30px rgba(0, 74, 173, 0.3);
-            text-transform: uppercase;
-            letter-spacing: 1px;
+            box-shadow: 0 5px 15px rgba(0, 74, 173, 0.3);
         }
 
-        #spinBtn:hover:not(:disabled) {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 40px rgba(0, 74, 173, 0.4);
-        }
-
-        #spinBtn:disabled { opacity: 0.5; cursor: not-allowed; }
-
-        /* العجلة والمؤشر */
+        /* العجلة */
         .wheel-container-wrapper {
             position: relative;
+            width: 60%; /* العجلة تأخذ مساحة أكبر */
+            height: 100%;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-top: 120px;
         }
 
         .wheel-box {
             position: relative;
-            width: 620px;
-            height: 620px;
+            width: 85vh; /* الحجم يعتمد على ارتفاع الشاشة لتبقى دائرية */
+            height: 85vh;
+            max-width: 90vw;
+            max-height: 90vh;
         }
 
         #wheelCanvas { 
             width: 100%; 
             height: 100%; 
             border-radius: 50%; 
-            border: 15px solid #ffffff;
-            box-shadow: 0 30px 80px rgba(0,0,0,0.15);
+            border: 10px solid #ffffff;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.1);
             background: #fff;
         }
 
-        /* تأثير لمعان فوق العجلة */
         .wheel-glass-effect {
             position: absolute;
             top: 0; left: 0; right: 0; bottom: 0;
             border-radius: 50%;
-            background: linear-gradient(135deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0) 50%, rgba(0,0,0,0.05) 100%);
+            background: linear-gradient(135deg, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0) 50%, rgba(0,0,0,0.05) 100%);
             pointer-events: none;
             z-index: 10;
         }
 
-        /* المؤشر الفاخر */
+        /* المؤشر الفاخر - العطر */
         .pointer-wrapper {
             position: absolute;
-            top: -160px;
+            top: -20px;
             left: 50%;
             transform: translateX(-50%);
             display: flex;
@@ -213,36 +194,29 @@
             align-items: center;
             z-index: 50;
             cursor: pointer;
-            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-
-        .pointer-wrapper:hover {
-            transform: translateX(-50%) translateY(-10px) scale(1.08);
+            transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
         .perfume-indicator {
-            width: 180px;
+            width: 100px; /* تصغير للوضع العرضي */
             height: auto;
-            max-height: 280px;
+            max-height: 150px;
             animation: elegantFloat 4s ease-in-out infinite;
-            filter: drop-shadow(0 20px 35px rgba(0, 74, 173, 0.3));
+            filter: drop-shadow(0 10px 15px rgba(0, 74, 173, 0.25));
             object-fit: contain;
-            margin-bottom: -10px;
+            margin-bottom: -5px;
         }
 
         @keyframes elegantFloat {
-            0%, 100% { transform: translateY(0) rotate(0deg); }
-            50% { transform: translateY(-20px) rotate(2deg); }
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
         }
 
         .pointer-triangle {
-            width: 50px;
-            height: 70px;
+            width: 30px;
+            height: 40px;
             background: var(--blue-main);
             clip-path: polygon(50% 100%, 0 0, 100% 0);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
-            position: relative;
-            z-index: -1;
         }
 
         .logo-center {
@@ -250,80 +224,62 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 140px;
-            height: 140px;
+            width: 80px;
+            height: 80px;
             background: #fff;
-            border: 6px solid var(--blue-main);
+            border: 4px solid var(--blue-main);
             border-radius: 50%;
             z-index: 20;
             display: flex;
             align-items: center;
             justify-content: center;
             overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
         }
 
         .logo-center img { width: 85%; }
 
-        /* نافذة الفوز الفاخرة */
+        /* نافذة النتيجة */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 20, 40, 0.95); display: none; justify-content: center; align-items: center;
-            z-index: 1000; backdrop-filter: blur(20px);
+            background: rgba(0, 20, 40, 0.9); display: none; justify-content: center; align-items: center;
+            z-index: 1000; backdrop-filter: blur(10px);
         }
 
         .modal-overlay.active { display: flex; }
 
         .modal-content {
-            background: #fff; padding: 70px 40px; border-radius: 50px;
-            text-align: center; width: 90%; max-width: 600px;
-            box-shadow: 0 40px 100px rgba(0,0,0,0.5);
-            border: 4px solid var(--blue-main);
-            position: relative;
-            animation: modalPop 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-
-        @keyframes modalPop {
-            from { transform: scale(0.7); opacity: 0; }
-            to { transform: scale(1); opacity: 1; }
-        }
-
-        .modal-content h2 {
-            color: var(--blue-main);
-            font-size: 3.5rem;
-            margin: 0 0 15px 0;
-            font-weight: 900;
+            background: #fff; padding: 30px; border-radius: 30px;
+            text-align: center; width: 80%; max-width: 400px;
+            border: 3px solid var(--blue-main);
         }
 
         .winner-name { 
-            font-size: 3.2rem; 
+            font-size: 2rem; 
             color: var(--blue-deep); 
             font-weight: 900; 
-            margin: 30px 0; 
+            margin: 20px 0; 
             display: block; 
-            padding: 20px;
+            padding: 15px;
             background: var(--blue-soft);
-            border-radius: 25px;
-        }
-
-        .close-btn {
-            background: var(--blue-main);
-            color: white;
-            padding: 15px 60px;
-            font-size: 1.2rem;
             border-radius: 15px;
-            border: none;
-            cursor: pointer;
-            font-weight: bold;
-            transition: 0.3s;
         }
 
-        .close-btn:hover { background: var(--blue-deep); transform: scale(1.05); }
+        /* تعديلات للوضع العمودي (Portrait) إذا احتاج المستخدم */
+        @media (orientation: portrait) {
+            .main-content {
+                flex-direction: column;
+                justify-content: center;
+                overflow-y: auto;
+            }
+            .admin-panel { width: 90%; height: auto; margin-top: 20px; }
+            .wheel-box { width: 90vw; height: 90vw; }
+            .pointer-wrapper { top: -40px; }
+        }
 
-        @media (max-width: 1200px) {
-            .wheel-box { width: 450px; height: 450px; }
-            .perfume-indicator { width: 130px; }
-            .main-content { gap: 30px; }
+        @media (max-width: 600px) {
+            header h1 { font-size: 1.2rem; }
+            .admin-panel { width: 35%; padding: 10px; }
+            .stats { font-size: 0.7rem; }
         }
     </style>
 </head>
@@ -331,32 +287,31 @@
 
     <header>
         <h1>MAD Parfumeur</h1>
-        <p>מצוינות בבחירה.. המזל מחכה</p>
     </header>
 
     <div class="main-content">
-        <!-- لوحة الإدخال الزجاجية -->
+        <!-- لوحة التحكم الجانبية (يسار في الوضع العرضي) -->
         <div class="admin-panel">
             <div class="admin-content-inner">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 15px;">
-                    <h3 style="color:var(--blue-main); margin:0; font-size: 1.4rem; font-weight: 800;">רשימת משתתפים</h3>
-                    <span id="saveStatus" style="font-size:0.8rem; color:var(--blue-deep); background: #fff; padding: 4px 10px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">...</span>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 5px;">
+                    <h3 style="color:var(--blue-main); margin:0; font-size: 1rem;">רשימת משתתפים</h3>
+                    <span id="saveStatus" style="font-size:0.6rem;">...</span>
                 </div>
                 
-                <textarea id="namesInput" spellcheck="false" placeholder="הכנס שמות כאן (שם בכל שורה)..."></textarea>
+                <textarea id="namesInput" spellcheck="false" placeholder="הכנס שמות כאן..."></textarea>
                 
                 <div class="stats">
-                    <span style="font-weight: 600;">משתתפים:</span>
-                    <span id="participantCount" style="color: var(--blue-main); font-weight: 900; font-size: 1.5rem;">0</span>
+                    <span>משתתפים:</span>
+                    <span id="participantCount" style="color: var(--blue-main); font-weight: 900;">0</span>
                 </div>
                 
-                <button id="spinBtn" class="btn" onclick="startSpin()">סובב את הגלגל 🔥</button>
-                <button class="btn" style="background:rgba(0,0,0,0.05); color:var(--blue-deep); font-size:0.9rem; margin-top: 10px; border: 1px solid rgba(0,0,0,0.1);" onclick="saveAndRefresh()">שמור נתונים</button>
+                <button id="spinBtn" class="btn" onclick="startSpin()">סובב 🔥</button>
+                <button class="btn" style="background:rgba(0,0,0,0.05); color:var(--blue-deep); font-size:0.7rem; margin-top: 5px;" onclick="saveAndRefresh()">שמור נתונים</button>
             </div>
         </div>
 
+        <!-- العجلة (يمين في الوضع العرضي) -->
         <div class="wheel-container-wrapper">
-            <!-- المؤثر المدمج الفاخر -->
             <div class="pointer-wrapper" onclick="startSpin()">
                 <img class="perfume-indicator" src="https://madperfume.ps/upload/01-2026/page/69710e210a9de.png" alt="MAD Perfume Premium">
                 <div class="pointer-triangle"></div>
@@ -372,13 +327,11 @@
         </div>
     </div>
 
-    <!-- نافذة النتيجة -->
     <div id="modal" class="modal-overlay">
         <div class="modal-content">
-            <h2>מזל טוב! 🎉</h2>
-            <p style="color:#666; font-size: 1.4rem;">הזוכה המאושר הוא/היא:</p>
+            <h2 style="color:var(--blue-main)">מזל טוב! 🎉</h2>
             <span id="winnerDisplay" class="winner-name">---</span>
-            <button class="close-btn" onclick="closeModal()">סגור</button>
+            <button class="btn" style="background:var(--blue-main); color:white;" onclick="closeModal()">סגור</button>
         </div>
     </div>
 
@@ -396,32 +349,17 @@
         const countDisplay = document.getElementById('participantCount');
         const statusDisplay = document.getElementById('saveStatus');
 
-        // نظام الصوت
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         function playTick() {
             if (audioCtx.state === 'suspended') audioCtx.resume();
             const o = audioCtx.createOscillator();
             const g = audioCtx.createGain();
             o.frequency.setValueAtTime(650, audioCtx.currentTime);
-            g.gain.setValueAtTime(0.06, audioCtx.currentTime);
+            g.gain.setValueAtTime(0.04, audioCtx.currentTime);
             o.connect(g); g.connect(audioCtx.destination);
-            o.start(); o.stop(audioCtx.currentTime + 0.05);
+            o.start(); o.stop(audioCtx.currentTime + 0.04);
         }
 
-        function playWin() {
-            const notes = [523.25, 659.25, 783.99, 1046.50, 1318.51];
-            notes.forEach((f, i) => {
-                const o = audioCtx.createOscillator();
-                const g = audioCtx.createGain();
-                o.type = 'sine';
-                o.frequency.value = f;
-                g.gain.setValueAtTime(0.1, audioCtx.currentTime + i * 0.1);
-                o.connect(g); g.connect(audioCtx.destination);
-                o.start(audioCtx.currentTime + i * 0.1); o.stop(audioCtx.currentTime + i * 0.1 + 0.7);
-            });
-        }
-
-        // الحفظ السحابي
         async function loadData() {
             if (!currentUser || !window.firebaseApp) return;
             const { db, appId, getDoc, doc } = window.firebaseApp;
@@ -466,16 +404,12 @@
 
             names.forEach((name, i) => {
                 const angle = startAngle + i * arcSize;
-                
-                // تدرج لوني ناعم للأقسام
                 ctx.fillStyle = i % 2 === 0 ? "#ffffff" : "#f8fbff";
                 ctx.beginPath();
                 ctx.arc(centerX, centerY, radius, angle, angle + arcSize, false);
                 ctx.lineTo(centerX, centerY);
                 ctx.fill();
-                
-                ctx.strokeStyle = "rgba(0, 74, 173, 0.08)";
-                ctx.lineWidth = 1;
+                ctx.strokeStyle = "rgba(0, 74, 173, 0.05)";
                 ctx.stroke();
 
                 ctx.save();
@@ -483,38 +417,33 @@
                 ctx.translate(centerX + Math.cos(angle + arcSize/2) * (radius - 35), 
                               centerY + Math.sin(angle + arcSize/2) * (radius - 35));
                 ctx.rotate(angle + arcSize/2 + Math.PI);
-                ctx.font = `800 ${fontSize}px 'Segoe UI', Arial`;
+                ctx.font = `800 ${fontSize}px Arial`;
                 ctx.textAlign = "right";
-                ctx.fillText(name.substring(0, 28), 0, fontSize/3);
+                ctx.fillText(name.substring(0, 25), 0, fontSize/3);
                 ctx.restore();
             });
 
-            // إطار خارجي ذهبي خفيف وأزرق
             const grad = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
             grad.addColorStop(0, '#001a3d'); grad.addColorStop(0.5, '#004aad'); grad.addColorStop(1, '#001a3d');
-            ctx.strokeStyle = grad; ctx.lineWidth = 20;
+            ctx.strokeStyle = grad; ctx.lineWidth = 15;
             ctx.beginPath(); ctx.arc(centerX, centerY, radius, 0, Math.PI * 2); ctx.stroke();
         }
 
         window.startSpin = () => {
             if (isSpinning || names.length === 0) return;
             if (audioCtx.state === 'suspended') audioCtx.resume();
-            
             isSpinning = true;
             document.getElementById('spinBtn').disabled = true;
-            
-            const duration = 11000 + Math.random() * 3000;
-            const totalRot = (35 + Math.random() * 20) * Math.PI;
+            const duration = 9000;
+            const totalRot = (30 + Math.random() * 20) * Math.PI;
             const start = performance.now();
 
             function anim(now) {
                 const progress = Math.min((now - start) / duration, 1);
-                const ease = 1 - Math.pow(1 - progress, 5); // تباطؤ ناعم جداً
+                const ease = 1 - Math.pow(1 - progress, 4);
                 startAngle = (ease * totalRot) % (Math.PI * 2);
-                
                 const currentIdx = Math.floor(((3*Math.PI/2) - startAngle + Math.PI*200) % (Math.PI*2) / arcSize);
                 if (currentIdx !== lastTickIndex) { playTick(); lastTickIndex = currentIdx; }
-
                 drawWheel();
                 if (progress < 1) requestAnimationFrame(anim);
                 else {
@@ -523,11 +452,7 @@
                     const winIdx = (Math.floor(((3*Math.PI/2) - startAngle + Math.PI*200) % (Math.PI*2) / arcSize) + names.length) % names.length;
                     document.getElementById('winnerDisplay').innerText = names[winIdx];
                     document.getElementById('modal').classList.add('active');
-                    playWin();
-                    confetti({ 
-                        particleCount: 500, spread: 160, origin: { y: 0.6 }, 
-                        colors: ['#004aad', '#ffffff', '#b3d1ff', '#001a3d'] 
-                    });
+                    confetti({ particleCount: 400, spread: 100, origin: { y: 0.6 } });
                 }
             }
             requestAnimationFrame(anim);
@@ -540,8 +465,7 @@
             const { auth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } = window.firebaseApp;
             const token = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
             try {
-                if (token) await signInWithCustomToken(auth, token); 
-                else await signInAnonymously(auth);
+                if (token) await signInWithCustomToken(auth, token); else await signInAnonymously(auth);
                 onAuthStateChanged(auth, (u) => { if (u) { currentUser = u; loadData(); } });
             } catch (error) { statusDisplay.innerText = "שגיאה"; }
         };
