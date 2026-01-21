@@ -250,6 +250,214 @@
         document.getElementById('branchesList').innerHTML = html;
     }
     init();
+    <style>
+
+/* ===== FLOATING GLASS BAR ===== */
+#mad-trust-bar {
+  position: fixed;
+  bottom: 15px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 95%;
+  max-width: 880px;
+  background: rgba(15,15,15,0.75);
+  backdrop-filter: blur(14px);
+  border-radius: 18px;
+  padding: 14px 18px;
+  color: #fff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 10px 35px rgba(0,0,0,.35);
+  z-index: 9999;
+  animation: madSlideUp .6s ease;
+  font-family: Arial, sans-serif;
+}
+
+@keyframes madSlideUp {
+  from {opacity:0; transform:translate(-50%,60px);}
+  to {opacity:1; transform:translate(-50%,0);}
+}
+
+.mad-stars {
+  color: gold;
+  font-size: 15px;
+}
+
+.mad-title {
+  font-weight: bold;
+  font-size: 15px;
+}
+
+.mad-sub {
+  font-size: 13px;
+  opacity: .85;
+}
+
+.mad-open-btn {
+  background: linear-gradient(135deg,#d4af37,#ffd700);
+  color:#000;
+  padding:10px 14px;
+  border-radius:12px;
+  border:none;
+  cursor:pointer;
+  font-weight:bold;
+}
+
+.mad-open-btn:hover {
+  transform: scale(1.05);
+}
+
+/* ===== FULLSCREEN POPUP ===== */
+
+#mad-popup-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.65);
+  backdrop-filter: blur(10px);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 10000;
+}
+
+#mad-popup-box {
+  width: 95%;
+  height: 92%;
+  background: rgba(20,20,20,.92);
+  border-radius: 20px;
+  overflow: hidden;
+  position: relative;
+  box-shadow: 0 0 40px rgba(0,0,0,.6);
+}
+
+/* Close Button */
+
+#mad-popup-close {
+  position: absolute;
+  top: 12px;
+  right: 15px;
+  background: rgba(255,255,255,.15);
+  color:#fff;
+  padding:8px 14px;
+  border-radius: 12px;
+  cursor:pointer;
+  font-size:14px;
+  z-index: 999;
+}
+
+#mad-popup-close:hover {
+  background: rgba(255,255,255,.3);
+}
+
+/* Iframe */
+
+#mad-popup-iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+@media(max-width:600px){
+  #mad-trust-bar {
+    flex-direction: column;
+    text-align:center;
+  }
+}
+
+</style>
+
+<!-- FLOATING BAR -->
+<div id="mad-trust-bar">
+
+  <div>
+    <div class="mad-stars">★★★★★ Trusted Fragrance Brand</div>
+    <div class="mad-title" id="madTitle"></div>
+    <div class="mad-sub" id="madSub"></div>
+  </div>
+
+  <button class="mad-open-btn" onclick="openMadPopup()" id="madBtn"></button>
+
+</div>
+
+<!-- POPUP -->
+<div id="mad-popup-overlay">
+
+  <div id="mad-popup-box">
+
+    <div id="mad-popup-close" onclick="closeMadPopup()">✕ Close</div>
+
+    <iframe 
+      id="mad-popup-iframe" 
+      src="https://www.mad-parfumeur.com/ifra.html">
+    </iframe>
+
+  </div>
+
+</div>
+
+<script>
+
+// ===== LANGUAGE DETECTION =====
+
+const lang = document.documentElement.lang || navigator.language || "en";
+
+// ===== TRANSLATIONS =====
+
+const texts = {
+
+ar: {
+  title: "MAD PARFUMEUR — عطور أصلية بمعايير عالمية",
+  sub: "اكتشف الفرق الحقيقي بيننا وبين باقي الشركات في الجودة والتركيب والاعتماد الدولي",
+  btn: "اكتشف الفرق →",
+  close: "إغلاق ✕"
+},
+
+he: {
+  title: "MAD PARFUMEUR — בישום מקורי בסטנדרט עולמי",
+  sub: "גלו את ההבדל האמיתי בין MAD לבין חברות אחרות באיכות ובתקנים",
+  btn: "גלה את ההבדל →",
+  close: "סגור ✕"
+},
+
+en: {
+  title: "MAD PARFUMEUR — Original Fragrances With Global Standards",
+  sub: "Discover the real difference between MAD and other perfume brands",
+  btn: "Discover Difference →",
+  close: "Close ✕"
+}
+
+};
+
+// ===== SELECT LANGUAGE =====
+
+let currentLang = "en";
+
+if(lang.startsWith("ar")) currentLang = "ar";
+else if(lang.startsWith("he")) currentLang = "he";
+
+// ===== APPLY TEXT =====
+
+document.getElementById("madTitle").innerText = texts[currentLang].title;
+document.getElementById("madSub").innerText = texts[currentLang].sub;
+document.getElementById("madBtn").innerText = texts[currentLang].btn;
+document.getElementById("mad-popup-close").innerText = texts[currentLang].close;
+
+
+// ===== POPUP FUNCTIONS =====
+
+function openMadPopup() {
+  document.getElementById("mad-popup-overlay").style.display = "flex";
+  document.body.style.overflow = "hidden";
+}
+
+function closeMadPopup() {
+  document.getElementById("mad-popup-overlay").style.display = "none";
+  document.body.style.overflow = "auto";
+}
+
 </script>
+
 </body>
 </html>
