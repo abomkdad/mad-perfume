@@ -1,0 +1,496 @@
+import React, { useState, useEffect } from 'react';
+import { 
+  ShieldCheck, 
+  Factory, 
+  Award, 
+  BadgeCheck, 
+  Menu, 
+  X, 
+  Globe, 
+  Star, 
+  Zap, 
+  History, 
+  ArrowRight,
+  Droplets,
+  FlaskConical,
+  Activity,
+  Scale,
+  Atom,
+  ShieldAlert,
+  CheckCircle2,
+  Binary,
+  Microscope,
+  Compass,
+  ArrowUpRight,
+  Skull,
+  Palette,
+  Users,
+  Target,
+  Rocket,
+  Eye,
+  Heart,
+  LayoutGrid,
+  Timer,
+  ExternalLink,
+  ChevronLeft,
+  Search,
+  BookOpen,
+  Verified,
+  Sparkles,
+  FileText,
+  Languages
+} from 'lucide-react';
+
+// --- Static Data and Configuration (Defined outside component to prevent scope errors) ---
+
+const logoUrl = "https://fimgs.net/mdimg/dizajneri/m.7379.jpg";
+const fragranticaLogo = "https://www.fragrantica.com/ndimg/fragrantica-logo-tagline-svg.svg";
+const videoUrl = "https://madparfumeurglobal.com/wp-content/uploads/2025/10/download.mp4";
+const wideBannerImg = "https://madparfumeurglobal.com/wp-content/uploads/2025/10/1920x600-BERGAY.jpg";
+const nicheImg = "https://fimgs.net/mdimg/perfume-thumbs/375x500.119707.2x.avif";
+const selectiveImg = "https://ba62e8.cdn.akinoncloud.com/products/2025/12/25/2165/a18c7d3a-12a2-4292-b768-95aa14572df9_size828_cropCenter.jpg";
+const isoDriveLink = "https://drive.google.com/file/d/1TzFKz9xHZnuQlPVB6ytOBRrojmfvQxy7/view?usp=sharing";
+
+const BuildingIcon = ({ size = 24, className = "" }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <rect width="16" height="20" x="4" y="2" rx="2" ry="2"/><path d="M9 22v-4h6v4"/><path d="M8 6h.01"/><path d="M16 6h.01"/><path d="M8 10h.01"/><path d="M16 10h.01"/><path d="M8 14h.01"/><path d="M16 14h.01"/>
+  </svg>
+);
+
+const certificates = [
+  { id: "ISO 22716", title: "GMP Excellence", desc: "أعلى معايير التصنيع الجيد" },
+  { id: "ISO 9001", title: "Quality Management", desc: "نظام إدارة الجودة العالمي" },
+  { id: "IFRA Standard", title: "Global Safety", desc: "ميثاق الأمان الدولي للعطور" },
+  { id: "SMIIC Halal", title: "Pure Certified", desc: "مطابقة الشروط الصحية والشرعية" }
+];
+
+const stats = [
+  { label_key: "heritage", value: "26Y", icon: <History className="w-5 h-5" /> },
+  { label_key: "stores", value: "455", icon: <BuildingIcon className="w-5 h-5" /> },
+  { label_key: "nations", value: "18", icon: <Globe className="w-5 h-5" /> },
+  { label_key: "cities", value: "70", icon: <Compass className="w-5 h-5" /> }
+];
+
+const translations = {
+  ar: {
+    dir: 'rtl',
+    nav: { maison: 'الدار', registry: 'السجل', standards: 'المعايير', manifesto: 'الميثاق', hub: 'المركز العالمي' },
+    hero: { est: 'تأسس عام 1999', truth: 'الحقيقة.', pure: 'نقاء', desc: '"نحن لا نصمم مجرد روائح؛ نحن نهندس أثراً جزيئياً لا يزول."' },
+    maison: { title: 'إرث يمتد عبر القارات', tag: '01 / الدار', desc: 'بدأت رحلتنا الشغوفة عام 1999، مؤمنين بأن العطر هو "توقيع الجسد" والهوية غير المرئية التي تسبق حضورك.', subDesc: 'على مدار 26 عاماً، استلهمنا جوهرنا من جمال الطبيعة لنصيغ لك تجارب نيش مبهرة بـ 455 متجراً عالمياً في 18 دولة.', vision: 'رؤيتنا العالمية', mission: 'مهمتنا الفنية', visionText: 'إلهام العالم للتعبير عن ذواتهم وخلق روابط عاطفية عميقة تكتشف الجمال الداخلي.', missionText: 'التعامل مع الإنتاج كفن رفيع، ودمج أجود المكونات الطبيعية مع أحدث الابتكارات الصناعية.', series: 'سلسلة التوقيع' },
+    fragrantica: { tag: 'سجل قواعد البيانات العالمية', title: 'بصمة في تاريخ النيش', desc: 'تُصنف MAD Parfumeur عالمياً كدار عطور نيش معتمدة ضمن موسوعة Fragrantica. هذا الاعتراف هو شهادة خبراء العطور حول العالم بجودة خلاصاتنا.', link: 'تصفح أرشيفنا العالمي' },
+    collections: { title: 'مجموعات مختارة', tag: 'المجموعة', niche: 'أتيليه النيش', selective: 'سلسلة سلكتيف', private: 'مزيج خاص', elite: 'سلسلة النخبة' },
+    standards: { title: 'ميثاق الأمان', tag: 'معيار IFRA', desc: 'الالتزام بمعايير (IFRA) هو ما يفصل بين خلط الروائح وبين صناعة العطور. نحن نضمن لك نقاءً مخبرياً وحماية كاملة للبشرة.', isoBtn: 'الاطلاع على شهادات الـ ISO', precise: 'دقة جزيئية', clinical: 'معايير سريرية' },
+    manifesto: { title: 'الميثاق', subtitle: 'ميثاق الفوارق الجوهرية: العلم المؤسسي في مواجهة فوضى البدائل والتركيب.', technical: 'المعيار الفني', labs: 'المختبرات العالمية', mad: 'عطور مـاد (MAD)', local: 'البدائل والتركيب', verdict: '"الجودة في MAD ليست مجرد وعد تسويقي؛ بل هي حقيقة مخبرية موثقة في أرشيف النيش العالمي."', choice: 'الخيار المعتمد' },
+    footer: { est: 'التميز في كل ثانية', stores: '455 متجراً عالمياً', iso: 'معتمد ISO 22716', nations: '18 دولة' },
+    stat_labels: { heritage: 'إرث عطري', stores: 'وجهة بيع', nations: 'دولة', cities: 'مدينة استراتيجية' },
+    compItems: [
+      { label: 'تطوير الرائحة', science: 'مختبرات بحث جزيئي', mad: 'خلاصات نيش احترافية', local: 'خلط يدوي تقديري' },
+      { label: 'الأمان الجلدي', science: 'معايير IFRA الصارمة', mad: 'مطابقة كاملة دولياً', local: 'زيوت مجهولة المصدر' },
+      { label: 'عملية التعتيق', science: 'أنظمة تحكم رقمية', mad: 'تعتيق صناعي مضبوط', local: 'خلط وبيع فوري' },
+      { label: 'استقرار الجودة', science: 'مرجعية مختبرية ثابتة', mad: 'موحد في 455 فرعاً', local: 'تذبذب واختلاف دائم' },
+      { label: 'ثبات الرائحة', science: 'استقرار جزيئي طويل', mad: 'ثبات مستقر ومُختبر', local: 'تأكسد وتغير سريع' },
+      { label: 'التعبئة والرقابة', science: 'هندسة فحص مجهري', mad: 'هوية ورقابة فاخرة', local: 'زجاجات غياب الرقابة' }
+    ]
+  },
+  he: {
+    dir: 'rtl',
+    nav: { maison: 'הבית', registry: 'מרשם', standards: 'תקנים', manifesto: 'המניפסט', hub: 'מרכז עולמי' },
+    hero: { est: 'נוסד ב-1999', truth: 'האמת.', pure: 'טוהר', desc: '"אנחנו לא רק מעצבים ריחות; אנחנו מהנדסים חתימה מולקולרית בלתי נשכחת."' },
+    maison: { title: 'מורשת על פני יבשות', tag: '01 / הבית העיצובי', desc: 'המסע שלנו החל ב-1999, מתוך אמונה שהבושם הוא "חתימת הגוף" והזהות הבלתי נראית שמקדימה את בואך.', subDesc: 'במשך 26 שנים, שאבנו השראה מיופי הטבע כדי ליצור חוויות נישה מרהיבות ב-455 חנויות ברחבי העולם ב-18 מדינות.', vision: 'חזון עולמי', mission: 'משימה אמנותית', visionText: 'לעורר השראה בעולם לבטא את עצמם וליצור קשרים רגשיים עמוקים המגלים יופי פנימי.', missionText: 'התייחסות לייצור כאמנות נעלה, שילוב רכיבים טבעיים משובחים עם חידושים תעשייתיים.', series: 'סדרת החתימה' },
+    fragrantica: { tag: 'מרשם מאגרי מידע עולמי', title: 'חותם בהיסטוריית הנישה', desc: 'MAD Parfumeur מסווגת בעולם כבית בשמי נישה מאושר בתוך אנציקלופדיית Fragrantica. הכרה זו היא עדות של מומחי בשמים לאיכות התמציות שלנו.', link: 'עיון בארכיון העולמי' },
+    collections: { title: 'אוספים נבחרים', tag: 'הקולקציה', niche: 'סטודיו נישה', selective: 'סדרת סלקטיב', private: 'בלנד פרטי', elite: 'סדרת עלית' },
+    standards: { title: 'אמנת הבטיחות', tag: 'תקן IFRA', desc: 'העמידה בתקני (IFRA) היא מה שמפריד בין ערבוב ריחות לבין תעשיית הבישום. אנו מבטיחים טוהר מעבדתי והגנה מלאה לעור.', isoBtn: 'צפייה בתעודות ISO', precise: 'דיוק מולקולרי', clinical: 'סטנדרטים קליניים' },
+    manifesto: { title: 'המניפסט', subtitle: 'מניפסט ההבדלים המהותיים: מדע מוסדי מול כאוס התחליפים והרקיחה המקומית.', technical: 'סטנדרט טכני', labs: 'מעבדות עולמיות', mad: 'בשמי מד (MAD)', local: 'תחליפים ורקיחה', verdict: '"האיכות ב-MAD היא לא רק הבטחה שיווקית; היא אמת מעבדתית מתועדת בארכיון הנישה העולמי."', choice: 'הבחירה המאושרת' },
+    footer: { est: 'מצוינות בכל שנייה', stores: '455 חנויות עולמיות', iso: 'מאושר ISO 22716', nations: '18 מדינות' },
+    stat_labels: { heritage: 'מורשת בשמים', stores: 'חנויות', nations: 'מדינות', cities: 'ערים אסטרטגיות' },
+    compItems: [
+      { label: 'פיתוח הריח', science: 'מעבדות מחקר מולקולרי', mad: 'תמציות נישה מקצועיות', local: 'ערבוב ידני משוער' },
+      { label: 'בטיחות העור', science: 'תקני IFRA מחמירים', mad: 'עמידה בינלאומית מלאה', local: 'שמנים ממקור לא ידוע' },
+      { label: 'תהליך היישון', science: 'מערכות בקרה דיגיטליות', mad: 'יישון תעשייתי מבוקר', local: 'ערבוב ומכירה מיידית' },
+      { label: 'יציבות האיכות', science: 'ייחוס מעבדתי קבוע', mad: 'אחיד ב-455 סניפים', local: 'חוסר עקביות ושינויים' },
+      { label: 'עמידות הריח', science: 'יציבות מולקולרית ארוכה', mad: 'עמידות יציבה ונבדקת', local: 'חמצון ושינוי מהיר' },
+      { label: 'אריזה ובקרה', science: 'הנדסה ובדיקה מיקרוסקופית', mad: 'זהות ובקרה יוקרתית', local: 'בקבוקים גנריים ללא בקרה' }
+    ]
+  },
+  en: {
+    dir: 'ltr',
+    nav: { maison: 'Maison', registry: 'Registry', standards: 'Standards', manifesto: 'Manifesto', hub: 'Global Hub' },
+    hero: { est: 'Established 1999', truth: 'truth.', pure: 'PURE', desc: '"We don’t just design scents; we engineer a molecular signature that lasts forever."' },
+    maison: { title: 'A Legacy Across Continents', tag: '01 / The Maison', desc: 'Our passionate journey began in 1999, believing that perfume is the "signature of the body" and the invisible identity.', subDesc: 'For 26 years, we inspired our essence from nature\'s beauty to craft stunning niche experiences in 455 global stores across 18 countries.', vision: 'Global Vision', mission: 'Artistic Mission', visionText: 'Inspiring the world to express themselves and build deep emotional bonds that discover inner beauty.', missionText: 'Treating production as a fine art, merging the finest natural ingredients with the latest industrial innovations.', series: 'Signature Series' },
+    fragrantica: { tag: 'Global Database Registry', title: 'A Mark in Niche History', desc: 'MAD Parfumeur is globally classified as a certified niche fragrance house within the Fragrantica encyclopedia. This recognition is a testament of experts to our quality.', link: 'Browse Our Global Archive' },
+    collections: { title: 'Curated Collections', tag: 'The Collection', niche: 'Niche Atelier', selective: 'Selective Series', private: 'Private Blend', elite: 'Elite Series' },
+    standards: { title: 'Safety Charter', tag: 'IFRA Standard', desc: 'Adhering to (IFRA) standards is what separates scent mixing from perfume manufacturing. We guarantee laboratory purity and skin protection.', isoBtn: 'View ISO Certificates', precise: 'Molecular Precision', clinical: 'Clinical Standards' },
+    manifesto: { title: 'The Manifesto', subtitle: 'The Manifesto of Core Differences: Institutional Science vs. The Chaos of Alternatives.', technical: 'Technical Standard', labs: 'Global Laboratories', mad: 'MAD Perfumes', local: 'Alternatives & Mixing', verdict: '"Quality at MAD is not just a marketing promise; it is a laboratory truth documented in the global niche archive."', choice: 'The Verified Choice' },
+    footer: { est: 'Excellence Per Second', stores: '455 Global Stores', iso: 'ISO 22716 Certified', nations: '18 Sovereign Nations' },
+    stat_labels: { heritage: 'Heritage', stores: 'Stores', nations: 'Nations', cities: 'Strategic Cities' },
+    compItems: [
+      { label: 'Scent Development', science: 'Molecular Research Labs', mad: 'Professional Niche Bases', local: 'Estimated Manual Mixing' },
+      { label: 'Dermatological Safety', science: 'Strict IFRA Standards', mad: 'Full International Compliance', local: 'Unknown Source Oils' },
+      { label: 'Maceration Process', science: 'Digital Control Systems', mad: 'Controlled Industrial Aging', local: 'Immediate Mixing & Sale' },
+      { label: 'Quality Stability', science: 'Fixed Laboratory Reference', mad: 'Uniform in 455 Branches', local: 'Permanent Scent Variance' },
+      { label: 'Scent Longevity', science: 'Long Molecular Stability', mad: 'Stable & Lab-Tested', local: 'Rapid Oxidation & Change' },
+      { label: 'Packaging & QC', science: 'Microscopic Inspection', mad: 'Luxury Identity & Audit', local: 'Generic Bottles & No QC' }
+    ]
+  }
+};
+
+// --- Helper Functions ---
+
+const getComparisonIcon = (index) => {
+  const icons = [
+    <Atom key="atom" className="w-6 h-6" />, 
+    <ShieldCheck key="shield" className="w-6 h-6" />, 
+    <Timer key="timer" className="w-6 h-6" />, 
+    <Activity key="activity" className="w-6 h-6" />, 
+    <Zap key="zap" className="w-6 h-6" />, 
+    <LayoutGrid key="grid" className="w-6 h-6" />
+  ];
+  return icons[index];
+};
+
+// --- Main App Component ---
+
+const App = () => {
+  const [lang, setLang] = useState('ar');
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    // Detect browser language automatically
+    const browserLang = navigator.language.split('-')[0];
+    if (translations[browserLang]) {
+      setLang(browserLang);
+    } else {
+      setLang('en');
+    }
+
+    const handleScroll = () => setScrolled(window.scrollY > 50);
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const t = translations[lang];
+
+  return (
+    <div className="min-h-screen bg-[#020202] text-[#f4f4f4] font-sans selection:bg-amber-500 selection:text-black overflow-x-hidden transition-all duration-500" dir={t.dir}>
+      
+      {/* Navigation */}
+      <nav className={`fixed top-0 w-full z-[100] transition-all duration-1000 px-10 py-8 flex justify-between items-center ${scrolled ? 'bg-[#0a0a0a]/95 backdrop-blur-xl border-b border-white/10 py-5' : 'bg-transparent'}`}>
+        <div className="flex items-center gap-10">
+          <button onClick={() => setIsMenuOpen(true)} className="group p-2">
+             <div className="w-10 h-px bg-amber-500 mb-2 transition-transform group-hover:translate-x-2"></div>
+             <div className="w-6 h-px bg-amber-500 transition-transform group-hover:-translate-x-2"></div>
+          </button>
+          
+          <button 
+            onClick={() => setLang(lang === 'ar' ? 'he' : lang === 'he' ? 'en' : 'ar')}
+            className="flex items-center gap-2 px-3 py-1 border border-white/10 rounded-full hover:bg-white/5 transition-all text-[10px] font-bold uppercase tracking-widest text-amber-500"
+          >
+            <Languages size={14} />
+            <span>{lang}</span>
+          </button>
+        </div>
+        
+        <div className="absolute left-1/2 -translate-x-1/2 flex flex-col items-center group cursor-pointer" onClick={() => window.scrollTo({top: 0, behavior: 'smooth'})}>
+          <span className="font-sans font-black tracking-[0.5em] text-3xl text-white leading-none">MAD</span>
+          <span className="font-sans text-[7px] tracking-[1em] text-amber-500 uppercase mt-2 ml-[-1em]">Parfumeur</span>
+        </div>
+
+        <div className="flex items-center gap-6">
+           <div className="hidden md:flex flex-col text-left items-end">
+              <span className="text-[10px] font-sans text-amber-500 font-bold uppercase tracking-widest leading-none">{t.nav.hub}</span>
+           </div>
+           <div className="w-12 h-12 rounded-full border border-white/5 flex items-center justify-center hover:border-amber-500 transition-all cursor-pointer">
+              <Globe size={18} className="text-white/60" />
+           </div>
+        </div>
+      </nav>
+
+      {/* Hero Section */}
+      <header className="relative h-screen flex items-center justify-center overflow-hidden bg-black">
+        <video autoPlay muted loop playsInline className="absolute inset-0 w-full h-full object-cover z-0 opacity-50">
+          <source src={videoUrl} type="video/mp4" />
+        </video>
+        <div className="absolute inset-0 bg-gradient-to-b from-black/90 via-black/30 to-black/95 z-10"></div>
+        <div className="container mx-auto px-6 relative z-20 text-center space-y-12">
+            <div className="space-y-4">
+              <div className="flex items-center justify-center gap-4 text-amber-500 font-sans text-[11px] tracking-[0.8em] uppercase">
+                <div className="w-12 h-px bg-amber-500/50"></div>
+                {t.hero.est}
+                <div className="w-12 h-px bg-amber-500/50"></div>
+              </div>
+              <h1 className="text-7xl md:text-[160px] font-black leading-[0.8] tracking-tighter text-white uppercase italic drop-shadow-2xl">
+                {t.hero.pure} <br/> 
+                <span className="text-transparent bg-clip-text bg-gradient-to-l from-amber-200 to-amber-600 non-italic">{t.hero.truth}</span>
+              </h1>
+            </div>
+            <p className="text-2xl md:text-3xl font-light leading-relaxed max-w-4xl mx-auto text-slate-100 italic drop-shadow-lg">
+              {t.hero.desc}
+            </p>
+        </div>
+      </header>
+
+      {/* Stats Section (Quick Look) */}
+      <section className="py-20 bg-black border-b border-white/5">
+        <div className="container mx-auto px-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-12">
+            {stats.map((s, i) => (
+              <div key={i} className="text-center group cursor-default">
+                <div className="flex justify-center mb-4 text-amber-500 group-hover:scale-110 transition-transform">{s.icon}</div>
+                <span className="block text-white font-sans font-bold text-3xl group-hover:text-amber-500 transition-colors">{s.value}</span>
+                <span className="text-[10px] uppercase tracking-widest text-amber-500/60 font-bold">{t.stat_labels[s.label_key]}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Story Section */}
+      <section className="py-40 bg-[#050505] relative border-b border-white/5">
+        <div className="container mx-auto px-6">
+          <div className={`max-w-4xl ${t.dir === 'rtl' ? 'mr-auto text-right' : 'ml-auto text-left'} space-y-12 mb-24`}>
+             <div className="space-y-6">
+                <span className={`text-amber-500 font-bold text-[10px] tracking-[0.6em] uppercase flex items-center gap-4 ${t.dir === 'rtl' ? 'justify-end' : 'justify-start'}`}>
+                  {t.dir === 'rtl' && <div className="w-8 h-px bg-amber-500/30"></div>}
+                  {t.maison.tag}
+                  {t.dir === 'ltr' && <div className="w-8 h-px bg-amber-500/30"></div>}
+                </span>
+                <h2 className="text-6xl md:text-[85px] font-black tracking-tighter text-white uppercase italic leading-none">
+                  {t.maison.title}
+                </h2>
+             </div>
+             <div className={`space-y-8 text-xl md:text-3xl font-light leading-relaxed text-slate-400 italic ${t.dir === 'rtl' ? 'border-r-4' : 'border-l-4'} border-amber-600/20 px-10`}>
+                <p>{t.maison.desc}</p>
+                <p>{t.maison.subDesc}</p>
+             </div>
+          </div>
+
+          <div className="relative group overflow-hidden rounded-[40px] border border-white/10 shadow-2xl bg-black">
+             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent z-10"></div>
+             <img src={wideBannerImg} className="w-full h-auto object-cover transform scale-100 group-hover:scale-105 transition-transform duration-[2000ms]" alt="Panoramic" />
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-20 pt-32 max-w-5xl mx-auto" style={{ textAlign: t.dir === 'rtl' ? 'right' : 'left' }}>
+             <div className="space-y-6">
+                <Eye className="w-12 h-12 text-amber-500" />
+                <h4 className="text-3xl font-black text-white uppercase tracking-tighter italic">{t.maison.vision}</h4>
+                <p className="text-lg text-slate-500 leading-relaxed italic">{t.maison.visionText}</p>
+             </div>
+             <div className="space-y-6">
+                <Rocket className="w-12 h-12 text-amber-500" />
+                <h4 className="text-3xl font-black text-white uppercase tracking-tighter italic">{t.maison.mission}</h4>
+                <p className="text-lg text-slate-500 leading-relaxed italic">{t.maison.missionText}</p>
+             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Fragrantica Recognition */}
+      <section className="py-40 bg-black relative border-b border-white/5 overflow-hidden">
+        <div className="container mx-auto px-6">
+          <div className="flex flex-col items-center text-center space-y-12">
+            <div className="p-8 bg-white/[0.02] rounded-[40px] border border-white/10 backdrop-blur-xl transition-transform hover:scale-105 duration-700">
+               <img src={fragranticaLogo} alt="Fragrantica" className="h-16 md:h-20 w-auto brightness-200" />
+            </div>
+            <div className="space-y-6 max-w-4xl">
+              <span className="text-amber-500 font-bold text-[10px] tracking-[0.8em] uppercase">{t.fragrantica.tag}</span>
+              <h2 className="text-5xl md:text-7xl font-black text-white italic tracking-tighter">{t.fragrantica.title}</h2>
+              <p className="text-xl md:text-3xl font-light text-slate-400 leading-relaxed italic border-x border-white/5 px-10">
+                {t.fragrantica.desc}
+              </p>
+              <div className="flex justify-center pt-8">
+                 <a href="https://www.fragrantica.com/designers/Mad-Parfumeur.html" target="_blank" rel="noopener noreferrer" className="flex items-center gap-4 text-[10px] font-black tracking-[0.3em] uppercase text-amber-500 border-b border-amber-500/20 pb-2 hover:border-amber-500 transition-all">
+                    {t.fragrantica.link} <ArrowUpRight size={16} />
+                 </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Small Perfume Gallery */}
+      <section className="py-40 bg-[#050505] relative overflow-hidden border-b border-white/5">
+        <div className="container mx-auto px-6">
+          <div className="text-center mb-24 space-y-4">
+             <span className="text-amber-500 font-bold text-[10px] tracking-[0.8em] uppercase">{t.collections.tag}</span>
+             <h2 className="text-5xl md:text-7xl font-black text-white italic tracking-tighter">{t.collections.title}</h2>
+          </div>
+          
+          <div className="grid md:grid-cols-2 gap-16 max-w-5xl mx-auto">
+             <div className="group relative">
+                <div className="aspect-[4/5] bg-black border border-white/10 rounded-[40px] overflow-hidden p-10 relative flex flex-col items-center justify-center space-y-10 transition-all hover:border-amber-500/40">
+                   <img src={nicheImg} className="w-48 md:w-56 h-auto object-contain shadow-2xl transform group-hover:scale-110 transition-transform duration-1000" alt="Niche" />
+                   <div className="text-center space-y-2">
+                      <span className="text-amber-500 font-black text-[10px] tracking-[0.4em] uppercase">{t.collections.private}</span>
+                      <h3 className="text-3xl font-black text-white uppercase italic tracking-tighter leading-none">{t.collections.niche}</h3>
+                   </div>
+                </div>
+             </div>
+             <div className="group relative md:mt-24">
+                <div className="aspect-[4/5] bg-black border border-white/10 rounded-[40px] overflow-hidden p-10 relative flex flex-col items-center justify-center space-y-10 transition-all hover:border-amber-500/40">
+                   <img src={selectiveImg} className="w-48 md:w-56 h-auto object-contain shadow-2xl transform group-hover:scale-110 transition-transform duration-1000" alt="Selective" />
+                   <div className="text-center space-y-2">
+                      <span className="text-slate-400 font-black text-[10px] tracking-[0.4em] uppercase">{t.collections.elite}</span>
+                      <h3 className="text-3xl font-black text-white uppercase italic tracking-tighter leading-none">{t.collections.selective}</h3>
+                   </div>
+                </div>
+             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Standards & ISO */}
+      <section className="py-40 bg-black relative border-b border-white/5">
+        <div className="container mx-auto px-6">
+          <div className="grid lg:grid-cols-12 gap-20 items-center">
+             <div className="lg:col-span-5 relative">
+                <div className="aspect-square rounded-full border border-white/5 p-20 flex items-center justify-center group overflow-hidden relative">
+                   <div className="absolute inset-0 bg-amber-500/5 translate-y-full group-hover:translate-y-0 transition-transform duration-1000"></div>
+                   <div className="text-center space-y-6 relative z-10">
+                      <ShieldCheck className="w-16 h-16 text-amber-500 mx-auto opacity-40 group-hover:opacity-100 transition-opacity" />
+                      <h3 className="text-4xl font-black uppercase tracking-widest italic leading-tight">{t.standards.tag}</h3>
+                   </div>
+                </div>
+             </div>
+             <div className="lg:col-span-7 space-y-12" style={{ textAlign: t.dir === 'rtl' ? 'right' : 'left' }}>
+                <div className="space-y-6">
+                  <h2 className="text-6xl md:text-8xl font-black text-white tracking-tighter uppercase italic leading-none">{t.standards.title}</h2>
+                  <p className={`text-2xl font-light text-slate-400 leading-relaxed ${t.dir === 'rtl' ? 'border-r-4' : 'border-l-4'} border-amber-600/20 px-10 italic`}>
+                    {t.standards.desc}
+                  </p>
+                  <div className={`pt-6 flex flex-col sm:flex-row gap-6 ${t.dir === 'rtl' ? 'justify-end' : 'justify-start'}`}>
+                     <a href={isoDriveLink} target="_blank" rel="noopener noreferrer" className="group relative inline-flex items-center gap-4 bg-amber-500 text-black px-8 py-5 font-black text-[10px] tracking-[0.3em] uppercase overflow-hidden shadow-2xl transition-all hover:bg-white">
+                       <FileText size={18} />
+                       <span>{t.standards.isoBtn}</span>
+                     </a>
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+                   {certificates.map((cert, i) => (
+                     <div key={i} className="p-6 border border-white/5 hover:border-amber-500 transition-all rounded-3xl group bg-[#0a0a0a]">
+                        <span className="block text-white font-sans font-black text-xs tracking-widest mb-1 uppercase group-hover:text-amber-500 transition-colors">{cert.id}</span>
+                        <span className="block text-amber-500/40 text-[8px] uppercase tracking-widest font-bold">{cert.title}</span>
+                     </div>
+                   ))}
+                </div>
+             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* The Manifesto: Final Comparison */}
+      <section className="py-40 bg-[#020202] relative">
+        <div className="container mx-auto px-6 max-w-7xl">
+          <div className="text-center mb-32 space-y-8">
+            <div className="inline-block p-5 bg-white/5 rounded-full border border-white/10 mb-8 shadow-2xl">
+              <Scale size={48} className="text-amber-500" />
+            </div>
+            <h2 className="text-7xl md:text-[110px] font-black text-white tracking-tighter uppercase italic leading-none">THE <span className="text-amber-500">{t.manifesto.title}</span></h2>
+            <p className="text-2xl md:text-3xl font-light text-slate-500 italic max-w-3xl mx-auto leading-relaxed border-x border-white/10 px-8 text-center uppercase tracking-widest">
+              {t.manifesto.subtitle}
+            </p>
+          </div>
+
+          <div className="space-y-8">
+             <div className={`grid grid-cols-12 gap-8 px-14 py-8 text-center font-black text-[12px] tracking-[0.4em] uppercase hidden lg:grid border-b border-white/10 text-slate-400`}>
+                <div className={`col-span-3 ${t.dir === 'rtl' ? 'text-right' : 'text-left'}`}>{t.manifesto.technical}</div>
+                <div className="col-span-3">{t.manifesto.labs}</div>
+                <div className="col-span-3 text-amber-500 bg-amber-500/5 py-3 rounded-t-2xl border-x border-amber-500/10 uppercase">{t.manifesto.mad}</div>
+                <div className="col-span-3 text-red-400 uppercase">{t.manifesto.local}</div>
+             </div>
+
+             {t.compItems.map((item, i) => (
+               <div key={i} className="group relative bg-[#0a0a0a] border border-white/5 rounded-[45px] overflow-hidden transition-all hover:border-amber-500/30 hover:shadow-[0_40px_80px_rgba(0,0,0,0.8)]">
+                  <div className={`absolute top-0 ${t.dir === 'rtl' ? 'right-0' : 'left-0'} w-2.5 h-full bg-amber-500 opacity-0 group-hover:opacity-100 transition-opacity`}></div>
+                  
+                  <div className={`grid grid-cols-1 lg:grid-cols-12 items-center p-12 lg:p-14 gap-8`}>
+                     <div className={`col-span-3 flex items-center gap-8 ${t.dir === 'ltr' ? 'order-1' : ''}`}>
+                        <div className="w-16 h-16 bg-black rounded-[25px] border border-white/10 flex items-center justify-center text-amber-500 shadow-xl group-hover:scale-110 transition-transform">
+                           {getComparisonIcon(i)}
+                        </div>
+                        <span className="text-3xl font-black text-white italic tracking-tighter leading-none uppercase">{item.label}</span>
+                     </div>
+
+                     <div className={`col-span-3 space-y-2 ${t.dir === 'rtl' ? 'border-r' : 'border-l'} border-white/5 px-8 hidden lg:block`}>
+                        <span className="text-[9px] font-black uppercase tracking-widest text-slate-600 block mb-1">{lang === 'en' ? 'Engineering Ref' : lang === 'he' ? 'ייחוס הנדסי' : 'مرجع هندسي'}</span>
+                        <p className="text-slate-400 font-light italic text-xl leading-snug">{item.science}</p>
+                     </div>
+
+                     <div className={`col-span-3 space-y-3 ${t.dir === 'rtl' ? 'border-r' : 'border-l'} border-amber-500/20 px-10 bg-amber-500/[0.04] p-10 rounded-[35px] border border-amber-500/10 text-center`}>
+                        <div className="flex items-center gap-3 justify-center">
+                           <CheckCircle2 size={20} className="text-amber-500" />
+                           <span className="text-[10px] font-black uppercase tracking-widest text-amber-500 block">{t.manifesto.mad}</span>
+                        </div>
+                        <p className="text-white font-bold text-2xl leading-snug tracking-tight">{item.mad}</p>
+                     </div>
+
+                     <div className={`col-span-3 space-y-3 px-10 opacity-90 transition-all text-center`}>
+                        <div className="flex items-center gap-3 justify-center">
+                           <Skull size={20} className="text-red-400" />
+                           <span className="text-[10px] font-black uppercase tracking-widest text-red-400 block">{t.manifesto.local}</span>
+                        </div>
+                        <p className="text-red-300 font-medium text-lg leading-snug line-through italic decoration-red-900/50">
+                          {item.local}
+                        </p>
+                     </div>
+                  </div>
+               </div>
+             ))}
+          </div>
+
+          <div className="mt-40 text-center space-y-12">
+             <div className="w-px h-40 bg-gradient-to-b from-amber-500 to-transparent mx-auto opacity-50"></div>
+             <p className="text-5xl font-light text-[#fcfaf2] max-w-5xl mx-auto leading-[1.3] italic">
+               {t.manifesto.verdict}
+             </p>
+             <div className="pt-10 flex flex-col items-center gap-6">
+                <button className="group relative px-28 py-8 bg-[#fcfaf2] text-black font-black text-xs tracking-[0.5em] uppercase overflow-hidden transition-all hover:bg-amber-500">
+                   <span className="relative z-10">{t.manifesto.choice}</span>
+                </button>
+             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="py-40 bg-black text-center space-y-24 border-t border-white/5 relative overflow-hidden">
+         <div className="relative z-10 flex flex-col items-center space-y-12">
+            <div className="w-28 h-28 p-2 bg-[#050505] border border-white/10 rounded-[45px] rotate-45 flex items-center justify-center overflow-hidden shadow-2xl">
+               <img src={logoUrl} className="w-full h-full object-cover -rotate-45 scale-125 grayscale hover:grayscale-0 transition-all duration-1000" alt="MAD Seal" />
+            </div>
+            <div className="space-y-4">
+              <h3 className="text-7xl md:text-[100px] font-sans font-black tracking-[0.5em] text-white leading-none uppercase">MAD</h3>
+              <p className="text-amber-500/40 font-sans text-[11px] tracking-[1.5em] uppercase italic">{t.footer.est}</p>
+            </div>
+         </div>
+         <div className="relative z-10 flex flex-wrap justify-center gap-16 text-[11px] font-bold tracking-[0.5em] text-white/30 uppercase italic border-y border-white/5 py-10">
+            <span>{t.footer.stores}</span>
+            <span>•</span>
+            <span>{t.footer.iso}</span>
+            <span>•</span>
+            <span>{t.footer.nations}</span>
+         </div>
+      </footer>
+
+      {/* Menu Overlay */}
+      {isMenuOpen && (
+        <div className="fixed inset-0 bg-black z-[200] flex flex-col items-center justify-center p-12 animate-in fade-in duration-1000 backdrop-blur-3xl">
+           <button onClick={() => setIsMenuOpen(false)} className="absolute top-12 right-12 text-amber-500 p-4 border border-white/10 rounded-full hover:rotate-90 transition-all">
+              <X size={48} />
+           </button>
+           <ul className="space-y-16 text-center">
+              {['maison', 'registry', 'standards', 'manifesto'].map((key, i) => (
+                <li key={key} className="overflow-hidden group">
+                   <button onClick={() => setIsMenuOpen(false)} className="block text-4xl md:text-[100px] font-black text-white group-hover:text-amber-500 transition-all tracking-tighter uppercase italic leading-none animate-in slide-in-from-bottom duration-700" style={{animationDelay: `${i * 100}ms`}}>
+                      {t.nav[key]}
+                   </button>
+                </li>
+              ))}
+           </ul>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default App;
