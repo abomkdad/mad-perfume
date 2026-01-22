@@ -8,42 +8,52 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>تم تأكيد الطلب | MAD Parfumeur</title>
 
-  <!-- Meta Pixel -->
+  <!-- Meta Pixel (FIXED) -->
   <script>
-    !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-    n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)n=f.fbq;
-    n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
-    t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}
-    (window, document,'script','https://connect.facebook.net/en_US/fbevents.js');
+    !function(f,b,e,v,n,t,s){
+      if(f.fbq)return;
+      n=f.fbq=function(){n.callMethod? n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+      if(!f._fbq)f._fbq=n;
+      n.push=n; n.loaded=!0; n.version='2.0'; n.queue=[];
+      t=b.createElement(e); t.async=!0; t.src=v;
+      s=b.getElementsByTagName(e)[0]; s.parentNode.insertBefore(t,s)
+    }(window, document,'script','https://connect.facebook.net/en_US/fbevents.js');
     fbq('init', '1072283127290819');
     fbq('track', 'PageView');
-    fbq('track', 'Lead', { value: 500, currency: 'ILS', content_name: 'Elite Set' });
   </script>
+  <noscript>
+    <img height="1" width="1" style="display:none"
+      src="https://www.facebook.com/tr?id=1072283127290819&ev=PageView&noscript=1"/>
+  </noscript>
 
-  <!-- TikTok Pixel -->
+  <!-- TikTok Pixel (FIXED) -->
   <script>
     !function (w, d, t) {
-      w.TiktokAnalyticsObject=t;
-      var ttq=w[t]=w[t]||[];
-      ttq.methods=["page","track","identify","instances","debug","on","off","once","ready","alias","group","enableCookie","disableCookie","holdConsent","revokeConsent","grantConsent"];
-      ttq.setAndDefer=function(t,e){t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}; 
-      for(var i=0;i<ttq.methods.length;i++)ttq.setAndDefer(ttq,ttq.methods[i]);
-      ttq.load=function(e,n){
-        var r="https://analytics.tiktok.com/i18n/pixel/events.js";
-        ttq._i=ttq._i||{};
-        ttq._i[e]=[];
-        ttq._t=ttq._t||{};
-        ttq._t[e]=+new Date;
-        n=document.createElement("script");
-        n.type="text/javascript";
-        n.async=!0;
-        n.src=r+"?sdkid="+e+"&lib="+t;
-        e=document.getElementsByTagName("script")[0];
-        e.parentNode.insertBefore(n,e)
+      w.TiktokAnalyticsObject = t;
+      var ttq = w[t] = w[t] || [];
+      ttq.methods = ["page","track","identify","instances","debug","on","off","once","ready","alias","group","enableCookie","disableCookie"];
+      ttq.setAndDefer = function (t, e) {
+        t[e] = function () { t.push([e].concat([].slice.call(arguments, 0))) };
+      };
+      for (var i = 0; i < ttq.methods.length; i++) ttq.setAndDefer(ttq, ttq.methods[i]);
+      ttq.load = function (e, n) {
+        var i = "https://analytics.tiktok.com/i18n/pixel/events.js";
+        ttq._i = ttq._i || {};
+        ttq._i[e] = [];
+        ttq._i[e]._u = i;
+        ttq._t = ttq._t || {};
+        ttq._t[e] = +new Date;
+        ttq._o = ttq._o || {};
+        ttq._o[e] = n || {};
+        var o = document.createElement("script");
+        o.type = "text/javascript";
+        o.async = !0;
+        o.src = i + "?sdkid=" + e + "&lib=" + t;
+        var a = document.getElementsByTagName("script")[0];
+        a.parentNode.insertBefore(o, a);
       };
       ttq.load('D2D02JBC77U4ENLN9SBG');
       ttq.page();
-      try{ ttq.track('Lead', { value: 500, currency: 'ILS', content_name: 'Elite Set' }); }catch(e){}
     }(window, document, 'ttq');
   </script>
 
@@ -90,13 +100,35 @@
   </div>
 
   <script>
-    if(navigator.language && navigator.language.startsWith('he')){
+    const qs = new URLSearchParams(location.search);
+    const langParam = (qs.get('lang') || '').toLowerCase();
+    const isHebrew = langParam === 'he' || (navigator.language && navigator.language.toLowerCase().startsWith('he'));
+
+    // Localize UI
+    if (isHebrew) {
       document.documentElement.lang = 'he';
+      document.documentElement.dir = 'rtl';
       document.getElementById('t').innerText = "ההזמנה אושרה בהצלחה";
       document.getElementById('b').innerText = "המארז יימסר תוך 3–5 ימי עסקים. תשלום במעמד המסירה.";
       document.getElementById('btn').innerText = "הזמנה חדשה";
       document.getElementById('wa').innerText = "צרו קשר בוואטסאפ";
       document.getElementById('note').innerText = "תודה שבחרתם MAD Parfumeur";
+    }
+
+    // Value/currency (dynamic via URL, default 500)
+    const value = Number(qs.get('value') || '500');
+    const currency = (qs.get('currency') || 'ILS').toUpperCase();
+    const contentName = qs.get('item') || 'Elite Set';
+
+    // Simple dedupe per session
+    if (!sessionStorage.getItem('mad_purchase_fired')) {
+      sessionStorage.setItem('mad_purchase_fired', '1');
+
+      // Meta Purchase
+      try { fbq('track', 'Purchase', { value, currency, content_name: contentName }); } catch(e){}
+
+      // TikTok Purchase
+      try { ttq.track('Purchase', { value, currency, content_name: contentName }); } catch(e){}
     }
   </script>
 </body>
