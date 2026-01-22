@@ -1,5 +1,9 @@
 <!-- =========================
-     FILE: thank-you.html
+     FILE: thank-you.html  (FULL + FIXED)
+     - Meta Pixel + TikTok Pixel
+     - Fires Purchase with: value, currency, content_id, content_name
+     - Supports AR/HE via ?lang=ar|he (fallback to browser language)
+     - Prevents double-firing on refresh (sessionStorage)
 ========================= -->
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
@@ -8,7 +12,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>تم تأكيد الطلب | MAD Parfumeur</title>
 
-  <!-- Meta Pixel (FIXED) -->
+  <!-- =========================
+       META PIXEL (OFFICIAL STYLE)
+  ========================= -->
   <script>
     !function(f,b,e,v,n,t,s){
       if(f.fbq)return;
@@ -26,7 +32,9 @@
       src="https://www.facebook.com/tr?id=1072283127290819&ev=PageView&noscript=1"/>
   </noscript>
 
-  <!-- TikTok Pixel (FIXED) -->
+  <!-- =========================
+       TIKTOK PIXEL (FIXED)
+  ========================= -->
   <script>
     !function (w, d, t) {
       w.TiktokAnalyticsObject = t;
@@ -100,14 +108,22 @@
   </div>
 
   <script>
+    // ---- Read params from redirect URL ----
     const qs = new URLSearchParams(location.search);
+
     const langParam = (qs.get('lang') || '').toLowerCase();
     const isHebrew = langParam === 'he' || (navigator.language && navigator.language.toLowerCase().startsWith('he'));
 
-    // Localize UI
+    const value = Number(qs.get('value') || '500');
+    const currency = (qs.get('currency') || 'ILS').toUpperCase();
+    const contentName = qs.get('item') || 'Elite Set';
+    const contentId = qs.get('content_id') || 'ELITE_SET_5';
+
+    // ---- Localize UI ----
     if (isHebrew) {
       document.documentElement.lang = 'he';
       document.documentElement.dir = 'rtl';
+      document.title = "ההזמנה אושרה | MAD Parfumeur";
       document.getElementById('t').innerText = "ההזמנה אושרה בהצלחה";
       document.getElementById('b').innerText = "המארז יימסר תוך 3–5 ימי עסקים. תשלום במעמד המסירה.";
       document.getElementById('btn').innerText = "הזמנה חדשה";
@@ -115,20 +131,33 @@
       document.getElementById('note').innerText = "תודה שבחרתם MAD Parfumeur";
     }
 
-    // Value/currency (dynamic via URL, default 500)
-    const value = Number(qs.get('value') || '500');
-    const currency = (qs.get('currency') || 'ILS').toUpperCase();
-    const contentName = qs.get('item') || 'Elite Set';
-
-    // Simple dedupe per session
+    // ---- Fire Purchase once per session (avoid double count on refresh) ----
     if (!sessionStorage.getItem('mad_purchase_fired')) {
       sessionStorage.setItem('mad_purchase_fired', '1');
 
       // Meta Purchase
-      try { fbq('track', 'Purchase', { value, currency, content_name: contentName }); } catch(e){}
+      try {
+        fbq('track', 'Purchase', {
+          value: value,
+          currency: currency,
+          content_name: contentName,
+          content_ids: [contentId],
+          content_type: 'product'
+        });
+      } catch (e) {}
 
       // TikTok Purchase
-      try { ttq.track('Purchase', { value, currency, content_name: contentName }); } catch(e){}
+      try {
+        ttq.track('Purchase', {
+          value: value,
+          currency: currency,
+          content_name: contentName,
+          content_id: contentId,
+          content_ids: [contentId],
+          content_type: 'product',
+          quantity: 1
+        });
+      } catch (e) {}
     }
   </script>
 </body>
