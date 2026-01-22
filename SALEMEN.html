@@ -5,27 +5,21 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>MAD Parfumeur - Elite Match & Excellence</title>
 
-  <!-- =========================
-       META PIXEL (FIXED)
-  ========================= -->
-  <script>
-  !function(f,b,e,v,n,t,s){
-    if(f.fbq)return;
-    n=f.fbq=function(){n.callMethod? n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-    if(!f._fbq)f._fbq=n;
-    n.push=n; n.loaded=!0; n.version='2.0'; n.queue=[];
-    t=b.createElement(e); t.async=!0; t.src=v;
-    s=b.getElementsByTagName(e)[0]; s.parentNode.insertBefore(t,s)
-  }(window, document,'script','https://connect.facebook.net/en_US/fbevents.js');
-  fbq('init','1072283127290819');
-  fbq('track','PageView');
-  </script>
-  <noscript><img height="1" width="1" style="display:none"
-  src="https://www.facebook.com/tr?id=1072283127290819&ev=PageView&noscript=1"/></noscript>
+  <!-- Zapier Interfaces Web Component -->
+  <script type='module' src='https://interfaces.zapier.com/assets/web-components/zapier-interfaces/zapier-interfaces.esm.js'></script>
 
-  <!-- =========================
-       TIKTOK PIXEL (KEEP)
-  ========================= -->
+  <!-- Meta Pixel -->
+  <script>
+    !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+    n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)n=f.fbq;
+    n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
+    t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}
+    (window, document,'script','https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init', '1072283127290819');
+    fbq('track', 'PageView');
+  </script>
+
+  <!-- TikTok Pixel -->
   <script>
     !function (w, d, t) {
       w.TiktokAnalyticsObject=t;
@@ -35,6 +29,7 @@
       for(var i=0;i<ttq.methods.length;i++)ttq.setAndDefer(ttq,ttq.methods[i]);
       ttq.load=function(e,n){
         var r="https://analytics.tiktok.com/i18n/pixel/events.js";
+        var o=n&&n.partner;
         ttq._i=ttq._i||{};
         ttq._i[e]=[];
         ttq._i[e]._u=r;
@@ -54,6 +49,7 @@
     }(window, document, 'ttq');
   </script>
 
+  <!-- UI Libraries -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
   <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
@@ -141,22 +137,22 @@
       font-weight:900;
     }
 
-    /* Zapier Form Integration Styles */
-    .google-form-wrapper{
+    /* Adjusted Wrapper for Web Component */
+    .form-wrapper-container{
       position:relative;
       padding:4px;border-radius:32px;
       background:linear-gradient(145deg, rgba(217,119,6,.3), rgba(0,0,0,0), rgba(251,191,36,.15));
       box-shadow:0 40px 100px -20px rgba(0,0,0,1);
-      margin:0 auto;width:100%;max-width:700px;
+      margin:0 auto;width:100%;max-width:900px; /* Matching max-width of component */
     }
-    .google-form-inner{
+    .form-inner-container{
       background:#0a0a0a;border-radius:28px;overflow:hidden;
       position:relative;z-index:1;width:100%;
-    }
-    .google-form-inner iframe{
-      width:100%;min-width:100%;
-      height:800px;
-      border:none;display:block;
+      min-height: 850px; /* Increased height for better visibility */
+      display: flex;
+      justify-content: center;
+      align-items: start; /* Align to top */
+      padding-top: 20px;
     }
     .form-glow-effect{
       position:absolute;top:-10%;left:50%;transform:translateX(-50%);
@@ -171,7 +167,8 @@
       const translations = {
         ar: {
           dir:'rtl',
-          zapier_url: 'https://new-form-project-5b9b9c.zapier.app/page',
+          // ID FOR ARABIC FORM (Updated)
+          zapierPageId: 'cmkpbwxjy001bonuoz5vy0gh1', 
           offer:'عرض النخبة الحصري',
           price:'500 ₪ فقط',
           shipping:'شامل التوصيل لجميع المناطق',
@@ -209,7 +206,8 @@
         },
         he: {
           dir:'rtl',
-          zapier_url: 'https://new-form-project-5b9b9c.zapier.app/copy-of-page',
+          // ID FOR HEBREW FORM (Updated)
+          zapierPageId: 'cmkpef5ul0009nc51356rtjm8',
           offer:'מארז העילית ב-500 ₪',
           price:'500 ₪ בלבד',
           shipping:'כולל משלוח לכל הארץ',
@@ -287,6 +285,21 @@
         getIconForIndex(i){
           const icons = ['shield-check','atom','zap'];
           return icons[i] || 'star';
+        },
+
+        trackLead(context){
+          try{
+            if(typeof fbq !== 'undefined') fbq('track','Lead',{ content_name: context, value: 500, currency:'ILS' });
+          }catch(e){}
+          try{
+            if(typeof ttq !== 'undefined') ttq.track('Lead',{ content_name: context, value: 500, currency:'ILS' });
+          }catch(e){}
+        },
+        
+        trackView(context) {
+          try {
+            if (typeof fbq !== 'undefined') fbq('track', 'ViewContent', { content_name: context });
+          } catch (e) {}
         }
       }
     }
@@ -295,6 +308,7 @@
 
 <body>
 
+  <!-- NAVIGATION -->
   <nav class="fixed top-0 w-full z-[100] glass-nav py-4 px-6 flex justify-between items-center">
     <div class="flex items-center gap-3">
       <div class="flex gap-1 border border-white/10 rounded-full px-4 py-1.5 bg-black/40">
@@ -317,6 +331,7 @@
     </div>
   </nav>
 
+  <!-- HERO SECTION -->
   <section class="hero-video">
     <video autoplay muted loop playsinline preload="metadata">
       <source src="https://madparfumeurglobal.com/wp-content/uploads/2025/10/download.mp4" type="video/mp4">
@@ -327,13 +342,14 @@
       <h1 class="text-6xl md:text-7xl font-black text-white italic font-serif leading-tight mb-6" x-text="t.price"></h1>
       <p class="text-xl font-light text-slate-200 italic" x-text="t.shipping"></p>
       <div class="mt-12">
-        <a id="orderNowBtn" href="#order-section"
+        <a href="#order-section"
            class="bg-amber-500 hover:bg-amber-600 text-black px-12 py-5 rounded-2xl font-black uppercase text-sm tracking-widest shadow-[0_0_50px_rgba(217,119,6,0.6)] active:scale-95 transition-all"
            x-text="t.orderNow"></a>
       </div>
     </div>
   </section>
 
+  <!-- MAIN PRODUCT SHOWCASE -->
   <section class="bg-[#020202] py-20 border-b border-white/5 relative overflow-hidden">
     <div class="container mx-auto px-4 text-center">
       <div class="relative inline-block w-full">
@@ -345,12 +361,13 @@
     </div>
   </section>
 
+  <!-- PERFUME COMPARISON CARDS -->
   <template x-for="item in t.perfumes" :key="item.code">
     <section class="perfume-section reveal">
       <div class="perfume-img-container">
-        <img src="https://madperfume.ps/upload/01-2026/page/69710fafb2c6f.png" class="perfume-img-brand" loading="lazy" alt="Brand">
+        <img src="https://madperfume.ps/upload/01-2026/page/69710fafb2c6f.png" class="perfume-img-brand" loading="lazy" alt="Brand Inspired">
         <div class="z-20 shrink-0 w-12 h-12 bg-amber-500 text-black flex items-center justify-center rounded-full font-black text-sm shadow-xl">VS</div>
-        <img src="https://madperfume.ps/upload/01-2026/page/6971495c69e7c.png" class="perfume-img-mad floating" loading="lazy" alt="MAD">
+        <img src="https://madperfume.ps/upload/01-2026/page/6971495c69e7c.png" class="perfume-img-mad floating" loading="lazy" alt="MAD Selective">
       </div>
 
       <div class="flex justify-center items-center gap-3 mb-4">
@@ -363,12 +380,13 @@
 
       <div class="mt-14">
         <a href="#order-section"
-           class="orderCollectionBtn px-14 py-4 bg-white/5 border border-white/10 rounded-full text-[13px] font-black uppercase tracking-widest hover:border-amber-500 transition-all"
+           class="px-14 py-4 bg-white/5 border border-white/10 rounded-full text-[13px] font-black uppercase tracking-widest hover:border-amber-500 transition-all"
            x-text="t.orderCollection"></a>
       </div>
     </section>
   </template>
 
+  <!-- MANIFESTO SECTION -->
   <section class="reveal py-24 bg-black px-6 border-t border-white/5">
     <div class="text-center mb-16">
       <span class="text-amber-500 font-black text-[13px] tracking-[0.4em] uppercase block mb-4" x-text="t.manifesto.tag"></span>
@@ -406,6 +424,7 @@
     </div>
   </section>
 
+  <!-- GLOBAL RECOGNITION -->
   <section class="reveal py-24 bg-[#050505] px-6 text-center border-y border-white/5">
     <img src="https://www.fragrantica.com/ndimg/fragrantica-logo-tagline-svg.svg" alt="Fragrantica"
          class="h-10 w-auto mx-auto mb-10 brightness-200 grayscale opacity-70">
@@ -431,6 +450,7 @@
     </div>
   </section>
 
+  <!-- ZAPIER ORDER FORM SECTION -->
   <section id="order-section" class="py-28 bg-[#050505] px-4 md:px-6 border-t border-white/5 relative mesh-bg overflow-hidden">
     <div class="form-glow-effect"></div>
 
@@ -441,18 +461,24 @@
     </div>
 
     <div class="max-w-4xl mx-auto relative z-10 px-2 md:px-0">
-      <div class="google-form-wrapper">
-        <div class="google-form-inner">
-          <iframe :src="t.zapier_url"
-                  frameborder="0"
-                  width="100%"
-                  height="800px"
-                  style="border:none;">
-            جار التحميل...
-          </iframe>
+      <div class="form-wrapper-container">
+        <div class="form-inner-container">
+          <!-- ZAPIER EMBED -->
+          <!-- We use :key="lang" to force re-render when language changes -->
+          <!-- We map :page-id to the correct ID from translations -->
+          <zapier-interfaces-page-embed 
+            :key="lang"
+            :page-id="t.zapierPageId" 
+            :test-id="t.zapierPageId + '-zapier-interfaces-page-embed-iframe'"
+            no-background='false' 
+            allow-query-params='true' 
+            query-params='' 
+            style='max-width: 100%; width: 100%; height: 850px;'
+          ></zapier-interfaces-page-embed>
         </div>
       </div>
 
+      <!-- DIRECT WHATSAPP OPTION -->
       <div class="max-w-md mx-auto mt-16 text-center">
         <div class="flex items-center justify-center gap-4 mb-8">
           <div class="h-px w-12 bg-white/10"></div>
@@ -460,7 +486,8 @@
           <div class="h-px w-12 bg-white/10"></div>
         </div>
 
-        <a id="waBtn" href="https://wa.me/972509787730"
+        <a href="https://wa.me/972509787730"
+           @click="trackLead('WhatsApp Direct Contact')"
            class="w-full py-5 bg-[#25d366] hover:bg-[#22c35e] text-white rounded-2xl font-black uppercase text-base tracking-widest shadow-[0_15px_30px_rgba(37,211,102,0.2)] flex items-center justify-center gap-3 active:scale-95 transition-all">
           <i data-lucide="message-square" class="w-6 h-6"></i>
           <span x-text="t.whatsapp"></span>
@@ -469,77 +496,11 @@
     </div>
   </section>
 
+  <!-- FOOTER -->
   <footer class="py-16 bg-black border-t border-white/5 text-center px-4">
-    <img src="https://madperfume.ps/upload/01-2026/page/45CM.png" class="h-8 w-auto mx-auto mb-8 opacity-30" alt="MAD">
+    <img src="https://madperfume.ps/upload/01-2026/page/45CM.png" class="h-8 w-auto mx-auto mb-8 opacity-30" alt="MAD Logo">
     <p class="text-[11px] text-white/20 uppercase font-black tracking-[0.4em]">© 2026 MAD PARFUMEUR | ELITE EDITION</p>
   </footer>
-
-  <!-- =========================
-       LANDING TRACKING (CLEAN)
-       - ViewContent once
-       - InitiateCheckout on Order clicks
-       - Contact on WhatsApp click
-       - Purchase stays ONLY on thank-you.html
-  ========================= -->
-  <script>
-    const MAD_PRODUCT = {
-      content_id: 'ELITE_SET_5',
-      content_name: 'Elite Set',
-      value: 500,
-      currency: 'ILS',
-      content_type: 'product'
-    };
-
-    function madTrack(eventName, extra = {}) {
-      const metaPayload = {
-        value: MAD_PRODUCT.value,
-        currency: MAD_PRODUCT.currency,
-        content_name: MAD_PRODUCT.content_name,
-        content_ids: [MAD_PRODUCT.content_id],
-        content_type: MAD_PRODUCT.content_type,
-        ...extra
-      };
-
-      const tiktokPayload = {
-        value: MAD_PRODUCT.value,
-        currency: MAD_PRODUCT.currency,
-        content_name: MAD_PRODUCT.content_name,
-        content_id: MAD_PRODUCT.content_id,
-        content_ids: [MAD_PRODUCT.content_id],
-        content_type: MAD_PRODUCT.content_type,
-        quantity: 1,
-        ...extra
-      };
-
-      try { if (typeof fbq !== 'undefined') fbq('track', eventName, metaPayload); } catch(e){}
-      try { if (typeof ttq !== 'undefined') ttq.track(eventName, tiktokPayload); } catch(e){}
-    }
-
-    // ViewContent once per session
-    (function(){
-      const key = 'mad_viewcontent_fired';
-      if (!sessionStorage.getItem(key)) {
-        sessionStorage.setItem(key, '1');
-        madTrack('ViewContent');
-      }
-    })();
-
-    document.addEventListener('DOMContentLoaded', () => {
-      document.getElementById('orderNowBtn')?.addEventListener('click', () => {
-        madTrack('InitiateCheckout');
-      }, { passive: true });
-
-      document.querySelectorAll('.orderCollectionBtn').forEach((btn) => {
-        btn.addEventListener('click', () => {
-          madTrack('InitiateCheckout');
-        }, { passive: true });
-      });
-
-      document.getElementById('waBtn')?.addEventListener('click', () => {
-        madTrack('Contact');
-      }, { passive: true });
-    });
-  </script>
 
 </body>
 </html>
