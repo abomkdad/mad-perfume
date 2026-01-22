@@ -217,6 +217,9 @@
                         local: 'البدائل (دبي، تركيا، محلي)',
                         verdict: 'الجودة في MAD هي حقيقة مخبرية موثقة دولياً بامتياز الشهادات العالمية.'
                     },
+                    fragrantica: {
+                        tag: 'الاعتراف العالمي', title: 'بصمة في تاريخ النيش', desc: 'تُصنف MAD Parfumeur عالمياً كدار عطور نيش معتمدة ضمن موسوعة Fragrantica الشهيرة.', archive: 'تصفح الأرشيف العالمي'
+                    },
                     perfumes: [
                         { code: 'W183', name: 'Selective MAD', title: 'Creed Aventus Inspired', desc: 'عطر القوة والهيبة. افتتاحية فاكهية منعشة مع قلب خشبي دخاني فاخر يمنحك حضورًا قياديًا.' },
                         { code: 'X102', name: 'Selective MAD', title: 'Naxos Inspired', desc: 'تحفة دافئة غنية بالعسل والفانيليا مع لمسة شرقية ناعمة. رائحة مترفة بالرقي.' },
@@ -246,6 +249,9 @@
                         local: 'תחליפים (דובאי, טורקיה, מקומי)',
                         verdict: 'האיכות ב-MAD היא אמת מעבדתית מתועדת בינלאומית.'
                     },
+                    fragrantica: {
+                        tag: 'הכרה עולמית', title: 'Fragrantica', desc: 'MAD Parfumeur מדורגת בעולם כבית בשמי נישה מאושר באנציקלופדיית Fragrantica המפורסמת.', archive: 'דפדף בארכיון העולמי'
+                    },
                     perfumes: [
                         { code: 'W183', name: 'Selective MAD', title: 'Creed Aventus Inspired', desc: 'בושם של כוח ויוקרה. פתיחה פירותית רעננה עם לב עצי מעושן שמעניק נוכחות.' },
                         { code: 'X102', name: 'Selective MAD', title: 'Naxos Inspired', desc: 'יצירת מופת חמה ועשירה בדבש ווניל מעניקה תחושת יוקרה.' },
@@ -265,6 +271,12 @@
                 lang: 'ar', 
                 t: translations['ar'], 
                 iframeLoads: 0,
+                stats: [
+                    { label_key: 'heritage', value: '26Y', icon: 'history' },
+                    { label_key: 'stores', value: '455', icon: 'building-2' },
+                    { label_key: 'nations', value: '18', icon: 'globe' },
+                    { label_key: 'cities', value: '70', icon: 'compass' }
+                ],
                 init() {
                     const browserLang = navigator.language.split('-')[0];
                     if (translations[browserLang]) this.toggleLang(browserLang);
@@ -286,8 +298,12 @@
                     return icons[i] || 'star';
                 },
                 trackPixelLead(context) {
-                    if (typeof fbq !== 'undefined') fbq('track', 'Lead', { content_name: context, value: 500, currency: 'ILS' });
-                    if (typeof ttq !== 'undefined') ttq.track('CompleteRegistration', { content_name: context });
+                    if (typeof fbq !== 'undefined') {
+                        fbq('track', 'Lead', { content_name: context, value: 500, currency: 'ILS' });
+                    }
+                    if (typeof ttq !== 'undefined') {
+                        ttq.track('CompleteRegistration', { content_name: context });
+                    }
                 },
                 handleIframeLoad() {
                     this.iframeLoads++;
@@ -371,7 +387,7 @@
         </section>
     </template>
 
-    <!-- 4️⃣ THE MANIFESTO - POWERFUL COMPARISON -->
+    <!-- 4️⃣ THE MANIFESTO -->
     <section class="reveal py-24 bg-black px-6 border-t border-white/5">
         <div class="text-center mb-16">
             <span class="text-amber-500 font-black text-[13px] tracking-[0.4em] uppercase block mb-4" x-text="t.manifesto.tag"></span>
@@ -402,6 +418,39 @@
         </div>
         <div class="mt-14 max-w-2xl mx-auto p-8 bg-neutral-900/30 border border-white/5 rounded-[35px] text-center">
              <p class="text-slate-300 italic text-lg leading-relaxed font-arabic" x-text="t.manifesto.verdict"></p>
+        </div>
+    </section>
+
+    <!-- 5️⃣ FRAGRANTICA RECOGNITION -->
+    <section class="reveal py-24 bg-[#050505] px-6 text-center border-y border-white/5">
+        <img src="https://www.fragrantica.com/ndimg/fragrantica-logo-tagline-svg.svg" alt="Fragrantica" class="h-10 w-auto mx-auto mb-10 brightness-200 grayscale opacity-70">
+        <div class="space-y-5 mb-12">
+            <span class="text-amber-500 font-bold text-[11px] uppercase tracking-[0.3em] block" x-text="t.fragrantica.tag"></span>
+            <h2 class="text-4xl md:text-5xl font-black text-white italic font-serif" x-text="t.fragrantica.title"></h2>
+            <p class="text-lg text-slate-300 leading-relaxed px-2 italic font-light max-w-2xl mx-auto" x-text="t.fragrantica.desc"></p>
+            <a href="https://www.fragrantica.com/designers/Mad-Parfumeur.html" target="_blank" class="inline-flex items-center gap-2 text-[12px] font-black uppercase text-amber-500 border-b border-amber-500/20 pb-1 pt-2 hover:text-amber-400 transition-all">
+                <span x-text="t.fragrantica.archive"></span> <i data-lucide="arrow-up-right" class="w-4 h-4"></i>
+            </a>
+        </div>
+        
+        <!-- Global Registry & Certificates (The "Wise" / IFRA Hub) -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 max-w-5xl mx-auto">
+            <template x-for="(stat, index) in stats" :key="index">
+                <div class="text-center p-6 bg-white/[0.02] border border-white/5 rounded-2xl hover:border-amber-500/20 transition-all">
+                    <span class="block text-white text-4xl font-black mb-1" x-text="stat.value"></span>
+                    <span class="text-[11px] uppercase text-amber-500/60 font-black tracking-widest" x-text="t.stat_labels[stat.label_key]"></span>
+                </div>
+            </template>
+        </div>
+        <div class="mt-12 flex justify-center items-center gap-6 opacity-40">
+            <div class="flex flex-col items-center">
+                <div class="w-12 h-12 rounded-full border border-white/20 flex items-center justify-center mb-2"><i data-lucide="shield-check" class="w-6 h-6"></i></div>
+                <span class="text-[10px] uppercase font-black tracking-widest">IFRA Certified</span>
+            </div>
+            <div class="flex flex-col items-center">
+                <div class="w-12 h-12 rounded-full border border-white/20 flex items-center justify-center mb-2"><i data-lucide="globe" class="w-6 h-6"></i></div>
+                <span class="text-[10px] uppercase font-black tracking-widest">Global Registry</span>
+            </div>
         </div>
     </section>
 
