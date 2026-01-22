@@ -37,22 +37,21 @@
         
         [x-cloak] { display: none !important; }
 
-        body { 
+        html, body { 
             margin: 0;
             padding: 0;
-            font-family: 'Inter', 'Assistant', sans-serif; 
+            width: 100%;
+            max-width: 100%;
+            overflow-x: hidden !important; 
             background-color: #020202; 
             color: #f4f4f4; 
-            overflow-x: hidden; 
+            font-family: 'Inter', 'Assistant', sans-serif; 
             -webkit-font-smoothing: antialiased;
-            width: 100%;
-            min-height: 100vh;
         }
 
         .font-serif { font-family: 'Playfair Display', serif; }
         .font-arabic { font-family: 'Amiri', serif; }
 
-        /* 1️⃣ HERO VIDEO */
         .hero-video {
             width: 100%;
             height: 100dvh; 
@@ -68,7 +67,6 @@
             z-index: 10;
         }
 
-        /* 2️⃣ PERFUME MATCHING */
         .perfume-section {
             padding: 80px 20px;
             text-align: center;
@@ -146,14 +144,14 @@
             filter: drop-shadow(0 0 15px rgba(217,119,6,0.3));
         }
 
-        /* ✨ NEW BEAUTIFUL FORM STYLES */
         .google-form-wrapper {
             position: relative;
             padding: 4px; 
             border-radius: 32px;
-            background: linear-gradient(145deg, rgba(217,119,6,0.4), rgba(0,0,0,0), rgba(251,191,36,0.2));
-            box-shadow: 0 40px 100px -20px rgba(0,0,0,1), 0 0 30px rgba(217,119,6,0.1);
+            background: linear-gradient(145deg, rgba(217,119,6,0.3), rgba(0,0,0,0), rgba(251,191,36,0.15));
+            box-shadow: 0 40px 100px -20px rgba(0,0,0,1);
             margin: 0 auto;
+            width: 100%;
             max-width: 700px;
         }
 
@@ -163,11 +161,13 @@
             overflow: hidden;
             position: relative;
             z-index: 1;
+            width: 100%;
         }
 
         .google-form-inner iframe {
             width: 100%;
-            height: 1100px;
+            min-width: 100%;
+            height: 1450px; 
             border: none;
             display: block;
         }
@@ -179,7 +179,7 @@
             transform: translateX(-50%);
             width: 120%;
             height: 120%;
-            background: radial-gradient(circle at center, rgba(217,119,6,0.1) 0%, transparent 70%);
+            background: radial-gradient(circle at center, rgba(217,119,6,0.08) 0%, transparent 70%);
             z-index: 0;
             pointer-events: none;
         }
@@ -188,6 +188,13 @@
             background-image: 
                 radial-gradient(at 0% 0%, rgba(217,119,6,0.05) 0px, transparent 50%),
                 radial-gradient(at 100% 100%, rgba(217,119,6,0.03) 0px, transparent 50%);
+        }
+
+        .manifesto-slogan {
+            background: linear-gradient(to right, #fbbf24, #d97706);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 900;
         }
     </style>
 
@@ -209,9 +216,6 @@
                         mad: 'عطور مـاد (MAD)',
                         local: 'البدائل (دبي، تركيا، محلي)',
                         verdict: 'الجودة في MAD هي حقيقة مخبرية موثقة دولياً بامتياز الشهادات العالمية.'
-                    },
-                    fragrantica: {
-                        tag: 'الاعتراف العالمي', title: 'بصمة في تاريخ النيش', desc: 'تُصنف MAD Parfumeur عالمياً كدار عطور نيش معتمدة ضمن موسوعة Fragrantica الشهيرة.', archive: 'تصفح الأرشيف العالمي'
                     },
                     perfumes: [
                         { code: 'W183', name: 'Selective MAD', title: 'Creed Aventus Inspired', desc: 'عطر القوة والهيبة. افتتاحية فاكهية منعشة مع قلب خشبي دخاني فاخر يمنحك حضورًا قياديًا.' },
@@ -242,9 +246,6 @@
                         local: 'תחליפים (דובאי, טורקיה, מקומי)',
                         verdict: 'האיכות ב-MAD היא אמת מעבדתית מתועדת בינלאומית.'
                     },
-                    fragrantica: {
-                        tag: 'הכרה עולמית', title: 'Fragrantica', desc: 'MAD Parfumeur מדורגת בעולם כבית בשמי נישה מאושר באנציקלופדיית Fragrantica המפורסמת.', archive: 'דפדף בארכיון העולמי'
-                    },
                     perfumes: [
                         { code: 'W183', name: 'Selective MAD', title: 'Creed Aventus Inspired', desc: 'בושם של כוח ויוקרה. פתיחה פירותית רעננה עם לב עצי מעושן שמעניק נוכחות.' },
                         { code: 'X102', name: 'Selective MAD', title: 'Naxos Inspired', desc: 'יצירת מופת חמה ועשירה בדבש ווניל מעניקה תחושת יוקרה.' },
@@ -264,12 +265,6 @@
                 lang: 'ar', 
                 t: translations['ar'], 
                 iframeLoads: 0,
-                stats: [
-                    { label_key: 'heritage', value: '26Y', icon: 'history' },
-                    { label_key: 'stores', value: '455', icon: 'building-2' },
-                    { label_key: 'nations', value: '18', icon: 'globe' },
-                    { label_key: 'cities', value: '70', icon: 'compass' }
-                ],
                 init() {
                     const browserLang = navigator.language.split('-')[0];
                     if (translations[browserLang]) this.toggleLang(browserLang);
@@ -290,22 +285,14 @@
                     const icons = ['shield-check', 'atom', 'zap'];
                     return icons[i] || 'star';
                 },
-                // وظيفة تتبع البكسل والتحويل
                 trackPixelLead(context) {
-                    console.log('Conversion Tracked: ' + context);
-                    if (typeof fbq !== 'undefined') {
-                        fbq('track', 'Lead', { content_name: context, value: 500, currency: 'ILS' });
-                    }
-                    if (typeof ttq !== 'undefined') {
-                        ttq.track('CompleteRegistration', { content_name: context });
-                    }
+                    if (typeof fbq !== 'undefined') fbq('track', 'Lead', { content_name: context, value: 500, currency: 'ILS' });
+                    if (typeof ttq !== 'undefined') ttq.track('CompleteRegistration', { content_name: context });
                 },
-                // مراقبة تحميل الفورم للكشف عن الإرسال
                 handleIframeLoad() {
                     this.iframeLoads++;
                     if (this.iframeLoads > 1) {
                         this.trackPixelLead('Google Form Submitted');
-                        // التحويل لصفحة الشكر التي زودتني بها
                         setTimeout(() => {
                             window.location.href = 'https://www.mad-parfumeur.com/thank-you.html';
                         }, 500);
@@ -319,7 +306,7 @@
 <body>
 
     <!-- Nav -->
-    <nav class="fixed top-0 w-full z-[100] glass-nav py-4 px-6 flex justify-between items-center transition-all">
+    <nav class="fixed top-0 w-full z-[100] glass-nav py-4 px-6 flex justify-between items-center">
         <div class="flex items-center gap-3">
             <div class="flex gap-1 border border-white/10 rounded-full px-4 py-1.5 bg-black/40">
                 <template x-for="l in ['ar', 'he']">
@@ -331,14 +318,14 @@
             <img src="https://madperfume.ps/upload/01-2026/page/45CM.png" class="h-7 w-auto logo-glow" alt="MAD">
             <span class="text-[8px] tracking-[0.5em] text-amber-500 uppercase font-black mt-1">Parfumeur</span>
         </div>
-        <div class="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center bg-white/5 cursor-pointer hover:bg-white/10 transition-colors">
+        <div class="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center bg-white/5 cursor-pointer">
             <i data-lucide="shopping-bag" class="w-5 h-5 text-amber-500"></i>
         </div>
     </nav>
 
     <!-- 1️⃣ HERO VIDEO -->
     <section class="hero-video">
-        <video autoplay muted loop playsinline poster="https://madperfume.ps/upload/01-2026/page/45CM.png">
+        <video autoplay muted loop playsinline>
             <source src="https://madparfumeurglobal.com/wp-content/uploads/2025/10/download.mp4" type="video/mp4">
         </video>
         <div class="video-overlay"></div>
@@ -352,14 +339,14 @@
         </div>
     </section>
 
-    <!-- 2️⃣ Main Product Display -->
+    <!-- 2️⃣ Main Product -->
     <section class="bg-[#020202] py-20 border-b border-white/5 relative overflow-hidden">
         <div class="container mx-auto px-4 text-center">
             <div class="relative inline-block w-full">
                 <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-[400px] aspect-square bg-amber-600/10 blur-[100px] rounded-full"></div>
                 <img src="https://madperfume.ps/upload/01-2026/page/6971495c69e7c.png" 
                      class="w-full max-w-[600px] h-auto floating relative z-10 mx-auto drop-shadow-[0_30px_60px_rgba(0,0,0,1)]" 
-                     alt="MAD Exclusive Bottle">
+                     alt="MAD Bottle">
             </div>
         </div>
     </section>
@@ -384,7 +371,7 @@
         </section>
     </template>
 
-    <!-- 4️⃣ THE MANIFESTO -->
+    <!-- 4️⃣ THE MANIFESTO - POWERFUL COMPARISON -->
     <section class="reveal py-24 bg-black px-6 border-t border-white/5">
         <div class="text-center mb-16">
             <span class="text-amber-500 font-black text-[13px] tracking-[0.4em] uppercase block mb-4" x-text="t.manifesto.tag"></span>
@@ -393,46 +380,45 @@
         </div>
         <div class="max-w-3xl mx-auto space-y-6">
             <template x-for="(item, index) in t.compItems" :key="index">
-                <div class="comp-card bg-neutral-900/40 p-6 rounded-[28px] border border-white/5">
+                <div class="bg-neutral-900/40 p-6 rounded-[28px] border border-white/5">
                     <div class="flex items-center gap-4 border-b border-white/5 pb-4 mb-6">
-                        <div class="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center text-amber-500"><i :data-lucide="getIconForIndex(index)" class="w-5 h-5"></i></div>
+                        <div class="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center text-amber-500">
+                            <i :data-lucide="getIconForIndex(index)" class="w-5 h-5"></i>
+                        </div>
                         <span class="text-lg font-black text-white uppercase" x-text="item.label"></span>
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div class="p-5 bg-amber-500/10 rounded-2xl border border-amber-500/10">
+                        <div class="p-5 bg-amber-500/10 rounded-2xl border border-amber-500/10 text-right">
                             <span class="text-[11px] font-black text-amber-500 uppercase tracking-widest" x-text="t.manifesto.mad"></span>
-                            <p class="text-white text-base font-bold mt-2" x-text="item.mad"></p>
+                            <p class="text-white text-base font-bold mt-2 leading-relaxed" x-text="item.mad"></p>
                         </div>
-                        <div class="p-5 bg-red-500/5 rounded-2xl border border-red-500/10 opacity-70">
+                        <div class="p-5 bg-red-500/5 rounded-2xl border border-red-500/10 text-right opacity-70">
                             <span class="text-[11px] font-black text-red-500 uppercase tracking-widest" x-text="t.manifesto.local"></span>
-                            <p class="text-red-300 text-sm mt-2" x-text="item.local"></p>
+                            <p class="text-red-300 text-sm mt-2 leading-relaxed" x-text="item.local"></p>
                         </div>
                     </div>
                 </div>
             </template>
         </div>
+        <div class="mt-14 max-w-2xl mx-auto p-8 bg-neutral-900/30 border border-white/5 rounded-[35px] text-center">
+             <p class="text-slate-300 italic text-lg leading-relaxed font-arabic" x-text="t.manifesto.verdict"></p>
+        </div>
     </section>
 
     <!-- 7️⃣ FINAL ORDER FORM -->
-    <section id="order-section" class="py-28 bg-[#050505] px-6 border-t border-white/5 relative mesh-bg overflow-hidden">
+    <section id="order-section" class="py-28 bg-[#050505] px-4 md:px-6 border-t border-white/5 relative mesh-bg overflow-hidden">
         <div class="form-glow-effect"></div>
         
         <div class="text-center mb-16 relative z-10">
             <span class="text-amber-500 font-black text-[13px] tracking-[0.5em] uppercase block mb-4" x-text="t.orderForm.tag"></span>
-            <h2 class="text-5xl md:text-6xl font-black text-white italic font-serif" x-text="t.orderForm.title"></h2>
+            <h2 class="text-5xl md:text-6xl font-black text-white italic font-serif leading-tight" x-text="t.orderForm.title"></h2>
             <p class="text-2xl text-amber-500 font-black mt-4" x-text="t.orderForm.subtitle"></p>
         </div>
 
-        <div class="max-w-5xl mx-auto relative z-10">
-            <!-- WRAPPER مع تتبع تحميل الإطار -->
+        <div class="max-w-4xl mx-auto relative z-10 px-2 md:px-0">
             <div class="google-form-wrapper">
                 <div class="google-form-inner">
                     <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSdES2vQiJPgVvnhZAry_cMfnYq0lejIZFkZGf23Gtpl1JwU8A/viewform?embedded=true" 
-                            width="100%" 
-                            height="1100" 
-                            frameborder="0" 
-                            marginheight="0" 
-                            marginwidth="0"
                             @load="handleIframeLoad()">جار التحميل…</iframe>
                 </div>
             </div>
@@ -440,7 +426,7 @@
             <div class="max-w-md mx-auto mt-16 text-center">
                 <div class="flex items-center justify-center gap-4 mb-8">
                     <div class="h-px w-12 bg-white/10"></div>
-                    <span class="text-white/30 text-xs font-black uppercase tracking-widest">أو عبر الواتساب</span>
+                    <span class="text-white/30 text-xs font-black uppercase tracking-widest">أو تواصل مباشرة</span>
                     <div class="h-px w-12 bg-white/10"></div>
                 </div>
                 <a href="https://wa.me/972509787730" 
@@ -456,7 +442,7 @@
     <!-- Footer -->
     <footer class="py-16 bg-black border-t border-white/5 text-center px-4">
         <img src="https://madperfume.ps/upload/01-2026/page/45CM.png" class="h-8 w-auto mx-auto mb-8 opacity-30" alt="MAD">
-        <p class="text-[11px] text-white/20 uppercase font-black tracking-[0.4em]">© 2026 MAD PARFUMEUR | THE GLOBAL ELITE EDITION</p>
+        <p class="text-[11px] text-white/20 uppercase font-black tracking-[0.4em]">© 2026 MAD PARFUMEUR | ELITE EDITION</p>
     </footer>
 
 </body>
