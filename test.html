@@ -133,18 +133,19 @@
 
         /* --- Social Icons --- */
         .social-bar {
-            display: flex; justify-content: center; gap: 20px;
+            display: flex; justify-content: center; gap: 15px; /* Reduced gap slightly to fit more icons */
             margin-top: 30px;
+            flex-wrap: wrap;
         }
         .social-btn {
-            width: 55px; height: 55px;
+            width: 50px; height: 50px;
             border-radius: 50%;
             background: rgba(255,255,255,0.05);
             border: 1px solid var(--border-glass);
             display: flex; align-items: center; justify-content: center;
             color: #fff;
             transition: all 0.3s ease;
-            font-size: 1.6rem;
+            font-size: 1.4rem;
         }
         .social-btn:hover {
             background: var(--primary);
@@ -258,36 +259,6 @@
             background: var(--primary); color: #000;
             text-align: center; padding: 15px; font-size: 2rem; font-weight: 900;
         }
-
-        /* --- AI Modal Styles --- */
-        .ai-input {
-            width: 100%;
-            background: rgba(255,255,255,0.05);
-            border: 1px solid var(--border-glass);
-            border-radius: 16px;
-            padding: 15px;
-            color: #fff;
-            margin-bottom: 15px;
-            outline: none;
-            font-size: 1rem;
-        }
-        .ai-input:focus { border-color: var(--primary); }
-        .ai-result-card {
-            background: linear-gradient(145deg, rgba(217,119,6,0.1), transparent);
-            border: 1px solid var(--primary);
-            border-radius: 16px;
-            padding: 15px;
-            margin-top: 20px;
-            display: none;
-            text-align: center;
-        }
-        .ai-loading {
-            display: none;
-            justify-content: center;
-            margin: 20px 0;
-        }
-        .animate-spin-slow { animation: spin 2s linear infinite; }
-        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
     </style>
 </head>
 <body dir="rtl">
@@ -409,35 +380,9 @@
         <span id="cart-count" class="absolute -top-1 -right-1 bg-white text-black w-6 h-6 rounded-full text-sm font-black flex items-center justify-center border-2 border-black">0</span>
     </div>
 
-    <!-- AI CONSULTANT FAB (NEW) -->
-    <div onclick="toggleAI(true)" class="fixed bottom-8 right-8 z-40 bg-white text-black w-16 h-16 rounded-full flex items-center justify-center shadow-[0_0_40px_rgba(255,255,255,0.4)] cursor-pointer hover:scale-110 transition active:scale-95 border-2 border-amber-500">
-        <i class="fas fa-sparkles text-2xl text-amber-500"></i>
-    </div>
-
-    <!-- AI POPUP -->
-    <div id="ai-popup" class="modal-overlay">
-        <div class="sale-box p-6">
-            <span style="position:absolute; top:15px; right:20px; font-size:2rem; color:#fff; cursor:pointer; z-index:10;" onclick="toggleAI(false)">&times;</span>
-            <div class="text-center mb-6">
-                <i class="fas fa-sparkles text-4xl text-amber-500 mb-2"></i>
-                <h3 class="font-serif text-2xl text-white" id="ai-title">مستشار العطور الذكي</h3>
-                <p class="text-slate-400 text-sm mt-2" id="ai-subtitle">صف ذوقك (مثلاً: أحب العطور الخشبية الفخمة) وسأقترح عليك الأفضل ✨</p>
-            </div>
-            
-            <textarea id="ai-user-input" class="ai-input" rows="3" placeholder="..."></textarea>
-            
-            <button onclick="askGemini()" class="add-btn mt-0 flex items-center justify-center gap-2">
-                <span id="ai-btn-txt">اقتراح عطر</span> <i class="fas fa-magic"></i>
-            </button>
-
-            <div id="ai-loading" class="ai-loading">
-                <i class="fas fa-circle-notch text-amber-500 text-3xl animate-spin-slow"></i>
-            </div>
-
-            <div id="ai-result" class="ai-result-card">
-                <!-- Result Injected Here -->
-            </div>
-        </div>
+    <!-- WHATSAPP FAB (REPLACES AI) -->
+    <div onclick="openWhatsApp()" class="fixed bottom-8 right-8 z-40 bg-[#25D366] text-white w-16 h-16 rounded-full flex items-center justify-center shadow-[0_0_40px_rgba(37,211,102,0.6)] cursor-pointer hover:scale-110 transition active:scale-95">
+        <i class="fab fa-whatsapp text-4xl"></i>
     </div>
 
     <!-- SALE POPUP -->
@@ -471,6 +416,31 @@
         </div>
     </div>
 
+    <!-- ZAPIER ORDER FORM SECTION (Compact & Transparent) -->
+    <section id="order-section" class="py-16 bg-[#050505] px-4 border-t border-white/5 relative mesh-bg overflow-hidden">
+        <div class="form-glow-effect"></div>
+
+        <div class="text-center mb-10 relative z-10">
+            <span class="text-amber-500 font-black text-[11px] tracking-[0.4em] uppercase block mb-2" id="order-tag">بوابة الحجز</span>
+            <h2 class="text-4xl md:text-5xl font-black text-white italic font-serif leading-tight" id="order-title">أكمل طلبك الآن</h2>
+        </div>
+
+        <div class="max-w-4xl mx-auto relative z-10">
+            <!-- MAIN FORM -->
+            <div class="form-wrapper-container">
+                <div class="form-inner-container">
+                    <zapier-interfaces-page-embed 
+                        id="zapier-embed"
+                        no-background='true' 
+                        allow-query-params='true' 
+                        query-params='' 
+                        style='max-width: 100%; width: 100%; height: 850px;'
+                    ></zapier-interfaces-page-embed>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- FOOTER -->
     <footer class="py-10 bg-black border-t border-white/5 text-center px-4">
         <img src="https://madperfume.ps/upload/01-2026/page/45CM.png" class="h-6 w-auto mx-auto mb-4 opacity-30" alt="MAD Logo">
@@ -480,15 +450,47 @@
     <!-- LOGIC -->
     <script type='module' src='https://interfaces.zapier.com/assets/web-components/zapier-interfaces/zapier-interfaces.esm.js'></script>
     <script>
-        // GEMINI CONFIG
-        const apiKey = ""; // API Key provided at runtime
-
         // --- GLOBAL STATE ---
         const params = new URLSearchParams(window.location.search);
         const branchID = parseInt(params.get('branch')) || 1;
         let STATE = { branch: null, products: [], cart: [] };
         let lang = 'ar';
         let activeCat = 'all';
+
+        // --- DATA ---
+        const BRANCH_DATA = {
+            id: 1,
+            name_ar: "الفرع الرئيسي - رام الله",
+            name_he: "הסניף הראשי - רמאללה",
+            phone: "0509787730",
+            social: { 
+                whatsapp: "https://wa.me/972509787730", 
+                instagram: "https://instagram.com", 
+                tiktok: "https://tiktok.com", 
+                waze: "https://waze.com",
+                facebook: "https://facebook.com",
+                fragrantica: "https://www.fragrantica.com/designers/Mad-Parfumeur.html"
+            },
+            schedule: {
+                sun: [["09:00", "22:00"]],
+                mon: [["09:00", "22:00"]],
+                tue: [["09:00", "22:00"]],
+                wed: [["09:00", "22:00"]],
+                thu: [["09:00", "22:00"]],
+                fri: [["14:00", "22:00"]],
+                sat: [["09:00", "23:00"]]
+            },
+            hours: { ar: "09:00 - 22:00", he: "09:00 - 22:00" } 
+        };
+
+        const PRODUCTS = [
+            { id: 1, name_ar: "سيليكتف 1 (أفنتوس)", name_he: "Selective 1 (Aventus)", price: 500, cat_ar: "رجالي", cat_he: "גברים", img: "https://madperfume.ps/upload/01-2026/page/69710fafb2c6f.png" },
+            { id: 2, name_ar: "سيليكتف 2 (ناكسوس)", name_he: "Selective 2 (Naxos)", price: 500, cat_ar: "للجنسين", cat_he: "יוניסקס", img: "https://madperfume.ps/upload/01-2026/page/6971495c69e7c.png" },
+            { id: 3, name_ar: "سيليكتف 3 (مستر سام)", name_he: "Selective 3 (Mr. Sam)", price: 500, cat_ar: "رجالي", cat_he: "גברים", img: "https://madperfume.ps/upload/01-2026/page/6971495c69e7c.png" },
+            { id: 4, name_ar: "سيليكتف 4 (أومبري نوماد)", name_he: "Selective 4 (Ombre)", price: 500, cat_ar: "للجنسين", cat_he: "יוניסקס", img: "https://madperfume.ps/upload/01-2026/page/6971495c69e7c.png" },
+            { id: 5, name_ar: "سيليكتف 5 (واي إنتنس)", name_he: "Selective 5 (Y YSL)", price: 500, cat_ar: "رجالي", cat_he: "גברים", img: "https://madperfume.ps/upload/01-2026/page/69710fafb2c6f.png" },
+            { id: 6, name_ar: "سيليكتف 6 (باكارات)", name_he: "Selective 6 (Baccarat)", price: 500, cat_ar: "نسائي", cat_he: "נשים", img: "https://madperfume.ps/upload/01-2026/page/6971495c69e7c.png" }
+        ];
 
         // --- TEXTS & UI CONSTANTS ---
         const TEXTS = {
@@ -508,11 +510,8 @@
                     { icon: 'timer', title: 'الثبات والأداء', mad: 'Extrait (+24 ساعة)', other: 'كحولي يختفي بسرعة' }
                 ],
                 cartT: "سلة المشتريات", total: "المجموع", check: "إتمام عبر واتساب",
-                // AI Texts
-                aiTitle: "مستشار العطور الذكي",
-                aiSub: "صف ذوقك (مثلاً: أحب العطور الخشبية الفخمة) وسأقترح عليك الأفضل ✨",
-                aiBtn: "اقتراح عطر",
-                aiRec: "نرشح لك:"
+                orderTag: "بوابة الحجز", orderTitle: "أكمل طلبك الآن",
+                zapierId: 'cmkpbwxjy001bonuoz5vy0gh1'
             },
             he: {
                 open: "פתוח עכשיו", closed: "סגור", add: "הוסף לסל", added: "נוסף", 
@@ -530,11 +529,8 @@
                     { icon: 'timer', title: 'עמידות וביצועים', mad: 'Extrait (מעל 24 שעות)', other: 'מתנדף תוך דקות' }
                 ],
                 cartT: "סל קניות", total: "סה״כ", check: "הזמנה בווטסאפ",
-                // AI Texts
-                aiTitle: "יועץ הבישום החכם",
-                aiSub: "תאר את הטעם שלך (למשל: אני אוהב בשמים עציים יוקרתיים) ואני אמליץ על הטוב ביותר ✨",
-                aiBtn: "המלץ לי",
-                aiRec: "מומלץ עבורך:"
+                orderTag: "פורטל הזמנות", orderTitle: "אשר הזמנה עכשיו",
+                zapierId: 'cmkpef5ul0009nc51356rtjm8'
             }
         };
 
@@ -542,14 +538,10 @@
         async function init() {
             try {
                 // 1. Fetch Branch Config
-                const bRes = await fetch('branches.json');
-                const bData = await bRes.json();
-                STATE.branch = bData.branches.find(b => b.id === branchID) || bData.branches[0];
+                STATE.branch = BRANCH_DATA;
 
                 // 2. Fetch Products CSV
-                const pRes = await fetch('products.csv');
-                const pText = await pRes.text();
-                parseCSV(pText);
+                STATE.products = PRODUCTS;
 
                 // 3. Initial Render
                 const urlLang = params.get('lang');
@@ -568,23 +560,6 @@
                 console.error("Initialization Error:", e);
                 // Fallback if files missing
                 alert("Please ensure branches.json and products.csv are present.");
-            }
-        }
-
-        // --- CSV PARSER ---
-        function parseCSV(text) {
-            const lines = text.split('\n');
-            for(let i=1; i<lines.length; i++) {
-                const c = lines[i].split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
-                if(!c[0]) continue;
-                STATE.products.push({
-                    id: i,
-                    title: c[0].replace(/"/g, '').trim(),
-                    img: c[3]?.trim() || 'logo.png',
-                    price: parseFloat(c[9]?.replace(/[^\d.]/g, '') || '0'),
-                    cat_ar: c[11]?.trim() || 'عام',
-                    cat_he: c[10]?.trim() || 'General'
-                });
             }
         }
 
@@ -609,6 +584,9 @@
             if(b.social.instagram) socHTML += `<a href="${b.social.instagram}" class="social-btn"><i class="fab fa-instagram"></i></a>`;
             if(b.social.tiktok) socHTML += `<a href="${b.social.tiktok}" class="social-btn"><i class="fab fa-tiktok"></i></a>`;
             if(b.social.waze) socHTML += `<a href="${b.social.waze}" class="social-btn"><i class="fab fa-waze"></i></a>`;
+            if(b.social.facebook) socHTML += `<a href="${b.social.facebook}" class="social-btn"><i class="fab fa-facebook-f"></i></a>`;
+            if(b.social.fragrantica) socHTML += `<a href="${b.social.fragrantica}" class="social-btn" title="Fragrantica"><i class="fas fa-star text-amber-500"></i></a>`;
+            
             socContainer.innerHTML = socHTML;
 
             // Static Texts
@@ -624,10 +602,14 @@
             document.getElementById('txt-checkout').innerText = t.check;
             document.getElementById('comp-title').innerText = t.compTitle;
             
-            // AI Texts
-            document.getElementById('ai-title').innerText = t.aiTitle;
-            document.getElementById('ai-subtitle').innerText = t.aiSub;
-            document.getElementById('ai-btn-txt').innerText = t.aiBtn;
+            // Order Form Texts
+            document.getElementById('order-tag').innerText = t.orderTag;
+            document.getElementById('order-title').innerText = t.orderTitle;
+            
+            // Update Zapier Embed
+            const zEmbed = document.getElementById('zapier-embed');
+            zEmbed.setAttribute('page-id', t.zapierId);
+            zEmbed.setAttribute('test-id', t.zapierId + '-embed');
 
             renderComparison();
             renderCats();
@@ -774,71 +756,12 @@
             if(open) { m.style.display = 'flex'; startTimer(); } else { m.style.display = 'none'; }
         }
 
-        function toggleAI(open) {
-            const m = document.getElementById('ai-popup');
-            m.style.display = open ? 'flex' : 'none';
-        }
-
-        async function askGemini() {
-            const input = document.getElementById('ai-user-input').value;
-            if(!input) return;
-
-            const resDiv = document.getElementById('ai-result');
-            const loadDiv = document.getElementById('ai-loading');
-            
-            // UI State: Loading
-            loadDiv.style.display = 'flex';
-            resDiv.style.display = 'none';
-
-            // Construct Context
-            const productsList = STATE.products.map(p => `${p.id}: ${p.title} (${p.cat_ar})`).join(', ');
-            
-            const systemPrompt = `You are an expert perfume consultant for MAD Parfumeur. 
-            The user speaks ${lang === 'ar' ? 'Arabic' : 'Hebrew'}.
-            Available Perfumes: ${productsList}.
-            User Preference: "${input}".
-            Task: Recommend ONE perfume ID from the list.
-            Response Format (JSON ONLY): { "recommended_id": number, "message": "Short explanation in user language" }`;
-
-            try {
-                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        contents: [{ parts: [{ text: systemPrompt }] }],
-                        generationConfig: { responseMimeType: "application/json" }
-                    })
-                });
-
-                const data = await response.json();
-                const aiRes = JSON.parse(data.candidates[0].content.parts[0].text);
-                
-                // Find Product
-                const p = STATE.products.find(x => x.id === aiRes.recommended_id);
-                
-                if(p) {
-                    resDiv.innerHTML = `
-                        <p class="text-amber-500 font-bold mb-2 text-sm">${TEXTS[lang].aiRec}</p>
-                        <div class="flex items-center gap-3 bg-white/10 p-3 rounded-xl mb-3 text-right">
-                            <img src="${p.img}" class="w-12 h-12 bg-black/50 rounded-lg">
-                            <div>
-                                <div class="font-bold text-white text-sm">${p.title}</div>
-                                <div class="text-amber-500 font-black text-xs">${p.price} ₪</div>
-                            </div>
-                        </div>
-                        <p class="text-slate-300 text-xs leading-relaxed mb-3">"${aiRes.message}"</p>
-                        <button onclick="addToCart(${p.id}); toggleAI(false); toggleDrawer(true);" class="w-full bg-amber-500 text-black font-bold py-2 rounded-lg text-sm hover:bg-amber-400">
-                            ${TEXTS[lang].add}
-                        </button>
-                    `;
-                    resDiv.style.display = 'block';
-                }
-            } catch(e) {
-                console.error(e);
-                alert("AI Service is busy. Please try again.");
-            } finally {
-                loadDiv.style.display = 'none';
-            }
+        // WhatsApp FAB
+        function openWhatsApp() {
+            const b = STATE.branch;
+            let phone = b.phone;
+            if(phone.startsWith('0')) phone = '972' + phone.substring(1);
+            window.open(`https://wa.me/${phone}`, '_blank');
         }
 
         function checkout() {
