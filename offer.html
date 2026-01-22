@@ -21,7 +21,7 @@
   <!-- Tracking Scripts -->
   <script>
     !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-    n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)n._fbq=n;
+    n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n; /* ✅ FIXED */
     n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
     t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script',
     'https://connect.facebook.net/en_US/fbevents.js');
@@ -58,6 +58,8 @@
       --live-green:#10b981;
       --live-red:#ef4444;
     }
+    *{ box-sizing:border-box; } /* ✅ helps layout on mobile */
+
     body{
       background-color:var(--bg-dark);
       color:#f4f4f4;
@@ -181,6 +183,7 @@
       display:flex;align-items:center;justify-content:center;
       background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);
       color:#fff;font-size:13px;
+      cursor:pointer;
     }
 
     .add-btn{
@@ -201,10 +204,69 @@
     .modal-overlay{
       position:fixed;inset:0;z-index:200;
       background:rgba(0,0,0,.9);backdrop-filter:blur(5px);
-      display:none;align-items:center;justify-content:center;padding:20px;
+      display:none;
+      padding:18px;
     }
-    .sale-box{width:100%;max-width:400px;background:#111;border:1px solid var(--primary);border-radius:24px;overflow:hidden;position:relative;}
-    .timer-box{background:var(--primary);color:#000;text-align:center;padding:15px;font-size:2rem;font-weight:900;}
+
+    /* ✅ FIXED POPUP CENTERING (always fully visible) */
+    .sale-box{
+      position:fixed;
+      left:50%;
+      top:50%;
+      transform:translate(-50%, -50%);
+      width:min(420px, calc(100vw - 36px));
+      max-height:min(90vh, calc(100vh - 36px));
+      background:#111;
+      border:1px solid var(--primary);
+      border-radius:24px;
+      overflow:hidden;
+      display:flex;
+      flex-direction:column;
+    }
+    .sale-close{
+      position:absolute;
+      top:10px;
+      inset-inline-end:12px; /* ✅ works in RTL/LTR */
+      font-size:2rem;
+      line-height:1;
+      color:#fff;
+      cursor:pointer;
+      z-index:10;
+      padding:4px 10px;
+      border-radius:12px;
+      background:rgba(0,0,0,.35);
+      border:1px solid rgba(255,255,255,.12);
+      backdrop-filter:blur(6px);
+    }
+    .sale-media{
+      width:100%;
+      background:#000;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+    .sale-media img{
+      width:100%;
+      height:auto;
+      max-height:48vh;
+      object-fit:contain;
+      display:block;
+    }
+    .sale-body{
+      padding:18px 18px 20px;
+      text-align:center;
+      overflow:auto;
+    }
+    .timer-box{
+      background:var(--primary);
+      color:#000;
+      text-align:center;
+      padding:15px;
+      font-size:2rem;
+      font-weight:900;
+      border-radius:12px;
+      margin-bottom:15px;
+    }
 
     /* Order section visuals */
     .mesh-bg{
@@ -305,9 +367,7 @@
         <img src="https://madperfume.ps/upload/01-2026/page/69724b7327345.png" class="relative z-10 w-full max-w-[900px] mx-auto drop-shadow-2xl transition-transform duration-700 hover:scale-105" alt="Niche">
       </div>
 
-      <p class="text-slate-300 leading-loose text-xl font-light max-w-2xl mx-auto px-2" id="niche-desc">
-        في MAD، نحن لا نصنع العطور فحسب، بل نصمم حضوراً. عطور النيش لدينا تعتمد على ندرة المكونات وحرية الإبداع، بعيداً عن القيود التجارية. كل زجاجة هي قصة فنية متكاملة.
-      </p>
+      <p class="text-slate-300 leading-loose text-xl font-light max-w-2xl mx-auto px-2" id="niche-desc"></p>
 
       <div class="mt-12 flex justify-center gap-10 text-amber-500 text-3xl opacity-80">
         <i class="fas fa-gem"></i>
@@ -323,13 +383,11 @@
 
     <div class="relative z-10 text-center">
       <h2 class="text-4xl md:text-5xl font-serif font-black text-white italic mb-3">Selective Collection</h2>
-      <p class="text-amber-500 font-bold text-lg mb-12 uppercase tracking-widest" id="sel-subtitle">مجموعة النخبة المختارة</p>
+      <p class="text-amber-500 font-bold text-lg mb-12 uppercase tracking-widest" id="sel-subtitle"></p>
 
       <img src="https://madperfume.ps/upload/01-2026/page/69724b7327f56.png" class="w-full max-w-[900px] mx-auto mb-12 drop-shadow-[0_30px_60px_rgba(217,119,6,0.3)] float-anim" alt="Selective">
 
-      <p class="text-slate-300 max-w-lg mx-auto text-lg leading-relaxed px-6" id="sel-desc">
-        أيقونة العطور الفاخرة التي تجمع بين الثبات الخارق (Extrait de Parfum) والمكونات النادرة المستوحاة من أعظم العطور العالمية.
-      </p>
+      <p class="text-slate-300 max-w-lg mx-auto text-lg leading-relaxed px-6" id="sel-desc"></p>
     </div>
   </section>
 
@@ -338,15 +396,15 @@
     <div class="grid grid-cols-3 gap-3 max-w-lg mx-auto text-center">
       <div class="bg-white/5 rounded-3xl p-6 border border-white/5 hover:border-amber-500/30 transition">
         <div class="text-3xl md:text-4xl font-black text-white mb-2">18</div>
-        <div class="text-xs font-bold text-amber-500 uppercase tracking-widest" id="stat-country">دولة</div>
+        <div class="text-xs font-bold text-amber-500 uppercase tracking-widest" id="stat-country"></div>
       </div>
       <div class="bg-white/5 rounded-3xl p-6 border border-white/5 hover:border-amber-500/30 transition">
         <div class="text-3xl md:text-4xl font-black text-white mb-2">455+</div>
-        <div class="text-xs font-bold text-amber-500 uppercase tracking-widest" id="stat-store">نقطة بيع</div>
+        <div class="text-xs font-bold text-amber-500 uppercase tracking-widest" id="stat-store"></div>
       </div>
       <div class="bg-white/5 rounded-3xl p-6 border border-white/5 hover:border-amber-500/30 transition">
         <div class="text-3xl md:text-4xl font-black text-white mb-2">26</div>
-        <div class="text-xs font-bold text-amber-500 uppercase tracking-widest" id="stat-year">عاماً</div>
+        <div class="text-xs font-bold text-amber-500 uppercase tracking-widest" id="stat-year"></div>
       </div>
     </div>
   </section>
@@ -355,7 +413,7 @@
   <section class="py-20 px-4 bg-black border-b border-white/5">
     <div class="text-center mb-12">
       <span class="text-amber-500 text-sm font-black tracking-widest uppercase block mb-2">THE MANIFESTO</span>
-      <h2 class="text-4xl md:text-5xl text-white font-serif italic" id="comp-title">MAD vs Others</h2>
+      <h2 class="text-4xl md:text-5xl text-white font-serif italic" id="comp-title"></h2>
     </div>
     <div class="max-w-xl mx-auto space-y-4" id="comparison-container"></div>
   </section>
@@ -376,13 +434,17 @@
 
   <!-- SALE POPUP -->
   <div id="sale-popup" class="modal-overlay">
-    <div class="sale-box">
-      <span style="position:absolute; top:15px; right:20px; font-size:2rem; color:#fff; cursor:pointer; z-index:10;" onclick="toggleSale(false)">&times;</span>
-      <img src="sale.png" style="width:100%; display:block;" onerror="this.style.display='none'">
-      <div style="padding:20px; text-align:center;">
-        <h3 class="font-serif text-2xl mb-2 text-white">Exclusive Offer</h3>
-        <div id="timer" class="timer-box" style="border-radius:12px; margin-bottom:15px;">00:00:00</div>
-        <button class="add-btn" style="margin:0;" onclick="claimOffer()">CLAIM NOW</button>
+    <div class="sale-box" role="dialog" aria-modal="true">
+      <span class="sale-close" onclick="toggleSale(false)">&times;</span>
+
+      <div class="sale-media">
+        <img src="sale.png" alt="sale" onerror="this.style.display='none'">
+      </div>
+
+      <div class="sale-body">
+        <h3 id="sale-title" class="font-serif text-2xl mb-2 text-white">عرض اليوم</h3>
+        <div id="timer" class="timer-box">00:00:00</div>
+        <button id="sale-btn" class="add-btn" style="margin:0;" onclick="claimOffer()">احصل على عرض اليوم</button>
       </div>
     </div>
   </div>
@@ -390,17 +452,17 @@
   <!-- CART DRAWER -->
   <div id="cart-drawer" class="drawer">
     <div class="flex justify-between items-center mb-8">
-      <h2 class="text-2xl font-bold text-white" id="cart-title">سلة المشتريات</h2>
+      <h2 class="text-2xl font-bold text-white" id="cart-title"></h2>
       <button onclick="toggleDrawer(false)" class="text-slate-400 p-2"><i class="fas fa-times text-2xl"></i></button>
     </div>
     <div id="cart-items" class="flex-1 overflow-y-auto space-y-4 pr-2"></div>
     <div class="border-t border-white/10 pt-6 mt-4">
       <div class="flex justify-between text-xl font-bold text-white mb-6">
-        <span id="txt-total">المجموع:</span>
+        <span id="txt-total"></span>
         <span class="text-amber-500" id="cart-total">0 ₪</span>
       </div>
       <button onclick="checkout()" class="w-full py-5 bg-[#25D366] text-white rounded-2xl font-black text-lg flex items-center justify-center gap-3 hover:bg-[#20b857] transition shadow-lg active:scale-95">
-        <i class="fab fa-whatsapp text-2xl"></i> <span id="txt-checkout">إتمام الطلب</span>
+        <i class="fab fa-whatsapp text-2xl"></i> <span id="txt-checkout"></span>
       </button>
     </div>
   </div>
@@ -441,19 +503,12 @@
   <script>
     /***********************
      *  ✅ DATA SOURCES
-     *  ضع الملفات بنفس مجلد الصفحة:
-     *  - branches.json
-     *  - products.csv
-     *  إذا أبقيت أسماء ملفاتك كما هي (مع الأقواس)، غيّر الروابط هنا.
      ***********************/
     const DATA_SOURCES = {
-      branchesUrl: "./branches.json",   // مثال: "./branches (10).json"
-      productsCsvUrl: "./products.csv"  // مثال: "./products (3).csv"
+      branchesUrl: "./branches.json",
+      productsCsvUrl: "./products.csv"
     };
 
-    /***********************
-     *  GLOBAL STATE
-     ***********************/
     const params = new URLSearchParams(window.location.search);
     const branchID = parseInt(params.get("branch") || "1", 10);
 
@@ -484,7 +539,10 @@
         orderTag: "بوابة الحجز", orderTitle: "أكمل طلبك الآن",
         zapierId: "cmkpbwxjy001bonuoz5vy0gh1",
         avail_in: "متوفر", avail_out: "غير متوفر",
-        details: "تفاصيل"
+        details: "تفاصيل",
+        saleTitle: "عرض اليوم",
+        saleBtn: "احصل على عرض اليوم",
+        saleMsg: "مرحباً، أريد عرض اليوم"
       },
       he: {
         open: "פתוח עכשיו", closed: "סגור",
@@ -508,13 +566,13 @@
         orderTag: "פורטל הזמנות", orderTitle: "אשר הזמנה עכשיו",
         zapierId: "cmkpef5ul0009nc51356rtjm8",
         avail_in: "במלאי", avail_out: "לא במלאי",
-        details: "פרטים"
+        details: "פרטים",
+        saleTitle: "מבצע היום",
+        saleBtn: "קבלו את מבצע היום",
+        saleMsg: "שלום, אני רוצה את מבצע היום"
       }
     };
 
-    /***********************
-     *  HELPERS
-     ***********************/
     function showError(msg){
       const el = document.getElementById("data-error");
       el.className = "err-box";
@@ -525,12 +583,10 @@
     function normalizePhoneForWhatsApp(phone){
       const p = (phone || "").toString().replace(/\D/g,"");
       if(!p) return "";
-      // If already includes country code (970/972/...) keep as-is.
       if(p.startsWith("972") || p.startsWith("970")) return p;
-      // Heuristics:
-      if(p.startsWith("059") || p.startsWith("056")) return "970" + p.substring(1); // فلسطين
-      if(p.startsWith("05")) return "972" + p.substring(1); // إسرائيل
-      if(p.startsWith("0")) return "972" + p.substring(1);  // fallback
+      if(p.startsWith("059") || p.startsWith("056")) return "970" + p.substring(1);
+      if(p.startsWith("05")) return "972" + p.substring(1);
+      if(p.startsWith("0")) return "972" + p.substring(1);
       return p;
     }
 
@@ -552,7 +608,7 @@
       if(!s) return true;
       if(s.includes("out")) return false;
       if(s.includes("0")) return false;
-      return true; // "in stock" or unknown => treat as available
+      return true;
     }
 
     function extractBranches(data){
@@ -590,7 +646,6 @@
         const id = parseProductIdFromLink(link) || (i+1);
         const priceNum = parsePriceToNumber(row["Price"]);
 
-        // minimal guard
         if(!title && !img && !link) continue;
 
         out.push({
@@ -611,22 +666,16 @@
         });
       }
 
-      // Remove duplicates by id (keep first)
       const seen = new Set();
       return out.filter(p => { if(seen.has(p.id)) return false; seen.add(p.id); return true; });
     }
 
-    /***********************
-     *  INIT
-     ***********************/
     async function init(){
-      // Choose language
       const urlLang = params.get("lang");
       if(urlLang) lang = urlLang === "he" ? "he" : "ar";
       else lang = navigator.language.startsWith("ar") ? "ar" : "he";
 
       try{
-        // Load branches + products
         const [branchesJSON, productsCSV] = await Promise.all([
           fetchJSON(DATA_SOURCES.branchesUrl),
           fetchText(DATA_SOURCES.productsCsvUrl)
@@ -640,13 +689,10 @@
         STATE.products = parseProductsCSV(productsCSV);
         if(!STATE.products.length) throw new Error("No products found in products.csv");
 
-        // Render
         setLang(lang, true);
 
-        // sale popup (optional)
-        setTimeout(() => toggleSale(true), 4000);
+        setTimeout(() => toggleSale(true), 3500);
 
-        // finish
         document.getElementById("page-loader").style.display = "none";
         document.body.style.opacity = "1";
 
@@ -661,14 +707,14 @@
       }
     }
 
-    /***********************
-     *  RENDER
-     ***********************/
     function setLang(l, isInit=false){
       lang = l;
-      document.documentElement.dir = l === "ar" ? "rtl" : "ltr";
 
-      // Keep URL updated (shareable)
+      // ✅ set html+body lang/dir properly
+      document.documentElement.dir = (l === "ar") ? "rtl" : "ltr";
+      document.body.dir = (l === "ar") ? "rtl" : "ltr";
+      document.documentElement.lang = (l === "ar") ? "ar" : "he";
+
       const u = new URL(window.location.href);
       u.searchParams.set("lang", lang);
       if(!u.searchParams.get("branch")) u.searchParams.set("branch", String(branchID));
@@ -682,13 +728,10 @@
       const t = TEXTS[lang];
       const b = STATE.branch;
 
-      document.getElementById("branch-name").innerText = lang === "ar" ? (b.name_ar || "MAD") : (b.name_he || "MAD");
+      document.getElementById("branch-name").innerText = (lang === "ar") ? (b.name_ar || "MAD") : (b.name_he || "MAD");
       updateBranchStatus();
-
-      // Socials (IMPORTANT: Waze uses ready link from JSON social.waze, no lat/lng building)
       renderSocials();
 
-      // Static texts
       document.getElementById("niche-title").innerText = t.nicheT;
       document.getElementById("niche-desc").innerText = t.nicheD;
       document.getElementById("sel-subtitle").innerText = t.selT;
@@ -701,16 +744,17 @@
       document.getElementById("txt-checkout").innerText = t.check;
       document.getElementById("comp-title").innerText = t.compTitle;
 
-      // Order
       document.getElementById("order-tag").innerText = t.orderTag;
       document.getElementById("order-title").innerText = t.orderTitle;
 
-      // Zapier Embed
+      // ✅ popup language
+      document.getElementById("sale-title").innerText = t.saleTitle;
+      document.getElementById("sale-btn").innerText = t.saleBtn;
+
       const zEmbed = document.getElementById("zapier-embed");
       zEmbed.setAttribute("page-id", t.zapierId);
       zEmbed.setAttribute("test-id", t.zapierId + "-embed");
 
-      // Push useful params into embed (lang + branch)
       const bName = (lang === "ar" ? (b.name_ar || "") : (b.name_he || ""));
       const qp = new URLSearchParams({
         lang,
@@ -723,13 +767,12 @@
       renderComparison();
       renderCats();
       renderProducts();
-      updateCart(); // keep cart UI synced
+      updateCart();
     }
 
     function renderSocials(){
       const b = STATE.branch || {};
       const s = b.social || {};
-
       const waPhone = normalizePhoneForWhatsApp(b.phone);
       const waLink = waPhone ? `https://wa.me/${waPhone}` : "";
 
@@ -745,8 +788,7 @@
         { key:"waze", url: s.waze || "", icon:"fab fa-waze", title:"Waze" }
       ].filter(x => x.url);
 
-      const socContainer = document.getElementById("social-container");
-      socContainer.innerHTML = items.map(it =>
+      document.getElementById("social-container").innerHTML = items.map(it =>
         `<a href="${it.url}" target="_blank" rel="noopener" class="social-btn" title="${it.title}" onclick="trackLead('Social: ${it.key}')"><i class="${it.icon}"></i></a>`
       ).join("");
     }
@@ -764,10 +806,9 @@
       if(b.schedule && b.schedule[currentDay]){
         const slots = b.schedule[currentDay] || [];
         if(slots.length){
-          // display first slot (like screenshot)
           hoursStr = `${slots[0][0]} - ${slots[0][1]}`;
         }else{
-          hoursStr = lang === "ar" ? "مغلق اليوم" : "סגור היום";
+          hoursStr = (lang === "ar") ? "مغلق اليوم" : "סגור היום";
         }
 
         slots.forEach(slot => {
@@ -775,13 +816,9 @@
           const en = slot[1] || "00:00";
           const [sh, sm] = st.split(":").map(n=>parseInt(n,10));
           const [eh, em] = en.split(":").map(n=>parseInt(n,10));
-
           const startMins = (sh*60) + (sm||0);
           let endMins = (eh*60) + (em||0);
-
-          // handle 24:00 => 1440
           if(String(en).startsWith("24")) endMins = 1440;
-
           if(currentTime >= startMins && currentTime < endMins) isOpen = true;
         });
       }
@@ -947,7 +984,7 @@
 
     function toggleSale(open){
       const m = document.getElementById("sale-popup");
-      if(open){ m.style.display = "flex"; startTimer(); }
+      if(open){ m.style.display = "block"; startTimer(); }  /* ✅ show overlay */
       else { m.style.display = "none"; }
     }
 
@@ -984,7 +1021,8 @@
       const waPhone = normalizePhoneForWhatsApp(b.phone);
       trackLead("Claim Offer");
       if(!waPhone) return;
-      window.open(`https://api.whatsapp.com/send/?phone=${waPhone}&text=${encodeURIComponent("Claim Offer")}`, "_blank");
+      const msg = TEXTS[lang].saleMsg;
+      window.open(`https://api.whatsapp.com/send/?phone=${waPhone}&text=${encodeURIComponent(msg)}`, "_blank");
     }
 
     let tInt;
@@ -1004,7 +1042,6 @@
       }, 1000);
     }
 
-    // Start
     init();
   </script>
 </body>
