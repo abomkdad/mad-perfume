@@ -1,10 +1,10 @@
 <!-- =========================
-     FILE: thank-you.html  (BEAUTIFUL + FIXED)
+     FILE: thank-you.html  (FINAL - BEAUTIFUL + NO HOMEPAGE REDIRECT)
      - Meta Pixel + TikTok Pixel
      - FB: Purchase | TikTok: CompletePayment
      - AR/HE via ?lang=ar|he (fallback browser)
      - Prevent duplicate (sessionStorage)
-     - No forced redirect to homepage
+     - NO forced redirect to homepage
      - Supports back= to return to landing
 ========================= -->
 <!DOCTYPE html>
@@ -19,7 +19,7 @@
     !function(f,b,e,v,n,t,s){
       if(f.fbq)return;
       n=f.fbq=function(){n.callMethod? n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-      if(!f._fbq)f._fbq=n;
+      if(!f._fbq)n=f.fbq=n;
       n.push=n; n.loaded=!0; n.version='2.0'; n.queue=[];
       t=b.createElement(e); t.async=!0; t.src=v;
       s=b.getElementsByTagName(e)[0]; s.parentNode.insertBefore(t,s)
@@ -62,6 +62,7 @@
       --card:#0f172a; --border:rgba(255,255,255,.08);
       --text:#e5e7eb; --muted:#a1a1aa;
       --green:#22c55e; --green2:#16a34a;
+      --red:#ef4444; --red2:#b91c1c;
       --gold:#d4af37;
       --shadow: 0 18px 70px rgba(0,0,0,.55);
     }
@@ -128,7 +129,6 @@
       background: linear-gradient(180deg, var(--green), var(--green2));
       display:flex; align-items:center; justify-content:center;
       box-shadow: 0 18px 50px rgba(34,197,94,.25);
-      position:relative;
     }
     .check svg{width:34px; height:34px; fill:none; stroke:#06240f; stroke-width:4; stroke-linecap:round; stroke-linejoin:round}
     h1{margin:10px 0 6px; font-size:22px; letter-spacing:.2px}
@@ -206,7 +206,7 @@
       </div>
 
       <div class="center">
-        <div class="checkWrap">
+        <div class="checkWrap" id="checkWrap">
           <div class="check" id="checkBox" aria-hidden="true">
             <svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"></path></svg>
           </div>
@@ -256,7 +256,7 @@
       }catch(e){ return null; }
     }
 
-    // ✅ default back = "/"
+    // ✅ back priority: back= > referrer (same-origin) > "/"
     const backRaw = qs.get('back') || document.referrer || '/';
     const back = safeBack(backRaw) || '/';
     document.getElementById('btn').href = back;
@@ -294,23 +294,34 @@
       document.getElementById('itm').parentElement.firstChild.textContent = "מוצר: ";
     }
 
-    // ---- Validation ----
+    // ---- Validation (NO redirect) ----
     const ORDER_OK_KEY = "MAD_ORDER_OK_V1";
     const urlOk = (qs.get('mad_ty') === '1') || (qs.get('ty') === '1');
 
     let ssOk = false;
     try { ssOk = (sessionStorage.getItem(ORDER_OK_KEY) === '1'); } catch(e) {}
 
-    // accept when key params exist (helps redirects)
+    // accept when key params exist (helps Zapier redirects)
     const hasParams = qs.has('value') || qs.has('content_id') || qs.has('item');
-
     const isValid = urlOk || ssOk || hasParams;
 
     if (!isValid) {
       document.getElementById('warn').style.display = 'block';
-      document.getElementById('checkBox').style.background = 'linear-gradient(180deg,#ef4444,#b91c1c)';
-      document.getElementById('checkBox').style.boxShadow = '0 18px 50px rgba(239,68,68,.25)';
-      document.getElementById('checkBox').innerHTML = '<svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"></path></svg>';
+
+      // turn to RED X (but stay on page)
+      const checkBox = document.getElementById('checkBox');
+      const checkWrap = document.getElementById('checkWrap');
+      checkBox.style.background = 'linear-gradient(180deg,var(--red),var(--red2))';
+      checkBox.style.boxShadow = '0 18px 50px rgba(239,68,68,.25)';
+      checkWrap.style.background = 'radial-gradient(closest-side, rgba(239,68,68,.18), rgba(239,68,68,.06))';
+      checkWrap.style.borderColor = 'rgba(239,68,68,.25)';
+      checkWrap.style.boxShadow = '0 20px 60px rgba(239,68,68,.12)';
+      checkBox.innerHTML = '<svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"></path></svg>';
+      checkBox.querySelector('svg').style.stroke = '#2b0b0b';
+      checkBox.querySelector('svg').style.strokeWidth = '4';
+      checkBox.querySelector('svg').style.fill = 'none';
+      checkBox.querySelector('svg').style.strokeLinecap = 'round';
+      checkBox.querySelector('svg').style.strokeLinejoin = 'round';
     } else {
       // ---- Fire once per session ----
       const OLD_LOCK = 'mad_purchase_fired';
