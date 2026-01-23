@@ -102,6 +102,28 @@
   <script>
     const qs = new URLSearchParams(location.search);
 
+    // ---- Safe back URL (so it doesn't always go to homepage) ----
+    function safeBack(raw){
+      if(!raw) return null;
+      try{
+        const r = String(raw).trim();
+        if(!r) return null;
+        if(r.toLowerCase().startsWith("javascript:")) return null;
+
+        if(r.startsWith("http://") || r.startsWith("https://")){
+          const u = new URL(r);
+          if(u.origin === location.origin) return u.pathname + u.search + u.hash;
+          return null;
+        }
+        if(r.includes("://")) return null; // block other schemes
+        return r; // relative path ok
+      }catch(e){ return null; }
+    }
+
+    const backRaw = qs.get('back') || document.referrer || 'index.html#order-section';
+    const back = safeBack(backRaw) || 'index.html#order-section';
+    document.getElementById('btn').href = back;
+
     // ---- Language ----
     const langParam = (qs.get('lang') || '').toLowerCase();
     const isHebrew = langParam === 'he' || (navigator.language && navigator.language.toLowerCase().startsWith('he'));
@@ -137,7 +159,7 @@
       document.getElementById('warn').style.display = 'block';
       document.getElementById('icon').textContent = '!';
       document.getElementById('icon').style.color = '#b42318';
-      setTimeout(() => { location.href = 'index.html'; }, 1500);
+      setTimeout(() => { location.href = back; }, 1500);
     } else {
       // ---- Fire once per session ----
       const OLD_LOCK = 'mad_purchase_fired';
@@ -164,7 +186,7 @@
           });
         } catch (e) {}
 
-        // TikTok CompletePayment (as per your spec)
+        // TikTok CompletePayment
         try {
           ttq.track('CompletePayment', {
             value: value,
