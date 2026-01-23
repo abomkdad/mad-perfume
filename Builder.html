@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MAD Builder - YouTube Fix</title>
+    <title>MAD Builder - Ultimate Fixed</title>
     <style>
         :root { --primary: #d97706; --bg: #0f172a; --panel: #1e293b; --text: #f1f5f9; --border: #334155; --danger: #ef4444; }
         body { margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); height: 100vh; overflow: hidden; }
@@ -29,7 +29,7 @@
         label { display: block; font-size: 0.85rem; margin-bottom: 5px; color: #cbd5e1; }
         input[type="text"], textarea, select { width: 100%; padding: 10px; background: #0f172a; border: 1px solid var(--border); color: white; border-radius: 6px; box-sizing: border-box; outline: none; font-size: 0.9rem; }
         input[type="color"] { width: 100%; height: 40px; border: none; padding: 0; cursor: pointer; border-radius: 6px; }
-        input:focus, textarea:focus { border-color: var(--primary); }
+        input:focus, textarea:focus, select:focus { border-color: var(--primary); }
 
         .lang-toggle { display: flex; background: #0f172a; border-radius: 8px; padding: 4px; margin-bottom: 20px; border: 1px solid var(--border); }
         .lang-btn { flex: 1; background: transparent; color: #64748b; border: none; padding: 10px; border-radius: 6px; cursor: pointer; font-weight: bold; transition: 0.2s; font-family: inherit; }
@@ -105,20 +105,18 @@
             </div>
         </div>
 
-        <h2>3. خيارات الطلب (Order Methods)</h2>
+        <h2>3. خيارات الطلب</h2>
         <div class="toggle-wrapper">
             <span class="toggle-label">⚡ Zapier Form</span>
             <input type="checkbox" id="showZapier" checked onchange="updateCommon('showZapier', this.checked)">
-            <div class="section-settings">
-                <label>Zapier ID (لهذه اللغة)</label><input type="text" id="zapierId" oninput="updateData('zapierId', this.value)">
-            </div>
+            <div class="section-settings"><label>ID</label><input type="text" id="zapierId" oninput="updateData('zapierId', this.value)"></div>
         </div>
         <div class="toggle-wrapper">
             <span class="toggle-label">🟢 WhatsApp</span>
             <input type="checkbox" id="showWa" checked onchange="updateCommon('showWa', this.checked)">
             <div class="section-settings">
                 <label>رقم الواتساب (مع الدولة)</label><input type="text" id="waNum" value="972509787730" oninput="updateCommon('waNum', this.value)">
-                <label>نص الرسالة المسبقة (لهذه اللغة)</label><input type="text" id="waText" oninput="updateData('waText', this.value)">
+                <label>نص الرسالة المسبقة</label><input type="text" id="waText" oninput="updateData('waText', this.value)">
                 <label>نص الزر</label><input type="text" id="waLabel" oninput="updateData('waLabel', this.value)">
             </div>
         </div>
@@ -131,20 +129,28 @@
             </div>
         </div>
         <div class="toggle-wrapper">
-            <span class="toggle-label">🌐 رابط موقع خارجي</span>
+            <span class="toggle-label">🌐 رابط موقع</span>
             <input type="checkbox" id="showWeb" onchange="updateCommon('showWeb', this.checked)">
             <div class="section-settings">
-                <label>الرابط (URL)</label><input type="text" id="webUrl" placeholder="https://..." oninput="updateCommon('webUrl', this.value)">
+                <label>الرابط</label><input type="text" id="webUrl" placeholder="https://..." oninput="updateCommon('webUrl', this.value)">
                 <label>نص الزر</label><input type="text" id="webLabel" oninput="updateData('webLabel', this.value)">
             </div>
         </div>
 
         <h2>4. الوسائط والبلوكات</h2>
-        <div class="form-group">
-            <label>فيديو الخلفية (رابط مباشر أو يوتيوب)</label>
-            <input type="text" id="vid" value="https://madparfumeurglobal.com/wp-content/uploads/2025/10/download.mp4" placeholder="MP4 URL or YouTube Link" oninput="updateCommon('vid', this.value)">
-            <div class="hint">يدعم: MP4 المباشر، YouTube العادي، و YouTube Shorts.</div>
+        
+        <!-- Hero Media Type Selector -->
+        <div class="form-group" style="background:rgba(255,255,255,0.05); padding:10px; border-radius:8px; border:1px solid #334155">
+            <label style="color:var(--primary); margin-bottom:8px;">خلفية الهيدر (Media Source)</label>
+            <select id="heroType" onchange="updateCommon('heroType', this.value)" style="margin-bottom:10px;">
+                <option value="video">فيديو مباشر (Direct MP4)</option>
+                <option value="youtube">يوتيوب (YouTube/Shorts)</option>
+                <option value="image">صورة ثابتة (Image)</option>
+            </select>
+            <input type="text" id="vid" value="https://madparfumeurglobal.com/wp-content/uploads/2025/10/download.mp4" placeholder="ضع الرابط هنا..." oninput="updateCommon('vid', this.value)">
+            <div class="hint">انسخ الرابط وضعه هنا. لليوتيوب استخدم الرابط العادي أو رابط المشاركة.</div>
         </div>
+
         <div class="form-group">
             <label>صور المنتج (Carousel)</label>
             <input type="file" id="heroInput" accept="image/*" style="display:none">
@@ -164,9 +170,9 @@
             <button class="btn-secondary" onclick="addBlock('embed')">HTML</button>
         </div>
 
-        <h2>5. التتبع (Pixels)</h2>
-        <div class="form-group"><label>Facebook Pixel ID</label><input type="text" id="fbPixel" value="1072283127290819" oninput="updateCommon('fb', this.value)"></div>
-        <div class="form-group"><label>TikTok Pixel ID</label><input type="text" id="ttPixel" value="D2D02JBC77U4ENLN9SBG" oninput="updateCommon('tt', this.value)"></div>
+        <h2>5. التتبع</h2>
+        <div class="form-group"><label>Facebook Pixel</label><input type="text" id="fbPixel" value="1072283127290819" oninput="updateCommon('fb', this.value)"></div>
+        <div class="form-group"><label>TikTok Pixel</label><input type="text" id="ttPixel" value="D2D02JBC77U4ENLN9SBG" oninput="updateCommon('tt', this.value)"></div>
 
         <button class="btn-action" onclick="download()">تحميل الصفحة</button>
     </div>
@@ -183,6 +189,7 @@
     let mode = 'ar';
     const common = {
         bgColor: "#020202",
+        heroType: 'video', 
         vid: "https://madparfumeurglobal.com/wp-content/uploads/2025/10/download.mp4",
         heroes: ["https://madperfume.ps/upload/01-2026/page/6971495c69e7c.png"],
         blocks: [],
@@ -220,9 +227,16 @@
         }
     };
 
+    // Safe escaping to prevent SyntaxError in template literals
     function escapeHtml(text) {
         if (!text) return "";
-        return text.replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+        return text.replace(/\\/g, '\\\\')
+                   .replace(/"/g, '\\"')
+                   .replace(/'/g, "\\'")
+                   .replace(/`/g, '\\`')
+                   .replace(/</g, '&lt;')
+                   .replace(/>/g, '&gt;')
+                   .replace(/\$/g, '\\$');
     }
 
     function setMode(lang) {
@@ -230,7 +244,8 @@
         document.getElementById('btn-ar').className = lang === 'ar' ? 'lang-btn active' : 'lang-btn';
         document.getElementById('btn-he').className = lang === 'he' ? 'lang-btn active' : 'lang-btn';
         ['price', 'offer', 'ctaText', 'zapierId', 'maniT', 'maniS', 'maniM', 'maniO', 'waLabel', 'waText', 'callLabel', 'webLabel'].forEach(id => {
-            document.getElementById(id).value = db[lang][id] || '';
+            const el = document.getElementById(id);
+            if(el) el.value = db[lang][id] || '';
         });
         renderManiRows(); render();
     }
@@ -241,9 +256,10 @@
     function renderManiRows() {
         const div = document.getElementById('maniRows'); div.innerHTML = '';
         db[mode].compItems.forEach((item, i) => {
+            // Using escaped values for HTML attribute to avoid breaking the builder UI
             div.innerHTML += `<div class="dynamic-row">
-                <input type="text" placeholder="MAD" value="${escapeHtml(item.mad)}" oninput="updateManiItem(${i}, 'mad', this.value)">
-                <input type="text" placeholder="Others" value="${escapeHtml(item.local)}" oninput="updateManiItem(${i}, 'local', this.value)">
+                <input type="text" placeholder="MAD" value="${item.mad.replace(/"/g, '&quot;')}" oninput="updateManiItem(${i}, 'mad', this.value)">
+                <input type="text" placeholder="Others" value="${item.local.replace(/"/g, '&quot;')}" oninput="updateManiItem(${i}, 'local', this.value)">
                 <button class="btn-delete" onclick="removeManiRow(${i})">X</button>
             </div>`;
         });
@@ -289,8 +305,8 @@
         const div = document.getElementById('blockList'); div.innerHTML = '';
         common.blocks.forEach((b) => {
             let f = '';
-            // Safe value insertion
-            const safeVal = escapeHtml(b.val);
+            // Safe value for input fields
+            const safeVal = b.val.replace(/"/g, '&quot;');
             if(b.type === 'text') f = `<textarea oninput="setBlockVal(${b.id},this.value)" placeholder="Text...">${safeVal}</textarea>`;
             if(b.type === 'video') f = `<input type="text" oninput="setBlockVal(${b.id},this.value)" value="${safeVal}" placeholder="MP4 URL">`;
             if(b.type === 'embed') f = `<textarea oninput="setBlockVal(${b.id},this.value)" placeholder="Code...">${safeVal}</textarea>`;
@@ -304,55 +320,63 @@
         });
     }
 
+    // Safety function for injecting JSON into script tags
     function safeJSON(obj) {
-        return JSON.stringify(obj).replace(/</g, '\\u003c');
+        return JSON.stringify(obj)
+            .replace(/</g, '\\u003c')
+            .replace(/>/g, '\\u003e')
+            .replace(/`/g, '\\u0060')
+            .replace(/\$/g, '\\u0024');
     }
 
     function getHTML(dl = false) {
         const jsonCommon = safeJSON(common);
         const jsonDB = safeJSON(db);
         
-        // Video Logic
+        // --- Smart Media Handler ---
         const vidUrl = common.vid;
+        const hType = common.heroType;
         let heroHtml = '';
-        // YouTube Regex to catch standard, short URLs, and youtube.com/shorts/
-        const ytMatch = vidUrl.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?|shorts)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/);
-        
-        if(ytMatch && ytMatch[1]) {
-            const vidId = ytMatch[1];
-            // YouTube Iframe Embed
-            heroHtml = `<div class="hero-wrapper"><iframe src="https://www.youtube.com/embed/${vidId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${vidId}&playsinline=1" class="hero-vid-iframe" allow="autoplay; encrypted-media" frameborder="0"></iframe></div>`;
+
+        if (hType === 'youtube') {
+            // YouTube ID Extraction (Supports regular, short, embed)
+            const ytMatch = vidUrl.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?|shorts)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/);
+            const vidId = ytMatch ? ytMatch[1] : '';
+            // Silent Autoplay Embed Code
+            heroHtml = vidId ? `<div class="hero-wrapper"><iframe src="https://www.youtube.com/embed/${vidId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${vidId}&playsinline=1&rel=0&showinfo=0&modestbranding=1" class="hero-vid-iframe" allow="autoplay; encrypted-media" frameborder="0"></iframe></div>` : `<div class="hero-wrapper" style="background:#333;display:flex;align-items:center;justify-content:center;color:white">Invalid YouTube URL</div>`;
+        } else if (hType === 'image') {
+            // Static Image
+            heroHtml = `<img src="${vidUrl}" class="hero-vid" alt="Background">`;
         } else {
-            // Standard Video Tag
+            // Default Video (MP4)
             heroHtml = `<video src="${vidUrl}" autoplay loop muted playsinline class="hero-vid"></video>`;
         }
 
-        const scriptOpen = '<' + 'script';
-        const scriptClose = '<' + '/script>';
+        const sOpen = '<' + 'script';
+        const sClose = '<' + '/script>';
 
         const pixels = dl ? `
-        ${scriptOpen}>
+        ${sOpen}>
             !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)n=f.fbq;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window, document,'script','https://connect.facebook.net/en_US/fbevents.js');
             fbq('init', '${common.fb}'); fbq('track', 'PageView');
             !function (w, d, t) { w.TiktokAnalyticsObject=t; var ttq=w[t]=w[t]||[]; ttq.methods=["page","track","identify","instances","debug","on","off","once","ready","alias","group","enableCookie","disableCookie","holdConsent","revokeConsent","grantConsent"]; ttq.setAndDefer=function(t,e){t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}; for(var i=0;i<ttq.methods.length;i++)ttq.setAndDefer(ttq,ttq.methods[i]); ttq.load=function(e,n){ var r="https://analytics.tiktok.com/i18n/pixel/events.js"; var o=n&&n.partner; ttq._i=ttq._i||{}; ttq._i[e]=[]; ttq._i[e]._u=r; ttq._t=ttq._t||{}; ttq._t[e]=+new Date; ttq._o=ttq._o||{}; ttq._o[e]=n||{}; n=document.createElement("script"); n.type="text/javascript"; n.async=!0; n.src=r+"?sdkid="+e+"&lib="+t; e=document.getElementsByTagName("script")[0]; e.parentNode.insertBefore(n,e) }; ttq.load('${common.tt}'); ttq.page(); }(window, document, 'ttq');
-        ${scriptClose}` : '';
+        ${sClose}` : '';
 
         return `<!DOCTYPE html>
 <html lang="${mode}" x-data="app()" x-init="init()" :dir="dir">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-${scriptOpen} src="https://cdn.tailwindcss.com">${scriptClose}
-${scriptOpen} src="https://unpkg.com/lucide@latest">${scriptClose}
-${scriptOpen} src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer>${scriptClose}
-${scriptOpen} type='module' src='https://interfaces.zapier.com/assets/web-components/zapier-interfaces/zapier-interfaces.esm.js'>${scriptClose}
+${sOpen} src="https://cdn.tailwindcss.com">${sClose}
+${sOpen} src="https://unpkg.com/lucide@latest">${sClose}
+${sOpen} src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer>${sClose}
+${sOpen} type='module' src='https://interfaces.zapier.com/assets/web-components/zapier-interfaces/zapier-interfaces.esm.js'>${sClose}
 ${pixels}
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,900;1,400;1,900&family=Inter:wght@300;400;700;900&family=Amiri:wght@400;700&family=Assistant:wght@300;400;700;800&display=swap');
 body{background:${common.bgColor};color:white;font-family:'Inter','Assistant',sans-serif}
-/* Background Video Styling */
-.hero-vid { height: 100vh; width: 100%; object-fit: cover; position: absolute; z-index: -1; filter: brightness(0.6); top: 0; left: 0; }
-.hero-wrapper { position: absolute; top: 0; left: 0; width: 100%; height: 100vh; overflow: hidden; z-index: -1; }
-.hero-vid-iframe { width: 300%; height: 100%; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); pointer-events: none; filter: brightness(0.6); }
+/* Hero Media Styles */
+.hero-vid, .hero-wrapper { position: absolute; top: 0; left: 0; width: 100%; height: 100vh; overflow: hidden; z-index: -1; object-fit: cover; filter: brightness(0.6); }
+.hero-vid-iframe { width: 300%; height: 150%; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); pointer-events: none; }
 @media (min-aspect-ratio: 16/9) { .hero-vid-iframe { width: 100%; height: 300%; } }
 
 .badge{background:linear-gradient(to right,#d97706,#fbbf24);color:black;padding:5px 20px;border-radius:50px;font-weight:900;display:inline-block;margin-bottom:10px}
@@ -372,7 +396,7 @@ body{background:${common.bgColor};color:white;font-family:'Inter','Assistant',sa
 .btn-call { background: #3b82f6; color: white; } .btn-call:hover { background: #2563eb; }
 .btn-web { background: #64748b; color: white; } .btn-web:hover { background: #475569; }
 </style>
-${scriptOpen}>
+${sOpen}>
 function app(){
 return {
     c:${jsonCommon}, db:${jsonDB},
@@ -391,7 +415,7 @@ return {
         if(typeof ttq !== 'undefined') ttq.track(ev);
     }
 }}
-${scriptClose}
+${sClose}
 </head>
 <body>
 
@@ -466,13 +490,11 @@ ${scriptClose}
                 <i data-lucide="message-circle"></i> <span x-text="t.waLabel"></span>
             </a>
         </template>
-        
         <template x-if="c.showCall">
             <a :href="'tel:'+c.callNum" class="btn-order btn-call" @click="track('Contact')">
                 <i data-lucide="phone"></i> <span x-text="t.callLabel"></span>
             </a>
         </template>
-
         <template x-if="c.showWeb">
             <a :href="c.webUrl" target="_blank" class="btn-order btn-web" @click="track('ViewContent')">
                 <i data-lucide="globe"></i> <span x-text="t.webLabel"></span>
