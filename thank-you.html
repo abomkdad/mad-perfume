@@ -1,9 +1,11 @@
 <!-- =========================
-     FILE: thank-you.html  (FULL + COMPATIBLE)
+     FILE: thank-you.html  (BEAUTIFUL + FIXED)
      - Meta Pixel + TikTok Pixel
      - FB: Purchase | TikTok: CompletePayment
      - AR/HE via ?lang=ar|he (fallback browser)
-     - Prevent manual access + prevent refresh duplicate (sessionStorage)
+     - Prevent duplicate (sessionStorage)
+     - No forced redirect to homepage
+     - Supports back= to return to landing
 ========================= -->
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
@@ -36,22 +38,15 @@
       w.TiktokAnalyticsObject = t;
       var ttq = w[t] = w[t] || [];
       ttq.methods = ["page","track","identify","instances","debug","on","off","once","ready","alias","group","enableCookie","disableCookie"];
-      ttq.setAndDefer = function (t, e) {
-        t[e] = function () { t.push([e].concat([].slice.call(arguments, 0))) };
-      };
+      ttq.setAndDefer = function (t, e) { t[e] = function () { t.push([e].concat([].slice.call(arguments, 0))) }; };
       for (var i = 0; i < ttq.methods.length; i++) ttq.setAndDefer(ttq, ttq.methods[i]);
       ttq.load = function (e, n) {
         var i = "https://analytics.tiktok.com/i18n/pixel/events.js";
-        ttq._i = ttq._i || {};
-        ttq._i[e] = [];
-        ttq._i[e]._u = i;
-        ttq._t = ttq._t || {};
-        ttq._t[e] = +new Date;
-        ttq._o = ttq._o || {};
-        ttq._o[e] = n || {};
+        ttq._i = ttq._i || {}; ttq._i[e] = []; ttq._i[e]._u = i;
+        ttq._t = ttq._t || {}; ttq._t[e] = +new Date;
+        ttq._o = ttq._o || {}; ttq._o[e] = n || {};
         var o = document.createElement("script");
-        o.type = "text/javascript";
-        o.async = !0;
+        o.type = "text/javascript"; o.async = !0;
         o.src = i + "?sdkid=" + e + "&lib=" + t;
         var a = document.getElementsByTagName("script")[0];
         a.parentNode.insertBefore(o, a);
@@ -62,47 +57,187 @@
   </script>
 
   <style>
+    :root{
+      --bg1:#0b0b0f; --bg2:#111827;
+      --card:#0f172a; --border:rgba(255,255,255,.08);
+      --text:#e5e7eb; --muted:#a1a1aa;
+      --green:#22c55e; --green2:#16a34a;
+      --gold:#d4af37;
+      --shadow: 0 18px 70px rgba(0,0,0,.55);
+    }
+    *{box-sizing:border-box}
     body{
-      margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;
-      background:#ffffff;font-family:system-ui,-apple-system,"Segoe UI",Arial;
-      text-align:center;padding:20px;
+      margin:0; min-height:100vh; display:flex; align-items:center; justify-content:center;
+      padding:22px;
+      background:
+        radial-gradient(900px 450px at 50% 10%, rgba(34,197,94,.15), transparent 60%),
+        radial-gradient(900px 450px at 10% 60%, rgba(212,175,55,.10), transparent 60%),
+        linear-gradient(180deg, var(--bg1), var(--bg2));
+      font-family: system-ui,-apple-system,"Segoe UI",Arial;
+      color: var(--text);
     }
-    .box{
-      width:100%;max-width:460px;border-radius:24px;
-      box-shadow:0 15px 60px rgba(0,0,0,.08);
-      padding:36px 26px;background:#fff;
+    .wrap{width:100%; max-width:520px}
+    .card{
+      background: linear-gradient(180deg, rgba(15,23,42,.92), rgba(2,6,23,.92));
+      border: 1px solid var(--border);
+      border-radius: 26px;
+      box-shadow: var(--shadow);
+      padding: 28px 22px;
+      position: relative;
+      overflow: hidden;
     }
-    .logo{height:34px;opacity:.9;margin-bottom:18px}
-    .check{font-size:64px;line-height:1;color:#12b76a;margin-bottom:14px}
-    h1{margin:0 0 10px;font-size:22px}
-    p{margin:0;color:#666;font-size:15px;line-height:1.7}
-    .btn{display:block;margin-top:22px;padding:14px 18px;border-radius:14px;text-decoration:none;font-weight:800;}
-    .btn-main{background:#000;color:#fff}
-    .btn-wa{background:#25d366;color:#fff;margin-top:12px}
-    .note{margin-top:14px;font-size:12px;color:#999}
-    .warn{margin-top:14px;font-size:13px;color:#b42318;font-weight:800;display:none}
+    .card::before{
+      content:"";
+      position:absolute; inset:-2px;
+      background: radial-gradient(600px 260px at 50% 0%, rgba(34,197,94,.18), transparent 60%);
+      pointer-events:none;
+    }
+    .top{
+      display:flex; align-items:center; justify-content:space-between;
+      position:relative; z-index:2;
+      gap:12px;
+    }
+    .logo{
+      height:32px; opacity:.95;
+      filter: drop-shadow(0 10px 20px rgba(0,0,0,.35));
+    }
+    .pill{
+      font-size:12px; font-weight:900;
+      padding:8px 12px; border-radius:999px;
+      background: rgba(34,197,94,.12);
+      border: 1px solid rgba(34,197,94,.25);
+      color: #bbf7d0;
+      white-space:nowrap;
+    }
+    .center{
+      text-align:center;
+      padding: 18px 10px 6px;
+      position:relative; z-index:2;
+    }
+    .checkWrap{
+      width:92px; height:92px; border-radius:999px;
+      margin: 10px auto 10px;
+      background: radial-gradient(closest-side, rgba(34,197,94,.22), rgba(34,197,94,.08));
+      border: 1px solid rgba(34,197,94,.28);
+      display:flex; align-items:center; justify-content:center;
+      box-shadow: 0 20px 60px rgba(34,197,94,.18);
+    }
+    .check{
+      width:56px; height:56px;
+      border-radius:18px;
+      background: linear-gradient(180deg, var(--green), var(--green2));
+      display:flex; align-items:center; justify-content:center;
+      box-shadow: 0 18px 50px rgba(34,197,94,.25);
+      position:relative;
+    }
+    .check svg{width:34px; height:34px; fill:none; stroke:#06240f; stroke-width:4; stroke-linecap:round; stroke-linejoin:round}
+    h1{margin:10px 0 6px; font-size:22px; letter-spacing:.2px}
+    p{margin:0; color: var(--muted); font-size:14.5px; line-height:1.75}
+    .mini{
+      margin: 14px auto 0;
+      display:inline-flex; gap:10px; flex-wrap:wrap; justify-content:center;
+      color:#d4d4d8; font-size:12.5px;
+    }
+    .tag{
+      padding:7px 10px; border-radius:999px;
+      background: rgba(255,255,255,.05);
+      border: 1px solid rgba(255,255,255,.07);
+    }
+    .tag strong{color:#fff}
+    .btns{
+      margin-top:18px;
+      display:grid; gap:10px;
+      position:relative; z-index:2;
+    }
+    a.btn{
+      text-decoration:none;
+      border-radius:16px;
+      padding:14px 16px;
+      font-weight:900;
+      display:flex; align-items:center; justify-content:center;
+      gap:10px;
+      border: 1px solid rgba(255,255,255,.08);
+      transition: transform .15s ease, opacity .15s ease;
+      user-select:none;
+    }
+    a.btn:active{transform:scale(.98)}
+    .btnMain{
+      background: linear-gradient(180deg, rgba(212,175,55,.18), rgba(212,175,55,.06));
+      color: #fff;
+    }
+    .btnWA{
+      background: linear-gradient(180deg, rgba(37,211,102,.22), rgba(37,211,102,.10));
+      color:#eafff1;
+      border-color: rgba(37,211,102,.25);
+    }
+    .note{
+      margin-top:12px;
+      text-align:center;
+      font-size:12px;
+      color: rgba(255,255,255,.55);
+      position:relative; z-index:2;
+    }
+    .warn{
+      display:none;
+      margin-top:12px;
+      text-align:center;
+      font-size:12.5px;
+      color:#fecaca;
+      background: rgba(244,63,94,.10);
+      border: 1px solid rgba(244,63,94,.22);
+      padding:10px 12px;
+      border-radius:14px;
+      position:relative; z-index:2;
+    }
+    .divider{
+      height:1px; background: rgba(255,255,255,.07);
+      margin: 16px 0 0;
+      position:relative; z-index:2;
+    }
   </style>
 </head>
 
 <body>
-  <div class="box">
-    <img class="logo" src="https://madperfume.ps/upload/01-2026/page/45CM.png" alt="MAD">
-    <div class="check" id="icon">✓</div>
+  <div class="wrap">
+    <div class="card">
+      <div class="top">
+        <img class="logo" src="https://madperfume.ps/upload/01-2026/page/45CM.png" alt="MAD">
+        <div class="pill" id="pill">تم التأكيد</div>
+      </div>
 
-    <h1 id="t">تم تأكيد طلبك بنجاح</h1>
-    <p id="b">سيتم تجهيز المجموعة بعناية وتسليمها خلال 3–5 أيام عمل. الدفع عند الاستلام.</p>
+      <div class="center">
+        <div class="checkWrap">
+          <div class="check" id="checkBox" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"></path></svg>
+          </div>
+        </div>
 
-    <a class="btn btn-main" href="index.html#order-section" id="btn">تقديم طلب جديد</a>
-    <a class="btn btn-wa" href="https://wa.me/972509787730" id="wa">تواصل عبر واتساب</a>
+        <h1 id="t">تم تأكيد طلبك بنجاح ✅</h1>
+        <p id="b">سيتم تجهيز المجموعة بعناية وتسليمها خلال 3–5 أيام عمل. الدفع عند الاستلام.</p>
 
-    <div class="note" id="note">شكراً لاختيارك MAD Parfumeur</div>
-    <div class="warn" id="warn">تم الدخول لصفحة الشكر بدون تحقق. سيتم تحويلك تلقائياً.</div>
+        <div class="mini">
+          <span class="tag">قيمة: <strong id="v">—</strong></span>
+          <span class="tag">عملة: <strong id="cur">—</strong></span>
+          <span class="tag">المنتج: <strong id="itm">—</strong></span>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="btns">
+          <a class="btn btnMain" href="#" id="btn">تقديم طلب جديد</a>
+          <a class="btn btnWA" href="https://wa.me/972509787730" id="wa">تواصل عبر واتساب</a>
+        </div>
+
+        <div class="warn" id="warn">تم الدخول لصفحة الشكر بدون تحقق. لن يتم احتساب شراء.</div>
+        <div class="note" id="note">شكراً لاختيارك MAD Parfumeur</div>
+      </div>
+    </div>
   </div>
 
   <script>
     const qs = new URLSearchParams(location.search);
 
-    // ---- Safe back URL (so it doesn't always go to homepage) ----
+    // ---- Safe back URL ----
     function safeBack(raw){
       if(!raw) return null;
       try{
@@ -110,18 +245,20 @@
         if(!r) return null;
         if(r.toLowerCase().startsWith("javascript:")) return null;
 
+        // allow same-origin absolute only
         if(r.startsWith("http://") || r.startsWith("https://")){
           const u = new URL(r);
           if(u.origin === location.origin) return u.pathname + u.search + u.hash;
           return null;
         }
-        if(r.includes("://")) return null; // block other schemes
-        return r; // relative path ok
+        if(r.includes("://")) return null;
+        return r;
       }catch(e){ return null; }
     }
 
-    const backRaw = qs.get('back') || document.referrer || 'index.html#order-section';
-    const back = safeBack(backRaw) || 'index.html#order-section';
+    // ✅ default back = "/"
+    const backRaw = qs.get('back') || document.referrer || '/';
+    const back = safeBack(backRaw) || '/';
     document.getElementById('btn').href = back;
 
     // ---- Language ----
@@ -134,32 +271,46 @@
     const contentName = qs.get('item') || 'Elite Set';
     const contentId = qs.get('content_id') || 'ELITE_SET_5';
 
+    // ---- Fill mini info ----
+    document.getElementById('v').textContent = isFinite(value) ? (value + ' ₪') : '—';
+    document.getElementById('cur').textContent = currency || '—';
+    document.getElementById('itm').textContent = contentName || '—';
+
     // ---- Localize UI ----
     if (isHebrew) {
       document.documentElement.lang = 'he';
       document.documentElement.dir = 'rtl';
       document.title = "ההזמנה אושרה | MAD Parfumeur";
-      document.getElementById('t').innerText = "ההזמנה אושרה בהצלחה";
+      document.getElementById('pill').innerText = "אושר";
+      document.getElementById('t').innerText = "ההזמנה אושרה בהצלחה ✅";
       document.getElementById('b').innerText = "המארז יימסר תוך 3–5 ימי עסקים. תשלום במעמד המסירה.";
       document.getElementById('btn').innerText = "הזמנה חדשה";
       document.getElementById('wa').innerText = "צרו קשר בוואטסאפ";
       document.getElementById('note').innerText = "תודה שבחרתם MAD Parfumeur";
-      document.getElementById('warn').innerText = "הגעתם לעמוד תודה ללא אימות. תועברו אוטומטית.";
+      document.getElementById('warn').innerText = "הגעתם לעמוד תודה ללא אימות. לא תיספר רכישה.";
+      // mini labels in HE
+      document.getElementById('v').parentElement.firstChild.textContent = "סכום: ";
+      document.getElementById('cur').parentElement.firstChild.textContent = "מטבע: ";
+      document.getElementById('itm').parentElement.firstChild.textContent = "מוצר: ";
     }
 
-    // ---- Validation (prevent manual access) ----
+    // ---- Validation ----
     const ORDER_OK_KEY = "MAD_ORDER_OK_V1";
     const urlOk = (qs.get('mad_ty') === '1') || (qs.get('ty') === '1');
+
     let ssOk = false;
     try { ssOk = (sessionStorage.getItem(ORDER_OK_KEY) === '1'); } catch(e) {}
 
-    const isValid = urlOk || ssOk;
+    // accept when key params exist (helps redirects)
+    const hasParams = qs.has('value') || qs.has('content_id') || qs.has('item');
+
+    const isValid = urlOk || ssOk || hasParams;
 
     if (!isValid) {
       document.getElementById('warn').style.display = 'block';
-      document.getElementById('icon').textContent = '!';
-      document.getElementById('icon').style.color = '#b42318';
-      setTimeout(() => { location.href = back; }, 1500);
+      document.getElementById('checkBox').style.background = 'linear-gradient(180deg,#ef4444,#b91c1c)';
+      document.getElementById('checkBox').style.boxShadow = '0 18px 50px rgba(239,68,68,.25)';
+      document.getElementById('checkBox').innerHTML = '<svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"></path></svg>';
     } else {
       // ---- Fire once per session ----
       const OLD_LOCK = 'mad_purchase_fired';
@@ -173,7 +324,7 @@
       if (!already) {
         try { sessionStorage.setItem(OLD_LOCK, '1'); } catch(e) {}
         try { sessionStorage.setItem(NEW_LOCK, '1'); } catch(e) {}
-        try { sessionStorage.removeItem(ORDER_OK_KEY); } catch(e) {} // optional: clean validation after success
+        try { sessionStorage.removeItem(ORDER_OK_KEY); } catch(e) {}
 
         // Meta Purchase
         try {
