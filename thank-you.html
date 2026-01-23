@@ -1,9 +1,10 @@
 <!-- =========================
-     FILE: thank-you.html  (FULL + FIXED)
+     FILE: thank-you.html  (FULL + COMPATIBLE)
      - Meta Pixel + TikTok Pixel
-     - Fires Purchase with: value, currency, content_id, content_name
+     - Fires FB: Purchase | TikTok: CompletePayment
      - Supports AR/HE via ?lang=ar|he (fallback to browser language)
      - Prevents double-firing on refresh (sessionStorage)
+     - Prevent manual access: requires ?mad_ty=1 OR sessionStorage(MAD_ORDER_OK_V1)=1
 ========================= -->
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
@@ -90,13 +91,14 @@
     .btn-main{background:#000;color:#fff}
     .btn-wa{background:#25d366;color:#fff;margin-top:12px}
     .note{margin-top:14px;font-size:12px;color:#999}
+    .warn{margin-top:14px;font-size:13px;color:#b42318;font-weight:700;display:none}
   </style>
 </head>
 
 <body>
   <div class="box">
     <img class="logo" src="https://madperfume.ps/upload/01-2026/page/45CM.png" alt="MAD">
-    <div class="check">✓</div>
+    <div class="check" id="checkIcon">✓</div>
 
     <h1 id="t">تم تأكيد طلبك بنجاح</h1>
     <p id="b">سيتم تجهيز المجموعة بعناية وتسليمها خلال 3–5 أيام عمل. الدفع عند الاستلام.</p>
@@ -105,6 +107,7 @@
     <a class="btn btn-wa" href="https://wa.me/972509787730" id="wa">تواصل عبر واتساب</a>
 
     <div class="note" id="note">شكراً لاختيارك MAD Parfumeur</div>
+    <div class="warn" id="warn">تم الدخول لصفحة الشكر بدون تحقق. سيتم تحويلك تلقائياً.</div>
   </div>
 
   <script>
@@ -129,35 +132,63 @@
       document.getElementById('btn').innerText = "הזמנה חדשה";
       document.getElementById('wa').innerText = "צרו קשר בוואטסאפ";
       document.getElementById('note').innerText = "תודה שבחרתם MAD Parfumeur";
+      document.getElementById('warn').innerText = "הגעתם לעמוד תודה ללא אימות. תועברו אוטומטית.";
     }
 
-    // ---- Fire Purchase once per session (avoid double count on refresh) ----
-    if (!sessionStorage.getItem('mad_purchase_fired')) {
-      sessionStorage.setItem('mad_purchase_fired', '1');
+    // ---- Redirect validation (prevent manual access) ----
+    // Compatible with our landing system: sessionStorage(MAD_ORDER_OK_V1)=1 OR URL ?mad_ty=1 / ?ty=1
+    let isValid = false;
+    try {
+      const urlOk = (qs.get('mad_ty') === '1') || (qs.get('ty') === '1');
+      const ssOk  = (sessionStorage.getItem('MAD_ORDER_OK_V1') === '1');
+      isValid = urlOk || ssOk;
+    } catch(e) { isValid = false; }
 
-      // Meta Purchase
-      try {
-        fbq('track', 'Purchase', {
-          value: value,
-          currency: currency,
-          content_name: contentName,
-          content_ids: [contentId],
-          content_type: 'product'
-        });
-      } catch (e) {}
+    if (!isValid) {
+      // Do NOT fire Purchase if manual access
+      document.getElementById('warn').style.display = 'block';
+      document.getElementById('checkIcon').textContent = '!';
+      document.getElementById('checkIcon').style.color = '#b42318';
 
-      // TikTok Purchase
+      // Optional: redirect away
+      setTimeout(() => { location.href = 'index.html'; }, 1500);
+    } else {
+      // ---- Fire Purchase once per session (avoid double count on refresh) ----
+      // Keep old key + new key for maximum compatibility
+      const OLD_LOCK = 'mad_purchase_fired';
+      const NEW_LOCK = 'MAD_PURCHASE_LOCK_V1';
+
+      let alreadyFired = false;
       try {
-        ttq.track('Purchase', {
-          value: value,
-          currency: currency,
-          content_name: contentName,
-          content_id: contentId,
-          content_ids: [contentId],
-          content_type: 'product',
-          quantity: 1
-        });
-      } catch (e) {}
+        alreadyFired = sessionStorage.getItem(OLD_LOCK) === '1' || sessionStorage.getItem(NEW_LOCK) === '1';
+      } catch(e) {}
+
+      if (!alreadyFired) {
+        try { sessionStorage.setItem(OLD_LOCK, '1'); } catch(e) {}
+        try { sessionStorage.setItem(NEW_LOCK, '1'); } catch(e) {}
+
+        // Meta Purchase
+        try {
+          fbq('track', 'Purchase', {
+            value: value,
+            currency: currency,
+            content_name: contentName,
+            content_ids: [contentId],
+            content_type: 'product'
+          });
+        } catch (e) {}
+
+        // TikTok CompletePayment (as per your JSON spec)
+        try {
+          ttq.track('CompletePayment', {
+            value: value,
+            currency: currency,
+            content_id: contentId,
+            content_type: 'product',
+            quantity: 1
+          });
+        } catch (e) {}
+      }
     }
   </script>
 </body>
