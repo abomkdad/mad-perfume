@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MAD Builder - YouTube Fix</title>
+    <style>
+        :root { --primary: #d97706; --bg: #0f172a; --panel: #1e293b; --text: #f1f5f9; --border: #334155; --danger: #ef4444; }
+        body { margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); height: 100vh; overflow: hidden; }
+        
+        .main-layout { display: flex; height: 100vh; flex-direction: row-reverse; }
+        .preview-pane { flex: 1; background: #020617; display: flex; justify-content: center; align-items: center; border-right: 1px solid var(--border); padding: 20px; overflow: hidden; background-image: radial-gradient(#1e293b 1px, transparent 1px); background-size: 20px 20px; }
+        .editor-pane { width: 550px; background: var(--panel); padding: 30px; overflow-y: auto; box-shadow: -5px 0 15px rgba(0,0,0,0.3); display: flex; flex-direction: column; gap: 20px; }
+
+        .iphone-mockup { width: 375px; height: 812px; background: #000; border-radius: 40px; border: 12px solid #2d2d2d; position: relative; box-shadow: 0 0 50px rgba(0,0,0,0.5); overflow: hidden; transform: scale(0.9); flex-shrink: 0; }
+        .iphone-notch { position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 150px; height: 30px; background: #2d2d2d; border-bottom-left-radius: 20px; border-bottom-right-radius: 20px; z-index: 100; }
+        .iphone-screen { width: 100%; height: 100%; background: #fff; border: none; display: block; }
+
+        @media (max-width: 768px) {
+            .main-layout { flex-direction: column; height: auto; overflow: auto; }
+            .preview-pane { display: none; }
+            .editor-pane { width: 100%; height: auto; box-shadow: none; }
+            body { overflow: auto; }
+        }
+
+        h1 { color: var(--primary); margin: 0 0 10px 0; font-size: 1.5rem; text-align: center; }
+        h2 { font-size: 1rem; color: #94a3b8; border-bottom: 1px solid var(--border); padding-bottom: 5px; margin-top: 25px; margin-bottom: 15px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; font-size: 0.85rem; margin-bottom: 5px; color: #cbd5e1; }
+        input[type="text"], textarea, select { width: 100%; padding: 10px; background: #0f172a; border: 1px solid var(--border); color: white; border-radius: 6px; box-sizing: border-box; outline: none; font-size: 0.9rem; }
+        input[type="color"] { width: 100%; height: 40px; border: none; padding: 0; cursor: pointer; border-radius: 6px; }
+        input:focus, textarea:focus { border-color: var(--primary); }
+
+        .lang-toggle { display: flex; background: #0f172a; border-radius: 8px; padding: 4px; margin-bottom: 20px; border: 1px solid var(--border); }
+        .lang-btn { flex: 1; background: transparent; color: #64748b; border: none; padding: 10px; border-radius: 6px; cursor: pointer; font-weight: bold; transition: 0.2s; font-family: inherit; }
+        .lang-btn.active { background: var(--primary); color: black; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+
+        .toggle-wrapper { display: flex; align-items: center; justify-content: space-between; background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px; margin-bottom: 10px; border: 1px solid var(--border); }
+        .toggle-label { font-weight: bold; font-size: 0.9rem; display: flex; align-items: center; gap: 8px; }
+        input[type="checkbox"] { width: 20px; height: 20px; accent-color: var(--primary); cursor: pointer; }
+        
+        .section-settings { padding: 15px; background: rgba(0,0,0,0.3); border-radius: 8px; margin-top: 5px; border-left: 2px solid var(--primary); display: none; }
+        input[type="checkbox"]:checked ~ .section-settings { display: block; }
+
+        .btn-action { background: var(--primary); color: #000; font-weight: 900; padding: 15px; border-radius: 8px; border: none; cursor: pointer; width: 100%; font-size: 1.1rem; margin-top: 20px; transition: 0.2s; }
+        .btn-secondary { background: transparent; border: 1px dashed var(--border); color: var(--primary); padding: 8px; border-radius: 6px; cursor: pointer; width: 100%; transition: 0.2s; text-align: center; }
+        .btn-secondary:hover { background: rgba(217,119,6,0.1); }
+        .btn-delete { background: var(--danger); color: white; border: none; padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; cursor: pointer; }
+
+        .dynamic-row { display: grid; grid-template-columns: 1fr 1fr 30px; gap: 5px; align-items: center; margin-bottom: 8px; }
+        .block-item { background: rgba(255,255,255,0.03); border: 1px solid var(--border); padding: 15px; border-radius: 8px; margin-bottom: 10px; }
+        .block-head { display: flex; justify-content: space-between; margin-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 5px; }
+        .img-list { display: flex; flex-wrap: gap: 5px; margin-top: 5px; }
+        .img-thumb { width: 50px; height: 50px; object-fit: cover; border-radius: 4px; border: 1px solid var(--border); }
+        .img-wrap { position: relative; }
+        .img-del { position: absolute; top: -5px; right: -5px; background: var(--danger); width: 15px; height: 15px; border-radius: 50%; color: white; font-size: 10px; display: flex; align-items: center; justify-content: center; cursor: pointer; border: none; }
+        
+        .url-input-group { display: flex; gap: 5px; margin-top: 5px; }
+        .or-divider { text-align: center; font-size: 0.8rem; color: #64748b; margin: 5px 0; }
+    </style>
+</head>
+<body>
+
+<div class="main-layout">
+    <div class="editor-pane">
+        <h1>MAD Builder 💎</h1>
+        <div class="lang-toggle">
+            <button class="lang-btn active" onclick="setMode('ar')" id="btn-ar">العربية (AR)</button>
+            <button class="lang-btn" onclick="setMode('he')" id="btn-he">עברית (HE)</button>
+        </div>
+
+        <h2>1. إعدادات الصفحة</h2>
+        <div class="form-group"><label>لون الخلفية (Page Background)</label><input type="color" id="bgColor" value="#020202" oninput="updateCommon('bgColor', this.value)"></div>
+        <div class="form-group"><label>العنوان (السعر)</label><input type="text" id="price" oninput="updateData('price', this.value)"></div>
+        <div class="form-group"><label>البادج (العرض)</label><input type="text" id="offer" oninput="updateData('offer', this.value)"></div>
+        
+        <!-- Sticky Button Toggle -->
+        <div class="form-group">
+            <div class="toggle-wrapper">
+                <span class="toggle-label">🔘 زر عائم (Sticky Button)</span>
+                <input type="checkbox" id="showFloatingBtn" checked onchange="updateCommon('showFloatingBtn', this.checked)">
+                <div class="section-settings">
+                    <label>نص الزر</label>
+                    <input type="text" id="ctaText" oninput="updateData('ctaText', this.value)">
+                </div>
+            </div>
+        </div>
+
+        <h2>2. المقارنة (Manifesto)</h2>
+        <div class="form-group">
+            <div class="toggle-wrapper">
+                <span class="toggle-label">⚖️ تفعيل القسم</span>
+                <input type="checkbox" id="showManifesto" checked onchange="updateCommon('showManifesto', this.checked)">
+                <div class="section-settings">
+                    <label>العنوان الرئيسي</label><input type="text" id="maniT" oninput="updateData('maniT', this.value)">
+                    <label>الوصف الفرعي</label><input type="text" id="maniS" oninput="updateData('maniS', this.value)">
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:5px; margin-top:5px; margin-bottom:10px;">
+                        <div><label>MAD (نحن)</label><input type="text" id="maniM" oninput="updateData('maniM', this.value)"></div>
+                        <div><label>Others (الغير)</label><input type="text" id="maniO" oninput="updateData('maniO', this.value)"></div>
+                    </div>
+                    <label>نقاط المقارنة (تعديل حسب اللغة)</label>
+                    <div id="maniRows"></div>
+                    <button class="btn-secondary" onclick="addManiRow()">+ إضافة نقطة مقارنة</button>
+                </div>
+            </div>
+        </div>
+
+        <h2>3. خيارات الطلب (Order Methods)</h2>
+        <div class="toggle-wrapper">
+            <span class="toggle-label">⚡ Zapier Form</span>
+            <input type="checkbox" id="showZapier" checked onchange="updateCommon('showZapier', this.checked)">
+            <div class="section-settings">
+                <label>Zapier ID (لهذه اللغة)</label><input type="text" id="zapierId" oninput="updateData('zapierId', this.value)">
+            </div>
+        </div>
+        <div class="toggle-wrapper">
+            <span class="toggle-label">🟢 WhatsApp</span>
+            <input type="checkbox" id="showWa" checked onchange="updateCommon('showWa', this.checked)">
+            <div class="section-settings">
+                <label>رقم الواتساب (مع الدولة)</label><input type="text" id="waNum" value="972509787730" oninput="updateCommon('waNum', this.value)">
+                <label>نص الرسالة المسبقة (لهذه اللغة)</label><input type="text" id="waText" oninput="updateData('waText', this.value)">
+                <label>نص الزر</label><input type="text" id="waLabel" oninput="updateData('waLabel', this.value)">
+            </div>
+        </div>
+        <div class="toggle-wrapper">
+            <span class="toggle-label">📞 اتصال هاتفي</span>
+            <input type="checkbox" id="showCall" onchange="updateCommon('showCall', this.checked)">
+            <div class="section-settings">
+                <label>رقم الهاتف</label><input type="text" id="callNum" placeholder="050..." oninput="updateCommon('callNum', this.value)">
+                <label>نص الزر</label><input type="text" id="callLabel" oninput="updateData('callLabel', this.value)">
+            </div>
+        </div>
+        <div class="toggle-wrapper">
+            <span class="toggle-label">🌐 رابط موقع خارجي</span>
+            <input type="checkbox" id="showWeb" onchange="updateCommon('showWeb', this.checked)">
+            <div class="section-settings">
+                <label>الرابط (URL)</label><input type="text" id="webUrl" placeholder="https://..." oninput="updateCommon('webUrl', this.value)">
+                <label>نص الزر</label><input type="text" id="webLabel" oninput="updateData('webLabel', this.value)">
+            </div>
+        </div>
+
+        <h2>4. الوسائط والبلوكات</h2>
+        <div class="form-group">
+            <label>فيديو الخلفية (رابط مباشر أو يوتيوب)</label>
+            <input type="text" id="vid" value="https://madparfumeurglobal.com/wp-content/uploads/2025/10/download.mp4" placeholder="MP4 URL or YouTube Link" oninput="updateCommon('vid', this.value)">
+            <div class="hint">يدعم: MP4 المباشر، YouTube العادي، و YouTube Shorts.</div>
+        </div>
+        <div class="form-group">
+            <label>صور المنتج (Carousel)</label>
+            <input type="file" id="heroInput" accept="image/*" style="display:none">
+            <button class="btn-secondary" onclick="document.getElementById('heroInput').click()">+ رفع صورة</button>
+            <div class="or-divider">- أو -</div>
+            <div class="url-input-group">
+                <input type="text" id="heroUrlInput" placeholder="رابط صورة (URL)">
+                <button class="btn-secondary" style="width:auto;" onclick="addHeroFromUrl()">إضافة</button>
+            </div>
+            <div id="heroList" class="img-list"></div>
+        </div>
+        <div id="blockList"></div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:5px; margin-top:10px;">
+            <button class="btn-secondary" onclick="addBlock('text')">نص</button>
+            <button class="btn-secondary" onclick="addBlock('image')">صورة</button>
+            <button class="btn-secondary" onclick="addBlock('video')">فيديو</button>
+            <button class="btn-secondary" onclick="addBlock('embed')">HTML</button>
+        </div>
+
+        <h2>5. التتبع (Pixels)</h2>
+        <div class="form-group"><label>Facebook Pixel ID</label><input type="text" id="fbPixel" value="1072283127290819" oninput="updateCommon('fb', this.value)"></div>
+        <div class="form-group"><label>TikTok Pixel ID</label><input type="text" id="ttPixel" value="D2D02JBC77U4ENLN9SBG" oninput="updateCommon('tt', this.value)"></div>
+
+        <button class="btn-action" onclick="download()">تحميل الصفحة</button>
+    </div>
+
+    <div class="preview-pane">
+        <div class="iphone-mockup">
+            <div class="iphone-notch"></div>
+            <iframe id="preview" class="iphone-screen"></iframe>
+        </div>
+    </div>
+</div>
+
+<script>
+    let mode = 'ar';
+    const common = {
+        bgColor: "#020202",
+        vid: "https://madparfumeurglobal.com/wp-content/uploads/2025/10/download.mp4",
+        heroes: ["https://madperfume.ps/upload/01-2026/page/6971495c69e7c.png"],
+        blocks: [],
+        fb: "1072283127290819", tt: "D2D02JBC77U4ENLN9SBG",
+        showManifesto: true, showZapier: true, showWa: true, showCall: false, showWeb: false, showFloatingBtn: true,
+        waNum: "972509787730", callNum: "0500000000", webUrl: "https://madparfumeur.com"
+    };
+
+    const db = {
+        ar: {
+            price: "500 ₪ فقط", offer: "عرض خاص", ctaText: "اطلب الآن",
+            zapierId: "cmkpbwxjy001bonuoz5vy0gh1",
+            maniT: "THE MANIFESTO", maniS: "لماذا MAD؟ مقارنة علمية", maniM: "عطور MAD", maniO: "السوق والتقليد",
+            waLabel: "اطلب عبر واتساب", waText: "أرغب بالحصول على العرض",
+            callLabel: "اتصل للطلب", webLabel: "زيارة الموقع",
+            compItems: [
+                {mad:'آمنة 100% معتمدة', local:'مجهولة المصدر'},
+                {mad:'تطابق جزيئي دقيق', local:'خلط يدوي عشوائي'},
+                {mad:'خلاصات أوروبية', local:'زيوت تجارية رخيصة'},
+                {mad:'ثبات +24 ساعة', local:'يختفي بعد ساعة'}
+            ]
+        },
+        he: {
+            price: "500 ₪ בלבד", offer: "מבצע מיוחד", ctaText: "הזמן עכשיו",
+            zapierId: "cmkpef5ul0009nc51356rtjm8",
+            maniT: "THE MANIFESTO", maniS: "למה MAD? השוואה מדעית", maniM: "בשמי MAD", maniO: "חיקויים",
+            waLabel: "הזמן בוואטסאפ", waText: "אני מעוניין לקבל את ההצעה",
+            callLabel: "חייג להזמנה", webLabel: "בקר באתר",
+            compItems: [
+                {mad:'בטוח 100% מאושר', local:'מקור לא ידוע'},
+                {mad:'התאמה מולקולרית', local:'ערבוב אקראי'},
+                {mad:'תמציות אירופאיות', local:'שמנים מסחריים'},
+                {mad:'עמידות 24+ שעות', local:'נעלם מהר'}
+            ]
+        }
+    };
+
+    function escapeHtml(text) {
+        if (!text) return "";
+        return text.replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+    }
+
+    function setMode(lang) {
+        mode = lang;
+        document.getElementById('btn-ar').className = lang === 'ar' ? 'lang-btn active' : 'lang-btn';
+        document.getElementById('btn-he').className = lang === 'he' ? 'lang-btn active' : 'lang-btn';
+        ['price', 'offer', 'ctaText', 'zapierId', 'maniT', 'maniS', 'maniM', 'maniO', 'waLabel', 'waText', 'callLabel', 'webLabel'].forEach(id => {
+            document.getElementById(id).value = db[lang][id] || '';
+        });
+        renderManiRows(); render();
+    }
+
+    function updateData(key, val) { db[mode][key] = val; render(); }
+    function updateCommon(key, val) { common[key] = val; render(); }
+
+    function renderManiRows() {
+        const div = document.getElementById('maniRows'); div.innerHTML = '';
+        db[mode].compItems.forEach((item, i) => {
+            div.innerHTML += `<div class="dynamic-row">
+                <input type="text" placeholder="MAD" value="${escapeHtml(item.mad)}" oninput="updateManiItem(${i}, 'mad', this.value)">
+                <input type="text" placeholder="Others" value="${escapeHtml(item.local)}" oninput="updateManiItem(${i}, 'local', this.value)">
+                <button class="btn-delete" onclick="removeManiRow(${i})">X</button>
+            </div>`;
+        });
+    }
+    function updateManiItem(i, f, v) { db[mode].compItems[i][f] = v; render(); }
+    function addManiRow() { db[mode].compItems.push({mad:'', local:''}); renderManiRows(); render(); }
+    function removeManiRow(i) { db[mode].compItems.splice(i, 1); renderManiRows(); render(); }
+
+    document.getElementById('heroInput').addEventListener('change', e => {
+        if(e.target.files[0]) {
+            const r = new FileReader();
+            r.onload = evt => { common.heroes.push(evt.target.result); updateHeroUI(); render(); };
+            r.readAsDataURL(e.target.files[0]);
+        }
+    });
+    
+    function addHeroFromUrl() {
+        const urlInp = document.getElementById('heroUrlInput');
+        if(urlInp.value.trim()){
+            common.heroes.push(urlInp.value.trim());
+            updateHeroUI(); render();
+            urlInp.value = '';
+        }
+    }
+
+    function updateHeroUI() {
+        const div = document.getElementById('heroList'); div.innerHTML = '';
+        common.heroes.forEach((src, i) => {
+            div.innerHTML += `<div class="img-wrap"><img src="${src}" class="img-thumb"><button class="img-del" onclick="delHero(${i})">x</button></div>`;
+        });
+    }
+    function delHero(i) { common.heroes.splice(i,1); updateHeroUI(); render(); }
+
+    function addBlock(t) { common.blocks.push({ id: Date.now(), type: t, val: '' }); updateBlockUI(); render(); }
+    function delBlock(id) { common.blocks = common.blocks.filter(b => b.id !== id); updateBlockUI(); render(); }
+    function setBlockVal(id, v) { common.blocks.find(b=>b.id===id).val = v; render(); }
+    function handleBlockImg(id, input) {
+        if(input.files[0]) {
+            const r = new FileReader(); r.onload = e => { setBlockVal(id, e.target.result); updateBlockUI(); }; r.readAsDataURL(input.files[0]);
+        }
+    }
+    function updateBlockUI() {
+        const div = document.getElementById('blockList'); div.innerHTML = '';
+        common.blocks.forEach((b) => {
+            let f = '';
+            // Safe value insertion
+            const safeVal = escapeHtml(b.val);
+            if(b.type === 'text') f = `<textarea oninput="setBlockVal(${b.id},this.value)" placeholder="Text...">${safeVal}</textarea>`;
+            if(b.type === 'video') f = `<input type="text" oninput="setBlockVal(${b.id},this.value)" value="${safeVal}" placeholder="MP4 URL">`;
+            if(b.type === 'embed') f = `<textarea oninput="setBlockVal(${b.id},this.value)" placeholder="Code...">${safeVal}</textarea>`;
+            if(b.type === 'image') f = `
+                <input type="file" onchange="handleBlockImg(${b.id},this)">
+                <div class="or-divider">- أو -</div>
+                <input type="text" placeholder="رابط صورة (URL)" value="${b.val.startsWith('data:') ? '' : safeVal}" oninput="setBlockVal(${b.id},this.value)">
+                ${b.val ? '<img src="'+b.val+'" style="height:40px;margin-top:5px;object-fit:contain">' : ''}
+            `;
+            div.innerHTML += `<div class="block-item"><div class="block-head"><span>${b.type}</span><button class="btn-delete" onclick="delBlock(${b.id})">x</button></div>${f}</div>`;
+        });
+    }
+
+    function safeJSON(obj) {
+        return JSON.stringify(obj).replace(/</g, '\\u003c');
+    }
+
+    function getHTML(dl = false) {
+        const jsonCommon = safeJSON(common);
+        const jsonDB = safeJSON(db);
+        
+        // Video Logic
+        const vidUrl = common.vid;
+        let heroHtml = '';
+        // YouTube Regex to catch standard, short URLs, and youtube.com/shorts/
+        const ytMatch = vidUrl.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?|shorts)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/);
+        
+        if(ytMatch && ytMatch[1]) {
+            const vidId = ytMatch[1];
+            // YouTube Iframe Embed
+            heroHtml = `<div class="hero-wrapper"><iframe src="https://www.youtube.com/embed/${vidId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${vidId}&playsinline=1" class="hero-vid-iframe" allow="autoplay; encrypted-media" frameborder="0"></iframe></div>`;
+        } else {
+            // Standard Video Tag
+            heroHtml = `<video src="${vidUrl}" autoplay loop muted playsinline class="hero-vid"></video>`;
+        }
+
+        const scriptOpen = '<' + 'script';
+        const scriptClose = '<' + '/script>';
+
+        const pixels = dl ? `
+        ${scriptOpen}>
+            !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)n=f.fbq;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window, document,'script','https://connect.facebook.net/en_US/fbevents.js');
+            fbq('init', '${common.fb}'); fbq('track', 'PageView');
+            !function (w, d, t) { w.TiktokAnalyticsObject=t; var ttq=w[t]=w[t]||[]; ttq.methods=["page","track","identify","instances","debug","on","off","once","ready","alias","group","enableCookie","disableCookie","holdConsent","revokeConsent","grantConsent"]; ttq.setAndDefer=function(t,e){t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}; for(var i=0;i<ttq.methods.length;i++)ttq.setAndDefer(ttq,ttq.methods[i]); ttq.load=function(e,n){ var r="https://analytics.tiktok.com/i18n/pixel/events.js"; var o=n&&n.partner; ttq._i=ttq._i||{}; ttq._i[e]=[]; ttq._i[e]._u=r; ttq._t=ttq._t||{}; ttq._t[e]=+new Date; ttq._o=ttq._o||{}; ttq._o[e]=n||{}; n=document.createElement("script"); n.type="text/javascript"; n.async=!0; n.src=r+"?sdkid="+e+"&lib="+t; e=document.getElementsByTagName("script")[0]; e.parentNode.insertBefore(n,e) }; ttq.load('${common.tt}'); ttq.page(); }(window, document, 'ttq');
+        ${scriptClose}` : '';
+
+        return `<!DOCTYPE html>
+<html lang="${mode}" x-data="app()" x-init="init()" :dir="dir">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+${scriptOpen} src="https://cdn.tailwindcss.com">${scriptClose}
+${scriptOpen} src="https://unpkg.com/lucide@latest">${scriptClose}
+${scriptOpen} src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer>${scriptClose}
+${scriptOpen} type='module' src='https://interfaces.zapier.com/assets/web-components/zapier-interfaces/zapier-interfaces.esm.js'>${scriptClose}
+${pixels}
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,900;1,400;1,900&family=Inter:wght@300;400;700;900&family=Amiri:wght@400;700&family=Assistant:wght@300;400;700;800&display=swap');
+body{background:${common.bgColor};color:white;font-family:'Inter','Assistant',sans-serif}
+/* Background Video Styling */
+.hero-vid { height: 100vh; width: 100%; object-fit: cover; position: absolute; z-index: -1; filter: brightness(0.6); top: 0; left: 0; }
+.hero-wrapper { position: absolute; top: 0; left: 0; width: 100%; height: 100vh; overflow: hidden; z-index: -1; }
+.hero-vid-iframe { width: 300%; height: 100%; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); pointer-events: none; filter: brightness(0.6); }
+@media (min-aspect-ratio: 16/9) { .hero-vid-iframe { width: 100%; height: 300%; } }
+
+.badge{background:linear-gradient(to right,#d97706,#fbbf24);color:black;padding:5px 20px;border-radius:50px;font-weight:900;display:inline-block;margin-bottom:10px}
+.carousel{position:relative;height:400px;display:flex;align-items:center;justify-content:center}
+.c-img{max-height:100%;max-width:100%;filter:drop-shadow(0 20px 40px rgba(0,0,0,0.8))}
+.c-btn{position:absolute;top:50%;transform:translateY(-50%);background:rgba(0,0,0,0.5);color:#d97706;border:1px solid #333;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.comp-row{display:grid;grid-template-columns:1fr 1fr;gap:2px;background:rgba(255,255,255,.05);border-radius:15px;overflow:hidden;margin-bottom:10px;border:1px solid rgba(255,255,255,.05)}
+.c-side{padding:15px;font-size:13px;display:flex;flex-direction:column;justify-content:center}
+.c-mad{background:linear-gradient(to right,rgba(217,119,6,.1),rgba(217,119,6,.05));text-align:right}
+.c-alt{background:rgba(0,0,0,.4);text-align:right;opacity:.7}
+.sticky-cta { position: fixed; bottom: 20px; left: 0; width: 100%; z-index: 50; padding: 0 20px; pointer-events: none; }
+.sticky-btn { display: block; max-width: 500px; margin: 0 auto; background: #d97706; color: black; text-align: center; padding: 16px; border-radius: 99px; font-weight: 900; text-decoration: none; box-shadow: 0 10px 25px rgba(0,0,0,0.5); pointer-events: auto; transition: 0.2s; animation: pulse 2s infinite; }
+@keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.02); } 100% { transform: scale(1); } }
+.order-grid { display: grid; gap: 10px; margin-bottom: 20px; max-width: 500px; margin-left: auto; margin-right: auto; }
+.btn-order { display: flex; align-items: center; justify-content: center; gap: 10px; padding: 12px; border-radius: 10px; font-weight: bold; text-decoration: none; transition: 0.2s; }
+.btn-wa { background: #25D366; color: white; } .btn-wa:hover { background: #1ebc57; }
+.btn-call { background: #3b82f6; color: white; } .btn-call:hover { background: #2563eb; }
+.btn-web { background: #64748b; color: white; } .btn-web:hover { background: #475569; }
+</style>
+${scriptOpen}>
+function app(){
+return {
+    c:${jsonCommon}, db:${jsonDB},
+    lang:'${mode}', idx:0,
+    get t() { return this.db[this.lang] },
+    get dir() { return this.lang=='ar'?'rtl':'ltr' },
+    init(){ 
+        if(window.lucide) lucide.createIcons();
+        if(this.c.heroes.length>1) setInterval(()=>this.next(),3000);
+    },
+    tog(l){ this.lang=l; },
+    next(){ this.idx = (this.idx===this.c.heroes.length-1)?0:this.idx+1 },
+    prev(){ this.idx = (this.idx===0)?this.c.heroes.length-1:this.idx-1 },
+    track(ev) {
+        if(typeof fbq !== 'undefined') fbq('track', ev);
+        if(typeof ttq !== 'undefined') ttq.track(ev);
+    }
+}}
+${scriptClose}
+</head>
+<body>
+
+<nav class="fixed top-0 w-full p-4 flex justify-between z-50 bg-black/50 backdrop-blur-md">
+    <div class="flex gap-2"><button @click="tog('ar')" :class="lang=='ar'?'text-amber-500':''">AR</button><button @click="tog('he')" :class="lang=='he'?'text-amber-500':''">HE</button></div>
+    <div class="text-amber-500 font-bold tracking-widest text-xs">MAD</div>
+</nav>
+
+<section class="relative h-screen flex flex-col justify-center items-center text-center px-4">
+    ${heroHtml}
+    <div class="badge" x-text="t.offer"></div>
+    <h1 class="text-6xl font-serif italic mb-6" x-text="t.price"></h1>
+    <a href="#shop" class="bg-amber-600 text-black px-8 py-3 rounded-full font-bold" x-text="t.ctaText"></a>
+</section>
+
+<section id="shop" class="py-16 px-4 text-center">
+    <!-- Carousel -->
+    <div class="carousel mb-10">
+        <template x-for="(src,i) in c.heroes">
+            <img :src="src" x-show="idx===i" class="c-img" x-transition.opacity>
+        </template>
+        <template x-if="c.heroes.length>1">
+            <div>
+                <button class="c-btn" style="left:0" @click="prev"><</button>
+                <button class="c-btn" style="right:0" @click="next">></button>
+            </div>
+        </template>
+    </div>
+
+    <!-- Dynamic Blocks -->
+    <div class="space-y-8 max-w-2xl mx-auto mb-10">
+        <template x-for="block in c.blocks">
+            <div>
+                <template x-if="block.type=='text'"><div class="text-gray-300 whitespace-pre-wrap" x-text="block.val"></div></template>
+                <template x-if="block.type=='image'"><img :src="block.val" class="w-full rounded-xl"></template>
+                <template x-if="block.type=='video'"><video :src="block.val" controls class="w-full rounded-xl"></video></template>
+                <template x-if="block.type=='embed'"><div x-html="block.val"></div></template>
+            </div>
+        </template>
+    </div>
+
+    <!-- Manifesto -->
+    <template x-if="c.showManifesto">
+    <div class="max-w-2xl mx-auto mb-16 text-right">
+        <h2 class="text-3xl font-serif italic mb-2 text-white text-center" x-text="t.maniT"></h2>
+        <p class="text-gray-400 text-center mb-6 text-sm" x-text="t.maniS"></p>
+        <template x-for="item in t.compItems">
+            <div class="comp-row">
+                <div class="c-side c-mad">
+                    <div class="flex items-center justify-end gap-2 mb-1">
+                        <span class="text-[10px] font-bold text-amber-500 uppercase" x-text="t.maniM"></span>
+                        <i data-lucide="check-circle" class="w-3 h-3 text-amber-500"></i>
+                    </div>
+                    <p class="text-white font-bold" x-text="item.mad"></p>
+                </div>
+                <div class="c-side c-alt">
+                     <div class="flex items-center justify-end gap-2 mb-1">
+                        <span class="text-[10px] font-bold text-red-400 uppercase" x-text="t.maniO"></span>
+                        <i data-lucide="x-circle" class="w-3 h-3 text-red-500"></i>
+                    </div>
+                    <p class="text-gray-400" x-text="item.local"></p>
+                </div>
+            </div>
+        </template>
+    </div>
+    </template>
+
+    <!-- Order Actions Grid -->
+    <div class="order-grid">
+        <template x-if="c.showWa">
+            <a :href="'https://wa.me/'+c.waNum+'?text='+encodeURIComponent(t.waText)" target="_blank" class="btn-order btn-wa" @click="track('Contact')">
+                <i data-lucide="message-circle"></i> <span x-text="t.waLabel"></span>
+            </a>
+        </template>
+        
+        <template x-if="c.showCall">
+            <a :href="'tel:'+c.callNum" class="btn-order btn-call" @click="track('Contact')">
+                <i data-lucide="phone"></i> <span x-text="t.callLabel"></span>
+            </a>
+        </template>
+
+        <template x-if="c.showWeb">
+            <a :href="c.webUrl" target="_blank" class="btn-order btn-web" @click="track('ViewContent')">
+                <i data-lucide="globe"></i> <span x-text="t.webLabel"></span>
+            </a>
+        </template>
+    </div>
+
+    <!-- Zapier Form -->
+    <template x-if="c.showZapier">
+    <div style="min-height:800px">
+        <zapier-interfaces-page-embed :key="lang" :page-id="t.zapierId" :test-id="t.zapierId" no-background='true' style='width:100%;height:800px;'></zapier-interfaces-page-embed>
+    </div>
+    </template>
+
+    <!-- Sticky Button -->
+    <template x-if="c.showFloatingBtn">
+        <div class="sticky-cta">
+            <a href="#shop" class="sticky-btn" x-text="t.ctaText"></a>
+        </div>
+    </template>
+</section>
+
+<footer class="py-6 text-center text-xs text-gray-600">© 2026 MAD PARFUMEUR</footer>
+</body></html>`;
+    }
+
+    function render() {
+        const frame = document.getElementById('preview');
+        const doc = frame.contentWindow.document;
+        doc.open();
+        doc.write(getHTML(false));
+        doc.close();
+    }
+
+    function download() {
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(new Blob([getHTML(true)], {type:'text/html'}));
+        link.download = 'mad-landing-page.html';
+        link.click();
+    }
+
+    // Init
+    setMode('ar');
+    updateHeroUI();
+</script>
+
+</body>
+</html>
