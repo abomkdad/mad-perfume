@@ -1,10 +1,9 @@
 <!-- =========================
      FILE: thank-you.html  (FULL + COMPATIBLE)
      - Meta Pixel + TikTok Pixel
-     - Fires FB: Purchase | TikTok: CompletePayment
-     - Supports AR/HE via ?lang=ar|he (fallback to browser language)
-     - Prevents double-firing on refresh (sessionStorage)
-     - Prevent manual access: requires ?mad_ty=1 OR sessionStorage(MAD_ORDER_OK_V1)=1
+     - FB: Purchase | TikTok: CompletePayment
+     - AR/HE via ?lang=ar|he (fallback browser)
+     - Prevent manual access + prevent refresh duplicate (sessionStorage)
 ========================= -->
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
@@ -13,9 +12,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>تم تأكيد الطلب | MAD Parfumeur</title>
 
-  <!-- =========================
-       META PIXEL (OFFICIAL STYLE)
-  ========================= -->
+  <!-- META PIXEL -->
   <script>
     !function(f,b,e,v,n,t,s){
       if(f.fbq)return;
@@ -33,9 +30,7 @@
       src="https://www.facebook.com/tr?id=1072283127290819&ev=PageView&noscript=1"/>
   </noscript>
 
-  <!-- =========================
-       TIKTOK PIXEL (FIXED)
-  ========================= -->
+  <!-- TIKTOK PIXEL -->
   <script>
     !function (w, d, t) {
       w.TiktokAnalyticsObject = t;
@@ -73,32 +68,26 @@
       text-align:center;padding:20px;
     }
     .box{
-      width:100%;max-width:460px;
-      border-radius:24px;
+      width:100%;max-width:460px;border-radius:24px;
       box-shadow:0 15px 60px rgba(0,0,0,.08);
-      padding:36px 26px;
-      background:#fff;
+      padding:36px 26px;background:#fff;
     }
     .logo{height:34px;opacity:.9;margin-bottom:18px}
     .check{font-size:64px;line-height:1;color:#12b76a;margin-bottom:14px}
     h1{margin:0 0 10px;font-size:22px}
     p{margin:0;color:#666;font-size:15px;line-height:1.7}
-    .btn{
-      display:block;margin-top:22px;
-      padding:14px 18px;border-radius:14px;
-      text-decoration:none;font-weight:800;
-    }
+    .btn{display:block;margin-top:22px;padding:14px 18px;border-radius:14px;text-decoration:none;font-weight:800;}
     .btn-main{background:#000;color:#fff}
     .btn-wa{background:#25d366;color:#fff;margin-top:12px}
     .note{margin-top:14px;font-size:12px;color:#999}
-    .warn{margin-top:14px;font-size:13px;color:#b42318;font-weight:700;display:none}
+    .warn{margin-top:14px;font-size:13px;color:#b42318;font-weight:800;display:none}
   </style>
 </head>
 
 <body>
   <div class="box">
     <img class="logo" src="https://madperfume.ps/upload/01-2026/page/45CM.png" alt="MAD">
-    <div class="check" id="checkIcon">✓</div>
+    <div class="check" id="icon">✓</div>
 
     <h1 id="t">تم تأكيد طلبك بنجاح</h1>
     <p id="b">سيتم تجهيز المجموعة بعناية وتسليمها خلال 3–5 أيام عمل. الدفع عند الاستلام.</p>
@@ -111,12 +100,13 @@
   </div>
 
   <script>
-    // ---- Read params from redirect URL ----
     const qs = new URLSearchParams(location.search);
 
+    // ---- Language ----
     const langParam = (qs.get('lang') || '').toLowerCase();
     const isHebrew = langParam === 'he' || (navigator.language && navigator.language.toLowerCase().startsWith('he'));
 
+    // ---- Purchase params ----
     const value = Number(qs.get('value') || '500');
     const currency = (qs.get('currency') || 'ILS').toUpperCase();
     const contentName = qs.get('item') || 'Elite Set';
@@ -135,37 +125,33 @@
       document.getElementById('warn').innerText = "הגעתם לעמוד תודה ללא אימות. תועברו אוטומטית.";
     }
 
-    // ---- Redirect validation (prevent manual access) ----
-    // Compatible with our landing system: sessionStorage(MAD_ORDER_OK_V1)=1 OR URL ?mad_ty=1 / ?ty=1
-    let isValid = false;
-    try {
-      const urlOk = (qs.get('mad_ty') === '1') || (qs.get('ty') === '1');
-      const ssOk  = (sessionStorage.getItem('MAD_ORDER_OK_V1') === '1');
-      isValid = urlOk || ssOk;
-    } catch(e) { isValid = false; }
+    // ---- Validation (prevent manual access) ----
+    const ORDER_OK_KEY = "MAD_ORDER_OK_V1";
+    const urlOk = (qs.get('mad_ty') === '1') || (qs.get('ty') === '1');
+    let ssOk = false;
+    try { ssOk = (sessionStorage.getItem(ORDER_OK_KEY) === '1'); } catch(e) {}
+
+    const isValid = urlOk || ssOk;
 
     if (!isValid) {
-      // Do NOT fire Purchase if manual access
       document.getElementById('warn').style.display = 'block';
-      document.getElementById('checkIcon').textContent = '!';
-      document.getElementById('checkIcon').style.color = '#b42318';
-
-      // Optional: redirect away
+      document.getElementById('icon').textContent = '!';
+      document.getElementById('icon').style.color = '#b42318';
       setTimeout(() => { location.href = 'index.html'; }, 1500);
     } else {
-      // ---- Fire Purchase once per session (avoid double count on refresh) ----
-      // Keep old key + new key for maximum compatibility
+      // ---- Fire once per session ----
       const OLD_LOCK = 'mad_purchase_fired';
       const NEW_LOCK = 'MAD_PURCHASE_LOCK_V1';
 
-      let alreadyFired = false;
+      let already = false;
       try {
-        alreadyFired = sessionStorage.getItem(OLD_LOCK) === '1' || sessionStorage.getItem(NEW_LOCK) === '1';
+        already = sessionStorage.getItem(OLD_LOCK) === '1' || sessionStorage.getItem(NEW_LOCK) === '1';
       } catch(e) {}
 
-      if (!alreadyFired) {
+      if (!already) {
         try { sessionStorage.setItem(OLD_LOCK, '1'); } catch(e) {}
         try { sessionStorage.setItem(NEW_LOCK, '1'); } catch(e) {}
+        try { sessionStorage.removeItem(ORDER_OK_KEY); } catch(e) {} // optional: clean validation after success
 
         // Meta Purchase
         try {
@@ -178,12 +164,13 @@
           });
         } catch (e) {}
 
-        // TikTok CompletePayment (as per your JSON spec)
+        // TikTok CompletePayment (as per your spec)
         try {
           ttq.track('CompletePayment', {
             value: value,
             currency: currency,
             content_id: contentId,
+            content_name: contentName,
             content_type: 'product',
             quantity: 1
           });
