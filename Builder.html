@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MAD Builder - Advanced Pixel Tracking</title>
+    <title>MAD Builder - Advanced Pixel</title>
     <style>
         :root { --primary: #d97706; --bg: #0f172a; --panel: #1e293b; --text: #f1f5f9; --border: #334155; --danger: #ef4444; }
         body { margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); height: 100vh; overflow: hidden; }
@@ -58,6 +58,9 @@
         .url-input-group { display: flex; gap: 5px; margin-top: 5px; }
         .or-divider { text-align: center; font-size: 0.8rem; color: #64748b; margin: 5px 0; }
         .input-label-sm { font-size: 0.75rem; color: #94a3b8; margin-bottom: 3px; display: block; }
+        
+        /* New Color Grid */
+        .color-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
     </style>
 </head>
 <body>
@@ -92,7 +95,34 @@
             </div>
         </div>
 
-        <h2>2. المقارنة (Manifesto)</h2>
+        <!-- NEW: Design & Fonts Section -->
+        <h2>2. التصميم والمظهر</h2>
+        <div class="form-group">
+            <label>نوع الخط (Font Family)</label>
+            <select id="fontFamily" onchange="updateCommon('fontFamily', this.value)">
+                <option value="Inter">Inter (افتراضي)</option>
+                <option value="Cairo">Cairo (كايرو)</option>
+                <option value="Tajawal">Tajawal (تجوال)</option>
+                <option value="Almarai">Almarai (المراعي)</option>
+                <option value="Amiri">Amiri (أميري)</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>ألوان النموذج (Form)</label>
+            <div class="color-grid">
+                <div><label class="input-label-sm">خلفية الفورم</label><input type="color" id="formBg" value="#000000" oninput="updateCommon('formBg', this.value)"></div>
+                <div><label class="input-label-sm">نصوص الفورم</label><input type="color" id="formColor" value="#ffffff" oninput="updateCommon('formColor', this.value)"></div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label>ألوان أزرار الطلب (Buttons)</label>
+            <div class="color-grid">
+                <div><label class="input-label-sm">خلفية الزر</label><input type="color" id="btnBg" value="#15b76b" oninput="updateCommon('btnBg', this.value)"></div>
+                <div><label class="input-label-sm">نص الزر</label><input type="color" id="btnTxt" value="#000000" oninput="updateCommon('btnTxt', this.value)"></div>
+            </div>
+        </div>
+
+        <h2>3. المقارنة (Manifesto)</h2>
         <div class="form-group">
             <div class="toggle-wrapper">
                 <span class="toggle-label">⚖️ تفعيل القسم</span>
@@ -111,12 +141,19 @@
             </div>
         </div>
 
-        <h2>3. خيارات الطلب</h2>
+        <h2>4. خيارات الطلب</h2>
+        <!-- Google Sheet Config -->
         <div class="toggle-wrapper">
-            <span class="toggle-label">⚡ Zapier Form</span>
-            <input type="checkbox" id="showZapier" checked onchange="updateCommon('showZapier', this.checked)">
-            <div class="section-settings"><label>ID</label><input type="text" id="zapierId" oninput="updateData('zapierId', this.value)"></div>
+            <span class="toggle-label">📝 نموذج الطلب (Google Sheet)</span>
+            <input type="checkbox" id="showForm" checked onchange="updateCommon('showForm', this.checked)">
+            <div class="section-settings">
+                <label>رابط سكربت غوغل (Web App URL)</label>
+                <input type="text" id="googleScript" value="https://script.google.com/macros/s/AKfycbzEEzQCP1xVJ9U1E15hh43sok6uRIir866l9daol-rUqXrp6dwnXusc3h9_B6miqqtE/exec" oninput="updateCommon('googleScript', this.value)">
+                <label>صفحة الشكر (رابط توجيه)</label>
+                <input type="text" id="tyPage" value="/thank-you.html" oninput="updateCommon('tyPage', this.value)">
+            </div>
         </div>
+
         <div class="toggle-wrapper">
             <span class="toggle-label">🟢 WhatsApp</span>
             <input type="checkbox" id="showWa" checked onchange="updateCommon('showWa', this.checked)">
@@ -143,7 +180,7 @@
             </div>
         </div>
 
-        <h2>4. الوسائط والبلوكات</h2>
+        <h2>5. الوسائط والبلوكات</h2>
         <div class="form-group" style="background:rgba(255,255,255,0.05); padding:10px; border-radius:8px; border:1px solid #334155">
             <label style="color:var(--primary); margin-bottom:8px;">خلفية الهيدر</label>
             <select id="heroType" onchange="updateCommon('heroType', this.value)" style="margin-bottom:10px;">
@@ -151,7 +188,7 @@
                 <option value="youtube">يوتيوب (YouTube)</option>
                 <option value="image">صورة ثابتة (Image)</option>
             </select>
-            <input type="text" id="vid" value="https://madperfume.ps/upload/01-2026/page/69738a53a1998.mp4#t=0.02" placeholder="الرابط..." oninput="updateCommon('vid', this.value)">
+            <input type="text" id="vid" value="https://madparfumeurglobal.com/wp-content/uploads/2025/10/download.mp4" placeholder="الرابط..." oninput="updateCommon('vid', this.value)">
         </div>
 
         <div class="form-group">
@@ -174,7 +211,7 @@
             <button class="btn-secondary" onclick="addBlock('embed')">HTML</button>
         </div>
 
-        <h2>5. التتبع</h2>
+        <h2>6. التتبع</h2>
         <div class="form-group"><label>Facebook Pixel</label><input type="text" id="fbPixel" value="1072283127290819" oninput="updateCommon('fb', this.value)"></div>
         <div class="form-group"><label>TikTok Pixel</label><input type="text" id="ttPixel" value="D2D02JBC77U4ENLN9SBG" oninput="updateCommon('tt', this.value)"></div>
 
@@ -193,10 +230,16 @@
     let mode = 'ar';
     const common = {
         bgColor: "#ab5c12",
+        fontFamily: "Inter",
+        formBg: "#000000",
+        formColor: "#ffffff",
+        btnBg: "#15b76b",
+        btnTxt: "#000000",
+        
         heroType: 'video', 
         logo: "https://madperfume.ps/upload/01-2026/page/69735b87d92ef.png",
-        vid: "https://madperfume.ps/upload/01-2026/page/69738a53a1998.mp4#t=0.02",
-        heroes: ["https://madperfume.ps/upload/01-2026/page/An_C_CgzIpu9EXMo9pdzVdfq8wAzSksIwyf5ZyhFqeQj3CAfge509Q5oLQ1hD9MRECqJ-2z6sHF1_N5VP4Q_BHNpvfiHOPGPepws5uPfzY66GEaOF-OKOFsv5jVXZcBS4BiVnHYlSFbJQFmiYNKQr2n1BixCpqbI15Luxz1Ch44pTkgdIlBwUQsCG7Gw9yDduKKZA0yKNfFmzXUDNuJKV.jpeg"],
+        vid: "https://madparfumeurglobal.com/wp-content/uploads/2025/10/download.mp4",
+        heroes: ["https://madperfume.ps/upload/01-2026/page/6971495c69e7c.png"],
         blocks: [
             {
                 id: 1769167825001,
@@ -224,41 +267,45 @@
             }
         ],
         fb: "1072283127290819", tt: "D2D02JBC77U4ENLN9SBG",
-        showManifesto: true, showZapier: true, showWa: true, showCall: true, showWeb: false, showFloatingBtn: false,
+        googleScript: "https://script.google.com/macros/s/AKfycbzEEzQCP1xVJ9U1E15hh43sok6uRIir866l9daol-rUqXrp6dwnXusc3h9_B6miqqtE/exec",
+        tyPage: "/thank-you.html",
+        showForm: true, showManifesto: true, showWa: true, showCall: true, showWeb: false, showFloatingBtn: false,
         waNum: "972509787730", callNum: "*9935", webUrl: "https://madparfumeur.com"
     };
 
     const db = {
         ar: {
             price: "240 ₪ شامل التوصيل", offer: "350 ₪ السعر السابق", ctaText: "اطلب الآن",
-            zapierId: "cmkpbwxjy001bonuoz5vy0gh1",
             maniT: "THE MANIFESTO", maniS: "لماذا MAD؟ مقارنة علمية", maniM: "عطور  MAD", maniO: "عطور تركيا دبي الزيوت والبدائل",
             waLabel: "اطلب عبر واتساب", waText: "ديبنس",
             callLabel: "اتصل للطلب", webLabel: "زيارة الموقع",
+            formTitle: "نموذج الطلب السريع", name: "الاسم الكامل", phone: "رقم الهاتف", city: "المدينة (اختياري)", notes: "ملاحظات (اختياري)",
+            submit: "إرسال الطلب ✅", sending: "جاري الإرسال...", ok: "تم إرسال الطلب بنجاح ✅", fail: "حصل خطأ، جرّب مرة ثانية.",
             compItems: [
-                {mad:"آمنة 100% معتمدة", local:"مجهولة المصدر"},
-                {mad:"تطابق جزيئي دقيق", local:"خلط يدوي عشوائي"},
-                {mad:"خلاصات أوروبية", local:"زيوت تجارية رخيصة"},
-                {mad:"ثبات +24 ساعة", local:"يختفي بعد ساعة"},
-                {mad:"41 فرع في البلاد", local:"اونلاين"},
-                {mad:"خدمة زبائن *9935", local:" حظر بعد الشراء"},
-                {mad:"مصادقات اييزو ووزارة الصحه", local:"غير مفحوصه"}
+                {mad: "آمنة 100% معتمدة", local: "مجهولة المصدر"},
+                {mad: "تطابق جزيئي دقيق", local: "خلط يدوي عشوائي"},
+                {mad: "خلاصات أوروبية", local: "زيوت تجارية رخيصة"},
+                {mad: "ثبات +24 ساعة", local: "يختفي بعد ساعة"},
+                {mad: "41 فرع في البلاد", local: "اونلاين"},
+                {mad: "خدمة زبائن *9935", local: " حظر بعد الشراء"},
+                {mad: "مصادقات اييزو ووزارة الصحه", local: "غير مفحوصه"}
             ]
         },
         he: {
             price: "240₪ כולל משלוח", offer: "350 ₪ מחיר קודם", ctaText: "הזמן עכשיו",
-            zapierId: "cmkpef5ul0009nc51356rtjm8",
             maniT: "THE MANIFESTO", maniS: "למה MAD? השוואה מדעית", maniM: "בשמי MAD", maniO: "חיקויים דובי טורקיה דיופים שמנים",
             waLabel: "הזמן בוואטסאפ", waText: "DEPENDENCE",
             callLabel: "חייג להזמנה", webLabel: "בקר באתר",
+            formTitle: "טופס הזמנה מהיר", name: "שם מלא", phone: "טלפון", city: "עיר (אופציונלי)", notes: "הערות (אופציונלי)",
+            submit: "שלח הזמנה ✅", sending: "שולח...", ok: "ההזמנה נשלחה בהצלחה ✅", fail: "שגיאה, נסו שוב.",
             compItems: [
-                {mad:"בטוח 100% מאושר", local:"מקור לא ידוע"},
-                {mad:"התאמה מולקולרית", local:"ערבוב אקראי"},
-                {mad:"תמציות אירופאיות", local:"שמנים מסחריים"},
-                {mad:"עמידות 24+ שעות", local:"נעלם מהר"},
-                {mad:"41 סניפים בארץ", local:" אונליין"},
-                {mad:"שירות לקוחות *9935", local:"נעלמים אחר ההזמנה"},
-                {mad:"תקן אייזו - משרד בריאות", local:" לא נבדק מסוכן"}
+                {mad: "בטוח 100% מאושר", local: "מקור לא ידוע"},
+                {mad: "התאמה מולקולרית", local: "ערבוב אקראי"},
+                {mad: "תמציות אירופאיות", local: "שמנים מסחריים"},
+                {mad: "עמידות 24+ שעות", local: "נעלם מהר"},
+                {mad: "41 סניפים בארץ", local: " אונליין"},
+                {mad: "שירות לקוחות *9935", local: "נעלמים אחר ההזמנה"},
+                {mad: "תקן אייזו - משרד בריאות", local: " לא נבדק מסוכן"}
             ]
         }
     };
@@ -278,7 +325,7 @@
         mode = lang;
         document.getElementById('btn-ar').className = lang === 'ar' ? 'lang-btn active' : 'lang-btn';
         document.getElementById('btn-he').className = lang === 'he' ? 'lang-btn active' : 'lang-btn';
-        ['price', 'offer', 'ctaText', 'zapierId', 'maniT', 'maniS', 'maniM', 'maniO', 'waLabel', 'waText', 'callLabel', 'webLabel'].forEach(id => {
+        ['price', 'offer', 'ctaText', 'maniT', 'maniS', 'maniM', 'maniO', 'waLabel', 'waText', 'callLabel', 'webLabel'].forEach(id => {
             const el = document.getElementById(id);
             if(el) el.value = db[lang][id] || '';
         });
@@ -424,7 +471,7 @@
                rules: { fire_event_only_once_per_session: true, prevent_manual_access: true, do_not_trigger_on_refresh: true }
              }
             };
-            window.MAD_KEYS = { ORDER_OK: "MAD_ORDER_OK_V1", PURCHASE_LOCK: "MAD_PURCHASE_LOCK_V1", EVENT_ID: "MAD_PURCHASE_EVENT_ID_V1" };
+            window.MAD_KEYS = { ORDER_OK: "MAD_ORDER_OK_V1", PURCHASE_LOCK: "MAD_PURCHASE_LOCK_V1" };
             window.MAD_MARK_ORDER_SUBMITTED = function(meta){
              try {
                sessionStorage.setItem(window.MAD_KEYS.ORDER_OK, "1");
@@ -446,11 +493,10 @@
 ${sOpen} src="https://cdn.tailwindcss.com">${sClose}
 ${sOpen} src="https://unpkg.com/lucide@latest">${sClose}
 ${sOpen} src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer>${sClose}
-${sOpen} type='module' src='https://interfaces.zapier.com/assets/web-components/zapier-interfaces/zapier-interfaces.esm.js'>${sClose}
 ${pixels}
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,900;1,400;1,900&family=Inter:wght@300;400;700;900&family=Amiri:wght@400;700&family=Assistant:wght@300;400;700;800&display=swap');
-body{background:${common.bgColor};color:white;font-family:'Inter','Assistant',sans-serif}
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,900;1,400;1,900&family=Inter:wght@300;400;700;900&family=Amiri:wght@400;700&family=Assistant:wght@300;400;700;800&family=Cairo:wght@400;700&family=Tajawal:wght@400;700&family=Almarai:wght@400;700&display=swap');
+body{background:${common.bgColor};color:${common.formColor};font-family:'${common.fontFamily}',sans-serif}
 .glass-nav { position: fixed; top: 0; left: 0; width: 100%; z-index: 50; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.6); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(255,255,255,0.1); }
 .nav-logo { height: 35px; object-fit: contain; }
 .lang-btn-nav { font-size: 11px; font-weight: bold; color: rgba(255,255,255,0.6); margin: 0 5px; transition:0.2s; }
@@ -474,6 +520,13 @@ body{background:${common.bgColor};color:white;font-family:'Inter','Assistant',sa
 .btn-wa { background: #25D366; color: white; } .btn-wa:hover { background: #1ebc57; }
 .btn-call { background: #3b82f6; color: white; } .btn-call:hover { background: #2563eb; }
 .btn-web { background: #64748b; color: white; } .btn-web:hover { background: #475569; }
+/* Form Styles */
+.form-card { max-width:520px; margin:0 auto; background:${common.formBg}; border:1px solid rgba(255,255,255,.10); border-radius:22px; padding:16px; box-shadow:0 20px 80px rgba(0,0,0,.45); text-align: right; }
+.inp { width:100%; padding:12px 12px; border-radius:14px; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12); outline:none; color:${common.formColor}; }
+.inp:focus { border-color: rgba(217,119,6,.7); box-shadow:0 0 0 3px rgba(217,119,6,.18); }
+.submit-btn { width:100%; padding:14px 14px; border-radius:16px; font-weight:900; color:${common.btnTxt}; background:${common.btnBg}; border:none; box-shadow:0 14px 50px rgba(0,0,0,.35); cursor:pointer; }
+.submit-btn:disabled { opacity:0.6; cursor:not-allowed; }
+.tiny { font-size:12px; color:rgba(255,255,255,.70); margin-top:10px; text-align:center; }
 </style>
 ${sOpen}>
 function app(){
@@ -481,46 +534,70 @@ return {
     c:${jsonCommon}, db:${jsonDB},
     lang:'${mode}', idx:0,
     isThankYou: false,
+    f:{name:"",phone:"",city:"",notes:""}, ui:{loading:false,msg:"",ok:false},
     trackingSpec: (window.MAD_TRACKING_SPEC || null),
     
     get t() { return this.db[this.lang] },
     get dir() { return this.lang=='ar'?'rtl':'ltr' },
+    get offerName() { try{ return decodeURIComponent(location.pathname.split("/").pop().replace(".html","")) || "MAD Offer"; }catch(e){ return "MAD Offer"; } },
+    
     init(){ 
         ${autoLang}
         if(window.lucide) lucide.createIcons();
         if(this.c.heroes.length>1) setInterval(()=>this.next(),3000);
         
-        // Tracking Init
-        this.isThankYou = this.isThankYouPage();
-        if(!this.isThankYou){ this.setupZapierRedirectValidationListener(); }
+        this.isThankYou = /thank/i.test(location.pathname);
         if(this.isThankYou){ this.fireThankYouPurchaseIfAllowed(); }
     },
     tog(l){ this.lang=l; },
     next(){ this.idx = (this.idx===this.c.heroes.length-1)?0:this.idx+1 },
     prev(){ this.idx = (this.idx===0)?this.c.heroes.length-1:this.idx-1 },
     
-    // Logic Methods
-    isThankYouPage(){ try{ const p=(location.pathname||"")+" "+(location.search||""); return /thank[-_ ]?you/i.test(p)||/ty=1/i.test(p)||/mad_ty=1/i.test(p); }catch(e){return false;} },
-    hasRedirectValidation(){ try{ const ok=sessionStorage.getItem(window.MAD_KEYS.ORDER_OK)==="1"; const urlOk=new URLSearchParams(location.search||"").get("mad_ty")==="1"||new URLSearchParams(location.search||"").get("ty")==="1"; return ok||urlOk; }catch(e){return false;} },
-    setupZapierRedirectValidationListener(){ try{ if(this._z)return; this._z=true; window.addEventListener("message",(e)=>{ try{ if(!e||!e.data)return; const s=JSON.stringify(e.data).toLowerCase(); if(s.includes("zapier")&&(s.includes("submit")||s.includes("success")||s.includes("completed"))){ window.MAD_MARK_ORDER_SUBMITTED({source:"zapier_message",raw:e.data}); } }catch(err){} },false); }catch(e){} },
-    isReloadNavigation(){ try{ const nav=performance.getEntriesByType&&performance.getEntriesByType("navigation"); if(nav&&nav[0]&&nav[0].type)return nav[0].type==="reload"; }catch(e){} return false; },
-    getPurchaseValue(){ return 500; },
-    fireThankYouPurchaseIfAllowed(){ try{ const rules=(this.trackingSpec&&this.trackingSpec.thank_you_page&&this.trackingSpec.thank_you_page.rules)?this.trackingSpec.thank_you_page.rules:{}; const preventManual=rules.prevent_manual_access!==false; const oncePerSession=rules.fire_event_only_once_per_session!==false; const noRefresh=rules.do_not_trigger_on_refresh!==false; if(noRefresh&&this.isReloadNavigation()){ if(sessionStorage.getItem(window.MAD_KEYS.PURCHASE_LOCK)==="1")return; } if(oncePerSession&&sessionStorage.getItem(window.MAD_KEYS.PURCHASE_LOCK)==="1")return; if(preventManual&&!this.hasRedirectValidation()){ try{console.warn("MAD: TY blocked");}catch(e){} return; } try{sessionStorage.setItem(window.MAD_KEYS.PURCHASE_LOCK,"1");}catch(e){} const val=this.getPurchaseValue(); const cur="ILS"; try{if(typeof fbq!=="undefined"){fbq("track","Purchase",{value:val,currency:cur});}}catch(e){} try{if(typeof ttq!=="undefined"){ttq.track("CompletePayment",{value:val,currency:cur});}}catch(e){} }catch(e){} },
-    
-    // Tracking Wrapper
-    trackContact(s){ this.track("Contact", {source:s||"unknown"}); },
-    track(ev, pl){
+    // Pixel & Form Logic
+    fireThankYouPurchaseIfAllowed(){
+         try{
+             if(sessionStorage.getItem(window.MAD_KEYS.ORDER_OK)!=="1") return;
+             if(sessionStorage.getItem(window.MAD_KEYS.PURCHASE_LOCK)==="1") return;
+             sessionStorage.setItem(window.MAD_KEYS.PURCHASE_LOCK,"1");
+             if(typeof fbq!=="undefined") fbq("track","Purchase",{value:500,currency:"ILS"});
+             if(typeof ttq!=="undefined") ttq.track("CompletePayment",{value:500,currency:"ILS"});
+         }catch(e){}
+    },
+    trackContact(s){ 
+        if(typeof fbq!=="undefined") fbq("track","Contact",{source:s});
+        if(typeof ttq!=="undefined") ttq.track("Contact",{source:s});
+    },
+    async submitOrder(){
+        if(this.ui.loading) return;
+        if(!this.f.name || !this.f.phone){ this.ui.msg = (this.lang==="he")?"נא למלא שם וטלפון":"يرجى تعبئة الاسم والهاتف"; return; }
+        
+        this.ui.loading=true; this.ui.msg="";
+        const fd = new FormData();
+        fd.append("order_id", "MAD-"+Date.now());
+        fd.append("lang", this.lang);
+        fd.append("name", this.f.name);
+        fd.append("phone", this.f.phone);
+        fd.append("city", this.f.city);
+        fd.append("notes", this.f.notes);
+        fd.append("offer", this.offerName);
+        
         try{
-            const isTY = this.isThankYou===true;
-            if(!isTY){
-               const allowed = ["PageView","Contact","ViewContent"];
-               if(!allowed.includes(ev)) return;
-            } else {
-               if(ev==="Purchase" || ev==="CompletePayment") return;
-            }
-        }catch(e){}
-        try{ if(typeof fbq!=='undefined') fbq('track', ev, pl); }catch(e){}
-        try{ if(typeof ttq!=='undefined') ttq.track(ev, pl); }catch(e){}
+            await fetch(this.c.googleScript, {method:"POST", body:fd, mode:"no-cors"});
+            window.MAD_MARK_ORDER_SUBMITTED({order_id: "MAD-"+Date.now()});
+            this.trackContact("form_submit");
+            if(typeof fbq!=="undefined") fbq("track","Lead");
+            if(typeof ttq!=="undefined") ttq.track("Lead");
+            
+            setTimeout(()=>{
+                window.location.href = this.c.tyPage + "?ty=1";
+            }, 1000);
+            
+            this.ui.ok=true;
+            this.ui.msg = this.t.ok;
+        }catch(e){
+            this.ui.loading=false;
+            this.ui.msg = this.t.fail;
+        }
     }
 }}
 ${sClose}
@@ -575,13 +652,26 @@ ${sClose}
     </div>
     </template>
 
+    <template x-if="c.showForm">
+        <div class="form-card text-right mb-10">
+            <div class="flex items-center justify-between mb-3"><h3 class="font-black text-lg" x-text="t.formTitle"></h3><span class="text-[11px] px-3 py-1 rounded-full bg-black/30 border border-white/10" x-text="offerName"></span></div>
+            <form @submit.prevent="submitOrder()" class="grid gap-3">
+                <input class="inp" type="text" x-model="f.name" :placeholder="t.name" required>
+                <input class="inp" type="tel" x-model="f.phone" :placeholder="t.phone" required>
+                <input class="inp" type="text" x-model="f.city" :placeholder="t.city">
+                <textarea class="inp" rows="3" x-model="f.notes" :placeholder="t.notes"></textarea>
+                <button class="submit-btn" type="submit" :disabled="ui.loading"><span x-show="!ui.loading" x-text="t.submit"></span><span x-show="ui.loading" x-text="t.sending"></span></button>
+                <div class="tiny text-center" :class="ui.ok?'text-green-200':'text-rose-200'" x-show="ui.msg" x-text="ui.msg"></div>
+            </form>
+        </div>
+    </template>
+
     <div class="order-grid">
         <template x-if="c.showWa"><a :href="'https://wa.me/'+c.waNum+'?text='+encodeURIComponent(t.waText)" target="_blank" class="btn-order btn-wa" @click="trackContact('whatsapp')"><i data-lucide="message-circle"></i> <span x-text="t.waLabel"></span></a></template>
         <template x-if="c.showCall"><a :href="'tel:'+c.callNum" class="btn-order btn-call" @click="trackContact('phone')"><i data-lucide="phone"></i> <span x-text="t.callLabel"></span></a></template>
         <template x-if="c.showWeb"><a :href="c.webUrl" target="_blank" class="btn-order btn-web" @click="track('ViewContent')"><i data-lucide="globe"></i> <span x-text="t.webLabel"></span></a></template>
     </div>
 
-    <template x-if="c.showZapier"><div style="min-height:800px"><zapier-interfaces-page-embed :key="lang" :page-id="t.zapierId" :test-id="t.zapierId" no-background='true' style='width:100%;height:800px;'></zapier-interfaces-page-embed></div></template>
     <template x-if="c.showFloatingBtn"><div class="sticky-cta"><a href="#shop" class="sticky-btn" x-text="t.ctaText"></a></div></template>
 </section>
 
