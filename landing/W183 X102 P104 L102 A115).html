@@ -106,11 +106,24 @@ return {
     trackContact(s){ 
         if(typeof fbq!=="undefined") fbq("track","Contact",{source:s});
         if(typeof ttq!=="undefined") ttq.track("Contact",{source:s});
-    },
-    async submitOrder(){
-        if(this.ui.loading) return;
-        if(!this.f.name || !this.f.phone){ this.ui.msg = (this.lang==="he")?"נא למלא שם וטלפון":"يرجى تعبئة الاسم والهاتف"; return; }
-        
+submitOrder(){
+  if(this.ui.loading) return;
+
+  if(!this.f.name || !this.f.phone){
+    this.ui.msg = (this.lang==="he") ? "נא למלא שם וטלפון" : "يرجى تعبئة الاسم والهاتف";
+    return;
+  }
+
+  this.ui.loading = true;
+  this.ui.msg = "";
+
+  // إرسال حقيقي عبر FORM للـ Google Script (بدون fetch)
+  // Google Script هو اللي بيرد ويرجعك لصفحة الشكر بعد ما يسجل بالشيت
+  setTimeout(() => {
+    this.$refs.gsForm.submit();
+  }, 120);
+}
+
         this.ui.loading=true; this.ui.msg="";
         const fd = new FormData();
         fd.append("order_id", "MAD-"+Date.now());
