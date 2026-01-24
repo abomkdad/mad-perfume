@@ -1,176 +1,572 @@
 <!DOCTYPE html>
 <html lang="ar" x-data="app()" x-init="init()" :dir="dir">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<script src="https://cdn.tailwindcss.com"></script>
-<script src="https://unpkg.com/lucide@latest"></script>
-<script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
-<script type='module' src='https://interfaces.zapier.com/assets/web-components/zapier-interfaces/zapier-interfaces.esm.js'></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-        <script>
-            !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)n=f.fbq;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window, document,'script','https://connect.facebook.net/en_US/fbevents.js');
-            fbq('init', '1072283127290819'); fbq('track', 'PageView');
-            !function (w, d, t) { w.TiktokAnalyticsObject=t; var ttq=w[t]=w[t]||[]; ttq.methods=["page","track","identify","instances","debug","on","off","once","ready","alias","group","enableCookie","disableCookie","holdConsent","revokeConsent","grantConsent"]; ttq.setAndDefer=function(t,e){t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}; for(var i=0;i<ttq.methods.length;i++)ttq.setAndDefer(ttq,ttq.methods[i]); ttq.load=function(e,n){ var r="https://analytics.tiktok.com/i18n/pixel/events.js"; var o=n&&n.partner; ttq._i=ttq._i||{}; ttq._i[e]=[]; ttq._i[e]._u=r; ttq._t=ttq._t||{}; ttq._t[e]=+new Date; ttq._o=ttq._o||{}; ttq._o[e]=n||{}; n=document.createElement("script"); n.type="text/javascript"; n.async=!0; n.src=r+"?sdkid="+e+"&lib="+t; e=document.getElementsByTagName("script")[0]; e.parentNode.insertBefore(n,e) }; ttq.load('D2D02JBC77U4ENLN9SBG'); ttq.page(); }(window, document, 'ttq');
-            
-            // MAD Tracking Logic
-            window.MAD_TRACKING_SPEC = {
-             project_name: "MAD Conversion Tracking System",
-             platforms: ["Facebook Pixel", "TikTok Pixel"],
-             currency: "ILS",
-             landing_page: { allowed_events_only: ["PageView", "Contact"], do_not_fire_purchase_event: true },
-             thank_you_page: {
-               facebook: { event: "Purchase", value: 500, currency: "ILS" },
-               tiktok: { event: "CompletePayment", value: 500, currency: "ILS" },
-               rules: { fire_event_only_once_per_session: true, prevent_manual_access: true, do_not_trigger_on_refresh: true }
-             }
-            };
-            window.MAD_KEYS = { ORDER_OK: "MAD_ORDER_OK_V1", PURCHASE_LOCK: "MAD_PURCHASE_LOCK_V1", EVENT_ID: "MAD_PURCHASE_EVENT_ID_V1" };
-            window.MAD_MARK_ORDER_SUBMITTED = function(meta){
-             try {
-               sessionStorage.setItem(window.MAD_KEYS.ORDER_OK, "1");
-               if(meta && typeof meta === "object"){ sessionStorage.setItem("MAD_ORDER_META_V1", JSON.stringify(meta)); }
-             } catch(e){}
-            };
-        </script>
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,900;1,400;1,900&family=Inter:wght@300;400;700;900&family=Amiri:wght@400;700&family=Assistant:wght@300;400;700;800&display=swap');
-body{background:#ab5c12;color:white;font-family:'Inter','Assistant',sans-serif}
-.glass-nav { position: fixed; top: 0; left: 0; width: 100%; z-index: 50; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.6); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(255,255,255,0.1); }
-.nav-logo { height: 35px; object-fit: contain; }
-.lang-btn-nav { font-size: 11px; font-weight: bold; color: rgba(255,255,255,0.6); margin: 0 5px; transition:0.2s; }
-.lang-btn-nav.active { color: #d97706; }
-.hero-vid, .hero-wrapper { position: absolute; top: 0; left: 0; width: 100%; height: 100vh; overflow: hidden; z-index: -1; object-fit: cover; filter: brightness(0.6); }
-.hero-vid-iframe { width: 300%; height: 150%; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); pointer-events: none; }
-@media (min-aspect-ratio: 16/9) { .hero-vid-iframe { width: 100%; height: 300%; } }
-.badge{background:linear-gradient(to right,#d97706,#fbbf24);color:black;padding:5px 20px;border-radius:50px;font-weight:900;display:inline-block;margin-bottom:10px}
-.carousel{position:relative;height:400px;display:flex;align-items:center;justify-content:center}
-.c-img{max-height:100%;max-width:100%;filter:drop-shadow(0 20px 40px rgba(0,0,0,0.8))}
-.c-btn{position:absolute;top:50%;transform:translateY(-50%);background:rgba(0,0,0,0.5);color:#d97706;border:1px solid #333;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer}
-.comp-row{display:grid;grid-template-columns:1fr 1fr;gap:2px;background:rgba(255,255,255,.05);border-radius:15px;overflow:hidden;margin-bottom:10px;border:1px solid rgba(255,255,255,.05)}
-.c-side{padding:15px;font-size:13px;display:flex;flex-direction:column;justify-content:center}
-.c-mad{background:linear-gradient(to right,rgba(217,119,6,.1),rgba(217,119,6,.05));text-align:right}
-.c-alt{background:rgba(0,0,0,.4);text-align:right;opacity:.7}
-.sticky-cta { position: fixed; bottom: 20px; left: 0; width: 100%; z-index: 50; padding: 0 20px; pointer-events: none; }
-.sticky-btn { display: block; max-width: 500px; margin: 0 auto; background: #d97706; color: black; text-align: center; padding: 16px; border-radius: 99px; font-weight: 900; text-decoration: none; box-shadow: 0 10px 25px rgba(0,0,0,0.5); pointer-events: auto; transition: 0.2s; animation: pulse 2s infinite; }
-@keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.02); } 100% { transform: scale(1); } }
-.order-grid { display: grid; gap: 10px; margin-bottom: 20px; max-width: 500px; margin-left: auto; margin-right: auto; }
-.btn-order { display: flex; align-items: center; justify-content: center; gap: 10px; padding: 12px; border-radius: 10px; font-weight: bold; text-decoration: none; transition: 0.2s; }
-.btn-wa { background: #25D366; color: white; } .btn-wa:hover { background: #1ebc57; }
-.btn-call { background: #3b82f6; color: white; } .btn-call:hover { background: #2563eb; }
-.btn-web { background: #64748b; color: white; } .btn-web:hover { background: #475569; }
-</style>
-<script>
-function app(){
-return {
-    c:{"bgColor":"#ab5c12","heroType":"video","logo":"https://madperfume.ps/upload/01-2026/page/69735b87d92ef.png","vid":"https://madperfume.ps/upload/01-2026/page/69738a53a1998.mp4#t=0.02","heroes":["https://madperfume.ps/upload/01-2026/page/An_C_CgzIpu9EXMo9pdzVdfq8wAzSksIwyf5ZyhFqeQj3CAfge509Q5oLQ1hD9MRECqJ-2z6sHF1_N5VP4Q_BHNpvfiHOPGPepws5uPfzY66GEaOF-OKOFsv5jVXZcBS4BiVnHYlSFbJQFmiYNKQr2n1BixCpqbI15Luxz1Ch44pTkgdIlBwUQsCG7Gw9yDduKKZA0yKNfFmzXUDNuJKV.jpeg"],"blocks":[{"id":1769167825001,"type":"text","val":"","text":{"ar":"DEPENDENCE – مستوحى من Bitter Peach (Tom Ford)\n\nDEPENDENCE هو عطر جريء، حسي ومُلفت، يجمع بين الحلاوة الفاكهية العميقة ولمسة فاخرة جذابة.\nمستوحى من Bitter Peach من Tom Ford ليمنحك تجربة عطرية قوية تعبّر عن الجرأة، الأناقة والحضور اللافت.\n\n🍑 افتتاحية خوخية جذابة\n🔥 عمق دافئ مثير\n💎 توقيع عطري فاخر بطابع عصري","he":"DEPENDENCE – Inspired by Bitter Peach (Tom Ford)\n\nDEPENDENCE הוא ניחוח נועז, חושני וממכר, המשלב מתיקות פירותית עמוקה עם אלגנטיות יוקרתית.\nהשראה מ־Bitter Peach של Tom Ford יוצרת חוויה חושית עוצמתית, מושלמת למי שמחפש נוכחות בולטת וסטייל בלתי נשכח.\n\n🍑 פתיחה עסיסית ומתוקה\n🔥 עומק חמים ומפתה\n💎 חתימה יוקרתית עם אופי מודרני"}},{"id":1769176873684,"type":"video","val":"https://madperfume.ps/upload/01-2026/page/Dependence%20madperfume.mp4#t=0.02","text":{"ar":"","he":""}},{"id":1769176890534,"type":"text","val":"","text":{"ar":"النوتات العطرية\n\nالنوتات العليا (Top Notes):\nخوخ مر، فواكه عصيرية\n\nنوتات القلب (Heart Notes):\nفانيليا، توابل دافئة، لمسات زهرية\n\nالنوتات الأساسية (Base Notes):\nعنبر، أخشاب دافئة، مسك","he":"תווי ניחוח (Notes)\n\nתווי פתיחה (Top Notes):\nאפרסק מריר, פירות עסיסיים\n\nתווי לב (Heart Notes):\nוניל, תבלינים חמים, פרחים עדינים\n\nתווי בסיס (Base Notes):\nענבר, עצים חמים, מושק"}}],"fb":"1072283127290819","tt":"D2D02JBC77U4ENLN9SBG","showManifesto":true,"showZapier":true,"showWa":true,"showCall":true,"showWeb":false,"showFloatingBtn":false,"waNum":"972509787730","callNum":"*9935","webUrl":"https://madparfumeur.com"}, db:{"ar":{"price":"240 ₪ شامل التوصيل","offer":"350 ₪ السعر السابق","ctaText":"اطلب الآن","zapierId":"cmkpbwxjy001bonuoz5vy0gh1","maniT":"THE MANIFESTO","maniS":"لماذا MAD؟ مقارنة علمية","maniM":"عطور  MAD","maniO":"عطور تركيا دبي الزيوت والبدائل","waLabel":"اطلب عبر واتساب","waText":"ديبنس","callLabel":"اتصل للطلب","webLabel":"زيارة الموقع","compItems":[{"mad":"آمنة 100% معتمدة","local":"مجهولة المصدر"},{"mad":"تطابق جزيئي دقيق","local":"خلط يدوي عشوائي"},{"mad":"خلاصات أوروبية","local":"زيوت تجارية رخيصة"},{"mad":"ثبات +24 ساعة","local":"يختفي بعد ساعة"},{"mad":"41 فرع في البلاد","local":"اونلاين"},{"mad":"خدمة زبائن *9935","local":" حظر بعد الشراء"},{"mad":"مصادقات اييزو ووزارة الصحه","local":"غير مفحوصه"}]},"he":{"price":"240₪ כולל משלוח","offer":"350 ₪ מחיר קודם","ctaText":"הזמן עכשיו","zapierId":"cmkpef5ul0009nc51356rtjm8","maniT":"THE MANIFESTO","maniS":"למה MAD? השוואה מדעית","maniM":"בשמי MAD","maniO":"חיקויים דובי טורקיה דיופים שמנים","waLabel":"הזמן בוואטסאפ","waText":"DEPENDENCE","callLabel":"חייג להזמנה","webLabel":"בקר באתר","compItems":[{"mad":"בטוח 100% מאושר","local":"מקור לא ידוע"},{"mad":"התאמה מולקולרית","local":"ערבוב אקראי"},{"mad":"תמציות אירופאיות","local":"שמנים מסחריים"},{"mad":"עמידות 24+ שעות","local":"נעלם מהר"},{"mad":"41 סניפים בארץ","local":" אונליין"},{"mad":"שירות לקוחות *9935","local":"נעלמים אחר ההזמנה"},{"mad":"תקן אייזו - משרד בריאות","local":" לא נבדק מסוכן"}]}},
-    lang:'ar', idx:0,
-    isThankYou: false,
-    trackingSpec: (window.MAD_TRACKING_SPEC || null),
-    
-    get t() { return this.db[this.lang] },
-    get dir() { return this.lang=='ar'?'rtl':'ltr' },
-    init(){ 
-        
-        const ul = navigator.language || navigator.userLanguage || '';
-        this.lang = ul.toLowerCase().startsWith('he') ? 'he' : 'ar';
-        
-        if(window.lucide) lucide.createIcons();
-        if(this.c.heroes.length>1) setInterval(()=>this.next(),3000);
-        
-        // Tracking Init
-        this.isThankYou = this.isThankYouPage();
-        if(!this.isThankYou){ this.setupZapierRedirectValidationListener(); }
-        if(this.isThankYou){ this.fireThankYouPurchaseIfAllowed(); }
-    },
-    tog(l){ this.lang=l; },
-    next(){ this.idx = (this.idx===this.c.heroes.length-1)?0:this.idx+1 },
-    prev(){ this.idx = (this.idx===0)?this.c.heroes.length-1:this.idx-1 },
-    
-    // Logic Methods
-    isThankYouPage(){ try{ const p=(location.pathname||"")+" "+(location.search||""); return /thank[-_ ]?you/i.test(p)||/ty=1/i.test(p)||/mad_ty=1/i.test(p); }catch(e){return false;} },
-    hasRedirectValidation(){ try{ const ok=sessionStorage.getItem(window.MAD_KEYS.ORDER_OK)==="1"; const urlOk=new URLSearchParams(location.search||"").get("mad_ty")==="1"||new URLSearchParams(location.search||"").get("ty")==="1"; return ok||urlOk; }catch(e){return false;} },
-    setupZapierRedirectValidationListener(){ try{ if(this._z)return; this._z=true; window.addEventListener("message",(e)=>{ try{ if(!e||!e.data)return; const s=JSON.stringify(e.data).toLowerCase(); if(s.includes("zapier")&&(s.includes("submit")||s.includes("success")||s.includes("completed"))){ window.MAD_MARK_ORDER_SUBMITTED({source:"zapier_message",raw:e.data}); } }catch(err){} },false); }catch(e){} },
-    isReloadNavigation(){ try{ const nav=performance.getEntriesByType&&performance.getEntriesByType("navigation"); if(nav&&nav[0]&&nav[0].type)return nav[0].type==="reload"; }catch(e){} return false; },
-    getPurchaseValue(){ return 500; },
-    fireThankYouPurchaseIfAllowed(){ try{ const rules=(this.trackingSpec&&this.trackingSpec.thank_you_page&&this.trackingSpec.thank_you_page.rules)?this.trackingSpec.thank_you_page.rules:{}; const preventManual=rules.prevent_manual_access!==false; const oncePerSession=rules.fire_event_only_once_per_session!==false; const noRefresh=rules.do_not_trigger_on_refresh!==false; if(noRefresh&&this.isReloadNavigation()){ if(sessionStorage.getItem(window.MAD_KEYS.PURCHASE_LOCK)==="1")return; } if(oncePerSession&&sessionStorage.getItem(window.MAD_KEYS.PURCHASE_LOCK)==="1")return; if(preventManual&&!this.hasRedirectValidation()){ try{console.warn("MAD: TY blocked");}catch(e){} return; } try{sessionStorage.setItem(window.MAD_KEYS.PURCHASE_LOCK,"1");}catch(e){} const val=this.getPurchaseValue(); const cur="ILS"; try{if(typeof fbq!=="undefined"){fbq("track","Purchase",{value:val,currency:cur});}}catch(e){} try{if(typeof ttq!=="undefined"){ttq.track("CompletePayment",{value:val,currency:cur});}}catch(e){} }catch(e){} },
-    
-    // Tracking Wrapper
-    trackContact(s){ this.track("Contact", {source:s||"unknown"}); },
-    track(ev, pl){
-        try{
-            const isTY = this.isThankYou===true;
-            if(!isTY){
-               const allowed = ["PageView","Contact","ViewContent"];
-               if(!allowed.includes(ev)) return;
-            } else {
-               if(ev==="Purchase" || ev==="CompletePayment") return;
-            }
-        }catch(e){}
-        try{ if(typeof fbq!=='undefined') fbq('track', ev, pl); }catch(e){}
-        try{ if(typeof ttq!=='undefined') ttq.track(ev, pl); }catch(e){}
+  <title>MAD PARFUMEUR | Landing</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+
+  <!-- ✅ META PIXEL + TIKTOK PIXEL (PageView) -->
+  <script>
+    const PIXEL_FB = "1072283127290819";
+    const PIXEL_TT = "D2D02JBC77U4ENLN9SBG";
+
+    !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+    n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)n=f.fbq;
+    n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
+    t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}
+    (window, document,'script','https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init', PIXEL_FB);
+    fbq('track', 'PageView');
+
+    !function (w, d, t) {
+      w.TiktokAnalyticsObject=t; var ttq=w[t]=w[t]||[];
+      ttq.methods=["page","track","identify","instances","debug","on","off","once","ready","alias","group","enableCookie","disableCookie","holdConsent","revokeConsent","grantConsent"];
+      ttq.setAndDefer=function(t,e){t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}; 
+      for(var i=0;i<ttq.methods.length;i++)ttq.setAndDefer(ttq,ttq.methods[i]);
+      ttq.load=function(e,n){ var r="https://analytics.tiktok.com/i18n/pixel/events.js";
+        ttq._i=ttq._i||{}; ttq._i[e]=[]; ttq._i[e]._u=r;
+        ttq._t=ttq._t||{}; ttq._t[e]=+new Date; ttq._o=ttq._o||{}; ttq._o[e]=n||{};
+        n=document.createElement("script"); n.type="text/javascript"; n.async=!0; n.src=r+"?sdkid="+e+"&lib="+t;
+        e=document.getElementsByTagName("script")[0]; e.parentNode.insertBefore(n,e)
+      };
+      ttq.load(PIXEL_TT);
+      ttq.page();
+    }(window, document, 'ttq');
+  </script>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,900;1,400;1,900&family=Inter:wght@300;400;700;900&family=Amiri:wght@400;700&family=Assistant:wght@300;400;700;800&display=swap');
+
+    :root{
+      --gold:#d4af37;
+      --primary:#d97706;
+      --bg:#ab5c12;
     }
-}}
-</script>
+    body{ background:var(--bg); color:#fff; font-family:'Inter','Assistant',system-ui; }
+
+    .glass-nav{
+      position:fixed; top:0; left:0; width:100%; z-index:50;
+      padding:15px 20px; display:flex; justify-content:space-between; align-items:center;
+      background:rgba(0,0,0,.6); backdrop-filter:blur(12px);
+      border-bottom:1px solid rgba(255,255,255,.1);
+    }
+    .nav-logo{ height:35px; object-fit:contain; }
+    .lang-btn-nav{ font-size:11px; font-weight:900; color:rgba(255,255,255,.6); margin:0 5px; transition:.2s; }
+    .lang-btn-nav.active{ color:var(--primary); }
+
+    .hero-vid{
+      position:absolute; top:0; left:0; width:100%; height:100vh; z-index:-1;
+      object-fit:cover; filter:brightness(.55);
+    }
+
+    .badge{
+      background:linear-gradient(to right,#d97706,#fbbf24);
+      color:#000; padding:6px 22px; border-radius:999px; font-weight:900; display:inline-block;
+      box-shadow:0 15px 50px rgba(0,0,0,.35);
+    }
+
+    .carousel{ position:relative; height:400px; display:flex; align-items:center; justify-content:center; }
+    .c-img{ max-height:100%; max-width:100%; filter:drop-shadow(0 20px 40px rgba(0,0,0,.8)); }
+    .c-btn{
+      position:absolute; top:50%; transform:translateY(-50%);
+      background:rgba(0,0,0,.55); color:#fff; border:1px solid rgba(255,255,255,.15);
+      width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+      cursor:pointer; user-select:none;
+    }
+
+    .comp-row{
+      display:grid; grid-template-columns:1fr 1fr; gap:2px;
+      background:rgba(255,255,255,.06);
+      border-radius:16px; overflow:hidden; margin-bottom:10px;
+      border:1px solid rgba(255,255,255,.08);
+    }
+    .c-side{ padding:14px; font-size:13px; display:flex; flex-direction:column; justify-content:center; }
+    .c-mad{ background:linear-gradient(to right,rgba(217,119,6,.14),rgba(217,119,6,.06)); }
+    .c-alt{ background:rgba(0,0,0,.35); opacity:.85; }
+
+    .order-grid{ display:grid; gap:10px; margin-top:12px; max-width:520px; margin-left:auto; margin-right:auto; }
+    .btn-order{
+      display:flex; align-items:center; justify-content:center; gap:10px;
+      padding:12px; border-radius:14px; font-weight:900; text-decoration:none; transition:.2s;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(0,0,0,.25);
+      backdrop-filter: blur(10px);
+    }
+    .btn-order:active{ transform:scale(.98); }
+
+    .btn-wa{ background:linear-gradient(180deg, rgba(37,211,102,.25), rgba(37,211,102,.12)); border-color:rgba(37,211,102,.25); }
+    .btn-call{ background:linear-gradient(180deg, rgba(59,130,246,.25), rgba(59,130,246,.12)); border-color:rgba(59,130,246,.25); }
+
+    .form-card{
+      max-width:520px; margin:0 auto;
+      background:linear-gradient(180deg, rgba(15,23,42,.78), rgba(2,6,23,.78));
+      border:1px solid rgba(255,255,255,.10);
+      border-radius:22px;
+      padding:16px;
+      box-shadow:0 20px 80px rgba(0,0,0,.45);
+    }
+    .inp{
+      width:100%;
+      padding:12px 12px;
+      border-radius:14px;
+      background:rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.12);
+      outline:none;
+      color:#fff;
+    }
+    .inp:focus{ border-color: rgba(217,119,6,.7); box-shadow:0 0 0 3px rgba(217,119,6,.18); }
+    .submit-btn{
+      width:100%;
+      padding:14px 14px;
+      border-radius:16px;
+      font-weight:900;
+      color:#000;
+      background:linear-gradient(to right,#d97706,#fbbf24);
+      border:none;
+      box-shadow:0 14px 50px rgba(0,0,0,.35);
+    }
+    .submit-btn:disabled{ opacity:.6; cursor:not-allowed; }
+
+    .tiny{
+      font-size:12px; color:rgba(255,255,255,.70);
+    }
+  </style>
+
+  <script>
+    function app(){
+      return {
+        // ✅ غيره إذا بدك
+        SCRIPT_URL: "https://script.google.com/macros/s/AKfycbzEEzQCP1xVJ9U1E15hh43sok6uRIir866l9daol-rUqXrp6dwnXusc3h9_B6miqqtE/exec",
+        THANK_YOU_PATH: "/thank-you.html",
+        CURRENCY: "ILS",
+        VALUE_DEFAULT: null, // لو null بنحاول نستخرج من السعر
+        WA_NUMBER: "972509787730",
+        CALL_NUMBER: "*9935",
+
+        c: {
+          logo: "https://madperfume.ps/upload/01-2026/page/69735b87d92ef.png",
+          vid: "https://madperfume.ps/upload/01-2026/page/69738a53a1998.mp4#t=0.02",
+          heroes: ["https://madperfume.ps/upload/01-2026/page/An_C_CgzIpu9EXMo9pdzVdfq8wAzSksIwyf5ZyhFqeQj3CAfge509Q5oLQ1hD9MRECqJ-2z6sHF1_N5VP4Q_BHNpvfiHOPGPepws5uPfzY66GEaOF-OKOFsv5jVXZcBS4BiVnHYlSFbJQFmiYNKQr2n1BixCpqbI15Luxz1Ch44pTkgdIlBwUQsCG7Gw9yDduKKZA0yKNfFmzXUDNuJKV.jpeg"],
+          blocks: [
+            {
+              type:"text",
+              text:{
+                ar:"Exotic Oud — تجربة عود فاخرة وثقيلة بثبات قوي.\n\n✅ مناسب لليل والمناسبات\n✅ رائحة عود منتقاة بعناية\n✅ فخامة من أول رشة",
+                he:"Exotic Oud — חוויית אוד יוקרתית ועשירה עם עמידות חזקה.\n\n✅ מתאים לערב ולאירועים\n✅ אוד מובחר בקפידה\n✅ יוקרה מהשפריץ הראשון"
+              }
+            }
+          ],
+          showManifesto: true,
+          compItems: {
+            ar: [
+              {mad:"مكوّنات مفحوصة ومعتمدة", local:"مصدر غير معروف"},
+              {mad:"ثبات قوي + ساعات طويلة", local:"يختفي بسرعة"},
+              {mad:"خدمة زبائن *9935", local:"بدون دعم"}
+            ],
+            he: [
+              {mad:"רכיבים נבדקו ואושרו", local:"מקור לא ידוע"},
+              {mad:"עמידות חזקה לשעות", local:"נעלם מהר"},
+              {mad:"שירות לקוחות *9935", local:"ללא תמיכה"}
+            ]
+          }
+        },
+
+        db:{
+          ar:{
+            offer:"🔥 عرض اليوم",
+            price:"240 ₪ شامل التوصيل",
+            cta:"اطلب الآن",
+            formTitle:"نموذج الطلب السريع",
+            name:"الاسم الكامل",
+            phone:"رقم الهاتف",
+            city:"المدينة (اختياري)",
+            notes:"ملاحظات (اختياري)",
+            submit:"إرسال الطلب ✅",
+            sending:"جاري الإرسال...",
+            ok:"تم إرسال الطلب بنجاح ✅",
+            fail:"حصل خطأ، جرّب مرة ثانية.",
+            wa:"اطلب عبر واتساب",
+            call:"اتصل للطلب",
+            manifestoT:"THE MANIFESTO",
+            manifestoS:"لماذا MAD؟ مقارنة سريعة"
+          },
+          he:{
+            offer:"🔥 מבצע היום",
+            price:"240₪ כולל משלוח",
+            cta:"הזמן עכשיו",
+            formTitle:"טופס הזמנה מהיר",
+            name:"שם מלא",
+            phone:"טלפון",
+            city:"עיר (אופציונלי)",
+            notes:"הערות (אופציונלי)",
+            submit:"שלח הזמנה ✅",
+            sending:"שולח...",
+            ok:"ההזמנה נשלחה בהצלחה ✅",
+            fail:"שגיאה, נסו שוב.",
+            wa:"הזמן בוואטסאפ",
+            call:"חייג להזמנה",
+            manifestoT:"THE MANIFESTO",
+            manifestoS:"למה MAD? השוואה קצרה"
+          }
+        },
+
+        lang:"ar",
+        idx:0,
+
+        // form state
+        f:{ name:"", phone:"", city:"", notes:"" },
+        ui:{ loading:false, msg:"", ok:false },
+
+        // ✅ dir: AR + HE = RTL
+        get dir(){ return (this.lang==="ar" || this.lang==="he") ? "rtl" : "ltr"; },
+        get t(){ return this.db[this.lang]; },
+
+        // Offer name from file: Exotic Oud.html => Exotic Oud
+        get offerName(){
+          try{
+            const p = (location.pathname.split("/").pop() || "").replace(".html","");
+            const clean = decodeURIComponent(p || "");
+            return clean || "MAD Offer";
+          }catch(e){ return "MAD Offer"; }
+        },
+        get contentId(){
+          return (this.offerName || "MAD_OFFER").toUpperCase().replace(/\s+/g,"_").replace(/[^\w]/g,"_");
+        },
+        get valueNum(){
+          if(this.VALUE_DEFAULT && Number(this.VALUE_DEFAULT)>0) return Number(this.VALUE_DEFAULT);
+          // حاول استخراج رقم من price
+          const s = (this.t.price || "");
+          const m = s.match(/(\d{2,4})/);
+          return m ? Number(m[1]) : 500;
+        },
+        get backUrl(){
+          return location.pathname + location.search + location.hash;
+        },
+
+        init(){
+          // auto-lang from browser if not forced
+          const qs = new URLSearchParams(location.search||"");
+          const ql = (qs.get("lang")||"").toLowerCase();
+          if(ql==="ar" || ql==="he") this.lang = ql;
+          else {
+            const ul = (navigator.language||"").toLowerCase();
+            this.lang = ul.startsWith("he") ? "he" : "ar";
+          }
+
+          if(window.lucide) lucide.createIcons();
+          if(this.c.heroes.length>1) setInterval(()=>this.next(), 3000);
+
+          // 🔥 Track view content when user reaches #shop
+          this.observeShop();
+        },
+
+        tog(l){ this.lang=l; },
+
+        next(){ this.idx = (this.idx===this.c.heroes.length-1)?0:this.idx+1; },
+        prev(){ this.idx = (this.idx===0)?this.c.heroes.length-1:this.idx-1; },
+
+        // ========== PIXEL HELPERS ==========
+        fireFB(ev, pl, eid){
+          try{
+            if(typeof fbq==="undefined") return;
+            if(eid) fbq("track", ev, pl||{}, {eventID:eid});
+            else fbq("track", ev, pl||{});
+          }catch(e){}
+        },
+        fireTT(ev, pl){
+          try{
+            if(typeof ttq==="undefined") return;
+            ttq.track(ev, pl||{});
+          }catch(e){}
+        },
+        // ✅ "لكل شي" نستعمل Lead + نضيف source + offer
+        trackLead(source, extra){
+          const payload = Object.assign({
+            source: source || "unknown",
+            content_name: this.offerName,
+            content_id: this.contentId,
+            value: this.valueNum,
+            currency: this.CURRENCY
+          }, extra||{});
+
+          // event id لمنع تكرار وتوافق
+          const eid = "MAD-" + Date.now() + "-" + Math.random().toString(16).slice(2);
+
+          this.fireFB("Lead", payload, eid);
+          this.fireTT("Lead", Object.assign({event_id:eid}, payload));
+        },
+        trackViewContent(){
+          const payload = {
+            content_name: this.offerName,
+            content_id: this.contentId,
+            value: this.valueNum,
+            currency: this.CURRENCY
+          };
+          this.fireFB("ViewContent", payload);
+          this.fireTT("ViewContent", payload);
+        },
+
+        observeShop(){
+          try{
+            const el = document.getElementById("shop");
+            if(!el) return;
+            const io = new IntersectionObserver((entries)=>{
+              entries.forEach(en=>{
+                if(en.isIntersecting){
+                  this.trackViewContent();
+                  io.disconnect();
+                }
+              });
+            }, {threshold:0.35});
+            io.observe(el);
+          }catch(e){}
+        },
+
+        // ========== FORM SUBMIT ==========
+        async submitOrder(){
+          if(this.ui.loading) return;
+
+          // basic validation
+          const name = (this.f.name||"").trim();
+          const phone = (this.f.phone||"").trim();
+          if(!name || !phone){
+            this.ui.msg = (this.lang==="he") ? "נא למלא שם וטלפון." : "لازم تكتب الاسم ورقم الهاتف.";
+            this.ui.ok = false;
+            return;
+          }
+
+          // prevent double submits per session
+          const LOCK = "MAD_ORDER_SENT_LOCK_V1";
+          try{
+            if(sessionStorage.getItem(LOCK)==="1") return;
+            sessionStorage.setItem(LOCK,"1");
+          }catch(e){}
+
+          this.ui.loading = true;
+          this.ui.msg = "";
+          this.ui.ok = false;
+
+          // order id
+          const orderId = "MAD-" + Date.now();
+
+          // ✅ لا نطلق Lead إلا بعد نجاح الإرسال
+          const fd = new FormData();
+          fd.append("order_id", orderId);
+          fd.append("ts", new Date().toISOString());
+          fd.append("lang", this.lang);
+          fd.append("offer", this.offerName);
+          fd.append("content_id", this.contentId);
+          fd.append("value", String(this.valueNum));
+          fd.append("currency", this.CURRENCY);
+          fd.append("name", name);
+          fd.append("phone", phone);
+          fd.append("city", (this.f.city||"").trim());
+          fd.append("notes", (this.f.notes||"").trim());
+          fd.append("page_url", location.href);
+
+          // timeout
+          const ctl = new AbortController();
+          const tmr = setTimeout(()=>ctl.abort(), 9000);
+
+          try{
+            const res = await fetch(this.SCRIPT_URL, {
+              method: "POST",
+              body: fd,
+              signal: ctl.signal,
+              // لو كان عندك CORS مضبوط رح يشتغل، لو لأ غالبًا opaque
+              mode: "cors"
+            }).catch(async()=>{
+              // fallback: no-cors (opaque) — يعتبر أنه خرج الطلب
+              return fetch(this.SCRIPT_URL, { method:"POST", body: fd, mode:"no-cors" });
+            });
+
+            clearTimeout(tmr);
+
+            // إذا رجع رد واضح وفشل
+            if(res && res.type !== "opaque" && res.ok === false){
+              throw new Error("server_not_ok");
+            }
+
+            // ✅ تأكيد: نخزن ORDER_OK للـ thank-you
+            try{
+              sessionStorage.setItem("MAD_ORDER_OK_V1","1");
+            }catch(e){}
+
+            // ✅ الآن نطلق Lead (تم الطلب فعليًا)
+            this.trackLead("form_submit", { order_id: orderId });
+
+            this.ui.ok = true;
+            this.ui.msg = this.t.ok;
+
+            // redirect to thank you مع كل البيانات + back + mad_ty=1
+            const ty = new URL(this.THANK_YOU_PATH, location.origin);
+            ty.searchParams.set("lang", this.lang);
+            ty.searchParams.set("value", String(this.valueNum));
+            ty.searchParams.set("currency", this.CURRENCY);
+            ty.searchParams.set("item", this.offerName);
+            ty.searchParams.set("content_id", this.contentId);
+            ty.searchParams.set("back", this.backUrl);
+            ty.searchParams.set("mad_ty", "1");
+
+            setTimeout(()=>{ location.href = ty.toString(); }, 450);
+
+          }catch(err){
+            clearTimeout(tmr);
+            try{ sessionStorage.removeItem(LOCK); }catch(e){}
+            this.ui.ok = false;
+            this.ui.msg = this.t.fail;
+            this.ui.loading = false;
+          }
+        },
+
+        // buttons tracking
+        clickWA(){
+          this.trackLead("whatsapp_click");
+          const msg = (this.lang==="he")
+            ? `שלום, אני רוצה להזמין: ${this.offerName}`
+            : `مرحباً، أريد طلب: ${this.offerName}`;
+          window.open(`https://wa.me/${this.WA_NUMBER}?text=${encodeURIComponent(msg)}`, "_blank");
+        },
+        clickCall(){
+          this.trackLead("call_click");
+          location.href = `tel:${this.CALL_NUMBER}`;
+        },
+        clickCTA(){
+          this.trackViewContent();
+          location.href = "#shop";
+        }
+      }
+    }
+  </script>
 </head>
+
 <body>
 
-<nav class="glass-nav">
+  <nav class="glass-nav">
     <div class="flex gap-2">
-        <button @click="tog('ar')" class="lang-btn-nav" :class="lang=='ar'?'active':''">AR</button>
-        <button @click="tog('he')" class="lang-btn-nav" :class="lang=='he'?'active':''">HE</button>
+      <button @click="tog('ar')" class="lang-btn-nav" :class="lang=='ar'?'active':''">AR</button>
+      <button @click="tog('he')" class="lang-btn-nav" :class="lang=='he'?'active':''">HE</button>
     </div>
-    <img :src="c.logo" class="nav-logo" alt="Logo" referrerpolicy="no-referrer">
-    <div class="w-8"><i data-lucide="shopping-bag" style="color:white; width:20px;"></i></div>
-</nav>
 
-<section class="relative h-screen flex flex-col justify-center items-center text-center px-4">
-    <video src="https://madperfume.ps/upload/01-2026/page/69738a53a1998.mp4#t=0.02" autoplay loop muted playsinline class="hero-vid"></video>
-    <div class="badge" x-text="t.offer"></div>
-    <h1 class="text-6xl font-serif italic mb-6" x-text="t.price"></h1>
-    <a href="#shop" class="bg-amber-600 text-black px-8 py-3 rounded-full font-bold" x-text="t.ctaText"></a>
-</section>
+    <img :src="c.logo" class="nav-logo" alt="MAD" referrerpolicy="no-referrer">
 
-<section id="shop" class="py-16 px-4 text-center">
+    <div class="w-8">
+      <i data-lucide="shopping-bag" style="color:white; width:20px;"></i>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="relative h-screen flex flex-col justify-center items-center text-center px-4">
+    <video :src="c.vid" autoplay loop muted playsinline class="hero-vid"></video>
+
+    <div class="badge mb-3" x-text="t.offer"></div>
+
+    <h1 class="text-5xl md:text-6xl font-serif italic mb-4 drop-shadow" x-text="t.price"></h1>
+
+    <div class="text-sm opacity-90 mb-6 font-bold">
+      <span class="px-3 py-1 rounded-full bg-black/30 border border-white/10" x-text="offerName"></span>
+    </div>
+
+    <button @click="clickCTA()" class="bg-amber-600 text-black px-8 py-3 rounded-full font-black shadow-xl">
+      <span x-text="t.cta"></span>
+    </button>
+  </section>
+
+  <!-- SHOP -->
+  <section id="shop" class="py-16 px-4 text-center">
+    <!-- Carousel -->
     <div class="carousel mb-10">
-        <template x-for="(src,i) in c.heroes"><img :src="src" x-show="idx===i" class="c-img" x-transition.opacity referrerpolicy="no-referrer"></template>
-        <template x-if="c.heroes.length>1"><div><button class="c-btn" style="left:0" @click="prev"><</button><button class="c-btn" style="right:0" @click="next">></button></div></template>
+      <template x-for="(src,i) in c.heroes" :key="i">
+        <img :src="src" x-show="idx===i" class="c-img" x-transition.opacity referrerpolicy="no-referrer">
+      </template>
+
+      <template x-if="c.heroes.length>1">
+        <div>
+          <button class="c-btn" style="left:10px" @click="prev()">‹</button>
+          <button class="c-btn" style="right:10px" @click="next()">›</button>
+        </div>
+      </template>
     </div>
 
-    <div class="space-y-8 max-w-2xl mx-auto mb-10">
-        <template x-for="block in c.blocks">
-            <div>
-                <template x-if="block.type=='text'"><div class="text-gray-300 whitespace-pre-wrap" x-text="block.text[lang]"></div></template>
-                <template x-if="block.type=='image'">
-                    <div>
-                        <img :src="block.val" class="w-full rounded-xl" referrerpolicy="no-referrer">
-                        <p class="text-gray-400 text-sm mt-2 font-bold" x-show="block.text && block.text[lang]" x-text="block.text[lang]"></p>
-                    </div>
-                </template>
-                <template x-if="block.type=='video'"><video :src="block.val" controls class="w-full rounded-xl"></video></template>
-                <template x-if="block.type=='embed'"><div x-html="block.val"></div></template>
-            </div>
-        </template>
+    <!-- Content blocks -->
+    <div class="space-y-8 max-w-2xl mx-auto mb-10 text-right">
+      <template x-for="(block,bi) in c.blocks" :key="bi">
+        <div class="text-gray-100/90 whitespace-pre-wrap leading-7 text-[15px]" x-text="block.text[lang]"></div>
+      </template>
     </div>
 
+    <!-- Manifesto -->
     <template x-if="c.showManifesto">
-    <div class="max-w-2xl mx-auto mb-16 text-right">
-        <h2 class="text-3xl font-serif italic mb-2 text-white text-center" x-text="t.maniT"></h2>
-        <p class="text-gray-400 text-center mb-6 text-sm" x-text="t.maniS"></p>
-        <template x-for="item in t.compItems">
-            <div class="comp-row"><div class="c-side c-mad"><div class="flex items-center justify-end gap-2 mb-1"><span class="text-[10px] font-bold text-amber-500 uppercase" x-text="t.maniM"></span><i data-lucide="check-circle" class="w-3 h-3 text-amber-500"></i></div><p class="text-white font-bold" x-text="item.mad"></p></div><div class="c-side c-alt"><div class="flex items-center justify-end gap-2 mb-1"><span class="text-[10px] font-bold text-red-400 uppercase" x-text="t.maniO"></span><i data-lucide="x-circle" class="w-3 h-3 text-red-500"></i></div><p class="text-gray-400" x-text="item.local"></p></div></div>
+      <div class="max-w-2xl mx-auto mb-12 text-right">
+        <h2 class="text-3xl font-serif italic mb-2 text-white text-center" x-text="t.manifestoT"></h2>
+        <p class="text-white/70 text-center mb-6 text-sm" x-text="t.manifestoS"></p>
+
+        <template x-for="(item,ii) in c.compItems[lang]" :key="ii">
+          <div class="comp-row">
+            <div class="c-side c-mad">
+              <div class="flex items-center justify-between mb-1">
+                <span class="text-[11px] font-black text-amber-300">MAD</span>
+                <i data-lucide="check-circle" class="w-4 h-4 text-amber-300"></i>
+              </div>
+              <p class="text-white font-black" x-text="item.mad"></p>
+            </div>
+            <div class="c-side c-alt">
+              <div class="flex items-center justify-between mb-1">
+                <span class="text-[11px] font-black text-rose-300">OTHERS</span>
+                <i data-lucide="x-circle" class="w-4 h-4 text-rose-300"></i>
+              </div>
+              <p class="text-white/80" x-text="item.local"></p>
+            </div>
+          </div>
         </template>
-    </div>
+      </div>
     </template>
 
-    <div class="order-grid">
-        <template x-if="c.showWa"><a :href="'https://wa.me/'+c.waNum+'?text='+encodeURIComponent(t.waText)" target="_blank" class="btn-order btn-wa" @click="trackContact('whatsapp')"><i data-lucide="message-circle"></i> <span x-text="t.waLabel"></span></a></template>
-        <template x-if="c.showCall"><a :href="'tel:'+c.callNum" class="btn-order btn-call" @click="trackContact('phone')"><i data-lucide="phone"></i> <span x-text="t.callLabel"></span></a></template>
-        <template x-if="c.showWeb"><a :href="c.webUrl" target="_blank" class="btn-order btn-web" @click="track('ViewContent')"><i data-lucide="globe"></i> <span x-text="t.webLabel"></span></a></template>
+    <!-- ✅ FORM (GOOGLE SHEET) -->
+    <div class="form-card text-right">
+      <div class="flex items-center justify-between mb-3">
+        <h3 class="font-black text-lg" x-text="t.formTitle"></h3>
+        <span class="text-[11px] px-3 py-1 rounded-full bg-black/30 border border-white/10" x-text="offerName"></span>
+      </div>
+
+      <form @submit.prevent="submitOrder()" class="grid gap-3">
+        <input class="inp" type="text" x-model="f.name" :placeholder="t.name" required>
+        <input class="inp" type="tel" x-model="f.phone" :placeholder="t.phone" required>
+        <input class="inp" type="text" x-model="f.city" :placeholder="t.city">
+        <textarea class="inp" rows="3" x-model="f.notes" :placeholder="t.notes"></textarea>
+
+        <button class="submit-btn" type="submit" :disabled="ui.loading">
+          <span x-show="!ui.loading" x-text="t.submit"></span>
+          <span x-show="ui.loading" x-text="t.sending"></span>
+        </button>
+
+        <div class="tiny text-center" :class="ui.ok ? 'text-green-200' : 'text-rose-200'" x-show="ui.msg" x-text="ui.msg"></div>
+        <div class="tiny text-center text-white/70">
+          <span x-text="(lang==='he') ? 'תשלום במעמד המסירה • משלוח מהיר' : 'الدفع عند الاستلام • توصيل سريع'"></span>
+        </div>
+      </form>
     </div>
 
-    <template x-if="c.showZapier"><div style="min-height:800px"><zapier-interfaces-page-embed :key="lang" :page-id="t.zapierId" :test-id="t.zapierId" no-background='true' style='width:100%;height:800px;'></zapier-interfaces-page-embed></div></template>
-    <template x-if="c.showFloatingBtn"><div class="sticky-cta"><a href="#shop" class="sticky-btn" x-text="t.ctaText"></a></div></template>
-</section>
+    <!-- Quick actions -->
+    <div class="order-grid mt-4">
+      <button class="btn-order btn-wa" type="button" @click="clickWA()">
+        <i data-lucide="message-circle"></i>
+        <span x-text="t.wa"></span>
+      </button>
 
-<footer class="py-6 text-center text-xs text-gray-600">© 2026 MAD PARFUMEUR</footer>
-</body></html>
+      <button class="btn-order btn-call" type="button" @click="clickCall()">
+        <i data-lucide="phone"></i>
+        <span x-text="t.call"></span>
+      </button>
+    </div>
+  </section>
+
+  <footer class="py-6 text-center text-xs text-white/60">© 2026 MAD PARFUMEUR</footer>
+
+</body>
+</html>
