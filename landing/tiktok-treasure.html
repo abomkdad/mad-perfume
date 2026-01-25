@@ -50,6 +50,15 @@
       };
       ttq.load("D2D02JBC77U4ENLN9SBG");
       ttq.page();
+
+      // ViewContent (مع content_id لتفادي التحذير)
+      ttq.track('ViewContent',{
+        content_id:'TREASURE100',
+        content_type:'product',
+        content_name:'Treasure 100ml',
+        value:400,
+        currency:'ILS'
+      });
     }(window, document, 'ttq');
   </script>
 
@@ -227,7 +236,7 @@
           <input type="hidden" name="price" value="400">
 
           <button type="submit" id="submitBtn" class="w-full bg-[#d4af37] text-black font-bold py-4 rounded-xl hover:bg-[#c4a030] transition-all flex items-center justify-center gap-2 mt-6 shadow-lg shadow-[#d4af37]/20 active:scale-[0.98]">
-            <span>SUBMIT</span>
+            <span id="submitTxt">SUBMIT</span>
             <i data-lucide="arrow-left" class="w-4 h-4"></i>
           </button>
 
@@ -259,11 +268,22 @@
 
   <script>
   (function(){
-    // 1) PUT YOUR APPS SCRIPT URL HERE:
-    const GOOGLE_SCRIPT_URL = "PUT_YOUR_APPS_SCRIPT_WEBAPP_URL_HERE";
+    // ✅ ضع رابط Google Apps Script Web App هنا (URL الذي ينتهي بـ /exec)
+    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxYxxwsl9UNl8fkx9OpeCVwGVgfhD-6BE25xPikWXwsyORKhnSLkmtctb3g6QhjehBs/exec";
 
-    // Auto language
-    let currentLang = (navigator.language && navigator.language.includes("ar")) ? "ar" : "he";
+    const PRODUCT = {
+      id: "TREASURE100",
+      name: "Treasure 100ml",
+      value: 400,
+      currency: "ILS"
+    };
+
+    // 🔥 اللغة الافتراضية = عبري (حتى لو المتصفح عربي)
+    // تقدر تفرض اللغة عبر: ?lang=he أو ?lang=ar
+    const qs = new URLSearchParams(location.search);
+    const forcedLang = (qs.get("lang") || "").toLowerCase();
+    let currentLang = (forcedLang === "ar" || forcedLang === "he") ? forcedLang : "he";
+
     const el = id => document.getElementById(id);
 
     const APP_TRANSLATIONS = {
@@ -364,6 +384,9 @@
     function updateContent(){
       const t = APP_TRANSLATIONS[currentLang];
 
+      // set lang attr
+      document.documentElement.setAttribute('lang', currentLang);
+
       el('titleTxt').innerText=t.title;
       el('oldPrice').innerText=t.old;
       el('priceTxt').innerText=t.price;
@@ -379,114 +402,4 @@
       el('phAddress').innerText=t.addressPh;
 
       el('payTitle').innerText=t.payTitle;
-      el('payCash').innerText=t.payCash;
-      el('payVisa').innerText=t.payVisa;
-
-      el('procTitle').innerText=t.procTitle;
-      el('procContact').innerText=t.procContact;
-      el('procDirect').innerText=t.procDirect;
-
-      el('mfTag').innerText=t.mfTag;
-      el('mfTitle').innerText=t.mfTitle;
-      el('mfSub').innerText=t.mfSub;
-      el('mfVerdict').innerText=t.mfVerdict;
-
-      el('langLabel').innerText=t.langLabel;
-      el('successTxt').innerText=t.success;
-      el('consentTxt').innerText=t.consent;
-
-      el('lang').value = currentLang;
-
-      renderComparison(t.compItems);
-
-      document.documentElement.setAttribute('dir','rtl');
-      if(window.lucide) lucide.createIcons();
-    }
-
-    // toggle language
-    el('langToggle').addEventListener('click',()=>{
-      currentLang = (currentLang === 'he') ? 'ar' : 'he';
-      updateContent();
-    });
-
-    // popup close
-    const popup = el('successPopup');
-    el('closePopupBtn').addEventListener('click',()=>{
-      popup.style.display='none';
-      popup.classList.add('hidden');
-      popup.classList.remove('flex');
-    });
-
-    // submit
-    const form = el('orderForm');
-    form.addEventListener('submit', async (e)=>{
-      e.preventDefault();
-
-      const btn = el('submitBtn');
-      const original = btn.innerHTML;
-      btn.innerHTML = `<span class="animate-pulse">Loading...</span>`;
-      btn.disabled=true;
-      btn.classList.add('opacity-75');
-
-      try{
-        let phoneVal = el('phone').value.trim().replace(/\s+/g,'').replace(/-/g,'');
-        if(phoneVal.startsWith('05')) phoneVal = '972' + phoneVal.substring(1);
-        if(phoneVal.startsWith('+')) phoneVal = phoneVal.substring(1);
-        if(phoneVal.startsWith('9720')) phoneVal = '972' + phoneVal.substring(4);
-        el('phone').value = phoneVal;
-
-        const phoneRegex = /^(970|972)\d{8,10}$/;
-        if(!phoneRegex.test(phoneVal)){
-          alert(currentLang==="ar" ? "رقم غير صحيح. مثال: 0521234567" : "מספר לא תקין. לדוגמה: 0521234567");
-          return;
-        }
-
-        const fd = new FormData(form);
-        const res = await fetch(https://script.google.com/macros/s/AKfycbz61pPpk9CBtDLOop6bKASYMQ97nAJxZA0hxjWD4aBmllV0PzTIXCZhYN6fGp4hvx-b/exec, { method:"POST", body:fd });
-        const txt = await res.text(); // "SUCCESS|ORDERID|STATUS"
-
-        // popup
-        const parts = (txt || "").split("|");
-        const orderId = parts[1] ? parts[1] : "";
-        el('orderIdBox').innerHTML = orderId ? (`<span class="text-slate-400">Order ID:</span> <b class="text-white">${orderId}</b>`) : "";
-        popup.classList.remove('hidden'); popup.classList.add('flex'); popup.style.display='flex';
-        form.reset();
-        el('lang').value = currentLang;
-
-        // Track as LEAD (حسب طلبك)
-        if(typeof fbq !== "undefined"){
-          fbq('track','Lead',{
-            content_name:'Treasure 100ml',
-            content_ids:['TREASURE100'],
-            content_type:'product',
-            value:400,
-            currency:'ILS'
-          });
-        }
-        if(typeof ttq !== "undefined"){
-          ttq.track('Lead',{
-            content_id:'TREASURE100',
-            content_name:'Treasure 100ml',
-            value:400,
-            currency:'ILS'
-          });
-        }
-
-      }catch(err){
-        alert(currentLang==="ar" ? "خطأ بالإرسال" : "שגיאה בשליחה");
-      }finally{
-        btn.innerHTML = original;
-        btn.disabled=false;
-        btn.classList.remove('opacity-75');
-        if(window.lucide) lucide.createIcons();
-      }
-    });
-
-    // init
-    if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', updateContent);
-    else updateContent();
-
-  })();
-  </script>
-</body>
-</html>
+      el
