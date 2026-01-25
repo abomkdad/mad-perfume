@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Treasure 100ml | MAD Parfumeur</title>
 
-<!-- ================= META PIXEL ================= -->
+<!-- META PIXEL -->
 <script>
 !function(f,b,e,v,n,t,s){
 if(f.fbq)return;n=f.fbq=function(){n.callMethod?
@@ -25,13 +25,12 @@ value:400,
 currency:'ILS'
 });
 </script>
-
 <noscript>
 <img height="1" width="1" style="display:none"
 src="https://www.facebook.com/tr?id=1072283127290819&ev=PageView&noscript=1"/>
 </noscript>
 
-<!-- ================= TIKTOK PIXEL ================= -->
+<!-- TIKTOK PIXEL -->
 <script>
 !function (w, d, t) {
 w.TiktokAnalyticsObject = t;
@@ -68,11 +67,15 @@ body{margin:0;font-family:Arial;background:#0b0b0b;color:white}
 .badge{background:#161616;padding:10px;border-radius:10px;text-align:center}
 .desc{font-size:15px;line-height:1.7;opacity:.9;margin-top:10px}
 .notes{background:#141414;padding:12px;border-radius:12px;margin-top:12px;font-size:14px}
+.sectionBox{background:#161616;padding:12px;border-radius:12px;margin-top:12px;font-size:14px}
+.sectionBox b{display:block;margin-bottom:8px}
 .compare-box{background:#121212;border-radius:14px;padding:14px;margin-top:18px}
 .compare-title{font-size:18px;color:#d4af37;margin-bottom:8px}
-.compare-row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #222;font-size:14px}
+.compare-row{display:flex;justify-content:space-between;gap:10px;padding:6px 0;border-bottom:1px solid #222;font-size:14px}
+.compare-row span:last-child{opacity:.9;text-align:left}
 input,button{width:100%;padding:14px;border-radius:10px;border:none;margin-top:10px;font-size:16px}
 button{background:#d4af37;font-weight:bold;cursor:pointer}
+.smallHint{font-size:12px;opacity:.75;margin-top:6px}
 </style>
 </head>
 
@@ -91,15 +94,41 @@ src="https://madperfume.co.il/upload/01-2026/product/An8OEZzT1Hor5KozPD5p1pefp9B
 <div class="badge" id="badgeTxt"></div>
 
 <p class="desc" id="descTxt"></p>
-
 <div class="notes" id="notesTxt"></div>
 
-<!-- ORDER FORM -->
+<!-- ORDER FORM (PAYMENT + PROCESS أهم شي) -->
 <form id="orderForm">
 
 <input id="name" name="name" required>
-<input id="phone" name="phone" required>
+<input id="phone" name="phone" inputmode="numeric" required>
+<div class="smallHint" id="phoneHint"></div>
 <input id="address" name="address" required>
+
+<!-- PAYMENT -->
+<div class="sectionBox">
+  <b id="payTitle"></b>
+  <label style="display:block;margin:8px 0;">
+    <input type="radio" name="payment" value="Cash" checked>
+    <span id="payCash"></span>
+  </label>
+  <label style="display:block;margin:8px 0;">
+    <input type="radio" name="payment" value="Visa">
+    <span id="payVisa"></span>
+  </label>
+</div>
+
+<!-- PROCESS -->
+<div class="sectionBox">
+  <b id="procTitle"></b>
+  <label style="display:block;margin:8px 0;">
+    <input type="radio" name="process" value="Contact" checked>
+    <span id="procContact"></span>
+  </label>
+  <label style="display:block;margin:8px 0;">
+    <input type="radio" name="process" value="Direct">
+    <span id="procDirect"></span>
+  </label>
+</div>
 
 <input type="hidden" name="product" value="Treasure 100ml">
 <input type="hidden" name="price" value="400">
@@ -108,7 +137,7 @@ src="https://madperfume.co.il/upload/01-2026/product/An8OEZzT1Hor5KozPD5p1pefp9B
 
 </form>
 
-<!-- COMPARISON -->
+<!-- COMPARISONS (بعد الفورم) -->
 <div class="compare-box">
 
 <div style="text-align:center">
@@ -133,120 +162,184 @@ src="https://madperfume.co.il/upload/01-2026/product/An8OEZzT1Hor5KozPD5p1pefp9B
 
 <!-- SUCCESS POPUP -->
 <div id="successPopup" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:#000c;align-items:center;justify-content:center">
-<div style="background:#111;padding:20px;border-radius:16px;text-align:center">
-<h3 id="successTxt"></h3>
-<button onclick="closePopup()">OK</button>
-</div>
+  <div style="background:#111;padding:20px;border-radius:16px;text-align:center;max-width:360px;width:88%">
+    <h3 id="successTxt"></h3>
+    <button onclick="closePopup()" style="margin-top:10px;background:#25D366;color:#fff">OK</button>
+  </div>
 </div>
 
 <script>
-let lang = navigator.language.includes("ar") ? "ar" : "he";
+/* ===== AUTO LANGUAGE ===== */
+let lang = navigator.language && navigator.language.includes("ar") ? "ar" : "he";
 
-const T={
-ar:{
-title:"Treasure 100ml",
-old:"350₪ السعر السابق",
-price:"400₪ شامل التوصيل",
-badge:"إصدار محدود · Extrait De Parfum · ثبات عالي",
-desc:"Treasure من MAD Parfumeur هو عطر شرقي فاخر للنساء والرجال، غني ودافئ بطابع أنيق وجذاب.",
-notes:`<b>النوتات العليا:</b> Lavender, Bergamot, Lemon<br>
-<b>قلب العطر:</b> Honey, Cinnamon<br>
-<b>قاعدة العطر:</b> Vanilla, Tobacco, Tonka Bean`,
-name:"الاسم الكامل",
-phone:"رقم الهاتف (970 أو 972)",
-address:"العنوان الكامل",
-btn:"إرسال الطلب",
-success:"تم إرسال الطلب بنجاح!",
-mfTag:"كشف الحقائق",
-mfTitle:"THE MANIFESTO",
-mfSub:"لماذا MAD؟ مقارنة علمية مع بدائل دبي وتركيا",
-mfVerdict:"الجودة في MAD حقيقة مخبرية موثقة دولياً، بينما البدائل مجرد محاكاة.",
-compTitle:"MAD مقابل خلط الأسواق",
-c1l:"الأمان الصحي",c1r:"MAD IFRA | زيوت مجهولة",
-c2l:"الهندسة العطرية",c2r:"تعتيق مخبري | خلط يدوي",
-c3l:"مصدر الزيوت",c3r:"أوروبي فاخر | تجاري",
-c4l:"التأثير الصحي",c4r:"لا صداع | تهيج",
-c5l:"الثبات",c5r:"24+ ساعة | سريع الزوال"
-},
-he:{
-title:"Treasure 100ml",
-old:"350 ₪ מחיר קודם",
-price:"400 ₪ כולל משלוח",
-badge:"מהדורה מוגבלת · Extrait De Parfum · עמידות גבוהה",
-desc:"Treasure מבית MAD Parfumeur הוא בושם מזרחי יוקרתי לנשים ולגברים, עשיר וחם עם נוכחות אלגנטית.",
-notes:`<b>תווי פתיחה:</b> לבנדר, ברגמוט, לימון<br>
-<b>תווי לב:</b> דבש, קינמון<br>
-<b>תווי בסיס:</b> וניל, טבק, טונקה`,
-name:"שם מלא",
-phone:"טלפון (970 או 972)",
-address:"כתובת מלאה",
-btn:"שלח הזמנה",
-success:"ההזמנה נשלחה בהצלחה!",
-mfTag:"חשיפת האמת",
-mfTitle:"THE MANIFESTO",
-mfSub:"למה MAD? השוואה מדעית מול חיקויים",
-mfVerdict:"האיכות של MAD מבוססת מדעית, החלופות הן חיקוי.",
-compTitle:"MAD מול ערבובים",
-c1l:"בטיחות",c1r:"MAD IFRA | שמנים לא ידועים",
-c2l:"הנדסה ריחנית",c2r:"יישון | ערבוב",
-c3l:"מקור שמנים",c3r:"אירופאי | מסחרי",
-c4l:"השפעה בריאותית",c4r:"ללא כאבים | גורם גירוי",
-c5l:"עמידות",c5r:"24+ שעות | נעלם מהר"
-}
+const T = {
+  ar:{
+    title:"Treasure 100ml",
+    old:"350₪ السعر السابق",
+    price:"400₪ شامل التوصيل",
+    badge:"إصدار محدود · Extrait De Parfum · ثبات عالي",
+    desc:"Treasure by Mad Parfumeur هو عطر شرقي فاخر للنساء والرجال، غني ودافئ بطابع أنيق وجذاب.",
+    notes:`<b>النوتات العليا:</b> Lavender, Bergamot, Lemon<br>
+           <b>قلب العطر:</b> Honey, Cinnamon<br>
+           <b>قاعدة العطر:</b> Vanilla, Tobacco, Tonka Bean`,
+    name:"الاسم الكامل",
+    phonePH:"05XXXXXXXX أو 972XXXXXXXXX",
+    phoneHint:"اكتب رقمك عادي 05… وسنحوّله تلقائيًا إلى 972.",
+    address:"العنوان الكامل",
+    submit:"إرسال الطلب",
+    success:"تم إرسال الطلب بنجاح!",
+    payTitle:"طريقة الدفع",
+    payCash:"نقدًا عند الاستلام",
+    payVisa:"بطاقة (Visa)",
+    procTitle:"بعد الطلب",
+    procContact:"تواصلوا معي بعد الطلب للتأكيد",
+    procDirect:"جهزوا الطلب للشحن بدون اتصال",
+    mfTag:"كشف الحقائق",
+    mfTitle:"THE MANIFESTO",
+    mfSub:"لماذا MAD؟ مقارنة علمية مع بدائل دبي وتركيا",
+    mfVerdict:"الجودة في MAD حقيقة مخبرية موثقة دولياً، بينما البدائل مجرد محاكاة.",
+    compTitle:"MAD مقابل خلط الأسواق",
+    c1l:"الأمان الصحي",c1r:"MAD IFRA | زيوت مجهولة",
+    c2l:"الهندسة العطرية",c2r:"تعتيق مخبري | خلط يدوي",
+    c3l:"مصدر الزيوت",c3r:"أوروبي فاخر | تجاري",
+    c4l:"التأثير الصحي",c4r:"لا صداع | تهيج",
+    c5l:"الثبات",c5r:"24+ ساعة | سريع الزوال"
+  },
+  he:{
+    title:"Treasure 100ml",
+    old:"350 ₪ מחיר קודם",
+    price:"400 ₪ כולל משלוח",
+    badge:"מהדורה מוגבלת · Extrait De Parfum · עמידות גבוהה",
+    desc:"Treasure by Mad Parfumeur הוא בושם מזרחי יוקרתי לנשים ולגברים, עשיר וחם עם נוכחות אלגנטית.",
+    notes:`<b>תווי פתיחה:</b> לבנדר, ברגמוט, לימון<br>
+           <b>תווי לב:</b> דבש, קינמון<br>
+           <b>תווי בסיס:</b> וניל, טבק, טונקה`,
+    name:"שם מלא",
+    phonePH:"05XXXXXXXX או 972XXXXXXXXX",
+    phoneHint:"הקלד 05… ואנחנו נהפוך אוטומטית ל-972.",
+    address:"כתובת מלאה",
+    submit:"שלח הזמנה",
+    success:"ההזמנה נשלחה בהצלחה!",
+    payTitle:"אמצעי תשלום",
+    payCash:"מזומן לשליח",
+    payVisa:"כרטיס אשראי (Visa)",
+    procTitle:"לאחר ההזמנה",
+    procContact:"צרו איתי קשר לאחר ההזמנה",
+    procDirect:"שלחו לשילוח ללא שיחה",
+    mfTag:"חשיפת האמת",
+    mfTitle:"THE MANIFESTO",
+    mfSub:"למה MAD? השוואה מדעית מול חיקויים",
+    mfVerdict:"האיכות של MAD מבוססת מדעית, החלופות הן חיקוי.",
+    compTitle:"MAD מול ערבובים",
+    c1l:"בטיחות",c1r:"MAD IFRA | שמנים לא ידועים",
+    c2l:"הנדסה ריחנית",c2r:"יישון | ערבוב",
+    c3l:"מקור שמנים",c3r:"אירופאי | מסחרי",
+    c4l:"השפעה בריאותית",c4r:"ללא כאבים | גורם גירוי",
+    c5l:"עמידות",c5r:"24+ שעות | נעלם מהר"
+  }
 };
 
-let t=T[lang];
+const t = T[lang];
 
-// Inject
-titleTxt.innerText=t.title;
-oldPrice.innerText=t.old;
-priceTxt.innerText=t.price;
-badgeTxt.innerText=t.badge;
-descTxt.innerText=t.desc;
-notesTxt.innerHTML=t.notes;
+/* ===== Inject UI ===== */
+document.getElementById("titleTxt").innerText = t.title;
+document.getElementById("oldPrice").innerText = t.old;
+document.getElementById("priceTxt").innerText = t.price;
+document.getElementById("badgeTxt").innerText = t.badge;
+document.getElementById("descTxt").innerText = t.desc;
+document.getElementById("notesTxt").innerHTML = t.notes;
 
-name.placeholder=t.name;
-phone.placeholder=t.phone;
-address.placeholder=t.address;
-submitBtn.innerText=t.btn;
-successTxt.innerText=t.success;
+document.getElementById("name").placeholder = t.name;
+document.getElementById("phone").placeholder = t.phonePH;
+document.getElementById("phoneHint").innerText = t.phoneHint;
+document.getElementById("address").placeholder = t.address;
+document.getElementById("submitBtn").innerText = t.submit;
 
-mfTag.innerText=t.mfTag;
-mfTitle.innerText=t.mfTitle;
-mfSub.innerText=t.mfSub;
-mfVerdict.innerText=t.mfVerdict;
+document.getElementById("payTitle").innerText = t.payTitle;
+document.getElementById("payCash").innerText = t.payCash;
+document.getElementById("payVisa").innerText = t.payVisa;
 
-compTitle.innerText=t.compTitle;
-c1l.innerText=t.c1l; c1r.innerText=t.c1r;
-c2l.innerText=t.c2l; c2r.innerText=t.c2r;
-c3l.innerText=t.c3l; c3r.innerText=t.c3r;
-c4l.innerText=t.c4l; c4r.innerText=t.c4r;
-c5l.innerText=t.c5l; c5r.innerText=t.c5r;
+document.getElementById("procTitle").innerText = t.procTitle;
+document.getElementById("procContact").innerText = t.procContact;
+document.getElementById("procDirect").innerText = t.procDirect;
 
-// FORM SUBMIT + PHONE VALIDATION
-orderForm.addEventListener("submit",function(e){
-e.preventDefault();
+document.getElementById("successTxt").innerText = t.success;
 
-let phoneVal=phone.value.trim().replace(/\s+/g,"");
-let regex=/^(970|972)[0-9]{7,9}$/;
+document.getElementById("mfTag").innerText = t.mfTag;
+document.getElementById("mfTitle").innerText = t.mfTitle;
+document.getElementById("mfSub").innerText = t.mfSub;
+document.getElementById("mfVerdict").innerText = t.mfVerdict;
 
-if(!regex.test(phoneVal)){
-alert(lang==="ar"?"رقم الهاتف غير صحيح":"מספר טלפון לא תקין");
-return;
-}
+document.getElementById("compTitle").innerText = t.compTitle;
+document.getElementById("c1l").innerText = t.c1l; document.getElementById("c1r").innerText = t.c1r;
+document.getElementById("c2l").innerText = t.c2l; document.getElementById("c2r").innerText = t.c2r;
+document.getElementById("c3l").innerText = t.c3l; document.getElementById("c3r").innerText = t.c3r;
+document.getElementById("c4l").innerText = t.c4l; document.getElementById("c4r").innerText = t.c4r;
+document.getElementById("c5l").innerText = t.c5l; document.getElementById("c5r").innerText = t.c5r;
 
-const fd=new FormData(orderForm);
+/* ===== Submit (ONE handler only) + Smart phone ===== */
+const form = document.getElementById("orderForm");
+const popup = document.getElementById("successPopup");
 
-fetch("https://script.google.com/macros/s/AKfycbyJ6SVe_boCdDdbq_uJOAxZ6v8ETR_ss7cqnqgLvW9mgBUPUogC6mjE_jSYERTM7-7x/exec",
-{method:"POST",body:fd})
-.then(()=>{
-successPopup.style.display="flex";
-fbq('track','Purchase',{value:400,currency:'ILS'});
-ttq.track('CompletePayment',{value:400,currency:'ILS',order_id:Date.now()});
+form.addEventListener("submit", function(e){
+  e.preventDefault();
+
+  let phone = document.getElementById("phone").value.trim();
+  phone = phone.replace(/\s+/g,"").replace(/-/g,"");
+
+  // تحويل 05xxxxxxx -> 9725xxxxxxx
+  if(phone.startsWith("05")){
+    phone = "972" + phone.substring(1);
+  }
+
+  // حفظ الرقم النهائي داخل الحقل (للوصول للشيت)
+  document.getElementById("phone").value = phone;
+
+  // قبول: 972XXXXXXXXX أو 970XXXXXXXXX (بدون +)
+  const phoneRegex = /^(970|972)\d{8,10}$/;
+  if(!phoneRegex.test(phone)){
+    alert(lang==="ar" ? "رقم غير صحيح. مثال: 0521234567" : "מספר לא תקין. לדוגמה: 0521234567");
+    return;
+  }
+
+  const fd = new FormData(form);
+
+  fetch("https://script.google.com/macros/s/AKfycbyJ6SVe_boCdDdbq_uJOAxZ6v8ETR_ss7cqnqgLvW9mgBUPUogC6mjE_jSYERTM7-7x/exec",{
+    method:"POST",
+    body:fd
+  })
+  .then(r => r.text())
+  .then(()=>{
+    popup.style.display="flex";
+    form.reset();
+
+    // Pixels after SUCCESS only
+    if(typeof fbq !== "undefined"){
+      fbq('track','Purchase',{
+        content_name:'Treasure 100ml',
+        content_ids:['TREASURE100'],
+        content_type:'product',
+        value:400,
+        currency:'ILS'
+      });
+    }
+
+    if(typeof ttq !== "undefined"){
+      ttq.track('CompletePayment',{
+        content_name:'Treasure 100ml',
+        content_id:'TREASURE100',
+        value:400,
+        currency:'ILS',
+        order_id: Date.now()
+      });
+    }
+  })
+  .catch(()=>{
+    alert(lang==="ar" ? "خطأ بالإرسال" : "שגיאה בשליחה");
+  });
 });
-});
 
-function closePopup(){successPopup.style.display="none";}
+function closePopup(){ popup.style.display="none"; }
 </script>
 
 </body>
