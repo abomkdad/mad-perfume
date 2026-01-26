@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MAD Builder Ultimate - The Full Control Edition 💎</title>
+    <title>MAD Builder Ultimate v5.6 - Clean Start Edition 💎</title>
     <style>
         :root { --primary: #d4af37; --bg: #0f172a; --panel: #1e293b; --text: #f1f5f9; --border: #334155; --danger: #ef4444; }
         body { margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); height: 100vh; overflow: hidden; }
@@ -23,7 +23,7 @@
             body { overflow: auto; }
         }
 
-        h1 { color: var(--primary); margin: 0 0 10px 0; font-size: 1.4rem; text-align: center; }
+        h1 { color: var(--primary); margin: 0 0 5px 0; font-size: 1.4rem; text-align: center; }
         h2 { font-size: 0.85rem; color: #94a3b8; border-bottom: 1px solid var(--border); padding-bottom: 5px; margin-top: 25px; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px; }
         
         .form-group { margin-bottom: 12px; }
@@ -35,16 +35,20 @@
         input[type="range"] { width: 100%; height: 6px; accent-color: var(--primary); cursor: pointer; }
         
         .card-control { background: rgba(0,0,0,0.2); padding: 15px; border-radius: 10px; border: 1px solid var(--border); margin-bottom: 10px; position: relative; }
-        .btn-delete { background: var(--danger); color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 0.7rem; position: absolute; top: 10px; left: 10px; }
+        .btn-delete { background: var(--danger); color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 0.7rem; position: absolute; top: 10px; left: 10px; z-index: 10; }
         .btn-action { background: var(--primary); color: #000; font-weight: 900; padding: 18px; border-radius: 10px; border: none; cursor: pointer; width: 100%; font-size: 1.1rem; margin-top: 20px; transition: 0.2s; box-shadow: 0 4px 15px rgba(212,175,55,0.2); }
         .btn-add { background: #334155; color: white; border: 1px solid var(--border); padding: 8px; border-radius: 6px; cursor: pointer; font-size: 0.8rem; flex: 1; transition: 0.2s; }
+        .btn-add:hover { background: var(--primary); color: black; }
+        
+        .toggle-group { display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px; border: 1px solid var(--border); }
+        .empty-notice { text-align: center; font-size: 0.7rem; color: #64748b; padding: 10px; border: 1px dashed var(--border); border-radius: 8px; }
     </style>
 </head>
 <body>
 
 <div class="main-layout">
     <div class="editor-pane">
-        <h1>MAD Builder Ultimate v5.1 💎</h1>
+        <h1>MAD Builder Ultimate v5.6 💎</h1>
         
         <div class="form-group">
             <label>1. القوالب الجاهزة</label>
@@ -57,7 +61,7 @@
             </select>
         </div>
 
-        <h2>🎨 2. التصميم والأبعاد</h2>
+        <h2>🎨 2. التصميم والأبعاد والتحريك</h2>
         <div class="grid-2">
             <div class="form-group"><label>لون التوهج</label><input type="color" id="clr-primary" oninput="updateDesign('primary', this.value)"></div>
             <div class="form-group"><label>لون الخلفية</label><input type="color" id="clr-bgBody" oninput="updateDesign('bgBody', this.value)"></div>
@@ -66,8 +70,12 @@
             <div class="form-group"><label>انحناء الزوايا</label><input type="range" min="0" max="50" id="rng-radius" oninput="updateDesign('borderRadius', this.value + 'px')"></div>
             <div class="form-group"><label>تباعد الأقسام</label><input type="range" min="10" max="100" id="rng-spacing" oninput="updateDesign('sectionSpacing', this.value + 'px')"></div>
         </div>
+        <div class="toggle-group">
+            <input type="checkbox" id="chk-animate" checked onchange="updateDesign('animate', this.checked)">
+            <label for="chk-animate" style="margin:0">تفعيل تأثيرات التحريك (Animations)</label>
+        </div>
 
-        <h2>🛍️ 3. التحكم في نصوص الصفحة</h2>
+        <h2>🛍️ 3. التحكم في نصوص الصفحة (عربي/عبري)</h2>
         <div class="form-group">
             <label>اللغة المفعلة للتعديل</label>
             <select id="langSelect" onchange="setMode(this.value)">
@@ -83,7 +91,7 @@
         <div class="form-group"><label>الوصف الرئيسي</label><textarea id="desc" oninput="updateData('desc', this.value)" rows="2"></textarea></div>
         <div class="form-group"><label>النوتات (HTML)</label><textarea id="notes" oninput="updateData('notes', this.value)" rows="3"></textarea></div>
         <div class="grid-2">
-            <div><label>نص الشارة (Badge)</label><input type="text" id="badge" oninput="updateData('badge', this.value)"></div>
+            <div><label>نص الشارة</label><input type="text" id="badge" oninput="updateData('badge', this.value)"></div>
             <div><label>نص الزر (CTA)</label><input type="text" id="cta" oninput="updateData('cta', this.value)"></div>
         </div>
 
@@ -105,12 +113,12 @@
         <div class="form-group" style="margin-top:5px"><input type="text" id="addressPh" placeholder="مكان العنوان" oninput="updateData('addressPh', this.value)"></div>
         
         <div class="grid-2">
-            <div><label>طريقة الدفع</label><input type="text" id="payTitle" oninput="updateData('payTitle', this.value)"></div>
-            <div><label>نص "كاش"</label><input type="text" id="payCash" oninput="updateData('payCash', this.value)"></div>
+            <div><label>عنوان الدفع</label><input type="text" id="payTitle" oninput="updateData('payTitle', this.value)"></div>
+            <div><label>نص كاش</label><input type="text" id="payCash" oninput="updateData('payCash', this.value)"></div>
         </div>
         <div class="grid-2">
-            <div><label>نص "فيزا"</label><input type="text" id="payVisa" oninput="updateData('payVisa', this.value)"></div>
-            <div><label>طريقة الشحن</label><input type="text" id="procTitle" oninput="updateData('procTitle', this.value)"></div>
+            <div><label>نص فيزا</label><input type="text" id="payVisa" oninput="updateData('payVisa', this.value)"></div>
+            <div><label>عنوان الشحن</label><input type="text" id="procTitle" oninput="updateData('procTitle', this.value)"></div>
         </div>
         <div class="grid-2">
             <input type="text" id="procContact" placeholder="نص اتصال" oninput="updateData('procContact', this.value)">
@@ -119,22 +127,25 @@
         <div class="form-group"><label>نص زر الإرسال</label><input type="text" id="submit" oninput="updateData('submit', this.value)"></div>
         <div class="form-group"><label>رسالة النجاح</label><input type="text" id="successMsg" oninput="updateData('successMsg', this.value)"></div>
 
-        <h2>🧩 6. الكتل الديناميكية</h2>
+        <h2>🧩 6. الكتل (اختيارية - أضف ما تريد)</h2>
         <div id="blocksContainer"></div>
-        <div style="display:flex; gap:5px;">
+        <div style="display:flex; gap:5px; flex-wrap: wrap;">
             <button class="btn-add" onclick="addBlock('carousel')">+ كرسول</button>
             <button class="btn-add" onclick="addBlock('image')">+ صورة</button>
             <button class="btn-add" onclick="addBlock('video')">+ فيديو</button>
+            <button class="btn-add" onclick="addBlock('html')">+ كود حر / فريم</button>
+            <button class="btn-add" onclick="addBlock('text')">+ نص حر</button>
         </div>
 
         <h2>⚙️ 7. التقنيات (Pixels)</h2>
-        <div class="form-group"><label>رابط سكربت جوجل</label><input type="text" id="googleScript" oninput="updateCommon('googleScript', this.value)"></div>
+        <div class="form-group"><label>رابط الشعار</label><input type="text" id="logo" oninput="updateCommon('logo', this.value)"></div>
+        <div class="form-group"><label>Google Script URL</label><input type="text" id="googleScript" oninput="updateCommon('googleScript', this.value)"></div>
         <div class="grid-2">
             <input type="text" id="fbPixel" placeholder="FB Pixel ID" oninput="updateCommon('fb', this.value)">
             <input type="text" id="ttPixel" placeholder="TT Pixel ID" oninput="updateCommon('tt', this.value)">
         </div>
 
-        <button class="btn-action" onclick="download()">تحميل الموقع النهائي (index.html) 📥</button>
+        <button class="btn-action" onclick="download()">تحميل ملف الصفحة (index.html) 📥</button>
     </div>
 
     <div class="preview-pane">
@@ -151,18 +162,15 @@
         bgBody: "#0b0b0b", primary: "#d4af37", textMain: "#ffffff",
         borderColor: "rgba(212, 175, 55, 0.15)", bgForm: "#161616", 
         btnBg: "#d4af37", btnText: "#000000",
-        borderRadius: "24px", sectionSpacing: "48px"
+        borderRadius: "24px", sectionSpacing: "48px", animate: true
     };
     
     const PERFUME_PRESETS = {
-        "W183": { 
-            ar: { title: "W183 — Creed Aventus", desc: "رائحة رجولية منعشة فاخرة بطابع أناناس دخاني أنيق وثبات قوي.", notes: "<b>النوتات:</b> أناناس، تفاح، مسك" },
-            he: { title: "W183 — Creed Aventus", desc: "ניחוח גברי רענן ויוקרתי עם אופי אננס מעושן ואלגנטי ועמידות חזקה.", notes: "<b>תווים:</b> אננס, תפוח, מושק" }
-        },
-        "X102": { 
-            ar: { title: "X102 — Naxos", desc: "رائحة تبغ وعسل دافئة بلمسة إيطالية راقية وحضور جذاب.", notes: "<b>النوتات:</b> عسل، قرفة، تبغ" },
-            he: { title: "X102 — Naxos", desc: "ניחוח טבק ודבש חמים עם נגיעה איטלקית יוקרתית ונוכחות מושכת.", notes: "<b>תווים:</b> דבש, קינמון, טבק" }
-        }
+        "W183": { ar: { title: "W183 — Creed Aventus", desc: "أناناس دخاني أنيق وثبات قوي.", notes: "<b>النوتات:</b> أناناس، تفاح، مسك" }, he: { title: "W183 — Creed Aventus", desc: "אננס מעושן אלגנטי ועמידות חזקה.", notes: "<b>תווים:</b> אננס, תפוח, מושק" } },
+        "X102": { ar: { title: "X102 — Naxos", desc: "تبغ وعسل دافئة بلمسة إيطالية.", notes: "<b>النوتات:</b> عسل، قرفة، تبغ" }, he: { title: "X102 — Naxos", desc: "טבק ודבש חמים בנגיעה איטלקית.", notes: "<b>תווים:</b> דבש, קינמון, טבק" } },
+        "P104": { ar: { title: "P104 — Mr. Sam", desc: "عطر قوي بتوابل دافئة وطابع شرقي.", notes: "<b>النوتات:</b> هيل، قرفة، تبغ" }, he: { title: "P104 — Mr. Sam", desc: "בושם חזק עם תבלינים חמים.", notes: "<b>תווים:</b> הל, קינמון, טבק" } },
+        "L102": { ar: { title: "L102 — Ombre Nomade", desc: "عود شرقي فاخر وعميق بثبات استثنائي.", notes: "<b>النوتات:</b> عود، توت، بخور" }, he: { title: "L102 — Ombre Nomade", desc: "אוד מזרחי יוקרתי ועמוק.", notes: "<b>תווים:</b> אוד, פטל, קטורת" } },
+        "A115": { ar: { title: "A115 — Y Intense", desc: "رائحة عصرية منعشة بقاعدة خشبية.", notes: "<b>النوتات:</b> زنجبيل، لافندر، أرز" }, he: { title: "A115 — Y Intense", desc: "ניחוח מודרני ורענן.", notes: "<b>תווים:</b> ג'ינג'ר, לבנדר, ארז" } }
     };
 
     const common = {
@@ -170,17 +178,19 @@
         googleScript: "https://script.google.com/macros/s/AKfycbyx0rxHpN9Csv2OV_9D_EIF_pqMlNEmF2rDi_s7ZFo6feB7r9Ohb2eHuxEM4gGfDuLu/exec",
         fb: "1072283127290819", tt: "D2D02JBC77U4ENLN9SBG",
         maniItems: [
-            { id: 1, icon: 'shield-check', labelAr:'الأمان وتراخيص الصحة', labelHe:'בטיחות ורישיונות בריאות', madAr:'آمنة 100%، معتمدة من IFRA ووزارة الصحة.', madHe:'בטוח ב-100%, מאושר ע"י IFRA ומשרד הבריאות.', localAr:'زيوت مجهولة تسبب حساسية.', localHe:'שמנים סינתטיים הגורמים לגירוי.' },
-            { id: 2, icon: 'flask-conical', labelAr:'الهندسة العطرية', labelHe:'הנדסת ניחוח', madAr:'تطابق جزيئي دقيق وتعتيق لأشهر لضمان التجانس.', madHe:'התאמה מולקולרית מדויקת ויישון להבטחת אחידות.', localAr:'خلط يدوي عشوائي يتفكك فوراً.', localHe:'ערבוב ידני אקראי המתפרק מייד.' },
-            { id: 3, icon: 'timer', labelAr:'الثبات والأداء', labelHe:'עמידות وביצועים', madAr:'تركيز Extrait De Parfum يدوم لأكثر من 24 ساعة.', madHe:'ריכוז Extrait De Parfum המחזיק מעמד מעל 24 שעות.', localAr:'يختفي تماماً بعد نصف ساعة.', localHe:'נעלם לחלוטין אחרי חצי שעה.' },
-            { id: 4, icon: 'store', labelAr:'الخدمة والانتشار', labelHe:'שירות ופריסה', madAr:'خدمة زبائن مع 41 فرعاً حول البلاد لضمان حقك.', madHe:'שירות לקוחות עם 41 סניפים להבטחת זכויותיך.', localAr:'متاجر مجهولة بلا عنوان للضمان.', localHe:'חנויות ללא כתובת פיזית לאחריות.' }
+            { id: 1, icon: 'shield-check', labelAr:'الأمان الصحي', labelHe:'בטיחות בריאותית', madAr:'آمنة 100% ومعتمدة من IFRA.', madHe:'בטוח ב-100% ומאושר ע"י IFRA.', localAr:'زيوت مجهولة تسبب حساسية.', localHe:'שמנים סינתטיים ממקור לא ידוע.' },
+            { id: 2, icon: 'flask-conical', labelAr:'الهندسة العطرية', labelHe:'הנדסת ניחוח', madAr:'تطابق جزيئي دقيق وتعتيق لأشهر.', madHe:'התאמה מולקולרית ויישון.', localAr:'خلط يدوي عشوائي يتفكك فوراً.', localHe:'ערבוב ידני אקראי המתפרק מייד.' },
+            { id: 3, icon: 'droplets', labelAr:'مصدر الزيوت', labelHe:'מקור השמנים', madAr:'خلاصات أوروبية "نخب أول".', madHe:'תמציות אירופאיות מובחרות.', localAr:'زيوت تجارية رخيصة.', localHe:'שמנים מסחריים זולים.' },
+            { id: 4, icon: 'activity', labelAr:'التأثير الصحي', labelHe:'השפעה בריאותית', madAr:'لا يسبب صداع أو ضيق تنفس.', madHe:'אינו גורם לכאבי ראש.', localAr:'مذيبات كيميائية ضارة.', localHe:'ממיסים כימיים מזיקים.' },
+            { id: 5, icon: 'timer', labelAr:'الثبات والأداء', labelHe:'עמידות וביצועים', madAr:'تركيز Extrait يدوم 24+ ساعة.', madHe:'ריכוז Extrait המחזיק 24+ שעות.', localAr:'يختفي تماماً بعد نصف ساعة.', localHe:'נעלם לחלוטין אחרי חצי شاعة.' },
+            { id: 6, icon: 'store', labelAr:'الخدمة والضمان', labelHe:'שירות ואחריות', madAr:'خدمة زبائن مع 41 فرعاً للضمان.', madHe:'שירות לקוחות עם 41 סניפים.', localAr:'متاجر مجهولة بلا عنوان.', localHe:'חנויות ללא כתובת פיזית.' }
         ],
-        blocks: [{ id: 101, type: 'carousel', content: ["https://madperfume.ps/upload/01-2026/page/6971495c69e7c.png", "https://madperfume.co.il/upload/01-2026/product/An8OEZzT1Hor5KozPD5p1pefp9BGkKqc_pmWfEek0RhJ6xxRFisna41ozE5dSAfka2jHZmsDk19wlovU0qVWdKookn1HhYV6h70_PbRMnL7Dat7c37QbzrZ2yo3zgGCaCZzE4g6eFIrt6sPbUatmRbci-8SihYIVkLfP9AkAHq2M_ij1fYO52o0FIEJSYgI8HoNxuU4mMkbn1sSUvH7kw.jpeg"] }]
+        blocks: [] // يبدأ فارغاً كما طلبت
     };
 
     const db = {
         ar: { title: "W183 — Creed Aventus", price: "400 ₪", old: "350 ₪", badge: "Premium Collection", desc: "رائحة رجولية منعشة فاخرة بطابع أناناس دخاني أنيق وثبات قوي.", notes: "<b>النوتات:</b> أناناس، تفاح، مسك", cta: "اطلب الآن", maniTitle: "لماذا MAD PARFUMEUR؟", maniHeaderMad: "MAD", maniHeaderOthers: "البدائل", formTitle: "نموذج الطلب السريع", namePh: "الاسم الكامل", phonePh: "رقم الهاتف", addressPh: "المدينة والعنوان", payTitle: "طريقة الدفع", payCash: "نقدًا عند الاستلام", payVisa: "بطاقة ائتمان", procTitle: "معالجة الطلب", procContact: "تواصلوا معي للتأكيد", procDirect: "شحن مباشر", submit: "إرسال الطلب الآن ✅", successMsg: "تم استلام طلبك بنجاح! ✅" },
-        he: { title: "W183 — Creed Aventus", price: "₪ 400", old: "₪ 350", badge: "Premium Collection", desc: "ניחוח גברי רענן ויוקרתי עם אופי אננס מעושן ואלגנטי ועמידות חזקה.", notes: "<b>תווים:</b> אננס, תפוח, מושק", cta: "הזמן עכשיו", maniTitle: "?למה MAD PARFUMEUR", maniHeaderMad: "MAD", maniHeaderOthers: "חיקויים", formTitle: "פרטי הזמנה מהירה", namePh: "שם מלא", phonePh: "מספר טלפון", addressPh: "יישוב וכתובת", payTitle: "אמצעי תשלום", payCash: "מזומן לשליח", payVisa: "כרטיס אשראי", procTitle: "שיטת משלוח", procContact: "שיחה טלפונית לאישור", procDirect: "משלוח ישיר", submit: "בצע הזמנה ✅", successMsg: "ההזמנה התקבלה בהצלחה! ✅" }
+        he: { title: "W183 — Creed Aventus", price: "₪ 400", old: "₪ 350", badge: "Premium Collection", desc: "ניחוח גברי רענן ויוקרתי עם אופי אננס מעושן ואלגנטי ועמידות חזקה.", notes: "<b>תווים:</b> אננס, תפוח, מושק", cta: "הזמן עכשיו", maniTitle: "?למה MAD PARFUMEUR", maniHeaderMad: "MAD", maniHeaderOthers: "חיקויים", formTitle: "פרטי הזמנה מהירה", namePh: "שם מלא", phonePh: "מספר טלפון", addressPh: "יישוב וכתובת", payTitle: "אמצעי תשלום", payCash: "מזומן לשليح", payVisa: "כרטיס אשראי", procTitle: "שיטת משלוח", procContact: "שיחה טלפונית לאישור", procDirect: "משלוח ישיר", submit: "בצע הזמנה ✅", successMsg: "ההזמנה התקבלה בהצלחה! ✅" }
     };
 
     function applyPreset(code) { if (!code || !PERFUME_PRESETS[code]) return; ['title', 'desc', 'notes'].forEach(k => { db.ar[k] = PERFUME_PRESETS[code].ar[k]; db.he[k] = PERFUME_PRESETS[code].he[k]; }); setMode(mode); }
@@ -192,7 +202,7 @@
         common.maniItems.forEach(item => {
             const div = document.createElement('div'); div.className = 'card-control';
             div.innerHTML = `<button class="btn-delete" onclick="common.maniItems=common.maniItems.filter(i=>i.id!=${item.id}); renderManiUI(); render()">X</button>
-            <div class="mani-inputs"><input type="text" placeholder="عنوان النقطة" value="${mode=='ar'?item.labelAr:item.labelHe}" oninput="const i=common.maniItems.find(x=>x.id==${item.id}); if(mode=='ar')i.labelAr=this.value; else i.labelHe=this.value; render()"><textarea style="margin-top:5px" placeholder="MAD وصف" oninput="const i=common.maniItems.find(x=>x.id==${item.id}); if(mode=='ar')i.madAr=this.value; else i.madHe=this.value; render()">${mode=='ar'?item.madAr:item.madHe}</textarea><textarea style="margin-top:5px" placeholder="البدائل وصف" oninput="const i=common.maniItems.find(x=>x.id==${item.id}); if(mode=='ar')i.localAr=this.value; else i.localHe=this.value; render()">${mode=='ar'?item.localAr:item.localHe}</textarea></div>`;
+            <div class="mani-inputs"><input type="text" placeholder="عنوان" value="${mode=='ar'?item.labelAr:item.labelHe}" oninput="const i=common.maniItems.find(x=>x.id==${item.id}); if(mode=='ar')i.labelAr=this.value; else i.labelHe=this.value; render()"><textarea style="margin-top:5px" oninput="const i=common.maniItems.find(x=>x.id==${item.id}); if(mode=='ar')i.madAr=this.value; else i.madHe=this.value; render()">${mode=='ar'?item.madAr:item.madHe}</textarea><textarea style="margin-top:5px" oninput="const i=common.maniItems.find(x=>x.id==${item.id}); if(mode=='ar')i.localAr=this.value; else i.localHe=this.value; render()">${mode=='ar'?item.localAr:item.localHe}</textarea></div>`;
             container.appendChild(div);
         });
     }
@@ -202,9 +212,14 @@
     function renderBlocksUI() {
         const container = document.getElementById('blocksContainer');
         if (!container) return; container.innerHTML = "";
+        if(common.blocks.length === 0) { container.innerHTML = '<div class="empty-notice">قسم الوسائط فارغ. أضف عناصر من الأسفل 👇</div>'; return; }
         common.blocks.forEach(b => {
             const div = document.createElement('div'); div.className = 'block-item';
-            div.innerHTML = `<div class="block-header"><span>${b.type.toUpperCase()}</span><button class="btn-delete" onclick="removeBlock(${b.id})">حذف</button></div><input type="text" oninput="common.blocks.find(x=>x.id==${b.id}).content=(this.value.includes(',')?this.value.split(','):this.value); render()" value="${Array.isArray(b.content)?b.content.join(','):b.content}" placeholder="URL">`;
+            const label = b.type === 'html' ? 'كود مخصص (Iframe / HTML)' : 'رابط / نص';
+            const inputField = b.type === 'html' || b.type === 'carousel' 
+                ? `<textarea rows="3" oninput="common.blocks.find(x=>x.id==${b.id}).content=(this.value.includes(',') && '${b.type}'=='carousel' ?this.value.split(','):this.value); render()">${Array.isArray(b.content)?b.content.join(','):b.content}</textarea>`
+                : `<input type="text" oninput="common.blocks.find(x=>x.id==${b.id}).content=this.value; render()" value="${b.content}" placeholder="URL">`;
+            div.innerHTML = `<div class="block-header"><span>${b.type.toUpperCase()}</span><button class="btn-delete" onclick="removeBlock(${b.id})">حذف</button></div><label>${label}</label>${inputField}`;
             container.appendChild(div);
         });
     }
@@ -225,10 +240,11 @@
         let blocksHTML = "";
         common.blocks.forEach((b, idx) => {
             const lazy = idx > 0 ? 'loading="lazy"' : '';
-            if(b.type === 'carousel') blocksHTML += `<div x-data="{ active: 0, images: ${JSON.stringify(b.content).replace(/"/g, "'")} }" class="relative w-full aspect-square bg-black rounded-[var(--br)] overflow-hidden shadow-2xl border border-[var(--brd)]"><template x-for="(img, idx) in images"><img x-show="active === idx" :src="img" class="absolute inset-0 w-full h-full object-contain" x-transition.opacity ${lazy}></template><button @click="active = (active === 0 ? images.length - 1 : active - 1)" class="absolute left-2 top-1/2 -translate-y-1/2 bg-black/40 p-2 rounded-full text-white">◀</button><button @click="active = (active === images.length - 1 ? 0 : active + 1)" class="absolute right-2 top-1/2 -translate-y-1/2 bg-black/40 p-2 rounded-full text-white">▶</button></div>`;
-            if(b.type === 'image') blocksHTML += `<img src="${b.content}" class="w-full shadow-2xl" style="border-radius:var(--br)" ${lazy}>`;
+            if(b.type === 'carousel' && b.content.length > 0) blocksHTML += `<div x-data="{ active: 0, images: ${JSON.stringify(b.content).replace(/"/g, "'")} }" class="relative w-full aspect-square bg-black rounded-[var(--br)] overflow-hidden shadow-2xl border border-[var(--brd)]"><template x-for="(img, idx) in images"><img x-show="active === idx" :src="img" class="absolute inset-0 w-full h-full object-contain" ${design.animate ? 'x-transition.opacity' : ''} ${lazy}></template><button @click="active = (active === 0 ? images.length - 1 : active - 1)" class="absolute left-2 top-1/2 -translate-y-1/2 bg-black/40 p-2 rounded-full text-white">◀</button><button @click="active = (active === images.length - 1 ? 0 : active + 1)" class="absolute right-2 top-1/2 -translate-y-1/2 bg-black/40 p-2 rounded-full text-white">▶</button></div>`;
+            if(b.type === 'image') blocksHTML += `<img src="${b.content}" class="w-full shadow-2xl border border-[var(--brd)]" style="border-radius:var(--br)" ${lazy}>`;
             if(b.type === 'video') blocksHTML += `<video src="${b.content}" controls class="w-full" style="border-radius:var(--br)"></video>`;
             if(b.type === 'text') blocksHTML += `<p class="text-center opacity-80 px-4 whitespace-pre-wrap">${b.content}</p>`;
+            if(b.type === 'html') blocksHTML += `<div class="custom-block w-full overflow-hidden" style="border-radius:var(--br)">${b.content}</div>`;
         });
 
         let maniHTML = "";
@@ -253,8 +269,8 @@
         input[type="radio"]:checked + div{border-color:var(--p);background-color:rgba(212,175,55,.1)}
         .radio-circle{width:12px;height:12px;border-radius:99px;border:1px solid #555; position:relative;}
         input[type="radio"]:checked + div .radio-circle::after{content:''; position:absolute; inset:2px; background:var(--p); border-radius:99px;}
-        .animate-pop{animation: pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);}
-        @keyframes pop { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        ${design.animate ? `.animate-pop{animation: pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);} @keyframes pop { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }` : ''}
+        iframe, .custom-block * { max-width: 100% !important; }
     </style>
     ${dl ? `${sOpen}>!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window, document,'script','https://connect.facebook.net/en_US/fbevents.js');fbq('init','${common.fb}');fbq('track','PageView');${sClose}
     ${sOpen}>!function (w, d, t) { w.TiktokAnalyticsObject = t; var ttq = w[t] = w[t] || []; ttq.methods = ["page","track","identify","instances","debug","on","off","once","ready","alias","group","enableCookie","disableCookie"]; ttq.setAndDefer = function(t, e) { t[e] = function() { t.push([e].concat(Array.prototype.slice.call(arguments, 0))) } }; for (var i = 0; i < ttq.methods.length; i++) { ttq.setAndDefer(ttq, ttq.methods[i]); } ttq.load = function(e) { var i = d.createElement("script"); i.type = "text/javascript"; i.async = true; i.src = "https://analytics.tiktok.com/i18n/pixel/events.js?sdkid=" + e + "&lib=" + t; var n = d.getElementsByTagName("script")[0]; n.parentNode.insertBefore(i, n); }; ttq.load('${common.tt}'); ttq.page(); }(window, document, 'ttq');${sClose}` : ''}
@@ -266,7 +282,7 @@
         <button @click="lang=(lang=='ar'?'he':'ar'); setTimeout(()=>lucide.createIcons(),50)" class="text-xs font-black" style="color:var(--p)">{{lang=='ar'?'עברית':'العربية'}}</button>
     </nav>
     <main class="max-w-md mx-auto px-5 pt-24" :style="{ gap: 'var(--sp)', display: 'flex', flexDirection: 'column' }">
-        <section class="text-center space-y-6">
+        <section class="text-center space-y-6 ${design.animate ? 'animate-pop' : ''}">
             <h1 class="text-3xl font-bold tracking-tight" x-text="t.title"></h1>
             <div class="flex flex-col items-center"><span class="text-slate-500 line-through text-sm" x-text="t.old"></span><span class="text-5xl font-black gold-gradient" x-text="t.price"></span></div>
             <div class="space-y-6">${blocksHTML}</div>
@@ -274,37 +290,35 @@
             <div class="glass-panel p-4 text-xs text-right border-r-2" style="border-color:var(--p)" x-html="t.notes"></div>
             <a href="#order" class="block w-full py-5 text-black font-black text-xl shadow-2xl active:scale-95 transition-all text-center" :style="{ backgroundColor: 'var(--p)', borderRadius: 'var(--br)' }" x-text="t.cta"></a>
         </section>
-        <section class="space-y-6">
+        <section class="space-y-6 ${design.animate ? 'animate-pop' : ''}">
             <div class="text-center"><span class="text-[10px] font-black text-[var(--p)] tracking-widest uppercase">Truth Revealed</span><h2 class="text-2xl font-bold mt-1" x-text="t.maniTitle"></h2></div>
             <div class="glass-panel overflow-hidden">${maniHTML}</div>
         </section>
-        <section id="order" class="p-8 space-y-6 shadow-2xl" :style="{ background: 'var(--f)', borderRadius: 'var(--br)' }">
+        <section id="order" class="p-8 space-y-6 shadow-2xl ${design.animate ? 'animate-pop' : ''}" :style="{ background: 'var(--f)', borderRadius: 'var(--br)' }">
             <h2 class="text-2xl font-black text-center" x-text="t.formTitle"></h2>
             <form @submit.prevent="submitOrder" class="space-y-5">
                 <input x-model="f.name" class="w-full p-4 rounded-xl bg-black/40 border border-white/10 outline-none focus:border-[var(--p)] text-right" :placeholder="t.namePh" required>
                 <input x-model="f.phone" class="w-full p-4 rounded-xl bg-black/40 border border-white/10 outline-none focus:border-[var(--p)] text-right" :placeholder="t.phonePh" required dir="ltr">
                 <input x-model="f.address" class="w-full p-4 rounded-xl bg-black/40 border border-white/10 outline-none focus:border-[var(--p)] text-right" :placeholder="t.addressPh" required>
-                
                 <div class="space-y-3"><label class="text-[10px] text-slate-400 font-bold uppercase tracking-widest" x-text="t.payTitle"></label>
                     <div class="grid grid-cols-2 gap-3">
-                        <label class="cursor-pointer"><input type="radio" value="Cash" x-model="f.payment" class="hidden"><div class="border border-white/10 rounded-xl p-3 flex flex-col items-center gap-2 bg-black/20"><i data-lucide="banknote" class="w-5 h-5 text-slate-400"></i><span class="text-[10px] font-bold" x-text="t.payCash"></span><div class="radio-circle"></div></div></label>
-                        <label class="cursor-pointer"><input type="radio" value="Visa" x-model="f.payment" class="hidden"><div class="border border-white/10 rounded-xl p-3 flex flex-col items-center gap-2 bg-black/20"><i data-lucide="credit-card" class="w-5 h-5 text-slate-400"></i><span class="text-[10px] font-bold" x-text="t.payVisa"></span><div class="radio-circle"></div></div></label>
+                        <label class="cursor-pointer"><input type="radio" value="Cash" x-model="f.payment" class="hidden"><div class="border border-white/10 rounded-xl p-3 flex flex-col items-center gap-2 bg-black/20 hover:bg-white/5 transition-all"><span class="text-[10px] font-bold" x-text="t.payCash"></span><div class="radio-circle"></div></div></label>
+                        <label class="cursor-pointer"><input type="radio" value="Visa" x-model="f.payment" class="hidden"><div class="border border-white/10 rounded-xl p-3 flex flex-col items-center gap-2 bg-black/20 hover:bg-white/5 transition-all"><span class="text-[10px] font-bold" x-text="t.payVisa"></span><div class="radio-circle"></div></div></label>
                     </div>
                 </div>
-
                 <div class="space-y-3"><label class="text-[10px] text-slate-400 font-bold uppercase tracking-widest" x-text="t.procTitle"></label>
                     <div class="grid grid-cols-1 gap-2">
                         <label class="cursor-pointer"><input type="radio" value="Contact" x-model="f.process" class="hidden"><div class="border border-white/10 rounded-xl p-3 flex justify-between items-center bg-black/20 transition-all"><span class="text-[10px] font-bold" x-text="t.procContact"></span><div class="radio-circle"></div></div></label>
                         <label class="cursor-pointer"><input type="radio" value="Direct" x-model="f.process" class="hidden"><div class="border border-white/10 rounded-xl p-3 flex justify-between items-center bg-black/20 transition-all"><span class="text-[10px] font-bold" x-text="t.procDirect"></span><div class="radio-circle"></div></div></label>
                     </div>
                 </div>
-
                 <button type="submit" class="w-full py-5 text-black font-black text-xl shadow-lg active:scale-95 transition-all" :style="{ backgroundColor: 'var(--p)', borderRadius: 'var(--br)' }" x-text="loading ? '...' : t.submit"></button>
             </form>
         </section>
+        <div class="flex justify-center gap-10 opacity-30 grayscale pb-10"><i data-lucide="award"></i><i data-lucide="shield-check"></i><i data-lucide="star"></i></div>
     </main>
     <div x-show="ui.ok" class="fixed inset-0 z-[100] bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
-        <div class="bg-[#111] border border-[var(--p)]/30 p-8 rounded-3xl max-w-xs w-full text-center shadow-2xl animate-pop">
+        <div class="bg-[#111] border border-[var(--p)]/30 p-8 rounded-3xl max-w-xs w-full text-center shadow-2xl ${design.animate ? 'animate-pop' : ''}">
             <div class="w-16 h-16 bg-green-500/10 rounded-full flex items-center justify-center mx-auto mb-4 border border-green-500/30"><i data-lucide="check" class="w-8 h-8 text-green-500"></i></div>
             <h3 class="text-xl font-bold text-white mb-2" x-text="t.successMsg"></h3>
             <button @click="ui.ok=false" class="w-full bg-[#161616] border border-white/10 text-white py-3 rounded-xl hover:bg-[#222] transition-colors font-bold text-sm mt-4">Close</button>
@@ -331,8 +345,12 @@
                 else el.value = db[mode][id] || '';
             }
         });
-        document.getElementById('rng-radius').value = 24;
-        document.getElementById('rng-spacing').value = 48;
+        const rad = document.getElementById('rng-radius');
+        const spc = document.getElementById('rng-spacing');
+        if(rad) rad.value = 24;
+        if(spc) spc.value = 48;
+        const chk = document.getElementById('chk-animate');
+        if(chk) chk.checked = design.animate;
         for(let k in design){ const el=document.getElementById('clr-'+k); if(el) el.value=design[k]; }
         setMode('ar');
     }
