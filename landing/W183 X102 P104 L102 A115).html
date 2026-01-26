@@ -1,232 +1,162 @@
 <!DOCTYPE html>
-<html lang="ar" x-data="app()" x-init="init()" :dir="dir">
+<html x-data="app()" x-init="init(null)" :lang="lang" :dir="lang==='he'?'ltr':'rtl'">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<script src="https://cdn.tailwindcss.com"></script>
-<script src="https://unpkg.com/lucide@latest"></script>
-<script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
-
-        <script>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- DNS Prefetch for faster loading -->
+    <link rel="dns-prefetch" href="//cdn.tailwindcss.com">
+    <link rel="dns-prefetch" href="//unpkg.com">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest" defer></script>
+    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    
+    <script>
+        // Optimization: Load Pixels only after basic UI is ready
+        window.addEventListener('DOMContentLoaded', () => {
             !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)n=f.fbq;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window, document,'script','https://connect.facebook.net/en_US/fbevents.js');
             fbq('init', '1072283127290819'); fbq('track', 'PageView');
+            
             !function (w, d, t) { w.TiktokAnalyticsObject=t; var ttq=w[t]=w[t]||[]; ttq.methods=["page","track","identify","instances","debug","on","off","once","ready","alias","group","enableCookie","disableCookie","holdConsent","revokeConsent","grantConsent"]; ttq.setAndDefer=function(t,e){t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}; for(var i=0;i<ttq.methods.length;i++)ttq.setAndDefer(ttq,ttq.methods[i]); ttq.load=function(e,n){ var r="https://analytics.tiktok.com/i18n/pixel/events.js"; var o=n&&n.partner; ttq._i=ttq._i||{}; ttq._i[e]=[]; ttq._i[e]._u=r; ttq._t=ttq._t||{}; ttq._t[e]=+new Date; ttq._o=ttq._o||{}; ttq._o[e]=n||{}; n=document.createElement("script"); n.type="text/javascript"; n.async=!0; n.src=r+"?sdkid="+e+"&lib="+t; e=document.getElementsByTagName("script")[0]; e.parentNode.insertBefore(n,e) }; ttq.load('D2D02JBC77U4ENLN9SBG'); ttq.page(); }(window, document, 'ttq');
             
-            // MAD Tracking Logic
-            window.MAD_TRACKING_SPEC = {
-             project_name: "MAD Conversion Tracking System",
-             platforms: ["Facebook Pixel", "TikTok Pixel"],
-             currency: "ILS",
-             landing_page: { allowed_events_only: ["PageView", "Contact"], do_not_fire_purchase_event: true },
-             thank_you_page: {
-               facebook: { event: "Purchase", value: 500, currency: "ILS" },
-               tiktok: { event: "CompletePayment", value: 500, currency: "ILS" },
-               rules: { fire_event_only_once_per_session: true, prevent_manual_access: true, do_not_trigger_on_refresh: true }
-             }
-            };
-            window.MAD_KEYS = { ORDER_OK: "MAD_ORDER_OK_V1", PURCHASE_LOCK: "MAD_PURCHASE_LOCK_V1" };
-            window.MAD_MARK_ORDER_SUBMITTED = function(meta){
-             try {
-               sessionStorage.setItem(window.MAD_KEYS.ORDER_OK, "1");
-               if(meta && typeof meta === "object"){ sessionStorage.setItem("MAD_ORDER_META_V1", JSON.stringify(meta)); }
-             } catch(e){}
-            };
-        </script>
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,900;1,400;1,900&family=Inter:wght@300;400;700;900&family=Amiri:wght@400;700&family=Assistant:wght@300;400;700;800&family=Cairo:wght@400;700&family=Tajawal:wght@400;700&family=Almarai:wght@400;700&display=swap');
-body{background:#ab5c12;color:#ffffff;font-family:'Inter',sans-serif}
-.glass-nav { position: fixed; top: 0; left: 0; width: 100%; z-index: 50; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.6); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(255,255,255,0.1); }
-.nav-logo { height: 35px; object-fit: contain; }
-.lang-btn-nav { font-size: 11px; font-weight: bold; color: rgba(255,255,255,0.6); margin: 0 5px; transition:0.2s; }
-.lang-btn-nav.active { color: #d97706; }
-.hero-vid, .hero-wrapper { position: absolute; top: 0; left: 0; width: 100%; height: 100vh; overflow: hidden; z-index: -1; object-fit: cover; filter: brightness(0.6); }
-.hero-vid-iframe { width: 300%; height: 150%; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); pointer-events: none; }
-@media (min-aspect-ratio: 16/9) { .hero-vid-iframe { width: 100%; height: 300%; } }
-.badge{background:linear-gradient(to right,#d97706,#fbbf24);color:black;padding:5px 20px;border-radius:50px;font-weight:900;display:inline-block;margin-bottom:10px}
-.carousel{position:relative;height:400px;display:flex;align-items:center;justify-content:center}
-.c-img{max-height:100%;max-width:100%;filter:drop-shadow(0 20px 40px rgba(0,0,0,0.8))}
-.c-btn{position:absolute;top:50%;transform:translateY(-50%);background:rgba(0,0,0,0.5);color:#d97706;border:1px solid #333;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer}
-.comp-row{display:grid;grid-template-columns:1fr 1fr;gap:2px;background:rgba(255,255,255,.05);border-radius:15px;overflow:hidden;margin-bottom:10px;border:1px solid rgba(255,255,255,.05)}
-.c-side{padding:15px;font-size:13px;display:flex;flex-direction:column;justify-content:center}
-.c-mad{background:linear-gradient(to right,rgba(217,119,6,.1),rgba(217,119,6,.05));text-align:right}
-.c-alt{background:rgba(0,0,0,.4);text-align:right;opacity:.7}
-.sticky-cta { position: fixed; bottom: 20px; left: 0; width: 100%; z-index: 50; padding: 0 20px; pointer-events: none; }
-.sticky-btn { display: block; max-width: 500px; margin: 0 auto; background: #d97706; color: black; text-align: center; padding: 16px; border-radius: 99px; font-weight: 900; text-decoration: none; box-shadow: 0 10px 25px rgba(0,0,0,0.5); pointer-events: auto; transition: 0.2s; animation: pulse 2s infinite; }
-@keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.02); } 100% { transform: scale(1); } }
-.order-grid { display: grid; gap: 10px; margin-bottom: 20px; max-width: 500px; margin-left: auto; margin-right: auto; }
-.btn-order { display: flex; align-items: center; justify-content: center; gap: 10px; padding: 12px; border-radius: 10px; font-weight: bold; text-decoration: none; transition: 0.2s; }
-.btn-wa { background: #25D366; color: white; } .btn-wa:hover { background: #1ebc57; }
-.btn-call { background: #3b82f6; color: white; } .btn-call:hover { background: #2563eb; }
-.btn-web { background: #64748b; color: white; } .btn-web:hover { background: #475569; }
-/* Form Styles */
-.form-card { max-width:520px; margin:0 auto; background:#000000; border:1px solid rgba(255,255,255,.10); border-radius:22px; padding:16px; box-shadow:0 20px 80px rgba(0,0,0,.45); text-align: right; }
-.inp { width:100%; padding:12px 12px; border-radius:14px; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12); outline:none; color:#ffffff; }
-.inp:focus { border-color: rgba(217,119,6,.7); box-shadow:0 0 0 3px rgba(217,119,6,.18); }
-.submit-btn { width:100%; padding:14px 14px; border-radius:16px; font-weight:900; color:#000000; background:#15b76b; border:none; box-shadow:0 14px 50px rgba(0,0,0,.35); cursor:pointer; }
-.submit-btn:disabled { opacity:0.6; cursor:not-allowed; }
-.tiny { font-size:12px; color:rgba(255,255,255,.70); margin-top:10px; text-align:center; }
-</style>
-<script>
-function app(){
-return {
-    c:{"bgColor":"#ab5c12","fontFamily":"Inter","formBg":"#000000","formColor":"#ffffff","btnBg":"#15b76b","btnTxt":"#000000","heroType":"video","logo":"https://madperfume.ps/upload/01-2026/page/69735b87d92ef.png","vid":"https://madparfumeurglobal.com/wp-content/uploads/2025/10/download.mp4","heroes":["https://madperfume.ps/upload/01-2026/page/6971495c69e7c.png"],"blocks":[{"id":1769167825001,"type":"text","val":"","text":{"ar":"DEPENDENCE – مستوحى من Bitter Peach (Tom Ford)\n\nDEPENDENCE هو عطر جريء، حسي ومُلفت، يجمع بين الحلاوة الفاكهية العميقة ولمسة فاخرة جذابة.\nمستوحى من Bitter Peach من Tom Ford ليمنحك تجربة عطرية قوية تعبّر عن الجرأة، الأناقة والحضور اللافت.\n\n🍑 افتتاحية خوخية جذابة\n🔥 عمق دافئ مثير\n💎 توقيع عطري فاخر بطابع عصري","he":"DEPENDENCE – Inspired by Bitter Peach (Tom Ford)\n\nDEPENDENCE הוא ניחוח נועז, חושני וממכר, המשלב מתיקות פירותית עמוקה עם אלגנטיות יוקרתית.\nהשראה מ־Bitter Peach של Tom Ford יוצרת חוויה חושית עוצמתית, מושלמת למי שמחפש נוכחות בולטת וסטייל בלתי נשכח.\n\n🍑 פתיחה עסיסית ומתוקה\n🔥 עומק חמים ומפתה\n💎 חתימה יוקרתית עם אופי מודרני"}},{"id":1769176873684,"type":"video","val":"https://madperfume.ps/upload/01-2026/page/Dependence%20madperfume.mp4#t=0.02","text":{"ar":"","he":""}},{"id":1769176890534,"type":"text","val":"","text":{"ar":"النوتات العطرية\n\nالنوتات العليا (Top Notes):\nخوخ مر، فواكه عصيرية\n\nنوتات القلب (Heart Notes):\nفانيليا، توابل دافئة، لمسات زهرية\n\nالنوتات الأساسية (Base Notes):\nعنبر، أخشاب دافئة، مسك","he":"תווי ניחוח (Notes)\n\nתווי פתיחה (Top Notes):\nאפרסק מריר, פירות עסיסיים\n\nתווי לב (Heart Notes):\nוניל, תבלינים חמים, פרחים עדינים\n\nתווי בסיס (Base Notes):\nענבר, עצים חמים, מושק"}}],"fb":"1072283127290819","tt":"D2D02JBC77U4ENLN9SBG","googleScript":"https://script.google.com/macros/s/AKfycbzEEzQCP1xVJ9U1E15hh43sok6uRIir866l9daol-rUqXrp6dwnXusc3h9_B6miqqtE/exec","tyPage":"/thank-you.html","showForm":true,"showManifesto":true,"showWa":true,"showCall":true,"showWeb":false,"showFloatingBtn":false,"waNum":"972509787730","callNum":"*9935","webUrl":"https://madparfumeur.com"}, db:{"ar":{"price":"240 ₪ شامل التوصيل","offer":"350 ₪ السعر السابق","ctaText":"اطلب الآن","maniT":"THE MANIFESTO","maniS":"لماذا MAD؟ مقارنة علمية","maniM":"عطور  MAD","maniO":"عطور تركيا دبي الزيوت والبدائل","waLabel":"اطلب عبر واتساب","waText":"ديبنس","callLabel":"اتصل للطلب","webLabel":"زيارة الموقع","formTitle":"نموذج الطلب السريع","name":"الاسم الكامل","phone":"رقم الهاتف","city":"المدينة (اختياري)","notes":"ملاحظات (اختياري)","submit":"إرسال الطلب ✅","sending":"جاري الإرسال...","ok":"تم إرسال الطلب بنجاح ✅","fail":"حصل خطأ، جرّب مرة ثانية.","compItems":[{"mad":"آمنة 100% معتمدة","local":"مجهولة المصدر"},{"mad":"تطابق جزيئي دقيق","local":"خلط يدوي عشوائي"},{"mad":"خلاصات أوروبية","local":"زيوت تجارية رخيصة"},{"mad":"ثبات +24 ساعة","local":"يختفي بعد ساعة"},{"mad":"41 فرع في البلاد","local":"اونلاين"},{"mad":"خدمة زبائن *9935","local":" حظر بعد الشراء"},{"mad":"مصادقات اييزو ووزارة الصحه","local":"غير مفحوصه"}]},"he":{"price":"240₪ כולל משלוח","offer":"350 ₪ מחיר קודם","ctaText":"הזמן עכשיו","maniT":"THE MANIFESTO","maniS":"למה MAD? השוואה מדעית","maniM":"בשמי MAD","maniO":"חיקויים דובי טורקיה דיופים שמנים","waLabel":"הזמן בוואטסאפ","waText":"DEPENDENCE","callLabel":"חייג להזמנה","webLabel":"בקר באתר","formTitle":"טופס הזמנה מהיר","name":"שם מלא","phone":"טלפון","city":"עיר (אופציונלי)","notes":"הערות (אופציונלי)","submit":"שלח הזמנה ✅","sending":"שולח...","ok":"ההזמנה נשלחה בהצלחה ✅","fail":"שגיאה, נסו שוב.","compItems":[{"mad":"בטוח 100% מאושר","local":"מקור לא ידוע"},{"mad":"התאמה מולקולרית","local":"ערבוב אקראי"},{"mad":"תמציות אירופאיות","local":"שמנים מסחריים"},{"mad":"עמידות 24+ שעות","local":"נעלם מהר"},{"mad":"41 סניפים בארץ","local":" אונליין"},{"mad":"שירות לקוחות *9935","local":"נעלמים אחר ההזמנה"},{"mad":"תקן אייזו - משרד בריאות","local":" לא נבדק מסוכן"}]}},
-    lang:'ar', idx:0,
-    isThankYou: false,
-    f:{name:"",phone:"",city:"",notes:""}, ui:{loading:false,msg:"",ok:false},
-    trackingSpec: (window.MAD_TRACKING_SPEC || null),
-    
-    get t() { return this.db[this.lang] },
-    get dir() { return this.lang=='ar'?'rtl':'ltr' },
-    get offerName() { try{ return decodeURIComponent(location.pathname.split("/").pop().replace(".html","")) || "MAD Offer"; }catch(e){ return "MAD Offer"; } },
-    
-    init(){ 
-        
-        const ul = navigator.language || navigator.userLanguage || '';
-        this.lang = ul.toLowerCase().startsWith('he') ? 'he' : 'ar';
-        
-        if(window.lucide) lucide.createIcons();
-        if(this.c.heroes.length>1) setInterval(()=>this.next(),3000);
-        
-        this.isThankYou = /thank/i.test(location.pathname);
-        if(this.isThankYou){ this.fireThankYouPurchaseIfAllowed(); }
-    },
-    tog(l){ this.lang=l; },
-    next(){ this.idx = (this.idx===this.c.heroes.length-1)?0:this.idx+1 },
-    prev(){ this.idx = (this.idx===0)?this.c.heroes.length-1:this.idx-1 },
-    
-    // Pixel & Form Logic
-    fireThankYouPurchaseIfAllowed(){
-         try{
-             if(sessionStorage.getItem(window.MAD_KEYS.ORDER_OK)!=="1") return;
-             if(sessionStorage.getItem(window.MAD_KEYS.PURCHASE_LOCK)==="1") return;
-             sessionStorage.setItem(window.MAD_KEYS.PURCHASE_LOCK,"1");
-             if(typeof fbq!=="undefined") fbq("track","Purchase",{value:500,currency:"ILS"});
-             if(typeof ttq!=="undefined") ttq.track("CompletePayment",{value:500,currency:"ILS"});
-         }catch(e){}
-    },
-    trackContact(s){ 
-        if(typeof fbq!=="undefined") fbq("track","Contact",{source:s});
-        if(typeof ttq!=="undefined") ttq.track("Contact",{source:s});
-submitOrder(){
-  if(this.ui.loading) return;
+            (function(e,t,n){if(e.snaptr)return;var a=e.snaptr=function(){a.handleRequest?a.handleRequest.apply(a,arguments):a.queue.push(arguments)};a.queue=[];var s='script';var r=t.createElement(s);r.async=!0;r.src=n;var u=t.getElementsByTagName(s)[0];u.parentNode.insertBefore(r,u)})(window,document,'https://sc-static.net/scevent.min.js');
+            snaptr('init', 'b143822e-1c3c-40ff-93f7-edadee74e626'); snaptr('track', 'PAGE_VIEW');
+        });
+    </script>
 
-  if(!this.f.name || !this.f.phone){
-    this.ui.msg = (this.lang==="he") ? "נא למלא שם וטלפון" : "يرجى تعبئة الاسم والهاتف";
-    return;
-  }
-
-  this.ui.loading = true;
-  this.ui.msg = "";
-
-  // إرسال حقيقي عبر FORM للـ Google Script (بدون fetch)
-  // Google Script هو اللي بيرد ويرجعك لصفحة الشكر بعد ما يسجل بالشيت
-  setTimeout(() => {
-    this.$refs.gsForm.submit();
-  }, 120);
-}
-
-        this.ui.loading=true; this.ui.msg="";
-        const fd = new FormData();
-        fd.append("order_id", "MAD-"+Date.now());
-        fd.append("lang", this.lang);
-        fd.append("name", this.f.name);
-        fd.append("phone", this.f.phone);
-        fd.append("city", this.f.city);
-        fd.append("notes", this.f.notes);
-        fd.append("offer", this.offerName);
-        
-        try{
-            await fetch(this.c.googleScript, {method:"POST", body:fd, mode:"no-cors"});
-            window.MAD_MARK_ORDER_SUBMITTED({order_id: "MAD-"+Date.now()});
-            this.trackContact("form_submit");
-            if(typeof fbq!=="undefined") fbq("track","Lead");
-            if(typeof ttq!=="undefined") ttq.track("Lead");
-            
-            setTimeout(()=>{
-                window.location.href = this.c.tyPage + "?ty=1";
-            }, 1000);
-            
-            this.ui.ok=true;
-            this.ui.msg = this.t.ok;
-        }catch(e){
-            this.ui.loading=false;
-            this.ui.msg = this.t.fail;
-        }
-    }
-}}
-</script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&family=Heebo:wght@400;700;900&display=swap');
+        body { background: #9f8b79; color: #000; font-family: 'Cairo', 'Heebo', sans-serif; overflow-x: hidden; scroll-behavior: smooth; }
+        .mad-input { width: 100%; padding: 15px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 14px; outline: none; margin-bottom: 12px; text-align: inherit; font-weight: 700; }
+        .mad-radio-ui { border: 1px solid #e2e8f0; border-radius: 14px; padding: 16px; background: #f8fafc; text-align: center; cursor: pointer; transition: 0.2s; font-weight: 800; }
+        input[type="radio"]:checked + .mad-radio-ui { border-color: #000; background: #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .btn-order-main { background: #000; color: #fff; padding: 20px; border-radius: 18px; font-weight: 900; font-size: 1.3rem; width: 100%; display: block; text-align: center; }
+        /* Optimization: Content visibility for off-screen blocks */
+        .page-block { content-visibility: auto; contain-intrinsic-size: 0 400px; }
+    </style>
 </head>
-<body>
+<body class="pb-20">
+    <nav class="p-4 flex justify-center border-b border-black/5 bg-white/40 backdrop-blur-lg sticky top-0 z-50">
+        <!-- High priority for logo (LCP) -->
+        <img src="https://madperfume.ps/upload/01-2026/page/6977cf82b87ef.png" style="height:42px; object-fit:contain" fetchpriority="high">
+    </nav>
+    <header class="text-center py-10 px-4"><h1 class="text-3xl font-black" x-text="c.heroTitle[lang]"></h1></header>
+    <main class="max-w-md mx-auto">
+        <template x-for="(b, idx) in blocks">
+            <div :class="b.align==='center'?'text-center':(b.align==='left'?'text-left':'text-right')" class="my-6 px-4 page-block">
+                <template x-if="b.type==='text'"><p class="text-lg font-bold whitespace-pre-wrap leading-relaxed" x-text="b.content[lang]"></p></template>
+                <template x-if="b.type==='emoji'"><div class="text-4xl" x-text="b.content[lang]"></div></template>
+                <!-- Image Optimization: Lazy load for everything except first block -->
+                <template x-if="b.type==='image'"><img :src="b.url" class="rounded-2xl mx-auto shadow-lg w-full" :loading="idx === 0 ? 'eager' : 'lazy'" decoding="async"></template>
+                <template x-if="b.type==='video'"><video :src="b.url" controls class="w-full rounded-2xl shadow-lg" playsinline preload="none"></video></template>
+                <template x-if="b.type==='button'"><a :href="b.link" class="btn-order-main no-underline" x-text="b.content[lang]"></a></template>
+                <template x-if="b.type==='iframe'"><iframe :src="b.url" class="w-full h-96 rounded-xl border-none shadow-sm" loading="lazy"></iframe></template>
+                
+                <template x-if="b.type==='fragrantica'">
+                    <a :href="b.url" target="_blank" class="block w-full max-w-[320px] bg-[#3f5a31] text-white p-5 rounded-[24px] shadow-xl relative overflow-hidden mx-auto no-underline text-right">
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="text-[10px] font-black uppercase tracking-widest text-white/60">Fragrantica Reviews</span>
+                            <div class="flex text-amber-400 gap-0.5"><i data-lucide="star" class="w-3 h-3 fill-current"></i><i data-lucide="star" class="w-3 h-3 fill-current"></i><i data-lucide="star" class="w-3 h-3 fill-current"></i><i data-lucide="star" class="w-3 h-3 fill-current"></i><i data-lucide="star" class="w-3 h-3 fill-current"></i></div>
+                        </div>
+                        <div class="flex items-end gap-2"><span class="text-4xl font-black" x-text="b.score"></span><span class="text-xs opacity-60 mb-1">Rating</span></div>
+                        <p class="text-[10px] font-bold mt-2 text-white/80" x-text="b.content[lang]"></p>
+                    </a>
+                </template>
 
-<nav class="glass-nav">
-    <div class="flex gap-2">
-        <button @click="tog('ar')" class="lang-btn-nav" :class="lang=='ar'?'active':''">AR</button>
-        <button @click="tog('he')" class="lang-btn-nav" :class="lang=='he'?'active':''">HE</button>
-    </div>
-    <img :src="c.logo" class="nav-logo" alt="Logo" referrerpolicy="no-referrer">
-    <div class="w-8"><i data-lucide="shopping-bag" style="color:white; width:20px;"></i></div>
-</nav>
-
-<section class="relative h-screen flex flex-col justify-center items-center text-center px-4">
-    <video src="https://madparfumeurglobal.com/wp-content/uploads/2025/10/download.mp4" autoplay loop muted playsinline class="hero-vid"></video>
-    <div class="badge" x-text="t.offer"></div>
-    <h1 class="text-6xl font-serif italic mb-6" x-text="t.price"></h1>
-    <a href="#shop" class="bg-amber-600 text-black px-8 py-3 rounded-full font-bold" x-text="t.ctaText"></a>
-</section>
-
-<section id="shop" class="py-16 px-4 text-center">
-    <div class="carousel mb-10">
-        <template x-for="(src,i) in c.heroes"><img :src="src" x-show="idx===i" class="c-img" x-transition.opacity referrerpolicy="no-referrer"></template>
-        <template x-if="c.heroes.length>1"><div><button class="c-btn" style="left:0" @click="prev"><</button><button class="c-btn" style="right:0" @click="next">></button></div></template>
-    </div>
-
-    <div class="space-y-8 max-w-2xl mx-auto mb-10">
-        <template x-for="block in c.blocks">
-            <div>
-                <template x-if="block.type=='text'"><div class="text-gray-300 whitespace-pre-wrap" x-text="block.text[lang]"></div></template>
-                <template x-if="block.type=='image'">
-                    <div>
-                        <img :src="block.val" class="w-full rounded-xl" referrerpolicy="no-referrer">
-                        <p class="text-gray-400 text-sm mt-2 font-bold" x-show="block.text && block.text[lang]" x-text="block.text[lang]"></p>
+                <template x-if="b.type==='iso'">
+                    <div class="grid grid-cols-3 gap-3 w-full max-w-sm mx-auto mt-4">
+                        <div class="bg-white border border-black/5 p-3 rounded-2xl text-center shadow-sm"><div class="text-xl">🛡️</div><p class="text-[8px] font-black uppercase leading-tight">ISO 9001<br>Certified</p></div>
+                        <div class="bg-white border border-black/5 p-3 rounded-2xl text-center shadow-sm"><div class="text-xl">🧪</div><p class="text-[8px] font-black uppercase leading-tight">IFRA Safe<br>Standard</p></div>
+                        <div class="bg-white border border-black/5 p-3 rounded-2xl text-center shadow-sm"><div class="text-xl">🏛️</div><p class="text-[8px] font-black uppercase leading-tight">Health<br>Ministry OK</p></div>
                     </div>
                 </template>
-                <template x-if="block.type=='video'"><video :src="block.val" controls class="w-full rounded-xl"></video></template>
-                <template x-if="block.type=='embed'"><div x-html="block.val"></div></template>
+
+                <template x-if="b.type==='comparison'">
+                    <div class="space-y-2 mt-4 text-right">
+                        <template x-for="row in b.items">
+                            <div class="grid grid-cols-2 gap-1 rounded-xl overflow-hidden border border-black/5 shadow-sm">
+                                <div class="bg-gray-50 p-4 border-r border-black/5"><span class="text-[8px] font-black text-amber-600 block mb-1">MAD</span><p class="text-[11px] font-bold leading-tight" x-text="row.mad[lang]"></p></div>
+                                <div class="bg-white p-4 text-gray-400 text-right"><span class="text-[8px] font-black text-gray-300 block mb-1">OTHERS</span><p class="text-[11px]" x-text="row.other[lang]"></p></div>
+                            </div>
+                        </template>
+                    </div>
+                </template>
+
+                <template x-if="b.type==='form'">
+                    <div class="bg-white border-2 border-gray-100 rounded-[28px] p-8 shadow-sm text-right mt-6" id="order">
+                        <h2 class="text-2xl font-black text-center mb-6" x-text="lang === 'he' ? 'הזמנה מהירה' : 'إتمام الطلب السريع'"></h2>
+                        <form @submit.prevent="submitForm">
+                            <input type="text" x-model="f.name" @input="trackInput" class="mad-input" :placeholder="lang === 'he' ? 'שם מלא' : 'الاسم الكامل'" required autocomplete="name">
+                            <input type="tel" x-model="f.phone" class="mad-input" :placeholder="lang === 'he' ? 'טלפון' : 'رقم الهاتف'" required autocomplete="tel">
+                            <input type="text" x-model="f.address" class="mad-input" :placeholder="lang === 'he' ? 'יישוב וכתובת' : 'المدينة والعنوان'" required autocomplete="street-address">
+                            <div class="grid grid-cols-2 gap-3 mb-6">
+                                <label class="cursor-pointer"><input type="radio" x-model="f.payment" value="Cash" class="hidden" required><div class="mad-radio-ui text-xs" x-text="lang === 'he' ? 'מזומן' : 'نقداً'"></div></label>
+                                <label class="cursor-pointer"><input type="radio" x-model="f.payment" value="Visa" class="hidden" required><div class="mad-radio-ui text-xs" x-text="lang === 'he' ? 'אשראי' : 'فيزا'"></div></label>
+                            </div>
+                            <div class="space-y-2 mb-6">
+                                <label class="block cursor-pointer"><input type="radio" x-model="f.process" value="Direct" class="hidden" required><div class="mad-radio-ui text-xs" x-text="lang === 'he' ? 'משלוח ישיר' : 'شحن مباشر'"></div></label>
+                                <label class="block cursor-pointer"><input type="radio" x-model="f.process" value="Contact" class="hidden" required><div class="mad-radio-ui text-xs" x-text="lang === 'he' ? 'אישור טלפוני' : 'تواصل معي للتأكيد'"></div></label>
+                            </div>
+                            <button type="submit" class="w-full py-5 rounded-2xl bg-black text-white font-black transition-all active:scale-95 shadow-lg h-20 flex items-center justify-center text-xl" :disabled="loading" x-text="loading ? '...' : (lang === 'he' ? 'אשר הזמנה' : 'تأكيد الطلب الآن')"></button>
+                        </form>
+                    </div>
+                </template>
             </div>
         </template>
-    </div>
+    </main>
 
-    <template x-if="c.showManifesto">
-    <div class="max-w-2xl mx-auto mb-16 text-right">
-        <h2 class="text-3xl font-serif italic mb-2 text-white text-center" x-text="t.maniT"></h2>
-        <p class="text-gray-400 text-center mb-6 text-sm" x-text="t.maniS"></p>
-        <template x-for="item in t.compItems">
-            <div class="comp-row"><div class="c-side c-mad"><div class="flex items-center justify-end gap-2 mb-1"><span class="text-[10px] font-bold text-amber-500 uppercase" x-text="t.maniM"></span><i data-lucide="check-circle" class="w-3 h-3 text-amber-500"></i></div><p class="text-white font-bold" x-text="item.mad"></p></div><div class="c-side c-alt"><div class="flex items-center justify-end gap-2 mb-1"><span class="text-[10px] font-bold text-red-400 uppercase" x-text="t.maniO"></span><i data-lucide="x-circle" class="w-3 h-3 text-red-500"></i></div><p class="text-gray-400" x-text="item.local"></p></div></div>
-        </template>
-    </div>
-    </template>
-
-    <template x-if="c.showForm">
-        <div class="form-card text-right mb-10">
-            <div class="flex items-center justify-between mb-3"><h3 class="font-black text-lg" x-text="t.formTitle"></h3><span class="text-[11px] px-3 py-1 rounded-full bg-black/30 border border-white/10" x-text="offerName"></span></div>
-            <form @submit.prevent="submitOrder()" class="grid gap-3">
-                <input class="inp" type="text" x-model="f.name" :placeholder="t.name" required>
-                <input class="inp" type="tel" x-model="f.phone" :placeholder="t.phone" required>
-                <input class="inp" type="text" x-model="f.city" :placeholder="t.city">
-                <textarea class="inp" rows="3" x-model="f.notes" :placeholder="t.notes"></textarea>
-                <button class="submit-btn" type="submit" :disabled="ui.loading"><span x-show="!ui.loading" x-text="t.submit"></span><span x-show="ui.loading" x-text="t.sending"></span></button>
-                <div class="tiny text-center" :class="ui.ok?'text-green-200':'text-rose-200'" x-show="ui.msg" x-text="ui.msg"></div>
-            </form>
+    <div x-show="submitted" class="fixed inset-0 z-[200] bg-black/80 flex items-center justify-center p-6 text-center" x-transition>
+        <div class="bg-white rounded-[40px] p-10 max-w-xs shadow-2xl">
+            <h3 class="text-2xl font-black mb-4" x-text="lang==='he'?'בוצע בהצלחה!':'تم بنجاح!'"></h3>
+            <p class="text-gray-500 font-bold mb-6" x-text="lang==='he'?'זהו, אתה מוכן! ההזמנה התקבלה':'خلاص أنت جاهز، تم استلام الطلب'"></p>
+            <button @click="submitted = false" class="mt-4 w-full bg-black text-white py-4 rounded-xl font-bold">إغلاق | סגור</button>
         </div>
-    </template>
-
-    <div class="order-grid">
-        <template x-if="c.showWa"><a :href="'https://wa.me/'+c.waNum+'?text='+encodeURIComponent(t.waText)" target="_blank" class="btn-order btn-wa" @click="trackContact('whatsapp')"><i data-lucide="message-circle"></i> <span x-text="t.waLabel"></span></a></template>
-        <template x-if="c.showCall"><a :href="'tel:'+c.callNum" class="btn-order btn-call" @click="trackContact('phone')"><i data-lucide="phone"></i> <span x-text="t.callLabel"></span></a></template>
-        <template x-if="c.showWeb"><a :href="c.webUrl" target="_blank" class="btn-order btn-web" @click="track('ViewContent')"><i data-lucide="globe"></i> <span x-text="t.webLabel"></span></a></template>
     </div>
 
-    <template x-if="c.showFloatingBtn"><div class="sticky-cta"><a href="#shop" class="sticky-btn" x-text="t.ctaText"></a></div></template>
-</section>
+    <script>
+        function app() {
+            return {
+                lang: 'ar', loading: false, submitted: false, hasStartedTyping: false,
+                blocks: [{"id":1,"type":"text","content":{"ar":"توصيل مجاني","he":"משלוח חינם"},"align":"center"},{"id":1769461382768,"type":"image","content":{"ar":"","he":""},"url":"https://madperfume.ps/upload/01-2026/page/6977dadece4a2.jpg","score":"4.9 / 5","link":"#order","align":"center","items":[]},{"id":1769461402031,"type":"fragrantica","content":{"ar":"","he":""},"url":"","score":"4.9 / 5","link":"#order","align":"center","items":[]},{"id":1769461406783,"type":"comparison","content":{"ar":"","he":""},"url":"","score":"4.9 / 5","link":"#order","align":"center","items":[{"mad":{"ar":"بصمة أمان 100% ومصادق من IFRA","he":"בטוח ב-100% ומאושר ע\"י IFRA"},"other":{"ar":"زيوت كيميائية مجهولة المصدر","he":"שמנים ממקור לא ידוע"}},{"mad":{"ar":"تطابق جزيئي وتركيز نيش حقيقي","he":"התאמה מולקולרית וריכוז נישה"},"other":{"ar":"خلط يدوي عشوائي يتفكك فوراً","he":"ערבוב ידני אקראי"}},{"mad":{"ar":"ثبات فائق يتجاوز 24 ساعة","he":"עמידות מעל 24 שעות"},"other":{"ar":"يختفي بعد أقل من ساعة","he":"נעלם מהר"}},{"mad":{"ar":"لا يسبب الحساسية أو الصداع","he":"לא גורם לאלרגיות או כאבי ראש"},"other":{"ar":"مذيبات كيميائية ضارة","he":"ממסים כימיים מזיקים"}},{"mad":{"ar":"خدمة زبائن و41 فرع في البلاد","he":"שירות לקוחות ו-41 סניפים בארץ"},"other":{"ar":"متاجر أونلاين بلا عنوان","he":"חנויות אונליין ללא כתובת"}},{"mad":{"ar":"تعتيق وتصفية مخبرية أوروبية","he":"יישון וסינון מעבדתי אירופאי"},"other":{"ar":"زيوت تجارية رخيصة","he":"שמנים מסחריים זולים"}},{"mad":{"ar":"مصادقات الأيزو ووزارة الصحة","he":"אישור תקן ISO ומשרד הבריאות"},"other":{"ar":"غير مفحوص ومقلد","he":"לא נבדק "}}]},{"id":1769461409701,"type":"form","content":{"ar":"","he":""},"url":"","score":"4.9 / 5","link":"#order","align":"center","items":[]},{"id":1769461411584,"type":"iso","content":{"ar":"","he":""},"url":"","score":"4.9 / 5","link":"#order","align":"center","items":[]}], c: {"bgColor":"#9f8b79","logoUrl":"https://madperfume.ps/upload/01-2026/page/6977cf82b87ef.png","heroTitle":{"ar":"أقوى العروض الحصرية بـ 500 شيكل","he":"המבצעים הבלעדיים ביותר ב-500 ש\"ח"},"sheetUrl":"https://script.google.com/macros/s/AKfycbzA9cDGKFFwAJ69Sso3rNOKIO7bbuHW-SL1ilXi4u0_MtJBkndwwzj3X0T7S4NB50kd/exec","fbPixel":"1072283127290819","ttPixel":"D2D02JBC77U4ENLN9SBG","snapPixel":"b143822e-1c3c-40ff-93f7-edadee74e626"}, f: { name:'', phone:'', address:'', payment:'', process:'' },
+                get offerName() { 
+                    const p = window.location.pathname.split('/').pop().split('.')[0];
+                    return (p && p !== 'index' && p !== '' && p !== 'srcdoc' && p !== 'blank') ? p : 'MAD-Product';
+                },
+                init(fL = null) {
+                    this.lang = fL || (navigator.language.startsWith('he') ? 'he' : 'ar');
+                    setTimeout(() => { if(window.lucide) lucide.createIcons(); }, 300);
+                },
+                trackInput() {
+                    if(!this.hasStartedTyping && this.f.name.length > 2) {
+                        this.hasStartedTyping = true;
+                        const p = { content_name: this.offerName };
+                        if(window.fbq) fbq('track', 'AddToCart', p);
+                        if(window.ttq) ttq.track('AddToCart', p);
+                        if(window.snaptr) snaptr('track', 'ADD_CART', p);
+                    }
+                },
+                async submitForm() {
+                    if(this.loading) return;
+                    this.loading = true;
+                    const p = { value: 500, currency: 'ILS', content_name: this.offerName };
+                    if(window.fbq) fbq('track', 'Purchase', p);
+                    if(window.ttq) ttq.track('CompletePayment', p);
+                    if(window.snaptr) snaptr('track', 'PURCHASE', { currency: 'ILS', price: 500 });
 
-<footer class="py-6 text-center text-xs text-gray-600">© 2026 MAD PARFUMEUR</footer>
-</body></html>
+                    const fd = new FormData();
+                    Object.keys(this.f).forEach(k => fd.append(k, this.f[k]));
+                    fd.append('offer', this.offerName);
+                    fd.append('lang', this.lang);
+                    
+                    try {
+                        await fetch(this.c.sheetUrl, { method: 'POST', body: fd, mode: 'no-cors' });
+                        this.submitted = true;
+                        this.f = { name:'', phone:'', address:'', payment:'', process:'' };
+                    } catch(e) { console.error(e); } finally { this.loading = false; }
+                }
+            }
+        }
+    </script>
+</body>
+</html>
