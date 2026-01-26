@@ -28,7 +28,6 @@
         .btn-download { background: #000; color: #fff; width: 100%; padding: 15px; border-radius: 12px; font-weight: 800; font-size: 1rem; cursor: pointer; margin-top: 20px; border: none; }
         .btn-copy { background: #4b5563; color: #fff; width: 100%; padding: 12px; border-radius: 12px; font-weight: 700; font-size: 0.9rem; cursor: pointer; margin-top: 10px; border: none; }
         .file-upload-label { display: block; background: #f1f5f9; border: 1px dashed #cbd5e1; padding: 10px; border-radius: 8px; text-align: center; font-size: 11px; cursor: pointer; margin-bottom: 10px; }
-        .btn-add { background:#111827; color:#fff; padding:8px 10px; border-radius:10px; font-size:11px; font-weight:800; margin:3px; }
     </style>
 </head>
 <body>
@@ -181,7 +180,6 @@
                 this.updatePreview();
             },
             updatePreview() { document.getElementById('iphone-iframe').srcdoc = this.generateFinalHTML(false); },
-
             generateFinalHTML(isDownload = true) {
                 const bJ = JSON.stringify(this.blocks).replace(/</g, '\\u003c');
                 const cJ = JSON.stringify(this.config).replace(/</g, '\\u003c');
@@ -232,12 +230,41 @@
                 <template x-if="b.type==='video'"><video :src="b.url" controls class="w-full rounded-2xl shadow-md" playsinline preload="metadata"></video></template>
                 <template x-if="b.type==='button'"><a :href="b.link" class="inline-block bg-black text-white px-10 py-4 rounded-xl font-black text-xl shadow-lg transition-transform active:scale-95" x-text="b.content[lang]"></a></template>
                 <template x-if="b.type==='iframe'"><iframe :src="b.url" class="w-full h-96 rounded-xl border-none"></iframe></template>
+                
+                <template x-if="b.type==='fragrantica'">
+                    <a :href="b.url" target="_blank" class="block w-full max-w-[320px] bg-[#3f5a31] text-white p-5 rounded-[24px] shadow-xl relative overflow-hidden mx-auto">
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="text-[10px] font-black uppercase text-white/60">Fragrantica Reviews</span>
+                            <div class="flex text-amber-400 gap-0.5"><i data-lucide="star" class="w-3 h-3 fill-current"></i><i data-lucide="star" class="w-3 h-3 fill-current"></i><i data-lucide="star" class="w-3 h-3 fill-current"></i><i data-lucide="star" class="w-3 h-3 fill-current"></i><i data-lucide="star" class="w-3 h-3 fill-current"></i></div>
+                        </div>
+                        <div class="flex items-end gap-2"><span class="text-4xl font-black" x-text="b.score"></span><span class="text-xs opacity-60 mb-1">Rating</span></div>
+                    </a>
+                </template>
+
+                <template x-if="b.type==='iso'">
+                    <div class="grid grid-cols-3 gap-3 w-full max-w-sm mx-auto mt-4 text-center">
+                        <div class="bg-white border border-black/5 p-3 rounded-2xl shadow-sm"><div class="text-xl">🛡️</div><p class="text-[8px] font-black uppercase leading-tight">ISO 9001<br>Certified</p></div>
+                        <div class="bg-white border border-black/5 p-3 rounded-2xl shadow-sm"><div class="text-xl">🧪</div><p class="text-[8px] font-black uppercase leading-tight">IFRA Safe<br>Standard</p></div>
+                        <div class="bg-white border border-black/5 p-3 rounded-2xl shadow-sm"><div class="text-xl">🏛️</div><p class="text-[8px] font-black uppercase leading-tight">Health<br>Ministry OK</p></div>
+                    </div>
+                </template>
+
+                <template x-if="b.type==='comparison'">
+                    <div class="space-y-2 mt-4">
+                        <template x-for="row in b.items">
+                            <div class="grid grid-cols-2 gap-1 rounded-xl overflow-hidden border border-black/5 shadow-sm">
+                                <div class="bg-gray-50 p-4"><span class="text-[8px] font-black text-amber-600 block mb-1 uppercase">MAD</span><p class="text-[11px] font-bold leading-tight" x-text="row.mad[lang]"></p></div>
+                                <div class="bg-white p-4 border-r border-black/5 text-gray-5 text-right"><span class="text-[8px] font-black text-gray-5 block mb-1 uppercase">OTHERS</span><p class="text-[11px]" x-text="row.other[lang]"></p></div>
+                            </div>
+                        </template>
+                    </div>
+                </template>
 
                 <template x-if="b.type==='form'">
                     <div class="bg-white border-2 border-gray-100 rounded-[28px] p-8 shadow-sm text-right mt-6" id="order">
                         <h2 class="text-2xl font-black text-center mb-6" x-text="lang === 'he' ? 'הזמנה מהירה' : 'إتمام الطلب السريع'"></h2>
                         <form @submit.prevent="submitForm">
-                            <input type="text" x-model="f.name" @input="trackInput" class="mad-input" :placeholder="lang === 'he' ? 'שם מלא' : 'الاسم الكامل'" required autocomplete="name">
+                            <input type="text" x-model="f.name" class="mad-input" :placeholder="lang === 'he' ? 'שם מלא' : 'الاسم الكامل'" required autocomplete="name">
                             <input type="tel" x-model="f.phone" class="mad-input" :placeholder="lang === 'he' ? 'טלפון' : 'رقم الهاتف'" required autocomplete="tel">
                             <input type="text" x-model="f.address" class="mad-input" :placeholder="lang === 'he' ? 'יישוב וכתובת' : 'المدينة والعنوان'" required autocomplete="street-address">
                             <div class="grid grid-cols-2 gap-3 mb-6">
@@ -246,7 +273,7 @@
                             </div>
                             <div class="space-y-3 mb-6">
                                 <label class="block cursor-pointer"><input type="radio" x-model="f.process" value="Direct" class="hidden"><div class="mad-radio-ui flex-row justify-between py-4 px-5"><div class="flex items-center gap-3"><i data-lucide="truck" class="w-4 h-4 text-black"></i><span class="text-sm font-bold" x-text="lang === 'he' ? 'משלוח ישיר' : 'شحن مباشر'"></span></div></div></label>
-                                <label class="block cursor-pointer"><input type="radio" x-model="f.process" value="Contact" class="hidden"><div class="mad-radio-ui flex-row justify-between py-4 px-5"><div class="flex items-center gap-3"><i data-lucide="phone" class="w-4 h-4 opacity-40"></i><span class="text-sm font-bold" x-text="lang === 'he' ? 'אישור טלפוני' : 'تواصل معي للتأكيد'"></span></div></div></label>
+                                <label class="block cursor-pointer"><input type="radio" x-model="f.process" value="Contact" class="hidden"><div class="mad-radio-ui flex-row justify-between py-4 px-5"><div class="flex items-center gap-3"><i data-lucide="phone" class="w-4 h-4 opacity-40"></i><span class="text-sm font-bold" x-text="lang === 'he' ? 'אישור טלפوني' : 'تواصل معي للتأكيد'"></span></div></div></label>
                             </div>
                             <button type="submit" class="w-full py-5 rounded-2xl bg-black text-white font-black transition-all active:scale-95" :disabled="loading" x-text="loading ? '...' : (lang === 'he' ? 'אשר הזמנה' : 'تأكيد الطلب الآن')"></button>
                         </form>
@@ -255,53 +282,48 @@
             </div>
         </template>
     </main>
-
+    <div x-show="submitted" x-cloak class="fixed inset-0 z-[100] bg-white/95 flex items-center justify-center p-6 text-center" x-transition>
+        <div class="max-w-xs">
+            <div class="w-20 h-20 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-6 text-white shadow-lg"><i data-lucide="check" class="w-10 h-10"></i></div>
+            <h3 class="text-2xl font-black" x-text="lang==='he'?'בוצע בהצלחה!':'تم بنجاح!'"></h3>
+            <p class="text-gray-500 mt-2 font-bold leading-relaxed" x-text="lang==='he'?'זהו, אתה מוכן! ההזמנה התקבלה והחבילה בדרך אליך (בתוך 5 ימי עסקים).':'خلاص أنت جاهز، تم ورايحين نشحن لك الطرد (خلال 5 يوم عمل).'"></p>
+            <button @click="submitted = false" class="mt-8 w-full bg-black text-white py-4 rounded-xl font-bold shadow-md">إغلاق | סגור</button>
+        </div>
+    </div>
     <script>
         function app() {
             return {
                 lang: 'ar', loading: false, submitted: false, hasStartedTyping: false,
                 blocks: ${bJ}, c: ${cJ}, f: { name:'', phone:'', address:'', payment:'Cash', process:'Direct' },
-
-                // ✅ اسم المنتج من الرابط قبل .html (بدون تخبيص)
-                get offerName() {
-                    const raw = decodeURIComponent((window.location.pathname.split('/').pop() || '').split('?')[0]);
-                    const clean = raw.replace(/\.html$/i, '');
-                    return clean || 'MAD-Product';
-                },
-
+                get offerName() { const p = window.location.pathname.split('/').pop().split('.')[0]; return p || 'MAD-Product'; },
                 init(fL = null) {
                     if(fL) this.lang = fL; else { const ul = (navigator.language || '').toLowerCase(); this.lang = ul.startsWith('he') ? 'he' : 'ar'; }
                     setTimeout(() => { if(window.lucide) lucide.createIcons(); }, 150);
                 },
-
                 trackInput() {
                     if(!this.hasStartedTyping && this.f.name.length > 2) {
                         this.hasStartedTyping = true;
-                        if(window.fbq) fbq('track', 'AddToCart', { content_name: this.offerName, content_id: this.offerName });
-                        if(window.ttq) ttq.track('AddToCart', { content_name: this.offerName, content_id: this.offerName });
+                        if(window.fbq) fbq('track', 'AddToCart', { content_name: this.offerName });
                     }
                 },
-
                 async submitForm() {
                     if(this.loading) return; this.loading = true;
-
-                    // ✅ TikTok VSA Fix: content_id موجود
+                    // Fire analytics if available
                     const p = { value: 500, currency: 'ILS', content_name: this.offerName, content_id: this.offerName };
 
                     if(window.fbq) fbq('track', 'Purchase', p);
                     if(window.ttq) ttq.track('CompletePayment', p);
                     if(window.snaptr) snaptr('track', 'PURCHASE', { currency: 'ILS', price: 500 });
-
+                    
                     const fd = new FormData(); 
                     Object.keys(this.f).forEach(k => fd.append(k, this.f[k]));
                     fd.append('offer', this.offerName); fd.append('lang', this.lang);
-
+                    
                     try { 
                         await fetch(this.c.sheetUrl, { method: 'POST', body: fd, mode: 'no-cors' }); 
                         this.submitted = true; 
                         this.f = { name:'', phone:'', address:'', payment:'Cash', process:'Direct' }; 
-                    } catch(e) { console.error(e); } 
-                    finally { this.loading = false; setTimeout(()=>lucide.createIcons(), 50); }
+                    } catch(e) { console.error(e); } finally { this.loading = false; setTimeout(()=>lucide.createIcons(), 50); }
                 }
             }
         }
@@ -309,7 +331,6 @@
 </body>
 </html>`;
             },
-
             async copyHTMLToClipboard() {
                 const html = this.generateFinalHTML(true);
                 const el = document.createElement('textarea');
@@ -322,16 +343,13 @@
                 } catch (err) {}
                 document.body.removeChild(el);
             },
-
             downloadHTML() {
                 const link = document.createElement('a');
                 link.href = URL.createObjectURL(new Blob([this.generateFinalHTML(true)], {type:'text/html'}));
-                link.download = 'mad-turbo-v7.html';
-                link.click();
+                link.download = 'mad-turbo-v7.html'; link.click();
             }
         }
     }
 </script>
-
 </body>
 </html>
