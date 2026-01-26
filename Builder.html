@@ -45,14 +45,14 @@
         .align-btn.active { background: #000; color: #fff; border-color: #000; }
 
         .sub-item { border-top: 1px dashed var(--border); padding: 10px 0; position: relative; }
-        .btn-row-del { position: absolute; left: 0; top: 10px; color: #ef4444; font-size: 10px; font-weight: bold; cursor: pointer; }
+        .btn-row-del { position: absolute; left: 0; top: 10px; color: #ef4444; font-size: 10px; font-weight: bold; cursor: pointer; border: none; background: none; }
     </style>
 </head>
 <body>
 
 <div class="app-layout" x-data="builderApp()">
     <aside class="editor-sidebar">
-        <h1 class="text-xl font-black mb-4 text-center text-black">MAD STUDIO PRO V2 💎</h1>
+        <h1 class="text-xl font-black mb-4 text-center">MAD STUDIO PRO V2 💎</h1>
 
         <div class="lang-switch">
             <button @click="setEditLang('ar')" :class="editLang === 'ar' ? 'active' : ''" class="lang-switch-btn">تعديل المحتوى العربي</button>
@@ -62,13 +62,11 @@
         <div class="section-box">
             <h2><i data-lucide="settings"></i> إعدادات الصفحة</h2>
             <label>لون خلفية الصفحة</label>
-            <input type="color" x-model="config.bgColor" @input="updatePreview()" class="h-10 p-1 mb-4">
-            
-            <label>رابط الشعار (Logo)</label>
+            <input type="color" x-model="config.bgColor" @input="updatePreview()" class="h-10 p-1 mb-4 w-full">
+            <label>رابط الشعار</label>
             <input type="text" x-model="config.logoUrl" @input="updatePreview()">
-            
             <label>العنوان الرئيسي (Hero)</label>
-            <input type="text" x-model="config.heroTitle[editLang]" @input="updatePreview()" :placeholder="editLang === 'ar' ? 'العنوان بالعربي' : 'כותרת בעברית'">
+            <input type="text" x-model="config.heroTitle[editLang]" @input="updatePreview()">
         </div>
 
         <div class="section-box">
@@ -77,28 +75,18 @@
                 <template x-for="(block, index) in blocks" :key="block.id">
                     <div class="block-item shadow-sm">
                         <button class="btn-del" @click="removeBlock(index)">×</button>
-                        <div class="flex justify-between items-center mb-2">
-                            <span class="text-[10px] font-black text-black/40" x-text="block.type.toUpperCase()"></span>
-                            <div class="flex gap-1">
-                                <button @click="moveBlock(index, -1)" class="p-1 hover:bg-gray-100 rounded"><i data-lucide="chevron-up" class="w-3 h-3"></i></button>
-                                <button @click="moveBlock(index, 1)" class="p-1 hover:bg-gray-100 rounded"><i data-lucide="chevron-down" class="w-3 h-3"></i></button>
-                            </div>
-                        </div>
+                        <span class="text-[10px] font-black text-black/40 block mb-2" x-text="block.type.toUpperCase()"></span>
 
                         <template x-if="['text', 'emoji', 'button'].includes(block.type)">
-                            <input type="text" x-model="block.content[editLang]" @input="updatePreview()" :placeholder="block.type === 'button' ? (editLang === 'ar' ? 'نص الزر' : 'טקסט כפתור') : (editLang === 'ar' ? 'المحتوى' : 'תוכן')">
+                            <input type="text" x-model="block.content[editLang]" @input="updatePreview()" :placeholder="block.type">
                         </template>
 
                         <template x-if="block.type === 'button'">
-                            <input type="text" x-model="block.link" @input="updatePreview()" placeholder="رابط الزر (#order)">
+                            <input type="text" x-model="block.link" @input="updatePreview()" placeholder="Link">
                         </template>
 
                         <template x-if="['image', 'video', 'iframe', 'fragrantica'].includes(block.type)">
-                            <input type="text" x-model="block.url" @input="updatePreview()" placeholder="رابط URL...">
-                        </template>
-
-                        <template x-if="block.type === 'fragrantica'">
-                            <input type="text" x-model="block.score" @input="updatePreview()" placeholder="التقييم (مثلاً 4.9/5)">
+                            <input type="text" x-model="block.url" @input="updatePreview()" placeholder="URL">
                         </template>
 
                         <template x-if="block.type === 'comparison'">
@@ -106,22 +94,22 @@
                                 <template x-for="(row, rIdx) in block.items" :key="rIdx">
                                     <div class="sub-item">
                                         <button class="btn-row-del" @click="block.items.splice(rIdx, 1); updatePreview()">حذف</button>
-                                        <input type="text" x-model="row.mad[editLang]" @input="updatePreview()" placeholder="ميزة MAD">
-                                        <input type="text" x-model="row.other[editLang]" @input="updatePreview()" placeholder="المنافس">
+                                        <input type="text" x-model="row.mad[editLang]" @input="updatePreview()" placeholder="MAD">
+                                        <input type="text" x-model="row.other[editLang]" @input="updatePreview()" placeholder="Others">
                                     </div>
                                 </template>
                                 <button class="btn-add w-full mt-2" @click="block.items.push({mad:{ar:'', he:''}, other:{ar:'', he:''}}); updatePreview()">+ سطر جديد</button>
                             </div>
                         </template>
 
-                        <template x-if="block.type === 'embed'">
-                            <textarea x-model="block.content[editLang]" @input="updatePreview()" placeholder="HTML code..." rows="3"></textarea>
-                        </template>
-
-                        <div class="align-tool">
-                            <button @click="block.align = 'right'; updatePreview()" :class="block.align === 'right' ? 'active' : ''" class="align-btn">يمين</button>
-                            <button @click="block.align = 'center'; updatePreview()" :class="block.align === 'center' ? 'active' : ''" class="align-btn">وسط</button>
-                            <button @click="block.align = 'left'; updatePreview()" :class="block.align === 'left' ? 'active' : ''" class="align-btn">يسار</button>
+                        <div class="flex gap-1 mt-3">
+                            <button @click="moveBlock(index, -1)" class="p-1 border rounded"><i data-lucide="chevron-up" class="w-3 h-3"></i></button>
+                            <button @click="moveBlock(index, 1)" class="p-1 border rounded"><i data-lucide="chevron-down" class="w-3 h-3"></i></button>
+                            <select x-model="block.align" @change="updatePreview()" class="text-[10px] p-1 border rounded flex-1">
+                                <option value="center">وسط</option>
+                                <option value="right">يمين</option>
+                                <option value="left">يسار</option>
+                            </select>
                         </div>
                     </div>
                 </template>
@@ -132,25 +120,18 @@
                 <button class="btn-add" @click="addBlock('image')">+ صورة</button>
                 <button class="btn-add" @click="addBlock('video')">+ فيديو</button>
                 <button class="btn-add" @click="addBlock('button')">+ زر</button>
-                <button class="btn-add" @click="addBlock('emoji')">+ ايموجي</button>
                 <button class="btn-add" @click="addBlock('comparison')">+ مقارنات كاملة</button>
-                <button class="btn-add" @click="addBlock('iso')">+ الأيزو</button>
+                <button class="btn-add" @click="addBlock('iso')">+ الأيزو والوزارة</button>
                 <button class="btn-add" @click="addBlock('fragrantica')">+ فراجرانتيكا</button>
                 <button class="btn-add" @click="addBlock('form')">+ فورم الشيت</button>
-                <button class="btn-add" @click="addBlock('embed')">+ HTML</button>
             </div>
         </div>
 
         <div class="section-box">
-            <h2>الإعدادات التقنية</h2>
-            <label>رابط Google Sheet Script</label>
-            <input type="text" x-model="config.sheetUrl">
-            <label>Meta Pixel</label>
-            <input type="text" x-model="config.fbPixel">
-            <label>TikTok Pixel</label>
-            <input type="text" x-model="config.ttPixel">
-            <label>Snapchat Pixel</label>
-            <input type="text" x-model="config.snapPixel">
+            <h2>التتبع</h2>
+            <label>Meta Pixel</label><input type="text" x-model="config.fbPixel">
+            <label>TikTok Pixel</label><input type="text" x-model="config.ttPixel">
+            <label>Snapchat Pixel</label><input type="text" x-model="config.snapPixel">
         </div>
 
         <button class="btn-download" @click="downloadHTML()">إصدار الصفحة النهائية 🚀</button>
@@ -180,11 +161,7 @@
             },
             
             init() { setTimeout(() => { if(window.lucide) lucide.createIcons(); this.updatePreview(); }, 500); },
-
-            setEditLang(l) {
-                this.editLang = l;
-                this.updatePreview();
-            },
+            setEditLang(l) { this.editLang = l; this.updatePreview(); },
 
             addBlock(type) {
                 let items = [];
@@ -195,8 +172,8 @@
                         {mad: {ar:'ثبات فائق يتجاوز 24 ساعة', he:'עמידות מעל 24 שעות'}, other: {ar:'يختفي بعد أقل من ساعة', he:'נעלם תוך פחות משעה'}},
                         {mad: {ar:'لا يسبب الحساسية أو الصداع', he:'לא גורם לאלרגיות או כאבי ראש'}, other: {ar:'مذيبات كيميائية ضارة', he:'ממסים כימיים מזיקים'}},
                         {mad: {ar:'خدمة زبائن و41 فرع في البلاد', he:'שירות לקוחות ו-41 סניפים בארץ'}, other: {ar:'متاجر أونلاين بلا عنوان', he:'חנויות אונליין ללא כתובת'}},
-                        {mad: {ar:'تعتيق وتصفية مخبرية أوروبية', he:'יישון וסינון מעבדתי אירופאי'}, other: {ar:'زيوت تجارية رخيصة', he:'שמנים מסחריים זולים'}},
-                        {mad: {ar:'مصادقات الأيزو ووزارة الصحة', he:'אישור תקן ISO ומשרד הבריאות'}, other: {ar:'غير مفحوص ومقلد', he:'לא נבדק ומזויף'}}
+                        {mad: {ar:'تعتيق وتصفية مخبرية أوروبية', he:'יישون וסינון מעבדתי אירופאי'}, other: {ar:'زيوت تجارية رخيصة', he:'שמנים מסחריים זולים'}},
+                        {mad: {ar:'مصادقات الأيزو ووزارة الصحة', he:'אישור תקן ISO ומשרד הבריאות'}, other: {ar:'غير مفحوص ومقلد', he:'לא נבדק ומזويף'}}
                     ];
                 }
                 this.blocks.push({ id: Date.now(), type, content: {ar:'', he:''}, url: '', score: '4.9 / 5', link: '#order', align: 'center', items });
@@ -219,36 +196,33 @@
             },
 
             generateFinalHTML(isDownload = true) {
-                const blocksJson = JSON.stringify(this.blocks).replace(/</g, '\\u003c');
-                const configJson = JSON.stringify(this.config).replace(/</g, '\\u003c');
-                const initialLang = isDownload ? null : `'${this.editLang}'`;
+                const bJ = JSON.stringify(this.blocks).replace(/</g, '\\u003c');
+                const cJ = JSON.stringify(this.config).replace(/</g, '\\u003c');
+                const iL = isDownload ? null : `'${this.editLang}'`;
 
                 return `<!DOCTYPE html>
-<html x-data="app()" x-init="init(${initialLang})" :lang="lang" :dir="lang==='he'?'ltr':'rtl'">
+<html x-data="app()" x-init="init(${iL})" :lang="lang" :dir="lang==='he'?'ltr':'rtl'">
 <head>
     <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.tailwindcss.com"><\/script>
     <script src="https://unpkg.com/lucide@latest"><\/script>
     <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer><\/script>
     <script>
-        // Meta Pixel
         !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)n=f.fbq;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window, document,'script','https://connect.facebook.net/en_US/fbevents.js');
         fbq('init', '${this.config.fbPixel}'); fbq('track', 'PageView');
-        // TikTok Pixel
         !function (w, d, t) { w.TiktokAnalyticsObject=t; var ttq=w[t]=w[t]||[]; ttq.methods=["page","track","identify","instances","debug","on","off","once","ready","alias","group","enableCookie","disableCookie","holdConsent","revokeConsent","grantConsent"]; ttq.setAndDefer=function(t,e){t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}; for(var i=0;i<ttq.methods.length;i++)ttq.setAndDefer(ttq,ttq.methods[i]); ttq.load=function(e,n){ var r="https://analytics.tiktok.com/i18n/pixel/events.js"; ttq._i=ttq._i||{}; ttq._i[e]=[]; ttq._i[e]._u=r; ttq._t=ttq._t||{}; ttq._t[e]=+new Date; ttq._o=ttq._o||{}; ttq._o[e]=n||{}; n=document.createElement("script"); n.type="text/javascript"; n.async=!0; n.src=r+"?sdkid="+e+"&lib="+t; e=document.getElementsByTagName("script")[0]; e.parentNode.insertBefore(n,e) }; ttq.load('${this.config.ttPixel}'); ttq.page(); }(window, document, 'ttq');
-        // Snapchat Pixel
         (function(e,t,n){if(e.snaptr)return;var a=e.snaptr=function(){a.handleRequest?a.handleRequest.apply(a,arguments):a.queue.push(arguments)};a.queue=[];var s='script';var r=t.createElement(s);r.async=!0;r.src=n;var u=t.getElementsByTagName(s)[0];u.parentNode.insertBefore(r,u)})(window,document,'https://sc-static.net/scevent.min.js');
         snaptr('init', '${this.config.snapPixel}'); snaptr('track', 'PAGE_VIEW');
     <\/script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&family=Heebo:wght@400;700;900&display=swap');
         body { background: ${this.config.bgColor}; color: #000; font-family: 'Cairo', 'Heebo', sans-serif; overflow-x: hidden; }
-        .mad-input { width: 100%; padding: 14px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; color: #000; outline: none; margin-bottom: 12px; text-align: inherit; }
+        .mad-input { width: 100%; padding: 14px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; outline: none; margin-bottom: 12px; text-align: inherit; }
         .mad-radio-ui { border: 1px solid #e2e8f0; border-radius: 14px; padding: 16px; background: #f8fafc; text-align: center; cursor: pointer; transition: 0.2s; }
         input[type="radio"]:checked + .mad-radio-ui { border-color: #000; background: #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
     </style>
 </head>
-<body>
+<body class="pb-20">
     <nav class="p-6 flex justify-center border-b border-black/5 bg-white/40 backdrop-blur-lg sticky top-0 z-50"><img src="${this.config.logoUrl}" style="height:45px; object-fit:contain"></nav>
     <header class="text-center py-10 px-4"><h1 class="text-3xl font-black" x-text="c.heroTitle[lang]"></h1></header>
     <main class="max-w-md mx-auto">
@@ -256,12 +230,9 @@
             <div :class="b.align==='center'?'text-center':(b.align==='left'?'text-left':'text-right')" class="my-6 px-4">
                 <template x-if="b.type==='text'"><p class="text-lg font-bold whitespace-pre-wrap" x-text="b.content[lang]"></p></template>
                 <template x-if="b.type==='emoji'"><div class="text-4xl" x-text="b.content[lang]"></div></template>
-                <template x-if="b.type==='image'"><img :src="b.url" class="rounded-2xl shadow-sm mx-auto"></template>
-                <template x-if="b.type==='video'"><video :src="b.url" controls class="w-full rounded-2xl" playsinline></video></template>
+                <template x-if="b.type==='image'"><img :src="b.url" class="rounded-2xl mx-auto shadow-lg"></template>
+                <template x-if="b.type==='video'"><video :src="b.url" controls class="w-full rounded-2xl shadow-lg" playsinline></video></template>
                 <template x-if="b.type==='button'"><a :href="b.link" class="inline-block bg-black text-white px-10 py-4 rounded-xl font-black text-xl shadow-lg" x-text="b.content[lang]"></a></template>
-                <template x-if="b.type==='iframe'"><iframe :src="b.url" class="w-full h-96 rounded-xl border-none"></iframe></template>
-                <template x-if="b.type==='embed'"><div x-html="b.content[lang]"></div></template>
-                
                 <template x-if="b.type==='fragrantica'">
                     <a :href="b.url" target="_blank" class="block w-full max-w-[320px] bg-[#3f5a31] text-white p-5 rounded-[24px] shadow-xl relative overflow-hidden mx-auto">
                         <div class="flex justify-between items-center mb-3">
@@ -275,9 +246,9 @@
 
                 <template x-if="b.type==='iso'">
                     <div class="grid grid-cols-3 gap-3 w-full max-w-sm mx-auto mt-4">
-                        <div class="bg-white border-2 border-black/5 p-3 rounded-2xl text-center"><div class="text-2xl">🛡️</div><p class="text-[8px] font-black uppercase">ISO 9001<br>Certified</p></div>
-                        <div class="bg-white border-2 border-black/5 p-3 rounded-2xl text-center"><div class="text-2xl">🧪</div><p class="text-[8px] font-black uppercase">IFRA Safe<br>Standard</p></div>
-                        <div class="bg-white border-2 border-black/5 p-3 rounded-2xl text-center"><div class="text-2xl">🏛️</div><p class="text-[8px] font-black uppercase">Ministry<br>Health OK</p></div>
+                        <div class="bg-white border border-black/5 p-3 rounded-2xl text-center shadow-sm"><div class="text-xl">🛡️</div><p class="text-[8px] font-black uppercase leading-tight">ISO 9001<br>Certified</p></div>
+                        <div class="bg-white border border-black/5 p-3 rounded-2xl text-center shadow-sm"><div class="text-xl">🧪</div><p class="text-[8px] font-black uppercase leading-tight">IFRA SAFE<br>Standard</p></div>
+                        <div class="bg-white border border-black/5 p-3 rounded-2xl text-center shadow-sm"><div class="text-xl">🏛️</div><p class="text-[8px] font-black uppercase leading-tight">Health<br>Ministry OK</p></div>
                     </div>
                 </template>
 
@@ -285,8 +256,10 @@
                     <div class="space-y-2 mt-4">
                         <template x-for="row in b.items">
                             <div class="grid grid-cols-2 gap-1 rounded-xl overflow-hidden border border-black/5 shadow-sm">
-                                <div class="bg-gray-50 p-4"><span class="text-[8px] font-black text-amber-600 block mb-1">MAD</span><p class="text-[11px] font-bold" x-text="row.mad[lang]"></p></div>
-                           <p class="text-gray-500 mt-2 font-bold leading-relaxed" x-text="lang==='he'?'זהו, אתה מוכן! ההזמנה התקבלה והחבילה בדרך אליך (עד 5 ימי עסקים).':'خلاص أنت جاهز، تم ورايحين نشحن لك الطرد (خلال 5 أيام عمل).'"></p>                            </div>
+                                <div class="bg-gray-50 p-4"><span class="text-[8px] font-black text-amber-600 block mb-1">MAD</span><p class="text-[11px] font-bold leading-tight" x-text="row.mad[lang]"></p></div>
+                                <!-- 🔥 FIX: row.other[lang] binds correctly now -->
+                                <div class="bg-white p-4 border-r border-black/5 text-gray-400"><span class="text-[8px] font-black text-gray-300 block mb-1">OTHERS</span><p class="text-[11px]" x-text="row.other[lang]"></p></div>
+                            </div>
                         </template>
                     </div>
                 </template>
@@ -306,7 +279,7 @@
                                 <label class="block cursor-pointer"><input type="radio" x-model="f.process" value="Direct" class="hidden" required><div class="mad-radio-ui text-xs" x-text="lang === 'he' ? 'משלוח ישיר' : 'شحن مباشر'"></div></label>
                                 <label class="block cursor-pointer"><input type="radio" x-model="f.process" value="Contact" class="hidden" required><div class="mad-radio-ui text-xs" x-text="lang === 'he' ? 'אישור טלפוני' : 'تواصل معي للتأكيد'"></div></label>
                             </div>
-                            <button type="submit" class="w-full py-5 rounded-2xl bg-black text-white font-black transition-transform active:scale-95" :disabled="loading" x-text="loading ? '...' : (lang === 'he' ? 'אשר הזמנה' : 'تأكيد الطلب')"></button>
+                            <button type="submit" class="w-full py-5 rounded-2xl bg-black text-white font-black transition-all active:scale-95" :disabled="loading" x-text="loading ? '...' : (lang === 'he' ? 'אשר הזמנה' : 'تأكيد الطلب الآن')"></button>
                         </form>
                     </div>
                 </template>
@@ -318,8 +291,9 @@
         <div class="max-w-xs">
             <div class="w-20 h-20 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-6 text-white shadow-lg"><i data-lucide="check" class="w-10 h-10"></i></div>
             <h3 class="text-2xl font-black" x-text="lang==='he'?'בוצע בהצלחה!':'تم بنجاح!'"></h3>
-            <p class="text-gray-500 mt-2 font-bold" x-text="lang==='he'?'זהו, אתה מוכן! החבילה נשלחה אליך.':'خلاص أنت جاهز، تم ورايحين نشحن لك الطرد.'"></p>
-            <button @click="submitted = false" class="mt-8 w-full bg-black text-white py-4 rounded-xl font-bold shadow-md">إغلاق | סגור</button>
+            <!-- 🔥 FIXED: 3 business days text -->
+            <p class="text-gray-500 mt-2 font-bold leading-relaxed" x-text="lang==='he'?'זהו, אתה מוכן! ההזמנה התקבלה והחבילה בדרך אליך (עד 3 ימי עסקים).':'خلاص أنت جاهز، تم ورايحين نشحن لك الطرد (خلال 3 أيام عمل).'"></p>
+            <button @click="submitted = false" class="mt-8 w-full bg-black text-white py-4 rounded-xl font-bold shadow-md">إغلاق | סגور</button>
         </div>
     </div>
 
@@ -327,16 +301,15 @@
         function app() {
             return {
                 lang: 'ar', loading: false, submitted: false, hasStartedTyping: false,
-                blocks: ${blocksJson}, c: ${configJson},
+                blocks: ${bJ}, c: ${cJ},
                 f: { name:'', phone:'', address:'', payment:'', process:'' },
                 get offerName() { 
                     const p = window.location.pathname.split('/').pop().split('.')[0];
                     return p && p !== 'index' && p !== '' ? p : 'MAD-Product';
                 },
-                init(forcedLang = null) {
-                    if(forcedLang) {
-                        this.lang = forcedLang;
-                    } else {
+                init(fL = null) {
+                    if(fL) { this.lang = fL; }
+                    else {
                         const ul = (navigator.language || '').toLowerCase();
                         this.lang = ul.startsWith('he') ? 'he' : 'ar';
                     }
@@ -355,18 +328,13 @@
                     if(this.loading) return;
                     this.loading = true;
                     
-                    // Fire Pixels Immediately
                     const p = { value: 500, currency: 'ILS', content_name: this.offerName };
                     if(window.fbq) fbq('track', 'Purchase', p);
                     if(window.ttq) ttq.track('CompletePayment', p);
                     if(window.snaptr) snaptr('track', 'PURCHASE', { currency: 'ILS', price: 500 });
 
                     const fd = new FormData();
-                    fd.append('name', this.f.name);
-                    fd.append('phone', this.f.phone);
-                    fd.append('address', this.f.address);
-                    fd.append('payment', this.f.payment);
-                    fd.append('process', this.f.process);
+                    Object.keys(this.f).forEach(k => fd.append(k, this.f[k]));
                     fd.append('offer', this.offerName);
                     fd.append('lang', this.lang);
                     
@@ -382,11 +350,9 @@
 </body>
 </html>`;
             },
-
             downloadHTML() {
-                const html = this.generateFinalHTML(true);
                 const link = document.createElement('a');
-                link.href = URL.createObjectURL(new Blob([html], {type:'text/html'}));
+                link.href = URL.createObjectURL(new Blob([this.generateFinalHTML(true)], {type:'text/html'}));
                 link.download = 'mad-smart-page.html';
                 link.click();
             }
