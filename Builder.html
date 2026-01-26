@@ -3,55 +3,64 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MAD Builder Ultimate v5.6 - Clean Start Edition 💎</title>
+    <title>MAD Builder PRO v7.0 - CLEAN & STABLE 💎</title>
     <style>
         :root { --primary: #d4af37; --bg: #0f172a; --panel: #1e293b; --text: #f1f5f9; --border: #334155; --danger: #ef4444; }
         body { margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); height: 100vh; overflow: hidden; }
-        
         .main-layout { display: flex; height: 100vh; flex-direction: row-reverse; }
         .preview-pane { flex: 1; background: #020617; display: flex; justify-content: center; align-items: center; border-right: 1px solid var(--border); padding: 20px; overflow: hidden; background-image: radial-gradient(#1e293b 1px, transparent 1px); background-size: 20px 20px; }
-        .editor-pane { width: 600px; background: var(--panel); padding: 30px; overflow-y: auto; box-shadow: -5px 0 15px rgba(0,0,0,0.3); display: flex; flex-direction: column; gap: 20px; scrollbar-width: thin; }
-
-        .iphone-mockup { width: 375px; height: 812px; background: #000; border-radius: 40px; border: 12px solid #2d2d2d; position: relative; box-shadow: 0 0 50px rgba(0,0,0,0.5); overflow: hidden; transform: scale(0.75); flex-shrink: 0; }
+        .editor-pane { width: 550px; background: var(--panel); padding: 30px; overflow-y: auto; box-shadow: -5px 0 15px rgba(0,0,0,0.3); display: flex; flex-direction: column; gap: 15px; scrollbar-width: thin; }
+        .iphone-mockup { width: 375px; height: 812px; background: #000; border-radius: 40px; border: 12px solid #2d2d2d; position: relative; box-shadow: 0 0 50px rgba(0,0,0,0.5); overflow: hidden; transform: scale(0.7); flex-shrink: 0; }
         .iphone-notch { position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 150px; height: 30px; background: #2d2d2d; border-bottom-left-radius: 20px; border-bottom-right-radius: 20px; z-index: 100; }
-        .iphone-screen { width: 100%; height: 100%; background: #0b0b0b; border: none; display: block; overflow-y: auto; }
-
-        @media (max-width: 768px) {
-            .main-layout { flex-direction: column; height: auto; overflow: auto; }
-            .preview-pane { display: none; }
-            .editor-pane { width: 100%; height: auto; box-shadow: none; }
-            body { overflow: auto; }
-        }
-
-        h1 { color: var(--primary); margin: 0 0 5px 0; font-size: 1.4rem; text-align: center; }
-        h2 { font-size: 0.85rem; color: #94a3b8; border-bottom: 1px solid var(--border); padding-bottom: 5px; margin-top: 25px; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px; }
-        
-        .form-group { margin-bottom: 12px; }
+        .iphone-screen { width: 100%; height: 100%; background: #0b0b0b; border: none; display: block; }
+        @media (max-width: 768px) { .main-layout { flex-direction: column; height: auto; overflow: auto; } .preview-pane { display: none; } .editor-pane { width: 100%; height: auto; } }
+        h1 { color: var(--primary); margin: 0; font-size: 1.2rem; text-align: center; }
+        h2 { font-size: 0.8rem; color: #94a3b8; border-bottom: 1px solid var(--border); padding-bottom: 5px; margin: 15px 0 10px 0; text-transform: uppercase; letter-spacing: 1px; }
         .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        label { display: block; font-size: 0.75rem; margin-bottom: 4px; color: #cbd5e1; }
-        input[type="text"], textarea, select { width: 100%; padding: 10px; background: #0f172a; border: 1px solid var(--border); color: white; border-radius: 6px; box-sizing: border-box; outline: none; font-size: 0.85rem; transition: 0.2s; }
+        label { display: block; font-size: 0.7rem; margin-bottom: 3px; color: #cbd5e1; }
+        input, textarea, select { width: 100%; padding: 8px; background: #0f172a; border: 1px solid var(--border); color: white; border-radius: 6px; box-sizing: border-box; outline: none; font-size: 0.8rem; }
         input:focus, textarea:focus { border-color: var(--primary); }
-        input[type="color"] { width: 100%; height: 35px; border: none; padding: 0; cursor: pointer; border-radius: 6px; background: transparent; }
-        input[type="range"] { width: 100%; height: 6px; accent-color: var(--primary); cursor: pointer; }
-        
-        .card-control { background: rgba(0,0,0,0.2); padding: 15px; border-radius: 10px; border: 1px solid var(--border); margin-bottom: 10px; position: relative; }
-        .btn-delete { background: var(--danger); color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 0.7rem; position: absolute; top: 10px; left: 10px; z-index: 10; }
-        .btn-action { background: var(--primary); color: #000; font-weight: 900; padding: 18px; border-radius: 10px; border: none; cursor: pointer; width: 100%; font-size: 1.1rem; margin-top: 20px; transition: 0.2s; box-shadow: 0 4px 15px rgba(212,175,55,0.2); }
-        .btn-add { background: #334155; color: white; border: 1px solid var(--border); padding: 8px; border-radius: 6px; cursor: pointer; font-size: 0.8rem; flex: 1; transition: 0.2s; }
-        .btn-add:hover { background: var(--primary); color: black; }
-        
-        .toggle-group { display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px; border: 1px solid var(--border); }
-        .empty-notice { text-align: center; font-size: 0.7rem; color: #64748b; padding: 10px; border: 1px dashed var(--border); border-radius: 8px; }
+        .card-control { background: rgba(0,0,0,0.2); padding: 12px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 10px; position: relative; }
+        .btn-delete { background: var(--danger); color: white; border: none; padding: 3px 6px; border-radius: 4px; cursor: pointer; font-size: 0.6rem; position: absolute; top: 8px; left: 8px; z-index: 10; }
+        .btn-action { background: var(--primary); color: #000; font-weight: 900; padding: 18px; border-radius: 10px; border: none; cursor: pointer; width: 100%; font-size: 1rem; margin-top: 10px; box-shadow: 0 4px 15px rgba(212,175,55,0.3); }
+        .btn-add { background: #334155; color: white; border: 1px solid var(--border); padding: 7px; border-radius: 6px; cursor: pointer; font-size: 0.7rem; flex: 1; transition: 0.2s; }
+        .wa-box { border: 1px solid #25d366; background: rgba(37,211,102,0.05); padding: 12px; border-radius: 8px; }
+        .user-box { border: 1px solid var(--primary); background: rgba(212,175,55,0.05); padding: 12px; border-radius: 8px; }
     </style>
 </head>
 <body>
 
 <div class="main-layout">
     <div class="editor-pane">
-        <h1>MAD Builder Ultimate v5.6 💎</h1>
+        <h1>MAD Builder PRO v7.0 💎</h1>
         
+        <!-- WhatsApp Settings -->
+        <div class="wa-box">
+            <label style="color:#25d366; font-weight:bold;">🟢 واتساب (6 باراميترات ثابتة)</label>
+            <div class="grid-2">
+                <div>
+                    <label>قالب العربية</label>
+                    <input type="text" id="waTemplateAr" placeholder="arabic_v3" oninput="updateCommon('waTemplateAr', this.value)">
+                </div>
+                <div>
+                    <label>قالب العبرية</label>
+                    <input type="text" id="waTemplateHe" placeholder="order_confirmation_he" oninput="updateCommon('waTemplateHe', this.value)">
+                </div>
+            </div>
+        </div>
+
+        <!-- User Auto-Fill -->
+        <div class="user-box">
+            <label style="color:var(--primary); font-weight:bold;">👤 بيانات التعبئة التلقائية للزبون</label>
+            <div class="grid-2">
+                <input type="text" id="defName" placeholder="الاسم الافتراضي" oninput="updateCommon('defName', this.value)">
+                <input type="text" id="defPhone" placeholder="الهاتف الافتراضي" oninput="updateCommon('defPhone', this.value)">
+            </div>
+            <input type="text" id="defAddress" placeholder="العنوان الافتراضي" oninput="updateCommon('defAddress', this.value)" style="margin-top:8px">
+        </div>
+
         <div class="form-group">
-            <label>1. القوالب الجاهزة</label>
+            <label>1. اختيار عطر جاهز</label>
             <select id="perfumePreset" onchange="applyPreset(this.value)" style="border: 2px solid var(--primary); font-weight: bold;">
                 <option value="W183">W183 — Creed Aventus</option>
                 <option value="X102">X102 — Naxos</option>
@@ -61,173 +70,116 @@
             </select>
         </div>
 
-        <h2>🎨 2. التصميم والأبعاد والتحريك</h2>
+        <h2>🎨 التصميم</h2>
         <div class="grid-2">
-            <div class="form-group"><label>لون التوهج</label><input type="color" id="clr-primary" oninput="updateDesign('primary', this.value)"></div>
-            <div class="form-group"><label>لون الخلفية</label><input type="color" id="clr-bgBody" oninput="updateDesign('bgBody', this.value)"></div>
+            <div><label>لون التوهج</label><input type="color" id="clr-primary" oninput="updateDesign('primary', this.value)"></div>
+            <div><label>انحناء px</label><input type="range" min="0" max="50" id="rng-radius" oninput="updateDesign('borderRadius', this.value + 'px')"></div>
         </div>
-        <div class="grid-2">
-            <div class="form-group"><label>انحناء الزوايا</label><input type="range" min="0" max="50" id="rng-radius" oninput="updateDesign('borderRadius', this.value + 'px')"></div>
-            <div class="form-group"><label>تباعد الأقسام</label><input type="range" min="10" max="100" id="rng-spacing" oninput="updateDesign('sectionSpacing', this.value + 'px')"></div>
+        <div class="form-group"><input type="checkbox" id="chk-animate" checked onchange="updateDesign('animate', this.checked)"> <label style="display:inline">تفعيل التحريك</label></div>
+
+        <h2>🛍️ التحكم في النصوص</h2>
+        <select id="langSelect" onchange="setMode(this.value)">
+            <option value="ar">العربية (AR)</option>
+            <option value="he">עברית (HE)</option>
+        </select>
+        <input type="text" id="title" placeholder="عنوان المنتج" oninput="updateData('title', this.value)" style="margin-top:8px">
+        <div class="grid-2" style="margin-top:8px">
+            <input type="text" id="price" placeholder="السعر" oninput="updateData('price', this.value)">
+            <input type="text" id="old" placeholder="السعر القديم" oninput="updateData('old', this.value)">
         </div>
-        <div class="toggle-group">
-            <input type="checkbox" id="chk-animate" checked onchange="updateDesign('animate', this.checked)">
-            <label for="chk-animate" style="margin:0">تفعيل تأثيرات التحريك (Animations)</label>
+        <textarea id="desc" placeholder="الوصف" oninput="updateData('desc', this.value)" rows="2" style="margin-top:8px"></textarea>
+        <textarea id="notes" placeholder="النوتات (HTML)" oninput="updateData('notes', this.value)" rows="3" style="margin-top:8px"></textarea>
+        
+        <div class="grid-2" style="margin-top:8px">
+            <input type="text" id="badge" placeholder="نص الشارة" oninput="updateData('badge', this.value)">
+            <input type="text" id="cta" placeholder="نص زر الشراء" oninput="updateData('cta', this.value)">
         </div>
 
-        <h2>🛍️ 3. التحكم في نصوص الصفحة (عربي/عبري)</h2>
-        <div class="form-group">
-            <label>اللغة المفعلة للتعديل</label>
-            <select id="langSelect" onchange="setMode(this.value)">
-                <option value="ar">العربية (AR)</option>
-                <option value="he">עברית (HE)</option>
-            </select>
-        </div>
-        <div class="form-group"><label>اسم المنتج</label><input type="text" id="title" oninput="updateData('title', this.value)"></div>
-        <div class="grid-2">
-            <div><label>السعر الحالي</label><input type="text" id="price" oninput="updateData('price', this.value)"></div>
-            <div><label>السعر القديم</label><input type="text" id="old" oninput="updateData('old', this.value)"></div>
-        </div>
-        <div class="form-group"><label>الوصف الرئيسي</label><textarea id="desc" oninput="updateData('desc', this.value)" rows="2"></textarea></div>
-        <div class="form-group"><label>النوتات (HTML)</label><textarea id="notes" oninput="updateData('notes', this.value)" rows="3"></textarea></div>
-        <div class="grid-2">
-            <div><label>نص الشارة</label><input type="text" id="badge" oninput="updateData('badge', this.value)"></div>
-            <div><label>نص الزر (CTA)</label><input type="text" id="cta" oninput="updateData('cta', this.value)"></div>
-        </div>
-
-        <h2>⚖️ 4. المقارنة السداسية (Manifesto)</h2>
-        <div class="form-group"><label>عنوان المانيفستو</label><input type="text" id="maniTitle" oninput="updateData('maniTitle', this.value)"></div>
-        <div class="grid-2">
-            <input type="text" id="maniHeaderMad" placeholder="عنوان MAD" oninput="updateData('maniHeaderMad', this.value)">
-            <input type="text" id="maniHeaderOthers" placeholder="عنوان البدائل" oninput="updateData('maniHeaderOthers', this.value)">
-        </div>
-        <div id="maniItemsContainer" style="margin-top:10px"></div>
+        <h2>⚖️ المقارنة (Manifesto)</h2>
+        <div id="maniItemsContainer"></div>
         <button class="btn-add" onclick="addManiItem()">+ إضافة نقطة مقارنة</button>
 
-        <h2>📝 5. نموذج الطلب والمنبثقة</h2>
-        <div class="form-group"><label>عنوان النموذج</label><input type="text" id="formTitle" oninput="updateData('formTitle', this.value)"></div>
-        <div class="grid-2">
-            <input type="text" id="namePh" placeholder="مكان الاسم" oninput="updateData('namePh', this.value)">
-            <input type="text" id="phonePh" placeholder="مكان الهاتف" oninput="updateData('phonePh', this.value)">
-        </div>
-        <div class="form-group" style="margin-top:5px"><input type="text" id="addressPh" placeholder="مكان العنوان" oninput="updateData('addressPh', this.value)"></div>
-        
-        <div class="grid-2">
-            <div><label>عنوان الدفع</label><input type="text" id="payTitle" oninput="updateData('payTitle', this.value)"></div>
-            <div><label>نص كاش</label><input type="text" id="payCash" oninput="updateData('payCash', this.value)"></div>
-        </div>
-        <div class="grid-2">
-            <div><label>نص فيزا</label><input type="text" id="payVisa" oninput="updateData('payVisa', this.value)"></div>
-            <div><label>عنوان الشحن</label><input type="text" id="procTitle" oninput="updateData('procTitle', this.value)"></div>
-        </div>
-        <div class="grid-2">
-            <input type="text" id="procContact" placeholder="نص اتصال" oninput="updateData('procContact', this.value)">
-            <input type="text" id="procDirect" placeholder="نص شحن مباشر" oninput="updateData('procDirect', this.value)">
-        </div>
-        <div class="form-group"><label>نص زر الإرسال</label><input type="text" id="submit" oninput="updateData('submit', this.value)"></div>
-        <div class="form-group"><label>رسالة النجاح</label><input type="text" id="successMsg" oninput="updateData('successMsg', this.value)"></div>
-
-        <h2>🧩 6. الكتل (اختيارية - أضف ما تريد)</h2>
+        <h2>🧩 الوسائط (اختيارية - فارغة حالياً)</h2>
         <div id="blocksContainer"></div>
         <div style="display:flex; gap:5px; flex-wrap: wrap;">
             <button class="btn-add" onclick="addBlock('carousel')">+ كرسول</button>
             <button class="btn-add" onclick="addBlock('image')">+ صورة</button>
             <button class="btn-add" onclick="addBlock('video')">+ فيديو</button>
-            <button class="btn-add" onclick="addBlock('html')">+ كود حر / فريم</button>
-            <button class="btn-add" onclick="addBlock('text')">+ نص حر</button>
+            <button class="btn-add" onclick="addBlock('html')">+ كود حر</button>
         </div>
 
-        <h2>⚙️ 7. التقنيات (Pixels)</h2>
-        <div class="form-group"><label>رابط الشعار</label><input type="text" id="logo" oninput="updateCommon('logo', this.value)"></div>
-        <div class="form-group"><label>Google Script URL</label><input type="text" id="googleScript" oninput="updateCommon('googleScript', this.value)"></div>
-        <div class="grid-2">
-            <input type="text" id="fbPixel" placeholder="FB Pixel ID" oninput="updateCommon('fb', this.value)">
-            <input type="text" id="ttPixel" placeholder="TT Pixel ID" oninput="updateCommon('tt', this.value)">
+        <h2>⚙️ التقنيات</h2>
+        <input type="text" id="googleScript" placeholder="Google Script URL" oninput="updateCommon('googleScript', this.value)">
+        <div class="grid-2" style="margin-top:8px">
+            <input type="text" id="fbPixel" placeholder="FB Pixel" oninput="updateCommon('fb', this.value)">
+            <input type="text" id="ttPixel" placeholder="TT Pixel" oninput="updateCommon('tt', this.value)">
         </div>
 
-        <button class="btn-action" onclick="download()">تحميل ملف الصفحة (index.html) 📥</button>
+        <button class="btn-action" onclick="download()">تحميل ملف الصفحة 📥</button>
     </div>
 
     <div class="preview-pane">
-        <div class="iphone-mockup">
-            <div class="iphone-notch"></div>
-            <iframe id="preview" class="iphone-screen"></iframe>
-        </div>
+        <div class="iphone-mockup"><div class="iphone-notch"></div><iframe id="preview" class="iphone-screen"></iframe></div>
     </div>
 </div>
 
 <script>
     let mode = 'ar';
-    const design = { 
-        bgBody: "#0b0b0b", primary: "#d4af37", textMain: "#ffffff",
-        borderColor: "rgba(212, 175, 55, 0.15)", bgForm: "#161616", 
-        btnBg: "#d4af37", btnText: "#000000",
-        borderRadius: "24px", sectionSpacing: "48px", animate: true
-    };
-    
-    const PERFUME_PRESETS = {
-        "W183": { ar: { title: "W183 — Creed Aventus", desc: "أناناس دخاني أنيق وثبات قوي.", notes: "<b>النوتات:</b> أناناس، تفاح، مسك" }, he: { title: "W183 — Creed Aventus", desc: "אננס מעושן אלגנטי ועמידות חזקה.", notes: "<b>תווים:</b> אננס, תפוח, מושק" } },
-        "X102": { ar: { title: "X102 — Naxos", desc: "تبغ وعسل دافئة بلمسة إيطالية.", notes: "<b>النوتات:</b> عسل، قرفة، تبغ" }, he: { title: "X102 — Naxos", desc: "טבק ודבש חמים בנגיעה איטלקית.", notes: "<b>תווים:</b> דבש, קינמון, טבק" } },
-        "P104": { ar: { title: "P104 — Mr. Sam", desc: "عطر قوي بتوابل دافئة وطابع شرقي.", notes: "<b>النوتات:</b> هيل، قرفة، تبغ" }, he: { title: "P104 — Mr. Sam", desc: "בושם חזק עם תבלינים חמים.", notes: "<b>תווים:</b> הל, קינמון, טבק" } },
-        "L102": { ar: { title: "L102 — Ombre Nomade", desc: "عود شرقي فاخر وعميق بثبات استثنائي.", notes: "<b>النوتات:</b> عود، توت، بخور" }, he: { title: "L102 — Ombre Nomade", desc: "אוד מזרחי יוקרתי ועמוק.", notes: "<b>תווים:</b> אוד, פטל, קטורת" } },
-        "A115": { ar: { title: "A115 — Y Intense", desc: "رائحة عصرية منعشة بقاعدة خشبية.", notes: "<b>النوتات:</b> زنجبيل، لافندر، أرز" }, he: { title: "A115 — Y Intense", desc: "ניחוח מודרני ורענן.", notes: "<b>תווים:</b> ג'ינג'ר, לבנדר, ארז" } }
-    };
-
-    const common = {
-        logo: "https://abomkdad.github.io/Digital-Business-Card/logo.png",
-        googleScript: "https://script.google.com/macros/s/AKfycbyx0rxHpN9Csv2OV_9D_EIF_pqMlNEmF2rDi_s7ZFo6feB7r9Ohb2eHuxEM4gGfDuLu/exec",
-        fb: "1072283127290819", tt: "D2D02JBC77U4ENLN9SBG",
+    const design = { bgBody: "#0b0b0b", primary: "#d4af37", textMain: "#ffffff", borderColor: "rgba(212, 175, 55, 0.15)", bgForm: "#161616", borderRadius: "24px", sectionSpacing: "40px", animate: true };
+    const common = { 
+        logo: "https://abomkdad.github.io/Digital-Business-Card/logo.png", googleScript: "", fb: "", tt: "",
+        waTemplateAr: "arabic_v3", waTemplateHe: "order_confirmation_he",
+        defName: "", defPhone: "", defAddress: "",
         maniItems: [
-            { id: 1, icon: 'shield-check', labelAr:'الأمان الصحي', labelHe:'בטיחות בריאותית', madAr:'آمنة 100% ومعتمدة من IFRA.', madHe:'בטוח ב-100% ומאושר ע"י IFRA.', localAr:'زيوت مجهولة تسبب حساسية.', localHe:'שמנים סינתטיים ממקור לא ידוע.' },
-            { id: 2, icon: 'flask-conical', labelAr:'الهندسة العطرية', labelHe:'הנדסת ניחוח', madAr:'تطابق جزيئي دقيق وتعتيق لأشهر.', madHe:'התאמה מולקולרית ויישון.', localAr:'خلط يدوي عشوائي يتفكك فوراً.', localHe:'ערבוב ידני אקראי המתפרק מייד.' },
-            { id: 3, icon: 'droplets', labelAr:'مصدر الزيوت', labelHe:'מקור השמנים', madAr:'خلاصات أوروبية "نخب أول".', madHe:'תמציות אירופאיות מובחרות.', localAr:'زيوت تجارية رخيصة.', localHe:'שמנים מסחריים זולים.' },
-            { id: 4, icon: 'activity', labelAr:'التأثير الصحي', labelHe:'השפעה בריאותית', madAr:'لا يسبب صداع أو ضيق تنفس.', madHe:'אינו גורם לכאבי ראש.', localAr:'مذيبات كيميائية ضارة.', localHe:'ממיסים כימיים מזיקים.' },
-            { id: 5, icon: 'timer', labelAr:'الثبات والأداء', labelHe:'עמידות וביצועים', madAr:'تركيز Extrait يدوم 24+ ساعة.', madHe:'ריכוז Extrait המחזיק 24+ שעות.', localAr:'يختفي تماماً بعد نصف ساعة.', localHe:'נעלם לחלוטין אחרי חצי شاعة.' },
-            { id: 6, icon: 'store', labelAr:'الخدمة والضمان', labelHe:'שירות ואחריות', madAr:'خدمة زبائن مع 41 فرعاً للضمان.', madHe:'שירות לקוחות עם 41 סניפים.', localAr:'متاجر مجهولة بلا عنوان.', localHe:'חנויות ללא כתובת פיזית.' }
+            { id: 1, labelAr:'الأمان الصحي', labelHe:'בטיחות בריאותית', madAr:'آمنة 100% ومعتمدة من IFRA.', madHe:'בטוח ב-100% ומאושר ע"י IFRA.' },
+            { id: 2, labelAr:'الثبات والأداء', labelHe:'עמידות וביצועים', madAr:'تركيز Extrait يدوم 24+ ساعة.', madHe:'ריכוז Extrait המחזיק 24+ שעות.' },
+            { id: 3, labelAr:'الهندسة العطرية', labelHe:'הנדסת ניחוח', madAr:'تطابق جزيئي دقيق وتعتيق لأشهر.', madHe:'התאמה מולקולרית ויישון.' },
+            { id: 4, labelAr:'مصدر الزيوت', labelHe:'מקור השמנים', madAr:'خلاصات أوروبية نخب أول.', madHe:'תמציות אירופאיות מובחרות.' },
+            { id: 5, labelAr:'التأثير الصحي', labelHe:'השפעה בריאותית', madAr:'لا يسبب صداع أو حساسية.', madHe:'אינו גורם לכאבי ראש.' },
+            { id: 6, labelAr:'الخدمة والضمان', labelHe:'שירות ואחריות', madAr:'خدمة زبائن مع 41 فرعاً للضمان.', madHe:'שירות לקוחות עם 41 סניפים.' }
         ],
-        blocks: [] // يبدأ فارغاً كما طلبت
+        blocks: []
     };
-
     const db = {
-        ar: { title: "W183 — Creed Aventus", price: "400 ₪", old: "350 ₪", badge: "Premium Collection", desc: "رائحة رجولية منعشة فاخرة بطابع أناناس دخاني أنيق وثبات قوي.", notes: "<b>النوتات:</b> أناناس، تفاح، مسك", cta: "اطلب الآن", maniTitle: "لماذا MAD PARFUMEUR؟", maniHeaderMad: "MAD", maniHeaderOthers: "البدائل", formTitle: "نموذج الطلب السريع", namePh: "الاسم الكامل", phonePh: "رقم الهاتف", addressPh: "المدينة والعنوان", payTitle: "طريقة الدفع", payCash: "نقدًا عند الاستلام", payVisa: "بطاقة ائتمان", procTitle: "معالجة الطلب", procContact: "تواصلوا معي للتأكيد", procDirect: "شحن مباشر", submit: "إرسال الطلب الآن ✅", successMsg: "تم استلام طلبك بنجاح! ✅" },
-        he: { title: "W183 — Creed Aventus", price: "₪ 400", old: "₪ 350", badge: "Premium Collection", desc: "ניחוח גברי רענן ויוקרתי עם אופי אננס מעושן ואלגנטי ועמידות חזקה.", notes: "<b>תווים:</b> אננס, תפוח, מושק", cta: "הזמן עכשיו", maniTitle: "?למה MAD PARFUMEUR", maniHeaderMad: "MAD", maniHeaderOthers: "חיקויים", formTitle: "פרטי הזמנה מהירה", namePh: "שם מלא", phonePh: "מספר טלפון", addressPh: "יישוב וכתובת", payTitle: "אמצעי תשלום", payCash: "מזומן לשليح", payVisa: "כרטיס אשראי", procTitle: "שיטת משלוח", procContact: "שיחה טלפונית לאישור", procDirect: "משלוח ישיר", submit: "בצע הזמנה ✅", successMsg: "ההזמנה התקבלה בהצלחה! ✅" }
+        ar: { title: "W183 — Creed Aventus", price: "400 ₪", old: "350 ₪", badge: "Premium Collection", desc: "رائحة رجولية فخمة بطابع أناناس دخاني.", notes: "<b>النوتات:</b> أناناس، تفاح، مسك", cta: "اطلب الآن", maniTitle: "لماذا MAD PARFUMEUR؟", formTitle: "نموذج الطلب السريع", namePh: "الاسم الكامل", phonePh: "رقم الهاتف", addressPh: "المدينة والعنوان", payTitle: "طريقة الدفع", payCash: "نقدًا عند الاستلام", payVisa: "بطاقة ائتمان", procTitle: "معالجة الطلب", procContact: "تواصلوا معي للتأكيد", procDirect: "شحن مباشر", submit: "إرسال الطلب الآن ✅", successMsg: "تم استلام طلبك بنجاح! ✅" },
+        he: { title: "W183 — Creed Aventus", price: "₪ 400", old: "₪ 350", badge: "Premium Collection", desc: "ניחוח גברי יוקרתי עם אופי אננס מעושן.", notes: "<b>תווים:</b> אננס, תפוח, מושק", cta: "הזמן עכשיו", maniTitle: "?למה MAD PARFUMEUR", formTitle: "פרטי הזמנה מהירה", namePh: "שם מלא", phonePh: "מספר טלפון", addressPh: "יישוב וכתובת", payTitle: "אמצעי תשלום", payCash: "מזומן לשليح", payVisa: "כרטיס אשראי", procTitle: "שיטת משלוח", procContact: "שיחה طلفونيت لايשור", procDirect: "משلوح يشير", submit: "בצע הזמנה ✅", successMsg: "ההזמנה התקבלה בהצלحة! ✅" }
     };
 
-    function applyPreset(code) { if (!code || !PERFUME_PRESETS[code]) return; ['title', 'desc', 'notes'].forEach(k => { db.ar[k] = PERFUME_PRESETS[code].ar[k]; db.he[k] = PERFUME_PRESETS[code].he[k]; }); setMode(mode); }
+    function render() { const f = document.getElementById('preview'); if(f) { const d = f.contentWindow.document; d.open(); d.write(getHTML()); d.close(); } }
 
-    function addManiItem() { common.maniItems.push({ id: Date.now(), icon: 'star', labelAr: '', labelHe: '', madAr: '', madHe: '', localAr: '', localHe: '' }); renderManiUI(); render(); }
+    function applyPreset(code) { 
+        db.ar.title = code; db.he.title = code;
+        setMode(mode);
+    }
+
+    function addManiItem() { common.maniItems.push({ id: Date.now(), labelAr: '', labelHe: '', madAr: '' }); renderManiUI(); render(); }
     function renderManiUI() {
-        const container = document.getElementById('maniItemsContainer');
-        if (!container) return; container.innerHTML = "";
+        const c = document.getElementById('maniItemsContainer'); if (!c) return; c.innerHTML = "";
         common.maniItems.forEach(item => {
             const div = document.createElement('div'); div.className = 'card-control';
             div.innerHTML = `<button class="btn-delete" onclick="common.maniItems=common.maniItems.filter(i=>i.id!=${item.id}); renderManiUI(); render()">X</button>
-            <div class="mani-inputs"><input type="text" placeholder="عنوان" value="${mode=='ar'?item.labelAr:item.labelHe}" oninput="const i=common.maniItems.find(x=>x.id==${item.id}); if(mode=='ar')i.labelAr=this.value; else i.labelHe=this.value; render()"><textarea style="margin-top:5px" oninput="const i=common.maniItems.find(x=>x.id==${item.id}); if(mode=='ar')i.madAr=this.value; else i.madHe=this.value; render()">${mode=='ar'?item.madAr:item.madHe}</textarea><textarea style="margin-top:5px" oninput="const i=common.maniItems.find(x=>x.id==${item.id}); if(mode=='ar')i.localAr=this.value; else i.localHe=this.value; render()">${mode=='ar'?item.localAr:item.localHe}</textarea></div>`;
-            container.appendChild(div);
+            <input type="text" placeholder="عنوان" value="${mode=='ar'?item.labelAr:item.labelHe}" oninput="const i=common.maniItems.find(x=>x.id==${item.id}); if(mode=='ar')i.labelAr=this.value; else i.labelHe=this.value; render()">
+            <textarea style="margin-top:5px" oninput="const i=common.maniItems.find(x=>x.id==${item.id}); if(mode=='ar')i.madAr=this.value; else i.madHe=this.value; render()">${mode=='ar'?item.madAr:item.madHe}</textarea>`;
+            c.appendChild(div);
         });
     }
 
-    function addBlock(type) { common.blocks.push({ id: Date.now(), type, content: type === 'carousel' ? [] : "" }); renderBlocksUI(); render(); }
+    function addBlock(type) { common.blocks.push({ id: Date.now(), type, content: "" }); renderBlocksUI(); render(); }
     function removeBlock(id) { common.blocks = common.blocks.filter(b => b.id !== id); renderBlocksUI(); render(); }
     function renderBlocksUI() {
-        const container = document.getElementById('blocksContainer');
-        if (!container) return; container.innerHTML = "";
-        if(common.blocks.length === 0) { container.innerHTML = '<div class="empty-notice">قسم الوسائط فارغ. أضف عناصر من الأسفل 👇</div>'; return; }
+        const c = document.getElementById('blocksContainer'); if (!c) return; c.innerHTML = "";
         common.blocks.forEach(b => {
             const div = document.createElement('div'); div.className = 'block-item';
-            const label = b.type === 'html' ? 'كود مخصص (Iframe / HTML)' : 'رابط / نص';
-            const inputField = b.type === 'html' || b.type === 'carousel' 
-                ? `<textarea rows="3" oninput="common.blocks.find(x=>x.id==${b.id}).content=(this.value.includes(',') && '${b.type}'=='carousel' ?this.value.split(','):this.value); render()">${Array.isArray(b.content)?b.content.join(','):b.content}</textarea>`
-                : `<input type="text" oninput="common.blocks.find(x=>x.id==${b.id}).content=this.value; render()" value="${b.content}" placeholder="URL">`;
-            div.innerHTML = `<div class="block-header"><span>${b.type.toUpperCase()}</span><button class="btn-delete" onclick="removeBlock(${b.id})">حذف</button></div><label>${label}</label>${inputField}`;
-            container.appendChild(div);
+            div.innerHTML = `<div class="block-header"><span>${b.type.toUpperCase()}</span><button class="btn-delete" onclick="removeBlock(${b.id})">حذف</button></div><textarea oninput="common.blocks.find(x=>x.id==${b.id}).content=(this.value.includes(',') && '${b.type}'=='carousel' ?this.value.split(','):this.value); render()">${Array.isArray(b.content)?b.content.join(','):b.content}</textarea>`;
+            c.appendChild(div);
         });
     }
 
     function setMode(l) { 
         mode = l; 
-        const fields = ['title', 'price', 'old', 'badge', 'desc', 'notes', 'cta', 'maniTitle', 'maniHeaderMad', 'maniHeaderOthers', 'formTitle', 'namePh', 'phonePh', 'addressPh', 'payTitle', 'payCash', 'payVisa', 'procTitle', 'procContact', 'procDirect', 'submit', 'successMsg'];
-        fields.forEach(f => { const el = document.getElementById(f); if (el) el.value = db[mode][f] || ''; });
+        ['title', 'price', 'old', 'badge', 'desc', 'notes', 'cta', 'maniTitle', 'formTitle', 'payTitle', 'payCash', 'payVisa', 'procTitle', 'procContact', 'procDirect', 'submit', 'successMsg'].forEach(id => {
+            const el = document.getElementById(id); if (el) el.value = db[mode][id] || '';
+        });
         renderManiUI(); renderBlocksUI(); render(); 
     }
 
@@ -235,25 +187,21 @@
     function updateCommon(k, v) { common[k] = v; render(); }
     function updateDesign(k, v) { design[k] = v; render(); }
 
-    function getHTML(dl = false) {
+    function getHTML() {
         const sOpen = '<' + 'script'; const sClose = '<' + '/script>';
         let blocksHTML = "";
-        common.blocks.forEach((b, idx) => {
-            const lazy = idx > 0 ? 'loading="lazy"' : '';
-            if(b.type === 'carousel' && b.content.length > 0) blocksHTML += `<div x-data="{ active: 0, images: ${JSON.stringify(b.content).replace(/"/g, "'")} }" class="relative w-full aspect-square bg-black rounded-[var(--br)] overflow-hidden shadow-2xl border border-[var(--brd)]"><template x-for="(img, idx) in images"><img x-show="active === idx" :src="img" class="absolute inset-0 w-full h-full object-contain" ${design.animate ? 'x-transition.opacity' : ''} ${lazy}></template><button @click="active = (active === 0 ? images.length - 1 : active - 1)" class="absolute left-2 top-1/2 -translate-y-1/2 bg-black/40 p-2 rounded-full text-white">◀</button><button @click="active = (active === images.length - 1 ? 0 : active + 1)" class="absolute right-2 top-1/2 -translate-y-1/2 bg-black/40 p-2 rounded-full text-white">▶</button></div>`;
-            if(b.type === 'image') blocksHTML += `<img src="${b.content}" class="w-full shadow-2xl border border-[var(--brd)]" style="border-radius:var(--br)" ${lazy}>`;
+        common.blocks.forEach((b) => {
+            if(b.type === 'carousel' && b.content.length > 0) blocksHTML += `<div x-data="{ active: 0, images: ${JSON.stringify(b.content).replace(/"/g, "'")} }" class="relative w-full aspect-square bg-black rounded-[var(--br)] overflow-hidden shadow-2xl border border-[var(--brd)]"><template x-for="(img, idx) in images"><img x-show="active === idx" :src="img" class="absolute inset-0 w-full h-full object-contain" ${design.animate ? 'x-transition.opacity' : ''}></template><button @click="active = (active === 0 ? images.length - 1 : active - 1)" class="absolute left-2 top-1/2 -translate-y-1/2 bg-black/40 p-2 rounded-full text-white">◀</button><button @click="active = (active === images.length - 1 ? 0 : active + 1)" class="absolute right-2 top-1/2 -translate-y-1/2 bg-black/40 p-2 rounded-full text-white">▶</button></div>`;
+            if(b.type === 'image') blocksHTML += `<img src="${b.content}" class="w-full shadow-2xl border border-[var(--brd)]" style="border-radius:var(--br)">`;
             if(b.type === 'video') blocksHTML += `<video src="${b.content}" controls class="w-full" style="border-radius:var(--br)"></video>`;
-            if(b.type === 'text') blocksHTML += `<p class="text-center opacity-80 px-4 whitespace-pre-wrap">${b.content}</p>`;
-            if(b.type === 'html') blocksHTML += `<div class="custom-block w-full overflow-hidden" style="border-radius:var(--br)">${b.content}</div>`;
+            if(b.type === 'html') blocksHTML += `<div class="w-full overflow-hidden" style="border-radius:var(--br)">${b.content}</div>`;
         });
-
         let maniHTML = "";
         common.maniItems.forEach(item => {
-            maniHTML += `<div class="border-t border-white/5 py-4 px-4"><div class="flex items-center gap-2 mb-2 text-[var(--p)]"><i data-lucide="${item.icon || 'star'}" class="w-4 h-4"></i><span class="text-xs font-black uppercase tracking-widest">${mode=='ar'?item.labelAr:item.labelHe}</span></div><div class="grid grid-cols-2 gap-4"><div class="text-[11px] text-white font-bold"><span class="block text-[8px] text-[var(--p)] mb-1 opacity-60 uppercase">${db[mode].maniHeaderMad}</span>${mode=='ar'?item.madAr:item.madHe}</div><div class="text-[11px] text-slate-500"><span class="block text-[8px] mb-1 opacity-60 uppercase">${db[mode].maniHeaderOthers}</span>${mode=='ar'?item.localAr:item.localHe}</div></div></div>`;
+            maniHTML += `<div class="border-t border-white/5 py-4 px-4"><div class="text-[11px] font-bold mb-1 uppercase text-[var(--p)]">${mode=='ar'?item.labelAr:item.labelHe}</div><div class="text-[11px] text-slate-300 leading-relaxed">${mode=='ar'?item.madAr:item.madHe}</div></div>`;
         });
-
         return `<!DOCTYPE html>
-<html lang="${mode}" dir="${mode=='ar'?'rtl':'ltr'}" x-data="app()">
+<html x-data="app()" :lang="lang" :dir="lang=='ar'?'rtl':'ltr'">
 <head>
     <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>${db[mode].title}</title>
@@ -270,43 +218,42 @@
         .radio-circle{width:12px;height:12px;border-radius:99px;border:1px solid #555; position:relative;}
         input[type="radio"]:checked + div .radio-circle::after{content:''; position:absolute; inset:2px; background:var(--p); border-radius:99px;}
         ${design.animate ? `.animate-pop{animation: pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);} @keyframes pop { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }` : ''}
-        iframe, .custom-block * { max-width: 100% !important; }
     </style>
-    ${dl ? `${sOpen}>!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window, document,'script','https://connect.facebook.net/en_US/fbevents.js');fbq('init','${common.fb}');fbq('track','PageView');${sClose}
-    ${sOpen}>!function (w, d, t) { w.TiktokAnalyticsObject = t; var ttq = w[t] = w[t] || []; ttq.methods = ["page","track","identify","instances","debug","on","off","once","ready","alias","group","enableCookie","disableCookie"]; ttq.setAndDefer = function(t, e) { t[e] = function() { t.push([e].concat(Array.prototype.slice.call(arguments, 0))) } }; for (var i = 0; i < ttq.methods.length; i++) { ttq.setAndDefer(ttq, ttq.methods[i]); } ttq.load = function(e) { var i = d.createElement("script"); i.type = "text/javascript"; i.async = true; i.src = "https://analytics.tiktok.com/i18n/pixel/events.js?sdkid=" + e + "&lib=" + t; var n = d.getElementsByTagName("script")[0]; n.parentNode.insertBefore(i, n); }; ttq.load('${common.tt}'); ttq.page(); }(window, document, 'ttq');${sClose}` : ''}
+    ${sOpen}>!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window, document,'script','https://connect.facebook.net/en_US/fbevents.js');fbq('init','${common.fb}');fbq('track','PageView');${sClose}
+    ${sOpen}>!function (w, d, t) { w.TiktokAnalyticsObject = t; var ttq = w[t] = w[t] || []; ttq.methods = ["page","track","identify","instances","debug","on","off","once","ready","alias","group","enableCookie","disableCookie"]; ttq.setAndDefer = function(t, e) { t[e] = function() { t.push([e].concat(Array.prototype.slice.call(arguments, 0))) } }; for (var i = 0; i < ttq.methods.length; i++) { ttq.setAndDefer(ttq, ttq.methods[i]); } ttq.load = function(e) { var i = d.createElement("script"); i.type = "text/javascript"; i.async = true; i.src = "https://analytics.tiktok.com/i18n/pixel/events.js?sdkid=" + e + "&lib=" + t; var n = d.getElementsByTagName("script")[0]; n.parentNode.insertBefore(i, n); }; ttq.load('${common.tt}'); ttq.page(); }(window, document, 'ttq');${sClose}
 </head>
 <body class="min-h-screen pb-32">
     <div class="fixed inset-0 pointer-events-none z-0"><div class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[600px] bg-[var(--p)]/5 blur-[120px]"></div></div>
     <nav class="fixed top-0 w-full z-50 p-4 flex justify-between items-center bg-black/60 backdrop-blur-xl border-b border-white/10">
         <span class="text-2xl font-black gold-gradient" style="font-family:serif">MAD</span>
-        <button @click="lang=(lang=='ar'?'he':'ar'); setTimeout(()=>lucide.createIcons(),50)" class="text-xs font-black" style="color:var(--p)">{{lang=='ar'?'עברית':'العربية'}}</button>
+        <div class="flex gap-2">
+            <button @click="lang='ar'; setTimeout(()=>lucide.createIcons(),50)" class="text-[10px] font-black px-3 py-1 rounded-full border" :class="lang=='ar'?'bg-[var(--p)] text-black border-[var(--p)]':'text-[var(--p)] border-[var(--p)]/30'">العربية</button>
+            <button @click="lang='he'; setTimeout(()=>lucide.createIcons(),50)" class="text-[10px] font-black px-3 py-1 rounded-full border" :class="lang=='he'?'bg-[var(--p)] text-black border-[var(--p)]':'text-[var(--p)] border-[var(--p)]/30'">עברית</button>
+        </div>
     </nav>
     <main class="max-w-md mx-auto px-5 pt-24" :style="{ gap: 'var(--sp)', display: 'flex', flexDirection: 'column' }">
         <section class="text-center space-y-6 ${design.animate ? 'animate-pop' : ''}">
             <h1 class="text-3xl font-bold tracking-tight" x-text="t.title"></h1>
             <div class="flex flex-col items-center"><span class="text-slate-500 line-through text-sm" x-text="t.old"></span><span class="text-5xl font-black gold-gradient" x-text="t.price"></span></div>
-            <div class="space-y-6">${blocksHTML}</div>
+            <div class="space-y-6 animate-pop">${blocksHTML}</div>
             <p class="text-slate-300 text-sm opacity-90" x-text="t.desc"></p>
             <div class="glass-panel p-4 text-xs text-right border-r-2" style="border-color:var(--p)" x-html="t.notes"></div>
-            <a href="#order" class="block w-full py-5 text-black font-black text-xl shadow-2xl active:scale-95 transition-all text-center" :style="{ backgroundColor: 'var(--p)', borderRadius: 'var(--br)' }" x-text="t.cta"></a>
+            <a href="#order" class="block w-full py-5 text-black font-black text-xl shadow-2xl active:scale-95 transition-all text-center uppercase tracking-widest" :style="{ backgroundColor: 'var(--p)', borderRadius: 'var(--br)' }" x-text="t.cta"></a>
         </section>
-        <section class="space-y-6 ${design.animate ? 'animate-pop' : ''}">
-            <div class="text-center"><span class="text-[10px] font-black text-[var(--p)] tracking-widest uppercase">Truth Revealed</span><h2 class="text-2xl font-bold mt-1" x-text="t.maniTitle"></h2></div>
-            <div class="glass-panel overflow-hidden">${maniHTML}</div>
-        </section>
+        <section class="space-y-6 ${design.animate ? 'animate-pop' : ''}"><div class="text-center"><h2 class="text-2xl font-bold mt-1" x-text="t.maniTitle"></h2></div><div class="glass-panel overflow-hidden">${maniHTML}</div></section>
         <section id="order" class="p-8 space-y-6 shadow-2xl ${design.animate ? 'animate-pop' : ''}" :style="{ background: 'var(--f)', borderRadius: 'var(--br)' }">
             <h2 class="text-2xl font-black text-center" x-text="t.formTitle"></h2>
             <form @submit.prevent="submitOrder" class="space-y-5">
-                <input x-model="f.name" class="w-full p-4 rounded-xl bg-black/40 border border-white/10 outline-none focus:border-[var(--p)] text-right" :placeholder="t.namePh" required>
-                <input x-model="f.phone" class="w-full p-4 rounded-xl bg-black/40 border border-white/10 outline-none focus:border-[var(--p)] text-right" :placeholder="t.phonePh" required dir="ltr">
-                <input x-model="f.address" class="w-full p-4 rounded-xl bg-black/40 border border-white/10 outline-none focus:border-[var(--p)] text-right" :placeholder="t.addressPh" required>
-                <div class="space-y-3"><label class="text-[10px] text-slate-400 font-bold uppercase tracking-widest" x-text="t.payTitle"></label>
+                <input x-model="f.name" class="w-full p-4 rounded-xl bg-black/40 border border-white/10 outline-none focus:border-[var(--p)] text-right" placeholder="${db.ar.namePh}" required>
+                <input x-model="f.phone" class="w-full p-4 rounded-xl bg-black/40 border border-white/10 outline-none focus:border-[var(--p)] text-right" placeholder="${db.ar.phonePh}" required dir="ltr">
+                <input x-model="f.address" class="w-full p-4 rounded-xl bg-black/40 border border-white/10 outline-none focus:border-[var(--p)] text-right" placeholder="${db.ar.addressPh}" required>
+                <div class="space-y-3"><label class="text-[10px] text-slate-400 font-bold uppercase" x-text="t.payTitle"></label>
                     <div class="grid grid-cols-2 gap-3">
                         <label class="cursor-pointer"><input type="radio" value="Cash" x-model="f.payment" class="hidden"><div class="border border-white/10 rounded-xl p-3 flex flex-col items-center gap-2 bg-black/20 hover:bg-white/5 transition-all"><span class="text-[10px] font-bold" x-text="t.payCash"></span><div class="radio-circle"></div></div></label>
                         <label class="cursor-pointer"><input type="radio" value="Visa" x-model="f.payment" class="hidden"><div class="border border-white/10 rounded-xl p-3 flex flex-col items-center gap-2 bg-black/20 hover:bg-white/5 transition-all"><span class="text-[10px] font-bold" x-text="t.payVisa"></span><div class="radio-circle"></div></div></label>
                     </div>
                 </div>
-                <div class="space-y-3"><label class="text-[10px] text-slate-400 font-bold uppercase tracking-widest" x-text="t.procTitle"></label>
+                <div class="space-y-3"><label class="text-[10px] text-slate-400 font-bold uppercase" x-text="t.procTitle"></label>
                     <div class="grid grid-cols-1 gap-2">
                         <label class="cursor-pointer"><input type="radio" value="Contact" x-model="f.process" class="hidden"><div class="border border-white/10 rounded-xl p-3 flex justify-between items-center bg-black/20 transition-all"><span class="text-[10px] font-bold" x-text="t.procContact"></span><div class="radio-circle"></div></div></label>
                         <label class="cursor-pointer"><input type="radio" value="Direct" x-model="f.process" class="hidden"><div class="border border-white/10 rounded-xl p-3 flex justify-between items-center bg-black/20 transition-all"><span class="text-[10px] font-bold" x-text="t.procDirect"></span><div class="radio-circle"></div></div></label>
@@ -315,43 +262,28 @@
                 <button type="submit" class="w-full py-5 text-black font-black text-xl shadow-lg active:scale-95 transition-all" :style="{ backgroundColor: 'var(--p)', borderRadius: 'var(--br)' }" x-text="loading ? '...' : t.submit"></button>
             </form>
         </section>
-        <div class="flex justify-center gap-10 opacity-30 grayscale pb-10"><i data-lucide="award"></i><i data-lucide="shield-check"></i><i data-lucide="star"></i></div>
     </main>
     <div x-show="ui.ok" class="fixed inset-0 z-[100] bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
-        <div class="bg-[#111] border border-[var(--p)]/30 p-8 rounded-3xl max-w-xs w-full text-center shadow-2xl ${design.animate ? 'animate-pop' : ''}">
+        <div class="bg-[#111] border border-[var(--p)]/30 p-8 rounded-3xl max-w-xs w-full text-center shadow-2xl animate-pop">
             <div class="w-16 h-16 bg-green-500/10 rounded-full flex items-center justify-center mx-auto mb-4 border border-green-500/30"><i data-lucide="check" class="w-8 h-8 text-green-500"></i></div>
-            <h3 class="text-xl font-bold text-white mb-2" x-text="t.successMsg"></h3>
+            <h3 class="text-xl font-bold text-white mb-2" x-text="t.successMsg">Success!</h3>
             <button @click="ui.ok=false" class="w-full bg-[#161616] border border-white/10 text-white py-3 rounded-xl hover:bg-[#222] transition-colors font-bold text-sm mt-4">Close</button>
         </div>
     </div>
-    ${sOpen}>function app(){return {db:${JSON.stringify(db)},lang:'${mode}',f:{name:'',phone:'',address:'',payment:'Cash',process:'Contact'},loading:false,ui:{ok:false},get t(){return this.db[this.lang]},async submitOrder(){this.loading=true;const fd=new FormData();fd.append('name',this.f.name);fd.append('phone',this.f.phone);fd.append('address',this.f.address);fd.append('payment',this.f.payment);fd.append('process',this.f.process);fd.append('offer',this.t.title);fd.append('lang',this.lang);try{await fetch('${common.googleScript}',{method:'POST',body:fd,mode:'no-cors'});if(typeof fbq!=='undefined')fbq('track','Purchase',{value:400,currency:'ILS'});if(typeof ttq!=='undefined')ttq.track('CompletePayment',{value:400,currency:'ILS'});this.ui.ok=true;this.f={name:'',phone:'',address:'',payment:'Cash',process:'Contact'};}catch(e){console.error('Error');}finally{this.loading=false;}}}} ${sClose}
+    ${sOpen}>function app(){return {db:${JSON.stringify(db)},lang:'ar',f:{name:'${common.defName}',phone:'${common.defPhone}',address:'${common.defAddress}',payment:'Cash',process:'Contact'},loading:false,ui:{ok:false},get t(){return this.db[this.lang]},async submitOrder(){this.loading=true;const fd=new FormData();fd.append('name',this.f.name);fd.append('phone',this.f.phone);fd.append('address',this.f.address);fd.append('offer',this.t.title);fd.append('lang',this.lang);fd.append('payment',this.f.payment);fd.append('process',this.f.process);fd.append('wa_template',this.lang=='ar'?'${common.waTemplateAr}':'${common.waTemplateHe}');fd.append('params_count','6');try{await fetch('${common.googleScript}',{method:'POST',body:fd,mode:'no-cors'});if(typeof fbq!=='undefined')fbq('track','Purchase',{value:400,currency:'ILS'});this.ui.ok=true;}catch(e){console.error('Error');}finally{this.loading=false;}}}} ${sClose}
     ${sOpen}>window.addEventListener('DOMContentLoaded',()=> { if(window.lucide) lucide.createIcons(); });${sClose}
 </body>
 </html>`;
     }
 
-    function render() { const f=document.getElementById('preview'); if(f) { const d=f.contentWindow.document; d.open(); d.write(getHTML(false)); d.close(); } }
-    function download() { const l=document.createElement('a'); l.href=URL.createObjectURL(new Blob([getHTML(true)],{type:'text/html'})); l.download='index.html'; l.click(); }
+    function download() { const l=document.createElement('a'); l.href=URL.createObjectURL(new Blob([getHTML()],{type:'text/html'})); l.download='index.html'; l.click(); }
 
     function init() {
-        const ids = ['logo', 'googleScript', 'fbPixel', 'ttPixel', 'badge', 'maniHeaderMad', 'maniHeaderOthers', 'maniTitle'];
-        ids.forEach(id => {
-            const el = document.getElementById(id);
-            if (el) {
-                if (id === 'logo') el.value = common.logo;
-                else if (id === 'googleScript') el.value = common.googleScript;
-                else if (id === 'fbPixel') el.value = common.fb;
-                else if (id === 'ttPixel') el.value = common.tt;
-                else el.value = db[mode][id] || '';
+        ['logo', 'googleScript', 'fbPixel', 'ttPixel', 'defName', 'defPhone', 'defAddress', 'waTemplateAr', 'waTemplateHe'].forEach(id => {
+            const el = document.getElementById(id); if (el) {
+                if (common[id] !== undefined) el.value = common[id];
             }
         });
-        const rad = document.getElementById('rng-radius');
-        const spc = document.getElementById('rng-spacing');
-        if(rad) rad.value = 24;
-        if(spc) spc.value = 48;
-        const chk = document.getElementById('chk-animate');
-        if(chk) chk.checked = design.animate;
-        for(let k in design){ const el=document.getElementById('clr-'+k); if(el) el.value=design[k]; }
         setMode('ar');
     }
     window.addEventListener('load', init);
