@@ -3,18 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MAD Builder - Advanced Pixel</title>
+    <title>MAD Builder - Pro Conversion & Speed Edition</title>
     <style>
-        :root { --primary: #d97706; --bg: #0f172a; --panel: #1e293b; --text: #f1f5f9; --border: #334155; --danger: #ef4444; }
+        :root { --primary: #d4af37; --bg: #0f172a; --panel: #1e293b; --text: #f1f5f9; --border: #334155; --danger: #ef4444; }
         body { margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); height: 100vh; overflow: hidden; }
         
         .main-layout { display: flex; height: 100vh; flex-direction: row-reverse; }
         .preview-pane { flex: 1; background: #020617; display: flex; justify-content: center; align-items: center; border-right: 1px solid var(--border); padding: 20px; overflow: hidden; background-image: radial-gradient(#1e293b 1px, transparent 1px); background-size: 20px 20px; }
         .editor-pane { width: 550px; background: var(--panel); padding: 30px; overflow-y: auto; box-shadow: -5px 0 15px rgba(0,0,0,0.3); display: flex; flex-direction: column; gap: 20px; }
 
-        .iphone-mockup { width: 375px; height: 812px; background: #000; border-radius: 40px; border: 12px solid #2d2d2d; position: relative; box-shadow: 0 0 50px rgba(0,0,0,0.5); overflow: hidden; transform: scale(0.9); flex-shrink: 0; }
+        .iphone-mockup { width: 375px; height: 812px; background: #000; border-radius: 40px; border: 12px solid #2d2d2d; position: relative; box-shadow: 0 0 50px rgba(0,0,0,0.5); overflow: hidden; transform: scale(0.85); flex-shrink: 0; }
         .iphone-notch { position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 150px; height: 30px; background: #2d2d2d; border-bottom-left-radius: 20px; border-bottom-right-radius: 20px; z-index: 100; }
-        .iphone-screen { width: 100%; height: 100%; background: #fff; border: none; display: block; }
+        .iphone-screen { width: 100%; height: 100%; background: #0b0b0b; border: none; display: block; overflow-y: auto; }
 
         @media (max-width: 768px) {
             .main-layout { flex-direction: column; height: auto; overflow: auto; }
@@ -28,194 +28,73 @@
         .form-group { margin-bottom: 15px; }
         label { display: block; font-size: 0.85rem; margin-bottom: 5px; color: #cbd5e1; }
         input[type="text"], textarea, select { width: 100%; padding: 10px; background: #0f172a; border: 1px solid var(--border); color: white; border-radius: 6px; box-sizing: border-box; outline: none; font-size: 0.9rem; }
-        input[type="color"] { width: 100%; height: 40px; border: none; padding: 0; cursor: pointer; border-radius: 6px; }
-        input:focus, textarea:focus, select:focus { border-color: var(--primary); }
-
-        .lang-toggle { display: flex; background: #0f172a; border-radius: 8px; padding: 4px; margin-bottom: 20px; border: 1px solid var(--border); }
-        .lang-btn { flex: 1; background: transparent; color: #64748b; border: none; padding: 10px; border-radius: 6px; cursor: pointer; font-weight: bold; transition: 0.2s; font-family: inherit; }
-        .lang-btn.active { background: var(--primary); color: black; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
-
-        .toggle-wrapper { display: flex; align-items: center; justify-content: space-between; background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px; margin-bottom: 10px; border: 1px solid var(--border); }
-        .toggle-label { font-weight: bold; font-size: 0.9rem; display: flex; align-items: center; gap: 8px; }
-        input[type="checkbox"] { width: 20px; height: 20px; accent-color: var(--primary); cursor: pointer; }
+        input[type="color"] { width: 100%; height: 40px; border: none; padding: 0; cursor: pointer; border-radius: 6px; background: transparent; }
         
-        .section-settings { padding: 15px; background: rgba(0,0,0,0.3); border-radius: 8px; margin-top: 5px; border-left: 2px solid var(--primary); display: none; }
-        input[type="checkbox"]:checked ~ .section-settings { display: block; }
-
+        .block-item { background: rgba(255,255,255,0.03); border: 1px solid var(--border); padding: 15px; border-radius: 10px; margin-bottom: 15px; }
+        .block-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; color: var(--primary); font-weight: bold; font-size: 0.8rem; }
+        .btn-delete { background: var(--danger); color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 0.7rem; }
+        
+        .color-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         .btn-action { background: var(--primary); color: #000; font-weight: 900; padding: 15px; border-radius: 8px; border: none; cursor: pointer; width: 100%; font-size: 1.1rem; margin-top: 20px; transition: 0.2s; }
-        .btn-secondary { background: transparent; border: 1px dashed var(--border); color: var(--primary); padding: 8px; border-radius: 6px; cursor: pointer; width: 100%; transition: 0.2s; text-align: center; }
-        .btn-secondary:hover { background: rgba(217,119,6,0.1); }
-        .btn-delete { background: var(--danger); color: white; border: none; padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; cursor: pointer; }
-
-        .dynamic-row { display: grid; grid-template-columns: 1fr 1fr 30px; gap: 5px; align-items: center; margin-bottom: 8px; }
-        .block-item { background: rgba(255,255,255,0.03); border: 1px solid var(--border); padding: 15px; border-radius: 8px; margin-bottom: 10px; }
-        .block-head { display: flex; justify-content: space-between; margin-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 5px; }
-        .img-list { display: flex; flex-wrap: gap: 5px; margin-top: 5px; }
-        .img-thumb { width: 50px; height: 50px; object-fit: cover; border-radius: 4px; border: 1px solid var(--border); }
-        .img-wrap { position: relative; }
-        .img-del { position: absolute; top: -5px; right: -5px; background: var(--danger); width: 15px; height: 15px; border-radius: 50%; color: white; font-size: 10px; display: flex; align-items: center; justify-content: center; cursor: pointer; border: none; }
-        
-        .url-input-group { display: flex; gap: 5px; margin-top: 5px; }
-        .or-divider { text-align: center; font-size: 0.8rem; color: #64748b; margin: 5px 0; }
-        .input-label-sm { font-size: 0.75rem; color: #94a3b8; margin-bottom: 3px; display: block; }
-        
-        /* New Color Grid */
-        .color-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+        .btn-add { background: #334155; color: white; border: 1px solid var(--border); padding: 10px; border-radius: 6px; cursor: pointer; font-size: 0.8rem; flex: 1; transition: 0.2s; }
     </style>
 </head>
 <body>
 
 <div class="main-layout">
     <div class="editor-pane">
-        <h1>MAD Builder 💎</h1>
-        <div class="lang-toggle">
-            <button class="lang-btn active" onclick="setMode('ar')" id="btn-ar">العربية (AR)</button>
-            <button class="lang-btn" onclick="setMode('he')" id="btn-he">עברית (HE)</button>
-        </div>
-
-        <h2>1. إعدادات الصفحة</h2>
-        <div class="form-group"><label>لون الخلفية (Page Background)</label><input type="color" id="bgColor" value="#ab5c12" oninput="updateCommon('bgColor', this.value)"></div>
-        <div class="form-group">
-            <label>شعار الموقع (Logo)</label>
-            <input type="text" id="logoUrl" placeholder="رابط الشعار (URL)" value="https://madperfume.ps/upload/01-2026/page/69735b87d92ef.png" oninput="updateCommon('logo', this.value)">
-            <input type="file" id="logoInput" accept="image/*" style="margin-top:5px">
-        </div>
-        <div class="form-group"><label>العنوان (السعر)</label><input type="text" id="price" oninput="updateData('price', this.value)"></div>
-        <div class="form-group"><label>البادج (العرض)</label><input type="text" id="offer" oninput="updateData('offer', this.value)"></div>
+        <h1>MAD Builder PRO 💎</h1>
         
-        <!-- Sticky Button Toggle -->
         <div class="form-group">
-            <div class="toggle-wrapper">
-                <span class="toggle-label">🔘 زر عائم (Sticky Button)</span>
-                <input type="checkbox" id="showFloatingBtn" onchange="updateCommon('showFloatingBtn', this.checked)">
-                <div class="section-settings">
-                    <label>نص الزر</label>
-                    <input type="text" id="ctaText" oninput="updateData('ctaText', this.value)">
-                </div>
-            </div>
-        </div>
-
-        <!-- NEW: Design & Fonts Section -->
-        <h2>2. التصميم والمظهر</h2>
-        <div class="form-group">
-            <label>نوع الخط (Font Family)</label>
-            <select id="fontFamily" onchange="updateCommon('fontFamily', this.value)">
-                <option value="Inter">Inter (افتراضي)</option>
-                <option value="Cairo">Cairo (كايرو)</option>
-                <option value="Tajawal">Tajawal (تجوال)</option>
-                <option value="Almarai">Almarai (المراعي)</option>
-                <option value="Amiri">Amiri (أميري)</option>
+            <label>اللغة المفعلة حالياً للتعديل</label>
+            <select id="langSelect" onchange="setMode(this.value)">
+                <option value="ar">العربية (AR)</option>
+                <option value="he">עברית (HE)</option>
             </select>
         </div>
+
+        <h2>🎨 الألوان والتصميم</h2>
+        <div class="color-grid">
+            <div class="form-group"><label>خلفية الصفحة</label><input type="color" id="clr-bgBody" oninput="updateDesign('bgBody', this.value)"></div>
+            <div class="form-group"><label>اللون الأساسي</label><input type="color" id="clr-primary" oninput="updateDesign('primary', this.value)"></div>
+            <div class="form-group"><label>خلفية النموذج</label><input type="color" id="clr-bgForm" oninput="updateDesign('bgForm', this.value)"></div>
+            <div class="form-group"><label>لون أزرار الإرسال</label><input type="color" id="clr-btnBg" oninput="updateDesign('btnBg', this.value)"></div>
+        </div>
+
+        <h2>🛍️ تفاصيل المنتج</h2>
+        <div class="form-group"><label>رابط الشعار</label><input type="text" id="logo" oninput="updateCommon('logo', this.value)"></div>
+        <div class="form-group"><label>اسم المنتج</label><input type="text" id="title" oninput="updateData('title', this.value)"></div>
+        <div class="form-group"><label>نص الشارة (Badge)</label><input type="text" id="badge" oninput="updateData('badge', this.value)"></div>
+        
         <div class="form-group">
-            <label>ألوان النموذج (Form)</label>
-            <div class="color-grid">
-                <div><label class="input-label-sm">خلفية الفورم</label><input type="color" id="formBg" value="#000000" oninput="updateCommon('formBg', this.value)"></div>
-                <div><label class="input-label-sm">نصوص الفورم</label><input type="color" id="formColor" value="#ffffff" oninput="updateCommon('formColor', this.value)"></div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                <div><label>السعر الحالي</label><input type="text" id="price" oninput="updateData('price', this.value)"></div>
+                <div><label>السعر القديم</label><input type="text" id="old" oninput="updateData('old', this.value)"></div>
             </div>
         </div>
+        <div class="form-group"><label>الوصف</label><textarea id="desc" oninput="updateData('desc', this.value)" rows="3"></textarea></div>
+        <div class="form-group"><label>النوتات (HTML)</label><textarea id="notes" oninput="updateData('notes', this.value)" rows="4"></textarea></div>
+
+        <h2>⚖️ قسم المقارنة</h2>
         <div class="form-group">
-            <label>ألوان أزرار الطلب (Buttons)</label>
-            <div class="color-grid">
-                <div><label class="input-label-sm">خلفية الزر</label><input type="color" id="btnBg" value="#15b76b" oninput="updateCommon('btnBg', this.value)"></div>
-                <div><label class="input-label-sm">نص الزر</label><input type="color" id="btnTxt" value="#000000" oninput="updateCommon('btnTxt', this.value)"></div>
-            </div>
+            <label>نقاط المقارنة (افصل بـ ,)</label>
+            <textarea id="maniPoints" oninput="updateMani(this.value)" rows="3"></textarea>
         </div>
 
-        <h2>3. المقارنة (Manifesto)</h2>
-        <div class="form-group">
-            <div class="toggle-wrapper">
-                <span class="toggle-label">⚖️ تفعيل القسم</span>
-                <input type="checkbox" id="showManifesto" checked onchange="updateCommon('showManifesto', this.checked)">
-                <div class="section-settings">
-                    <label>العنوان الرئيسي</label><input type="text" id="maniT" oninput="updateData('maniT', this.value)">
-                    <label>الوصف الفرعي</label><input type="text" id="maniS" oninput="updateData('maniS', this.value)">
-                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:5px; margin-top:5px; margin-bottom:10px;">
-                        <div><label>MAD (نحن)</label><input type="text" id="maniM" oninput="updateData('maniM', this.value)"></div>
-                        <div><label>Others (الغير)</label><input type="text" id="maniO" oninput="updateData('maniO', this.value)"></div>
-                    </div>
-                    <label>نقاط المقارنة (تعديل حسب اللغة)</label>
-                    <div id="maniRows"></div>
-                    <button class="btn-secondary" onclick="addManiRow()">+ إضافة نقطة مقارنة</button>
-                </div>
-            </div>
+        <h2>🧩 العناصر الإضافية</h2>
+        <div id="blocksContainer"></div>
+        <div class="block-controls" style="display:flex; gap:10px;">
+            <button class="btn-add" onclick="addBlock('carousel')">+ كرسول</button>
+            <button class="btn-add" onclick="addBlock('text')">+ نص</button>
+            <button class="btn-add" onclick="addBlock('video')">+ فيديو</button>
         </div>
 
-        <h2>4. خيارات الطلب</h2>
-        <!-- Google Sheet Config -->
-        <div class="toggle-wrapper">
-            <span class="toggle-label">📝 نموذج الطلب (Google Sheet)</span>
-            <input type="checkbox" id="showForm" checked onchange="updateCommon('showForm', this.checked)">
-            <div class="section-settings">
-                <label>رابط سكربت غوغل (Web App URL)</label>
-                <input type="text" id="googleScript" value="https://script.google.com/macros/s/AKfycbzEEzQCP1xVJ9U1E15hh43sok6uRIir866l9daol-rUqXrp6dwnXusc3h9_B6miqqtE/exec" oninput="updateCommon('googleScript', this.value)">
-                <label>صفحة الشكر (رابط توجيه)</label>
-                <input type="text" id="tyPage" value="/thank-you.html" oninput="updateCommon('tyPage', this.value)">
-            </div>
-        </div>
+        <h2>⚙️ التتبع والسكربتات</h2>
+        <div class="form-group"><label>رابط سكربت جوجل</label><input type="text" id="googleScript" oninput="updateCommon('googleScript', this.value)"></div>
+        <div class="form-group"><label>Facebook Pixel ID</label><input type="text" id="fbPixel" oninput="updateCommon('fb', this.value)"></div>
+        <div class="form-group"><label>TikTok Pixel ID</label><input type="text" id="ttPixel" oninput="updateCommon('tt', this.value)"></div>
 
-        <div class="toggle-wrapper">
-            <span class="toggle-label">🟢 WhatsApp</span>
-            <input type="checkbox" id="showWa" checked onchange="updateCommon('showWa', this.checked)">
-            <div class="section-settings">
-                <label>رقم الواتساب (مع الدولة)</label><input type="text" id="waNum" value="972509787730" oninput="updateCommon('waNum', this.value)">
-                <label>نص الرسالة المسبقة</label><input type="text" id="waText" oninput="updateData('waText', this.value)">
-                <label>نص الزر</label><input type="text" id="waLabel" oninput="updateData('waLabel', this.value)">
-            </div>
-        </div>
-        <div class="toggle-wrapper">
-            <span class="toggle-label">📞 اتصال هاتفي</span>
-            <input type="checkbox" id="showCall" checked onchange="updateCommon('showCall', this.checked)">
-            <div class="section-settings">
-                <label>رقم الهاتف</label><input type="text" id="callNum" value="*9935" oninput="updateCommon('callNum', this.value)">
-                <label>نص الزر</label><input type="text" id="callLabel" oninput="updateData('callLabel', this.value)">
-            </div>
-        </div>
-        <div class="toggle-wrapper">
-            <span class="toggle-label">🌐 رابط موقع</span>
-            <input type="checkbox" id="showWeb" onchange="updateCommon('showWeb', this.checked)">
-            <div class="section-settings">
-                <label>الرابط</label><input type="text" id="webUrl" placeholder="https://..." oninput="updateCommon('webUrl', this.value)">
-                <label>نص الزر</label><input type="text" id="webLabel" oninput="updateData('webLabel', this.value)">
-            </div>
-        </div>
-
-        <h2>5. الوسائط والبلوكات</h2>
-        <div class="form-group" style="background:rgba(255,255,255,0.05); padding:10px; border-radius:8px; border:1px solid #334155">
-            <label style="color:var(--primary); margin-bottom:8px;">خلفية الهيدر</label>
-            <select id="heroType" onchange="updateCommon('heroType', this.value)" style="margin-bottom:10px;">
-                <option value="video">فيديو مباشر (MP4)</option>
-                <option value="youtube">يوتيوب (YouTube)</option>
-                <option value="image">صورة ثابتة (Image)</option>
-            </select>
-            <input type="text" id="vid" value="https://madparfumeurglobal.com/wp-content/uploads/2025/10/download.mp4" placeholder="الرابط..." oninput="updateCommon('vid', this.value)">
-        </div>
-
-        <div class="form-group">
-            <label>صور المنتج (Carousel)</label>
-            <input type="file" id="heroInput" accept="image/*" style="display:none">
-            <button class="btn-secondary" onclick="document.getElementById('heroInput').click()">+ رفع صورة</button>
-            <div class="or-divider">- أو -</div>
-            <div class="url-input-group">
-                <input type="text" id="heroUrlInput" placeholder="رابط صورة URL">
-                <button class="btn-secondary" style="width:auto;" onclick="addHeroFromUrl()">إضافة</button>
-            </div>
-            <div id="heroList" class="img-list"></div>
-        </div>
-
-        <div id="blockList"></div>
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:5px; margin-top:10px;">
-            <button class="btn-secondary" onclick="addBlock('text')">نص</button>
-            <button class="btn-secondary" onclick="addBlock('image')">صورة + نص</button>
-            <button class="btn-secondary" onclick="addBlock('video')">فيديو</button>
-            <button class="btn-secondary" onclick="addBlock('embed')">HTML</button>
-        </div>
-
-        <h2>6. التتبع</h2>
-        <div class="form-group"><label>Facebook Pixel</label><input type="text" id="fbPixel" value="1072283127290819" oninput="updateCommon('fb', this.value)"></div>
-        <div class="form-group"><label>TikTok Pixel</label><input type="text" id="ttPixel" value="D2D02JBC77U4ENLN9SBG" oninput="updateCommon('tt', this.value)"></div>
-
-        <button class="btn-action" onclick="download()">تحميل الصفحة</button>
+        <button class="btn-action" onclick="download()">تحميل الصفحة النهائية 📥</button>
     </div>
 
     <div class="preview-pane">
@@ -228,476 +107,244 @@
 
 <script>
     let mode = 'ar';
+    const design = { bgBody: "#0b0b0b", primary: "#d4af37", bgForm: "#161616", btnBg: "#d4af37", btnText: "#000000" };
+    
     const common = {
-        bgColor: "#ab5c12",
-        fontFamily: "Inter",
-        formBg: "#000000",
-        formColor: "#ffffff",
-        btnBg: "#15b76b",
-        btnTxt: "#000000",
-        
-        heroType: 'video', 
-        logo: "https://madperfume.ps/upload/01-2026/page/69735b87d92ef.png",
-        vid: "https://madparfumeurglobal.com/wp-content/uploads/2025/10/download.mp4",
-        heroes: ["https://madperfume.ps/upload/01-2026/page/6971495c69e7c.png"],
+        logo: "https://abomkdad.github.io/Digital-Business-Card/logo.png",
+        googleScript: "https://script.google.com/macros/s/AKfycbyx0rxHpN9Csv2OV_9D_EIF_pqMlNEmF2rDi_s7ZFo6feB7r9Ohb2eHuxEM4gGfDuLu/exec",
+        fb: "1072283127290819", 
+        tt: "D2D02JBC77U4ENLN9SBG",
+        maniRawAr: "الأمان الصحي, الهندسة العطرية, المصدر الأصلي, الثبات",
+        maniRawHe: "בטיחות בריאותית, הנדסת ניחוח, מקור מקורי, עמידות לאורך זמן",
         blocks: [
-            {
-                id: 1769167825001,
-                type: "text",
-                val: "",
-                text: {
-                    ar: "DEPENDENCE – مستوحى من Bitter Peach (Tom Ford)\n\nDEPENDENCE هو عطر جريء، حسي ومُلفت، يجمع بين الحلاوة الفاكهية العميقة ولمسة فاخرة جذابة.\nمستوحى من Bitter Peach من Tom Ford ليمنحك تجربة عطرية قوية تعبّر عن الجرأة، الأناقة والحضور اللافت.\n\n🍑 افتتاحية خوخية جذابة\n🔥 عمق دافئ مثير\n💎 توقيع عطري فاخر بطابع عصري",
-                    he: "DEPENDENCE – Inspired by Bitter Peach (Tom Ford)\n\nDEPENDENCE הוא ניחוח נועז, חושני וממכר, המשלב מתיקות פירותית עמוקה עם אלגנטיות יוקרתית.\nהשראה מ־Bitter Peach של Tom Ford יוצרת חוויה חושית עוצמתית, מושלמת למי שמחפש נוכחות בולטת וסטייל בלתי נשכח.\n\n🍑 פתיחה עסיסית ומתוקה\n🔥 עומק חמים ומפתה\n💎 חתימה יוקרתית עם אופי מודרני"
-                }
-            },
-            {
-                id: 1769176873684,
-                type: "video",
-                val: "https://madperfume.ps/upload/01-2026/page/Dependence%20madperfume.mp4#t=0.02",
-                text: { ar: "", he: "" }
-            },
-            {
-                id: 1769176890534,
-                type: "text",
-                val: "",
-                text: {
-                    ar: "النوتات العطرية\n\nالنوتات العليا (Top Notes):\nخوخ مر، فواكه عصيرية\n\nنوتات القلب (Heart Notes):\nفانيليا، توابل دافئة، لمسات زهرية\n\nالنوتات الأساسية (Base Notes):\nعنبر، أخشاب دافئة، مسك",
-                    he: "תווי ניחוח (Notes)\n\nתווי פתיחה (Top Notes):\nאפרסק מריר, פירות עסיסיים\n\nתווי לב (Heart Notes):\nוניל, תבלינים חמים, פרחים עדינים\n\nתווי בסיס (Base Notes):\nענבר, עצים חמים, מושק"
-                }
-            }
-        ],
-        fb: "1072283127290819", tt: "D2D02JBC77U4ENLN9SBG",
-        googleScript: "https://script.google.com/macros/s/AKfycbzEEzQCP1xVJ9U1E15hh43sok6uRIir866l9daol-rUqXrp6dwnXusc3h9_B6miqqtE/exec",
-        tyPage: "/thank-you.html",
-        showForm: true, showManifesto: true, showWa: true, showCall: true, showWeb: false, showFloatingBtn: false,
-        waNum: "972509787730", callNum: "*9935", webUrl: "https://madparfumeur.com"
+            { id: 1, type: 'carousel', content: ["https://madperfume.ps/upload/01-2026/page/6971495c69e7c.png"] }
+        ]
     };
 
     const db = {
-        ar: {
-            price: "240 ₪ شامل التوصيل", offer: "350 ₪ السعر السابق", ctaText: "اطلب الآن",
-            maniT: "THE MANIFESTO", maniS: "لماذا MAD؟ مقارنة علمية", maniM: "عطور  MAD", maniO: "عطور تركيا دبي الزيوت والبدائل",
-            waLabel: "اطلب عبر واتساب", waText: "ديبنس",
-            callLabel: "اتصل للطلب", webLabel: "زيارة الموقع",
-            formTitle: "نموذج الطلب السريع", name: "الاسم الكامل", phone: "رقم الهاتف", city: "المدينة (اختياري)", notes: "ملاحظات (اختياري)",
-            submit: "إرسال الطلب ✅", sending: "جاري الإرسال...", ok: "تم إرسال الطلب بنجاح ✅", fail: "حصل خطأ، جرّب مرة ثانية.",
-            compItems: [
-                {mad: "آمنة 100% معتمدة", local: "مجهولة المصدر"},
-                {mad: "تطابق جزيئي دقيق", local: "خلط يدوي عشوائي"},
-                {mad: "خلاصات أوروبية", local: "زيوت تجارية رخيصة"},
-                {mad: "ثبات +24 ساعة", local: "يختفي بعد ساعة"},
-                {mad: "41 فرع في البلاد", local: "اونلاين"},
-                {mad: "خدمة زبائن *9935", local: " حظر بعد الشراء"},
-                {mad: "مصادقات اييزو ووزارة الصحه", local: "غير مفحوصه"}
-            ]
+        ar: { 
+            title: "Treasure 100ml", price: "400 ₪", old: "350 ₪", badge: "Premium Collection", 
+            desc: "عطر شرقي فاخر للنساء والرجال، غني ودافئ بطابع أنيق وجذاب.", 
+            notes: "<b>النوتات العليا:</b> البرغموت، الليمون<br><b>قلب العطر:</b> اللافندر، العسل<br><b>قاعدة العطر:</b> الفانيليا", 
+            maniTitle: "لماذا MAD PARFUMEUR؟", maniOthers: "التقليد والزيوت", formTitle: "Order Form", namePh: "الاسم الكامل", phonePh: "رقم الهاتف", addressPh: "العنوان", submit: "إرسال الطلب", successMsg: "تم استلام طلبك بنجاح! ✅" 
         },
-        he: {
-            price: "240₪ כולל משלוח", offer: "350 ₪ מחיר קודם", ctaText: "הזמן עכשיו",
-            maniT: "THE MANIFESTO", maniS: "למה MAD? השוואה מדעית", maniM: "בשמי MAD", maniO: "חיקויים דובי טורקיה דיופים שמנים",
-            waLabel: "הזמן בוואטסאפ", waText: "DEPENDENCE",
-            callLabel: "חייג להזמנה", webLabel: "בקר באתר",
-            formTitle: "טופס הזמנה מהיר", name: "שם מלא", phone: "טלפון", city: "עיר (אופציונלי)", notes: "הערות (אופציונלי)",
-            submit: "שלח הזמנה ✅", sending: "שולח...", ok: "ההזמנה נשלחה בהצלחה ✅", fail: "שגיאה, נסו שוב.",
-            compItems: [
-                {mad: "בטוח 100% מאושר", local: "מקור לא ידוע"},
-                {mad: "התאמה מולקולרית", local: "ערבוב אקראי"},
-                {mad: "תמציות אירופאיות", local: "שמנים מסחריים"},
-                {mad: "עמידות 24+ שעות", local: "נעלם מהר"},
-                {mad: "41 סניפים בארץ", local: " אונליין"},
-                {mad: "שירות לקוחות *9935", local: "נעלמים אחר ההזמנה"},
-                {mad: "תקן אייזו - משרד בריאות", local: " לא נבדק מסוכן"}
-            ]
+        he: { 
+            title: "Treasure 100ml", price: "₪ 400", old: "₪ 350", badge: "Premium Collection", 
+            desc: "בושם מזרחי יוקרתי לנשים ולגברים, עשיר וחם עם נוכחות אלגנטית.", 
+            notes: "<b>תווי פתיחה:</b> ברגמוט, לימון<br><b>תווי לב:</b> לבנדר, דבש<br><b>תווי בסיס:</b> וניל", 
+            maniTitle: "?למה MAD PARFUMEUR", maniOthers: "חיקויים ושמנים", formTitle: "טופס הזמנה", namePh: "שם מלא", phonePh: "מספר טלפון", addressPh: "כתובת", submit: "שלח הזמנה", successMsg: "הזמנה התקבלה בהצלחה! ✅" 
         }
     };
 
-    function escapeHtml(text) {
-        if (!text) return "";
-        return text.replace(/\\/g, '\\\\')
-                   .replace(/"/g, '\\"')
-                   .replace(/'/g, "\\'")
-                   .replace(/`/g, '\\`')
-                   .replace(/</g, '&lt;')
-                   .replace(/>/g, '&gt;')
-                   .replace(/\$/g, '\\$');
+    function addBlock(type) {
+        const id = Date.now();
+        common.blocks.push({ id, type, content: type === 'carousel' ? [] : "" });
+        renderBlocksUI(); render();
+    }
+
+    function removeBlock(id) { common.blocks = common.blocks.filter(b => b.id !== id); renderBlocksUI(); render(); }
+
+    function updateBlockContent(id, value) {
+        const block = common.blocks.find(b => b.id === id);
+        if(block.type === 'carousel') block.content = value.split(',').map(s => s.trim());
+        else block.content = value;
+        render();
+    }
+
+    function renderBlocksUI() {
+        const container = document.getElementById('blocksContainer');
+        if(!container) return;
+        container.innerHTML = "";
+        common.blocks.forEach(block => {
+            const div = document.createElement('div');
+            div.className = 'block-item';
+            let inputField = block.type === 'carousel' ? `<textarea oninput="updateBlockContent(${block.id}, this.value)">${block.content.join(',')}</textarea>` : `<input type="text" oninput="updateBlockContent(${block.id}, this.value)" value="${block.content}">`;
+            div.innerHTML = `<div class="block-header"><span>${block.type.toUpperCase()}</span><button class="btn-delete" onclick="removeBlock(${block.id})">حذف</button></div>${inputField}`;
+            container.appendChild(div);
+        });
     }
 
     function setMode(lang) {
         mode = lang;
-        document.getElementById('btn-ar').className = lang === 'ar' ? 'lang-btn active' : 'lang-btn';
-        document.getElementById('btn-he').className = lang === 'he' ? 'lang-btn active' : 'lang-btn';
-        ['price', 'offer', 'ctaText', 'maniT', 'maniS', 'maniM', 'maniO', 'waLabel', 'waText', 'callLabel', 'webLabel'].forEach(id => {
-            const el = document.getElementById(id);
-            if(el) el.value = db[lang][id] || '';
-        });
-        renderManiRows(); updateBlockUI(); render(); 
+        if(document.getElementById('title')) document.getElementById('title').value = db[lang].title;
+        if(document.getElementById('badge')) document.getElementById('badge').value = db[lang].badge;
+        if(document.getElementById('price')) document.getElementById('price').value = db[lang].price;
+        if(document.getElementById('old')) document.getElementById('old').value = db[lang].old;
+        if(document.getElementById('desc')) document.getElementById('desc').value = db[lang].desc;
+        if(document.getElementById('notes')) document.getElementById('notes').value = db[lang].notes;
+        if(document.getElementById('maniPoints')) document.getElementById('maniPoints').value = mode === 'ar' ? common.maniRawAr : common.maniRawHe;
+        render();
     }
 
     function updateData(key, val) { db[mode][key] = val; render(); }
     function updateCommon(key, val) { common[key] = val; render(); }
-
-    function renderManiRows() {
-        const div = document.getElementById('maniRows'); div.innerHTML = '';
-        db[mode].compItems.forEach((item, i) => {
-            div.innerHTML += `<div class="dynamic-row">
-                <input type="text" placeholder="MAD" value="${escapeHtml(item.mad)}" oninput="updateManiItem(${i}, 'mad', this.value)">
-                <input type="text" placeholder="Others" value="${escapeHtml(item.local)}" oninput="updateManiItem(${i}, 'local', this.value)">
-                <button class="btn-delete" onclick="removeManiRow(${i})">X</button>
-            </div>`;
-        });
-    }
-    function updateManiItem(i, f, v) { db[mode].compItems[i][f] = v; render(); }
-    function addManiRow() { db[mode].compItems.push({mad:'', local:''}); renderManiRows(); render(); }
-    function removeManiRow(i) { db[mode].compItems.splice(i, 1); renderManiRows(); render(); }
-
-    const logoInput = document.getElementById('logoInput');
-    if(logoInput) logoInput.addEventListener('change', e => handleFile(e, res => { common.logo = res; render(); }));
-    
-    const heroInput = document.getElementById('heroInput');
-    if(heroInput) heroInput.addEventListener('change', e => handleFile(e, res => { common.heroes.push(res); updateHeroUI(); render(); }));
-
-    function handleFile(e, cb) {
-        if(e.target.files[0]) {
-            const r = new FileReader();
-            r.onload = evt => cb(evt.target.result);
-            r.readAsDataURL(e.target.files[0]);
-        }
-    }
-    
-    function addHeroFromUrl() {
-        const urlInp = document.getElementById('heroUrlInput');
-        if(urlInp && urlInp.value.trim()){
-            common.heroes.push(urlInp.value.trim());
-            updateHeroUI(); render();
-            urlInp.value = '';
-        }
-    }
-
-    function updateHeroUI() {
-        const div = document.getElementById('heroList'); div.innerHTML = '';
-        common.heroes.forEach((src, i) => {
-            div.innerHTML += `<div class="img-wrap"><img src="${src}" class="img-thumb"><button class="img-del" onclick="delHero(${i})">x</button></div>`;
-        });
-    }
-    function delHero(i) { common.heroes.splice(i,1); updateHeroUI(); render(); }
-
-    function addBlock(t) { 
-        common.blocks.push({ id: Date.now(), type: t, val: '', text: { ar: '', he: '' } }); 
-        updateBlockUI(); render(); 
-    }
-    function delBlock(id) { common.blocks = common.blocks.filter(b => b.id !== id); updateBlockUI(); render(); }
-    
-    function setBlockVal(id, v) { common.blocks.find(b=>b.id===id).val = v; render(); }
-    
-    function setBlockText(id, v) { 
-        const b = common.blocks.find(b=>b.id===id);
-        if(!b.text) b.text = { ar: '', he: '' };
-        b.text[mode] = v;
-        render(); 
-    }
-
-    function handleBlockImg(id, input) { handleFile({target:input}, res => { setBlockVal(id, res); updateBlockUI(); }); }
-
-    function updateBlockUI() {
-        const div = document.getElementById('blockList'); div.innerHTML = '';
-        common.blocks.forEach((b) => {
-            let f = '';
-            const safeVal = escapeHtml(b.val);
-            const currentText = (b.text && b.text[mode]) ? escapeHtml(b.text[mode]) : '';
-            const langName = mode === 'ar' ? 'العربية' : 'עברית';
-
-            if(b.type === 'text') {
-                f = `<label class="input-label-sm">النص (${langName})</label>
-                     <textarea oninput="setBlockText(${b.id},this.value)" placeholder="اكتب النص هنا...">${currentText}</textarea>`;
-            } else if(b.type === 'video') {
-                f = `<input type="text" oninput="setBlockVal(${b.id},this.value)" value="${safeVal}" placeholder="رابط MP4">`;
-            } else if(b.type === 'embed') {
-                f = `<textarea oninput="setBlockVal(${b.id},this.value)" placeholder="كود HTML...">${safeVal}</textarea>`;
-            } else if(b.type === 'image') {
-                f = `
-                <input type="file" onchange="handleBlockImg(${b.id},this)">
-                <div class="or-divider">- أو -</div>
-                <input type="text" placeholder="رابط صورة" value="${b.val.startsWith('data:') ? '' : safeVal}" oninput="setBlockVal(${b.id},this.value)">
-                ${b.val ? '<img src="'+b.val+'" style="height:40px;margin-top:5px;object-fit:contain" referrerpolicy="no-referrer">' : ''}
-                <div style="margin-top:8px">
-                    <label class="input-label-sm">نص تحت الصورة (${langName})</label>
-                    <input type="text" value="${currentText}" oninput="setBlockText(${b.id},this.value)" placeholder="وصف اختياري...">
-                </div>
-                `;
-            }
-            div.innerHTML += `<div class="block-item"><div class="block-head"><span>${b.type.toUpperCase()}</span><button class="btn-delete" onclick="delBlock(${b.id})">x</button></div>${f}</div>`;
-        });
-    }
-
-    function safeJSON(obj) {
-        return JSON.stringify(obj).replace(/</g, '\\u003c');
-    }
+    function updateDesign(key, val) { design[key] = val; render(); }
+    function updateMani(val) { if(mode === 'ar') common.maniRawAr = val; else common.maniRawHe = val; render(); }
 
     function getHTML(dl = false) {
-        const jsonCommon = safeJSON(common);
-        const jsonDB = safeJSON(db);
-        
-        const vidUrl = common.vid;
-        const hType = common.heroType;
-        let heroHtml = '';
+        const sOpen = '<' + 'script'; const sClose = '<' + '/script>';
+        let blocksHTML = "";
+        common.blocks.forEach((b, idx) => {
+            const lazyAttr = (idx > 0) ? 'loading="lazy"' : '';
+            if(b.type === 'text') blocksHTML += `<p class="text-center opacity-80 whitespace-pre-wrap">${b.content}</p>`;
+            if(b.type === 'image') blocksHTML += `<img src="${b.content}" class="w-full rounded-2xl shadow-xl" ${lazyAttr}>`;
+            if(b.type === 'video') blocksHTML += `<video src="${b.content}" controls class="w-full rounded-2xl" preload="metadata"></video>`;
+            if(b.type === 'carousel' && b.content.length > 0) {
+                blocksHTML += `<div x-data="{ active: 0, images: ${JSON.stringify(b.content).replace(/"/g, "'")} }" class="relative w-full aspect-square bg-black rounded-2xl overflow-hidden shadow-2xl border border-white/5"><template x-for="(img, idx) in images"><img x-show="active === idx" :src="img" class="absolute inset-0 w-full h-full object-contain" ${lazyAttr}></template><button @click="active = (active === 0 ? images.length - 1 : active - 1)" class="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 p-3 rounded-full">◀</button><button @click="active = (active === images.length - 1 ? 0 : active + 1)" class="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 p-3 rounded-full">▶</button></div>`;
+            }
+        });
 
-        if (hType === 'youtube') {
-            const ytMatch = vidUrl.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?|shorts)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/);
-            const vidId = ytMatch ? ytMatch[1] : '';
-            heroHtml = vidId ? `<div class="hero-wrapper"><iframe src="https://www.youtube.com/embed/${vidId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${vidId}&playsinline=1&rel=0&showinfo=0&modestbranding=1" class="hero-vid-iframe" allow="autoplay; encrypted-media" frameborder="0"></iframe></div>` : `<div class="hero-wrapper" style="background:#333;"></div>`;
-        } else if (hType === 'image') {
-            heroHtml = `<img src="${vidUrl}" class="hero-vid" alt="Background" referrerpolicy="no-referrer">`;
-        } else {
-            heroHtml = `<video src="${vidUrl}" autoplay loop muted playsinline class="hero-vid"></video>`;
-        }
-
-        const sOpen = '<' + 'script';
-        const sClose = '<' + '/script>';
-
-        const pixels = dl ? `
-        ${sOpen}>
-            !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)n=f.fbq;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window, document,'script','https://connect.facebook.net/en_US/fbevents.js');
-            fbq('init', '${common.fb}'); fbq('track', 'PageView');
-            !function (w, d, t) { w.TiktokAnalyticsObject=t; var ttq=w[t]=w[t]||[]; ttq.methods=["page","track","identify","instances","debug","on","off","once","ready","alias","group","enableCookie","disableCookie","holdConsent","revokeConsent","grantConsent"]; ttq.setAndDefer=function(t,e){t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}; for(var i=0;i<ttq.methods.length;i++)ttq.setAndDefer(ttq,ttq.methods[i]); ttq.load=function(e,n){ var r="https://analytics.tiktok.com/i18n/pixel/events.js"; var o=n&&n.partner; ttq._i=ttq._i||{}; ttq._i[e]=[]; ttq._i[e]._u=r; ttq._t=ttq._t||{}; ttq._t[e]=+new Date; ttq._o=ttq._o||{}; ttq._o[e]=n||{}; n=document.createElement("script"); n.type="text/javascript"; n.async=!0; n.src=r+"?sdkid="+e+"&lib="+t; e=document.getElementsByTagName("script")[0]; e.parentNode.insertBefore(n,e) }; ttq.load('${common.tt}'); ttq.page(); }(window, document, 'ttq');
-            
-            // MAD Tracking Logic
-            window.MAD_TRACKING_SPEC = {
-             project_name: "MAD Conversion Tracking System",
-             platforms: ["Facebook Pixel", "TikTok Pixel"],
-             currency: "ILS",
-             landing_page: { allowed_events_only: ["PageView", "Contact"], do_not_fire_purchase_event: true },
-             thank_you_page: {
-               facebook: { event: "Purchase", value: 500, currency: "ILS" },
-               tiktok: { event: "CompletePayment", value: 500, currency: "ILS" },
-               rules: { fire_event_only_once_per_session: true, prevent_manual_access: true, do_not_trigger_on_refresh: true }
-             }
-            };
-            window.MAD_KEYS = { ORDER_OK: "MAD_ORDER_OK_V1", PURCHASE_LOCK: "MAD_PURCHASE_LOCK_V1" };
-            window.MAD_MARK_ORDER_SUBMITTED = function(meta){
-             try {
-               sessionStorage.setItem(window.MAD_KEYS.ORDER_OK, "1");
-               if(meta && typeof meta === "object"){ sessionStorage.setItem("MAD_ORDER_META_V1", JSON.stringify(meta)); }
-             } catch(e){}
-            };
-        ${sClose}` : '';
-
-        // Auto-detect logic for downloaded file
-        const autoLang = dl ? `
-        const ul = navigator.language || navigator.userLanguage || '';
-        this.lang = ul.toLowerCase().startsWith('he') ? 'he' : 'ar';
-        ` : '';
+        const currentMani = mode === 'ar' ? common.maniRawAr : common.maniRawHe;
+        const maniItems = currentMani.split(',').map(p => p.trim());
+        let maniHTML = `<div class="space-y-3">`;
+        maniItems.forEach(item => {
+            maniHTML += `<div class="grid grid-cols-2 gap-1 rounded-xl overflow-hidden border border-white/5"><div class="bg-white/5 p-3 text-right text-xs"><span class="text-[var(--p)] font-bold">MAD:</span> ${item}</div><div class="bg-black/40 p-3 text-right text-[10px] opacity-40">${db[mode].maniOthers}</div></div>`;
+        });
+        maniHTML += `</div>`;
 
         return `<!DOCTYPE html>
-<html lang="${mode}" x-data="app()" x-init="init()" :dir="dir">
+<html lang="${mode}" dir="${mode=='ar'?'rtl':'ltr'}" x-data="app()">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-${sOpen} src="https://cdn.tailwindcss.com">${sClose}
-${sOpen} src="https://unpkg.com/lucide@latest">${sClose}
-${sOpen} src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer>${sClose}
-${pixels}
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,900;1,400;1,900&family=Inter:wght@300;400;700;900&family=Amiri:wght@400;700&family=Assistant:wght@300;400;700;800&family=Cairo:wght@400;700&family=Tajawal:wght@400;700&family=Almarai:wght@400;700&display=swap');
-body{background:${common.bgColor};color:${common.formColor};font-family:'${common.fontFamily}',sans-serif}
-.glass-nav { position: fixed; top: 0; left: 0; width: 100%; z-index: 50; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.6); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(255,255,255,0.1); }
-.nav-logo { height: 35px; object-fit: contain; }
-.lang-btn-nav { font-size: 11px; font-weight: bold; color: rgba(255,255,255,0.6); margin: 0 5px; transition:0.2s; }
-.lang-btn-nav.active { color: #d97706; }
-.hero-vid, .hero-wrapper { position: absolute; top: 0; left: 0; width: 100%; height: 100vh; overflow: hidden; z-index: -1; object-fit: cover; filter: brightness(0.6); }
-.hero-vid-iframe { width: 300%; height: 150%; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); pointer-events: none; }
-@media (min-aspect-ratio: 16/9) { .hero-vid-iframe { width: 100%; height: 300%; } }
-.badge{background:linear-gradient(to right,#d97706,#fbbf24);color:black;padding:5px 20px;border-radius:50px;font-weight:900;display:inline-block;margin-bottom:10px}
-.carousel{position:relative;height:400px;display:flex;align-items:center;justify-content:center}
-.c-img{max-height:100%;max-width:100%;filter:drop-shadow(0 20px 40px rgba(0,0,0,0.8))}
-.c-btn{position:absolute;top:50%;transform:translateY(-50%);background:rgba(0,0,0,0.5);color:#d97706;border:1px solid #333;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer}
-.comp-row{display:grid;grid-template-columns:1fr 1fr;gap:2px;background:rgba(255,255,255,.05);border-radius:15px;overflow:hidden;margin-bottom:10px;border:1px solid rgba(255,255,255,.05)}
-.c-side{padding:15px;font-size:13px;display:flex;flex-direction:column;justify-content:center}
-.c-mad{background:linear-gradient(to right,rgba(217,119,6,.1),rgba(217,119,6,.05));text-align:right}
-.c-alt{background:rgba(0,0,0,.4);text-align:right;opacity:.7}
-.sticky-cta { position: fixed; bottom: 20px; left: 0; width: 100%; z-index: 50; padding: 0 20px; pointer-events: none; }
-.sticky-btn { display: block; max-width: 500px; margin: 0 auto; background: #d97706; color: black; text-align: center; padding: 16px; border-radius: 99px; font-weight: 900; text-decoration: none; box-shadow: 0 10px 25px rgba(0,0,0,0.5); pointer-events: auto; transition: 0.2s; animation: pulse 2s infinite; }
-@keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.02); } 100% { transform: scale(1); } }
-.order-grid { display: grid; gap: 10px; margin-bottom: 20px; max-width: 500px; margin-left: auto; margin-right: auto; }
-.btn-order { display: flex; align-items: center; justify-content: center; gap: 10px; padding: 12px; border-radius: 10px; font-weight: bold; text-decoration: none; transition: 0.2s; }
-.btn-wa { background: #25D366; color: white; } .btn-wa:hover { background: #1ebc57; }
-.btn-call { background: #3b82f6; color: white; } .btn-call:hover { background: #2563eb; }
-.btn-web { background: #64748b; color: white; } .btn-web:hover { background: #475569; }
-/* Form Styles */
-.form-card { max-width:520px; margin:0 auto; background:${common.formBg}; border:1px solid rgba(255,255,255,.10); border-radius:22px; padding:16px; box-shadow:0 20px 80px rgba(0,0,0,.45); text-align: right; }
-.inp { width:100%; padding:12px 12px; border-radius:14px; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12); outline:none; color:${common.formColor}; }
-.inp:focus { border-color: rgba(217,119,6,.7); box-shadow:0 0 0 3px rgba(217,119,6,.18); }
-.submit-btn { width:100%; padding:14px 14px; border-radius:16px; font-weight:900; color:${common.btnTxt}; background:${common.btnBg}; border:none; box-shadow:0 14px 50px rgba(0,0,0,.35); cursor:pointer; }
-.submit-btn:disabled { opacity:0.6; cursor:not-allowed; }
-.tiny { font-size:12px; color:rgba(255,255,255,.70); margin-top:10px; text-align:center; }
-</style>
-${sOpen}>
-function app(){
-return {
-    c:${jsonCommon}, db:${jsonDB},
-    lang:'${mode}', idx:0,
-    isThankYou: false,
-    f:{name:"",phone:"",city:"",notes:""}, ui:{loading:false,msg:"",ok:false},
-    trackingSpec: (window.MAD_TRACKING_SPEC || null),
-    
-    get t() { return this.db[this.lang] },
-    get dir() { return this.lang=='ar'?'rtl':'ltr' },
-    get offerName() { try{ return decodeURIComponent(location.pathname.split("/").pop().replace(".html","")) || "MAD Offer"; }catch(e){ return "MAD Offer"; } },
-    
-    init(){ 
-        ${autoLang}
-        if(window.lucide) lucide.createIcons();
-        if(this.c.heroes.length>1) setInterval(()=>this.next(),3000);
-        
-        this.isThankYou = /thank/i.test(location.pathname);
-        if(this.isThankYou){ this.fireThankYouPurchaseIfAllowed(); }
-    },
-    tog(l){ this.lang=l; },
-    next(){ this.idx = (this.idx===this.c.heroes.length-1)?0:this.idx+1 },
-    prev(){ this.idx = (this.idx===0)?this.c.heroes.length-1:this.idx-1 },
-    
-    // Pixel & Form Logic
-    fireThankYouPurchaseIfAllowed(){
-         try{
-             if(sessionStorage.getItem(window.MAD_KEYS.ORDER_OK)!=="1") return;
-             if(sessionStorage.getItem(window.MAD_KEYS.PURCHASE_LOCK)==="1") return;
-             sessionStorage.setItem(window.MAD_KEYS.PURCHASE_LOCK,"1");
-             if(typeof fbq!=="undefined") fbq("track","Purchase",{value:500,currency:"ILS"});
-             if(typeof ttq!=="undefined") ttq.track("CompletePayment",{value:500,currency:"ILS"});
-         }catch(e){}
-    },
-    trackContact(s){ 
-        if(typeof fbq!=="undefined") fbq("track","Contact",{source:s});
-        if(typeof ttq!=="undefined") ttq.track("Contact",{source:s});
-    },
-    async submitOrder(){
-        if(this.ui.loading) return;
-        if(!this.f.name || !this.f.phone){ this.ui.msg = (this.lang==="he")?"נא למלא שם וטלפון":"يرجى تعبئة الاسم والهاتف"; return; }
-        
-        this.ui.loading=true; this.ui.msg="";
-        const fd = new FormData();
-        fd.append("order_id", "MAD-"+Date.now());
-        fd.append("lang", this.lang);
-        fd.append("name", this.f.name);
-        fd.append("phone", this.f.phone);
-        fd.append("city", this.f.city);
-        fd.append("notes", this.f.notes);
-        fd.append("offer", this.offerName);
-        
-        try{
-            await fetch(this.c.googleScript, {method:"POST", body:fd, mode:"no-cors"});
-            window.MAD_MARK_ORDER_SUBMITTED({order_id: "MAD-"+Date.now()});
-            this.trackContact("form_submit");
-            if(typeof fbq!=="undefined") fbq("track","Lead");
-            if(typeof ttq!=="undefined") ttq.track("Lead");
-            
-            setTimeout(()=>{
-                window.location.href = this.c.tyPage + "?ty=1";
-            }, 1000);
-            
-            this.ui.ok=true;
-            this.ui.msg = this.t.ok;
-        }catch(e){
-            this.ui.loading=false;
-            this.ui.msg = this.t.fail;
-        }
-    }
-}}
-${sClose}
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>${db[mode].title}</title>
+    ${sOpen} src="https://cdn.tailwindcss.com" defer>${sClose}
+    ${sOpen} src="https://unpkg.com/lucide@latest" defer>${sClose}
+    ${sOpen} src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer>${sClose}
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;700;900&family=Cairo:wght@400;700;900&display=swap');
+        :root { --p: ${design.primary}; --bg: ${design.bgBody}; --f: ${design.bgForm}; --btn: ${design.btnBg}; }
+        body { background: var(--bg); color: white; font-family: 'Heebo', 'Cairo', sans-serif; scroll-behavior: smooth; }
+        .gold-gradient { background: linear-gradient(to right, var(--p), #fff, var(--p)); -webkit-background-clip: text; color: transparent; }
+        .glass-panel{background:rgba(20,20,20,.6);backdrop-filter:blur(16px);border:1px solid rgba(212,175,55,.15);box-shadow: 0 4px 30px rgba(0,0,0,0.3);}
+        input[type="radio"]:checked + div{border-color:var(--p);background-color:rgba(212,175,55,.1)}
+        .radio-circle{width:12px;height:12px;border-radius:99px;border:1px solid #555;}
+        input[type="radio"]:checked + div .radio-circle{background:var(--p);border-color:var(--p);}
+        .animate-pop{animation: pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);}
+        @keyframes pop { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    </style>
+    ${dl ? `${sOpen}>
+        // Async Pixel Loader for Speed
+        (function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)})(window, document,'script','https://connect.facebook.net/en_US/fbevents.js');
+        fbq('init','${common.fb}'); fbq('track','PageView');
+        (function (w, d, t) { w.TiktokAnalyticsObject = t; var ttq = w[t] = w[t] || []; ttq.methods = ["page","track"]; ttq.setAndDefer = function(t, e) { t[e] = function() { t.push([e].concat(Array.prototype.slice.call(arguments, 0))) } }; for (var i = 0; i < ttq.methods.length; i++) { ttq.setAndDefer(ttq, ttq.methods[i]); } ttq.load = function(e) { var i = d.createElement("script"); i.type = "text/javascript"; i.async = true; i.src = "https://analytics.tiktok.com/i18n/pixel/events.js?sdkid=" + e + "&lib=" + t; var n = d.getElementsByTagName("script")[0]; n.parentNode.insertBefore(i, n); }; ttq.load('${common.tt}'); ttq.page(); })(window, document, 'ttq');
+    ${sClose}` : ''}
 </head>
-<body>
+<body class="min-h-screen pb-24">
+    <div class="fixed inset-0 pointer-events-none z-0"><div class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[600px] bg-[var(--p)]/5 blur-[120px]"></div></div>
+    
+    <nav class="fixed top-0 w-full z-50 p-4 flex justify-between items-center bg-black/60 backdrop-blur-xl border-b border-white/10">
+        <img src="${common.logo}" class="h-8" alt="Logo">
+        <button @click="lang=(lang=='ar'?'he':'ar'); setTimeout(()=>lucide.createIcons(),50)" class="text-xs font-black" style="color:var(--p)">{{lang=='ar'?'עברית':'العربية'}}</button>
+    </nav>
 
-<nav class="glass-nav">
-    <div class="flex gap-2">
-        <button @click="tog('ar')" class="lang-btn-nav" :class="lang=='ar'?'active':''">AR</button>
-        <button @click="tog('he')" class="lang-btn-nav" :class="lang=='he'?'active':''">HE</button>
-    </div>
-    <img :src="c.logo" class="nav-logo" alt="Logo" referrerpolicy="no-referrer">
-    <div class="w-8"><i data-lucide="shopping-bag" style="color:white; width:20px;"></i></div>
-</nav>
-
-<section class="relative h-screen flex flex-col justify-center items-center text-center px-4">
-    ${heroHtml}
-    <div class="badge" x-text="t.offer"></div>
-    <h1 class="text-6xl font-serif italic mb-6" x-text="t.price"></h1>
-    <a href="#shop" class="bg-amber-600 text-black px-8 py-3 rounded-full font-bold" x-text="t.ctaText"></a>
-</section>
-
-<section id="shop" class="py-16 px-4 text-center">
-    <div class="carousel mb-10">
-        <template x-for="(src,i) in c.heroes"><img :src="src" x-show="idx===i" class="c-img" x-transition.opacity referrerpolicy="no-referrer"></template>
-        <template x-if="c.heroes.length>1"><div><button class="c-btn" style="left:0" @click="prev"><</button><button class="c-btn" style="right:0" @click="next">></button></div></template>
-    </div>
-
-    <div class="space-y-8 max-w-2xl mx-auto mb-10">
-        <template x-for="block in c.blocks">
-            <div>
-                <template x-if="block.type=='text'"><div class="text-gray-300 whitespace-pre-wrap" x-text="block.text[lang]"></div></template>
-                <template x-if="block.type=='image'">
-                    <div>
-                        <img :src="block.val" class="w-full rounded-xl" referrerpolicy="no-referrer">
-                        <p class="text-gray-400 text-sm mt-2 font-bold" x-show="block.text && block.text[lang]" x-text="block.text[lang]"></p>
-                    </div>
-                </template>
-                <template x-if="block.type=='video'"><video :src="block.val" controls class="w-full rounded-xl"></video></template>
-                <template x-if="block.type=='embed'"><div x-html="block.val"></div></template>
+    <main class="max-w-md mx-auto px-5 pt-24 space-y-12">
+        <section class="text-center space-y-6">
+            <div class="relative inline-block mx-auto group">
+                <div class="absolute inset-0 bg-[var(--p)]/20 rounded-[2rem] blur-2xl"></div>
+                <div class="absolute -bottom-3 left-1/2 -translate-x-1/2 bg-[var(--p)] text-black text-[10px] font-black uppercase tracking-wider px-3 py-1 rounded-full z-10" x-text="t.badge"></div>
+                <div class="relative overflow-hidden rounded-[2rem] border border-white/10 shadow-2xl">${blocksHTML}</div>
             </div>
-        </template>
-    </div>
+            <h1 class="text-3xl font-bold tracking-tight" x-text="t.title"></h1>
+            <div class="flex flex-col items-center"><span class="text-slate-500 line-through text-sm" x-text="t.old"></span><span class="text-5xl font-black gold-gradient" x-text="t.price"></span></div>
+            <p class="text-slate-300 text-sm" x-text="t.desc"></p>
+            <div class="glass-panel p-4 rounded-xl text-xs text-right border-r-2" style="border-color:var(--p)" x-html="t.notes"></div>
+            <a href="#order" class="block w-full py-4 rounded-xl font-bold text-lg" style="background:var(--btn); color:${design.btnText}" x-text="t.submit"></a>
+        </section>
+        
+        <section class="space-y-6"><h2 class="text-center text-xl font-bold" style="color:var(--p)" x-text="t.maniTitle"></h2>${maniHTML}</section>
 
-    <template x-if="c.showManifesto">
-    <div class="max-w-2xl mx-auto mb-16 text-right">
-        <h2 class="text-3xl font-serif italic mb-2 text-white text-center" x-text="t.maniT"></h2>
-        <p class="text-gray-400 text-center mb-6 text-sm" x-text="t.maniS"></p>
-        <template x-for="item in t.compItems">
-            <div class="comp-row"><div class="c-side c-mad"><div class="flex items-center justify-end gap-2 mb-1"><span class="text-[10px] font-bold text-amber-500 uppercase" x-text="t.maniM"></span><i data-lucide="check-circle" class="w-3 h-3 text-amber-500"></i></div><p class="text-white font-bold" x-text="item.mad"></p></div><div class="c-side c-alt"><div class="flex items-center justify-end gap-2 mb-1"><span class="text-[10px] font-bold text-red-400 uppercase" x-text="t.maniO"></span><i data-lucide="x-circle" class="w-3 h-3 text-red-500"></i></div><p class="text-gray-400" x-text="item.local"></p></div></div>
-        </template>
-    </div>
-    </template>
+        <section id="order" class="p-8 rounded-[2.5rem] space-y-6" style="background:var(--f)">
+            <h2 class="text-2xl font-black text-center" x-text="t.formTitle"></h2>
+            <form @submit.prevent="submitOrder" class="space-y-4">
+                <input x-model="f.name" class="w-full p-4 rounded-xl bg-black/40 border border-white/10 outline-none focus:border-[var(--p)] text-right" :placeholder="t.namePh" required>
+                <input x-model="f.phone" class="w-full p-4 rounded-xl bg-black/40 border border-white/10 outline-none focus:border-[var(--p)] text-right" :placeholder="t.phonePh" required>
+                <input x-model="f.address" class="w-full p-4 rounded-xl bg-black/40 border border-white/10 outline-none focus:border-[var(--p)] text-right" :placeholder="t.addressPh" required>
+                
+                <div class="space-y-2 pt-2">
+                    <label class="text-xs text-slate-400" x-text="lang=='he'?'אמצעי תשלום':'طريقة الدفع'"></label>
+                    <div class="grid grid-cols-2 gap-3">
+                        <label class="cursor-pointer"><input type="radio" value="Cash" x-model="f.payment" class="hidden"><div class="border border-white/10 rounded-xl p-3 flex flex-col items-center bg-black/20"><span class="text-xs" x-text="lang=='he'?'מזומן לשليח':'نقدًا'"></span><div class="radio-circle mt-2"></div></div></label>
+                        <label class="cursor-pointer"><input type="radio" value="Visa" x-model="f.payment" class="hidden"><div class="border border-white/10 rounded-xl p-3 flex flex-col items-center bg-black/20"><span class="text-xs" x-text="lang=='he'?'אשראي':'بطاقة ائتمان'"></span><div class="radio-circle mt-2"></div></div></label>
+                    </div>
+                </div>
 
-    <template x-if="c.showForm">
-        <div class="form-card text-right mb-10">
-            <div class="flex items-center justify-between mb-3"><h3 class="font-black text-lg" x-text="t.formTitle"></h3><span class="text-[11px] px-3 py-1 rounded-full bg-black/30 border border-white/10" x-text="offerName"></span></div>
-            <form @submit.prevent="submitOrder()" class="grid gap-3">
-                <input class="inp" type="text" x-model="f.name" :placeholder="t.name" required>
-                <input class="inp" type="tel" x-model="f.phone" :placeholder="t.phone" required>
-                <input class="inp" type="text" x-model="f.city" :placeholder="t.city">
-                <textarea class="inp" rows="3" x-model="f.notes" :placeholder="t.notes"></textarea>
-                <button class="submit-btn" type="submit" :disabled="ui.loading"><span x-show="!ui.loading" x-text="t.submit"></span><span x-show="ui.loading" x-text="t.sending"></span></button>
-                <div class="tiny text-center" :class="ui.ok?'text-green-200':'text-rose-200'" x-show="ui.msg" x-text="ui.msg"></div>
+                <div class="space-y-2 pt-2">
+                    <label class="text-xs text-slate-400" x-text="lang=='he'?'תהליך עיבוד':'معالجة الطلب'"></label>
+                    <div class="grid grid-cols-1 gap-2">
+                        <label class="cursor-pointer"><input type="radio" value="Contact" x-model="f.process" class="hidden"><div class="border border-white/10 rounded-xl p-3 flex justify-between items-center bg-black/20"><span class="text-xs" x-text="lang=='he'?'צرو كشر لايشار':'تواصلوا معي للتأكيد'"></span><div class="radio-circle"></div></div></label>
+                        <label class="cursor-pointer"><input type="radio" value="Direct" x-model="f.process" class="hidden"><div class="border border-white/10 rounded-xl p-3 flex justify-between items-center bg-black/20"><span class="text-xs" x-text="lang=='he'?'משلوح يشير':'شحن مباشر'"></span><div class="radio-circle"></div></div></label>
+                    </div>
+                </div>
+
+                <button type="submit" class="w-full py-5 rounded-2xl font-black text-xl shadow-lg active:scale-95 transition-all" style="background:var(--btn); color:${design.btnText}" x-text="loading ? '...' : t.submit"></button>
             </form>
-        </div>
-    </template>
+        </section>
+        
+        <div class="flex justify-center gap-6 opacity-30 grayscale pb-10"><i data-lucide="award"></i><i data-lucide="shield-check"></i><i data-lucide="star"></i></div>
+    </main>
 
-    <div class="order-grid">
-        <template x-if="c.showWa"><a :href="'https://wa.me/'+c.waNum+'?text='+encodeURIComponent(t.waText)" target="_blank" class="btn-order btn-wa" @click="trackContact('whatsapp')"><i data-lucide="message-circle"></i> <span x-text="t.waLabel"></span></a></template>
-        <template x-if="c.showCall"><a :href="'tel:'+c.callNum" class="btn-order btn-call" @click="trackContact('phone')"><i data-lucide="phone"></i> <span x-text="t.callLabel"></span></a></template>
-        <template x-if="c.showWeb"><a :href="c.webUrl" target="_blank" class="btn-order btn-web" @click="track('ViewContent')"><i data-lucide="globe"></i> <span x-text="t.webLabel"></span></a></template>
+    <!-- Success Modal -->
+    <div x-show="ui.ok" class="fixed inset-0 z-[100] bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="bg-[#111] border border-[var(--p)]/30 p-8 rounded-3xl max-w-xs w-full text-center shadow-2xl animate-pop">
+            <div class="w-16 h-16 bg-green-500/10 rounded-full flex items-center justify-center mx-auto mb-4 border border-green-500/30">
+                <i data-lucide="check" class="w-8 h-8 text-green-500"></i>
+            </div>
+            <h3 class="text-xl font-bold text-white mb-2" x-text="t.successMsg"></h3>
+            <button @click="ui.ok=false" class="w-full bg-[#161616] border border-white/10 text-white py-3 rounded-xl hover:bg-[#222] transition-colors font-bold text-sm mt-4">Close</button>
+        </div>
     </div>
 
-    <template x-if="c.showFloatingBtn"><div class="sticky-cta"><a href="#shop" class="sticky-btn" x-text="t.ctaText"></a></div></template>
-</section>
-
-<footer class="py-6 text-center text-xs text-gray-600">© 2026 MAD PARFUMEUR</footer>
-</body></html>`;
+    ${sOpen}>
+        function app(){
+            return {
+                db: ${JSON.stringify(db)}, lang: '${mode}', f:{name:'',phone:'',address:'',payment:'Cash',process:'Contact'}, loading:false, ui:{ok:false},
+                get t() { return this.db[this.lang] },
+                async submitOrder() {
+                    this.loading = true;
+                    const fd = new FormData();
+                    fd.append('name', this.f.name); fd.append('phone', this.f.phone); fd.append('address', this.f.address);
+                    fd.append('payment', this.f.payment); fd.append('process', this.f.process);
+                    fd.append('offer', this.t.title); fd.append('lang', this.lang);
+                    try {
+                        await fetch('${common.googleScript}', { method: 'POST', body: fd, mode: 'no-cors' });
+                        
+                        // Fire Purchase Pixel Events with Error Handling
+                        try {
+                            if(typeof fbq !== 'undefined') fbq('track', 'Purchase', { value: 400.00, currency: 'ILS' });
+                            if(typeof ttq !== 'undefined') ttq.track('CompletePayment', { value: 400.00, currency: 'ILS' });
+                        } catch(e) {}
+                        
+                        this.ui.ok = true; 
+                        this.f = {name:'',phone:'',address:'',payment:'Cash',process:'Contact'};
+                    } catch(e) { console.error('Error sending order'); } finally { this.loading = false; }
+                }
+            }
+        }
+    ${sClose}
+    ${sOpen}>window.addEventListener('DOMContentLoaded',()=> { if(window.lucide) lucide.createIcons(); });${sClose}
+</body>
+</html>`;
     }
 
-    function render() {
-        const frame = document.getElementById('preview');
-        const doc = frame.contentWindow.document;
-        doc.open();
-        doc.write(getHTML(false));
-        doc.close();
-    }
+    function render() { const f=document.getElementById('preview'); if(f) { const d=f.contentWindow.document; d.open(); d.write(getHTML(false)); d.close(); } }
+    function download() { const l=document.createElement('a'); l.href=URL.createObjectURL(new Blob([getHTML(true)],{type:'text/html'})); l.download='mad-landing.html'; l.click(); }
 
-    function download() {
-        const link = document.createElement('a');
-        link.href = URL.createObjectURL(new Blob([getHTML(true)], {type:'text/html'}));
-        link.download = 'mad-landing-page.html';
-        link.click();
-    }
+    function init() {
+        const logoEl = document.getElementById('logo');
+        const scriptEl = document.getElementById('googleScript');
+        const fbEl = document.getElementById('fbPixel');
+        const ttEl = document.getElementById('ttPixel');
+        const notesEl = document.getElementById('notes');
 
-    // Init
-    setMode('ar');
-    updateHeroUI();
+        if(logoEl) logoEl.value = common.logo;
+        if(scriptEl) scriptEl.value = common.googleScript;
+        if(fbEl) fbEl.value = common.fb;
+        if(ttEl) ttEl.value = common.tt;
+
+        for(let k in design){ const el=document.getElementById('clr-'+k); if(el) el.value=design[k]; }
+        setMode('ar'); renderBlocksUI();
+    }
+    window.addEventListener('load', init);
 </script>
-
 </body>
 </html>
