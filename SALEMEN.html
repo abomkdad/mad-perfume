@@ -1,625 +1,162 @@
 <!DOCTYPE html>
-<html lang="ar" x-data="perfumeApp()" x-init="init()" :dir="t.dir" class="scroll-smooth" x-cloak>
+<html x-data="app()" x-init="init(null)" :lang="lang" :dir="lang==='he'?'ltr':'rtl'">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>MAD Parfumeur - Elite Match & Excellence</title>
-
-  <!-- Zapier Interfaces Web Component -->
-  <script type='module' src='https://interfaces.zapier.com/assets/web-components/zapier-interfaces/zapier-interfaces.esm.js'></script>
-
-  <!-- Meta Pixel -->
-  <script>
-    !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-    n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)n=f.fbq;
-    n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
-    t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}
-    (window, document,'script','https://connect.facebook.net/en_US/fbevents.js');
-    fbq('init', '1072283127290819');
-    fbq('track', 'PageView');
-  </script>
-
-  <!-- TikTok Pixel -->
-  <script>
-    !function (w, d, t) {
-      w.TiktokAnalyticsObject=t;
-      var ttq=w[t]=w[t]||[];
-      ttq.methods=["page","track","identify","instances","debug","on","off","once","ready","alias","group","enableCookie","disableCookie","holdConsent","revokeConsent","grantConsent"];
-      ttq.setAndDefer=function(t,e){t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}; 
-      for(var i=0;i<ttq.methods.length;i++)ttq.setAndDefer(ttq,ttq.methods[i]);
-      ttq.load=function(e,n){
-        var r="https://analytics.tiktok.com/i18n/pixel/events.js";
-        var o=n&&n.partner;
-        ttq._i=ttq._i||{};
-        ttq._i[e]=[];
-        ttq._i[e]._u=r;
-        ttq._t=ttq._t||{};
-        ttq._t[e]=+new Date;
-        ttq._o=ttq._o||{};
-        ttq._o[e]=n||{};
-        n=document.createElement("script");
-        n.type="text/javascript";
-        n.async=!0;
-        n.src=r+"?sdkid="+e+"&lib="+t;
-        e=document.getElementsByTagName("script")[0];
-        e.parentNode.insertBefore(n,e)
-      };
-      ttq.load('D2D02JBC77U4ENLN9SBG');
-      ttq.page();
-    }(window, document, 'ttq');
-  </script>
-
-  <!-- UI Libraries -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://unpkg.com/lucide@latest"></script>
-  <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
-
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,900;1,400;1,900&family=Inter:wght@300;400;700;900&family=Amiri:wght@400;700&family=Assistant:wght@300;400;700;800&display=swap');
-    [x-cloak]{display:none!important;}
-
-    html, body{
-      margin:0;padding:0;width:100%;max-width:100%;
-      overflow-x:hidden!important;
-      background:#020202;color:#f4f4f4;
-      font-family:'Inter','Assistant',sans-serif;
-      -webkit-font-smoothing:antialiased;
-    }
-    .font-serif{font-family:'Playfair Display',serif;}
-    .font-arabic{font-family:'Amiri',serif;}
-
-    .glass-nav{
-      backdrop-filter:blur(15px);
-      background-color:rgba(5,5,5,.85);
-      border-bottom:1px solid rgba(255,255,255,.1);
-    }
-
-    .hero-video{width:100%;height:100dvh;background:#000;position:relative;overflow:hidden;}
-    .hero-video video{width:100%;height:100%;object-fit:cover;display:block;}
-    .video-overlay{
-      position:absolute;inset:0;
-      background:linear-gradient(to bottom, rgba(0,0,0,.3) 0%, transparent 40%, rgba(0,0,0,1) 100%);
-      z-index:10;
-    }
-
-    .badge-offer{
-      background:linear-gradient(to right,#d97706,#fbbf24);
-      color:#000;font-weight:900;
-      padding:8px 24px;border-radius:99px;
-      font-size:15px;letter-spacing:.05em;
-    }
-
-    /* COMPACT PERFUME CARD STYLES */
-    .perfume-card {
-        background: rgba(255,255,255,0.02);
-        border: 1px solid rgba(255,255,255,0.05);
-        border-radius: 24px;
-        padding: 24px;
-        transition: all 0.4s ease;
-        position: relative;
-        overflow: hidden;
-    }
-    .perfume-card:hover {
-        background: rgba(255,255,255,0.05);
-        border-color: rgba(217,119,6,0.3);
-        transform: translateY(-5px);
-    }
-    .perfume-img-compact {
-        height: 180px; 
-        width: auto;
-        filter: drop-shadow(0 15px 30px rgba(0,0,0,0.6));
-    }
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- DNS Prefetch for faster loading -->
+    <link rel="dns-prefetch" href="//cdn.tailwindcss.com">
+    <link rel="dns-prefetch" href="//unpkg.com">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     
-    /* NEW COMPARISON STYLE - RESPONSIVE FIX */
-    .comparison-row {
-        display: flex;
-        flex-direction: column;
-        gap: 2px;
-        background: rgba(255,255,255,0.05);
-        border-radius: 20px;
-        overflow: hidden;
-        margin-bottom: 16px;
-        border: 1px solid rgba(255,255,255,0.05);
-        transition: transform 0.3s ease;
-    }
-    /* Grid on Larger Screens */
-    @media (min-width: 768px) {
-        .comparison-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-        }
-    }
-
-    .comparison-row:hover {
-        transform: scale(1.01);
-        border-color: rgba(217,119,6,0.3);
-    }
-    .comp-side { padding: 20px; font-size: 13px; display: flex; flex-direction: column; justify-content: center; }
-    .comp-mad { background: linear-gradient(to right, rgba(217,119,6,0.1), rgba(217,119,6,0.05)); text-align: right; }
-    .comp-alt { background: rgba(0,0,0,0.4); text-align: right; opacity: 0.7; }
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest" defer></script>
+    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
     
-    .reveal { opacity: 0; transform: translateY(20px); transition: 0.8s all ease; }
-    .reveal.active { opacity: 1; transform: translateY(0); }
-
-    @keyframes floating{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
-    .floating{animation:floating 4s ease-in-out infinite;}
-
-    .logo-glow{filter:drop-shadow(0 0 15px rgba(217,119,6,.3));}
-
-    .mesh-bg{
-      background-image:
-        radial-gradient(at 0% 0%, rgba(217,119,6,.05) 0px, transparent 50%),
-        radial-gradient(at 100% 100%, rgba(217,119,6,.03) 0px, transparent 50%);
-    }
-
-    .manifesto-slogan{
-      background:linear-gradient(to right,#fbbf24,#d97706);
-      -webkit-background-clip:text;
-      -webkit-text-fill-color:transparent;
-      font-weight:900;
-    }
-
-    /* Checkout / Form Design Improvements - TRANSPARENT */
-    .form-wrapper-container{
-      position:relative;
-      width:100%;max-width:900px; 
-      margin:0 auto;
-    }
-    .form-inner-container{
-      /* Transparent background to show site background */
-      background: transparent; 
-      position:relative;z-index:1;width:100%;
-      min-height: 850px; 
-      display: flex;
-      justify-content: center;
-      align-items: start; 
-      padding-top: 20px;
-    }
-    .form-glow-effect{
-      position:absolute;top:-10%;left:50%;transform:translateX(-50%);
-      width:120%;height:120%;
-      background:radial-gradient(circle at center, rgba(217,119,6,.08) 0%, transparent 70%);
-      z-index:0;pointer-events:none;
-    }
-    .step-card {
-      background: rgba(255,255,255,0.03);
-      border: 1px solid rgba(255,255,255,0.05);
-      border-radius: 20px;
-      padding: 15px;
-      text-align: center;
-      transition: all 0.3s ease;
-    }
-    .step-card:hover {
-      background: rgba(255,255,255,0.05);
-      border-color: rgba(217,119,6,0.3);
-      transform: translateY(-5px);
-    }
-    .trust-badge {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 8px 16px;
-      background: rgba(217,119,6,0.1);
-      border-radius: 12px;
-      border: 1px solid rgba(217,119,6,0.2);
-    }
-  </style>
-
-  <script>
-    function perfumeApp(){
-      const translations = {
-        ar: {
-          dir:'rtl',
-          zapierPageId: 'cmkpbwxjy001bonuoz5vy0gh1', 
-          offer:'عرض النخبة الحصري',
-          price:'500 ₪ فقط',
-          shipping:'شامل التوصيل لجميع المناطق',
-          orderNow:'اطلب الآن',
-          collectionTitle: 'المجموعة الكاملة',
-          collectionSubtitle: '5 عطور عالمية في صندوق واحد',
-          orderCollection:'اطلب المجموعة الآن',
-          whatsapp:'تواصل عبر واتساب',
-          orderForm:{ 
-            tag:'بوابة الحجز', 
-            title:'أكمل طلبك الآن', 
-            subtitle:'المجموعة كاملة (5 عطور) بـ 500 ₪ فقط' 
-          },
-          steps: [
-            { icon: 'pen-tool', text: 'سجل بياناتك' },
-            { icon: 'phone-call', text: 'تأكيد فوري' },
-            { icon: 'truck', text: 'توصيل سريع' }
-          ],
-          trust: [
-            { icon: 'award', text: 'ضمان أصلي' },
-            { icon: 'truck', text: 'شحن مجاني' }
-          ],
-          manifesto:{
-            tag:'كشف الحقائق',
-            title:'THE MANIFESTO',
-            subtitle:'لماذا MAD؟ مقارنة علمية مع بدائل دبي وتركيا',
-            mad:'عطور مـاد (MAD)',
-            local:'أسواق دبي، تركيا والتركيب',
-            verdict:'الجودة في MAD هي حقيقة مخبرية موثقة دولياً، بينما البدائل هي مجرد محاكاة عشوائية.'
-          },
-          fragrantica:{
-            tag:'الاعتراف العالمي',
-            title:'بصمة النيش',
-            desc:'MAD Parfumeur مصنفة عالمياً ضمن موسوعة Fragrantica الشهيرة.',
-            archive:'الأرشيف'
-          },
-          perfumes:[
-            { code:'W183', name:'Selective MAD', title:'Creed Aventus', desc:'عطر القوة والهيبة. افتتاحية فاكهية مع قلب خشبي دخاني.' },
-            { code:'X102', name:'Selective MAD', title:'Naxos', desc:'تحفة دافئة غنية بالعسل والفانيليا مع لمسة شرقية ناعمة.' },
-            { code:'P104', name:'Selective MAD', title:'Mr. Sam', desc:'عطر جريء بشخصية قوية. مزيج أنيق من التوابل الدافئة.' },
-            { code:'L102', name:'Selective MAD', title:'Ombre Nomade', desc:'عطر شرقي عودي فاخر بعمق دخاني ساحر.' },
-            { code:'A115', name:'Selective MAD', title:'Y Intensely', desc:'عطر عصري شبابي بطاقة منعشة وحارة متوازنة.' }
-          ],
-          compItems:[
-            { 
-              icon: 'shield-check',
-              label:'الأمان وتراخيص الصحة', 
-              mad:'آمنة 100%، معتمدة من IFRA ووزارة الصحة، خالية من الكحول الضار.', 
-              local:'زيوت صناعية مجهولة المصدر من دبي/تركيا تسبب حساسية وتهيج.' 
-            },
-            { 
-              icon: 'flask-conical',
-              label:'الهندسة العطرية (التصنيع)', 
-              mad:'تطابق جزيئي دقيق وتعتيق (Maceration) لأشهر لضمان التجانس.', 
-              local:'خلط يدوي عشوائي (رج الزجاجة) يؤدي لتفكك الرائحة فوراً.' 
-            },
-            { 
-              icon: 'droplets',
-              label:'مصدر الزيوت الخام', 
-              mad:'خلاصات أوروبية "نخب أول" مصممة خصيصاً للماركات العالمية.', 
-              local:'زيوت تجارية رخيصة تُباع بالكيلو في الأسواق الشعبية.' 
-            },
-            { 
-              icon: 'activity',
-              label:'التأثير الصحي', 
-              mad:'مكونات مضادة للحساسية (Hypoallergenic) لا تسبب الصداع.', 
-              local:'مذيبات كيميائية رخيصة تسبب الصداع النصفي وضيق التنفس.' 
-            },
-            { 
-              icon: 'timer',
-              label:'الثبات والأداء', 
-              mad:'تركيز Extrait De Parfum حقيقي يدوم لأكثر من 24 ساعة.', 
-              local:'فوحان كحولي قوي ومخادع يختفي تماماً بعد نصف ساعة.' 
-            }
-          ]
-        },
-        he: {
-          dir:'rtl',
-          zapierPageId: 'cmkpef5ul0009nc51356rtjm8',
-          offer:'מארז העילית ב-500 ₪',
-          price:'500 ₪ בלבד',
-          shipping:'כולל משלוח לכל הארץ',
-          orderNow:'הזמן עכשיו',
-          collectionTitle: 'הקולקציה המלאה',
-          collectionSubtitle: '5 בשמים בינלאומיים במארז אחד',
-          orderCollection:'הזמן את המארז עכשיו',
-          whatsapp:'צרו קשר בוואטסאפ',
-          orderForm:{ 
-            tag:'פורטל הזמנות', 
-            title:'אשר הזמנה עכשיו', 
-            subtitle:'המארז המלא (5 בשמים) ב-500 ₪ בלבד' 
-          },
-          steps: [
-            { icon: 'pen-tool', text: 'מלא פרטים' },
-            { icon: 'phone-call', text: 'אישור מיידי' },
-            { icon: 'truck', text: 'משלוח מהיר' }
-          ],
-          trust: [
-            { icon: 'award', text: 'אחריות מקורית' },
-            { icon: 'truck', text: 'משלוח חינם' }
-          ],
-          manifesto:{
-            tag:'חשיפת האמת',
-            title:'THE MANIFESTO',
-            subtitle:'למה MAD? השוואה מדעית מול דובאי וטורקיה',
-            mad:'בשמי MAD',
-            local:'דובאי, טורקיה וחיקויים',
-            verdict:'האיכות ב-MAD היא אמת מעבדתית מתועדת, החיקויים הם רק אשליה.'
-          },
-          fragrantica:{
-            tag:'הכרה עולמית',
-            title:'Fragrantica',
-            desc:'MAD Parfumeur מדורגת בעולם כבית בשמי נישה מאושר.',
-            archive:'ארכיון'
-          },
-          perfumes:[
-            { code:'W183', name:'Selective MAD', title:'Creed Aventus', desc:'בושם של כוח ויוקרה. פתיחה פירותית ורעננה.' },
-            { code:'X102', name:'Selective MAD', title:'Naxos', desc:'יצירת מופת חמה ועשירה בדבש ווניל.' },
-            { code:'P104', name:'Selective MAD', title:'Mr. Sam', desc:'בושם נועז עם אישיות חזקה ותבלינים חמים.' },
-            { code:'L102', name:'Selective MAD', title:'Ombre Nomade', desc:'בושם מזרחי יוקרתי עם עומק מעושן.' },
-            { code:'A115', name:'Selective MAD', title:'Y Intensely', desc:'בושם מודרני ואנרגטי עם רעננות מאוזנת.' }
-          ],
-          compItems:[
-            { 
-              icon: 'shield-check',
-              label:'בטיחות ותקנים', 
-              mad:'בטוח ב-100%, מאושר IFRA ומשרד הבריאות.', 
-              local:'שמנים מדובאי/טורקיה ממקור לא ידוע הגורמים לאלרגיות.' 
-            },
-            { 
-              icon: 'flask-conical',
-              label:'הנדסה ארומטית', 
-              mad:'התאמה מולקולרית ויישון (Maceration) של חודשים.', 
-              local:'ערבוב ידני אקראי שגורם לפירוק הריח מיד.' 
-            },
-            { 
-              icon: 'droplets',
-              label:'מקור השמנים', 
-              mad:'תמציות אירופאיות "Top Grade" למותגי יוקרה.', 
-              local:'שמנים מסחריים זולים הנמכרים במשקל בשווקים.' 
-            },
-            { 
-              icon: 'activity',
-              label:'השפעה בריאותית', 
-              mad:'היפואלרגני, ללא מרכיבים הגורמים לכאבי ראש.', 
-              local:'ממיסים כימיים זולים הגורמים למיגרנות.' 
-            },
-            { 
-              icon: 'timer',
-              label:'עמידות וביצועים', 
-              mad:'ריכוז Extrait אמיתי שמחזיק מעל 24 שעות.', 
-              local:'ריח כוהלי חזק שנעלם תוך חצי שעה.' 
-            }
-          ]
-        }
-      };
-
-      return {
-        lang:'ar',
-        t: translations.ar,
-        init(){
-          const browserLang = navigator.language.split('-')[0];
-          if(translations[browserLang]) this.toggleLang(browserLang);
-          this.$nextTick(() => {
-            this.initIntersectionObserver();
-            if(window.lucide) lucide.createIcons();
-          });
-        },
-
-        toggleLang(target){
-          this.lang = target;
-          this.t = translations[target] || translations.ar;
-          this.$nextTick(() => {
-            this.initIntersectionObserver();
-            if(window.lucide) lucide.createIcons();
-          });
-        },
-
-        initIntersectionObserver(){
-          const observer = new IntersectionObserver(entries=>{
-            entries.forEach(entry=>{
-              if(entry.isIntersecting) entry.target.classList.add('active');
-            });
-          }, { threshold:0.1 });
-          document.querySelectorAll('.reveal').forEach(el=>observer.observe(el));
-        },
-
-        getIconForIndex(i){
-          const icons = ['shield-check','atom','zap'];
-          return icons[i] || 'star';
-        },
-
-        trackLead(context){
-          try{
-            if(typeof fbq !== 'undefined') fbq('track','Lead',{ content_name: context, value: 500, currency:'ILS' });
-          }catch(e){}
-          try{
-            if(typeof ttq !== 'undefined') ttq.track('Lead',{ content_name: context, value: 500, currency:'ILS' });
-          }catch(e){}
-        },
-        
-        trackView(context) {
-          try {
-            if (typeof fbq !== 'undefined') fbq('track', 'ViewContent', { content_name: context });
-          } catch (e) {}
-        }
-      }
-    }
-  </script>
-</head>
-
-<body>
-
-  <!-- NAVIGATION -->
-  <nav class="fixed top-0 w-full z-[100] glass-nav py-3 px-6 flex justify-between items-center">
-    <div class="flex items-center gap-3">
-      <div class="flex gap-1 border border-white/10 rounded-full px-3 py-1 bg-black/40">
-        <template x-for="l in ['ar','he']" :key="l">
-          <button @click="toggleLang(l)"
-                  :class="lang===l ? 'text-amber-500 font-black' : 'text-white/30'"
-                  class="text-[12px] uppercase px-2 transition-all hover:text-amber-400"
-                  x-text="l"></button>
-        </template>
-      </div>
-    </div>
-
-    <div class="absolute left-1/2 -translate-x-1/2 flex flex-col items-center">
-      <img src="https://madperfume.ps/upload/01-2026/page/45CM.png" class="h-6 w-auto logo-glow" alt="MAD">
-      <span class="text-[8px] tracking-[0.5em] text-amber-500 uppercase font-black mt-1">Parfumeur</span>
-    </div>
-
-    <div class="w-9 h-9 rounded-full border border-white/10 flex items-center justify-center bg-white/5">
-      <i data-lucide="shopping-bag" class="w-4 h-4 text-amber-500"></i>
-    </div>
-  </nav>
-
-  <!-- HERO SECTION -->
-  <section class="hero-video">
-    <video autoplay muted loop playsinline preload="metadata">
-      <source src="https://madparfumeurglobal.com/wp-content/uploads/2025/10/download.mp4" type="video/mp4">
-    </video>
-    <div class="video-overlay"></div>
-    <div class="absolute inset-0 flex flex-col items-center justify-center z-20 text-center px-8 pt-16">
-      <div class="inline-block badge-offer mb-8 shadow-2xl scale-110" x-text="t.offer"></div>
-      <h1 class="text-6xl md:text-7xl font-black text-white italic font-serif leading-tight mb-6" x-text="t.price"></h1>
-      <p class="text-xl font-light text-slate-200 italic" x-text="t.shipping"></p>
-      <div class="mt-12">
-        <a href="#order-section"
-           class="bg-amber-500 hover:bg-amber-600 text-black px-12 py-5 rounded-2xl font-black uppercase text-sm tracking-widest shadow-[0_0_50px_rgba(217,119,6,0.6)] active:scale-95 transition-all"
-           x-text="t.orderNow"></a>
-      </div>
-    </div>
-  </section>
-
-  <!-- MAIN PRODUCT & PERFUMES GRID (COMPACTED) -->
-  <section class="bg-[#020202] py-16 border-b border-white/5 relative overflow-hidden">
-    <div class="container mx-auto px-4">
-      
-      <!-- Intro Image (Scaled Up 6x) -->
-      <div class="text-center mb-16 relative">
-         <div class="relative inline-block w-full">
-            <!-- Scaled up glow background -->
-            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-[1000px] aspect-square bg-amber-600/10 blur-[120px] rounded-full"></div>
-            <!-- Scaled up main image -->
-            <img src="https://madperfume.ps/upload/01-2026/page/6971495c69e7c.png"
-                 class="w-full max-w-[900px] h-auto floating relative z-10 mx-auto drop-shadow-[0_50px_100px_rgba(0,0,0,1)]"
-                 alt="MAD Bottle">
-         </div>
-      </div>
-
-      <!-- Perfumes Grid -->
-      <div class="text-center mb-10">
-        <h2 class="text-3xl md:text-4xl font-serif italic font-black text-white" x-text="t.collectionTitle"></h2>
-        <p class="text-amber-500 font-bold mt-2" x-text="t.collectionSubtitle"></p>
-      </div>
-
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-w-6xl mx-auto">
-        <template x-for="item in t.perfumes" :key="item.code">
-          <div class="perfume-card reveal text-center group">
-            <!-- Updated Image Container: Removed VS and MAD Bottle -->
-            <div class="flex justify-center items-center gap-2 mb-4 h-[180px]">
-              <img src="https://madperfume.ps/upload/01-2026/page/69710fafb2c6f.png" 
-                   class="perfume-img-compact transition-transform group-hover:scale-110 drop-shadow-2xl" 
-                   alt="Brand Inspiration">
-            </div>
+    <script>
+        // Optimization: Load Pixels only after basic UI is ready
+        window.addEventListener('DOMContentLoaded', () => {
+            !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)n=f.fbq;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window, document,'script','https://connect.facebook.net/en_US/fbevents.js');
+            fbq('init', '1072283127290819'); fbq('track', 'PageView');
             
-            <h3 class="text-xl font-serif font-black text-white" x-text="item.name"></h3>
-            <span class="text-amber-500 font-bold text-xs uppercase tracking-widest block mb-2" x-text="item.code"></span>
-            <p class="text-slate-400 text-xs mb-1" x-text="'Inspired by ' + item.title"></p>
-            <p class="text-slate-500 text-[11px] leading-relaxed px-2" x-text="item.desc"></p>
-          </div>
-        </template>
-      </div>
-      
-      <div class="mt-12 text-center">
-        <a href="#order-section" class="px-10 py-3 bg-white/5 border border-white/10 rounded-full text-xs font-black uppercase tracking-widest hover:border-amber-500 hover:text-amber-500 transition-all" x-text="t.orderCollection"></a>
-      </div>
+            !function (w, d, t) { w.TiktokAnalyticsObject=t; var ttq=w[t]=w[t]||[]; ttq.methods=["page","track","identify","instances","debug","on","off","once","ready","alias","group","enableCookie","disableCookie","holdConsent","revokeConsent","grantConsent"]; ttq.setAndDefer=function(t,e){t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}; for(var i=0;i<ttq.methods.length;i++)ttq.setAndDefer(ttq,ttq.methods[i]); ttq.load=function(e,n){ var r="https://analytics.tiktok.com/i18n/pixel/events.js"; var o=n&&n.partner; ttq._i=ttq._i||{}; ttq._i[e]=[]; ttq._i[e]._u=r; ttq._t=ttq._t||{}; ttq._t[e]=+new Date; ttq._o=ttq._o||{}; ttq._o[e]=n||{}; n=document.createElement("script"); n.type="text/javascript"; n.async=!0; n.src=r+"?sdkid="+e+"&lib="+t; e=document.getElementsByTagName("script")[0]; e.parentNode.insertBefore(n,e) }; ttq.load('D2D02JBC77U4ENLN9SBG'); ttq.page(); }(window, document, 'ttq');
+            
+            (function(e,t,n){if(e.snaptr)return;var a=e.snaptr=function(){a.handleRequest?a.handleRequest.apply(a,arguments):a.queue.push(arguments)};a.queue=[];var s='script';var r=t.createElement(s);r.async=!0;r.src=n;var u=t.getElementsByTagName(s)[0];u.parentNode.insertBefore(r,u)})(window,document,'https://sc-static.net/scevent.min.js');
+            snaptr('init', 'b143822e-1c3c-40ff-93f7-edadee74e626'); snaptr('track', 'PAGE_VIEW');
+        });
+    </script>
 
-    </div>
-  </section>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&family=Heebo:wght@400;700;900&display=swap');
+        body { background: #fcfcfc; color: #000; font-family: 'Cairo', 'Heebo', sans-serif; overflow-x: hidden; scroll-behavior: smooth; }
+        .mad-input { width: 100%; padding: 15px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 14px; outline: none; margin-bottom: 12px; text-align: inherit; font-weight: 700; }
+        .mad-radio-ui { border: 1px solid #e2e8f0; border-radius: 14px; padding: 16px; background: #f8fafc; text-align: center; cursor: pointer; transition: 0.2s; font-weight: 800; }
+        input[type="radio"]:checked + .mad-radio-ui { border-color: #000; background: #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .btn-order-main { background: #000; color: #fff; padding: 20px; border-radius: 18px; font-weight: 900; font-size: 1.3rem; width: 100%; display: block; text-align: center; }
+        /* Optimization: Content visibility for off-screen blocks */
+        .page-block { content-visibility: auto; contain-intrinsic-size: 0 400px; }
+    </style>
+</head>
+<body class="pb-20">
+    <nav class="p-4 flex justify-center border-b border-black/5 bg-white/40 backdrop-blur-lg sticky top-0 z-50">
+        <!-- High priority for logo (LCP) -->
+        <img src="https://www.mad-parfumeur.com/assets/hero/logo.webp" style="height:42px; object-fit:contain" fetchpriority="high">
+    </nav>
+    <header class="text-center py-10 px-4"><h1 class="text-3xl font-black" x-text="c.heroTitle[lang]"></h1></header>
+    <main class="max-w-md mx-auto">
+        <template x-for="(b, idx) in blocks">
+            <div :class="b.align==='center'?'text-center':(b.align==='left'?'text-left':'text-right')" class="my-6 px-4 page-block">
+                <template x-if="b.type==='text'"><p class="text-lg font-bold whitespace-pre-wrap leading-relaxed" x-text="b.content[lang]"></p></template>
+                <template x-if="b.type==='emoji'"><div class="text-4xl" x-text="b.content[lang]"></div></template>
+                <!-- Image Optimization: Lazy load for everything except first block -->
+                <template x-if="b.type==='image'"><img :src="b.url" class="rounded-2xl mx-auto shadow-lg w-full" :loading="idx === 0 ? 'eager' : 'lazy'" decoding="async"></template>
+                <template x-if="b.type==='video'"><video :src="b.url" controls class="w-full rounded-2xl shadow-lg" playsinline preload="none"></video></template>
+                <template x-if="b.type==='button'"><a :href="b.link" class="btn-order-main no-underline" x-text="b.content[lang]"></a></template>
+                <template x-if="b.type==='iframe'"><iframe :src="b.url" class="w-full h-96 rounded-xl border-none shadow-sm" loading="lazy"></iframe></template>
+                
+                <template x-if="b.type==='fragrantica'">
+                    <a :href="b.url" target="_blank" class="block w-full max-w-[320px] bg-[#3f5a31] text-white p-5 rounded-[24px] shadow-xl relative overflow-hidden mx-auto no-underline text-right">
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="text-[10px] font-black uppercase tracking-widest text-white/60">Fragrantica Reviews</span>
+                            <div class="flex text-amber-400 gap-0.5"><i data-lucide="star" class="w-3 h-3 fill-current"></i><i data-lucide="star" class="w-3 h-3 fill-current"></i><i data-lucide="star" class="w-3 h-3 fill-current"></i><i data-lucide="star" class="w-3 h-3 fill-current"></i><i data-lucide="star" class="w-3 h-3 fill-current"></i></div>
+                        </div>
+                        <div class="flex items-end gap-2"><span class="text-4xl font-black" x-text="b.score"></span><span class="text-xs opacity-60 mb-1">Rating</span></div>
+                        <p class="text-[10px] font-bold mt-2 text-white/80" x-text="b.content[lang]"></p>
+                    </a>
+                </template>
 
-  <!-- MANIFESTO & FRAGRANTICA (MERGED & COMPACT) -->
-  <section class="reveal py-16 bg-black px-6 border-t border-white/5">
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 max-w-6xl mx-auto items-start">
-      
-      <!-- Manifesto Side (Enhanced Design) -->
-      <div>
-        <span class="text-amber-500 font-black text-[11px] tracking-[0.4em] uppercase block mb-2" x-text="t.manifesto.tag"></span>
-        <h2 class="text-4xl font-black text-white italic font-serif mb-2" x-text="t.manifesto.title"></h2>
-        <p class="text-slate-400 text-sm mb-8" x-text="t.manifesto.subtitle"></p>
-        
-        <div class="space-y-3">
-          <template x-for="(item, index) in t.compItems" :key="index">
-            <div class="comparison-row">
-                <!-- MAD SIDE -->
-                <div class="comp-side comp-mad">
-                    <div class="flex items-center justify-end gap-2 mb-1">
-                        <span class="text-[10px] font-black text-amber-500 uppercase tracking-wider" x-text="t.manifesto.mad"></span>
-                        <i :data-lucide="item.icon" class="w-3 h-3 text-amber-500"></i>
+                <template x-if="b.type==='iso'">
+                    <div class="grid grid-cols-3 gap-3 w-full max-w-sm mx-auto mt-4">
+                        <div class="bg-white border border-black/5 p-3 rounded-2xl text-center shadow-sm"><div class="text-xl">🛡️</div><p class="text-[8px] font-black uppercase leading-tight">ISO 9001<br>Certified</p></div>
+                        <div class="bg-white border border-black/5 p-3 rounded-2xl text-center shadow-sm"><div class="text-xl">🧪</div><p class="text-[8px] font-black uppercase leading-tight">IFRA Safe<br>Standard</p></div>
+                        <div class="bg-white border border-black/5 p-3 rounded-2xl text-center shadow-sm"><div class="text-xl">🏛️</div><p class="text-[8px] font-black uppercase leading-tight">Health<br>Ministry OK</p></div>
                     </div>
-                    <p class="text-white font-bold leading-snug" x-text="item.mad"></p>
-                </div>
+                </template>
 
-                <!-- ALT SIDE -->
-                <div class="comp-side comp-alt">
-                     <div class="flex items-center justify-end gap-2 mb-1">
-                        <span class="text-[10px] font-black text-red-400 uppercase tracking-wider" x-text="t.manifesto.local"></span>
-                        <i data-lucide="x-circle" class="w-3 h-3 text-red-500/50"></i>
+                <template x-if="b.type==='comparison'">
+                    <div class="space-y-2 mt-4 text-right">
+                        <template x-for="row in b.items">
+                            <div class="grid grid-cols-2 gap-1 rounded-xl overflow-hidden border border-black/5 shadow-sm">
+                                <div class="bg-gray-50 p-4 border-r border-black/5"><span class="text-[8px] font-black text-amber-600 block mb-1">MAD</span><p class="text-[11px] font-bold leading-tight" x-text="row.mad[lang]"></p></div>
+                                <div class="bg-white p-4 text-gray-400 text-right"><span class="text-[8px] font-black text-gray-300 block mb-1">OTHERS</span><p class="text-[11px]" x-text="row.other[lang]"></p></div>
+                            </div>
+                        </template>
                     </div>
-                    <p class="text-slate-400 leading-snug" x-text="item.local"></p>
-                </div>
+                </template>
+
+                <template x-if="b.type==='form'">
+                    <div class="bg-white border-2 border-gray-100 rounded-[28px] p-8 shadow-sm text-right mt-6" id="order">
+                        <h2 class="text-2xl font-black text-center mb-6" x-text="lang === 'he' ? 'הזמנה מהירה' : 'إتمام الطلب السريع'"></h2>
+                        <form @submit.prevent="submitForm">
+                            <input type="text" x-model="f.name" @input="trackInput" class="mad-input" :placeholder="lang === 'he' ? 'שם מלא' : 'الاسم الكامل'" required autocomplete="name">
+                            <input type="tel" x-model="f.phone" class="mad-input" :placeholder="lang === 'he' ? 'טלפון' : 'رقم الهاتف'" required autocomplete="tel">
+                            <input type="text" x-model="f.address" class="mad-input" :placeholder="lang === 'he' ? 'יישוב וכתובת' : 'المدينة والعنوان'" required autocomplete="street-address">
+                            <div class="grid grid-cols-2 gap-3 mb-6">
+                                <label class="cursor-pointer"><input type="radio" x-model="f.payment" value="Cash" class="hidden" required><div class="mad-radio-ui text-xs" x-text="lang === 'he' ? 'מזומן' : 'نقداً'"></div></label>
+                                <label class="cursor-pointer"><input type="radio" x-model="f.payment" value="Visa" class="hidden" required><div class="mad-radio-ui text-xs" x-text="lang === 'he' ? 'אשראי' : 'فيزا'"></div></label>
+                            </div>
+                            <div class="space-y-2 mb-6">
+                                <label class="block cursor-pointer"><input type="radio" x-model="f.process" value="Direct" class="hidden" required><div class="mad-radio-ui text-xs" x-text="lang === 'he' ? 'משלוח ישיר' : 'شحن مباشر'"></div></label>
+                                <label class="block cursor-pointer"><input type="radio" x-model="f.process" value="Contact" class="hidden" required><div class="mad-radio-ui text-xs" x-text="lang === 'he' ? 'אישור טלפוני' : 'تواصل معي للتأكيد'"></div></label>
+                            </div>
+                            <button type="submit" class="w-full py-5 rounded-2xl bg-black text-white font-black transition-all active:scale-95 shadow-lg h-20 flex items-center justify-center text-xl" :disabled="loading" x-text="loading ? '...' : (lang === 'he' ? 'אשר הזמנה' : 'تأكيد الطلب الآن')"></button>
+                        </form>
+                    </div>
+                </template>
             </div>
-          </template>
+        </template>
+    </main>
+
+    <div x-show="submitted" class="fixed inset-0 z-[200] bg-black/80 flex items-center justify-center p-6 text-center" x-transition>
+        <div class="bg-white rounded-[40px] p-10 max-w-xs shadow-2xl">
+            <h3 class="text-2xl font-black mb-4" x-text="lang==='he'?'בוצע בהצלחה!':'تم بنجاح!'"></h3>
+            <p class="text-gray-500 font-bold mb-6" x-text="lang==='he'?'זהו, אתה מוכן! ההזמנה התקבלה':'خلاص أنت جاهز، تم استلام الطلب'"></p>
+            <button @click="submitted = false" class="mt-4 w-full bg-black text-white py-4 rounded-xl font-bold">إغلاق | סגור</button>
         </div>
-
-        <p class="mt-6 text-xs text-center text-slate-500 italic border-t border-white/5 pt-4" x-text="t.manifesto.verdict"></p>
-      </div>
-
-      <!-- Fragrantica & Stats Side -->
-      <div class="text-center lg:text-right bg-[#050505] p-8 rounded-[30px] border border-white/5 sticky top-24">
-        <img src="https://www.fragrantica.com/ndimg/fragrantica-logo-tagline-svg.svg" alt="Fragrantica" class="h-8 w-auto mx-auto lg:ml-auto lg:mr-0 mb-6 brightness-200 grayscale opacity-50">
-        <h3 class="text-2xl font-black text-white italic font-serif mb-2" x-text="t.fragrantica.title"></h3>
-        <p class="text-sm text-slate-400 mb-0" x-text="t.fragrantica.desc"></p>
-        
-        <div class="mt-8 pt-8 border-t border-white/5">
-             <div class="bg-amber-900/10 border border-amber-500/10 rounded-xl p-6 text-center">
-                 <i data-lucide="quote" class="w-8 h-8 text-amber-500/20 mx-auto mb-2"></i>
-                 <p class="text-amber-100/80 italic text-sm leading-relaxed" x-text="lang === 'ar' ? 'نحن لا نبيع العطر، نحن نبيع المعيار الذي يجب أن يكون عليه العطر.' : 'אנחנו לא מוכרים בושם, אנחנו מוכרים את הסטנדרט שבושם צריך להיות.'"></p>
-             </div>
-        </div>
-      </div>
-
-    </div>
-  </section>
-
-  <!-- ZAPIER ORDER FORM SECTION (Compact & Transparent) -->
-  <section id="order-section" class="py-16 bg-[#050505] px-4 border-t border-white/5 relative mesh-bg overflow-hidden">
-    <div class="form-glow-effect"></div>
-
-    <div class="text-center mb-10 relative z-10">
-      <span class="text-amber-500 font-black text-[11px] tracking-[0.4em] uppercase block mb-2" x-text="t.orderForm.tag"></span>
-      <h2 class="text-4xl md:text-5xl font-black text-white italic font-serif leading-tight" x-text="t.orderForm.title"></h2>
     </div>
 
-    <div class="max-w-4xl mx-auto relative z-10">
-      
-      <!-- STEPS & TRUST (Compact Row) -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-         <div class="flex justify-between gap-2 bg-white/5 p-4 rounded-2xl border border-white/5">
-            <template x-for="(step, index) in t.steps" :key="index">
-               <div class="text-center flex-1">
-                  <div class="w-8 h-8 rounded-full bg-amber-500/10 flex items-center justify-center mx-auto mb-2"><i :data-lucide="step.icon" class="w-4 h-4 text-amber-500"></i></div>
-                  <div class="text-[10px] font-bold text-white" x-text="step.text"></div>
-               </div>
-            </template>
-         </div>
-         <div class="flex flex-wrap items-center justify-center gap-2">
-            <template x-for="badge in t.trust">
-               <div class="trust-badge text-[10px] py-2 px-3">
-                  <i :data-lucide="badge.icon" class="w-3 h-3 text-amber-500"></i>
-                  <span x-text="badge.text"></span>
-               </div>
-            </template>
-         </div>
-      </div>
+    <script>
+        function app() {
+            return {
+                lang: 'ar', loading: false, submitted: false, hasStartedTyping: false,
+                blocks: [{"id":1,"type":"text","content":{"ar":"شامل التوصيل","he":"כולל משלוח"},"align":"center"},{"id":1769481011498,"type":"image","content":{"ar":"","he":""},"url":"https://www.mad-parfumeur.com/assets/hero/5.webp","score":"4.9 / 5","link":"#order","align":"center","items":[]},{"id":1769481083228,"type":"fragrantica","content":{"ar":"","he":""},"url":"","score":"4.9 / 5","link":"#order","align":"center","items":[]},{"id":1769481097260,"type":"comparison","content":{"ar":"","he":""},"url":"","score":"4.9 / 5","link":"#order","align":"center","items":[{"mad":{"ar":"بصمة أمان 100% ومصادق من IFRA","he":"בטוח ב-100% ומאושר ע\"י IFRA"},"other":{"ar":"زيوت كيميائية مجهولة المصدر","he":"שמנים ממקור לא ידוע"}},{"mad":{"ar":"تطابق جزيئي وتركيز نيش حقيقي","he":"התאמה מולקולרית וריכוז נישה"},"other":{"ar":"خلط يدوي عشوائي يتفكك فوراً","he":"ערבוב ידני אקראי"}},{"mad":{"ar":"ثبات فائق يتجاوز 24 ساعة","he":"עמידות מעל 24 שעות"},"other":{"ar":"يختفي بعد أقل من ساعة","he":"נעלם מהר"}},{"mad":{"ar":"لا يسبب الحساسية أو الصداع","he":"לא גורם לאלרגיות או כאבי ראש"},"other":{"ar":"مذيبات كيميائية ضارة","he":"ממסים כימיים מזיקים"}},{"mad":{"ar":"خدمة زبائن و41 فرع في البلاد","he":"שירות לקוחות ו-41 סניפים בארץ"},"other":{"ar":"متاجر أونلاين بلا عنوان","he":"חנויות אונליין ללא כתובת"}},{"mad":{"ar":"تعتيق وتصفية مخبرية أوروبية","he":"יישון וסינון מעבדתי אירופאי"},"other":{"ar":"زيوت تجارية رخيصة","he":"שמנים מסחריים זולים"}},{"mad":{"ar":"مصادقات الأيزو ووزارة الصحة","he":"אישור תקן ISO ומשרד הבריאות"},"other":{"ar":"غير مفحوص ومقلد","he":"לא נבדק "}}]},{"id":1769481104804,"type":"form","content":{"ar":"","he":""},"url":"","score":"4.9 / 5","link":"#order","align":"center","items":[]},{"id":1769481107287,"type":"iso","content":{"ar":"","he":""},"url":"","score":"4.9 / 5","link":"#order","align":"center","items":[]},{"id":1769509166765,"type":"text","content":{"ar":"","he":"MAD Parfumeur\n\nמקורי. אמין. מוכר בעולם.\n\nMAD היא לא עוד מותג בישום…\nMAD היא שם בינלאומי בעולם הבשמים.\n\n🌍 MAD Parfumeur מופיעה רשמית באתר\nFragrantica — מגזין הבשמים הגדול בעולם\n🔗 https://www.fragrantica.com/designers/Mad-Parfumeur.html\n\n🏆 רשת עם מעל 41 סניפים רשמיים בארץ\n✅ ייצור לפי תקני ISO – IFRA – GMP ואישורי משרד הבריאות\n💎 ריכוז Eau De Parfum מקורי ונישה אמיתית\n🧬 התאמה מולקולרית מקצועית\n🧪 יישון וסינון מעבדתי אירופאי\n🔥 עמידות חזקה מעל 24 שעות\n🛡 ללא אלרגיות או כאבי ראש\n📦 שירות לקוחות מקצועי ומשלוח מהיר\n\nההבדל ברור:\n\nMAD\n✔ מותג עם הכרה עולמית\n✔ איכות אירופאית מאושרת\n✔ ביצועים ברמת פרימיום\n\nOTHERS\n✖ מקורות לא ידועים\n✖ ערבובים אקראיים\n✖ חנויות ללא אחריות\n\nMAD Parfumeur\nמקוריות עם הוכחה עולמית.\n\n👉 בחרו במותג שמופיע על המפה העולמית."},"url":"","score":"4.9 / 5","link":"#order","align":"right","items":[]},{"id":1769513627913,"type":"text","content":{"ar":"MAD Parfumeur\n\nأصلي. موثوق. معترف به عالمياً.\n\nMAD ليست مجرد علامة عطور…\nMAD هي اسم عالمي في عالم البارفان.\n\n🌍 تم استضافة MAD Parfumeur رسمياً على موقع\nFragrantica — أكبر مجلة ومنصة عطور عالمية\n🔗 https://www.fragrantica.com/designers/Mad-Parfumeur.html\n\n🏆 شبكة تضم أكثر من 41 فرع رسمي في البلاد\n✅ تصنيع بمعايير ISO – IFRA – GMP ومصادقات وزارة الصحة\n💎 تركيز Eau De Parfum أصلي ونِيش حقيقي\n🧬 تطابق جزيئي احترافي\n🧪 تعتيق وتصفية مخبرية أوروبية\n🔥 ثبات فائق يتجاوز 24 ساعة\n🛡 لا يسبب الحساسية أو الصداع\n📦 خدمة زبائن احترافية وتوصيل سريع\n\nالفرق واضح:\n\nMAD\n✔ علامة معترف بها عالمياً\n✔ جودة أوروبية معتمدة\n✔ أداء بمستوى الماركات العالمية\n\nOTHERS\n✖ زيوت مجهولة المصدر\n✖ خلط عشوائي\n✖ متاجر بدون عنوان أو مسؤولية\n\nMAD Parfumeur\nالأصلي ليس كلام… الأصلي له إثبات عالمي.\n\n👉 اختَر الجودة العالمية.","he":""},"url":"","score":"4.9 / 5","link":"#order","align":"center","items":[]}], c: {"bgColor":"#fcfcfc","logoUrl":"https://www.mad-parfumeur.com/assets/hero/logo.webp","heroTitle":{"ar":"أقوى العروض الحصرية بـ 500 شيكل","he":"המבצעים הבלעדיים ביותר ב-500ש\"ח"},"sheetUrl":"https://script.google.com/macros/s/AKfycbwOhU29CKnGH5cHDD1cGRvfbh49xJPPuF7-rbf6_mo6ZO2g52rLl8mQ3BDEU9qXedHH/exec","fbPixel":"1072283127290819","ttPixel":"D2D02JBC77U4ENLN9SBG","snapPixel":"b143822e-1c3c-40ff-93f7-edadee74e626"}, f: { name:'', phone:'', address:'', payment:'', process:'' },
+                get offerName() { 
+                    const p = window.location.pathname.split('/').pop().split('.')[0];
+                    return (p && p !== 'index' && p !== '' && p !== 'srcdoc' && p !== 'blank') ? p : 'MAD-Product';
+                },
+                init(fL = null) {
+                    this.lang = fL || (navigator.language.startsWith('he') ? 'he' : 'ar');
+                    setTimeout(() => { if(window.lucide) lucide.createIcons(); }, 300);
+                },
+                trackInput() {
+                    if(!this.hasStartedTyping && this.f.name.length > 2) {
+                        this.hasStartedTyping = true;
+                        const p = { content_name: this.offerName };
+                        if(window.fbq) fbq('track', 'AddToCart', p);
+                        if(window.ttq) ttq.track('AddToCart', p);
+                        if(window.snaptr) snaptr('track', 'ADD_CART', p);
+                    }
+                },
+                async submitForm() {
+                    if(this.loading) return;
+                    this.loading = true;
+                    const p = { value: 500, currency: 'ILS', content_name: this.offerName };
+                    if(window.fbq) fbq('track', 'Purchase', p);
+                    if(window.ttq) ttq.track('CompletePayment', p);
+                    if(window.snaptr) snaptr('track', 'PURCHASE', { currency: 'ILS', price: 500 });
 
-      <!-- MAIN FORM -->
-      <div class="form-wrapper-container">
-        <div class="form-inner-container">
-          <zapier-interfaces-page-embed 
-            :key="lang"
-            :page-id="t.zapierPageId" 
-            :test-id="t.zapierPageId + '-embed'"
-            no-background='true' 
-            allow-query-params='true' 
-            query-params='' 
-            style='max-width: 100%; width: 100%; height: 850px;'
-          ></zapier-interfaces-page-embed>
-        </div>
-      </div>
-
-    </div>
-  </section>
-
-  <!-- FOOTER -->
-  <footer class="py-10 bg-black border-t border-white/5 text-center px-4">
-    <img src="https://madperfume.ps/upload/01-2026/page/45CM.png" class="h-6 w-auto mx-auto mb-4 opacity-30" alt="MAD Logo">
-    <p class="text-[9px] text-white/20 uppercase font-black tracking-[0.4em]">© 2026 MAD PARFUMEUR</p>
-  </footer>
-
+                    const fd = new FormData();
+                    Object.keys(this.f).forEach(k => fd.append(k, this.f[k]));
+                    fd.append('offer', this.offerName);
+                    fd.append('lang', this.lang);
+                    
+                    try {
+                        await fetch(this.c.sheetUrl, { method: 'POST', body: fd, mode: 'no-cors' });
+                        this.submitted = true;
+                        this.f = { name:'', phone:'', address:'', payment:'', process:'' };
+                    } catch(e) { console.error(e); } finally { this.loading = false; }
+                }
+            }
+        }
+    </script>
 </body>
 </html>
