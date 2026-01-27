@@ -1,234 +1,162 @@
 <!DOCTYPE html>
-<html lang="he" x-data="app()" x-init="init()" :dir="dir">
+<html x-data="app()" x-init="init(null)" :lang="lang" :dir="lang==='he'?'ltr':'rtl'">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<script src="https://cdn.tailwindcss.com"></script>
-<script src="https://unpkg.com/lucide@latest"></script>
-<script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
-<script type='module' src='https://interfaces.zapier.com/assets/web-components/zapier-interfaces/zapier-interfaces.esm.js'></script>
-
-        <script>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- DNS Prefetch for faster loading -->
+    <link rel="dns-prefetch" href="//cdn.tailwindcss.com">
+    <link rel="dns-prefetch" href="//unpkg.com">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest" defer></script>
+    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    
+    <script>
+        // Optimization: Load Pixels only after basic UI is ready
+        window.addEventListener('DOMContentLoaded', () => {
             !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)n=f.fbq;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window, document,'script','https://connect.facebook.net/en_US/fbevents.js');
             fbq('init', '1072283127290819'); fbq('track', 'PageView');
+            
             !function (w, d, t) { w.TiktokAnalyticsObject=t; var ttq=w[t]=w[t]||[]; ttq.methods=["page","track","identify","instances","debug","on","off","once","ready","alias","group","enableCookie","disableCookie","holdConsent","revokeConsent","grantConsent"]; ttq.setAndDefer=function(t,e){t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}; for(var i=0;i<ttq.methods.length;i++)ttq.setAndDefer(ttq,ttq.methods[i]); ttq.load=function(e,n){ var r="https://analytics.tiktok.com/i18n/pixel/events.js"; var o=n&&n.partner; ttq._i=ttq._i||{}; ttq._i[e]=[]; ttq._i[e]._u=r; ttq._t=ttq._t||{}; ttq._t[e]=+new Date; ttq._o=ttq._o||{}; ttq._o[e]=n||{}; n=document.createElement("script"); n.type="text/javascript"; n.async=!0; n.src=r+"?sdkid="+e+"&lib="+t; e=document.getElementsByTagName("script")[0]; e.parentNode.insertBefore(n,e) }; ttq.load('D2D02JBC77U4ENLN9SBG'); ttq.page(); }(window, document, 'ttq');
-        </script>
+            
+            (function(e,t,n){if(e.snaptr)return;var a=e.snaptr=function(){a.handleRequest?a.handleRequest.apply(a,arguments):a.queue.push(arguments)};a.queue=[];var s='script';var r=t.createElement(s);r.async=!0;r.src=n;var u=t.getElementsByTagName(s)[0];u.parentNode.insertBefore(r,u)})(window,document,'https://sc-static.net/scevent.min.js');
+            snaptr('init', 'b143822e-1c3c-40ff-93f7-edadee74e626'); snaptr('track', 'PAGE_VIEW');
+        });
+    </script>
 
-<!-- ✅ Compatibility Layer with thank-you.html -->
-<script>
-  // Keys expected by thank-you.html (prevent_manual_access + anti-duplicate)
-  window.MAD_KEYS = {
-    ORDER_OK: "MAD_ORDER_OK_V1",
-    PURCHASE_LOCK: "MAD_PURCHASE_LOCK_V1"
-  };
-
-  // Mark order as valid (for thank-you page)
-  window.MAD_MARK_ORDER_SUBMITTED = function(meta){
-    try { sessionStorage.setItem(window.MAD_KEYS.ORDER_OK, "1"); } catch(e){}
-    try { sessionStorage.setItem("MAD_ORDER_META_V1", JSON.stringify(meta||{})); } catch(e){}
-  };
-</script>
-
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,900;1,400;1,900&family=Inter:wght@300;400;700;900&family=Amiri:wght@400;700&family=Assistant:wght@300;400;700;800&display=swap');
-body{background:#0e0102;color:white;font-family:'Inter','Assistant',sans-serif}
-.glass-nav { position: fixed; top: 0; left: 0; width: 100%; z-index: 50; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.6); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(255,255,255,0.1); }
-.nav-logo { height: 35px; object-fit: contain; }
-.lang-btn-nav { font-size: 11px; font-weight: bold; color: rgba(255,255,255,0.6); margin: 0 5px; transition:0.2s; }
-.lang-btn-nav.active { color: #d97706; }
-.hero-vid, .hero-wrapper { position: absolute; top: 0; left: 0; width: 100%; height: 100vh; overflow: hidden; z-index: -1; object-fit: cover; filter: brightness(0.6); }
-.hero-vid-iframe { width: 300%; height: 150%; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); pointer-events: none; }
-@media (min-aspect-ratio: 16/9) { .hero-vid-iframe { width: 100%; height: 300%; } }
-.badge{background:linear-gradient(to right,#d97706,#fbbf24);color:black;padding:5px 20px;border-radius:50px;font-weight:900;display:inline-block;margin-bottom:10px}
-.carousel{position:relative;height:400px;display:flex;align-items:center;justify-content:center}
-.c-img{max-height:100%;max-width:100%;filter:drop-shadow(0 20px 40px rgba(0,0,0,0.8))}
-.c-btn{position:absolute;top:50%;transform:translateY(-50%);background:rgba(0,0,0,0.5);color:#d97706;border:1px solid #333;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer}
-.comp-row{display:grid;grid-template-columns:1fr 1fr;gap:2px;background:rgba(255,255,255,.05);border-radius:15px;overflow:hidden;margin-bottom:10px;border:1px solid rgba(255,255,255,.05)}
-.c-side{padding:15px;font-size:13px;display:flex;flex-direction:column;justify-content:center}
-.c-mad{background:linear-gradient(to right,rgba(217,119,6,.1),rgba(217,119,6,.05));text-align:right}
-.c-alt{background:rgba(0,0,0,.4);text-align:right;opacity:.7}
-.sticky-cta { position: fixed; bottom: 20px; left: 0; width: 100%; z-index: 50; padding: 0 20px; pointer-events: none; }
-.sticky-btn { display: block; max-width: 500px; margin: 0 auto; background: #d97706; color: black; text-align: center; padding: 16px; border-radius: 99px; font-weight: 900; text-decoration: none; box-shadow: 0 10px 25px rgba(0,0,0,0.5); pointer-events: auto; transition: 0.2s; animation: pulse 2s infinite; }
-@keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.02); } 100% { transform: scale(1); } }
-.order-grid { display: grid; gap: 10px; margin-bottom: 20px; max-width: 500px; margin-left: auto; margin-right: auto; }
-.btn-order { display: flex; align-items: center; justify-content: center; gap: 10px; padding: 12px; border-radius: 10px; font-weight: bold; text-decoration: none; transition: 0.2s; }
-.btn-wa { background: #25D366; color: white; } .btn-wa:hover { background: #1ebc57; }
-.btn-call { background: #3b82f6; color: white; } .btn-call:hover { background: #2563eb; }
-.btn-web { background: #64748b; color: white; } .btn-web:hover { background: #475569; }
-</style>
-
-<script>
-function app(){
-return {
-    c:{"bgColor":"#0e0102","heroType":"video","logo":"https://madperfume.ps/upload/01-2026/page/69735b87d92ef.png","vid":"https://madperfume.ps/upload/01-2026/page/WhatsApp%20Video%202025-12-28%20at%2011.59.51.mp4#t=0.02","heroes":["https://ba62e8.cdn.akinoncloud.com/products/2025/12/19/2650/c3e017a8-49c9-45f5-adc3-5afd27184a21_size828_cropCenter.jpg","https://ba62e8.cdn.akinoncloud.com/products/2025/12/19/2650/65e89a2e-6d88-4eed-bda3-07a849649405_size828_cropCenter.jpg","https://ba62e8.cdn.akinoncloud.com/products/2025/12/19/2650/3caa8499-c879-4417-9fc5-58bbbdb076be_size828_cropCenter.jpg"],"blocks":[{"id":1769167825001,"type":"text","val":"","text":{"ar":"Dubai Signature Series\n\nتجمع سلسلة دبي سيغنتشر بين بريق الفخامة وغموض العالم الشرقي لتقدم تجربة عطرية استثنائية بثلاث روائح مميزة:\nMystic Gourmand – Exotic Oud – Timeless Leather.\n\nاستُلهمت هذه السلسلة من أفق دبي الذهبي وروحها التي تمزج الماضي بالحاضر والمستقبل في آنٍ واحد.\nكل عطر صُمم بعناية من خلال إعادة تفسير المكونات التقليدية بأسلوب عصري راقٍ، ليقدم قصة عطرية قوية، أنيقة، وجذابة تناسب أصحاب الذوق الرفيع.","he":"\nDubai Signature Series\n\nסדרת Dubai Signature משלבת בין זוהר היוקרה למסתורין של העולם האוריינטלי, ומציעה חוויה ייחודית עם שלושה ניחוחות מיוחדים:\nMystic Gourmand – Exotic Oud – Timeless Leather.\n\nהסדרה שואבת השראה מקו הרקיע הזהוב של דובאי ומהרוח הייחודית שלה, המחברת בין עבר, הווה ועתיד בו־זמנית.\nכל בושם נוצר מפרשנות מודרנית לרכיבים מסורתיים, והופך לסיפור ריח עוצמתי, אלגנטי ומרשים – המיועד לאניני "}},{"id":1769176873684,"type":"video","val":"https://madperfume.ps/upload/01-2026/page/AQP3_0hgJpu16OaO5gKI2zUqUL6wTDVSiq20lIgKyeT7I1jc_RmcXPkpDaQxYX7.mp4#t=0.02","text":{"ar":"","he":""}},{"id":1769176890534,"type":"text","val":"","text":{"ar":"Exotic Oud\n\nExotic Oud يمنحك تجربة فاخرة من العود المركز والنفيس، مع طابع خشبي عصري يعكس الهيبة والقوة والرقي.\n\nالنوتات العليا (Top Notes):\nزعفران، ورد، فراولة\n\nنوتات القلب (Heart Notes):\nفانيليا، عود، بخور، باتشولي\n\nالنوتات الأساسية (Base Notes):\nلمسات حلوة، خشب الصندل، عود","he":"Exotic Oud\n\nExotic Oud מעניק חוויה יוקרתית של ניחוחות אוד עמוקים ונבחרים, עם אופי עצי מודרני המשדר עוצמה, יוקרה ונוכחות מרשימה.\n\nתווי פתיחה (Top Notes):\nזעפרן, ורד, תות\n\nתווי לב (Heart Notes):\nוניל, אוד, קטורת, פטשולי\n\nתווי בסיס (Base Notes):\n"}}],"fb":"1072283127290819","tt":"D2D02JBC77U4ENLN9SBG","showManifesto":true,"showZapier":true,"showWa":true,"showCall":true,"showWeb":false,"showFloatingBtn":false,"waNum":"972509787730","callNum":"*9935","webUrl":"https://madparfumeur.com"},
-    db:{"ar":{"price":"400 ₪ فقط","offer":"عرض خاص","ctaText":"اطلب الآن","zapierId":"cmkpbwxjy001bonuoz5vy0gh1","maniT":"THE MANIFESTO","maniS":"لماذا MAD؟ مقارنة علمية","maniM":"عطور  MAD","maniO":"عطور تركيا دبي الزيوت والبدائل","waLabel":"اطلب عبر واتساب","waText":"Exotic Oud","callLabel":"اتصل للطلب","webLabel":"زيارة الموقع","compItems":[{"mad":"آمنة 100% معتمدة","local":"مجهولة المصدر"},{"mad":"تطابق جزيئي دقيق","local":"خلط يدوي عشوائي"},{"mad":"خلاصات أوروبية","local":"زيوت تجارية رخيصة"},{"mad":"ثبات +24 ساعة","local":"يختفي بعد ساعة"},{"mad":"41 فرع في البلاد","local":"اونلاين"},{"mad":"خدمة زبائن *9935","local":" حظر بعد الشراء"},{"mad":"مصادقات اييزو ووزارة الصحه","local":"غير مفحوصه"}]},
-         "he":{"price":"400₪ בלבד","offer":"מבצע מיוחד","ctaText":"הזמן עכשיו","zapierId":"cmkpef5ul0009nc51356rtjm8","maniT":"THE MANIFESTO","maniS":"למה MAD? השוואה מדעית","maniM":"בשמי MAD","maniO":"חיקויים דובי טורקיה דיופים שמנים","waLabel":"הזמן בוואטסאפ","waText":"Exotic Oud","callLabel":"חייג להזמנה","webLabel":"בקר באתר","compItems":[{"mad":"בטוח 100% מאושר","local":"מקור לא ידוע"},{"mad":"התאמה מולקולרית","local":"ערבוב אקראי"},{"mad":"תמציות אירופאיות","local":"שמנים מסחריים"},{"mad":"עמידות 24+ שעות","local":"נעלם מהר"},{"mad":"41 סניפים בארץ","local":" אונליין"},{"mad":"שירות לקוחות *9935","local":"נעלמים אחר ההזמנה"},{"mad":"תקן אייזו - משרד בריאות","local":" לא נבדק מסוכן"}]}},
-
-    // ------- runtime -------
-    lang:'he', idx:0,
-    get t() { return this.db[this.lang] },
-    get dir() { return this.lang=='ar'?'rtl':'ltr' },
-
-    init(){
-        const ul = navigator.language || navigator.userLanguage || '';
-        this.lang = ul.toLowerCase().startsWith('he') ? 'he' : 'ar';
-
-        if(window.lucide) lucide.createIcons();
-        if(this.c.heroes.length>1) setInterval(()=>this.next(),3000);
-
-        // ✅ install listener: if Zapier reports submit success -> mark + redirect to thank-you
-        this.installZapierSuccessListener();
-
-        // ✅ expose manual trigger (if you ever need it)
-        window.MAD_GO_THANKYOU = () => this.goThankYou({ source: "manual_trigger" });
-    },
-
-    tog(l){ this.lang=l; },
-    next(){ this.idx = (this.idx===this.c.heroes.length-1)?0:this.idx+1 },
-    prev(){ this.idx = (this.idx===0)?this.c.heroes.length-1:this.idx-1 },
-
-    // ---- helpers for thank-you params ----
-    getPurchaseValue(){
-      // extract first number from price text (e.g. "400 ₪ فقط" or "400₪ בלבד")
-      try{
-        const m = String(this.t.price||"").match(/(\d+(?:\.\d+)?)/);
-        return m ? Number(m[1]) : 500;
-      }catch(e){ return 500; }
-    },
-    getContentName(){
-      return (this.t && this.t.waText) ? String(this.t.waText).trim() : "Elite Set";
-    },
-    getContentId(){
-      // Make a stable id from name: "Exotic Oud" -> "EXOTIC_OUD"
-      try{
-        const n = this.getContentName();
-        const s = n.replace(/[^\w]+/g, "_").replace(/^_+|_+$/g,"").toUpperCase();
-        return s || "ELITE_SET_5";
-      }catch(e){ return "ELITE_SET_5"; }
-    },
-
-    markOrderOk(meta){
-      try { window.MAD_MARK_ORDER_SUBMITTED(meta || {}); } catch(e){}
-    },
-
-    goThankYou(meta){
-      // set validation key + redirect with params used by thank-you.html
-      this.markOrderOk(meta || { source: "unknown" });
-
-      const value = this.getPurchaseValue();
-      const item = this.getContentName();
-      const contentId = this.getContentId();
-      const lang = this.lang || "ar";
-
-      const url =
-        "thank-you.html" +
-        "?mad_ty=1" +
-        "&lang=" + encodeURIComponent(lang) +
-        "&value=" + encodeURIComponent(String(value)) +
-        "&currency=" + encodeURIComponent("ILS") +
-        "&item=" + encodeURIComponent(item) +
-        "&content_id=" + encodeURIComponent(contentId);
-
-      window.location.href = url;
-    },
-
-    installZapierSuccessListener(){
-      // Best-effort listener: detects Zapier success via postMessage
-      if(this._zapierListenerInstalled) return;
-      this._zapierListenerInstalled = true;
-
-      window.addEventListener("message", (e)=>{
-        try{
-          if(!e || !e.data) return;
-          const s = JSON.stringify(e.data).toLowerCase();
-
-          // Heuristics for "submitted / success" from zapier iframe
-          const looksZapier = s.includes("zapier") || s.includes("interfaces");
-          const looksSuccess =
-            s.includes("success") ||
-            s.includes("submitted") ||
-            s.includes("submit") ||
-            s.includes("completed") ||
-            s.includes("thank") ||
-            s.includes("order") ||
-            s.includes("created");
-
-          if(looksZapier && looksSuccess){
-            this.goThankYou({ source: "zapier_postMessage", raw: e.data });
-          }
-        }catch(err){}
-      }, false);
-    },
-
-    track(ev) {
-        // ✅ Never allow Purchase/CompletePayment from landing
-        if(ev === "Purchase" || ev === "CompletePayment") return;
-
-        if(typeof fbq !== 'undefined') fbq('track', ev);
-        if(typeof ttq !== 'undefined') ttq.track(ev);
-    }
-}}
-</script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&family=Heebo:wght@400;700;900&display=swap');
+        body { background: #be9968; color: #000; font-family: 'Cairo', 'Heebo', sans-serif; overflow-x: hidden; scroll-behavior: smooth; }
+        .mad-input { width: 100%; padding: 15px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 14px; outline: none; margin-bottom: 12px; text-align: inherit; font-weight: 700; }
+        .mad-radio-ui { border: 1px solid #e2e8f0; border-radius: 14px; padding: 16px; background: #f8fafc; text-align: center; cursor: pointer; transition: 0.2s; font-weight: 800; }
+        input[type="radio"]:checked + .mad-radio-ui { border-color: #000; background: #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .btn-order-main { background: #000; color: #fff; padding: 20px; border-radius: 18px; font-weight: 900; font-size: 1.3rem; width: 100%; display: block; text-align: center; }
+        /* Optimization: Content visibility for off-screen blocks */
+        .page-block { content-visibility: auto; contain-intrinsic-size: 0 400px; }
+    </style>
 </head>
+<body class="pb-20">
+    <nav class="p-4 flex justify-center border-b border-black/5 bg-white/40 backdrop-blur-lg sticky top-0 z-50">
+        <!-- High priority for logo (LCP) -->
+        <img src="https://www.mad-parfumeur.com/assets/hero/logo.webp" style="height:42px; object-fit:contain" fetchpriority="high">
+    </nav>
+    <header class="text-center py-10 px-4"><h1 class="text-3xl font-black" x-text="c.heroTitle[lang]"></h1></header>
+    <main class="max-w-md mx-auto">
+        <template x-for="(b, idx) in blocks">
+            <div :class="b.align==='center'?'text-center':(b.align==='left'?'text-left':'text-right')" class="my-6 px-4 page-block">
+                <template x-if="b.type==='text'"><p class="text-lg font-bold whitespace-pre-wrap leading-relaxed" x-text="b.content[lang]"></p></template>
+                <template x-if="b.type==='emoji'"><div class="text-4xl" x-text="b.content[lang]"></div></template>
+                <!-- Image Optimization: Lazy load for everything except first block -->
+                <template x-if="b.type==='image'"><img :src="b.url" class="rounded-2xl mx-auto shadow-lg w-full" :loading="idx === 0 ? 'eager' : 'lazy'" decoding="async"></template>
+                <template x-if="b.type==='video'"><video :src="b.url" controls class="w-full rounded-2xl shadow-lg" playsinline preload="none"></video></template>
+                <template x-if="b.type==='button'"><a :href="b.link" class="btn-order-main no-underline" x-text="b.content[lang]"></a></template>
+                <template x-if="b.type==='iframe'"><iframe :src="b.url" class="w-full h-96 rounded-xl border-none shadow-sm" loading="lazy"></iframe></template>
+                
+                <template x-if="b.type==='fragrantica'">
+                    <a :href="b.url" target="_blank" class="block w-full max-w-[320px] bg-[#3f5a31] text-white p-5 rounded-[24px] shadow-xl relative overflow-hidden mx-auto no-underline text-right">
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="text-[10px] font-black uppercase tracking-widest text-white/60">Fragrantica Reviews</span>
+                            <div class="flex text-amber-400 gap-0.5"><i data-lucide="star" class="w-3 h-3 fill-current"></i><i data-lucide="star" class="w-3 h-3 fill-current"></i><i data-lucide="star" class="w-3 h-3 fill-current"></i><i data-lucide="star" class="w-3 h-3 fill-current"></i><i data-lucide="star" class="w-3 h-3 fill-current"></i></div>
+                        </div>
+                        <div class="flex items-end gap-2"><span class="text-4xl font-black" x-text="b.score"></span><span class="text-xs opacity-60 mb-1">Rating</span></div>
+                        <p class="text-[10px] font-bold mt-2 text-white/80" x-text="b.content[lang]"></p>
+                    </a>
+                </template>
 
-<body>
-
-<nav class="glass-nav">
-    <div class="flex gap-2">
-        <button @click="tog('ar')" class="lang-btn-nav" :class="lang=='ar'?'active':''">AR</button>
-        <button @click="tog('he')" class="lang-btn-nav" :class="lang=='he'?'active':''">HE</button>
-    </div>
-    <img :src="c.logo" class="nav-logo" alt="Logo" referrerpolicy="no-referrer">
-    <div class="w-8"><i data-lucide="shopping-bag" style="color:white; width:20px;"></i></div>
-</nav>
-
-<section class="relative h-screen flex flex-col justify-center items-center text-center px-4">
-    <video src="https://madperfume.ps/upload/01-2026/page/WhatsApp%20Video%202025-12-28%20at%2011.59.51.mp4#t=0.02" autoplay loop muted playsinline class="hero-vid"></video>
-    <div class="badge" x-text="t.offer"></div>
-    <h1 class="text-6xl font-serif italic mb-6" x-text="t.price"></h1>
-    <a href="#shop" class="bg-amber-600 text-black px-8 py-3 rounded-full font-bold" x-text="t.ctaText"></a>
-</section>
-
-<section id="shop" class="py-16 px-4 text-center">
-    <div class="carousel mb-10">
-        <template x-for="(src,i) in c.heroes"><img :src="src" x-show="idx===i" class="c-img" x-transition.opacity referrerpolicy="no-referrer"></template>
-        <template x-if="c.heroes.length>1"><div><button class="c-btn" style="left:0" @click="prev"><</button><button class="c-btn" style="right:0" @click="next">></button></div></template>
-    </div>
-
-    <div class="space-y-8 max-w-2xl mx-auto mb-10">
-        <template x-for="block in c.blocks">
-            <div>
-                <template x-if="block.type=='text'"><div class="text-gray-300 whitespace-pre-wrap" x-text="block.text[lang]"></div></template>
-                <template x-if="block.type=='image'">
-                    <div>
-                        <img :src="block.val" class="w-full rounded-xl" referrerpolicy="no-referrer">
-                        <p class="text-gray-400 text-sm mt-2 font-bold" x-show="block.text && block.text[lang]" x-text="block.text[lang]"></p>
+                <template x-if="b.type==='iso'">
+                    <div class="grid grid-cols-3 gap-3 w-full max-w-sm mx-auto mt-4">
+                        <div class="bg-white border border-black/5 p-3 rounded-2xl text-center shadow-sm"><div class="text-xl">🛡️</div><p class="text-[8px] font-black uppercase leading-tight">ISO 9001<br>Certified</p></div>
+                        <div class="bg-white border border-black/5 p-3 rounded-2xl text-center shadow-sm"><div class="text-xl">🧪</div><p class="text-[8px] font-black uppercase leading-tight">IFRA Safe<br>Standard</p></div>
+                        <div class="bg-white border border-black/5 p-3 rounded-2xl text-center shadow-sm"><div class="text-xl">🏛️</div><p class="text-[8px] font-black uppercase leading-tight">Health<br>Ministry OK</p></div>
                     </div>
                 </template>
-                <template x-if="block.type=='video'"><video :src="block.val" controls class="w-full rounded-xl"></video></template>
-                <template x-if="block.type=='embed'"><div x-html="block.val"></div></template>
+
+                <template x-if="b.type==='comparison'">
+                    <div class="space-y-2 mt-4 text-right">
+                        <template x-for="row in b.items">
+                            <div class="grid grid-cols-2 gap-1 rounded-xl overflow-hidden border border-black/5 shadow-sm">
+                                <div class="bg-gray-50 p-4 border-r border-black/5"><span class="text-[8px] font-black text-amber-600 block mb-1">MAD</span><p class="text-[11px] font-bold leading-tight" x-text="row.mad[lang]"></p></div>
+                                <div class="bg-white p-4 text-gray-400 text-right"><span class="text-[8px] font-black text-gray-300 block mb-1">OTHERS</span><p class="text-[11px]" x-text="row.other[lang]"></p></div>
+                            </div>
+                        </template>
+                    </div>
+                </template>
+
+                <template x-if="b.type==='form'">
+                    <div class="bg-white border-2 border-gray-100 rounded-[28px] p-8 shadow-sm text-right mt-6" id="order">
+                        <h2 class="text-2xl font-black text-center mb-6" x-text="lang === 'he' ? 'הזמנה מהירה' : 'إتمام الطلب السريع'"></h2>
+                        <form @submit.prevent="submitForm">
+                            <input type="text" x-model="f.name" @input="trackInput" class="mad-input" :placeholder="lang === 'he' ? 'שם מלא' : 'الاسم الكامل'" required autocomplete="name">
+                            <input type="tel" x-model="f.phone" class="mad-input" :placeholder="lang === 'he' ? 'טלפון' : 'رقم الهاتف'" required autocomplete="tel">
+                            <input type="text" x-model="f.address" class="mad-input" :placeholder="lang === 'he' ? 'יישוב וכתובת' : 'المدينة والعنوان'" required autocomplete="street-address">
+                            <div class="grid grid-cols-2 gap-3 mb-6">
+                                <label class="cursor-pointer"><input type="radio" x-model="f.payment" value="Cash" class="hidden" required><div class="mad-radio-ui text-xs" x-text="lang === 'he' ? 'מזומן' : 'نقداً'"></div></label>
+                                <label class="cursor-pointer"><input type="radio" x-model="f.payment" value="Visa" class="hidden" required><div class="mad-radio-ui text-xs" x-text="lang === 'he' ? 'אשראי' : 'فيزا'"></div></label>
+                            </div>
+                            <div class="space-y-2 mb-6">
+                                <label class="block cursor-pointer"><input type="radio" x-model="f.process" value="Direct" class="hidden" required><div class="mad-radio-ui text-xs" x-text="lang === 'he' ? 'משלוח ישיר' : 'شحن مباشر'"></div></label>
+                                <label class="block cursor-pointer"><input type="radio" x-model="f.process" value="Contact" class="hidden" required><div class="mad-radio-ui text-xs" x-text="lang === 'he' ? 'אישור טלפוני' : 'تواصل معي للتأكيد'"></div></label>
+                            </div>
+                            <button type="submit" class="w-full py-5 rounded-2xl bg-black text-white font-black transition-all active:scale-95 shadow-lg h-20 flex items-center justify-center text-xl" :disabled="loading" x-text="loading ? '...' : (lang === 'he' ? 'אשר הזמנה' : 'تأكيد الطلب الآن')"></button>
+                        </form>
+                    </div>
+                </template>
             </div>
         </template>
+    </main>
+
+    <div x-show="submitted" class="fixed inset-0 z-[200] bg-black/80 flex items-center justify-center p-6 text-center" x-transition>
+        <div class="bg-white rounded-[40px] p-10 max-w-xs shadow-2xl">
+            <h3 class="text-2xl font-black mb-4" x-text="lang==='he'?'בוצע בהצלחה!':'تم بنجاح!'"></h3>
+            <p class="text-gray-500 font-bold mb-6" x-text="lang==='he'?'זהו, אתה מוכן! ההזמנה התקבלה':'خلاص أنت جاهز، تم استلام الطلب'"></p>
+            <button @click="submitted = false" class="mt-4 w-full bg-black text-white py-4 rounded-xl font-bold">إغلاق | סגור</button>
+        </div>
     </div>
 
-    <template x-if="c.showManifesto">
-    <div class="max-w-2xl mx-auto mb-16 text-right">
-        <h2 class="text-3xl font-serif italic mb-2 text-white text-center" x-text="t.maniT"></h2>
-        <p class="text-gray-400 text-center mb-6 text-sm" x-text="t.maniS"></p>
-        <template x-for="item in t.compItems">
-            <div class="comp-row"><div class="c-side c-mad"><div class="flex items-center justify-end gap-2 mb-1"><span class="text-[10px] font-bold text-amber-500 uppercase" x-text="t.maniM"></span><i data-lucide="check-circle" class="w-3 h-3 text-amber-500"></i></div><p class="text-white font-bold" x-text="item.mad"></p></div><div class="c-side c-alt"><div class="flex items-center justify-end gap-2 mb-1"><span class="text-[10px] font-bold text-red-400 uppercase" x-text="t.maniO"></span><i data-lucide="x-circle" class="w-3 h-3 text-red-500"></i></div><p class="text-gray-400" x-text="item.local"></p></div></div>
-        </template>
-    </div>
-    </template>
+    <script>
+        function app() {
+            return {
+                lang: 'ar', loading: false, submitted: false, hasStartedTyping: false,
+                blocks: [{"id":1,"type":"text","content":{"ar":"شامل التوصيل","he":"כולל משלוח"},"align":"center"},{"id":1769481011498,"type":"image","content":{"ar":"","he":""},"url":"https://www.mad-parfumeur.com/assets/hero/6.webp","score":"4.9 / 5","link":"#order","align":"center","items":[]},{"id":1769481083228,"type":"fragrantica","content":{"ar":"","he":""},"url":"","score":"4.9 / 5","link":"#order","align":"center","items":[]},{"id":1769481097260,"type":"comparison","content":{"ar":"","he":""},"url":"","score":"4.9 / 5","link":"#order","align":"center","items":[{"mad":{"ar":"بصمة أمان 100% ومصادق من IFRA","he":"בטוח ב-100% ומאושר ע\"י IFRA"},"other":{"ar":"زيوت كيميائية مجهولة المصدر","he":"שמנים ממקור לא ידוע"}},{"mad":{"ar":"تطابق جزيئي وتركيز نيش حقيقي","he":"התאמה מולקולרית וריכוז נישה"},"other":{"ar":"خلط يدوي عشوائي يتفكك فوراً","he":"ערבוב ידני אקראי"}},{"mad":{"ar":"ثبات فائق يتجاوز 24 ساعة","he":"עמידות מעל 24 שעות"},"other":{"ar":"يختفي بعد أقل من ساعة","he":"נעלם מהר"}},{"mad":{"ar":"لا يسبب الحساسية أو الصداع","he":"לא גורם לאלרגיות או כאבי ראש"},"other":{"ar":"مذيبات كيميائية ضارة","he":"ממסים כימיים מזיקים"}},{"mad":{"ar":"خدمة زبائن و41 فرع في البلاد","he":"שירות לקוחות ו-41 סניפים בארץ"},"other":{"ar":"متاجر أونلاين بلا عنوان","he":"חנויות אונליין ללא כתובת"}},{"mad":{"ar":"تعتيق وتصفية مخبرية أوروبية","he":"יישון וסינון מעבדתי אירופאי"},"other":{"ar":"زيوت تجارية رخيصة","he":"שמנים מסחריים זולים"}},{"mad":{"ar":"مصادقات الأيزو ووزارة الصحة","he":"אישור תקן ISO ומשרד הבריאות"},"other":{"ar":"غير مفحوص ومقلد","he":"לא נבדק "}}]},{"id":1769481104804,"type":"form","content":{"ar":"","he":""},"url":"","score":"4.9 / 5","link":"#order","align":"center","items":[]},{"id":1769481107287,"type":"iso","content":{"ar":"","he":""},"url":"","score":"4.9 / 5","link":"#order","align":"center","items":[]},{"id":1769509166765,"type":"text","content":{"ar":"","he":"MAD Parfumeur\n\nמקורי. אמין. מוכר בעולם.\n\nMAD היא לא עוד מותג בישום…\nMAD היא שם בינלאומי בעולם הבשמים.\n\n🌍 MAD Parfumeur מופיעה רשמית באתר\nFragrantica — מגזין הבשמים הגדול בעולם\n🔗 https://www.fragrantica.com/designers/Mad-Parfumeur.html\n\n🏆 רשת עם מעל 41 סניפים רשמיים בארץ\n✅ ייצור לפי תקני ISO – IFRA – GMP ואישורי משרד הבריאות\n💎 ריכוז Eau De Parfum מקורי ונישה אמיתית\n🧬 התאמה מולקולרית מקצועית\n🧪 יישון וסינון מעבדתי אירופאי\n🔥 עמידות חזקה מעל 24 שעות\n🛡 ללא אלרגיות או כאבי ראש\n📦 שירות לקוחות מקצועי ומשלוח מהיר\n\nההבדל ברור:\n\nMAD\n✔ מותג עם הכרה עולמית\n✔ איכות אירופאית מאושרת\n✔ ביצועים ברמת פרימיום\n\nOTHERS\n✖ מקורות לא ידועים\n✖ ערבובים אקראיים\n✖ חנויות ללא אחריות\n\nMAD Parfumeur\nמקוריות עם הוכחה עולמית.\n\n👉 בחרו במותג שמופיע על המפה העולמית."},"url":"","score":"4.9 / 5","link":"#order","align":"right","items":[]},{"id":1769513627913,"type":"text","content":{"ar":"MAD Parfumeur\n\nأصلي. موثوق. معترف به عالمياً.\n\nMAD ليست مجرد علامة عطور…\nMAD هي اسم عالمي في عالم البارفان.\n\n🌍 تم استضافة MAD Parfumeur رسمياً على موقع\nFragrantica — أكبر مجلة ومنصة عطور عالمية\n🔗 https://www.fragrantica.com/designers/Mad-Parfumeur.html\n\n🏆 شبكة تضم أكثر من 41 فرع رسمي في البلاد\n✅ تصنيع بمعايير ISO – IFRA – GMP ومصادقات وزارة الصحة\n💎 تركيز Eau De Parfum أصلي ونِيش حقيقي\n🧬 تطابق جزيئي احترافي\n🧪 تعتيق وتصفية مخبرية أوروبية\n🔥 ثبات فائق يتجاوز 24 ساعة\n🛡 لا يسبب الحساسية أو الصداع\n📦 خدمة زبائن احترافية وتوصيل سريع\n\nالفرق واضح:\n\nMAD\n✔ علامة معترف بها عالمياً\n✔ جودة أوروبية معتمدة\n✔ أداء بمستوى الماركات العالمية\n\nOTHERS\n✖ زيوت مجهولة المصدر\n✖ خلط عشوائي\n✖ متاجر بدون عنوان أو مسؤولية\n\nMAD Parfumeur\nالأصلي ليس كلام… الأصلي له إثبات عالمي.\n\n👉 اختَر الجودة العالمية.","he":""},"url":"","score":"4.9 / 5","link":"#order","align":"center","items":[]},{"id":1769517065366,"type":"video","content":{"ar":"","he":""},"url":"https://www.youtube.com/shorts/sevXWHgy5tA?feature=share","score":"4.9 / 5","link":"#order","align":"center","items":[]}], c: {"bgColor":"#be9968","logoUrl":"https://www.mad-parfumeur.com/assets/hero/logo.webp","heroTitle":{"ar":"أقوى العروض الحصرية بـ 400 شيكل","he":"המבצעים הבלעדיים ביותר ב-400ש\"ח"},"sheetUrl":"https://script.google.com/macros/s/AKfycbwOhU29CKnGH5cHDD1cGRvfbh49xJPPuF7-rbf6_mo6ZO2g52rLl8mQ3BDEU9qXedHH/exec","fbPixel":"1072283127290819","ttPixel":"D2D02JBC77U4ENLN9SBG","snapPixel":"b143822e-1c3c-40ff-93f7-edadee74e626"}, f: { name:'', phone:'', address:'', payment:'', process:'' },
+                get offerName() { 
+                    const p = window.location.pathname.split('/').pop().split('.')[0];
+                    return (p && p !== 'index' && p !== '' && p !== 'srcdoc' && p !== 'blank') ? p : 'MAD-Product';
+                },
+                init(fL = null) {
+                    this.lang = fL || (navigator.language.startsWith('he') ? 'he' : 'ar');
+                    setTimeout(() => { if(window.lucide) lucide.createIcons(); }, 300);
+                },
+                trackInput() {
+                    if(!this.hasStartedTyping && this.f.name.length > 2) {
+                        this.hasStartedTyping = true;
+                        const p = { content_name: this.offerName };
+                        if(window.fbq) fbq('track', 'AddToCart', p);
+                        if(window.ttq) ttq.track('AddToCart', p);
+                        if(window.snaptr) snaptr('track', 'ADD_CART', p);
+                    }
+                },
+                async submitForm() {
+                    if(this.loading) return;
+                    this.loading = true;
+                    const p = { value: 500, currency: 'ILS', content_name: this.offerName };
+                    if(window.fbq) fbq('track', 'Purchase', p);
+                    if(window.ttq) ttq.track('CompletePayment', p);
+                    if(window.snaptr) snaptr('track', 'PURCHASE', { currency: 'ILS', price: 500 });
 
-    <div class="order-grid">
-        <template x-if="c.showWa"><a :href="'https://wa.me/'+c.waNum+'?text='+encodeURIComponent(t.waText)" target="_blank" class="btn-order btn-wa" @click="track('Contact')"><i data-lucide="message-circle"></i> <span x-text="t.waLabel"></span></a></template>
-        <template x-if="c.showCall"><a :href="'tel:'+c.callNum" class="btn-order btn-call" @click="track('Contact')"><i data-lucide="phone"></i> <span x-text="t.callLabel"></span></a></template>
-        <template x-if="c.showWeb"><a :href="c.webUrl" target="_blank" class="btn-order btn-web" @click="track('ViewContent')"><i data-lucide="globe"></i> <span x-text="t.webLabel"></span></a></template>
-    </div>
-
-    <template x-if="c.showZapier"><div style="min-height:800px"><zapier-interfaces-page-embed :key="lang" :page-id="t.zapierId" :test-id="t.zapierId" no-background='true' style='width:100%;height:800px;'></zapier-interfaces-page-embed></div></template>
-    <template x-if="c.showFloatingBtn"><div class="sticky-cta"><a href="#shop" class="sticky-btn" x-text="t.ctaText"></a></div></template>
-</section>
-
-<footer class="py-6 text-center text-xs text-gray-600">© 2026 MAD PARFUMEUR</footer>
-</body></html>
+                    const fd = new FormData();
+                    Object.keys(this.f).forEach(k => fd.append(k, this.f[k]));
+                    fd.append('offer', this.offerName);
+                    fd.append('lang', this.lang);
+                    
+                    try {
+                        await fetch(this.c.sheetUrl, { method: 'POST', body: fd, mode: 'no-cors' });
+                        this.submitted = true;
+                        this.f = { name:'', phone:'', address:'', payment:'', process:'' };
+                    } catch(e) { console.error(e); } finally { this.loading = false; }
+                }
+            }
+        }
+    </script>
+</body>
+</html>
