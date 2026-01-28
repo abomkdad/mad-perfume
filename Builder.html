@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MAD Builder V27 - Speed & Psychology ⚡</title>
+    <title>MAD Builder V32 - Slider & Colors 🎨🛒</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest" defer></script>
     <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
@@ -28,13 +28,15 @@
         .sub-item { border-top: 1px dashed #eee; padding-top: 8px; margin-top: 8px; }
         .zoom-controls { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.8); padding: 8px 16px; border-radius: 99px; display: flex; gap: 10px; color: white; z-index: 50; align-items: center; }
         .zoom-btn { cursor: pointer; padding: 4px; } .zoom-btn:hover { color: #ddd; }
+        .color-dot { width: 20px; height: 20px; border-radius: 50%; cursor: pointer; border: 1px solid #ddd; }
+        .color-dot:hover { transform: scale(1.1); }
     </style>
 </head>
 <body>
 
 <div class="app-layout" x-data="builderApp()" x-init="init()" x-cloak>
     <aside class="editor-sidebar">
-        <h1 class="text-xl font-black mb-6 text-center">MAD BUILDER <span class="text-blue-600">V27 SPEED</span> ⚡</h1>
+        <h1 class="text-xl font-black mb-6 text-center">MAD BUILDER <span class="text-blue-600">V32 FIXED</span> 🛒</h1>
         
         <div class="flex bg-gray-100 p-1 rounded-lg mb-4">
             <button @click="setEditLang('ar')" :class="editLang==='ar'?'bg-black text-white':''" class="flex-1 py-2 rounded-md text-xs font-bold transition">عربي</button>
@@ -60,7 +62,19 @@
                 <div><label>TikTok</label><input type="text" x-model="config.ttPixel"></div>
                 <div><label>Snap</label><input type="text" x-model="config.snapPixel"></div>
             </div>
-            <p class="text-[9px] text-gray-500 mt-2">✨ ملاحظة: البيكسلات سيتم تحميلها بذكاء بعد فتح الصفحة لضمان أقصى سرعة.</p>
+            <p class="text-[9px] text-gray-500 mt-2">✨ ملاحظة: البيكسلات سيتم تحميلها بعد 3.5 ثانية للسرعة.</p>
+        </div>
+
+        <div class="section-box">
+            <h2 class="font-bold text-xs mb-2">🎨 المظهر العام</h2>
+            <div class="flex gap-2 items-center">
+                <input type="color" x-model="config.bgColor" @input="updatePreviewDebounced()" class="h-10 w-10 p-0 border rounded cursor-pointer">
+                <input type="text" x-model="config.bgColor" @input="updatePreviewDebounced()" class="text-xs font-mono w-full" placeholder="#ffffff">
+            </div>
+            <label class="mt-2">رابط الشعار</label>
+            <input type="text" x-model="config.logoUrl" @input="updatePreviewDebounced()">
+            <label>العنوان الرئيسي</label>
+            <input type="text" x-model="config.heroTitle[editLang]" @input="updatePreviewDebounced()">
         </div>
 
         <div class="section-box">
@@ -77,18 +91,49 @@
                             </div>
                         </div>
                         
-                        <!-- Interactive Rating -->
-                        <template x-if="block.type === 'interactive_rating'">
+                        <!-- Offers Slider Editor -->
+                        <template x-if="block.type === 'offers_slider'">
                             <div>
-                                <label class="text-yellow-600 font-bold">تقييم تفاعلي (نفسي)</label>
-                                <input type="text" x-model="block.content[editLang]" @input="updatePreviewDebounced()" class="w-full text-xs p-1 border rounded mt-1" placeholder="عنوان التقييم (مثال: ما رأيك؟)">
+                                <label class="text-blue-600 font-bold">عنوان القسم</label>
+                                <input type="text" x-model="block.title[editLang]" @input="updatePreviewDebounced()" class="w-full text-xs p-1 border rounded mb-2">
+                                
+                                <div class="space-y-2 max-h-60 overflow-y-auto pr-1">
+                                    <template x-for="(offer, oIdx) in block.items" :key="oIdx">
+                                        <div class="bg-gray-50 p-2 rounded border border-gray-200 relative">
+                                            <button @click="block.items.splice(oIdx, 1); updatePreviewDebounced()" class="absolute top-1 left-1 text-red-500 text-[10px] font-bold">x</button>
+                                            <input type="text" x-model="offer.img" @input="updatePreviewDebounced()" placeholder="رابط الصورة" class="w-full text-[10px] mb-1 border rounded p-1">
+                                            <div class="flex gap-1">
+                                                <input type="text" x-model="offer.title[editLang]" @input="updatePreviewDebounced()" placeholder="اسم المنتج" class="flex-1 text-[10px] border rounded p-1">
+                                                <input type="text" x-model="offer.price" @input="updatePreviewDebounced()" placeholder="السعر" class="w-12 text-[10px] border rounded p-1 text-center">
+                                            </div>
+                                            <input type="text" x-model="offer.link" @input="updatePreviewDebounced()" placeholder="رابط الصفحة (Link)" class="w-full text-[10px] mt-1 border rounded p-1">
+                                        </div>
+                                    </template>
+                                </div>
+                                <button @click="block.items.push({img:'', title:{ar:'منتج جديد', he:'מוצר חדש'}, price:'100', link:'#'}); updatePreviewDebounced()" class="mt-2 text-[10px] text-blue-600 font-bold w-full border border-blue-200 rounded p-1 hover:bg-blue-50">+ إضافة عرض آخر</button>
                             </div>
                         </template>
 
+                        <!-- Interactive Rating -->
+                        <template x-if="block.type === 'interactive_rating'">
+                            <div>
+                                <label class="text-yellow-600 font-bold">تقييم تفاعلي</label>
+                                <input type="text" x-model="block.content[editLang]" @input="updatePreviewDebounced()" class="w-full text-xs p-1 border rounded mt-1" placeholder="عنوان التقييم">
+                            </div>
+                        </template>
+
+                        <!-- Text Editor -->
                         <template x-if="block.type === 'text'">
                             <div class="space-y-2">
                                 <div class="flex flex-wrap gap-2 items-center bg-gray-50 p-2 rounded border border-gray-200">
-                                    <input type="color" x-model="block.style.color" @input="updatePreviewDebounced()" class="w-8 h-8 p-0 border-0 rounded cursor-pointer">
+                                    <div class="flex items-center gap-1">
+                                        <input type="color" x-model="block.style.color" @input="updatePreviewDebounced()" class="w-6 h-6 p-0 border-0 rounded cursor-pointer">
+                                        <div class="flex gap-1">
+                                            <div @click="block.style.color='#000000'; updatePreviewDebounced()" class="color-dot bg-black"></div>
+                                            <div @click="block.style.color='#dc2626'; updatePreviewDebounced()" class="color-dot bg-red-600"></div>
+                                            <div @click="block.style.color='#d97706'; updatePreviewDebounced()" class="color-dot bg-amber-600"></div>
+                                        </div>
+                                    </div>
                                     <select x-model="block.style.font" @change="updatePreviewDebounced()" class="text-[10px] p-1 border rounded h-8 bg-white"><option value="Cairo">Cairo</option><option value="Tajawal">Tajawal</option></select>
                                     <select x-model="block.style.size" @change="updatePreviewDebounced()" class="text-[10px] p-1 border rounded h-8 bg-white"><option value="text-sm">S</option><option value="text-lg">L</option><option value="text-2xl">XL</option></select>
                                     <select x-model="block.align" @change="updatePreviewDebounced()" class="text-[10px] p-1 border rounded h-8 bg-white w-16"><option value="center">وسط</option><option value="right">يمين</option></select>
@@ -101,12 +146,11 @@
                         <template x-if="block.type === 'urgency_box'">
                             <div>
                                 <div class="bg-red-50 p-2 rounded mb-2 border border-red-100">
-                                    <h3 class="text-[10px] font-bold text-red-600 mb-1">إعدادات الضغط النفسي 🔥</h3>
                                     <div class="flex gap-2 mb-1">
-                                        <div class="flex-1"><label class="text-gray-500 text-[9px]">الزوار</label><input type="number" x-model="block.visitors" @input="updatePreviewDebounced()" class="w-full text-center font-bold"></div>
-                                        <div class="flex-1"><label class="text-gray-500 text-[9px]">القطع</label><input type="number" x-model="block.left" @input="updatePreviewDebounced()" class="w-full text-center font-bold text-red-600"></div>
+                                        <div class="flex-1"><label class="text-[9px]">الزوار</label><input type="number" x-model="block.visitors" @input="updatePreviewDebounced()" class="w-full text-center font-bold"></div>
+                                        <div class="flex-1"><label class="text-[9px]">القطع</label><input type="number" x-model="block.left" @input="updatePreviewDebounced()" class="w-full text-center font-bold text-red-600"></div>
                                     </div>
-                                    <label class="text-gray-500 text-[9px]">الدقائق</label><input type="number" x-model="block.timerMinutes" @input="updatePreviewDebounced()" class="w-full">
+                                    <label class="text-[9px]">الدقائق</label><input type="number" x-model="block.timerMinutes" @input="updatePreviewDebounced()" class="w-full">
                                 </div>
                             </div>
                         </template>
@@ -146,6 +190,7 @@
             </div>
             
             <div class="grid grid-cols-2 gap-2">
+                <button class="btn-add border-blue-500 bg-blue-100 text-blue-900 font-bold" @click="addBlock('offers_slider')">🛒 شريط العروض</button>
                 <button class="btn-add border-yellow-500 bg-yellow-100 text-yellow-900 font-bold" @click="addBlock('interactive_rating')">⭐ تقييم تفاعلي</button>
                 <button class="btn-add border-red-500 bg-red-100 text-red-900 font-bold shadow-sm" @click="addBlock('urgency_box')">🔥 عداد + ضغط</button>
                 <button class="btn-add" @click="addBlock('form')">📋 فورم</button>
@@ -191,7 +236,7 @@
                 productName: 'MAD Offer',
                 price: '150',
                 adminPhone: '972525105889',
-                sheetUrl: 'https://script.google.com/macros/s/AKfycbxuKgqJyUIV_5MVdmY37SKUCcfxCWJaCYgVBJdpd-zxS20RTKm_8_VMFbPxICa3K89xPw/exec',
+                sheetUrl: 'https://script.google.com/macros/s/AKfycbw7m6OCcTnH6CILpTo2TVRZIXXy5cui-zhKsCq3k491yaun5Hd5b_QECTjCrpCytkndDg/exec',
                 fbPixel: '1072283127290819', ttPixel: 'D2D02JBC77U4ENLN9SBG', snapPixel: 'b143822e-1c3c-40ff-93f7-edadee74e626'
             },
             blocks: [
@@ -217,8 +262,12 @@
                 let left = '8';
                 let visitors = '550';
                 let timerMinutes = 15;
+                let title = {ar:'عروض أخرى قد تعجبك', he:'מוצרים נוספים שאולי תאהב'};
 
+                // Set default style for text
                 if(type === 'text') style = { color: '#000000', size: 'text-lg', font: 'Cairo', weight: 'font-black' };
+                else style = { color: '#000000', size: 'text-base', font: 'Cairo', weight: 'normal' };
+
                 if(type === 'stock') content = {ar:'⚠️ تنبيه: الكمية تنفذ بسرعة!', he:'⚠️ שימו לב: המלאי אוזל!'};
                 if(type === 'sales_pop') content = {ar:'مفعل', he:'مفعل'};
                 if(type === 'form') { content = {ar:'اطلب الآن', he:'הזמנה מהירה'}; btnText = {ar:'تأكيد الطلب', he:'שלח הזמנה'}; }
@@ -234,11 +283,19 @@
                         {mad:{ar:'مصادقات الأيزو ووزارة الصحة', he:'אישור תקן ISO ומשרד הבריאות'}, other:{ar:'غير مفحوص ومقلد', he:'לא נבדק '}}
                     ];
                 }
+
+                if(type === 'offers_slider') {
+                    items = [
+                        {img:'https://www.mad-parfumeur.com/assets/hero/4.webp', title:{ar:'عطر المسك', he:'בושם מאסק'}, price:'120', link:'#'},
+                        {img:'https://www.mad-parfumeur.com/assets/hero/4.webp', title:{ar:'عطر العود', he:'בושם עוד'}, price:'150', link:'#'},
+                        {img:'https://www.mad-parfumeur.com/assets/hero/4.webp', title:{ar:'بكج العيد', he:'מארז חג'}, price:'200', link:'#'}
+                    ];
+                }
                 
                 if(type === 'fragrantica') content = {ar:'تقييمات ممتازة', he:'ביקורות מצוינות'};
                 if(type === 'interactive_rating') content = {ar:'ما هو تقييمك لمنتجاتنا؟', he:'איך אתם מדרגים את המוצרים שלנו?'};
 
-                this.blocks.push({id:Date.now(), type, content, btnText, url:'', link:'#order', align:'center', items, score, stars, style, sold, left, visitors, timerMinutes});
+                this.blocks.push({id:Date.now(), type, content, btnText, url:'', link:'#order', align:'center', items, score, stars, style, sold, left, visitors, timerMinutes, title});
                 this.updatePreview();
             },
             removeBlock(i) { this.blocks.splice(i,1); this.updatePreview(); },
@@ -274,7 +331,7 @@
 <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer><\/script>
 <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Aref+Ruqaa:wght@400;700&family=Cairo:wght@200..1000&family=Rakkas&family=Tajawal:wght@200..900&display=swap" rel="stylesheet">
 <style>
-body { background: ${this.config.bgColor}; font-family: 'Cairo', sans-serif; overflow-x: hidden; }
+body { background: ${this.config.bgColor}; font-family: 'Cairo', sans-serif; overflow-x: hidden; min-height: 100vh; }
 .inp { width: 100%; padding: 15px; background: #f8fafc; border: 1px solid #ddd; border-radius: 12px; margin-bottom: 10px; font-weight: bold; }
 .btn-main { 
     background: #000; color: #fff; width: 100%; padding: 18px; border-radius: 14px; font-weight: 900; font-size: 1.2rem;
@@ -293,6 +350,10 @@ input[type="radio"]:checked + .mad-radio-box { border-color: #10b981; background
 .mad-radio-box.recommended::after { content: '★'; position: absolute; top: -8px; right: -8px; background: #10b981; color: white; border-radius: 50%; width: 20px; height: 20px; font-size: 10px; display: flex; align-items: center; justify-content: center; }
 .sales-pop { animation: slideIn 0.5s ease-out forwards; }
 @keyframes slideIn { from { transform: translateY(100px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+/* Hide scrollbar for Chrome, Safari and Opera */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+/* Hide scrollbar for IE, Edge and Firefox */
+.no-scrollbar { -ms-overflow-style: none;  scrollbar-width: none; }
 .page-block { content-visibility: auto; contain-intrinsic-size: 0 400px; }
 </style>
 </head>
@@ -307,19 +368,48 @@ input[type="radio"]:checked + .mad-radio-box { border-color: #10b981; background
                     <p class="whitespace-pre-wrap leading-relaxed" :class="[b.style?.size || 'text-lg', b.style?.weight || 'font-bold']" :style="{ color: b.style?.color || '#000', fontFamily: (b.style?.font || 'Cairo') + ', sans-serif' }" x-text="b.content[lang]"></p>
                 </template>
                 
-                <!-- NEW Interactive Rating Block -->
+                <!-- Offers Slider (Horizontal Scroll) -->
+                <template x-if="b.type==='offers_slider'">
+                    <div class="mt-4">
+                        <h3 class="text-lg font-bold mb-3 px-2 text-right" x-text="b.title[lang]"></h3>
+                        <div class="flex overflow-x-auto snap-x snap-mandatory gap-3 pb-4 no-scrollbar pr-2 pl-2">
+                            <template x-for="item in b.items">
+                                <a :href="item.link" class="min-w-[140px] w-[140px] snap-center bg-white rounded-xl shadow-lg border border-gray-100 p-2 flex flex-col no-underline transition transform active:scale-95">
+                                    <img :src="item.img" class="w-full aspect-square object-cover rounded-lg mb-2 bg-gray-100">
+                                    <h4 class="text-xs font-bold text-gray-800 line-clamp-2 h-8 leading-tight mb-1" x-text="item.title[lang]"></h4>
+                                    <div class="mt-auto">
+                                        <p class="text-sm font-black text-red-600 mb-2" x-text="item.price + (lang==='he'?' ₪':' شيكل')"></p>
+                                        <div class="w-full bg-black text-white text-[10px] font-bold py-1.5 rounded text-center" x-text="lang==='he'?'הוסף לסל':'أضف للسلة'"></div>
+                                    </div>
+                                </a>
+                            </template>
+                        </div>
+                    </div>
+                </template>
+
+                <!-- Interactive Rating Block (SVG Stars) -->
                 <template x-if="b.type==='interactive_rating'">
                     <div class="bg-white border-2 border-yellow-100 rounded-xl p-6 shadow-sm text-center">
                          <h3 class="text-lg font-bold mb-3" x-text="b.content[lang]"></h3>
-                         <div x-data="{ rated: false, stars: 0, count: Math.floor(Math.random() * 5000) + 12000 }" class="flex flex-col items-center">
-                             <div class="flex gap-2 mb-2" x-show="!rated">
+                         <div x-data="{ rated: false, stars: 0, hover: 0, count: Math.floor(Math.random() * 5000) + 12000 }" class="flex flex-col items-center">
+                             <div class="flex gap-2 mb-2" x-show="!rated" @mouseleave="hover=0">
                                 <template x-for="i in 5">
-                                    <button @click="rated=true; stars=i" class="text-3xl text-gray-300 hover:text-yellow-400 transition transform hover:scale-125">★</button>
+                                    <button 
+                                        @click="rated=true; stars=i" 
+                                        @mouseover="hover=i"
+                                        class="transition-all duration-200 transform hover:scale-110"
+                                    >
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" :fill="(i <= (hover || stars)) ? '#FACC15' : 'none'" :stroke="(i <= (hover || stars)) ? 'none' : '#D1D5DB'" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                                    </button>
                                 </template>
                              </div>
                              <div x-show="rated" class="text-green-600 font-bold animate-bounce mt-2" x-transition>
-                                 <p class="text-2xl mb-1">🎉</p>
-                                 <p x-text="lang==='he' ? 'תודה! את/ה המדרג ה-' + count.toLocaleString() + ' שנתן 5 כוכבים!' : 'شكراً! أنت الشخص رقم ' + count.toLocaleString() + ' الذي يمنحنا 5 نجوم!'"></p>
+                                 <p class="text-3xl mb-2">🎉</p>
+                                 <p class="text-sm">
+                                    <span x-text="lang==='he'?'תודה על הדירוג!':'شكراً على تقييمك!'"></span>
+                                    <span class="font-black" x-text="'(' + stars + '/5)'"></span>
+                                 </p>
+                                 <p class="text-xs text-gray-500 mt-1" x-text="lang==='he' ? 'הצטרפת ל-' + count.toLocaleString() + ' לקוחות מרוצים' : 'انضممت إلى ' + count.toLocaleString() + ' عميل سعيد'"></p>
                              </div>
                          </div>
                     </div>
@@ -366,26 +456,31 @@ input[type="radio"]:checked + .mad-radio-box { border-color: #10b981; background
                 <template x-if="b.type==='embed'"><div x-html="b.content[lang]"></div></template>
                 <template x-if="b.type==='iso'">
                     <div class="grid grid-cols-3 gap-3 w-full max-w-sm mx-auto mt-4">
-                        <div class="bg-white border border-black/5 p-3 rounded-2xl text-center shadow-sm"><div class="text-2xl">🛡️</div><p class="text-[8px] font-black uppercase leading-tight">ISO 9001</p></div>
-                        <div class="bg-white border border-black/5 p-3 rounded-2xl text-center shadow-sm"><div class="text-2xl">🧪</div><p class="text-[8px] font-black uppercase leading-tight">IFRA Safe</p></div>
-                        <div class="bg-white border border-black/5 p-3 rounded-2xl text-center shadow-sm"><div class="text-2xl">🏛️</div><p class="text-[8px] font-black uppercase leading-tight">Health OK</p></div>
+                        <div class="bg-white border border-black/5 p-3 rounded-2xl text-center shadow-sm relative overflow-hidden group">
+                           <div class="absolute inset-0 bg-amber-50 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                           <div class="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center mx-auto mb-1 text-amber-600 relative z-10"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg></div>
+                           <p class="text-[8px] font-bold uppercase relative z-10">ISO 9001</p>
+                        </div>
+                        <div class="bg-white border border-black/5 p-3 rounded-2xl text-center shadow-sm relative overflow-hidden group">
+                           <div class="absolute inset-0 bg-amber-50 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                           <div class="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center mx-auto mb-1 text-amber-600 relative z-10"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12l2 2 4-4"></path><circle cx="12" cy="12" r="10"></circle></svg></div>
+                           <p class="text-[8px] font-bold uppercase relative z-10">IFRA Safe</p>
+                        </div>
+                        <div class="bg-white border border-black/5 p-3 rounded-2xl text-center shadow-sm relative overflow-hidden group">
+                           <div class="absolute inset-0 bg-amber-50 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                           <div class="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center mx-auto mb-1 text-amber-600 relative z-10"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg></div>
+                           <p class="text-[8px] font-bold uppercase relative z-10">Health OK</p>
+                        </div>
                     </div>
                 </template>
                 <template x-if="b.type==='comparison'">
-                   <div class="space-y-3 mt-6">
-                      <template x-for="row in b.items">
-                        <div class="flex items-stretch rounded-xl overflow-hidden shadow-sm border border-gray-100">
-                           <div class="w-1/2 bg-gradient-to-br from-amber-50 to-amber-100 p-3 border-l-4 border-amber-400 flex flex-col justify-center relative">
-                               <div class="absolute top-1 right-1 text-amber-500 opacity-20"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg></div>
-                               <span class="text-[9px] font-black text-amber-600 tracking-widest mb-1">MAD</span>
-                               <p class="text-xs font-bold text-gray-800 leading-tight relative z-10" x-text="row.mad[lang]"></p>
-                           </div>
-                           <div class="w-1/2 bg-gray-50 p-3 flex flex-col justify-center grayscale opacity-80">
-                               <span class="text-[9px] font-bold text-gray-400 tracking-widest mb-1">OTHERS</span>
-                               <p class="text-[10px] text-gray-500 leading-tight" x-text="row.other[lang]"></p>
-                           </div>
-                        </div>
-                      </template>
+                    <div class="space-y-2 mt-4 text-right">
+                        <template x-for="row in b.items">
+                            <div class="grid grid-cols-2 gap-1 rounded-xl overflow-hidden border border-black/5 shadow-sm">
+                                <div class="bg-gray-50 p-4 border-r border-black/5"><span class="text-[8px] font-black text-amber-600 block mb-1">MAD</span><p class="text-[11px] font-bold leading-tight" x-text="row.mad[lang]"></p></div>
+                                <div class="bg-white p-4 text-gray-400 text-right"><span class="text-[8px] font-black text-gray-300 block mb-1">OTHERS</span><p class="text-[11px]" x-text="row.other[lang]"></p></div>
+                            </div>
+                        </template>
                     </div>
                 </template>
                 <template x-if="b.type==='form'">
@@ -396,7 +491,6 @@ input[type="radio"]:checked + .mad-radio-box { border-color: #10b981; background
                             <input type="text" x-model="f.name" class="inp" :placeholder="lang==='he'?'שם מלא':'الاسم'" required>
                             <input type="tel" x-model="f.phone" class="inp" :placeholder="lang==='he'?'טלפון':'الهاتف'" required>
                             <input type="text" x-model="f.address" class="inp" :placeholder="lang==='he'?'כתובת':'العنوان'" required>
-                            
                             <div class="grid grid-cols-2 gap-3 mb-4">
                                 <label class="cursor-pointer group">
                                     <input type="radio" x-model="f.payment" value="Cash" class="hidden">
@@ -410,7 +504,6 @@ input[type="radio"]:checked + .mad-radio-box { border-color: #10b981; background
                                     <div class="mad-radio-box"><span x-text="lang==='he'?'אשראי 💳':'فيزا 💳'"></span></div>
                                 </label>
                             </div>
-
                             <div class="grid grid-cols-2 gap-3 mb-6">
                                 <label class="cursor-pointer group">
                                     <input type="radio" x-model="f.process" value="Direct" class="hidden">
@@ -424,7 +517,6 @@ input[type="radio"]:checked + .mad-radio-box { border-color: #10b981; background
                                     <div class="mad-radio-box"><span class="text-xs" x-text="lang==='he'?'צור קשר':'تواصل معي'"></span></div>
                                 </label>
                             </div>
-
                             <button type="submit" class="btn-main transform active:scale-95 transition-transform" :disabled="loading" x-text="loading?'...':(b.btnText && b.btnText[lang] ? b.btnText[lang] : (lang==='he'?'שלח הזמנה':'تأكيد الطلب'))"></button>
                         </form>
                     </div>
@@ -516,17 +608,5 @@ input[type="radio"]:checked + .mad-radio-box { border-color: #10b981; background
             }
         }
     <\/script>
-</body>
-</html>`;
-            },
-            downloadHTML() {
-                const link = document.createElement('a');
-                link.href = URL.createObjectURL(new Blob([this.generateFinalHTML(true)], {type:'text/html'}));
-                link.download = 'MAD-Landing-Page.html';
-                link.click();
-            }
-        }
-    }
-</script>
 </body>
 </html>
