@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MAD Builder V18 - Ready 🚀</title>
+    <title>MAD Builder V27 - Speed & Psychology ⚡</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest" defer></script>
     <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
@@ -34,7 +34,7 @@
 
 <div class="app-layout" x-data="builderApp()" x-init="init()" x-cloak>
     <aside class="editor-sidebar">
-        <h1 class="text-xl font-black mb-6 text-center">MAD BUILDER <span class="text-emerald-600">V18</span></h1>
+        <h1 class="text-xl font-black mb-6 text-center">MAD BUILDER <span class="text-blue-600">V27 SPEED</span> ⚡</h1>
         
         <div class="flex bg-gray-100 p-1 rounded-lg mb-4">
             <button @click="setEditLang('ar')" :class="editLang==='ar'?'bg-black text-white':''" class="flex-1 py-2 rounded-md text-xs font-bold transition">عربي</button>
@@ -43,25 +43,24 @@
 
         <div class="section-box border-green-200 bg-green-50/50">
             <h2 class="font-bold text-xs mb-2 text-green-700">💰 إعدادات السعر</h2>
-            <label>اسم المنتج (للشيت)</label>
-            <input type="text" x-model="config.productName" class="font-bold" @input="updatePreviewDebounced()" placeholder="عطر العيد">
+            <label>اسم المنتج</label>
+            <input type="text" x-model="config.productName" class="font-bold" @input="updatePreviewDebounced()">
             <label>السعر (شيكل)</label>
-            <input type="number" x-model="config.price" class="font-bold text-center" @input="updatePreviewDebounced()" placeholder="150">
+            <input type="number" x-model="config.price" class="font-bold text-center" @input="updatePreviewDebounced()">
         </div>
 
         <div class="section-box border-blue-200 bg-blue-50/50">
-            <h2 class="font-bold text-xs mb-2 text-blue-700">⚙️ إعدادات الربط والمدير</h2>
-            <label>رابط السكربت (تم التحديث ✅)</label>
+            <h2 class="font-bold text-xs mb-2 text-blue-700">⚙️ إعدادات الربط</h2>
+            <label>رابط السكربت</label>
             <input type="text" x-model="config.sheetUrl" class="text-xs font-mono mb-2 bg-white">
-            
-            <label class="text-indigo-700 font-black">📞 رقم المدير (اختياري)</label>
-            <input type="text" x-model="config.adminPhone" class="text-center font-bold border-indigo-300 bg-indigo-50" placeholder="972500000000">
-            
-            <div class="grid grid-cols-3 gap-1 mt-2">
-                <div><label>FB Pixel</label><input type="text" x-model="config.fbPixel"></div>
+            <label class="text-indigo-700 font-black">📞 رقم المدير</label>
+            <input type="text" x-model="config.adminPhone" class="text-center font-bold border-indigo-300 bg-indigo-50">
+             <div class="grid grid-cols-3 gap-1 mt-2">
+                <div><label>FB</label><input type="text" x-model="config.fbPixel"></div>
                 <div><label>TikTok</label><input type="text" x-model="config.ttPixel"></div>
                 <div><label>Snap</label><input type="text" x-model="config.snapPixel"></div>
             </div>
+            <p class="text-[9px] text-gray-500 mt-2">✨ ملاحظة: البيكسلات سيتم تحميلها بذكاء بعد فتح الصفحة لضمان أقصى سرعة.</p>
         </div>
 
         <div class="section-box">
@@ -78,75 +77,87 @@
                             </div>
                         </div>
                         
+                        <!-- Interactive Rating -->
+                        <template x-if="block.type === 'interactive_rating'">
+                            <div>
+                                <label class="text-yellow-600 font-bold">تقييم تفاعلي (نفسي)</label>
+                                <input type="text" x-model="block.content[editLang]" @input="updatePreviewDebounced()" class="w-full text-xs p-1 border rounded mt-1" placeholder="عنوان التقييم (مثال: ما رأيك؟)">
+                            </div>
+                        </template>
+
                         <template x-if="block.type === 'text'">
                             <div class="space-y-2">
                                 <div class="flex flex-wrap gap-2 items-center bg-gray-50 p-2 rounded border border-gray-200">
                                     <input type="color" x-model="block.style.color" @input="updatePreviewDebounced()" class="w-8 h-8 p-0 border-0 rounded cursor-pointer">
-                                    <select x-model="block.style.font" @change="updatePreviewDebounced()" class="text-[10px] p-1 border rounded h-8 bg-white"><option value="Cairo">Cairo</option><option value="Tajawal">Tajawal</option><option value="Amiri">Amiri</option></select>
-                                    <select x-model="block.style.size" @change="updatePreviewDebounced()" class="text-[10px] p-1 border rounded h-8 bg-white"><option value="text-sm">S</option><option value="text-base">M</option><option value="text-lg">L</option><option value="text-xl">XL</option><option value="text-2xl">2XL</option></select>
-                                    <button @click="block.style.weight = (block.style.weight === 'font-normal' ? 'font-black' : 'font-normal'); updatePreviewDebounced()" class="p-1 border rounded bg-white w-8 h-8 font-black">B</button>
-                                    <select x-model="block.align" @change="updatePreviewDebounced()" class="text-[10px] p-1 border rounded h-8 bg-white w-16"><option value="center">وسط</option><option value="right">يمين</option><option value="left">يسار</option></select>
+                                    <select x-model="block.style.font" @change="updatePreviewDebounced()" class="text-[10px] p-1 border rounded h-8 bg-white"><option value="Cairo">Cairo</option><option value="Tajawal">Tajawal</option></select>
+                                    <select x-model="block.style.size" @change="updatePreviewDebounced()" class="text-[10px] p-1 border rounded h-8 bg-white"><option value="text-sm">S</option><option value="text-lg">L</option><option value="text-2xl">XL</option></select>
+                                    <select x-model="block.align" @change="updatePreviewDebounced()" class="text-[10px] p-1 border rounded h-8 bg-white w-16"><option value="center">وسط</option><option value="right">يمين</option></select>
                                 </div>
                                 <textarea x-model="block.content[editLang]" @input="updatePreviewDebounced()" class="mt-2 h-20 w-full border p-2 rounded text-xs"></textarea>
                             </div>
                         </template>
 
-                        <template x-if="['button','emoji','fragrantica'].includes(block.type)">
-                            <textarea x-model="block.content[editLang]" @input="updatePreviewDebounced()" class="mt-2 h-14 w-full border p-1 rounded text-xs"></textarea>
+                        <!-- Urgency Box Editor -->
+                        <template x-if="block.type === 'urgency_box'">
+                            <div>
+                                <div class="bg-red-50 p-2 rounded mb-2 border border-red-100">
+                                    <h3 class="text-[10px] font-bold text-red-600 mb-1">إعدادات الضغط النفسي 🔥</h3>
+                                    <div class="flex gap-2 mb-1">
+                                        <div class="flex-1"><label class="text-gray-500 text-[9px]">الزوار</label><input type="number" x-model="block.visitors" @input="updatePreviewDebounced()" class="w-full text-center font-bold"></div>
+                                        <div class="flex-1"><label class="text-gray-500 text-[9px]">القطع</label><input type="number" x-model="block.left" @input="updatePreviewDebounced()" class="w-full text-center font-bold text-red-600"></div>
+                                    </div>
+                                    <label class="text-gray-500 text-[9px]">الدقائق</label><input type="number" x-model="block.timerMinutes" @input="updatePreviewDebounced()" class="w-full">
+                                </div>
+                            </div>
                         </template>
-                        
-                        <template x-if="['image','video','iframe','fragrantica'].includes(block.type)">
+
+                        <template x-if="['image','video','iframe'].includes(block.type)">
                             <input type="text" x-model="block.url" @input="updatePreviewDebounced()" placeholder="URL" class="mt-2 w-full border p-1 rounded text-xs">
                         </template>
 
                         <template x-if="block.type === 'form'">
                             <div>
-                                <label>عنوان الفورم</label>
-                                <input type="text" x-model="block.content[editLang]" @input="updatePreviewDebounced()" class="mt-1 w-full border p-1 rounded text-xs">
-                                <label class="mt-2 text-pink-600">نص زر التأكيد</label>
-                                <input type="text" x-model="block.btnText[editLang]" @input="updatePreviewDebounced()" class="mt-1 w-full border border-pink-200 p-1 rounded text-xs font-bold text-center" placeholder="مثال: تأكيد الطلب الآن">
+                                <label>نص زر التأكيد</label>
+                                <input type="text" x-model="block.btnText[editLang]" @input="updatePreviewDebounced()" class="mt-1 w-full border border-pink-200 p-1 rounded text-xs font-bold text-center">
                             </div>
                         </template>
-
-                        <template x-if="block.type === 'embed'">
-                            <div>
-                                <label class="text-blue-600">كود التضمين (HTML / Iframe / Script)</label>
-                                <textarea x-model="block.content[editLang]" @input="updatePreviewDebounced()" class="mt-2 h-24 w-full border p-2 rounded text-xs font-mono text-left bg-gray-50" dir="ltr" placeholder="<iframe...></iframe> or <script>...</script>"></textarea>
-                            </div>
+                        
+                        <template x-if="['button','emoji'].includes(block.type)">
+                             <textarea x-model="block.content[editLang]" @input="updatePreviewDebounced()" class="mt-2 h-14 w-full border p-1 rounded text-xs"></textarea>
+                             <input x-show="block.type==='button'" type="text" x-model="block.link" @input="updatePreviewDebounced()" placeholder="Link" class="mt-1 w-full border p-1 rounded text-xs">
                         </template>
-
+                         <template x-if="block.type === 'embed'">
+                            <textarea x-model="block.content[editLang]" @input="updatePreviewDebounced()" class="mt-2 h-24 w-full border p-2 rounded text-xs font-mono text-left bg-gray-50" dir="ltr"></textarea>
+                        </template>
                         <template x-if="block.type === 'comparison'">
                             <div class="mt-2 space-y-2">
-                                <template x-for="(item, iIdx) in block.items" :key="iIdx">
-                                    <div class="sub-item">
-                                        <input type="text" x-model="item.mad[editLang]" @input="updatePreviewDebounced()" placeholder="MAD" class="w-full text-[10px] mb-1">
-                                        <input type="text" x-model="item.other[editLang]" @input="updatePreviewDebounced()" placeholder="Others" class="w-full text-[10px]">
-                                    </div>
-                                </template>
                                 <button @click="block.items.push({mad:{ar:'', he:''}, other:{ar:'', he:''}}); updatePreviewDebounced()" class="text-[10px] text-blue-600 font-bold">+ إضافة سطر</button>
+                            </div>
+                        </template>
+                        <template x-if="block.type === 'fragrantica'">
+                            <div>
+                                <label>النجوم</label>
+                                <select x-model="block.stars" @change="updatePreviewDebounced()" class="w-full text-xs"><option value="5">5</option><option value="4">4</option></select>
+                                <input type="text" x-model="block.score" @input="updatePreviewDebounced()" class="w-full mt-1 text-xs" placeholder="Score">
                             </div>
                         </template>
                     </div>
                 </template>
             </div>
             
-            <div class="section-box">
-                <h2 class="font-bold text-xs mb-2">🎨 المظهر</h2>
-                <label>لون الخلفية</label><input type="color" x-model="config.bgColor" @input="updatePreviewDebounced()">
-                <label>رابط الشعار</label><input type="text" x-model="config.logoUrl" @input="updatePreviewDebounced()">
-                <label>العنوان الرئيسي</label><input type="text" x-model="config.heroTitle[editLang]" @input="updatePreviewDebounced()">
-            </div>
-
-            <div class="grid grid-cols-3 gap-2">
+            <div class="grid grid-cols-2 gap-2">
+                <button class="btn-add border-yellow-500 bg-yellow-100 text-yellow-900 font-bold" @click="addBlock('interactive_rating')">⭐ تقييم تفاعلي</button>
+                <button class="btn-add border-red-500 bg-red-100 text-red-900 font-bold shadow-sm" @click="addBlock('urgency_box')">🔥 عداد + ضغط</button>
+                <button class="btn-add" @click="addBlock('form')">📋 فورم</button>
                 <button class="btn-add" @click="addBlock('text')">📝 نص</button>
                 <button class="btn-add" @click="addBlock('image')">🖼️ صورة</button>
                 <button class="btn-add" @click="addBlock('video')">🎥 فيديو</button>
-                <button class="btn-add" @click="addBlock('form')">📋 فورم</button>
                 <button class="btn-add" @click="addBlock('iso')">🛡️ ISO</button>
-                <button class="btn-add" @click="addBlock('comparison')">⚖️ مقارنة</button>
-                <button class="btn-add" @click="addBlock('fragrantica')">⭐ تقييم</button>
+                <button class="btn-add border-amber-500 bg-amber-100 text-amber-900 font-bold" @click="addBlock('comparison')">⚖️ مقارنة كاملة</button>
+                <button class="btn-add" @click="addBlock('fragrantica')">⭐ فراجرانتيكا</button>
                 <button class="btn-add" @click="addBlock('button')">🔗 زر</button>
-                <button class="btn-add border-blue-200 text-blue-700 bg-blue-50 hover:bg-blue-100" @click="addBlock('embed')">💻 كود</button>
+                <button class="btn-add" @click="addBlock('sales_pop')">🔔 إشعارات</button>
+                <button class="btn-add" @click="addBlock('embed')">💻 كود</button>
             </div>
         </div>
 
@@ -180,13 +191,13 @@
                 productName: 'MAD Offer',
                 price: '150',
                 adminPhone: '972525105889',
-                // ✅ تم وضع الرابط الجديد هنا
-                sheetUrl: 'https://script.google.com/macros/s/AKfycbw7m6OCcTnH6CILpTo2TVRZIXXy5cui-zhKsCq3k491yaun5Hd5b_QECTjCrpCytkndDg/exec',
+                sheetUrl: 'https://script.google.com/macros/s/AKfycbxuKgqJyUIV_5MVdmY37SKUCcfxCWJaCYgVBJdpd-zxS20RTKm_8_VMFbPxICa3K89xPw/exec',
                 fbPixel: '1072283127290819', ttPixel: 'D2D02JBC77U4ENLN9SBG', snapPixel: 'b143822e-1c3c-40ff-93f7-edadee74e626'
             },
             blocks: [
                 {id:1, type:'text', content:{ar:'أهلاً بك', he:'ברוכים הבאים'}, align:'center', style:{color:'#000000', size:'text-lg', font:'Cairo', weight:'font-black'}},
-                {id:2, type:'form', content:{ar:'اطلب الآن', he:'הזמנה מהירה'}, btnText:{ar:'تأكيد الطلب', he:'שלח הזמנה'}, align:'center'}
+                {id:2, type:'urgency_box', sold:'650', left:'8', visitors:'600', timerMinutes:15},
+                {id:3, type:'form', content:{ar:'اطلب الآن', he:'הזמנה מהירה'}, btnText:{ar:'تأكيد الطلب', he:'שלח הזמנה'}, align:'center'}
             ],
             
             init() { setTimeout(()=> { if(window.lucide) lucide.createIcons(); this.updatePreview(); }, 500); if(window.innerHeight < 900) this.zoom = 0.7; },
@@ -196,18 +207,38 @@
             zoomOut() { if(this.zoom > 0.4) this.zoom -= 0.05; },
 
             addBlock(type) {
-                let items = [];
                 let content = {ar:'', he:''};
                 let style = {}; 
                 let btnText = {ar:'', he:''};
+                let items = [];
+                let stars = 5;
+                let score = '4.9 / 5';
+                let sold = '600';
+                let left = '8';
+                let visitors = '550';
+                let timerMinutes = 15;
 
                 if(type === 'text') style = { color: '#000000', size: 'text-lg', font: 'Cairo', weight: 'font-black' };
-                if(type === 'comparison') items = [{mad:{ar:'',he:''}, other:{ar:'',he:''}}];
-                if(type === 'form') {
-                    content = {ar:'اطلب الآن', he:'הזמנה מהירה'};
-                    btnText = {ar:'تأكيد الطلب', he:'שלח הזמנה'};
+                if(type === 'stock') content = {ar:'⚠️ تنبيه: الكمية تنفذ بسرعة!', he:'⚠️ שימו לב: המלאי אוזל!'};
+                if(type === 'sales_pop') content = {ar:'مفعل', he:'مفعل'};
+                if(type === 'form') { content = {ar:'اطلب الآن', he:'הזמנה מהירה'}; btnText = {ar:'تأكيد الطلب', he:'שלח הזמנה'}; }
+                
+                if(type === 'comparison') {
+                    items = [
+                        {mad:{ar:'بصمة أمان 100% ومصادق من IFRA', he:'בטוח ב-100% ומאושר ע"י IFRA'}, other:{ar:'زيوت كيميائية مجهولة المصدر', he:'שמנים ממקור לא ידוע'}},
+                        {mad:{ar:'تطابق جزيئي وتركيز نيش حقيقي', he:'התאמה מולקולרית וריכוז נישה'}, other:{ar:'خلط يدوي عشوائي يتفكك فوراً', he:'ערבוב ידני אקראי'}},
+                        {mad:{ar:'ثبات فائق يتجاوز 24 ساعة', he:'עמידות מעל 24 שעות'}, other:{ar:'يختفي بعد أقل من ساعة', he:'נעלם מהר'}},
+                        {mad:{ar:'لا يسبب الحساسية أو الصداع', he:'לא גורם לאלרגיות או כאבי ראש'}, other:{ar:'مذيبات كيميائية ضارة', he:'ממסים כימיים מזיקים'}},
+                        {mad:{ar:'خدمة زبائن و41 فرع في البلاد', he:'שירות לקוחות ו-41 סניפים בארץ'}, other:{ar:'متاجر أونلاين بلا عنوان', he:'חנויות אונליין ללא כתובת'}},
+                        {mad:{ar:'تعتيق وتصفية مخبرية أوروبية', he:'יישון וסינון מעבדתי אירופאי'}, other:{ar:'زيوت تجارية رخيصة', he:'שמנים מסחריים זולים'}},
+                        {mad:{ar:'مصادقات الأيزو ووزارة الصحة', he:'אישור תקן ISO ומשרד הבריאות'}, other:{ar:'غير مفحوص ومقلد', he:'לא נבדק '}}
+                    ];
                 }
-                this.blocks.push({id:Date.now(), type, content, btnText, url:'', link:'#order', align:'center', items, score:'4.9 / 5', style});
+                
+                if(type === 'fragrantica') content = {ar:'تقييمات ممتازة', he:'ביקורות מצוינות'};
+                if(type === 'interactive_rating') content = {ar:'ما هو تقييمك لمنتجاتنا؟', he:'איך אתם מדרגים את המוצרים שלנו?'};
+
+                this.blocks.push({id:Date.now(), type, content, btnText, url:'', link:'#order', align:'center', items, score, stars, style, sold, left, visitors, timerMinutes});
                 this.updatePreview();
             },
             removeBlock(i) { this.blocks.splice(i,1); this.updatePreview(); },
@@ -242,16 +273,26 @@
 <script src="https://unpkg.com/lucide@latest" defer><\/script>
 <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer><\/script>
 <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Aref+Ruqaa:wght@400;700&family=Cairo:wght@200..1000&family=Rakkas&family=Tajawal:wght@200..900&display=swap" rel="stylesheet">
-<script>
-window.addEventListener('DOMContentLoaded', () => {
-    !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)n=f.fbq;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window, document,'script','https://connect.facebook.net/en_US/fbevents.js');
-    fbq('init', '${this.config.fbPixel}'); fbq('track', 'PageView');
-});
-<\/script>
 <style>
 body { background: ${this.config.bgColor}; font-family: 'Cairo', sans-serif; overflow-x: hidden; }
 .inp { width: 100%; padding: 15px; background: #f8fafc; border: 1px solid #ddd; border-radius: 12px; margin-bottom: 10px; font-weight: bold; }
-.btn-main { background: #000; color: #fff; width: 100%; padding: 18px; border-radius: 14px; font-weight: 900; font-size: 1.2rem; }
+.btn-main { 
+    background: #000; color: #fff; width: 100%; padding: 18px; border-radius: 14px; font-weight: 900; font-size: 1.2rem;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.2); position: relative; overflow: hidden;
+    animation: pulse 2s infinite;
+}
+@keyframes pulse { 0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(0, 0, 0, 0.7); } 70% { transform: scale(1.02); box-shadow: 0 0 0 10px rgba(0, 0, 0, 0); } 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(0, 0, 0, 0); } }
+@keyframes loadingBar { 0% { width: 0%; } 80% { width: 90%; } 100% { width: 100%; } }
+.progress-container { margin-bottom: 15px; }
+.progress-text { display: flex; justify-content: space-between; font-size: 0.75rem; font-weight: bold; margin-bottom: 5px; opacity: 0.7; }
+.progress-track { height: 6px; background: #e5e7eb; border-radius: 99px; overflow: hidden; }
+.progress-fill { height: 100%; background: #10b981; width: 85%; }
+.mad-radio-box { border: 2px solid #e5e7eb; border-radius: 12px; padding: 12px; text-align: center; cursor: pointer; transition: all 0.2s ease; background: white; color: #4b5563; font-weight: 700; }
+input[type="radio"]:checked + .mad-radio-box { border-color: #10b981; background: #f0fdf4; color: #047857; transform: scale(1.02); box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2); }
+.mad-radio-box.recommended { border-color: #10b981; position: relative; }
+.mad-radio-box.recommended::after { content: '★'; position: absolute; top: -8px; right: -8px; background: #10b981; color: white; border-radius: 50%; width: 20px; height: 20px; font-size: 10px; display: flex; align-items: center; justify-content: center; }
+.sales-pop { animation: slideIn 0.5s ease-out forwards; }
+@keyframes slideIn { from { transform: translateY(100px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 .page-block { content-visibility: auto; contain-intrinsic-size: 0 400px; }
 </style>
 </head>
@@ -263,95 +304,214 @@ body { background: ${this.config.bgColor}; font-family: 'Cairo', sans-serif; ove
         <template x-for="(b, idx) in blocks">
             <div class="my-6 page-block" :class="b.align==='center'?'text-center':(b.align==='left'?'text-left':'text-right')">
                 <template x-if="b.type==='text'">
-                    <p class="whitespace-pre-wrap leading-relaxed" 
-                       :class="[b.style?.size || 'text-lg', b.style?.weight || 'font-bold']"
-                       :style="{ color: b.style?.color || '#000', fontFamily: (b.style?.font || 'Cairo') + ', sans-serif' }"
-                       x-text="b.content[lang]"></p>
+                    <p class="whitespace-pre-wrap leading-relaxed" :class="[b.style?.size || 'text-lg', b.style?.weight || 'font-bold']" :style="{ color: b.style?.color || '#000', fontFamily: (b.style?.font || 'Cairo') + ', sans-serif' }" x-text="b.content[lang]"></p>
                 </template>
-                <template x-if="b.type==='emoji'"><div class="text-4xl" x-text="b.content[lang]"></div></template>
+                
+                <!-- NEW Interactive Rating Block -->
+                <template x-if="b.type==='interactive_rating'">
+                    <div class="bg-white border-2 border-yellow-100 rounded-xl p-6 shadow-sm text-center">
+                         <h3 class="text-lg font-bold mb-3" x-text="b.content[lang]"></h3>
+                         <div x-data="{ rated: false, stars: 0, count: Math.floor(Math.random() * 5000) + 12000 }" class="flex flex-col items-center">
+                             <div class="flex gap-2 mb-2" x-show="!rated">
+                                <template x-for="i in 5">
+                                    <button @click="rated=true; stars=i" class="text-3xl text-gray-300 hover:text-yellow-400 transition transform hover:scale-125">★</button>
+                                </template>
+                             </div>
+                             <div x-show="rated" class="text-green-600 font-bold animate-bounce mt-2" x-transition>
+                                 <p class="text-2xl mb-1">🎉</p>
+                                 <p x-text="lang==='he' ? 'תודה! את/ה המדרג ה-' + count.toLocaleString() + ' שנתן 5 כוכבים!' : 'شكراً! أنت الشخص رقم ' + count.toLocaleString() + ' الذي يمنحنا 5 نجوم!'"></p>
+                             </div>
+                         </div>
+                    </div>
+                </template>
+
+                <template x-if="b.type==='urgency_box'">
+                   <div x-data="{ v: parseInt(b.visitors || 600), s: parseInt(b.left || 8) }" x-init="setInterval(()=>{v+=Math.floor(Math.random()*5)-2}, 3000); setInterval(()=>{if(s>2)s--}, 9000)" class="bg-gradient-to-r from-red-50 to-orange-50 border border-red-100 rounded-2xl p-5 shadow-sm mb-4 relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-red-500"></div>
+                        <div class="flex items-center justify-center gap-2 text-gray-500 text-xs mb-3 font-bold"><span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span><span x-text="v"></span><span x-text="lang==='he'?'צופים במוצר זה כעת':'يتصفحون هذا العرض الآن'"></span></div>
+                        <div class="flex justify-between items-center mb-3"><span class="text-[10px] font-black bg-red-600 text-white px-2 py-1 rounded animate-pulse" x-text="lang==='he'?'🔥 ביקוש גבוה':'🔥 طلب مرتفع'"></span><div class="text-lg font-mono font-black text-red-600 bg-white px-2 rounded border border-red-100 shadow-sm" x-text="timer"></div></div>
+                        <h3 class="text-sm font-bold text-gray-800 mb-1"><span x-text="lang==='he'?'נמכר מעל ':'تم شراء هذا العرض '"></span><span class="text-red-600 text-lg" x-text="b.sold"></span><span x-text="lang==='he'?' פעמים היום':' مرة اليوم'"></span></h3>
+                         <div class="flex items-center gap-2 text-xs text-gray-600 mb-2"><span>⚡</span><span x-text="lang==='he'?'נותרו ':'بقي '"></span><span class="font-black text-red-600 text-base" x-text="s"></span><span x-text="lang==='he'?' יחידות בלבד!':' قطع فقط!'"></span></div>
+                        <div class="w-full bg-gray-200 rounded-full h-2 overflow-hidden"><div class="bg-gradient-to-r from-red-500 to-orange-500 h-full rounded-full transition-all duration-1000" :style="'width: ' + (s*10) + '%'"></div></div>
+                   </div>
+                </template>
+
+                <template x-if="b.type==='stock'">
+                    <div class="bg-red-50 border border-red-200 rounded-xl p-4 shadow-sm animate-pulse">
+                        <p class="text-red-600 font-black text-sm mb-2" x-text="b.content[lang]"></p>
+                        <div class="w-full bg-red-200 rounded-full h-2.5"><div class="bg-red-600 h-2.5 rounded-full" style="width: 15%"></div></div>
+                    </div>
+                </template>
+
                 <template x-if="b.type==='image'"><img :src="b.url" class="rounded-2xl mx-auto shadow-lg w-full" :loading="idx===0?'eager':'lazy'"></template>
                 <template x-if="b.type==='video'"><video :src="b.url" controls class="w-full rounded-2xl shadow-lg" playsinline preload="none"></video></template>
                 <template x-if="b.type==='iframe'"><iframe :src="b.url" class="w-full h-96 rounded-xl border-none shadow-sm" loading="lazy"></iframe></template>
                 <template x-if="b.type==='button'"><a :href="b.link" class="btn-main block text-center no-underline" x-text="b.content[lang]"></a></template>
-                <template x-if="b.type==='embed'"><div x-html="b.content[lang]"></div></template>
-                <template x-if="b.type==='iso'">
-                    <div class="grid grid-cols-3 gap-3 w-full max-w-sm mx-auto mt-4">
-                        <div class="bg-white border border-black/5 p-3 rounded-2xl text-center shadow-sm"><div class="text-xl">🛡️</div><p class="text-[8px] font-black uppercase leading-tight">ISO 9001<br>Certified</p></div>
-                        <div class="bg-white border border-black/5 p-3 rounded-2xl text-center shadow-sm"><div class="text-xl">🧪</div><p class="text-[8px] font-black uppercase leading-tight">IFRA Safe<br>Standard</p></div>
-                        <div class="bg-white border border-black/5 p-3 rounded-2xl text-center shadow-sm"><div class="text-xl">🏛️</div><p class="text-[8px] font-black uppercase leading-tight">Health<br>Ministry OK</p></div>
-                    </div>
-                </template>
-                <template x-if="b.type==='comparison'">
-                    <div class="space-y-2 mt-4 text-right">
-                        <template x-for="row in b.items">
-                            <div class="grid grid-cols-2 gap-1 rounded-xl overflow-hidden border border-black/5 shadow-sm">
-                                <div class="bg-gray-50 p-4 border-r border-black/5"><span class="text-[8px] font-black text-amber-600 block mb-1">MAD</span><p class="text-[11px] font-bold leading-tight" x-text="row.mad[lang]"></p></div>
-                                <div class="bg-white p-4 text-gray-400 text-right"><span class="text-[8px] font-black text-gray-300 block mb-1">OTHERS</span><p class="text-[11px]" x-text="row.other[lang]"></p></div>
-                            </div>
-                        </template>
-                    </div>
-                </template>
+                
                 <template x-if="b.type==='fragrantica'">
                     <a :href="b.url" target="_blank" class="block w-full max-w-[320px] bg-[#3f5a31] text-white p-5 rounded-[24px] shadow-xl relative overflow-hidden mx-auto no-underline text-right">
-                        <div class="flex justify-between items-center mb-3"><span class="text-[10px] font-black uppercase tracking-widest text-white/60">Fragrantica Reviews</span><div class="flex text-amber-400 gap-0.5"><i data-lucide="star" class="w-3 h-3 fill-current"></i><i data-lucide="star" class="w-3 h-3 fill-current"></i><i data-lucide="star" class="w-3 h-3 fill-current"></i><i data-lucide="star" class="w-3 h-3 fill-current"></i><i data-lucide="star" class="w-3 h-3 fill-current"></i></div></div>
-                        <div class="flex items-end gap-2"><span class="text-4xl font-black" x-text="b.score"></span><span class="text-xs opacity-60 mb-1">Rating</span></div>
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="text-[10px] font-black uppercase tracking-widest text-white/60">Reviews</span>
+                            <div class="flex text-amber-400 gap-0.5">
+                                <template x-for="i in parseInt(b.stars || 5)">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                                </template>
+                            </div>
+                        </div>
+                        <div class="flex items-end gap-2"><span class="text-4xl font-black" x-text="b.score || '4.9 / 5'"></span><span class="text-xs opacity-60 mb-1">Rating</span></div>
                         <p class="text-[10px] font-bold mt-2 text-white/80" x-text="b.content[lang]"></p>
                     </a>
                 </template>
+
+                <template x-if="b.type==='embed'"><div x-html="b.content[lang]"></div></template>
+                <template x-if="b.type==='iso'">
+                    <div class="grid grid-cols-3 gap-3 w-full max-w-sm mx-auto mt-4">
+                        <div class="bg-white border border-black/5 p-3 rounded-2xl text-center shadow-sm"><div class="text-2xl">🛡️</div><p class="text-[8px] font-black uppercase leading-tight">ISO 9001</p></div>
+                        <div class="bg-white border border-black/5 p-3 rounded-2xl text-center shadow-sm"><div class="text-2xl">🧪</div><p class="text-[8px] font-black uppercase leading-tight">IFRA Safe</p></div>
+                        <div class="bg-white border border-black/5 p-3 rounded-2xl text-center shadow-sm"><div class="text-2xl">🏛️</div><p class="text-[8px] font-black uppercase leading-tight">Health OK</p></div>
+                    </div>
+                </template>
+                <template x-if="b.type==='comparison'">
+                   <div class="space-y-3 mt-6">
+                      <template x-for="row in b.items">
+                        <div class="flex items-stretch rounded-xl overflow-hidden shadow-sm border border-gray-100">
+                           <div class="w-1/2 bg-gradient-to-br from-amber-50 to-amber-100 p-3 border-l-4 border-amber-400 flex flex-col justify-center relative">
+                               <div class="absolute top-1 right-1 text-amber-500 opacity-20"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg></div>
+                               <span class="text-[9px] font-black text-amber-600 tracking-widest mb-1">MAD</span>
+                               <p class="text-xs font-bold text-gray-800 leading-tight relative z-10" x-text="row.mad[lang]"></p>
+                           </div>
+                           <div class="w-1/2 bg-gray-50 p-3 flex flex-col justify-center grayscale opacity-80">
+                               <span class="text-[9px] font-bold text-gray-400 tracking-widest mb-1">OTHERS</span>
+                               <p class="text-[10px] text-gray-500 leading-tight" x-text="row.other[lang]"></p>
+                           </div>
+                        </div>
+                      </template>
+                    </div>
+                </template>
                 <template x-if="b.type==='form'">
                     <div class="bg-white p-6 rounded-[24px] shadow-sm text-right border-2 border-gray-100" id="order">
+                        <div class="progress-container"><div class="progress-text"><span x-text="lang==='he'?'פרטי משלוח':'معلومات الشحن'"></span><span x-text="lang==='he'?'שלב אחרון':'الخطوة الأخيرة'"></span></div><div class="progress-track"><div class="progress-fill"></div></div></div>
                         <h2 class="text-xl font-black text-center mb-4" x-text="b.content[lang] || (lang==='he'?'הזמנה':'اطلب الآن')"></h2>
                         <form @submit.prevent="submitForm">
                             <input type="text" x-model="f.name" class="inp" :placeholder="lang==='he'?'שם מלא':'الاسم'" required>
                             <input type="tel" x-model="f.phone" class="inp" :placeholder="lang==='he'?'טלפון':'الهاتف'" required>
                             <input type="text" x-model="f.address" class="inp" :placeholder="lang==='he'?'כתובת':'العنوان'" required>
-                            <div class="grid grid-cols-2 gap-2 mb-4">
-                                <label class="cursor-pointer bg-gray-50 p-3 rounded-xl text-center border font-bold hover:bg-gray-100 transition ring-inset hover:ring-2 ring-black">
-                                    <input type="radio" x-model="f.payment" value="Cash" class="hidden"><span x-text="lang==='he'?'מזומן':'نقد'"></span>
+                            
+                            <div class="grid grid-cols-2 gap-3 mb-4">
+                                <label class="cursor-pointer group">
+                                    <input type="radio" x-model="f.payment" value="Cash" class="hidden">
+                                    <div class="mad-radio-box recommended">
+                                        <span x-text="lang==='he'?'מזומן 💵':'نقد 💵'"></span>
+                                        <div class="text-[9px] text-green-600 font-normal" x-text="lang==='he'?'מומלץ':'موصى به'"></div>
+                                    </div>
                                 </label>
-                                <label class="cursor-pointer bg-gray-50 p-3 rounded-xl text-center border font-bold hover:bg-gray-100 transition ring-inset hover:ring-2 ring-black">
-                                    <input type="radio" x-model="f.payment" value="Visa" class="hidden"><span x-text="lang==='he'?'אשראי':'فيزا'"></span>
-                                </label>
-                            </div>
-                            <div class="grid grid-cols-2 gap-2 mb-4">
-                                <label class="cursor-pointer bg-blue-50 p-3 rounded-xl text-center border border-blue-200 font-bold hover:bg-blue-100 transition relative">
-                                    <input type="radio" x-model="f.process" value="Direct" class="hidden"><span class="text-[10px]" x-text="lang==='he'?'שלח הזמנה':'ارسل الطلب'"></span><div x-show="f.process==='Direct'" class="absolute top-1 right-1 text-blue-600">✓</div>
-                                </label>
-                                <label class="cursor-pointer bg-blue-50 p-3 rounded-xl text-center border border-blue-200 font-bold hover:bg-blue-100 transition relative">
-                                    <input type="radio" x-model="f.process" value="Contact" class="hidden"><span class="text-[10px]" x-text="lang==='he'?'צור קשר':'تواصل معي'"></span><div x-show="f.process==='Contact'" class="absolute top-1 right-1 text-blue-600">✓</div>
+                                <label class="cursor-pointer group">
+                                    <input type="radio" x-model="f.payment" value="Visa" class="hidden">
+                                    <div class="mad-radio-box"><span x-text="lang==='he'?'אשראי 💳':'فيزا 💳'"></span></div>
                                 </label>
                             </div>
-                            <button type="submit" class="btn-main" :disabled="loading" x-text="loading?'...':(b.btnText && b.btnText[lang] ? b.btnText[lang] : (lang==='he'?'שלח הזמנה':'تأكيد الطلب'))"></button>
+
+                            <div class="grid grid-cols-2 gap-3 mb-6">
+                                <label class="cursor-pointer group">
+                                    <input type="radio" x-model="f.process" value="Direct" class="hidden">
+                                    <div class="mad-radio-box recommended">
+                                        <span class="text-xs" x-text="lang==='he'?'שלח הזמנה':'ارسل الطلب'"></span>
+                                        <div class="text-[9px] text-blue-600 font-normal">🚀 أسرع</div>
+                                    </div>
+                                </label>
+                                <label class="cursor-pointer group">
+                                    <input type="radio" x-model="f.process" value="Contact" class="hidden">
+                                    <div class="mad-radio-box"><span class="text-xs" x-text="lang==='he'?'צור קשר':'تواصل معي'"></span></div>
+                                </label>
+                            </div>
+
+                            <button type="submit" class="btn-main transform active:scale-95 transition-transform" :disabled="loading" x-text="loading?'...':(b.btnText && b.btnText[lang] ? b.btnText[lang] : (lang==='he'?'שלח הזמנה':'تأكيد الطلب'))"></button>
                         </form>
                     </div>
                 </template>
             </div>
         </template>
     </main>
-    <div x-show="submitted" class="fixed inset-0 bg-black/80 z-50 flex items-center justify-center text-center text-white" style="display:none">
-        <div class="bg-white text-black p-10 rounded-3xl max-w-xs"><h3 class="text-2xl font-black mb-2">✅</h3><p class="font-bold">تم استلام طلبك بنجاح</p><button @click="submitted=false" class="mt-4 bg-gray-200 px-6 py-2 rounded-lg font-bold">Close</button></div>
+    
+    <div x-show="pop.show" class="fixed bottom-4 left-4 right-4 bg-white p-3 rounded-xl shadow-2xl border border-gray-100 z-40 sales-pop flex items-center gap-3" style="display:none">
+        <div class="bg-green-100 p-2 rounded-full"><span class="text-xl">🛍️</span></div>
+        <div><p class="text-xs font-bold" x-text="pop.msg"></p><p class="text-[10px] text-gray-500">منذ دقيقتين</p></div>
     </div>
+
+    <div x-show="loading" class="fixed inset-0 z-50 bg-black/90 flex flex-col items-center justify-center text-white" x-transition.opacity><div class="text-5xl mb-4 animate-bounce">🚀</div><h2 class="text-xl font-bold mb-4" x-text="lang==='he'?'שולח הזמנה...':'جاري إرسال الطلب...'"></h2><div class="w-64 h-2 bg-gray-800 rounded-full overflow-hidden"><div class="h-full bg-green-500 transition-all duration-[3000ms] ease-out w-full" :style="loading ? 'width: 100%' : 'width: 0%'"></div></div><p class="text-xs text-gray-400 mt-2" x-text="lang==='he'?'אנא המתן, לא לסגור את הדף':'يرجى الانتظار قليلاً...'"></p></div>
+    <div x-show="submitted" class="fixed inset-0 bg-black/95 z-50 flex items-center justify-center text-center text-white" style="display:none" x-transition><div class="bg-white text-black p-10 rounded-3xl max-w-xs shadow-2xl transform scale-100 transition-transform"><div class="text-6xl mb-4">✅</div><h3 class="text-2xl font-black mb-2" x-text="lang==='he'?'ההזמנה התקבלה!':'تم استلام طلبك!'"></h3><p class="font-bold text-gray-600 mb-6" x-text="lang==='he'?'ניצור איתך קשר בהקדם':'سنتواصل معك قريباً لتأكيد التفاصيل'"></p><button @click="submitted=false" class="w-full bg-black text-white py-4 rounded-xl font-bold hover:bg-gray-900 transition">Close</button></div></div>
+    
+    <!-- Optimized Pixel Loading for Speed ⚡ -->
     <script>
+        function loadPixels() {
+            // FB
+            !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)n=f.fbq;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window, document,'script','https://connect.facebook.net/en_US/fbevents.js');
+            fbq('init', '${this.config.fbPixel}'); fbq('track', 'PageView');
+            
+            // TT
+            !function (w, d, t) { w.TiktokAnalyticsObject=t; var ttq=w[t]=w[t]||[]; ttq.methods=["page","track","identify","instances","debug","on","off","once","ready","alias","group","enableCookie","disableCookie","holdConsent","revokeConsent","grantConsent"]; ttq.setAndDefer=function(t,e){t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}; for(var i=0;i<ttq.methods.length;i++)ttq.setAndDefer(ttq,ttq.methods[i]); ttq.load=function(e,n){ var r="https://analytics.tiktok.com/i18n/pixel/events.js"; var o=n&&n.partner; ttq._i=ttq._i||{}; ttq._i[e]=[]; ttq._i[e]._u=r; ttq._t=ttq._t||{}; ttq._t[e]=+new Date; ttq._o=ttq._o||{}; ttq._o[e]=n||{}; n=document.createElement("script"); n.type="text/javascript"; n.async=!0; n.src=r+"?sdkid="+e+"&lib="+t; e=document.getElementsByTagName("script")[0]; e.parentNode.insertBefore(n,e) }; ttq.load('${this.config.ttPixel}'); ttq.page(); }(window, document, 'ttq');
+            
+            // Snap
+            (function(e,t,n){if(e.snaptr)return;var a=e.snaptr=function(){a.handleRequest?a.handleRequest.apply(a,arguments):a.queue.push(arguments)};a.queue=[];var s='script';var r=t.createElement(s);r.async=!0;r.src=n;var u=t.getElementsByTagName(s)[0];u.parentNode.insertBefore(r,u)})(window,document,'https://sc-static.net/scevent.min.js');
+            snaptr('init', '${this.config.snapPixel}'); snaptr('track', 'PAGE_VIEW');
+        }
+
         function app() {
             return {
-                lang: 'ar', loading: false, submitted: false,
+                lang: 'ar', loading: false, submitted: false, pop: {show:false, msg:''}, hasStartedTyping: false,
                 blocks: ${bJ}, c: ${cJ}, f: {name:'', phone:'', address:'', payment:'Cash', process:'Direct'},
-                init(l) { this.lang = l || (navigator.language.startsWith('he')?'he':'ar'); if(window.lucide) lucide.createIcons(); },
+                // Timer Logic
+                time: ${JSON.parse(bJ).find(b => b.type === 'urgency_box')?.timerMinutes * 60 || 900},
+                get timer() { const m=Math.floor(this.time/60); const s=this.time%60; return \`\${m}:\${s<10?'0':''}\${s}\`; },
+                
+                init(l) { 
+                    this.lang = l || (navigator.language.startsWith('he')?'he':'ar'); 
+                    if(this.blocks.some(b => b.type === 'sales_pop')) {
+                        setInterval(() => {
+                            const names = this.lang === 'he' ? ['אחמד','שרה','מוחמד','נור','עומר'] : ['أحمد','سارة','محمد','نور','عمر'];
+                            const cities = this.lang === 'he' ? ['ירושלים','חיפה','נצרת','תל אביב'] : ['القدس','حيفا','الناصرة','يافا'];
+                            const name = names[Math.floor(Math.random() * names.length)];
+                            const city = cities[Math.floor(Math.random() * cities.length)];
+                            this.pop.msg = this.lang === 'he' ? \`\${name} מ\${city} קנה עכשיו\` : \`\${name} من \${city} اشترى الآن\`;
+                            this.pop.show = true;
+                            setTimeout(() => this.pop.show = false, 4000);
+                        }, 15000);
+                    }
+                    setInterval(() => { if(this.time > 0) this.time--; }, 1000);
+
+                    // Load Pixels Delayed for Speed
+                    setTimeout(loadPixels, 3500);
+                },
+                trackInput() {
+                    if(!this.hasStartedTyping && this.f.name.length > 2) {
+                        this.hasStartedTyping = true;
+                        const p = { content_name: '${PROD_NAME}', value: ${PRICE_VAL}, currency: 'ILS' };
+                        // Ensure objects exist before tracking
+                        if(window.fbq) fbq('track', 'AddToCart', p);
+                        if(window.ttq) ttq.track('AddToCart', p);
+                        if(window.snaptr) snaptr('track', 'ADD_CART', p);
+                    }
+                },
                 async submitForm() {
                     this.loading = true;
+                    await new Promise(r => setTimeout(r, 800));
                     const fd = new FormData();
                     Object.keys(this.f).forEach(k => fd.append(k, this.f[k]));
                     fd.append('lang', this.lang);
                     fd.append('offer', '${PROD_NAME}');
                     fd.append('price', '${PRICE_VAL}');
                     fd.append('admin_phone', '${ADMIN_PHONE_VAL}');
-                    
                     try {
-                        if(window.fbq) fbq('track', 'Purchase', {value: ${PRICE_VAL}, currency: 'ILS'});
+                        if(window.fbq) fbq('track', 'Purchase', {value: ${PRICE_VAL}, currency: 'ILS', content_name: '${PROD_NAME}'});
+                        if(window.ttq) ttq.track('CompletePayment', {value: ${PRICE_VAL}, currency: 'ILS', content_name: '${PROD_NAME}'});
+                        if(window.snaptr) snaptr('track', 'PURCHASE', {currency: 'ILS', price: ${PRICE_VAL}});
+
                         await fetch(this.c.sheetUrl, { method: 'POST', body: fd, mode: 'no-cors' });
+                        await new Promise(r => setTimeout(r, 1500));
+                        this.loading = false;
                         this.submitted = true;
                         this.f = {name:'', phone:'', address:'', payment:'Cash', process:'Direct'};
-                    } catch(e) { alert('Error'); } finally { this.loading = false; }
+                    } catch(e) { this.loading = false; alert('Error'); }
                 }
             }
         }
