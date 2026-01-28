@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MAD Builder V32 - Slider & Colors 🎨🛒</title>
+    <title>MAD Builder V33 - Fixed Complete ✅</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest" defer></script>
     <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
@@ -36,7 +36,7 @@
 
 <div class="app-layout" x-data="builderApp()" x-init="init()" x-cloak>
     <aside class="editor-sidebar">
-        <h1 class="text-xl font-black mb-6 text-center">MAD BUILDER <span class="text-blue-600">V32 FIXED</span> 🛒</h1>
+        <h1 class="text-xl font-black mb-6 text-center">MAD BUILDER <span class="text-blue-600">V33 FIXED</span> 🛒</h1>
         
         <div class="flex bg-gray-100 p-1 rounded-lg mb-4">
             <button @click="setEditLang('ar')" :class="editLang==='ar'?'bg-black text-white':''" class="flex-1 py-2 rounded-md text-xs font-bold transition">عربي</button>
@@ -54,13 +54,15 @@
         <div class="section-box border-blue-200 bg-blue-50/50">
             <h2 class="font-bold text-xs mb-2 text-blue-700">⚙️ إعدادات الربط</h2>
             <label>رابط السكربت</label>
-            <input type="text" x-model="config.sheetUrl" class="text-xs font-mono mb-2 bg-white">
+            <!-- FIX: كان لا يحدث المعاينة عند تغيير الرابط -->
+            <input type="text" x-model="config.sheetUrl" @input="updatePreviewDebounced()" class="text-xs font-mono mb-2 bg-white">
             <label class="text-indigo-700 font-black">📞 رقم المدير</label>
-            <input type="text" x-model="config.adminPhone" class="text-center font-bold border-indigo-300 bg-indigo-50">
+            <!-- FIX: كان لا يحدث المعاينة عند تغيير الرقم -->
+            <input type="text" x-model="config.adminPhone" @input="updatePreviewDebounced()" class="text-center font-bold border-indigo-300 bg-indigo-50">
              <div class="grid grid-cols-3 gap-1 mt-2">
-                <div><label>FB</label><input type="text" x-model="config.fbPixel"></div>
-                <div><label>TikTok</label><input type="text" x-model="config.ttPixel"></div>
-                <div><label>Snap</label><input type="text" x-model="config.snapPixel"></div>
+                <div><label>FB</label><input type="text" x-model="config.fbPixel" @input="updatePreviewDebounced()"></div>
+                <div><label>TikTok</label><input type="text" x-model="config.ttPixel" @input="updatePreviewDebounced()"></div>
+                <div><label>Snap</label><input type="text" x-model="config.snapPixel" @input="updatePreviewDebounced()"></div>
             </div>
             <p class="text-[9px] text-gray-500 mt-2">✨ ملاحظة: البيكسلات سيتم تحميلها بعد 3.5 ثانية للسرعة.</p>
         </div>
@@ -146,7 +148,11 @@
                         <template x-if="block.type === 'urgency_box'">
                             <div>
                                 <div class="bg-red-50 p-2 rounded mb-2 border border-red-100">
-                                    <div class="flex gap-2 mb-1">
+                                    <!-- FIX: إضافة حقل sold لأنه كان موجود بالبلوك بدون محرر -->
+                                    <label class="text-[9px]">المبيعات اليوم (Sold)</label>
+                                    <input type="number" x-model="block.sold" @input="updatePreviewDebounced()" class="w-full text-center font-bold">
+
+                                    <div class="flex gap-2 mb-1 mt-2">
                                         <div class="flex-1"><label class="text-[9px]">الزوار</label><input type="number" x-model="block.visitors" @input="updatePreviewDebounced()" class="w-full text-center font-bold"></div>
                                         <div class="flex-1"><label class="text-[9px]">القطع</label><input type="number" x-model="block.left" @input="updatePreviewDebounced()" class="w-full text-center font-bold text-red-600"></div>
                                     </div>
@@ -170,19 +176,42 @@
                              <textarea x-model="block.content[editLang]" @input="updatePreviewDebounced()" class="mt-2 h-14 w-full border p-1 rounded text-xs"></textarea>
                              <input x-show="block.type==='button'" type="text" x-model="block.link" @input="updatePreviewDebounced()" placeholder="Link" class="mt-1 w-full border p-1 rounded text-xs">
                         </template>
-                         <template x-if="block.type === 'embed'">
+
+                        <template x-if="block.type === 'embed'">
                             <textarea x-model="block.content[editLang]" @input="updatePreviewDebounced()" class="mt-2 h-24 w-full border p-2 rounded text-xs font-mono text-left bg-gray-50" dir="ltr"></textarea>
                         </template>
+
                         <template x-if="block.type === 'comparison'">
                             <div class="mt-2 space-y-2">
                                 <button @click="block.items.push({mad:{ar:'', he:''}, other:{ar:'', he:''}}); updatePreviewDebounced()" class="text-[10px] text-blue-600 font-bold">+ إضافة سطر</button>
+
+                                <!-- FIX: كان يمكن إضافة سطر لكن بدون محرر للنصوص -->
+                                <div class="space-y-2 max-h-64 overflow-y-auto pr-1 mt-2">
+                                    <template x-for="(row, rIdx) in block.items" :key="rIdx">
+                                        <div class="bg-gray-50 p-2 rounded border border-gray-200 relative">
+                                            <button @click="block.items.splice(rIdx,1); updatePreviewDebounced()" class="absolute top-1 left-1 text-red-500 text-[10px] font-bold">x</button>
+
+                                            <label class="text-[9px] text-amber-600 font-black">MAD</label>
+                                            <textarea x-model="row.mad[editLang]" @input="updatePreviewDebounced()" class="h-12 w-full border p-1 rounded text-[10px]"></textarea>
+
+                                            <label class="text-[9px] text-gray-400 font-black">OTHERS</label>
+                                            <textarea x-model="row.other[editLang]" @input="updatePreviewDebounced()" class="h-12 w-full border p-1 rounded text-[10px]"></textarea>
+                                        </div>
+                                    </template>
+                                </div>
                             </div>
                         </template>
+
                         <template x-if="block.type === 'fragrantica'">
                             <div>
+                                <!-- FIX: إضافة رابط لأن الكرت يعتمد على b.url وكان فارغ بدون محرر -->
+                                <label>الرابط (Fragrantica)</label>
+                                <input type="text" x-model="block.url" @input="updatePreviewDebounced()" class="w-full text-xs" placeholder="https://...">
                                 <label>النجوم</label>
                                 <select x-model="block.stars" @change="updatePreviewDebounced()" class="w-full text-xs"><option value="5">5</option><option value="4">4</option></select>
                                 <input type="text" x-model="block.score" @input="updatePreviewDebounced()" class="w-full mt-1 text-xs" placeholder="Score">
+                                <label class="mt-1">النص</label>
+                                <input type="text" x-model="block.content[editLang]" @input="updatePreviewDebounced()" class="w-full mt-1 text-xs" placeholder="تقييمات ممتازة">
                             </div>
                         </template>
                     </div>
@@ -269,7 +298,7 @@
                 else style = { color: '#000000', size: 'text-base', font: 'Cairo', weight: 'normal' };
 
                 if(type === 'stock') content = {ar:'⚠️ تنبيه: الكمية تنفذ بسرعة!', he:'⚠️ שימו לב: המלאי אוזל!'};
-                if(type === 'sales_pop') content = {ar:'مفعل', he:'مفعل'};
+                if(type === 'sales_pop') content = {ar:'مفعل', he:'מופעל'};
                 if(type === 'form') { content = {ar:'اطلب الآن', he:'הזמנה מהירה'}; btnText = {ar:'تأكيد الطلب', he:'שלח הזמנה'}; }
                 
                 if(type === 'comparison') {
@@ -283,7 +312,7 @@
                         {mad:{ar:'مصادقات الأيزو ووزارة الصحة', he:'אישור תקן ISO ומשרד הבריאות'}, other:{ar:'غير مفحوص ومقلد', he:'לא נבדק '}}
                     ];
                 }
-
+                
                 if(type === 'offers_slider') {
                     items = [
                         {img:'https://www.mad-parfumeur.com/assets/hero/4.webp', title:{ar:'عطر المسك', he:'בושם מאסק'}, price:'120', link:'#'},
@@ -291,9 +320,9 @@
                         {img:'https://www.mad-parfumeur.com/assets/hero/4.webp', title:{ar:'بكج العيد', he:'מארז חג'}, price:'200', link:'#'}
                     ];
                 }
-                
+
                 if(type === 'fragrantica') content = {ar:'تقييمات ممتازة', he:'ביקורות מצוינות'};
-                if(type === 'interactive_rating') content = {ar:'ما هو تقييمك لمنتجاتنا؟', he:'איך אתם מדרגים את המוצרים שלנו?'};
+                if(type === 'interactive_rating') content = {ar:'ما هو تقييمك لمنتجاتنا؟', he:'איך אתם מדרגים את המוצרים שלנו؟'};
 
                 this.blocks.push({id:Date.now(), type, content, btnText, url:'', link:'#order', align:'center', items, score, stars, style, sold, left, visitors, timerMinutes, title});
                 this.updatePreview();
@@ -463,7 +492,7 @@ input[type="radio"]:checked + .mad-radio-box { border-color: #10b981; background
                         </div>
                         <div class="bg-white border border-black/5 p-3 rounded-2xl text-center shadow-sm relative overflow-hidden group">
                            <div class="absolute inset-0 bg-amber-50 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                           <div class="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center mx-auto mb-1 text-amber-600 relative z-10"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12l2 2 4-4"></path><circle cx="12" cy="12" r="10"></circle></svg></div>
+                           <div class="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-content-center mx-auto mb-1 text-amber-600 relative z-10"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12l2 2 4-4"></path><circle cx="12" cy="12" r="10"></circle></svg></div>
                            <p class="text-[8px] font-bold uppercase relative z-10">IFRA Safe</p>
                         </div>
                         <div class="bg-white border border-black/5 p-3 rounded-2xl text-center shadow-sm relative overflow-hidden group">
@@ -488,7 +517,8 @@ input[type="radio"]:checked + .mad-radio-box { border-color: #10b981; background
                         <div class="progress-container"><div class="progress-text"><span x-text="lang==='he'?'פרטי משלוח':'معلومات الشحن'"></span><span x-text="lang==='he'?'שלב אחרון':'الخطوة الأخيرة'"></span></div><div class="progress-track"><div class="progress-fill"></div></div></div>
                         <h2 class="text-xl font-black text-center mb-4" x-text="b.content[lang] || (lang==='he'?'הזמנה':'اطلب الآن')"></h2>
                         <form @submit.prevent="submitForm">
-                            <input type="text" x-model="f.name" class="inp" :placeholder="lang==='he'?'שם מלא':'الاسم'" required>
+                            <!-- FIX: تشغيل trackInput فعلياً عند بدء الكتابة (AddToCart) -->
+                            <input type="text" x-model="f.name" @input="trackInput()" class="inp" :placeholder="lang==='he'?'שם מלא':'الاسم'" required>
                             <input type="tel" x-model="f.phone" class="inp" :placeholder="lang==='he'?'טלפון':'الهاتف'" required>
                             <input type="text" x-model="f.address" class="inp" :placeholder="lang==='he'?'כתובת':'العنوان'" required>
                             <div class="grid grid-cols-2 gap-3 mb-4">
@@ -608,5 +638,24 @@ input[type="radio"]:checked + .mad-radio-box { border-color: #10b981; background
             }
         }
     <\/script>
+</body>
+</html>`;
+            },
+
+            downloadHTML() {
+                const code = this.generateFinalHTML(true);
+                const blob = new Blob([code], { type: "text/html" });
+                const a = document.createElement("a");
+                a.href = URL.createObjectURL(blob);
+                a.download = "mad-page.html";
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(a.href);
+            }
+        }
+    }
+</script>
+
 </body>
 </html>
