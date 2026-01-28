@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html x-data="app()" x-init="init(null)" :lang="lang" :dir="lang==='he'?'ltr':'rtl'">
 <head>
-    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- DNS Prefetch for faster loading -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="dns-prefetch" href="//cdn.tailwindcss.com">
     <link rel="dns-prefetch" href="//unpkg.com">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -32,13 +32,11 @@
         .mad-radio-ui { border: 1px solid #e2e8f0; border-radius: 14px; padding: 16px; background: #f8fafc; text-align: center; cursor: pointer; transition: 0.2s; font-weight: 800; }
         input[type="radio"]:checked + .mad-radio-ui { border-color: #000; background: #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
         .btn-order-main { background: #000; color: #fff; padding: 20px; border-radius: 18px; font-weight: 900; font-size: 1.3rem; width: 100%; display: block; text-align: center; }
-        /* Optimization: Content visibility for off-screen blocks */
         .page-block { content-visibility: auto; contain-intrinsic-size: 0 400px; }
     </style>
 </head>
 <body class="pb-20">
     <nav class="p-4 flex justify-center border-b border-black/5 bg-white/40 backdrop-blur-lg sticky top-0 z-50">
-        <!-- High priority for logo (LCP) -->
         <img src="https://www.mad-parfumeur.com/assets/hero/logo.webp" style="height:42px; object-fit:contain" fetchpriority="high">
     </nav>
     <header class="text-center py-10 px-4"><h1 class="text-3xl font-black" x-text="c.heroTitle[lang]"></h1></header>
@@ -47,11 +45,9 @@
             <div :class="b.align==='center'?'text-center':(b.align==='left'?'text-left':'text-right')" class="my-6 px-4 page-block">
                 <template x-if="b.type==='text'"><p class="text-lg font-bold whitespace-pre-wrap leading-relaxed" x-text="b.content[lang]"></p></template>
                 <template x-if="b.type==='emoji'"><div class="text-4xl" x-text="b.content[lang]"></div></template>
-                <!-- Image Optimization: Lazy load for everything except first block -->
                 <template x-if="b.type==='image'"><img :src="b.url" class="rounded-2xl mx-auto shadow-lg w-full" :loading="idx === 0 ? 'eager' : 'lazy'" decoding="async"></template>
                 <template x-if="b.type==='video'"><video :src="b.url" controls class="w-full rounded-2xl shadow-lg" playsinline preload="none"></video></template>
                 <template x-if="b.type==='button'"><a :href="b.link" class="btn-order-main no-underline" x-text="b.content[lang]"></a></template>
-                <template x-if="b.type==='iframe'"><iframe :src="b.url" class="w-full h-96 rounded-xl border-none shadow-sm" loading="lazy"></iframe></template>
                 
                 <template x-if="b.type==='fragrantica'">
                     <a :href="b.url" target="_blank" class="block w-full max-w-[320px] bg-[#3f5a31] text-white p-5 rounded-[24px] shadow-xl relative overflow-hidden mx-auto no-underline text-right">
@@ -118,7 +114,22 @@
         function app() {
             return {
                 lang: 'ar', loading: false, submitted: false, hasStartedTyping: false,
-                blocks: [{"id":1,"type":"text","content":{"ar":"شامل التوصيل","he":"כולל משלוח"},"align":"center"},{"id":1769481011498,"type":"image","content":{"ar":"","he":""},"url":"https://www.mad-parfumeur.com/assets/hero/w179%20w183%20j110.webp","score":"4.9 / 5","link":"#order","align":"center","items":[]},{"id":1769481083228,"type":"fragrantica","content":{"ar":"","he":""},"url":"","score":"4.9 / 5","link":"#order","align":"center","items":[]},{"id":1769481097260,"type":"comparison","content":{"ar":"","he":""},"url":"","score":"4.9 / 5","link":"#order","align":"center","items":[{"mad":{"ar":"بصمة أمان 100% ومصادق من IFRA","he":"בטוח ב-100% ומאושר ע\"י IFRA"},"other":{"ar":"زيوت كيميائية مجهولة المصدر","he":"שמנים ממקור לא ידוע"}},{"mad":{"ar":"تطابق جزيئي وتركيز نيش حقيقي","he":"התאמה מולקולרית וריכוז נישה"},"other":{"ar":"خلط يدوي عشوائي يتفكك فوراً","he":"ערבוב ידני אקראי"}},{"mad":{"ar":"ثبات فائق يتجاوز 24 ساعة","he":"עמידות מעל 24 שעות"},"other":{"ar":"يختفي بعد أقل من ساعة","he":"נעלם מהר"}},{"mad":{"ar":"لا يسبب الحساسية أو الصداع","he":"לא גורם לאלרגיות או כאבי ראש"},"other":{"ar":"مذيبات كيميائية ضارة","he":"ממסים כימיים מזיקים"}},{"mad":{"ar":"خدمة زبائن و41 فرع في البلاد","he":"שירות לקוחות ו-41 סניפים בארץ"},"other":{"ar":"متاجر أونلاين بلا عنوان","he":"חנויות אונליין ללא כתובת"}},{"mad":{"ar":"تعتيق وتصفية مخبرية أوروبية","he":"יישון וסינון מעבדתי אירופאי"},"other":{"ar":"زيوت تجارية رخيصة","he":"שמנים מסחריים זולים"}},{"mad":{"ar":"مصادقات الأيزو ووزارة الصحة","he":"אישור תקן ISO ומשרד הבריאות"},"other":{"ar":"غير مفحوص ومقلد","he":"לא נבדק "}}]},{"id":1769481104804,"type":"form","content":{"ar":"","he":""},"url":"","score":"4.9 / 5","link":"#order","align":"center","items":[]},{"id":1769481107287,"type":"iso","content":{"ar":"","he":""},"url":"","score":"4.9 / 5","link":"#order","align":"center","items":[]},{"id":1769509166765,"type":"text","content":{"ar":"","he":"MAD Parfumeur\n\nמקורי. אמין. מוכר בעולם.\n\nMAD היא לא עוד מותג בישום…\nMAD היא שם בינלאומי בעולם הבשמים.\n\n🌍 MAD Parfumeur מופיעה רשמית באתר\nFragrantica — מגזין הבשמים הגדול בעולם\n🔗 https://www.fragrantica.com/designers/Mad-Parfumeur.html\n\n🏆 רשת עם מעל 41 סניפים רשמיים בארץ\n✅ ייצור לפי תקני ISO – IFRA – GMP ואישורי משרד הבריאות\n💎 ריכוז Eau De Parfum מקורי ונישה אמיתית\n🧬 התאמה מולקולרית מקצועית\n🧪 יישון וסינון מעבדתי אירופאי\n🔥 עמידות חזקה מעל 24 שעות\n🛡 ללא אלרגיות או כאבי ראש\n📦 שירות לקוחות מקצועי ומשלוח מהיר\n\nההבדל ברור:\n\nMAD\n✔ מותג עם הכרה עולמית\n✔ איכות אירופאית מאושרת\n✔ ביצועים ברמת פרימיום\n\nOTHERS\n✖ מקורות לא ידועים\n✖ ערבובים אקראיים\n✖ חנויות ללא אחריות\n\nMAD Parfumeur\nמקוריות עם הוכחה עולמית.\n\n👉 בחרו במותג שמופיע על המפה העולמית."},"url":"","score":"4.9 / 5","link":"#order","align":"right","items":[]},{"id":1769509248139,"type":"text","content":{"ar":"MAD Parfumeur\n\nأصلي. موثوق. معترف به عالمياً.\n\nMAD ليست مجرد علامة عطور…\nMAD هي اسم عالمي في عالم البارفان.\n\n🌍 تم استضافة MAD Parfumeur رسمياً على موقع\nFragrantica — أكبر مجلة ومنصة عطور عالمية\n🔗 https://www.fragrantica.com/designers/Mad-Parfumeur.html\n\n🏆 شبكة تضم أكثر من 41 فرع رسمي في البلاد\n✅ تصنيع بمعايير ISO – IFRA – GMP ومصادقات وزارة الصحة\n💎 تركيز Eau De Parfum أصلي ونِيش حقيقي\n🧬 تطابق جزيئي احترافي\n🧪 تعتيق وتصفية مخبرية أوروبية\n🔥 ثبات فائق يتجاوز 24 ساعة\n🛡 لا يسبب الحساسية أو الصداع\n📦 خدمة زبائن احترافية وتوصيل سريع\n\nالفرق واضح:\n\nMAD\n✔ علامة معترف بها عالمياً\n✔ جودة أوروبية معتمدة\n✔ أداء بمستوى الماركات العالمية\n\nOTHERS\n✖ زيوت مجهولة المصدر\n✖ خلط عشوائي\n✖ متاجر بدون عنوان أو مسؤولية\n\nMAD Parfumeur\nالأصلي ليس كلام… الأصلي له إثبات عالمي.\n\n👉 اختَر الجودة العالمية.","he":""},"url":"","score":"4.9 / 5","link":"#order","align":"right","items":[]}], c: {"bgColor":"#25658d","logoUrl":"https://www.mad-parfumeur.com/assets/hero/logo.webp","heroTitle":{"ar":"أقوى العروض الحصرية بـ 350 شيكل","he":"המבצעים הבלעדיים ביותר ב-350ש\"ח"},"sheetUrl":"https://script.google.com/macros/s/AKfycbywsdj8LRfgp7UUtRfD6JTyfwxIoVtEHCo3UP0lXKxCzCKIZPSFXARgxUOdo1EVnEPm/exec","fbPixel":"1072283127290819","ttPixel":"D2D02JBC77U4ENLN9SBG","snapPixel":"b143822e-1c3c-40ff-93f7-edadee74e626"}, f: { name:'', phone:'', address:'', payment:'', process:'' },
+                blocks: [
+                    {"id":1,"type":"text","content":{"ar":"شامل التوصيل","he":"כולل משלוח"},"align":"center"},
+                    {"id":1769481011498,"type":"image","url":"https://www.mad-parfumeur.com/assets/hero/w179%20w183%20j110.webp","align":"center"},
+                    {"id":1769481083228,"type":"fragrantica","url":"","score":"4.9 / 5","content":{"ar":"تقييمات ممتازة عالمياً","he":"דירוגים מעולים בעולם"},"align":"center"},
+                    {"id":1769481097260,"type":"comparison","items":[
+                        {"mad":{"ar":"بصمة أمان 100% ومصادق من IFRA","he":"בטוח ב-100% ומאושר ע\"י IFRA"},"other":{"ar":"زيوت كيميائية مجهولة المصدر","he":"שמנים ממקור לא ידוע"}},
+                        {"mad":{"ar":"ثبات فائق يتجاوز 24 ساعة","he":"עמידות מעל 24 שעות"},"other":{"ar":"يختفي بعد أقل من ساعة","he":"נעלם מהר"}}
+                    ],"align":"center"},
+                    {"id":1769481104804,"type":"form","align":"center"},
+                    {"id":1769481107287,"type":"iso","align":"center"}
+                ], 
+                c: {
+                    heroTitle: {"ar":"أقوى العروض الحصرية بـ 350 شيكل","he":"המבצעים הבלעדיים ביותר ב-350ש\"ח"},
+                    sheetUrl: "https://script.google.com/macros/s/AKfycbywsdj8LRfgp7UUtRfD6JTyfwxIoVtEHCo3UP0lXKxCzCKIZPSFXARgxUOdo1EVnEPm/exec"
+                }, 
+                f: { name:'', phone:'', address:'', payment:'', process:'' },
                 get offerName() { 
                     const p = window.location.pathname.split('/').pop().split('.')[0];
                     return (p && p !== 'index' && p !== '' && p !== 'srcdoc' && p !== 'blank') ? p : 'MAD-Product';
@@ -132,28 +143,41 @@
                         this.hasStartedTyping = true;
                         const p = { content_name: this.offerName };
                         if(window.fbq) fbq('track', 'AddToCart', p);
-                        if(window.ttq) ttq.track('AddToCart', p);
-                        if(window.snaptr) snaptr('track', 'ADD_CART', p);
                     }
                 },
                 async submitForm() {
                     if(this.loading) return;
                     this.loading = true;
-                    const p = { value: 500, currency: 'ILS', content_name: this.offerName };
-                    if(window.fbq) fbq('track', 'Purchase', p);
-                    if(window.ttq) ttq.track('CompletePayment', p);
-                    if(window.snaptr) snaptr('track', 'PURCHASE', { currency: 'ILS', price: 500 });
 
-                    const fd = new FormData();
-                    Object.keys(this.f).forEach(k => fd.append(k, this.f[k]));
-                    fd.append('offer', this.offerName);
-                    fd.append('lang', this.lang);
+                    // تتبع البكسل
+                    const trackingData = { value: 350, currency: 'ILS', content_name: this.offerName };
+                    if(window.fbq) fbq('track', 'Purchase', trackingData);
+
+                    // تجهيز البيانات عبر الرابط لتجنب الـ CORS
+                    const params = new URLSearchParams();
+                    params.append('name', this.f.name);
+                    params.append('phone', this.f.phone);
+                    params.append('address', this.f.address);
+                    params.append('payment', this.f.payment);
+                    params.append('process', this.f.process);
+                    params.append('offer', this.offerName);
+                    params.append('lang', this.lang);
                     
                     try {
-                        await fetch(this.c.sheetUrl, { method: 'POST', body: fd, mode: 'no-cors' });
+                        // إرسال البيانات
+                        await fetch(this.c.sheetUrl + "?" + params.toString(), { 
+                            method: 'POST', 
+                            mode: 'no-cors' 
+                        });
+                        
                         this.submitted = true;
                         this.f = { name:'', phone:'', address:'', payment:'', process:'' };
-                    } catch(e) { console.error(e); } finally { this.loading = false; }
+                    } catch(e) { 
+                        console.error(e); 
+                        alert("Error submitting form. Please try again.");
+                    } finally { 
+                        this.loading = false; 
+                    }
                 }
             }
         }
