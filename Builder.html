@@ -131,9 +131,36 @@
                             </div>
                         </template>
 
-                        <template x-if="['image','video','iframe','embed'].includes(block.type)">
-                            <textarea x-model="block.content ? block.content[editLang] : block.url" @input="update()" class="h-16 font-mono text-[10px]" placeholder="URL or Code"></textarea>
-                        </template>
+                        <!-- ✅ Image / Video يجب تكتب في url -->
+<template x-if="['image','video'].includes(block.type)">
+  <textarea
+    x-model="block.url"
+    @input="update()"
+    class="h-16 font-mono text-[10px]"
+    :placeholder="block.type==='image' ? 'رابط الصورة (URL)' : 'رابط الفيديو (URL)'"
+  ></textarea>
+</template>
+
+<!-- ✅ Embed كود -->
+<template x-if="block.type === 'embed'">
+  <textarea
+    x-model="block.content[editLang]"
+    @input="update()"
+    class="h-16 font-mono text-[10px]"
+    placeholder="ضع كود HTML هنا"
+  ></textarea>
+</template>
+
+<!-- ✅ Iframe رابط -->
+<template x-if="block.type === 'iframe'">
+  <textarea
+    x-model="block.url"
+    @input="update()"
+    class="h-16 font-mono text-[10px]"
+    placeholder="رابط iframe (URL)"
+  ></textarea>
+</template>
+
                          <template x-if="block.type === 'interactive_rating'">
                             <input type="text" x-model="block.content[editLang]" @input="update()" placeholder="عنوان السؤال">
                         </template>
