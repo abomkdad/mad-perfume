@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MAD Builder V53 - Pixel Precision 🛡️ (Full Fixed)</title>
+  <title>MAD Builder V54 - FINAL ✅ (Images + Pixels + E.164 Fix)</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest" defer></script>
   <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
@@ -32,7 +32,7 @@
 <div class="app-layout" x-data="builderApp()" x-init="init()" x-cloak>
   <aside class="editor-sidebar">
     <h1 class="text-xl font-black mb-4 text-center text-slate-800">
-      MAD BUILDER <span class="text-blue-600">V53 GUARD</span>
+      MAD BUILDER <span class="text-blue-600">V54 FINAL</span>
     </h1>
 
     <div class="flex bg-slate-100 p-1 rounded-lg mb-4">
@@ -52,6 +52,7 @@
       <span class="section-title text-blue-700">🔗 الربط والمدير</span>
       <input type="text" x-model="config.sheetUrl" class="mb-2 font-mono" placeholder="Script URL" @input="update()">
       <input type="text" x-model="config.adminPhone" class="text-center font-bold" placeholder="رقم المدير" @input="update()">
+      <p class="text-[10px] text-gray-500 mt-2">يفضل رقم دولي: 9725xxxxxxx / 9705xxxxxxx</p>
     </div>
 
     <div class="section-box bg-slate-50 border-slate-300">
@@ -61,7 +62,7 @@
         <input type="text" x-model="config.ttPixel" placeholder="TikTok Pixel ID" @input="update()">
         <input type="text" x-model="config.snapPixel" placeholder="Snapchat Pixel ID" @input="update()">
       </div>
-      <p class="text-[9px] text-gray-500 mt-1">يمنع التكرار نهائياً + يدعم VSA ✅</p>
+      <p class="text-[9px] text-gray-500 mt-1">منع التكرار + تحسين المطابقة بالهاتف (E.164) ✅</p>
     </div>
 
     <div class="section-box">
@@ -122,7 +123,7 @@
                     <option value="cover">ملء</option>
                   </select>
                 </div>
-                <template x-for="(offer, oIdx) in block.items">
+                <template x-for="(offer, oIdx) in block.items" :key="oIdx">
                   <div class="bg-slate-50 p-1 mb-1 border flex gap-1 items-center">
                     <input x-model="offer.title[editLang]" @input="update()" class="flex-1" placeholder="اسم">
                     <input x-model="offer.price" @input="update()" class="w-12 text-center" placeholder="سعر">
@@ -149,14 +150,14 @@
               </div>
             </template>
 
-            <!-- ✅ FIX: Image/Video bind to url -->
-            <template x-if="['image','video'].includes(block.type)">
-              <textarea x-model="block.url" @input="update()" class="h-16 font-mono text-[10px]"
-                        :placeholder="block.type==='image' ? 'رابط الصورة (URL)' : 'رابط الفيديو (URL)'"></textarea>
-            </template>
-
-            <template x-if="block.type==='iframe'">
-              <textarea x-model="block.url" @input="update()" class="h-16 font-mono text-[10px]" placeholder="رابط iframe (URL)"></textarea>
+            <!-- ✅ Image/Video/Iframe bind to url -->
+            <template x-if="['image','video','iframe'].includes(block.type)">
+              <textarea
+                x-model="block.url"
+                @input="update()"
+                class="h-16 font-mono text-[10px]"
+                :placeholder="block.type==='image' ? 'رابط الصورة (URL)' : (block.type==='video' ? 'رابط الفيديو (URL)' : 'رابط iframe (URL)')"
+              ></textarea>
             </template>
 
             <template x-if="block.type==='embed'">
@@ -170,7 +171,7 @@
             <template x-if="block.type === 'comparison'">
               <div>
                 <div class="space-y-1 max-h-40 overflow-y-auto">
-                  <template x-for="(row, rIdx) in block.items">
+                  <template x-for="(row, rIdx) in block.items" :key="rIdx">
                     <div class="bg-slate-50 p-1 border rounded relative flex gap-1">
                       <input x-model="row.mad[editLang]" @input="update()" class="w-1/2 text-[9px]" placeholder="MAD">
                       <input x-model="row.other[editLang]" @input="update()" class="w-1/2 text-[9px]" placeholder="Other">
@@ -186,13 +187,14 @@
               <div class="flex gap-1">
                 <select x-model="block.stars" @change="update()"><option value="5">5</option><option value="4">4</option></select>
                 <input x-model="block.score" @input="update()" placeholder="Score">
+                <input x-model="block.url" @input="update()" placeholder="رابط Fragrantica" class="font-mono">
               </div>
             </template>
 
             <template x-if="block.type === 'faq'">
               <div>
                 <div class="space-y-1 max-h-40 overflow-y-auto">
-                  <template x-for="(qa, i) in block.items">
+                  <template x-for="(qa, i) in block.items" :key="i">
                     <div class="bg-slate-50 p-1 border rounded relative">
                       <button @click="block.items.splice(i, 1); update()" class="absolute top-1 left-1 text-red-500 text-[10px]">x</button>
                       <input x-model="qa.q[editLang]" @input="update()" class="w-full mb-1 text-[10px] font-bold" placeholder="السؤال">
@@ -217,15 +219,16 @@
                     <option value="contain">احتواء</option>
                   </select>
                 </div>
+
                 <div class="space-y-1 max-h-40 overflow-y-auto pr-1">
-                  <template x-for="(img, idx) in block.images">
+                  <template x-for="(img, idx) in (block.images||[])" :key="idx">
                     <div class="flex gap-1 mb-1">
                       <input type="text" x-model="block.images[idx]" @input="update()" placeholder="رابط الصورة..." class="w-full text-[10px]">
                       <button @click="block.images.splice(idx, 1); update()" class="text-red-500 font-bold text-xs px-1">x</button>
                     </div>
                   </template>
                 </div>
-                <!-- ✅ LIMIT 10 -->
+
                 <button
                   @click="if((block.images||[]).length < 10){ block.images.push('https://via.placeholder.com/400x600'); update() } else { alert('الحد الأقصى 10 صور') }"
                   class="w-full text-[10px] text-sky-600 bg-sky-50 py-1 rounded mt-1"
@@ -241,9 +244,11 @@
         <button class="btn-add border-sky-500 bg-sky-100 text-sky-900 font-bold" @click="addBlock('gallery')">📸 صور</button>
         <button class="btn-add" @click="addBlock('text')">📝 نص</button>
         <button class="btn-add" @click="addBlock('image')">🖼️ صورة</button>
+        <button class="btn-add" @click="addBlock('video')">🎬 فيديو</button>
+        <button class="btn-add" @click="addBlock('iframe')">🧩 Iframe</button>
         <button class="btn-add" @click="addBlock('form')">📋 فورم</button>
         <button class="btn-add" @click="addBlock('offers_slider')">🛒 سلايدر</button>
-        <button class="btn-add border-purple-500 bg-purple-100 text-purple-900 font-bold" @click="addBlock('faq')">❓ أسئلة (6)</button>
+        <button class="btn-add border-purple-500 bg-purple-100 text-purple-900 font-bold" @click="addBlock('faq')">❓ FAQ (6)</button>
         <button class="btn-add" @click="addBlock('urgency_box')">🔥 ضغط</button>
         <button class="btn-add" @click="addBlock('interactive_rating')">⭐ تقييم</button>
         <button class="btn-add" @click="addBlock('sales_pop')">🔔 إشعار</button>
@@ -297,7 +302,7 @@ function builderApp() {
     ],
 
     init() {
-      // migrate old blocks (if any) that used content instead of url
+      // migrate old blocks that used content instead of url
       try {
         (this.blocks||[]).forEach(b=>{
           if((b.type==='image'||b.type==='video'||b.type==='iframe') && !b.url){
@@ -305,6 +310,7 @@ function builderApp() {
             else if(b.content && (b.content.ar||b.content.he)) b.url = b.content.ar || b.content.he;
           }
           if(b.type==='gallery' && !Array.isArray(b.images)) b.images=[];
+          if(b.type==='offers_slider' && !Array.isArray(b.items)) b.items=[];
         });
       } catch(e){}
 
@@ -364,7 +370,12 @@ function builderApp() {
         ];
       }
 
-      if (type === 'fragrantica') { block.stars = 5; block.score = '4.9/5'; block.content = { ar: 'تقييمات ممتازة', he: 'ביקורות מצוינות' }; }
+      if (type === 'fragrantica') {
+        block.stars = 5;
+        block.score = '4.9/5';
+        block.url = 'https://www.fragrantica.com/designers/Mad-Parfumeur.html';
+        block.content = { ar: 'تقييمات ممتازة', he: 'ביקורות מצוינות' };
+      }
 
       this.blocks.push(block);
       this.update();
@@ -390,18 +401,20 @@ function builderApp() {
     downloadHTML() {
       const link = document.createElement('a');
       link.href = URL.createObjectURL(new Blob([this.generateFinalHTML(true)], { type: 'text/html' }));
-      link.download = 'MAD-Page-V53.html';
+      link.download = 'MAD-Page-V54.html';
       link.click();
     },
 
     generateFinalHTML(isDownload) {
+      // ✅ hide admin phone from Meta auto matching (send via base64 only)
+      const ADMIN_B64 = btoa(String(this.config.adminPhone || '').replace(/\D/g,''));
+      const cJ = JSON.stringify({ ...this.config, adminPhoneB64: ADMIN_B64, adminPhone: '' }).replace(/</g, '\\u003c');
+
       const bJ = JSON.stringify(this.blocks).replace(/</g, '\\u003c');
-      const cJ = JSON.stringify(this.config).replace(/</g, '\\u003c');
       const PROD_NAME = (this.config.productName || '').replace(/'/g, "\\'");
       const PRICE_VAL = this.config.price || '0';
       const iL = isDownload ? null : `'${this.editLang}'`;
 
-      // ✅ Pixel helper (TRUE E.164 + IL + PS + strict)
       const PIXEL_CODE = `
       window._mad_px_fired = false;
 
@@ -412,7 +425,6 @@ function builderApp() {
         let digits = s.replace(/[^0-9]/g, '');
         if (!digits) return '';
 
-        // remove 00 prefix
         if (digits.startsWith('00')) digits = digits.slice(2);
 
         // IL local: 05XXXXXXXX (10) -> +9725XXXXXXXX
@@ -421,13 +433,11 @@ function builderApp() {
         // PS local: 059XXXXXXX / 056XXXXXXX (10) -> +97059XXXXXXX / +97056XXXXXXX
         if ((digits.startsWith('059') || digits.startsWith('056')) && digits.length === 10) digits = '970' + digits.slice(1);
 
-        // already has country code without +
         if (digits.startsWith('972') || digits.startsWith('970')) {
           if (digits.length < 11) return '';
           return '+' + digits;
         }
 
-        // fallback if user typed full intl number without +
         if (digits.length >= 11 && digits.length <= 15) return '+' + digits;
 
         return '';
@@ -439,7 +449,9 @@ function builderApp() {
 
         // FB
         if ('${this.config.fbPixel}') {
-          !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)n=f.fbq;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
+          !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+          if(!f._fbq)n=f.fbq;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;
+          s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
           fbq('init','${this.config.fbPixel}');
           fbq('track','PageView');
         }
@@ -449,16 +461,18 @@ function builderApp() {
           !function (w, d, t) { w.TiktokAnalyticsObject=t; var ttq=w[t]=w[t]||[];
           ttq.methods=["page","track","identify","instances","debug","on","off","once","ready","alias","group","enableCookie","disableCookie","holdConsent","revokeConsent","grantConsent"];
           ttq.setAndDefer=function(t,e){t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}; for(var i=0;i<ttq.methods.length;i++)ttq.setAndDefer(ttq,ttq.methods[i]);
-          ttq.load=function(e,n){ var r="https://analytics.tiktok.com/i18n/pixel/events.js"; var o=n&&n.partner;
-          ttq._i=ttq._i||{}; ttq._i[e]=[]; ttq._i[e]._u=r; ttq._t=ttq._t||{}; ttq._t[e]=+new Date;
-          ttq._o=ttq._o||{}; ttq._o[e]=n||{}; n=document.createElement("script"); n.type="text/javascript"; n.async=!0;
-          n.src=r+"?sdkid="+e+"&lib="+t; e=document.getElementsByTagName("script")[0]; e.parentNode.insertBefore(n,e) };
+          ttq.load=function(e,n){ var r="https://analytics.tiktok.com/i18n/pixel/events.js"; ttq._i=ttq._i||{}; ttq._i[e]=[]; ttq._i[e]._u=r;
+          ttq._t=ttq._t||{}; ttq._t[e]=+new Date; ttq._o=ttq._o||{}; ttq._o[e]=n||{};
+          n=document.createElement("script"); n.type="text/javascript"; n.async=!0; n.src=r+"?sdkid="+e+"&lib="+t;
+          e=document.getElementsByTagName("script")[0]; e.parentNode.insertBefore(n,e) };
           ttq.load('${this.config.ttPixel}'); ttq.page(); }(window, document, 'ttq');
         }
 
         // Snap
         if ('${this.config.snapPixel}') {
-          (function(e,t,n){if(e.snaptr)return;var a=e.snaptr=function(){a.handleRequest?a.handleRequest.apply(a,arguments):a.queue.push(arguments)};a.queue=[];var s='script';var r=t.createElement(s);r.async=!0;r.src=n;var u=t.getElementsByTagName(s)[0];u.parentNode.insertBefore(r,u)})(window,document,'https://sc-static.net/scevent.min.js');
+          (function(e,t,n){if(e.snaptr)return;var a=e.snaptr=function(){a.handleRequest?a.handleRequest.apply(a,arguments):a.queue.push(arguments)};
+          a.queue=[];var s='script';var r=t.createElement(s);r.async=!0;r.src=n;var u=t.getElementsByTagName(s)[0];
+          u.parentNode.insertBefore(r,u)})(window,document,'https://sc-static.net/scevent.min.js');
           snaptr('init','${this.config.snapPixel}');
           snaptr('track','PAGE_VIEW');
         }
@@ -503,7 +517,7 @@ input:checked + .mad-radio-box { border-color: #10b981; background: #f0fdf4; col
 </header>
 
 <main class="max-w-md mx-auto px-4">
-  <template x-for="b in blocks">
+  <template x-for="b in blocks" :key="b.id">
     <div class="my-4" :class="'text-'+(b.align||'center')">
 
       <template x-if="b.type==='text'">
@@ -511,7 +525,7 @@ input:checked + .mad-radio-box { border-color: #10b981; background: #f0fdf4; col
            :style="{color:b.style?.color||'#000', fontFamily:b.style?.font}" x-text="b.content?.[lang] || ''"></p>
       </template>
 
-      <!-- ✅ IMAGE (robust + error label) -->
+      <!-- ✅ IMAGE robust -->
       <template x-if="b.type==='image'">
         <div x-data="{err:false}">
           <img :src="(b.url || (b.content && (b.content[lang]||b.content.ar||b.content.he)) || '')"
@@ -543,7 +557,7 @@ input:checked + .mad-radio-box { border-color: #10b981; background: #f0fdf4; col
              :class="(b.aspect === 'portrait' ? 'aspect-[3/4]' : (b.aspect === 'square' ? 'aspect-square' : 'aspect-video'))"
              x-data="{ curr: 0, total: (b.images||[]).length }"
              x-init="if(total>1){ setInterval(() => { curr = (curr + 1) % total }, 3000) }">
-          <template x-for="(img, i) in (b.images||[])">
+          <template x-for="(img, i) in (b.images||[])" :key="i">
             <img :src="img" x-show="curr === i"
                  x-transition:enter="transition ease-out duration-500"
                  x-transition:enter-start="opacity-0"
@@ -557,7 +571,7 @@ input:checked + .mad-radio-box { border-color: #10b981; background: #f0fdf4; col
           </template>
 
           <div class="absolute bottom-2 flex gap-1 justify-center w-full z-10" x-show="total>1">
-            <template x-for="(img, i) in (b.images||[])">
+            <template x-for="(img, i) in (b.images||[])" :key="i">
               <div class="w-2 h-2 rounded-full transition-all" :class="curr===i ? 'bg-white w-4' : 'bg-white/50'"></div>
             </template>
           </div>
@@ -568,7 +582,7 @@ input:checked + .mad-radio-box { border-color: #10b981; background: #f0fdf4; col
         <div class="mt-4">
           <h3 class="text-lg font-bold mb-2 px-2 text-white" x-text="b.title?.[lang] || ''"></h3>
           <div class="flex overflow-x-auto gap-3 pb-4 px-2 no-scrollbar">
-            <template x-for="item in (b.items||[])">
+            <template x-for="(item, idx) in (b.items||[])" :key="idx">
               <a :href="item.link || '#'" class="min-w-[180px] w-[180px] bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden flex flex-col no-underline transition transform active:scale-95">
                 <div class="w-full bg-white flex items-center justify-center overflow-hidden relative"
                      :class="(b.aspect === 'portrait' ? 'h-64' : (b.aspect === 'landscape' ? 'h-32' : 'h-40'))">
@@ -577,7 +591,7 @@ input:checked + .mad-radio-box { border-color: #10b981; background: #f0fdf4; col
                        referrerpolicy="no-referrer">
                 </div>
                 <div class="p-2 pt-1 text-center h-auto">
-                  <h4 class="text-xs font-bold text-gray-800 line-clamp-1 mb-1" x-text="item.title?.[lang] || ''"></h4>
+                  <h4 class="text-xs font-bold text-gray-800 mb-1" x-text="item.title?.[lang] || ''"></h4>
                   <p class="text-sm font-black text-red-600 mb-2" x-text="(item.price||'') + (lang==='he'?' ₪':' شيكل')"></p>
                   <div class="w-full bg-black text-white text-[10px] font-bold py-1.5 rounded-lg" x-text="lang==='he'?'הוסף לסל':'أضف للسلة'"></div>
                 </div>
@@ -590,7 +604,7 @@ input:checked + .mad-radio-box { border-color: #10b981; background: #f0fdf4; col
       <template x-if="b.type==='faq'">
         <div class="bg-white rounded-2xl p-4 shadow-sm text-right space-y-2">
           <h3 class="font-black mb-2 text-black" x-text="lang==='he'?'שאלות נפוצות':'الأسئلة المتكررة'"></h3>
-          <template x-for="(qa, i) in (b.items||[])">
+          <template x-for="(qa, i) in (b.items||[])" :key="i">
             <div class="border-b pb-2 last:border-0" x-data="{open:false}">
               <button @click="open=!open" class="w-full flex justify-between font-bold text-sm text-black">
                 <span x-text="qa.q?.[lang] || ''"></span>
@@ -620,7 +634,7 @@ input:checked + .mad-radio-box { border-color: #10b981; background: #f0fdf4; col
         <div class="bg-white border-2 border-yellow-100 rounded-xl p-6 text-center" x-data="{r:0}">
           <h3 class="font-bold mb-2 text-black" x-text="b.content?.[lang] || ''"></h3>
           <div class="flex justify-center gap-2 text-3xl text-gray-200">
-            <template x-for="i in 5"><button @click="r=i" :class="i<=r?'text-yellow-400':''">★</button></template>
+            <template x-for="i in 5" :key="i"><button @click="r=i" :class="i<=r?'text-yellow-400':''">★</button></template>
           </div>
           <p x-show="r>0" class="text-green-600 text-xs font-bold mt-2 animate-bounce" x-text="lang==='he'?'תודה! (5/5)':'شكراً لك! (5/5)'"></p>
         </div>
@@ -628,7 +642,7 @@ input:checked + .mad-radio-box { border-color: #10b981; background: #f0fdf4; col
 
       <template x-if="b.type==='comparison'">
         <div class="space-y-2 mt-4 text-right">
-          <template x-for="row in (b.items||[])">
+          <template x-for="(row, idx) in (b.items||[])" :key="idx">
             <div class="grid grid-cols-2 gap-1 rounded-xl overflow-hidden border border-black/5 shadow-sm">
               <div class="bg-gray-50 p-4 border-r border-black/5"><span class="text-[8px] font-black text-amber-600 block mb-1">MAD</span><p class="text-[11px] font-bold leading-tight text-black" x-text="row.mad?.[lang] || ''"></p></div>
               <div class="bg-white p-4 text-gray-400 text-right"><span class="text-[8px] font-black text-gray-300 block mb-1">OTHERS</span><p class="text-[11px]" x-text="row.other?.[lang] || ''"></p></div>
@@ -642,7 +656,7 @@ input:checked + .mad-radio-box { border-color: #10b981; background: #f0fdf4; col
           <div class="flex justify-between items-center mb-3">
             <span class="text-[10px] font-black uppercase tracking-widest text-white/60">Reviews</span>
             <div class="flex text-amber-400 gap-0.5">
-              <template x-for="i in parseInt(b.stars || 5)">
+              <template x-for="i in parseInt(b.stars || 5)" :key="i">
                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
               </template>
             </div>
@@ -665,9 +679,21 @@ input:checked + .mad-radio-box { border-color: #10b981; background: #f0fdf4; col
           <h2 class="text-xl font-black text-center mb-4 text-black" x-text="b.content?.[lang] || (lang==='he'?'הזמנה':'اطلب الآن')"></h2>
 
           <form @submit.prevent="submitForm">
-            <!-- ✅ trackCart on name + phone, BUT it will fire ONLY when phone becomes valid -->
+            <!-- ✅ AddToCart on name typing -->
             <input type="text" x-model="f.name" @input="trackCart" class="inp" :placeholder="lang==='he'?'שם':'الاسم'" required>
-            <input type="tel" x-model="f.phone" @input="trackCart" dir="ltr" class="inp text-right" :placeholder="lang==='he'?'טלפון':'الهاتف'" required>
+
+            <!-- ✅ phone normalized on blur, but doesn't break submit -->
+            <input
+              type="tel"
+              inputmode="tel"
+              x-model="f.phone"
+              @blur="f.phone = formatPhoneE164(f.phone) || f.phone"
+              dir="ltr"
+              class="inp text-right"
+              :placeholder="lang==='he'?'טלפון':'الهاتف'"
+              required
+            >
+
             <input type="text" x-model="f.address" class="inp" :placeholder="lang==='he'?'כתובת':'العنوان'" required>
 
             <div class="grid grid-cols-2 gap-3 mb-4">
@@ -697,7 +723,6 @@ input:checked + .mad-radio-box { border-color: #10b981; background: #f0fdf4; col
   </div>
 </div>
 
-<!-- ✅ Sending popup -->
 <div x-show="sending" class="fixed inset-0 bg-black/80 flex items-center justify-center z-50" style="display:none">
   <div class="text-center p-7 bg-white text-black rounded-3xl max-w-sm mx-4">
     <div class="text-5xl mb-3 animate-pulse">📨</div>
@@ -723,7 +748,7 @@ function app() {
     submitted: false,
     pop: { show: false, msg: '' },
 
-    cartFired: false, // ✅ prevents duplicates, but only after valid phone
+    cartFired: false,
 
     blocks: ${bJ},
     c: ${cJ},
@@ -756,20 +781,20 @@ function app() {
       }
     },
 
+    // ✅ AddToCart fires when user starts typing name (phone optional)
     trackCart() {
       if (this.cartFired) return;
 
-      // ✅ only fire when phone is valid E.164 => fixes "Incorrect phone number format"
-      const e164 = formatPhoneE164(this.f.phone);
-      if (!e164) return;
+      const name = (this.f.name || '').trim();
+      if (!name) return;
 
       this.cartFired = true;
       this.ensurePixelsNow();
 
-      const name = (this.f.name || '').trim();
-      const ttPhone = e164.replace('+',''); // safer for ttq identify
+      const e164 = formatPhoneE164(this.f.phone);        // +972...
+      const ttPhone = e164 ? e164.replace('+','') : '';  // 972...
 
-      // FB
+      // Facebook (only send phone if valid)
       if (window.fbq && this.c.fbPixel) {
         const am = { fn: name };
         if (e164) am.ph = e164;
@@ -784,7 +809,7 @@ function app() {
         });
       }
 
-      // TikTok ✅ phone line fixed
+      // TikTok
       if (window.ttq && this.c.ttPixel) {
         if (ttPhone) ttq.identify({ phone_number: ttPhone, name: name });
         ttq.track('AddToCart', {
@@ -832,7 +857,7 @@ function app() {
         });
       }
 
-      // TikTok ✅ second phone line fixed
+      // TikTok
       if (window.ttq && this.c.ttPixel) {
         if (ttPhone) ttq.identify({ phone_number: ttPhone, name: name });
         ttq.track('CompletePayment', {
@@ -861,7 +886,9 @@ function app() {
       fd.append('lang', this.lang);
       fd.append('offer', '${PROD_NAME}');
       fd.append('price', '${PRICE_VAL}');
-      fd.append('admin_phone', (this.c.adminPhone || this.c.admin_phone || '${this.config.adminPhone}'));
+
+      // ✅ admin phone from base64 (not visible to Meta)
+      fd.append('admin_phone', (this.c.adminPhoneB64 ? atob(this.c.adminPhoneB64) : ''));
 
       try {
         await fetch(this.c.sheetUrl, { method: 'POST', body: fd, mode: 'no-cors' });
@@ -879,11 +906,4 @@ function app() {
 <\/script>
 
 </body>
-</html>`;
-    }
-  }
-}
-</script>
-
-</body>
-</html>
+</html>`
