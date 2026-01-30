@@ -171,7 +171,8 @@ function builderApp() {
   return {
     editLang: 'ar', zoom: 0.85, timeout: null,
     config: {
-      bgColor: '#f07d70',
+      // ✅ افتراضي مثل الصورة (غامق فخم)
+      bgColor: '#0e0302',
       logoUrl: 'https://www.mad-parfumeur.com/assets/hero/logo.png',
       heroTitle: { ar: 'أقوى العروض الحصرية', he: 'המבצעים הבלעדיים ביותר' },
       productName: 'big-sale', price: '500', adminPhone: '972525105889',
@@ -189,12 +190,15 @@ function builderApp() {
       clearTimeout(this.timeout);
       this.timeout = setTimeout(() => {
         const frame = document.getElementById('preview-frame');
-        if (frame) frame.srcdoc = this.generateFinalHTML();
+        // ✅ المعاينة تتبع لغة التحرير (AR/HE)
+        if (frame) frame.srcdoc = this.generateFinalHTML(this.editLang, false);
       }, 300);
     },
     addBlock(type) {
       let b = { 
-        id: Date.now() + Math.random(), type, "content":{ ar: 'MAD PERFUME', he: 'MAD PERFUME' }, 
+        id: Date.now() + Math.random(),
+        type,
+        content:{ ar: 'MAD PERFUME', he: 'MAD PERFUME' }, 
         url: '', align: 'center', btnText: { ar: 'تأكيد الطلب', he: 'אישור הזמנה' }, 
         items: [], images: [], score: '4.9 / 5', 
         style: { color: '#ffffff', size: 'text-lg', font: 'Cairo', weight: 'font-bold' } 
@@ -214,9 +218,9 @@ function builderApp() {
       }
       if (type === 'faq') {
         b.items = [
-          { q: {ar:'هل العطور أصلية؟',he:'האם הבשמים מקוריים?'}, a: {ar:'نعم، جميع عطورنا أصلية 100% ومصادق عليها.',he:'כן, כל הבשמים שלנו מקוריים 100% ומאושרים על ידי משרד הבריאות.'} },
+          { q: {ar:'هل العطور أصلية؟',he:'האם הבשמים מקוריים?'}, a: {ar:'نعم، جميع عطورنا أصلية 100% ومصادق عليها.',he:'כן, כל הבשמים שלנו מקוריים 100% ומאושרים على ידי משרד הבריאות.'} },
           { q: {ar:'كم تستغرق مدة التوصيل؟',he:'כמה זמן לוקח המשלוח?'}, a: {ar:'خلال 2-3 أيام عمل لجميع المناطق.',he:'אספקה מהירה תוך 2-3 ימי עסקים לכל הארץ.'} },
-          { q: {ar:'هل الرائحة ثابتة؟',he:'האם הריח נשאר لاורך זמן?'}, a: {ar:'نعم، تركيز نيش يضمن ثباتاً يتجاوز 24 ساعة.',he:'בהחלט, ריכוז הבשמים גבוה מאוד (נישה) להבטחת עמידות מעל 24 שעות.'} },
+          { q: {ar:'هل الرائحة ثابتة؟',he:'האם הריח נשאר לאורך זמן?'}, a: {ar:'نعم، تركيز نيش يضمن ثباتاً يتجاوز 24 ساعة.',he:'בהחלט, ריכוז הבשמים גבוה מאוד (נישה) להבטחת עמידות מעל 24 שעות.'} },
           { q: {ar:'هل يتوفر دفع عند الاستلام؟',he:'יש אפשרות לתשלום במזומן?'}, a: {ar:'نعم، نوفر خدمة الدفع نقداً عند استلام الطلب.',he:'כן, אנו מציעים תשלום במזומן בעת מסירת ההזמנה.'} },
           { q: {ar:'أين تقع فروعكم؟',he:'איפה נמצאים הסניפים שלכם?'}, a: {ar:'لدينا أكثر من 40 فرع في كافة المناطق.',he:'יש לנו מעל 40 סניפים הפרוסים בכל רחבי הארץ לשירותכם.'} },
           { q: {ar:'ماذا لو لم يعجبني العطر؟',he:'מה אם לא אהבתי את הבושם?'}, a: {ar:'نحن نضمن رضاك بسياسة استبدال مرنة.',he:'אנחנו מבטיחים שביעות רצון מלאה, ניתן להחליף את הבושם בקלות.'} }
@@ -230,30 +234,49 @@ function builderApp() {
       if (ni >= 0 && ni < this.blocks.length) { [this.blocks[i], this.blocks[ni]] = [this.blocks[ni], this.blocks[i]]; this.update(); }
     },
     async copyCode() {
-      const html = this.generateFinalHTML();
+      // ✅ النسخ: ملف نهائي تلقائي حسب لغة المستخدم
+      const html = this.generateFinalHTML(null, true);
       try { await navigator.clipboard.writeText(html); alert('✅ تم نسخ الكود!'); } 
       catch (err) { const t = document.createElement("textarea"); t.value = html; document.body.appendChild(t); t.select(); document.execCommand('copy'); document.body.removeChild(t); alert('✅ تم نسخ الكود!'); }
     },
     downloadHTML() {
-      const html = this.generateFinalHTML();
+      // ✅ التحميل: ملف نهائي تلقائي حسب لغة المستخدم
+      const html = this.generateFinalHTML(null, true);
       const blob = new Blob([html], { type: 'text/html' });
       const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'MAD_Landing_Final.html'; a.click();
     },
-    generateFinalHTML() {
+    generateFinalHTML(forcedLang=null, forExport=false) {
       const bStr = JSON.stringify(this.blocks).replace(/</g, '\\u003c');
       const cStr = JSON.stringify(this.config).replace(/</g, '\\u003c');
-      // Pass editLang to init to sync preview with builder
+      const initArg = forcedLang ? `'${forcedLang}'` : 'null';
+
       return `<!DOCTYPE html>
-<html x-data="app()" x-init="init(null)" :lang="lang" :dir="lang==='he'?'ltr':'rtl'">
+<html x-data="app()" x-init="init(${initArg})" :lang="lang" :dir="lang==='he'?'ltr':'rtl'">
 <head>
   <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script src="https://cdn.tailwindcss.com"><\/script>
   <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer><\/script>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;900&display=swap" rel="stylesheet">
   <style>
-    body { background: ${this.config.bgColor}; font-family: 'Cairo', sans-serif; overflow-x: hidden; min-height: 100vh; }
+    body {
+      background:
+        radial-gradient(900px circle at 50% -200px, rgba(255,255,255,.10), transparent 55%),
+        radial-gradient(700px circle at 10% 40%, rgba(255,255,255,.06), transparent 60%),
+        linear-gradient(180deg, rgba(0,0,0,.65), rgba(0,0,0,.15) 45%, rgba(0,0,0,.85)),
+        ${this.config.bgColor};
+      font-family: 'Cairo', sans-serif;
+      overflow-x: hidden;
+      min-height: 100vh;
+      color: #fff;
+    }
+
     .inp { width: 100%; padding: 15px; background: #f8fafc; border: 1px solid #ddd; border-radius: 12px; margin-bottom: 10px; font-weight: bold; text-align: center; color: black; }
-    .btn-main { background: #000; color: #fff; width: 100%; padding: 18px; border-radius: 14px; font-weight: 900; font-size: 1.2rem; animation: pulse 2s infinite; cursor: pointer; border:none; box-shadow: 0 4px 14px rgba(0,0,0,0.2); }
+
+    /* ✅ زر الطلب أخضر */
+    .btn-main { background: #10b981; color: #fff; width: 100%; padding: 18px; border-radius: 14px; font-weight: 900; font-size: 1.2rem; animation: pulse 2s infinite; cursor: pointer; border:none; box-shadow: 0 6px 18px rgba(16,185,129,0.35); }
+    .btn-main:hover { filter: brightness(1.05); }
+    .btn-main:active { transform: scale(0.99); }
+
     @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.02); } 100% { transform: scale(1); } }
     .progress-container { margin-bottom: 15px; }
     .progress-track { height: 6px; background: rgba(0,0,0,0.1); border-radius: 99px; overflow: hidden; }
@@ -264,6 +287,7 @@ function builderApp() {
   </style>
   <script>
     function formatE164(p) { if(!p) return ''; let d = String(p).replace(/[^0-9]/g, ''); if(d.startsWith('05') && d.length === 10) d = '972' + d.slice(1); if(d.startsWith('00')) d = d.slice(2); return '+' + d; }
+
     function loadPixels(cfg) {
       if(window._px_f) return; window._px_f = true;
       if(cfg.fbPixel) { !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)n=f.fbq;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js'); fbq('init', cfg.fbPixel); fbq('track', 'PageView'); }
@@ -273,7 +297,7 @@ function builderApp() {
   <\/script>
 </head>
 <body class="pb-20">
-  <nav class="p-4 flex justify-center bg-white/40 backdrop-blur sticky top-0 z-50"><img src="${this.config.logoUrl}" class="h-10 object-contain"></nav>
+  <nav class="p-4 flex justify-center bg-white/15 backdrop-blur sticky top-0 z-50 border-b border-white/10"><img src="${this.config.logoUrl}" class="h-10 object-contain"></nav>
   <header class="text-center py-8 px-4 text-white"><h1 class="text-3xl font-black" x-text="c.heroTitle[lang]"></h1></header>
 
   <main class="max-w-md mx-auto">
@@ -317,42 +341,33 @@ function builderApp() {
       <span class="text-xs opacity-60 mb-1" x-text="lang==='he' ? 'דירוג' : 'Rating'"></span>
     </div>
 
-    <!-- ✅ التعديل الأفخم بدل MAD PERFUME -->
     <p class="text-[11px] font-black text-white/90 mt-1"
        x-text="lang==='he' ? 'דירוג לקוחות שניסו לפניך' : 'تقييم عملاء جرّبوا العطر قبلَك'"></p>
 
-    <!-- وصف صغير تحتها (اختياري) -->
     <p class="text-[10px] font-bold mt-2 text-white/80"
        x-text="b.content && b.content[lang] ? b.content[lang] : (lang==='he' ? 'מבוסס על ביקורות לקוחות אמיתיות' : 'مبني على تقييمات عملاء حقيقيين')"></p>
   </a>
 </template>
 
-
 <!-- ✅ تقييم تفاعلي + عنوان فوق النجوم (مثل الصورة) -->
 <template x-if="b.type==='interactive_rating'">
   <div class="bg-white border-2 border-amber-100 rounded-2xl p-5 shadow-sm text-center mt-4" x-data="{ r: 0 }">
-
-    <!-- ✅ هذا هو السطر اللي فوق التقييم -->
     <div class="flex items-center justify-center gap-2 mb-3">
       <span class="text-amber-500 text-xl">★</span>
       <h3 class="text-[18px] font-black text-slate-900" x-text="b.content && b.content[lang] ? b.content[lang] : (lang==='he' ? 'ניסית את הבושם? דרג אותנו' : 'جرّبت العطر؟ قيّمنا')"></h3>
     </div>
 
-    <!-- النجوم -->
     <div class="flex justify-center gap-2 mb-2" x-show="r===0">
       <template x-for="i in 5">
         <button @click="r=i" class="text-3xl text-gray-200 hover:text-amber-400 transition">★</button>
       </template>
     </div>
 
-    <!-- رسالة بعد التقييم -->
     <div x-show="r>0" class="text-emerald-600 font-bold mt-2">
       <p class="text-sm" x-text="lang==='he' ? 'תודה רבה על הדירוג!' : 'شكراً لتقييمك! ⭐'"></p>
     </div>
-
   </div>
 </template>
-
 
         <template x-if="b.type==='comparison'">
           <div class="mt-4">
@@ -369,7 +384,6 @@ function builderApp() {
         <template x-if="b.type==='form'">
 <div class="bg-white p-6 rounded-[24px] shadow-sm text-right border-2 border-gray-100 mt-4" id="order">
 
-  <!-- ✅ إضافة المزايا (أفضل مكان داخل الفورم) -->
   <div class="flex gap-2 mb-4">
     <div class="flex-1 rounded-full py-2 text-center text-[12px] font-black bg-slate-100 text-slate-600 border border-slate-200"
          x-text="lang==='he' ? 'אחריות החלפה' : 'ضمان استبدال'"></div>
@@ -382,29 +396,29 @@ function builderApp() {
   </div>
 
   <div class="progress-container">
+    <div class="progress-text flex justify-between text-[10px] font-bold mb-1 text-gray-400">
+      <span x-text="lang==='he'?'פרטי משלוח':'معلومات الشحن'"></span>
+      <span x-text="lang==='he'?'שלב אחרון':'الخطوة الأخيرة'"></span>
+    </div>
+    <div class="progress-track"><div class="progress-fill"></div></div>
+  </div>
 
-              <div class="progress-text flex justify-between text-[10px] font-bold mb-1 text-gray-400">
-                <span x-text="lang==='he'?'פרטי משלוח':'معلومات الشحن'"></span>
-                <span x-text="lang==='he'?'שלב אחרון':'الخطوة الأخيرة'"></span>
-              </div>
-              <div class="progress-track"><div class="progress-fill"></div></div>
-            </div>
-            <h2 class="text-xl font-black text-center mb-4 text-gray-800" x-text="lang==='he'?'הזמינו עכשיו':'اطلب الآن'"></h2>
-            <form @submit.prevent="submitForm">
-              <input type="text" x-model="f.name" @input="trackInput()" class="inp" :placeholder="lang==='he'?'שם מלא':'الاسم الكامل'" required>
-              <input type="tel" x-model="f.phone" @input="trackInput()" class="inp" :placeholder="lang==='he'?'טלפון':'رقم الهاتف'" dir="ltr" required>
-              <input type="text" x-model="f.address" class="inp" :placeholder="lang==='he'?'כתובת מלאה':'العنوان الكامل'" required>
-              <div class="grid grid-cols-2 gap-3 mb-4">
-                <label class="cursor-pointer"><input type="radio" x-model="f.payment" value="Cash" class="hidden"><div class="mad-radio-box recommended"><span x-text="lang==='he'?'מזומן 💵':'نقد 💵'"></span><div class="text-[9px] text-green-600 font-normal" x-text="lang==='he'?'מומלץ':'موصى به'"></div></div></label>
-                <label class="cursor-pointer"><input type="radio" x-model="f.payment" value="Visa" class="hidden"><div class="mad-radio-box"><span x-text="lang==='he'?'אשראי 💳':'فيزا 💳'"></span></div></label>
-              </div>
-              <div class="grid grid-cols-2 gap-3 mb-6">
-                <label class="cursor-pointer"><input type="radio" x-model="f.process" value="Direct" class="hidden"><div class="mad-radio-box recommended"><span class="text-xs" x-text="lang==='he'?'שלח הזמנה':'ارسل الطلب'"></span><div class="text-[9px] text-blue-600 font-normal" x-text="lang==='he'?'הכי מהיר':'🚀 أسرع'"></div></div></label>
-                <label class="cursor-pointer"><input type="radio" x-model="f.process" value="Contact" class="hidden"><div class="mad-radio-box"><span class="text-xs" x-text="lang==='he'?'צור איתי קשר':'تواصل معي'"></span></div></label>
-              </div>
-              <button type="submit" class="btn-main mt-2 w-full" x-text="loading?'...':(lang==='he'?'אישור הזמנה':'تأكيد الطلب')" :disabled="loading"></button>
-            </form>
-          </div>
+  <h2 class="text-xl font-black text-center mb-4 text-gray-800" x-text="lang==='he'?'הזמינו עכשיו':'اطلب الآن'"></h2>
+  <form @submit.prevent="submitForm">
+    <input type="text" x-model="f.name" @input="trackInput()" class="inp" :placeholder="lang==='he'?'שם מלא':'الاسم الكامل'" required>
+    <input type="tel" x-model="f.phone" @input="trackInput()" class="inp" :placeholder="lang==='he'?'טלפון':'رقم الهاتف'" dir="ltr" required>
+    <input type="text" x-model="f.address" class="inp" :placeholder="lang==='he'?'כתובת מלאה':'العنوان الكامل'" required>
+    <div class="grid grid-cols-2 gap-3 mb-4">
+      <label class="cursor-pointer"><input type="radio" x-model="f.payment" value="Cash" class="hidden"><div class="mad-radio-box recommended"><span x-text="lang==='he'?'מזומן 💵':'نقد 💵'"></span><div class="text-[9px] text-green-600 font-normal" x-text="lang==='he'?'מומלץ':'موصى به'"></div></div></label>
+      <label class="cursor-pointer"><input type="radio" x-model="f.payment" value="Visa" class="hidden"><div class="mad-radio-box"><span x-text="lang==='he'?'אשראי 💳':'فيزا 💳'"></span></div></label>
+    </div>
+    <div class="grid grid-cols-2 gap-3 mb-6">
+      <label class="cursor-pointer"><input type="radio" x-model="f.process" value="Direct" class="hidden"><div class="mad-radio-box recommended"><span class="text-xs" x-text="lang==='he'?'שלח הזמנה':'ارسل الطلب'"></span><div class="text-[9px] text-blue-600 font-normal" x-text="lang==='he'?'הכי מהיר':'🚀 أسرع'"></div></div></label>
+      <label class="cursor-pointer"><input type="radio" x-model="f.process" value="Contact" class="hidden"><div class="mad-radio-box"><span class="text-xs" x-text="lang==='he'?'צור איתי קשר':'تواصل معي'"></span></div></label>
+    </div>
+    <button type="submit" class="btn-main mt-2 w-full" x-text="loading?'...':(lang==='he'?'אישור הזמנה':'تأكيد الطلب')" :disabled="loading"></button>
+  </form>
+</div>
         </template>
       </div>
     </template>
@@ -431,7 +445,18 @@ function app() {
     blocks: ${bStr}, c: ${cStr}, f: {name:'', phone:'', address:'', payment:'Cash', process:'Direct'},
     time: 900, hasStartedTyping: false,
     get timer() { const m=Math.floor(this.time/60); const s=this.time%60; return \`\${m}:\${s<10?'0':''}\${s}\`; },
-    init(forcedLang) { this.lang = forcedLang || (navigator.language.startsWith('he')?'he':'ar'); loadPixels(this.c); setInterval(()=>{if(this.time>0) this.time--}, 1000); },
+
+    // ✅ النهائي: تلقائي حسب لغة المستخدم + يدعم ?lang=he أو ?lang=ar
+    init(forcedLang) {
+      const qs = new URLSearchParams(window.location.search);
+      const urlLang = qs.get('lang');
+      const autoLang = navigator.language.startsWith('he') ? 'he' : 'ar';
+      this.lang = forcedLang || ((urlLang==='he'||urlLang==='ar') ? urlLang : autoLang);
+
+      loadPixels(this.c);
+      setInterval(()=>{if(this.time>0) this.time--}, 1000);
+    },
+
     trackInput() { if(!this.hasStartedTyping && this.f.name.length>2){ this.hasStartedTyping=true; this.track('AddToCart'); } },
     track(ev) {
       const cfg = this.c; let ph = formatE164(this.f.phone);
