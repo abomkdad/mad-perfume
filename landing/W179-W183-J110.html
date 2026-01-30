@@ -170,20 +170,60 @@ function app() {
     get timer() { const m=Math.floor(this.time/60); const s=this.time%60; return `${m}:${s<10?'0':''}${s}`; },
     init(forcedLang) { this.lang = forcedLang || (navigator.language.startsWith('he')?'he':'ar'); loadPixels(this.c); setInterval(()=>{if(this.time>0) this.time--}, 1000); },
     trackInput() { if(!this.hasStartedTyping && this.f.name.length>2){ this.hasStartedTyping=true; this.track('AddToCart'); } },
-    track(ev) {
+      track(ev) {
       const cfg = this.c; let ph = formatE164(this.f.phone);
       if(window.ttq){ if(ph.length>=10) ttq.identify({phone_number:ph, name:this.f.name}); ttq.track(ev==='AddToCart'?'AddToCart':'CompletePayment', {content_id:cfg.productName, value:Number(cfg.price), currency:'ILS', content_type:'product'}); }
       if(window.fbq) fbq('track', ev, {value:Number(cfg.price), currency:'ILS', content_ids:[cfg.productName], content_type:'product'});
       if(window.snaptr) { if(ph.length>=10) snaptr('init', cfg.snapPixel, {user_phone_number:ph}); if(ev==='AddToCart') snaptr('track','ADD_CART',{item_ids:[cfg.productName]}); if(ev==='Purchase') snaptr('track','PURCHASE',{currency:'ILS', price:Number(cfg.price)}); }
     },
+
     async submitForm() {
-      this.loading=true; this.track('Purchase');
+      this.loading=true; 
+      this.track('Purchase');
+
       const cfg = this.c;
-      let fd=new FormData(); Object.keys(this.f).forEach(k=>fd.append(k,this.f[k]));
-      fd.append('offer',cfg.productName); fd.append('price',cfg.price); fd.append('lang',this.lang);
-      try { await fetch(cfg.sheetUrl,{method:'POST', body:fd, mode:'no-cors'}); this.submitted=true; } catch(e){ alert('Error'); } finally { this.loading=false; }
+
+      let fd=new FormData(); 
+      Object.keys(this.f).forEach(k=>fd.append(k,this.f[k]));
+
+      fd.append('offer',cfg.productName); 
+      fd.append('price',cfg.price); 
+      fd.append('lang',this.lang);
+
+      // ✅ مصدر العميل: فيس / تيك توك / سناب
+      const qs = new URLSearchParams(location.search);
+      let src = (qs.get('utm_source') || '').toLowerCase().trim();
+
+      // لو ما في utm_source نخمن من كليكات المنصات
+      if (!src) {
+        if (qs.get('fbclid')) src = 'facebook';
+        else if (qs.get('ttclid')) src = 'tiktok';
+        else if (qs.get('sccid') || qs.get('scclid') || qs.get('snapclid')) src = 'snap';
+      }
+
+      // توحيدها لقيمك المطلوبة
+      if (src.includes('face') || src.includes('fb') || src.includes('meta')) src = 'فيس';
+      else if (src.includes('tiktok') || src.includes('tt')) src = 'تيك توك';
+      else if (src.includes('snap')) src = 'سناب';
+      else src = '';
+
+      fd.append('utm_source', src);
+
+      try { 
+        await fetch(cfg.sheetUrl,{method:'POST', body:fd, mode:'no-cors'}); 
+        this.submitted=true; 
+      } catch(e){ 
+        alert('Error'); 
+      } finally { 
+        this.loading=false; 
+      }
     }
   }
+}
+</script>
+</body>
+</html>
+}
 }
 </script>
 </body>
