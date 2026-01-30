@@ -211,16 +211,33 @@ function app() {
       if(window.ttq){ if(ph.length>=10) ttq.identify({phone_number:ph, name:this.f.name}); ttq.track(ev==='AddToCart'?'AddToCart':'CompletePayment', {content_id:cfg.productName, value:Number(cfg.price), currency:'ILS', content_type:'product'}); }
       if(window.fbq) fbq('track', ev, {value:Number(cfg.price), currency:'ILS', content_ids:[cfg.productName], content_type:'product'});
       if(window.snaptr) { if(ph.length>=10) snaptr('init', cfg.snapPixel, {user_phone_number:ph}); if(ev==='AddToCart') snaptr('track','ADD_CART',{item_ids:[cfg.productName]}); if(ev==='Purchase') snaptr('track','PURCHASE',{currency:'ILS', price:Number(cfg.price)}); }
-    },
-    async submitForm() {
-      this.loading=true; this.track('Purchase');
-      const cfg = this.c;
-      let fd=new FormData(); Object.keys(this.f).forEach(k=>fd.append(k,this.f[k]));
-      fd.append('offer',cfg.productName); fd.append('price',cfg.price); fd.append('lang',this.lang);
-      try { await fetch(cfg.sheetUrl,{method:'POST', body:fd, mode:'no-cors'}); this.submitted=true; } catch(e){ alert('Error'); } finally { this.loading=false; }
-    }
+ },
+async submitForm() {
+  this.loading=true; this.track('Purchase');
+  const cfg = this.c;
+
+  let fd=new FormData();
+  Object.keys(this.f).forEach(k=>fd.append(k,this.f[k]));
+
+  fd.append('offer',cfg.productName);
+  fd.append('price',cfg.price);
+  fd.append('lang',this.lang);
+
+  // ✅ مصدر العميل (فيس/تيك توك/سناب) من utm_source
+  const qs2 = new URLSearchParams(location.search);
+  fd.append('utm_source', qs2.get('utm_source') || '');
+
+  try {
+    await fetch(cfg.sheetUrl,{method:'POST', body:fd, mode:'no-cors'});
+    this.submitted=true;
+  } catch(e){
+    alert('Error');
+  } finally {
+    this.loading=false;
   }
 }
+}
+
 </script>
 </body>
 </html>
