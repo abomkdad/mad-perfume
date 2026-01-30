@@ -206,12 +206,34 @@ function app() {
     },
 
     trackInput() { if(!this.hasStartedTyping && this.f.name.length>2){ this.hasStartedTyping=true; this.track('AddToCart'); } },
-    track(ev) {
-      const cfg = this.c; let ph = formatE164(this.f.phone);
-      if(window.ttq){ if(ph.length>=10) ttq.identify({phone_number:ph, name:this.f.name}); ttq.track(ev==='AddToCart'?'AddToCart':'CompletePayment', {content_id:cfg.productName, value:Number(cfg.price), currency:'ILS', content_type:'product'}); }
-      if(window.fbq) fbq('track', ev, {value:Number(cfg.price), currency:'ILS', content_ids:[cfg.productName], content_type:'product'});
-      if(window.snaptr) { if(ph.length>=10) snaptr('init', cfg.snapPixel, {user_phone_number:ph}); if(ev==='AddToCart') snaptr('track','ADD_CART',{item_ids:[cfg.productName]}); if(ev==='Purchase') snaptr('track','PURCHASE',{currency:'ILS', price:Number(cfg.price)}); }
-    },
+   track(ev) {
+  const cfg = this.c; 
+  let ph = formatE164(this.f.phone);
+
+  if (window.ttq) {
+    if (ph.length >= 10) ttq.identify({ phone_number: ph, name: this.f.name });
+    ttq.track(ev === 'AddToCart' ? 'AddToCart' : 'CompletePayment', {
+      content_id: cfg.productName,
+      value: Number(cfg.price),
+      currency: 'ILS',
+      content_type: 'product'
+    });
+  }
+
+  if (window.fbq) fbq('track', ev, {
+    value: Number(cfg.price),
+    currency: 'ILS',
+    content_ids: [cfg.productName],
+    content_type: 'product'
+  });
+
+  if (window.snaptr) {
+    if (ph.length >= 10) snaptr('init', cfg.snapPixel, { user_phone_number: ph });
+    if (ev === 'AddToCart') snaptr('track', 'ADD_CART', { item_ids: [cfg.productName] });
+    if (ev === 'Purchase') snaptr('track', 'PURCHASE', { currency: 'ILS', price: Number(cfg.price) });
+  }
+},
+
 async submitForm() {
   this.loading = true;
   this.track('Purchase');
@@ -229,7 +251,6 @@ async submitForm() {
   const qs = new URLSearchParams(location.search);
   let src = (qs.get('utm_source') || '').toLowerCase().trim();
 
-  // (اختياري) لو ما في utm_source نخمن من كليكات المنصات
   if (!src) {
     if (qs.get('fbclid')) src = 'facebook';
     else if (qs.get('ttclid')) src = 'tiktok';
@@ -245,7 +266,8 @@ async submitForm() {
     alert('Error');
   } finally {
     this.loading = false;
-    },
+  }
+},
   }
 }
 </script>
