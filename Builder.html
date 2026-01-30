@@ -194,7 +194,7 @@ function builderApp() {
     },
     addBlock(type) {
       let b = { 
-        id: Date.now() + Math.random(), type, content: { ar: 'MAD PERFUME', he: 'MAD PERFUME' }, 
+        id: Date.now() + Math.random(), type, content: { ar: 'جرّبت العطر؟ قيّمنا ⭐', he: 'ניסית את הבושם? דרג אותנו ⭐' }, 
         url: '', align: 'center', btnText: { ar: 'تأكيد الطلب', he: 'אישור הזמנה' }, 
         items: [], images: [], score: '4.9 / 5', 
         style: { color: '#ffffff', size: 'text-lg', font: 'Cairo', weight: 'font-bold' } 
@@ -294,13 +294,39 @@ function builderApp() {
           </div>
         </template>
 
-        <template x-if="b.type==='fragrantica'">
-          <a :href="b.url" target="_blank" class="block w-full max-w-[320px] bg-[#3f5a31] text-white p-5 rounded-[24px] shadow-xl relative overflow-hidden mx-auto no-underline text-right mt-4">
-            <div class="flex justify-between items-center mb-3"><span class="text-[10px] font-black uppercase text-white/60">Reviews</span><div class="flex text-amber-400 gap-0.5"><template x-for="i in 5"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></template></div></div>
-            <div class="flex items-end gap-2"><span class="text-4xl font-black" x-text="b.score"></span><span class="text-xs opacity-60 mb-1">Rating</span></div>
-            <p class="text-[10px] font-bold mt-2 text-white/80" x-text="b.content[lang]"></p>
-          </a>
+<!-- ✅ قسم فراغرانتيكا (كامل) -->
+<template x-if="b.type==='fragrantica'">
+  <a :href="b.url" target="_blank"
+     class="block w-full max-w-[320px] bg-[#3f5a31] text-white p-5 rounded-[24px] shadow-xl relative overflow-hidden mx-auto no-underline text-right mt-4">
+
+    <div class="flex justify-between items-center mb-3">
+      <span class="text-[10px] font-black uppercase tracking-widest text-white/60"
+            x-text="lang==='he' ? 'ביקורות' : 'REVIEWS'"></span>
+
+      <div class="flex text-amber-400 gap-0.5">
+        <template x-for="i in 5">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+          </svg>
         </template>
+      </div>
+    </div>
+
+    <div class="flex items-end gap-2">
+      <span class="text-4xl font-black" x-text="b.score || '4.9 / 5'"></span>
+      <span class="text-xs opacity-60 mb-1" x-text="lang==='he' ? 'דירוג' : 'Rating'"></span>
+    </div>
+
+    <!-- ✅ التعديل الأفخم بدل MAD PERFUME -->
+    <p class="text-[11px] font-black text-white/90 mt-1"
+       x-text="lang==='he' ? 'דירוג לקוחות שניסו לפניך' : 'تقييم عملاء جرّبوا العطر قبلَك'"></p>
+
+    <!-- وصف صغير تحتها (اختياري) -->
+    <p class="text-[10px] font-bold mt-2 text-white/80"
+       x-text="b.content && b.content[lang] ? b.content[lang] : (lang==='he' ? 'מבוסס על ביקורות לקוחות אמיתיות' : 'مبني على تقييمات عملاء حقيقيين')"></p>
+  </a>
+</template>
+
 
         <template x-if="b.type==='interactive_rating'">
           <div class="bg-white border-2 border-yellow-100 rounded-xl p-6 shadow-sm text-center mt-4" x-data="{ r: 0 }">
