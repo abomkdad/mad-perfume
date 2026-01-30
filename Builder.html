@@ -328,13 +328,31 @@ function builderApp() {
 </template>
 
 
-        <template x-if="b.type==='interactive_rating'">
-          <div class="bg-white border-2 border-yellow-100 rounded-xl p-6 shadow-sm text-center mt-4" x-data="{ r: 0 }">
-            <h3 class="text-lg font-bold mb-3 text-gray-800" x-text="b.content[lang]"></h3>
-            <div class="flex justify-center gap-2 mb-2" x-show="r===0"><template x-for="i in 5"><button @click="r=i" class="text-3xl text-gray-200 hover:text-yellow-400 transition">★</button></template></div>
-            <div x-show="r>0" class="text-green-600 font-bold animate-bounce mt-2"><p class="text-sm" x-text="lang==='he'?'תודה על הדירוג!':'شكراً لك لتقييمنا!'"></p></div>
-          </div>
-        </template>
+<!-- ✅ تقييم تفاعلي + عنوان فوق النجوم (مثل الصورة) -->
+<template x-if="b.type==='interactive_rating'">
+  <div class="bg-white border-2 border-amber-100 rounded-2xl p-5 shadow-sm text-center mt-4" x-data="{ r: 0 }">
+
+    <!-- ✅ هذا هو السطر اللي فوق التقييم -->
+    <div class="flex items-center justify-center gap-2 mb-3">
+      <span class="text-amber-500 text-xl">★</span>
+      <h3 class="text-[18px] font-black text-slate-900" x-text="b.content && b.content[lang] ? b.content[lang] : (lang==='he' ? 'ניסית את הבושם? דרג אותנו' : 'جرّبت العطر؟ قيّمنا')"></h3>
+    </div>
+
+    <!-- النجوم -->
+    <div class="flex justify-center gap-2 mb-2" x-show="r===0">
+      <template x-for="i in 5">
+        <button @click="r=i" class="text-3xl text-gray-200 hover:text-amber-400 transition">★</button>
+      </template>
+    </div>
+
+    <!-- رسالة بعد التقييم -->
+    <div x-show="r>0" class="text-emerald-600 font-bold mt-2">
+      <p class="text-sm" x-text="lang==='he' ? 'תודה רבה על הדירוג!' : 'شكراً لتقييمك! ⭐'"></p>
+    </div>
+
+  </div>
+</template>
+
 
         <template x-if="b.type==='comparison'">
           <div class="mt-4">
