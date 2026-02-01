@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html x-data="app()" x-init="init(null)" :lang="lang" :dir="lang==='he'?'ltr':'rtl'">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;900&display=swap" rel="stylesheet">
+  <style>
+    body {
+      background:
+        radial-gradient(900px circle at 50% -200px, rgba(255,255,255,.10), transparent 55%),
+        radial-gradient(700px circle at 10% 40%, rgba(255,255,255,.06), transparent 60%),
+        linear-gradient(180deg, rgba(0,0,0,.65), rgba(0,0,0,.15) 45%, rgba(0,0,0,.85)),
+        #f980c7;
+      font-family: 'Cairo', sans-serif;
+      overflow-x: hidden;
+      min-height: 100vh;
+      color: #fff;
+    }
+
+    .inp { width: 100%; padding: 15px; background: #f8fafc; border: 1px solid #ddd; border-radius: 12px; margin-bottom: 10px; font-weight: bold; text-align: center; color: black; }
+
+    /* ✅ زر الطلب أخضر */
+    .btn-main { background: #10b981; color: #fff; width: 100%; padding: 18px; border-radius: 14px; font-weight: 900; font-size: 1.2rem; animation: pulse 2s infinite; cursor: pointer; border:none; box-shadow: 0 6px 18px rgba(16,185,129,0.35); }
+    .btn-main:hover { filter: brightness(1.05); }
+    .btn-main:active { transform: scale(0.99); }
+
+    @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.02); } 100% { transform: scale(1); } }
+    .progress-container { margin-bottom: 15px; }
+    .progress-track { height: 6px; background: rgba(0,0,0,0.1); border-radius: 99px; overflow: hidden; }
+    .progress-fill { height: 100%; background: #10b981; width: 85%; }
+    .mad-radio-box { border: 2px solid #e5e7eb; border-radius: 12px; padding: 12px; text-align: center; background: white; font-weight: 700; cursor: pointer; transition: 0.2s; color: black; }
+    input:checked + .mad-radio-box { border-color: #10b981; background: #f0fdf4; color: #047857; transform: scale(1.02); }
+    .recommended::after { content: '★'; position: absolute; top: -8px; right: -8px; background: #10b981; color: white; border-radius: 50%; width: 20px; height: 20px; font-size: 10px; display: flex; align-items: center; justify-content: center; }
+  </style>
+  <script>
+    function formatE164(p) { if(!p) return ''; let d = String(p).replace(/[^0-9]/g, ''); if(d.startsWith('05') && d.length === 10) d = '972' + d.slice(1); if(d.startsWith('00')) d = d.slice(2); return '+' + d; }
+
+    function loadPixels(cfg) {
+      if(window._px_f) return; window._px_f = true;
+      if(cfg.fbPixel) { !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)n=f.fbq;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js'); fbq('init', cfg.fbPixel); fbq('track', 'PageView'); }
+      if(cfg.ttPixel) { !function(w,d,t){w.TiktokAnalyticsObject=t;var ttq=w[t]=w[t]||[];ttq.methods=["page","track","identify","instances","debug","on","off","once","ready","alias","group","enableCookie","disableCookie","holdConsent","revokeConsent","grantConsent"];ttq.setAndDefer=function(t,e){t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}};for(var i=0;i<ttq.methods.length;i++)ttq.setAndDefer(ttq,ttq.methods[i]);ttq.load=function(e,n){var r="https://analytics.tiktok.com/i18n/pixel/events.js";ttq._i=ttq._i||{};ttq._i[e]=[];ttq._i[e]._u=r;ttq._t=ttq._t||{};ttq._t[e]=+new Date;ttq._o=ttq._o||{};ttq._o[e]=n||{};var o=document.createElement("script");o.type="text/javascript";o.async=!0;o.src=r+"?sdkid="+e+"&lib="+t;var a=document.getElementsByTagName("script")[0];a.parentNode.insertBefore(o,a)};ttq.load(cfg.ttPixel);ttq.page();}(window,document,'ttq'); }
+      if(cfg.snapPixel) { (function(e,t,n){if(e.snaptr)return;var a=e.snaptr=function(){a.handleRequest?a.handleRequest.apply(a,arguments):a.queue.push(arguments)};a.queue=[];var s='script';var r=t.createElement(s);r.async=!0;r.src=n;var u=t.getElementsByTagName(s)[0];u.parentNode.insertBefore(r,u)})(window,document,'https://sc-static.net/scevent.min.js'); snaptr('init', cfg.snapPixel); snaptr('track', 'PAGE_VIEW'); }
+    }
+  </script>
+</head>
+<body class="pb-20">
+  <nav class="p-4 flex justify-center bg-white/15 backdrop-blur sticky top-0 z-50 border-b border-white/10"><img src="https://www.mad-parfumeur.com/assets/hero/logo.png" class="h-10 object-contain"></nav>
+  <header class="text-center py-8 px-4 text-white"><h1 class="text-3xl font-black" x-text="c.heroTitle[lang]"></h1></header>
+
+  <main class="max-w-md mx-auto">
+    <template x-for="(b, idx) in (blocks || [])" :key="b.id">
+      <div class="my-6 px-4" :class="b.type==='carousel'?'!px-0':'px-4'">
+        <template x-if="b.type==='text'"><p class="whitespace-pre-wrap leading-relaxed font-black text-center" :style="{ color: b.style.color || '#fff', fontSize: '1.25rem' }" x-text="b.content[lang]"></p></template>
+        <template x-if="b.type==='image'"><img :src="b.url" class="rounded-2xl mx-auto shadow-lg w-full"></template>
+        <template x-if="b.type==='video'"><video :src="b.url" controls class="w-full rounded-2xl shadow-lg"></video></template>
+        
+        <template x-if="b.type==='carousel'">
+          <div class="relative w-full overflow-hidden" x-data="{ curr: 0, total: b.images.length }" x-init="if(total>1) setInterval(()=>{curr=(curr+1)%total}, 4000)">
+            <div class="flex transition-transform duration-700 ease-in-out" :style="'transform: translateX(' + (lang === 'he' ? (curr * -100) : (curr * 100)) + '%)'">
+               <template x-for="(img, i) in b.images" :key="'ci-'+i"><div class="min-w-full w-full"><img :src="img" class="w-full object-cover shadow-xl"></div></template>
+            </div>
+            <div class="absolute bottom-4 left-0 right-0 flex justify-center gap-2" x-show="total > 1">
+               <template x-for="(img, i) in b.images" :key="'ind-'+i"><div class="w-2 h-2 rounded-full transition-all duration-300" :class="curr === i ? 'bg-white w-6' : 'bg-white/40'"></div></template>
+            </div>
+          </div>
+        </template>
+
+<!-- ✅ قسم فراغرانتيكا (كامل) -->
+<template x-if="b.type==='fragrantica'">
+  <a :href="b.url" target="_blank"
+     class="block w-full max-w-[320px] bg-[#3f5a31] text-white p-5 rounded-[24px] shadow-xl relative overflow-hidden mx-auto no-underline text-right mt-4">
+
+    <div class="flex justify-between items-center mb-3">
+      <span class="text-[10px] font-black uppercase tracking-widest text-white/60"
+            x-text="lang==='he' ? 'ביקורות' : 'REVIEWS'"></span>
+
+      <div class="flex text-amber-400 gap-0.5">
+        <template x-for="i in 5">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+          </svg>
+        </template>
+      </div>
+    </div>
+
+    <div class="flex items-end gap-2">
+      <span class="text-4xl font-black" x-text="b.score || '4.9 / 5'"></span>
+      <span class="text-xs opacity-60 mb-1" x-text="lang==='he' ? 'דירוג' : 'Rating'"></span>
+    </div>
+
+    <p class="text-[11px] font-black text-white/90 mt-1"
+       x-text="lang==='he' ? 'דירוג לקוחות שניסו לפניך' : 'تقييم عملاء جرّبوا العطر قبلَك'"></p>
+
+    <p class="text-[10px] font-bold mt-2 text-white/80"
+       x-text="b.content && b.content[lang] ? b.content[lang] : (lang==='he' ? 'מבוסס על ביקורות לקוחות אמיתיות' : 'مبني على تقييمات عملاء حقيقيين')"></p>
+  </a>
+</template>
+
+<!-- ✅ تقييم تفاعلي + عنوان فوق النجوم (مثل الصورة) -->
+<template x-if="b.type==='interactive_rating'">
+  <div class="bg-white border-2 border-amber-100 rounded-2xl p-5 shadow-sm text-center mt-4" x-data="{ r: 0 }">
+    <div class="flex items-center justify-center gap-2 mb-3">
+      <span class="text-amber-500 text-xl">★</span>
+      <h3 class="text-[18px] font-black text-slate-900" x-text="b.content && b.content[lang] ? b.content[lang] : (lang==='he' ? 'ניסית את הבושם? דרג אותנו' : 'جرّبت العطر؟ قيّمنا')"></h3>
+    </div>
+
+    <div class="flex justify-center gap-2 mb-2" x-show="r===0">
+      <template x-for="i in 5">
+        <button @click="r=i" class="text-3xl text-gray-200 hover:text-amber-400 transition">★</button>
+      </template>
+    </div>
+
+    <div x-show="r>0" class="text-emerald-600 font-bold mt-2">
+      <p class="text-sm" x-text="lang==='he' ? 'תודה רבה על הדירוג!' : 'شكراً لتقييمك! ⭐'"></p>
+    </div>
+  </div>
+</template>
+
+        <template x-if="b.type==='comparison'">
+          <div class="mt-4">
+            <div class="grid grid-cols-2 gap-1 mb-2 px-1 text-right">
+              <div class="text-center font-black text-white text-[10px] uppercase bg-black/20 py-1 rounded-t-lg">MAD</div>
+              <div class="text-center font-black text-white/70 text-[10px] uppercase bg-black/10 py-1 rounded-t-lg" x-text="lang==='he'?'אחרים':'الآخرين'"></div>
+            </div>
+            <div class="space-y-2 text-right"><template x-for="(row, rIdx) in b.items" :key="'c-'+rIdx"><div class="grid grid-cols-2 gap-1 rounded-xl overflow-hidden shadow-sm"><div class="bg-amber-50 p-4 border-r border-amber-100 text-center font-bold text-[11px] text-black" x-text="row.mad[lang]"></div><div class="bg-white p-4 text-center text-gray-400 text-[11px]" x-text="row.other[lang]"></div></div></template></div>
+          </div>
+        </template>
+
+        <template x-if="b.type==='faq'"><div class="bg-white rounded-2xl p-4 shadow-sm space-y-2 text-right mt-4"><template x-for="(qa, qIdx) in b.items" :key="'f-'+qIdx"><div class="border-b last:border-0 pb-2" x-data="{open:false}"><button @click="open=!open" class="w-full flex justify-between font-bold text-sm text-gray-800"><span x-text="qa.q[lang]"></span><span x-text="open?'-':'+'"></span></button><p x-show="open" class="text-xs text-gray-500 mt-1 leading-relaxed" x-text="qa.a[lang]"></p></div></template></div></template>
+
+        <template x-if="b.type==='form'">
+<div class="bg-white p-6 rounded-[24px] shadow-sm text-right border-2 border-gray-100 mt-4" id="order">
+
+  <div class="flex gap-2 mb-4">
+    <div class="flex-1 rounded-full py-2 text-center text-[12px] font-black bg-slate-100 text-slate-600 border border-slate-200"
+         x-text="lang==='he' ? 'אחריות החלפה' : 'ضمان استبدال'"></div>
+
+    <div class="flex-1 rounded-full py-2 text-center text-[12px] font-black bg-amber-100 text-amber-700 border border-amber-200"
+         x-text="lang==='he' ? 'משלוח מהיר' : 'توصيل سريع'"></div>
+
+    <div class="flex-1 rounded-full py-2 text-center text-[12px] font-black bg-emerald-100 text-emerald-700 border border-emerald-200"
+         x-text="lang==='he' ? 'תשלום במשלוח' : 'دفع عند الاستلام'"></div>
+  </div>
+
+  <div class="progress-container">
+    <div class="progress-text flex justify-between text-[10px] font-bold mb-1 text-gray-400">
+      <span x-text="lang==='he'?'פרטי משלוח':'معلومات الشحن'"></span>
+      <span x-text="lang==='he'?'שלב אחרון':'الخطوة الأخيرة'"></span>
+    </div>
+    <div class="progress-track"><div class="progress-fill"></div></div>
+  </div>
+
+  <h2 class="text-xl font-black text-center mb-4 text-gray-800" x-text="lang==='he'?'הזמינו עכשיו':'اطلب الآن'"></h2>
+  <form @submit.prevent="submitForm">
+    <input type="text" x-model="f.name" @input="trackInput()" class="inp" :placeholder="lang==='he'?'שם מלא':'الاسم الكامل'" required>
+    <input type="tel" x-model="f.phone" @input="trackInput()" class="inp" :placeholder="lang==='he'?'טלפון':'رقم الهاتف'" dir="ltr" required>
+    <input type="text" x-model="f.address" class="inp" :placeholder="lang==='he'?'כתובת מלאה':'العنوان الكامل'" required>
+    <div class="grid grid-cols-2 gap-3 mb-4">
+      <label class="cursor-pointer"><input type="radio" x-model="f.payment" value="Cash" class="hidden"><div class="mad-radio-box recommended"><span x-text="lang==='he'?'מזומן 💵':'نقد 💵'"></span><div class="text-[9px] text-green-600 font-normal" x-text="lang==='he'?'מומלץ':'موصى به'"></div></div></label>
+      <label class="cursor-pointer"><input type="radio" x-model="f.payment" value="Visa" class="hidden"><div class="mad-radio-box"><span x-text="lang==='he'?'אשראי 💳':'فيزا 💳'"></span></div></label>
+    </div>
+    <div class="grid grid-cols-2 gap-3 mb-6">
+      <label class="cursor-pointer"><input type="radio" x-model="f.process" value="Direct" class="hidden"><div class="mad-radio-box recommended"><span class="text-xs" x-text="lang==='he'?'שלח הזמנה':'ارسل الطلب'"></span><div class="text-[9px] text-blue-600 font-normal" x-text="lang==='he'?'הכי מהיר':'🚀 أسرع'"></div></div></label>
+      <label class="cursor-pointer"><input type="radio" x-model="f.process" value="Contact" class="hidden"><div class="mad-radio-box"><span class="text-xs" x-text="lang==='he'?'צור איתי קשר':'تواصل معي'"></span></div></label>
+    </div>
+    <button type="submit" class="btn-main mt-2 w-full" x-text="loading?'...':(lang==='he'?'אישור הזמנה':'تأكيد الطلب')" :disabled="loading"></button>
+  </form>
+</div>
+        </template>
+      </div>
+    </template>
+  </main>
+
+  <div x-show="loading" class="fixed inset-0 z-50 bg-black/90 flex flex-col items-center justify-center text-white" style="display:none">
+    <div class="text-5xl mb-4 animate-bounce">🚀</div>
+    <h2 class="text-xl font-bold" x-text="lang==='he'?'שולח הזמנה...':'يتم ارسال الطلب...'"></h2>
+  </div>
+
+  <div x-show="submitted" class="fixed inset-0 bg-black/95 z-50 flex items-center justify-center text-center text-white" style="display:none">
+    <div class="bg-white text-black p-10 rounded-3xl max-w-xs shadow-2xl mx-4">
+      <div class="text-6xl mb-4">✅</div>
+      <h3 class="text-2xl font-black mb-2" x-text="lang==='he'?'ההזמנה התקבלה!':'تم استلام طلبك!'"></h3>
+      <p class="font-bold text-gray-600 mb-6" x-text="lang==='he'?'ההזמנה בוצעה בהצלה! נשלח לך הודעת וואטסאפ בקרוב. האספקה תוך 5 ימי עסקים.':'تم الطلب بنجاح، سنرسل لك رسالة واتساب، الاستلام خلال 5 أيام عمل'"></p>
+      <button @click="submitted=false" class="w-full bg-black text-white py-4 rounded-xl font-bold mt-4 transition active:scale-95" x-text="lang==='he'?'סגור':'إغلاق'"></button>
+    </div>
+  </div>
+
+<script>
+function app() {
+  return {
+    lang: 'ar', loading: false, submitted: false,
+    blocks: [{"id":1769930234560.208,"type":"carousel","content":{"ar":"MAD PERFUME","he":"MAD PERFUME"},"url":"","align":"center","btnText":{"ar":"تأكيد الطلب","he":"אישור הזמנה"},"items":[],"images":["https://www.mad-parfumeur.com/assets/hero/16.webp","https://www.mad-parfumeur.com/assets/hero/17.webp","https://www.mad-parfumeur.com/assets/hero/18.webp"],"score":"4.9 / 5","style":{"color":"#ffffff","size":"text-lg","font":"Cairo","weight":"font-bold"}},{"id":1769930312969.5679,"type":"text","content":{"ar":"السعر شامل التوصيل","he":"המחיר כולל משלוח "},"url":"","align":"center","btnText":{"ar":"تأكيد الطلب","he":"אישור הזמנה"},"items":[],"images":[],"score":"4.9 / 5","style":{"color":"#ffffff","size":"text-lg","font":"Cairo","weight":"font-bold"}},{"id":1769930535993.794,"type":"form","content":{"ar":"MAD PERFUME","he":"MAD PERFUME"},"url":"","align":"center","btnText":{"ar":"تأكيد الطلب","he":"אישור הזמנה"},"items":[],"images":[],"score":"4.9 / 5","style":{"color":"#ffffff","size":"text-lg","font":"Cairo","weight":"font-bold"}},{"id":1769930549434.844,"type":"comparison","content":{"ar":"MAD PERFUME","he":"MAD PERFUME"},"url":"","align":"center","btnText":{"ar":"تأكيد الطلب","he":"אישור הזמנה"},"items":[{"mad":{"ar":"أصلي ومضمون 100% ماركة MAD ✅","he":"מוצר מקורי ומובטח 100% מבית MAD ✅"},"other":{"ar":"مقلد ومجهول المصدر وضار ❌","he":"מוצרים מזויפים ממקור לא ידוע ❌"}},{"mad":{"ar":"ثبات جبار يتجاوز 48 ساعة ✅","he":"עמידות עוצמתית מעל 48 שעות ✅"},"other":{"ar":"رائحة تختفي خلال دقائق ❌","he":"ריח שנעלם תוך דקות ספורות ❌"}},{"mad":{"ar":"زيوت نيش فرنسية فاخرة جداً ✅","he":"שמנים צרפתיים יוקרתיים ✅"},"other":{"ar":"رائحة كحول رخيصة ومزعجة ❌","he":"ריח אלכוהול זול ומציק ❌"}},{"mad":{"ar":"آمن تماماً ولا يسبب حساسية ✅","he":"בטוח לחלוטין ולא גורם לאלרגיות ✅"},"other":{"ar":"يسبب صداع وضيق تنفس ❌","he":"גורם לכאבי ראש וקוצר נשימה ❌"}},{"mad":{"ar":"تغليف فخم يليق بك وبمقامك ✅","he":"אריזת VIP יוקרתית שמתאימה לך ✅"},"other":{"ar":"تغليف عشوائي وشغل شوارع ❌","he":"אריזה פשוטה וזולה ❌"}},{"mad":{"ar":"ضمان استبدال حقيقي وخدمة زبائن ✅","he":"אחריות החלפה אמיתית ושירות לקוחות ✅"},"other":{"ar":"بتشتري وبتتوه وما حد برد عليك ❌","he":"קונים ונתקעים, אין מענה ❌"}}],"images":[],"score":"4.9 / 5","style":{"color":"#ffffff","size":"text-lg","font":"Cairo","weight":"font-bold"}},{"id":1769930560106.0413,"type":"faq","content":{"ar":"MAD PERFUME","he":"MAD PERFUME"},"url":"","align":"center","btnText":{"ar":"تأكيد الطلب","he":"אישור הזמנה"},"items":[{"q":{"ar":"هل العطور أصلية؟","he":"האם הבשמים מקוריים?"},"a":{"ar":"نعم، جميع عطورنا أصلية 100% ومصادق عليها.","he":"כן, כל הבשמים שלנו מקוריים 100% ומאושרים على ידי משרד הבריאות."}},{"q":{"ar":"كم تستغرق مدة التوصيل؟","he":"כמה זמן לוקח המשלוח?"},"a":{"ar":"خلال 2-3 أيام عمل لجميع المناطق.","he":"אספקה מהירה תוך 2-3 ימי עסקים לכל הארץ."}},{"q":{"ar":"هل الرائحة ثابتة؟","he":"האם הריח נשאר לאורך זמן?"},"a":{"ar":"نعم، تركيز نيش يضمن ثباتاً يتجاوز 24 ساعة.","he":"בהחלט, ריכוז הבשמים גבוה מאוד (נישה) להבטחת עמידות מעל 24 שעות."}},{"q":{"ar":"هل يتوفر دفع عند الاستلام؟","he":"יש אפשרות לתשלום במזומן?"},"a":{"ar":"نعم، نوفر خدمة الدفع نقداً عند استلام الطلب.","he":"כן, אנו מציעים תשלום במזומן בעת מסירת ההזמנה."}},{"q":{"ar":"أين تقع فروعكم؟","he":"איפה נמצאים הסניפים שלכם?"},"a":{"ar":"لدينا أكثر من 40 فرع في كافة المناطق.","he":"יש לנו מעל 40 סניפים הפרוסים בכל רחבי הארץ לשירותכם."}},{"q":{"ar":"ماذا لو لم يعجبني العطر؟","he":"מה אם לא אהבתי את הבושם?"},"a":{"ar":"نحن نضمن رضاك بسياسة استبدال مرنة.","he":"אנחנו מבטיחים שביעות רצון מלאה, ניתן להחליף את הבושם בקלות."}}],"images":[],"score":"4.9 / 5","style":{"color":"#ffffff","size":"text-lg","font":"Cairo","weight":"font-bold"}},{"id":1769930562982.1733,"type":"fragrantica","content":{"ar":"MAD PERFUME","he":"MAD PERFUME"},"url":"","align":"center","btnText":{"ar":"تأكيد الطلب","he":"אישור הזמנה"},"items":[],"images":[],"score":"4.9 / 5","style":{"color":"#ffffff","size":"text-lg","font":"Cairo","weight":"font-bold"}},{"id":1769930564285.1409,"type":"interactive_rating","content":{"ar":"MAD PERFUME","he":"MAD PERFUME"},"url":"","align":"center","btnText":{"ar":"تأكيد الطلب","he":"אישור הזמנה"},"items":[],"images":[],"score":"4.9 / 5","style":{"color":"#ffffff","size":"text-lg","font":"Cairo","weight":"font-bold"}}], c: {"bgColor":"#f980c7","logoUrl":"https://www.mad-parfumeur.com/assets/hero/logo.png","heroTitle":{"ar":"أقوى العروض الحصرية","he":"המבצעים הבלעדיים ביותר"},"productName":"G104 P107 WOMEN","price":"250","adminPhone":"972509787730","sheetUrl":"https://script.google.com/macros/s/AKfycbw7m6OCcTnH6CILpTo2TVRZIXXy5cui-zhKsCq3k491yaun5Hd5b_QECTjCrpCytkndDg/exec","fbPixel":"1072283127290819","ttPixel":"D2D02JBC77U4ENLN9SBG","snapPixel":"b143822e-1c3c-40ff-93f7-edadee74e626"}, f: {name:'', phone:'', address:'', payment:'Cash', process:'Direct'},
+    time: 900, hasStartedTyping: false,
+    get timer() { const m=Math.floor(this.time/60); const s=this.time%60; return `${m}:${s<10?'0':''}${s}`; },
+
+    // ✅ النهائي: تلقائي حسب لغة المستخدم + يدعم ?lang=he أو ?lang=ar
+    init(forcedLang) {
+      const qs = new URLSearchParams(window.location.search);
+      const urlLang = qs.get('lang');
+      const autoLang = navigator.language.startsWith('he') ? 'he' : 'ar';
+      this.lang = forcedLang || ((urlLang==='he'||urlLang==='ar') ? urlLang : autoLang);
+
+      loadPixels(this.c);
+      setInterval(()=>{if(this.time>0) this.time--}, 1000);
+    },
+
+    trackInput() { if(!this.hasStartedTyping && this.f.name.length>2){ this.hasStartedTyping=true; this.track('AddToCart'); } },
+    track(ev) {
+      const cfg = this.c; let ph = formatE164(this.f.phone);
+      if(window.ttq){ if(ph.length>=10) ttq.identify({phone_number:ph, name:this.f.name}); ttq.track(ev==='AddToCart'?'AddToCart':'CompletePayment', {content_id:cfg.productName, value:Number(cfg.price), currency:'ILS', content_type:'product'}); }
+      if(window.fbq) fbq('track', ev, {value:Number(cfg.price), currency:'ILS', content_ids:[cfg.productName], content_type:'product'});
+      if(window.snaptr) { if(ph.length>=10) snaptr('init', cfg.snapPixel, {user_phone_number:ph}); if(ev==='AddToCart') snaptr('track','ADD_CART',{item_ids:[cfg.productName]}); if(ev==='Purchase') snaptr('track','PURCHASE',{currency:'ILS', price:Number(cfg.price)}); }
+    },
+    async submitForm() {
+      this.loading = true; 
+      this.track('Purchase');
+
+      const cfg = this.c;
+      let fd = new FormData();
+      Object.keys(this.f).forEach(k => fd.append(k, this.f[k]));
+
+      fd.append('offer', cfg.productName);
+      fd.append('price', cfg.price);
+      fd.append('lang', this.lang);
+
+      try {
+        await fetch(cfg.sheetUrl, { method: 'POST', body: fd, mode: 'no-cors' });
+        this.submitted = true;
+      } catch (e) {
+        alert('Error');
+      } finally {
+        this.loading = false;
+      }
+    }
+  }
+}
+</script>
+</body>
+</html>
