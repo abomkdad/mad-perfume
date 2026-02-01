@@ -1,1188 +1,315 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>MAD PARFUMEUR | Branch Portal</title>
-
-  <!-- Performance: preconnect -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
-  <!-- Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,900&family=Inter:wght@300;400;600;800&family=Amiri:wght@400;700&family=Assistant:wght@300;400;600;700;800&display=swap" rel="stylesheet">
-
-  <!-- Font Awesome -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-  <!-- Tailwind CSS (CDN) -->
-  <script src="https://cdn.tailwindcss.com"></script>
-
-  <style>
-    :root{
-      --primary:#d97706;
-      --primary-light:#fbbf24;
-      --bg-dark:#020202;
-      --glass:rgba(10,10,10,.85);
-      --border-glass:rgba(255,255,255,.1);
-      --live-green:#10b981;
-      --live-red:#ef4444;
-    }
-    *{ box-sizing:border-box; }
-
-    body{
-      background-color:var(--bg-dark);
-      color:#f4f4f4;
-      font-family:'Assistant','Inter',sans-serif;
-      overflow-x:hidden;
-      font-size:16px;
-    }
-    .font-serif{font-family:'Playfair Display',serif;}
-    .font-arabic{font-family:'Amiri',serif;}
-
-    /* Loader (now non-blocking; hides immediately) */
-    .page-loader{
-      position:fixed;inset:0;z-index:9999;
-      background:#020202;
-      display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;
-      pointer-events:none; /* ✅ doesn't block taps */
-    }
-    .loader-dot{width:10px;height:10px;border-radius:99px;background:var(--primary);box-shadow:0 0 18px rgba(217,119,6,.55);animation:pulse 1.2s infinite;}
-    @keyframes pulse{0%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.8)}100%{opacity:1;transform:scale(1)}}
-
-    /* no-scrollbar */
-    .no-scrollbar::-webkit-scrollbar{display:none;}
-    .no-scrollbar{-ms-overflow-style:none;scrollbar-width:none;}
-
-    /* float */
-    @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
-    .float-anim{animation:float 4s ease-in-out infinite;}
-
-    /* Header Video */
-    .video-header{position:relative;height:90vh;width:100%;overflow:hidden;display:flex;align-items:center;justify-content:center;text-align:center;}
-    .video-bg{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;z-index:0;opacity:.6;}
-    .video-overlay{position:absolute;inset:0;background:linear-gradient(to top,#020202 5%,rgba(0,0,0,.3) 60%,#020202 100%);z-index:1;}
-    .header-content{position:relative;z-index:10;padding:20px;width:100%;}
-
-    /* Staff */
-    .staff-avatar{
-      width:130px;height:130px;border-radius:50%;
-      border:3px solid var(--primary);
-      padding:4px;margin:0 auto 25px;
-      position:relative;background:rgba(0,0,0,.5);
-      backdrop-filter:blur(10px);
-      box-shadow:0 10px 40px rgba(0,0,0,.5);
-    }
-    .staff-img{width:100%;height:100%;border-radius:50%;object-fit:cover;}
-    .status-badge{
-      position:absolute;bottom:-10px;left:50%;transform:translateX(-50%);
-      background:#000;border:1px solid var(--border-glass);
-      padding:8px 20px;border-radius:30px;font-size:1rem;font-weight:800;white-space:nowrap;
-      display:flex;align-items:center;gap:8px;
-      box-shadow:0 5px 20px rgba(0,0,0,.6);
-    }
-    .status-dot{width:12px;height:12px;border-radius:50%;background:var(--live-red);box-shadow:0 0 10px var(--live-red);animation:pulse 2s infinite;}
-
-    /* Social Icons */
-    .social-bar{display:flex;justify-content:center;gap:16px;flex-wrap:wrap;margin-top:26px;padding:0 16px;}
-    .social-btn{
-      width:54px;height:54px;border-radius:50%;
-      background:rgba(255,255,255,.05);
-      border:1px solid var(--border-glass);
-      display:flex;align-items:center;justify-content:center;color:#fff;
-      transition:all .25s ease;font-size:1.45rem;
-    }
-    .social-btn:hover{background:var(--primary);color:#000;transform:translateY(-4px);}
-
-    /* Section title */
-    .section-title{
-      font-family:'Playfair Display',serif;font-weight:900;font-style:italic;
-      background:linear-gradient(to right,#fff,#999);
-      -webkit-background-clip:text;-webkit-text-fill-color:transparent;
-      line-height:1.2;
-    }
-
-    /* Comparison */
-    .comp-row{
-      display:grid;grid-template-columns:1fr 1fr;
-      background:#0a0a0a;border:1px solid var(--border-glass);
-      margin-bottom:15px;border-radius:20px;overflow:hidden;
-      box-shadow:0 10px 30px -10px rgba(0,0,0,.5);
-    }
-    .comp-col{
-      padding:22px 14px;font-size:1rem;
-      display:flex;flex-direction:column;justify-content:center;align-items:center;
-    }
-    .comp-mad{
-      background:linear-gradient(135deg,rgba(217,119,6,.15),rgba(217,119,6,.05));
-      border-left:1px solid rgba(217,119,6,.2);
-      position:relative;
-    }
-
-    /* Store */
-    .sticky-cats{
-      position:sticky;top:0;z-index:50;
-      background:rgba(2,2,2,.95);
-      backdrop-filter:blur(10px);
-      padding:18px 0;border-bottom:1px solid var(--border-glass);
-    }
-    .cat-pill{
-      padding:10px 22px;border-radius:99px;border:1px solid var(--border-glass);
-      font-size:1rem;font-weight:600;cursor:pointer;transition:.25s;white-space:nowrap;
-    }
-    .cat-pill.active{background:var(--primary);color:#000;font-weight:800;border-color:var(--primary);}
-
-    .product-card{
-      background:#0a0a0a;border:1px solid var(--border-glass);
-      border-radius:20px;overflow:hidden;position:relative;display:flex;flex-direction:column;
-    }
-    .badge{
-      position:absolute;top:10px;left:10px;
-      padding:6px 10px;border-radius:999px;font-size:11px;font-weight:900;letter-spacing:.12em;
-      background:rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.14);
-      backdrop-filter:blur(6px);
-      text-transform:uppercase;
-    }
-    .badge.ok{color:#22c55e;border-color:rgba(34,197,94,.35);}
-    .badge.no{color:#ef4444;border-color:rgba(239,68,68,.35);}
-    .meta-icons{
-      position:absolute;top:10px;right:10px;display:flex;gap:8px;
-    }
-    .meta-icons span{
-      width:30px;height:30px;border-radius:10px;
-      display:flex;align-items:center;justify-content:center;
-      background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);
-      color:#fff;font-size:13px;
-      cursor:pointer;
-    }
-
-    .add-btn{
-      background:var(--primary);color:#000;font-weight:900;
-      width:100%;padding:14px;margin-top:12px;border-radius:12px;font-size:1rem;
-    }
-
-    /* Drawer */
-    .drawer{
-      position:fixed;bottom:-100%;left:0;width:100%;height:75vh;
-      background:#111;z-index:100;border-radius:30px 30px 0 0;
-      transition:.4s;border-top:1px solid var(--primary);
-      padding:25px;display:flex;flex-direction:column;
-    }
-    .drawer.open{bottom:0;}
-
-    /* Modal */
-    .modal-overlay{
-      position:fixed;inset:0;z-index:200;
-      background:rgba(0,0,0,.9);backdrop-filter:blur(5px);
-      display:none;
-      padding:18px;
-    }
-
-    /* ✅ FIXED POPUP CENTERING */
-    .sale-box{
-      position:fixed;
-      left:50%;
-      top:50%;
-      transform:translate(-50%, -50%);
-      width:min(420px, calc(100vw - 36px));
-      max-height:min(90vh, calc(100vh - 36px));
-      background:#111;
-      border:1px solid var(--primary);
-      border-radius:24px;
-      overflow:hidden;
-      display:flex;
-      flex-direction:column;
-    }
-    .sale-close{
-      position:absolute;
-      top:10px;
-      inset-inline-end:12px;
-      font-size:2rem;
-      line-height:1;
-      color:#fff;
-      cursor:pointer;
-      z-index:10;
-      padding:4px 10px;
-      border-radius:12px;
-      background:rgba(0,0,0,.35);
-      border:1px solid rgba(255,255,255,.12);
-      backdrop-filter:blur(6px);
-    }
-    .sale-media{
-      width:100%;
-      background:#000;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-    }
-    .sale-media img{
-      width:100%;
-      height:auto;
-      max-height:48vh;
-      object-fit:contain;
-      display:block;
-    }
-    .sale-body{
-      padding:18px 18px 20px;
-      text-align:center;
-      overflow:auto;
-    }
-    .timer-box{
-      background:var(--primary);
-      color:#000;
-      text-align:center;
-      padding:15px;
-      font-size:2rem;
-      font-weight:900;
-      border-radius:12px;
-      margin-bottom:15px;
-    }
-
-    /* Order section visuals */
-    .mesh-bg{
-      background:
-        radial-gradient(circle at 20% 30%, rgba(217,119,6,.10), transparent 40%),
-        radial-gradient(circle at 80% 70%, rgba(255,255,255,.06), transparent 35%),
-        #050505;
-    }
-    .form-glow-effect{
-      position:absolute;inset:-80px;
-      background:radial-gradient(circle at 50% 40%, rgba(217,119,6,.10), transparent 55%);
-      filter:blur(40px);pointer-events:none;
-    }
-    .form-wrapper-container{
-      border-radius:26px;
-      border:1px solid rgba(255,255,255,.10);
-      background:rgba(0,0,0,.35);
-      backdrop-filter:blur(10px);
-      padding:14px;
-      box-shadow:0 30px 80px rgba(0,0,0,.45);
-    }
-    .form-inner-container{
-      border-radius:20px;
-      overflow:hidden;
-      border:1px solid rgba(255,255,255,.08);
-      background:rgba(255,255,255,.02);
-    }
-
-    /* Small helpers */
-    .dim{color:rgba(255,255,255,.55);}
-    .err-box{
-      background:rgba(239,68,68,.12);
-      border:1px solid rgba(239,68,68,.35);
-      color:#fecaca;
-      padding:12px 14px;
-      border-radius:16px;
-      text-align:center;
-      margin:14px auto;
-      max-width:720px;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MAD Parfumeur | Maison</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@100;300;400;700;900&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body {
+            font-family: 'Noto Sans Arabic', sans-serif;
+            scroll-behavior: smooth;
+        }
+        .selection-black::selection {
+            background-color: black;
+            color: white;
+        }
+        .transition-all { transition: all 0.3s ease; }
+    </style>
 </head>
-
-<body dir="rtl">
-
-  <!-- LOADER (auto hides immediately; doesn't block page) -->
-  <div id="page-loader" class="page-loader">
-    <div class="loader-dot"></div>
-    <div class="text-white font-black tracking-widest text-xs uppercase">Loading</div>
-    <div class="text-white/40 text-[11px]">MAD PARFUMEUR</div>
-  </div>
-
-  <!-- LANGUAGE TOGGLE -->
-  <div class="fixed top-6 right-6 z-50 flex gap-3">
-    <button onclick="setLang('ar')" class="w-10 h-10 flex items-center justify-center bg-black/60 backdrop-blur rounded-full border border-white/20 text-sm font-bold text-white hover:border-amber-500 hover:text-amber-500 transition">AR</button>
-    <button onclick="setLang('he')" class="w-10 h-10 flex items-center justify-center bg-black/60 backdrop-blur rounded-full border border-white/20 text-sm font-bold text-white hover:border-amber-500 hover:text-amber-500 transition">HE</button>
-  </div>
-
-  <!-- 1. VIDEO HEADER & BRANCH INFO -->
-  <header class="video-header">
-    <video autoplay muted loop playsinline preload="none" class="video-bg">
-      <source src="https://madparfumeurglobal.com/wp-content/uploads/2025/10/download.mp4" type="video/mp4">
-    </video>
-    <div class="video-overlay"></div>
-
-    <div class="header-content pt-10">
-      <img src="https://madperfume.ps/upload/01-2026/page/45CM.png" class="h-14 mx-auto mb-8 drop-shadow-[0_0_20px_rgba(217,119,6,0.6)]" alt="MAD" />
-
-      <div class="staff-avatar">
-        <img id="staff-img" src="https://madperfume.ps/upload/01-2026/page/6966930e9af7f.png" class="staff-img" alt="Staff">
-        <div class="status-badge">
-          <div class="status-dot" id="status-light"></div>
-          <span id="status-text">...</span>
-        </div>
-      </div>
-
-      <h1 class="text-5xl md:text-7xl font-serif font-black text-white mb-3 tracking-wide" id="branch-name">MAD PARFUMEUR</h1>
-      <p class="text-xl text-slate-300 mb-6 font-bold tracking-widest" id="work-hours">...</p>
-
-      <div class="social-bar" id="social-container"></div>
-
-      <div id="data-error" class="hidden"></div>
-
-      <div class="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce text-slate-400">
-        <i class="fas fa-chevron-down text-2xl"></i>
-      </div>
-    </div>
-  </header>
-
-  <!-- 2. NICHE STORY -->
-  <section class="py-20 px-6 border-b border-white/5 bg-[#050505] text-center">
-    <div class="max-w-4xl mx-auto">
-      <span class="text-amber-500 text-sm font-black tracking-[0.4em] uppercase block mb-6" id="niche-tag">THE ART OF SCENT</span>
-      <h2 class="section-title text-5xl md:text-6xl mb-8" id="niche-title">عطور النيش</h2>
-
-      <div class="relative mb-14 mt-10">
-        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-amber-500/10 blur-[100px] rounded-full"></div>
-        <img src="https://madperfume.ps/upload/01-2026/page/69724b7327345.png" class="relative z-10 w-full max-w-[900px] mx-auto drop-shadow-2xl transition-transform duration-700 hover:scale-105" alt="Niche">
-      </div>
-
-      <p class="text-slate-300 leading-loose text-xl font-light max-w-2xl mx-auto px-2" id="niche-desc"></p>
-
-      <div class="mt-12 flex justify-center gap-10 text-amber-500 text-3xl opacity-80">
-        <i class="fas fa-gem"></i>
-        <i class="fas fa-flask"></i>
-        <i class="fas fa-crown"></i>
-      </div>
-    </div>
-  </section>
-
-  <!-- 3. SELECTIVE COLLECTION SPOTLIGHT -->
-  <section class="py-20 px-4 bg-black relative overflow-hidden border-b border-white/5">
-    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[900px] bg-amber-600/10 blur-[120px] rounded-full"></div>
-
-    <div class="relative z-10 text-center">
-      <h2 class="text-4xl md:text-5xl font-serif font-black text-white italic mb-3">Selective Collection</h2>
-      <p class="text-amber-500 font-bold text-lg mb-12 uppercase tracking-widest" id="sel-subtitle"></p>
-
-      <img src="https://madperfume.ps/upload/01-2026/page/69724b7327f56.png" class="w-full max-w-[900px] mx-auto mb-12 drop-shadow-[0_30px_60px_rgba(217,119,6,0.3)] float-anim" alt="Selective">
-
-      <p class="text-slate-300 max-w-lg mx-auto text-lg leading-relaxed px-6" id="sel-desc"></p>
-    </div>
-  </section>
-
-  <!-- 4. GLOBAL REACH -->
-  <section class="py-16 px-4 bg-[#080808] border-b border-white/5">
-    <div class="grid grid-cols-3 gap-3 max-w-lg mx-auto text-center">
-      <div class="bg-white/5 rounded-3xl p-6 border border-white/5 hover:border-amber-500/30 transition">
-        <div class="text-3xl md:text-4xl font-black text-white mb-2">18</div>
-        <div class="text-xs font-bold text-amber-500 uppercase tracking-widest" id="stat-country"></div>
-      </div>
-      <div class="bg-white/5 rounded-3xl p-6 border border-white/5 hover:border-amber-500/30 transition">
-        <div class="text-3xl md:text-4xl font-black text-white mb-2">455+</div>
-        <div class="text-xs font-bold text-amber-500 uppercase tracking-widest" id="stat-store"></div>
-      </div>
-      <div class="bg-white/5 rounded-3xl p-6 border border-white/5 hover:border-amber-500/30 transition">
-        <div class="text-3xl md:text-4xl font-black text-white mb-2">26</div>
-        <div class="text-xs font-bold text-amber-500 uppercase tracking-widest" id="stat-year"></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- 5. MANIFESTO -->
-  <section class="py-20 px-4 bg-black border-b border-white/5">
-    <div class="text-center mb-12">
-      <span class="text-amber-500 text-sm font-black tracking-widest uppercase block mb-2">THE MANIFESTO</span>
-      <h2 class="text-4xl md:text-5xl text-white font-serif italic" id="comp-title"></h2>
-    </div>
-    <div class="max-w-xl mx-auto space-y-4" id="comparison-container"></div>
-  </section>
-
-  <!-- 6. STORE SECTION -->
-  <section id="shop" class="bg-[#050505] min-h-screen pb-28">
-    <div class="sticky-cats">
-      <div class="flex overflow-x-auto gap-3 px-6 no-scrollbar" id="cats-container"></div>
-    </div>
-
-    <!-- lightweight skeleton until products load -->
-    <div id="products-skeleton" class="max-w-5xl mx-auto px-4 pt-10 pb-6 text-center text-white/40 font-bold">
-      جاري تحميل المنتجات...
-    </div>
-
-    <div class="grid grid-cols-2 gap-4 p-4 max-w-5xl mx-auto" id="products-grid"></div>
-  </section>
-
-  <!-- CART FAB -->
-  <div onclick="toggleDrawer(true)" class="fixed bottom-8 left-8 z-40 bg-amber-500 text-black w-16 h-16 rounded-full flex items-center justify-center shadow-[0_0_40px_rgba(217,119,6,0.6)] cursor-pointer hover:scale-110 transition active:scale-95">
-    <i class="fas fa-shopping-bag text-2xl"></i>
-    <span id="cart-count" class="absolute -top-1 -right-1 bg-white text-black w-6 h-6 rounded-full text-sm font-black flex items-center justify-center border-2 border-black">0</span>
-  </div>
-
-  <!-- SALE POPUP -->
-  <div id="sale-popup" class="modal-overlay">
-    <div class="sale-box" role="dialog" aria-modal="true">
-      <span class="sale-close" onclick="toggleSale(false)">&times;</span>
-
-      <div class="sale-media">
-        <img src="sale.png" alt="sale" onerror="this.style.display='none'">
-      </div>
-
-      <div class="sale-body">
-        <h3 id="sale-title" class="font-serif text-2xl mb-2 text-white">عرض اليوم</h3>
-        <div id="timer" class="timer-box">00:00:00</div>
-        <button id="sale-btn" class="add-btn" style="margin:0;" onclick="claimOffer()">احصل على عرض اليوم</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- CART DRAWER -->
-  <div id="cart-drawer" class="drawer">
-    <div class="flex justify-between items-center mb-8">
-      <h2 class="text-2xl font-bold text-white" id="cart-title"></h2>
-      <button onclick="toggleDrawer(false)" class="text-slate-400 p-2"><i class="fas fa-times text-2xl"></i></button>
-    </div>
-    <div id="cart-items" class="flex-1 overflow-y-auto space-y-4 pr-2"></div>
-    <div class="border-t border-white/10 pt-6 mt-4">
-      <div class="flex justify-between text-xl font-bold text-white mb-6">
-        <span id="txt-total"></span>
-        <span class="text-amber-500" id="cart-total">0 ₪</span>
-      </div>
-      <button onclick="checkout()" class="w-full py-5 bg-[#25D366] text-white rounded-2xl font-black text-lg flex items-center justify-center gap-3 hover:bg-[#20b857] transition shadow-lg active:scale-95">
-        <i class="fab fa-whatsapp text-2xl"></i> <span id="txt-checkout"></span>
-      </button>
-    </div>
-  </div>
-
-  <!-- ZAPIER ORDER FORM SECTION -->
-  <section id="order-section" class="py-16 px-4 border-t border-white/5 relative mesh-bg overflow-hidden">
-    <div class="form-glow-effect"></div>
-
-    <div class="text-center mb-10 relative z-10">
-      <span class="text-amber-500 font-black text-[11px] tracking-[0.4em] uppercase block mb-2" id="order-tag">بوابة الحجز</span>
-      <h2 class="text-4xl md:text-5xl font-black text-white italic font-serif leading-tight" id="order-title">أكمل طلبك الآن</h2>
-    </div>
-
-    <div class="max-w-4xl mx-auto relative z-10">
-      <div class="form-wrapper-container">
-        <div class="form-inner-container">
-          <!-- Placeholder until Zapier component loads (after 3s) -->
-          <div id="zapier-placeholder" class="p-10 text-center text-white/40 font-bold">
-            جاري تحميل نموذج الطلب...
-          </div>
-
-          <zapier-interfaces-page-embed
-            id="zapier-embed"
-            no-background="true"
-            allow-query-params="true"
-            query-params=""
-            style="max-width: 100%; width: 100%; height: 850px; display:none;">
-          </zapier-interfaces-page-embed>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- FOOTER -->
-  <footer class="py-10 bg-black border-t border-white/5 text-center px-4">
-    <img src="https://madperfume.ps/upload/01-2026/page/45CM.png" class="h-6 w-auto mx-auto mb-4 opacity-30" alt="MAD Logo">
-    <p class="text-[9px] text-white/20 uppercase font-black tracking-[0.4em]">© 2026 MAD PARFUMEUR</p>
-  </footer>
-
-  <script>
-    /***********************
-     * ✅ LIGHT ADS VERSION
-     * - Page renders immediately
-     * - Heavy third-party scripts load AFTER 3 seconds:
-     *   (Zapier embed, Lucide icons, Pixels)
-     * - Pixels are at the END of HTML (here) ✅
-     ***********************/
-
-    /***********************
-     * ✅ DATA SOURCES
-     ***********************/
-    const DATA_SOURCES = {
-      branchesUrl: "./branches.json",
-      productsCsvUrl: "./products.csv"
-    };
-
-    const params = new URLSearchParams(window.location.search);
-    const branchID = parseInt(params.get("branch") || "1", 10);
-
-    let STATE = { branch: null, products: [], cart: [] };
-    let lang = "ar";
-    let activeCat = "all";
-
-    // -------- Pixel Lead Queue (works even before pixels load) --------
-    let __pixelsReady = false;
-    const __leadQueue = [];
-    function trackLead(actionName) {
-      // queue first (so you don't lose events)
-      __leadQueue.push({ actionName: actionName || "Lead", ts: Date.now() });
-
-      // if pixels already ready, flush immediately
-      if (__pixelsReady) flushLeadQueue();
-    }
-    function flushLeadQueue(){
-      try{
-        while(__leadQueue.length){
-          const ev = __leadQueue.shift();
-          try { if(window.fbq) fbq('track', 'Lead', { content_name: ev.actionName }); } catch(e){}
-          try { if(window.ttq) ttq.track('Lead', { content_name: ev.actionName }); } catch(e){}
-        }
-      }catch(e){}
-    }
-
-    // -------- Helpers --------
-    function showError(msg){
-      const el = document.getElementById("data-error");
-      el.className = "err-box";
-      el.innerText = msg;
-      el.classList.remove("hidden");
-    }
-
-    function normalizePhoneForWhatsApp(phone){
-      const p = (phone || "").toString().replace(/\D/g,"");
-      if(!p) return "";
-      if(p.startsWith("972") || p.startsWith("970")) return p;
-      if(p.startsWith("059") || p.startsWith("056")) return "970" + p.substring(1);
-      if(p.startsWith("05")) return "972" + p.substring(1);
-      if(p.startsWith("0")) return "972" + p.substring(1);
-      return p;
-    }
-
-    function parsePriceToNumber(priceStr){
-      if(!priceStr) return 0;
-      const s = String(priceStr).replace(/,/g,"");
-      const m = s.match(/(\d+(\.\d+)?)/);
-      return m ? parseFloat(m[1]) : 0;
-    }
-
-    function parseProductIdFromLink(link){
-      if(!link) return null;
-      const m = String(link).match(/product\.show\.(\d+)/i);
-      return m ? parseInt(m[1],10) : null;
-    }
-
-    function isInStock(av){
-      const s = (av || "").toString().toLowerCase();
-      if(!s) return true;
-      if(s.includes("out")) return false;
-      if(s.includes("0")) return false;
-      return true;
-    }
-
-    function extractBranches(data){
-      if(Array.isArray(data)) return data;
-      if(data && Array.isArray(data.branches)) return data.branches;
-      if(data && Array.isArray(data.data)) return data.data;
-      return [];
-    }
-
-    async function fetchJSON(url){
-      const r = await fetch(url, { cache: "no-store" });
-      if(!r.ok) throw new Error("Failed to load JSON: " + url);
-      return await r.json();
-    }
-
-    async function fetchText(url){
-      const r = await fetch(url, { cache: "no-store" });
-      if(!r.ok) throw new Error("Failed to load CSV: " + url);
-      return await r.text();
-    }
-
-    /***********************
-     * ✅ Lightweight CSV parser (replaces PapaParse)
-     * Handles quoted fields and commas safely
-     ***********************/
-    function parseCSV(csvText){
-      const text = (csvText || "").replace(/\r\n/g, "\n").replace(/\r/g, "\n");
-      let i = 0, field = "", row = [], rows = [];
-      let inQuotes = false;
-
-      while(i < text.length){
-        const c = text[i];
-
-        if(inQuotes){
-          if(c === '"'){
-            if(text[i+1] === '"'){ field += '"'; i += 2; continue; }
-            inQuotes = false; i++; continue;
-          }
-          field += c; i++; continue;
-        }else{
-          if(c === '"'){ inQuotes = true; i++; continue; }
-          if(c === ","){ row.push(field); field = ""; i++; continue; }
-          if(c === "\n"){
-            row.push(field); field = "";
-            // ignore empty trailing lines
-            if(row.length > 1 || (row.length === 1 && row[0].trim() !== "")){
-              rows.push(row);
-            }
-            row = [];
-            i++;
-            continue;
-          }
-          field += c; i++; continue;
-        }
-      }
-      // last field
-      if(field.length || row.length){
-        row.push(field);
-        if(row.length > 1 || (row.length === 1 && row[0].trim() !== "")){
-          rows.push(row);
-        }
-      }
-
-      return rows;
-    }
-
-    function parseProductsCSV(csvText){
-      const rows = parseCSV(csvText);
-      if(!rows.length) return [];
-      const headers = rows[0].map(h => (h || "").trim());
-      const out = [];
-
-      for(let r=1; r<rows.length; r++){
-        const arr = rows[r];
-        const row = {};
-        for(let c=0; c<headers.length; c++){
-          row[headers[c]] = (arr[c] ?? "").toString();
-        }
-
-        const title = (row["Title"] || "").toString().trim();
-        const link  = (row["Product Link"] || "").toString().trim();
-        const img   = (row["Image"] || "").toString().trim();
-        const addImgs = (row["Additional Images"] || "").toString().trim();
-        const video = (row["Video"] || "").toString().trim();
-
-        const id = parseProductIdFromLink(link) || (r);
-        const priceNum = parsePriceToNumber(row["Price"]);
-
-        if(!title && !img && !link) continue;
-
-        out.push({
-          id,
-          title,
-          description: (row["Description"] || "").toString().trim(),
-          link,
-          img,
-          additionalImages: addImgs,
-          video,
-          price: priceNum,
-          priceRaw: (row["Price"] || "").toString().trim(),
-          availability: (row["Availability"] || "").toString().trim(),
-          condition: (row["Condition"] || "").toString().trim(),
-          brand: (row["Brand"] || "").toString().trim(),
-          cat_ar: (row["Category ar"] || "").toString().trim(),
-          cat_he: (row["Category he"] || "").toString().trim()
-        });
-      }
-
-      const seen = new Set();
-      return out.filter(p => { if(seen.has(p.id)) return false; seen.add(p.id); return true; });
-    }
-
-    // -------- Texts --------
-    const TEXTS = {
-      ar: {
-        open: "مفتوح الآن", closed: "مغلق",
-        add: "إضافة للسلة", added: "تمت الإضافة",
-        all: "الكل",
-        nicheT: "عطور النيش",
-        nicheD: "في MAD، نحن لا نصنع العطور فحسب، بل نصمم حضوراً. عطور النيش لدينا تعتمد على ندرة المكونات وحرية الإبداع.",
-        selT: "مجموعة النخبة المختارة",
-        selD: "أيقونة العطور الفاخرة التي تجمع بين الثبات الخارق والمكونات النادرة.",
-        statC: "دولة", statS: "نقطة بيع", statY: "عاماً",
-        compTitle: "MAD vs بدائل الأسواق",
-        compLabelOthers: "دبي / تركيا / خلط",
-        compItems: [
-          { icon: "shield-check", title: "الأمان والتراخيص", mad: "آمن 100% (معتمد IFRA)", other: "زيوت مجهولة المصدر" },
-          { icon: "flask", title: "الهندسة العطرية", mad: "تطابق جزيئي وتعتيق", other: "خلط يدوي عشوائي" },
-          { icon: "droplets", title: "مصدر الزيوت", mad: "خلاصات أوروبية (نخب أول)", other: "زيوت تجارية بالكيلو" },
-          { icon: "activity", title: "التأثير الصحي", mad: "هايبوالرجينيك (لا صداع)", other: "مذيبات تسبب الحساسية" },
-          { icon: "timer", title: "الثبات والأداء", mad: "Extrait (+24 ساعة)", other: "يختفي بسرعة" }
-        ],
-        cartT: "سلة المشتريات", total: "المجموع:", check: "إتمام عبر واتساب",
-        orderTag: "بوابة الحجز", orderTitle: "أكمل طلبك الآن",
-        zapierId: "cmkpbwxjy001bonuoz5vy0gh1",
-        avail_in: "متوفر", avail_out: "غير متوفر",
-        details: "تفاصيل",
-        saleTitle: "عرض اليوم",
-        saleBtn: "احصل على عرض اليوم",
-        saleMsg: "مرحباً، أريد عرض اليوم"
-      },
-      he: {
-        open: "פתוח עכשיו", closed: "סגור",
-        add: "הוסף לסל", added: "נוסף",
-        all: "הכל",
-        nicheT: "בשמי נישה",
-        nicheD: "ב-MAD אנחנו לא רק יוצרים בושם — אנחנו מעצבים נוכחות. בשמי הנישה שלנו מבוססים על נדירות ויצירתיות.",
-        selT: "קולקציית העילית",
-        selD: "בישום יוקרתי עם עמידות גבוהה ורכיבים נדירים.",
-        statC: "מדינות", statS: "נקודות מכירה", statY: "שנים",
-        compTitle: "MAD vs חיקויים",
-        compLabelOthers: "דובאי / טורקיה",
-        compItems: [
-          { icon: "shield-check", title: "בטיחות ותקנים", mad: "בטוח 100% (אישור IFRA)", other: "שמנים ממקור לא ידוע" },
-          { icon: "flask", title: "הנדסה ארומטית", mad: "התאמה מולקולרית", other: "ערבוב ידני אקראי" },
-          { icon: "droplets", title: "מקור השמנים", mad: "תמציות אירופאיות", other: "שמנים זולים" },
-          { icon: "activity", title: "השפעה בריאותית", mad: "היפואלרגני", other: "ממיסים גורמי אלרגיה" },
-          { icon: "timer", title: "עמידות", mad: "Extrait (24+ שעות)", other: "מתנדף מהר" }
-        ],
-        cartT: "סל קניות", total: "סה״כ:", check: "הזמנה בווטסאפ",
-        orderTag: "פורטל הזמנות", orderTitle: "אשר הזמנה עכשיו",
-        zapierId: "cmkpef5ul0009nc51356rtjm8",
-        avail_in: "במלאי", avail_out: "לא במלאי",
-        details: "פרטים",
-        saleTitle: "מבצע היום",
-        saleBtn: "קבלו את מבצע היום",
-        saleMsg: "שלום, אני רוצה את מבצע היום"
-      }
-    };
-
-    // -------- Rendering --------
-    function setLang(l, isInit=false){
-      lang = l;
-
-      document.documentElement.dir = (l === "ar") ? "rtl" : "ltr";
-      document.body.dir = (l === "ar") ? "rtl" : "ltr";
-      document.documentElement.lang = (l === "ar") ? "ar" : "he";
-
-      const u = new URL(window.location.href);
-      u.searchParams.set("lang", lang);
-      if(!u.searchParams.get("branch")) u.searchParams.set("branch", String(branchID));
-      history.replaceState({}, "", u.toString());
-
-      renderAll();
-      if(!isInit) trackLead("Change Language");
-    }
-
-    function renderAll(){
-      const t = TEXTS[lang];
-      const b = STATE.branch || {};
-
-      document.getElementById("branch-name").innerText =
-        (lang === "ar") ? (b.name_ar || "MAD PARFUMEUR") : (b.name_he || "MAD PARFUMEUR");
-
-      updateBranchStatus();
-      renderSocials();
-
-      document.getElementById("niche-title").innerText = t.nicheT;
-      document.getElementById("niche-desc").innerText = t.nicheD;
-      document.getElementById("sel-subtitle").innerText = t.selT;
-      document.getElementById("sel-desc").innerText = t.selD;
-      document.getElementById("stat-country").innerText = t.statC;
-      document.getElementById("stat-store").innerText = t.statS;
-      document.getElementById("stat-year").innerText = t.statY;
-      document.getElementById("cart-title").innerText = t.cartT;
-      document.getElementById("txt-total").innerText = t.total;
-      document.getElementById("txt-checkout").innerText = t.check;
-      document.getElementById("comp-title").innerText = t.compTitle;
-
-      document.getElementById("order-tag").innerText = t.orderTag;
-      document.getElementById("order-title").innerText = t.orderTitle;
-
-      document.getElementById("sale-title").innerText = t.saleTitle;
-      document.getElementById("sale-btn").innerText = t.saleBtn;
-
-      // Zapier embed props (component loads later)
-      const zEmbed = document.getElementById("zapier-embed");
-      zEmbed.setAttribute("page-id", t.zapierId);
-      zEmbed.setAttribute("test-id", t.zapierId + "-embed");
-
-      const bName = (lang === "ar" ? (b.name_ar || "") : (b.name_he || ""));
-      const qp = new URLSearchParams({
-        lang,
-        branch_id: String(b.id || ""),
-        branch_name: bName,
-        phone: (b.phone || "")
-      }).toString();
-      zEmbed.setAttribute("query-params", qp);
-
-      renderComparison();
-      renderCats();
-      renderProducts();
-      updateCart();
-    }
-
-    function renderSocials(){
-      const b = STATE.branch || {};
-      const s = b.social || {};
-      const waPhone = normalizePhoneForWhatsApp(b.phone);
-      const waLink = waPhone ? `https://wa.me/${waPhone}` : "";
-
-      const items = [
-        { key:"whatsapp", url: waLink, icon:"fab fa-whatsapp", title:"WhatsApp" },
-        { key:"phone", url: b.phone ? `tel:${b.phone}` : "", icon:"fas fa-phone", title:"Call" },
-        { key:"instagram", url: s.instagram || "", icon:"fab fa-instagram", title:"Instagram" },
-        { key:"tiktok", url: s.tiktok || "", icon:"fab fa-tiktok", title:"TikTok" },
-        { key:"facebook", url: s.facebook || "", icon:"fab fa-facebook-f", title:"Facebook" },
-        { key:"snapchat", url: s.snapchat || "", icon:"fab fa-snapchat", title:"Snapchat" },
-        { key:"youtube", url: s.youtube || "", icon:"fab fa-youtube", title:"YouTube" },
-        { key:"email", url: s.email ? `mailto:${s.email}` : "", icon:"fas fa-envelope", title:"Email" },
-        { key:"waze", url: s.waze || "", icon:"fab fa-waze", title:"Waze" }
-      ].filter(x => x.url);
-
-      document.getElementById("social-container").innerHTML = items.map(it =>
-        `<a href="${it.url}" target="_blank" rel="noopener" class="social-btn" title="${it.title}" onclick="trackLead('Social: ${it.key}')"><i class="${it.icon}"></i></a>`
-      ).join("");
-    }
-
-    function updateBranchStatus(){
-      const b = STATE.branch || {};
-      const now = new Date();
-      const days = ["sun","mon","tue","wed","thu","fri","sat"];
-      const currentDay = days[now.getDay()];
-      const currentTime = now.getHours()*60 + now.getMinutes();
-
-      let isOpen = false;
-      let hoursStr = (b.hours && String(b.hours).trim()) ? String(b.hours).trim() : "";
-
-      if(b.schedule && b.schedule[currentDay]){
-        const slots = b.schedule[currentDay] || [];
-        if(slots.length){
-          hoursStr = `${slots[0][0]} - ${slots[0][1]}`;
-        }else{
-          hoursStr = (lang === "ar") ? "مغلق اليوم" : "סגור היום";
-        }
-
-        slots.forEach(slot => {
-          const st = slot[0] || "00:00";
-          const en = slot[1] || "00:00";
-          const [sh, sm] = st.split(":").map(n=>parseInt(n,10));
-          const [eh, em] = en.split(":").map(n=>parseInt(n,10));
-          const startMins = (sh*60) + (sm||0);
-          let endMins = (eh*60) + (em||0);
-          if(String(en).startsWith("24")) endMins = 1440;
-          if(currentTime >= startMins && currentTime < endMins) isOpen = true;
-        });
-      }
-
-      document.getElementById("work-hours").innerText = hoursStr || "...";
-
-      const light = document.getElementById("status-light");
-      const txt = document.getElementById("status-text");
-
-      if(isOpen){
-        light.style.background = "var(--live-green)";
-        light.style.boxShadow = "0 0 10px var(--live-green)";
-        txt.innerText = TEXTS[lang].open;
-        txt.style.color = "var(--live-green)";
-      }else{
-        light.style.background = "var(--live-red)";
-        light.style.boxShadow = "0 0 10px var(--live-red)";
-        txt.innerText = TEXTS[lang].closed;
-        txt.style.color = "var(--live-red)";
-      }
-    }
-
-    function renderComparison(){
-      const t = TEXTS[lang];
-      const items = t.compItems || [];
-      document.getElementById("comparison-container").innerHTML = items.map(item => `
-        <div class="comp-row">
-          <div class="comp-col comp-mad text-center">
-            <div class="flex items-center justify-center gap-2 mb-2 text-amber-500 font-bold tracking-wider text-sm">
-              <i data-lucide="${item.icon}" class="w-5 h-5"></i> ${item.title}
+<body class="bg-white text-slate-900 selection-black antialiased">
+
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full z-50 bg-white/80 backdrop-blur-md border-b border-slate-100">
+        <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+            <div class="flex items-center gap-8">
+                <h1 class="text-2xl font-bold tracking-tighter text-black uppercase">MAD <span class="font-light text-slate-400 italic">Parfumeur</span></h1>
             </div>
-            <div class="text-white font-black text-lg leading-tight">${item.mad}</div>
-          </div>
-          <div class="comp-col text-center" style="background:rgba(255,255,255,0.02); color:#666;">
-            <div class="mb-2 text-[10px] font-bold tracking-widest text-slate-500 uppercase">${t.compLabelOthers}</div>
-            <div class="text-red-400 font-bold text-lg leading-tight">${item.other}</div>
-          </div>
-        </div>
-      `).join("");
-      // Lucide icons load after 3s, then we'll call createIcons()
-    }
-
-    function renderCats(){
-      const catField = lang === "ar" ? "cat_ar" : "cat_he";
-      const categories = [...new Set((STATE.products||[]).map(p => p[catField]).filter(Boolean))];
-
-      let html = `<div onclick="filterCat('all')" class="cat-pill ${activeCat==='all' ? 'active' : 'text-slate-400 border-white/10'}">${TEXTS[lang].all}</div>`;
-      categories.forEach(c => {
-        const safe = String(c).replace(/'/g,"\\'");
-        html += `<div onclick="filterCat('${safe}')" class="cat-pill ${activeCat===c ? 'active' : 'text-slate-400 border-white/10'}">${c}</div>`;
-      });
-
-      document.getElementById("cats-container").innerHTML = html;
-    }
-
-    function filterCat(c){
-      activeCat = c;
-      renderCats();
-      renderProducts();
-      trackLead("Filter Category");
-    }
-
-    function renderProducts(){
-      const t = TEXTS[lang];
-      const catField = lang === "ar" ? "cat_ar" : "cat_he";
-
-      const list = activeCat === "all"
-        ? (STATE.products||[])
-        : (STATE.products||[]).filter(p => p[catField] === activeCat);
-
-      // hide skeleton once products exist
-      const sk = document.getElementById("products-skeleton");
-      if(sk){
-        sk.style.display = (STATE.products && STATE.products.length) ? "none" : "block";
-      }
-
-      document.getElementById("products-grid").innerHTML = list.map(p => {
-        const inCart = (STATE.cart||[]).find(i => i.id === p.id);
-        const ok = isInStock(p.availability);
-        const badgeTxt = ok ? t.avail_in : t.avail_out;
-
-        const hasVideo = !!(p.video && p.video.trim());
-        const hasImgs = !!(p.additionalImages && p.additionalImages.trim());
-        const hasLink = !!(p.link && p.link.trim());
-
-        return `
-          <div class="product-card">
-            <div class="badge ${ok ? 'ok' : 'no'}">${badgeTxt}</div>
-
-            <div class="meta-icons">
-              ${hasVideo ? `<span title="Video"><i class="fas fa-video"></i></span>` : ``}
-              ${hasImgs ? `<span title="Images"><i class="fas fa-images"></i></span>` : ``}
-              ${hasLink ? `<span title="${t.details}" onclick="window.open('${p.link}','_blank'); trackLead('Product Details'); event.stopPropagation();"><i class="fas fa-up-right-from-square"></i></span>` : ``}
-            </div>
-
-            <div class="h-44 bg-white/5 flex items-center justify-center p-6 relative">
-              <img src="${p.img || ''}" class="h-full object-contain drop-shadow-2xl hover:scale-110 transition duration-500" loading="lazy"
-                onerror="this.style.opacity=.2; this.style.filter='grayscale(1)';">
-            </div>
-
-            <div class="p-4 text-center flex-1 flex flex-col justify-between">
-              <div>
-                <h3 class="text-base font-black text-white mb-1 h-12 overflow-hidden leading-snug">${p.title || ''}</h3>
-                <p class="text-amber-500 font-black text-lg mb-2">${(p.price || 0)} ₪</p>
-                <div class="text-[11px] dim font-bold tracking-wider">
-                  ${(lang==='ar' ? (p.cat_ar || '') : (p.cat_he || ''))}
+            
+            <div class="flex items-center gap-4">
+                <div class="flex bg-slate-100 rounded-full p-1 text-[10px] font-bold" id="lang-switcher">
+                    <button onclick="changeLang('ar')" id="btn-ar" class="px-3 py-1 rounded-full transition-all uppercase bg-white shadow-sm text-black">AR</button>
+                    <button onclick="changeLang('he')" id="btn-he" class="px-3 py-1 rounded-full transition-all uppercase text-slate-400 hover:text-slate-600">HE</button>
+                    <button onclick="changeLang('en')" id="btn-en" class="px-3 py-1 rounded-full transition-all uppercase text-slate-400 hover:text-slate-600">EN</button>
                 </div>
-              </div>
-
-              <button onclick="addToCart(${p.id})" class="add-btn ${inCart ? 'bg-slate-800 text-white' : ''}">
-                ${inCart ? t.added : t.add}
-              </button>
             </div>
-          </div>
-        `;
-      }).join("");
-    }
+        </div>
+    </nav>
 
-    function addToCart(id){
-      const p = (STATE.products||[]).find(x => x.id === id);
-      if(!p) return;
-      if(!STATE.cart.find(i => i.id === id)){
-        STATE.cart.push(p);
-      }
-      renderProducts();
-      updateCart();
-      trackLead("Add To Cart");
-    }
+    <!-- Main Content Wrapper -->
+    <div id="app-content">
+        <!-- Content will be injected here by JavaScript -->
+    </div>
 
-    function updateCart(){
-      document.getElementById("cart-count").innerText = (STATE.cart||[]).length;
-
-      let total = 0;
-      document.getElementById("cart-items").innerHTML = (STATE.cart||[]).map(item => {
-        total += (item.price || 0);
-        const linkBtn = item.link ? `<a href="${item.link}" target="_blank" class="text-[10px] text-white/40 hover:text-amber-500 font-black tracking-widest">LINK</a>` : "";
-        return `
-          <div class="flex items-center gap-4 bg-white/5 p-4 rounded-2xl border border-white/5">
-            <img src="${item.img || ''}" class="w-14 h-14 rounded-xl bg-black/50 object-cover" onerror="this.style.opacity=.2; this.style.filter='grayscale(1)';">
-            <div class="flex-1">
-              <div class="flex items-center justify-between gap-2">
-                <div class="text-base font-black text-white mb-1">${item.title || ''}</div>
-                ${linkBtn}
-              </div>
-              <div class="text-amber-500 text-sm font-black">${(item.price||0)} ₪</div>
+    <!-- Footer -->
+    <footer class="py-16 px-6 border-t border-slate-100 text-center">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
+            <div class="text-right md:text-left">
+                <h1 class="text-xl font-black uppercase mb-1">MAD <span class="font-light italic">MAISON</span></h1>
+                <p class="text-[10px] uppercase tracking-widest text-slate-400 font-bold">Molecular Engineering & Fragrance Lab</p>
             </div>
-            <button onclick="removeFromCart(${item.id})" class="w-8 h-8 rounded-full bg-red-500/10 flex items-center justify-center text-red-500 hover:bg-red-500 hover:text-white transition" title="Remove">
-              <i class="fas fa-trash text-sm"></i>
-            </button>
-          </div>
-        `;
-      }).join("");
+            <div class="flex gap-8 text-[11px] font-bold text-slate-400 uppercase tracking-widest" id="footer-stats">
+                <!-- Footer stats injected here -->
+            </div>
+            <div class="text-slate-300 text-[10px] font-medium uppercase tracking-[0.2em]" id="copyright">
+                © 1999 - 2024 MAD PARFUMEUR GLOBAL.
+            </div>
+        </div>
+    </footer>
 
-      document.getElementById("cart-total").innerText = total + " ₪";
-    }
+    <script>
+        const translations = {
+            ar: {
+                dir: 'rtl',
+                hero: { est: 'تأسس عام 1999', truth: 'الحقيقة.', pure: 'نقاء', desc: '"نحن لا نصمم مجرد روائح؛ نحن نهندس أثراً جزيئياً لا يزول."' },
+                recognition: {
+                    tag: 'الاعتراف والانتشار العالمي',
+                    fragTitle: 'موثق في Fragrantica',
+                    fragDesc: 'تصنيف MAD Parfumeur كدار نيش معتمدة عالمياً هو شهادة خبراء العطور بجودة خلاصاتنا الاستثنائية.',
+                    link: 'تصفح الأرشيف العالمي'
+                },
+                comparison: {
+                    title: 'لماذا تختار MAD؟',
+                    mad: 'MAD',
+                    others: 'الآخرين',
+                    items: [
+                        { mad: 'أصلي ومضمون 100% ماركة MAD', others: 'مقلد ومجهول المصدر وضار' },
+                        { mad: 'ثبات جبار يتجاوز 48 ساعة', others: 'رائحة تختفي خلال دقائق' },
+                        { mad: 'زيوت نيش فرنسية فاخرة جداً', others: 'رائحة كحول رخيصة ومزعجة' },
+                        { mad: 'آمن تماماً ولا يسبب حساسية', others: 'يسبب صداع وضيق تنفس' },
+                        { mad: 'تغليف فخم يليق بك وبمقامك', others: 'تغليف عشوائي وشغل شوارع' },
+                        { mad: 'ضمان استبدال حقيقي وخدمة زبائن', others: 'بتشتري وبتتوه وما حد برد عليك' }
+                    ]
+                },
+                faq: {
+                    title: 'الأسئلة الشائعة',
+                    questions: [
+                        { q: 'هل العطور أصلية؟', a: 'نعم، جميع عطورنا أصلية 100% ومن إنتاج مصانعنا الخاصة المسجلة عالمياً.' },
+                        { q: 'كم تستغرق مدة التوصيل؟', a: 'تستغرق مدة التوصيل من 2 إلى 5 أيام عمل حسب منطقتك الجغرافية.' },
+                        { q: 'هل الرائحة ثابتة؟', a: 'تتميز عطورنا بتركيز عالي وثبات يتجاوز 48 ساعة بفضل جودة الزيوت الفرنسية.' },
+                        { q: 'هل يتوفر دفع عند الاستلام؟', a: 'نعم، نوفر خدمة الدفع عند الاستلام لجميع عملائنا لضمان الثقة والراحة.' },
+                        { q: 'أين تقع فروعكم؟', a: 'نمتلك أكثر من 455 فرعاً حول العالم.' },
+                        { q: 'ماذا لو لم يعجبني العطر؟', a: 'نوفر ضمان استبدال حقيقي؛ يمكنك التواصل مع خدمة العملاء في حال وجود أي ملاحظة.' }
+                    ]
+                },
+                reviews: { rating: '4.9 / 5', text: 'تقييم عملاء جربوا العطر قبلك', brand: 'MAD PERFUME' },
+                footer: { nations: '18 دولة', iso: 'معتمد ISO 22716' }
+            },
+            he: {
+                dir: 'rtl',
+                hero: { est: 'נוסד ב-1999', truth: 'האמת.', pure: 'טוהר', desc: '"אנחנו לא מעצבים רק ריחות; אנחנו מהנדסים חתימה מולקולרית שאינה נעלמת."' },
+                recognition: {
+                    tag: 'הכרה ותפוצה עולמית',
+                    fragTitle: 'מתועד ב-Fragrantica',
+                    fragDesc: 'דירוג MAD Parfumeur כבית בשמי נישה מאושר עולמי הוא עדות של מומחי הבישום לאיכות התמציות יוצאת הדופן שלנו.',
+                    link: 'דפדף בארכיון העולמי'
+                },
+                comparison: {
+                    title: 'למה לבחור ב-MAD?',
+                    mad: 'MAD',
+                    others: 'אחרים',
+                    items: [
+                        { mad: 'מקורי ומובטח 100% מותג MAD', others: 'מזויף, מקור לא ידוע ומזיק' },
+                        { mad: 'עמידות מדהימה מעל 48 שעות', others: 'הריח נעלם תוך דקות' },
+                        { mad: 'שמני נישה צרפתיים יוקרתיים', others: 'ריח אלכוהול זול ומטריד' },
+                        { mad: 'בטוח לחלוטיن ואינו גורם לאלרגיה', others: 'גורם לכאבי ראש וקוצר נשימה' },
+                        { mad: 'אריזה יוקרתית שמתאימה לך', others: 'אריזה אקראית ואיכות נמוכה' },
+                        { mad: 'אחריות החלפה אמיתית ושירות לקוחות', others: 'קונים והולכים לאיבוד ללא מענה' }
+                    ]
+                },
+                faq: {
+                    title: 'שאלות נפוצות',
+                    questions: [
+                        { q: 'האם הבשמים מקוריים?', a: 'כן, כל הבשמים שלנו מקוריים ב-100% ומיוצרים במפעלים הרשומים שלנו.' },
+                        { q: 'כמה זמן לוקח המשלוח?', a: 'המשלוח לוקח בין 2 ל-5 ימי עסקים.' },
+                        { q: 'האם הריח עמיד?', a: 'הבשמים שלנו מתאפיינים בריכוז גבוה ועמידות מעל 48 שעות.' },
+                        { q: 'האם ניתן לשלם במזומן?', a: 'כן, אנו מציעים שירות תשלום במזומן בעת המשלוח.' },
+                        { q: 'איפה הסניפים?', a: 'יש לנו מעל 455 סניפים ברחבי העולם.' },
+                        { q: 'מה אם לא אהבתי?', a: 'אנו מציעים אחריות החלפה מלאה.' }
+                    ]
+                },
+                reviews: { rating: '4.9 / 5', text: 'דירוג לקוחות שניסו לפניך', brand: 'MAD PERFUME' },
+                footer: { nations: '18 מדינות', iso: 'מאושר ISO 22716' }
+            },
+            en: {
+                dir: 'ltr',
+                hero: { est: 'Since 1999', truth: 'truth.', pure: 'PURE', desc: '"We don\'t just design scents; we engineer a molecular signature that lasts forever."' },
+                recognition: {
+                    tag: 'Global Recognition',
+                    fragTitle: 'Fragrantica Certified',
+                    fragDesc: 'Classified as a certified niche house, a testament to our quality and exceptional extracts.',
+                    link: 'Browse Global Archive'
+                },
+                comparison: {
+                    title: 'Why Choose MAD?',
+                    mad: 'MAD',
+                    others: 'Others',
+                    items: [
+                        { mad: '100% Original & Guaranteed MAD Brand', others: 'Counterfeit, unknown & harmful' },
+                        { mad: 'Incredible longevity over 48 hours', others: 'Scent disappears in minutes' },
+                        { mad: 'Premium French Niche Oils', others: 'Cheap & annoying alcohol smell' },
+                        { mad: '100% Safe & Non-Allergenic', others: 'Causes headaches & breathing issues' },
+                        { mad: 'Luxury packaging that fits your status', others: 'Random & street-level packaging' },
+                        { mad: 'Genuine warranty & customer service', others: 'No support or follow-up after purchase' }
+                    ]
+                },
+                faq: {
+                    title: 'Frequently Asked Questions',
+                    questions: [
+                        { q: 'Are the perfumes original?', a: 'Yes, all our perfumes are 100% original MAD products.' },
+                        { q: 'How long does delivery take?', a: 'Delivery typically takes 2 to 5 business days.' },
+                        { q: 'Is the scent long-lasting?', a: 'Our perfumes feature high concentration lasting over 48 hours.' },
+                        { q: 'Is cash on delivery available?', a: 'Yes, we provide COD services for your convenience.' },
+                        { q: 'Where are your branches?', a: 'We have over 455 branches worldwide.' },
+                        { q: 'What if I don\'t like it?', a: 'We offer a genuine replacement guarantee.' }
+                    ]
+                },
+                reviews: { rating: '4.9 / 5', text: 'Reviews from customers who tried it before you', brand: 'MAD PERFUME' },
+                footer: { nations: '18 Countries', iso: 'ISO 22716 Certified' }
+            }
+        };
 
-    function removeFromCart(id){
-      STATE.cart = (STATE.cart||[]).filter(i => i.id !== id);
-      renderProducts();
-      updateCart();
-      trackLead("Remove From Cart");
-    }
+        let currentLang = 'ar';
 
-    function toggleDrawer(open){
-      const d = document.getElementById("cart-drawer");
-      if(open) d.classList.add("open");
-      else d.classList.remove("open");
-    }
+        function changeLang(lang) {
+            currentLang = lang;
+            render();
+        }
 
-    function toggleSale(open){
-      const m = document.getElementById("sale-popup");
-      if(open){ m.style.display = "block"; startTimer(); }
-      else { m.style.display = "none"; }
-    }
+        function render() {
+            const t = translations[currentLang];
+            document.documentElement.dir = t.dir;
+            document.documentElement.lang = currentLang;
 
-    function checkout(){
-      if(!STATE.cart.length) return;
+            // Update language buttons UI
+            ['ar', 'he', 'en'].forEach(l => {
+                const btn = document.getElementById(`btn-${l}`);
+                if (l === currentLang) {
+                    btn.className = "px-3 py-1 rounded-full transition-all uppercase bg-white shadow-sm text-black";
+                } else {
+                    btn.className = "px-3 py-1 rounded-full transition-all uppercase text-slate-400 hover:text-slate-600";
+                }
+            });
 
-      const b = STATE.branch || {};
-      const waPhone = normalizePhoneForWhatsApp(b.phone);
+            // Build Page Content
+            let html = `
+                <!-- Hero Section -->
+                <section class="relative pt-40 pb-20 px-6">
+                    <div class="max-w-7xl mx-auto flex flex-col items-center text-center">
+                        <div class="inline-block px-4 py-1 border border-slate-200 rounded-full text-[10px] font-bold tracking-[0.3em] uppercase mb-8 text-slate-400">
+                            ${t.hero.est}
+                        </div>
+                        <h2 class="text-6xl md:text-9xl font-black tracking-tighter mb-4 leading-none text-black">
+                            ${t.hero.truth} <br/>
+                            <span class="text-slate-200 italic font-thin">${t.hero.pure}</span>
+                        </h2>
+                        <p class="max-w-lg mt-12 text-slate-500 text-lg font-medium italic">
+                            ${t.hero.desc}
+                        </p>
+                    </div>
+                </section>
 
-      let msg = (lang === "ar")
-        ? `مرحباً، أريد طلب من الفرع: ${(b.name_ar||'')}\n\n`
-        : `שלום, אני רוצה להזמין מהסניף: ${(b.name_he||'')}\n\n`;
+                <!-- Comparison Section -->
+                <section class="py-24 bg-slate-50/50">
+                    <div class="max-w-4xl mx-auto px-6">
+                        <h3 class="text-3xl font-black text-center mb-12 uppercase tracking-tight">${t.comparison.title}</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+                            <div class="hidden md:block bg-slate-200 text-slate-600 font-bold text-center py-3 rounded-xl uppercase tracking-widest text-sm">${t.comparison.others}</div>
+                            <div class="hidden md:block bg-slate-800 text-white font-bold text-center py-3 rounded-xl uppercase tracking-widest text-sm">${t.comparison.mad}</div>
+                            
+                            ${t.comparison.items.map(item => `
+                                <div class="md:hidden text-[10px] font-bold text-slate-400 uppercase mt-4 text-center">${t.comparison.others}</div>
+                                <div class="bg-white p-4 rounded-2xl border border-slate-200 flex items-center gap-4">
+                                    <i data-lucide="x-circle" class="text-red-400 shrink-0"></i>
+                                    <span class="text-slate-400 text-sm font-medium">${item.others}</span>
+                                </div>
+                                <div class="md:hidden text-[10px] font-bold text-slate-900 uppercase mt-2 text-center tracking-widest">MAD</div>
+                                <div class="bg-white p-4 rounded-2xl border-2 border-slate-100 shadow-sm flex items-center gap-4 transform transition-transform hover:scale-[1.02]">
+                                    <i data-lucide="check-circle-2" class="text-emerald-500 shrink-0"></i>
+                                    <span class="text-slate-900 text-sm font-bold">${item.mad}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                </section>
 
-      STATE.cart.forEach(i => {
-        msg += `- ${i.title} (${(i.price||0)} ₪)`;
-        if(i.link) msg += `\n  ${i.link}`;
-        msg += "\n";
-      });
+                <!-- FAQ Section -->
+                <section class="py-24 bg-white">
+                    <div class="max-w-3xl mx-auto px-6">
+                        <h3 class="text-3xl font-black text-center mb-12 uppercase">${t.faq.title}</h3>
+                        <div class="grid grid-cols-1 gap-8">
+                            ${t.faq.questions.map((item, idx) => `
+                                <div class="border-b border-slate-100 pb-8 last:border-0 group">
+                                    <div class="flex items-start gap-4 mb-4">
+                                        <div class="w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center font-bold text-xs shrink-0">
+                                            ${idx + 1}
+                                        </div>
+                                        <h4 class="font-bold text-xl text-slate-900 group-hover:text-blue-600 transition-colors">
+                                            ${item.q}
+                                        </h4>
+                                    </div>
+                                    <div class="${t.dir === 'rtl' ? 'pr-12 pl-4' : 'pl-12 pr-4'} text-slate-500 text-md leading-relaxed">
+                                        ${item.a}
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                </section>
 
-      msg += `\n${TEXTS[lang].total} ${document.getElementById("cart-total").innerText}`;
+                <!-- Review Section -->
+                <section class="py-20 px-6">
+                    <div class="max-w-md mx-auto">
+                        <div class="bg-[#38502e] text-white p-10 rounded-[2.5rem] shadow-2xl relative overflow-hidden">
+                            <div class="relative z-10 flex flex-col items-center text-center">
+                                <div class="flex gap-1 mb-6">
+                                    <i data-lucide="star" class="text-yellow-400 fill-yellow-400" size="20"></i>
+                                    <i data-lucide="star" class="text-yellow-400 fill-yellow-400" size="20"></i>
+                                    <i data-lucide="star" class="text-yellow-400 fill-yellow-400" size="20"></i>
+                                    <i data-lucide="star" class="text-yellow-400 fill-yellow-400" size="20"></i>
+                                    <i data-lucide="star" class="text-yellow-400 fill-yellow-400" size="20"></i>
+                                </div>
+                                <div class="text-[12px] uppercase tracking-[0.3em] font-bold text-emerald-100/60 mb-2">REVIEWS</div>
+                                <div class="text-6xl font-black mb-4 tracking-tighter">${t.reviews.rating}</div>
+                                <div class="text-emerald-100 text-lg font-medium leading-tight mb-8">${t.reviews.text}</div>
+                                <div class="w-12 h-px bg-emerald-100/20 mb-6"></div>
+                                <div class="text-xs font-black tracking-[0.4em] text-white uppercase">${t.reviews.brand}</div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
 
-      trackLead("Cart Checkout");
+                <!-- Recognition Section -->
+                <section class="py-20 bg-slate-50">
+                    <div class="max-w-7xl mx-auto px-6 text-center">
+                        <div class="bg-white p-12 rounded-[3rem] shadow-sm border border-slate-100 inline-block">
+                            <i data-lucide="award" class="mx-auto text-black mb-6" size="80" stroke-width="1"></i>
+                            <h3 class="text-2xl font-black mb-4">${t.recognition.fragTitle}</h3>
+                            <p class="text-slate-500 max-w-md mx-auto mb-8">${t.recognition.fragDesc}</p>
+                            <button class="px-10 py-4 bg-black text-white rounded-full font-bold text-xs tracking-widest uppercase transition-transform hover:scale-105">
+                                ${t.recognition.link}
+                            </button>
+                        </div>
+                    </div>
+                </section>
+            `;
+            
+            document.getElementById('app-content').innerHTML = html;
+            
+            // Footer Stats
+            document.getElementById('footer-stats').innerHTML = `
+                <span class="flex items-center gap-2"><i data-lucide="map-pin" size="14"></i> ${t.footer.nations}</span>
+                <span class="flex items-center gap-2"><i data-lucide="award" size="14"></i> ${t.footer.iso}</span>
+            `;
 
-      if(!waPhone){
-        alert(lang === "ar" ? "رقم واتساب غير متوفر لهذا الفرع." : "מספר וואטסאפ לא זמין לסניף הזה.");
-        return;
-      }
+            // Refresh icons
+            lucide.createIcons();
+        }
 
-      window.open(`https://api.whatsapp.com/send/?phone=${waPhone}&text=${encodeURIComponent(msg)}`, "_blank");
-    }
-
-    function claimOffer(){
-      const b = STATE.branch || {};
-      const waPhone = normalizePhoneForWhatsApp(b.phone);
-      trackLead("Claim Offer");
-      if(!waPhone) return;
-      const msg = TEXTS[lang].saleMsg;
-      window.open(`https://api.whatsapp.com/send/?phone=${waPhone}&text=${encodeURIComponent(msg)}`, "_blank");
-    }
-
-    let tInt;
-    function startTimer(){
-      clearInterval(tInt);
-      tInt = setInterval(() => {
-        const d = new Date();
-        const end = new Date();
-        end.setHours(23,59,59,999);
-        const diff = end - d;
-
-        const h = Math.max(0, Math.floor(diff/3600000)).toString().padStart(2,"0");
-        const m = Math.max(0, Math.floor((diff%3600000)/60000)).toString().padStart(2,"0");
-        const s = Math.max(0, Math.floor((diff%60000)/1000)).toString().padStart(2,"0");
-        const el = document.getElementById("timer");
-        if(el) el.innerText = `${h}:${m}:${s}`;
-      }, 1000);
-    }
-
-    // -------- Deferred script loader --------
-    function loadScript(src, opts={}){
-      return new Promise((resolve, reject) => {
-        const s = document.createElement("script");
-        s.src = src;
-        s.async = true;
-        if(opts.type) s.type = opts.type; // e.g. "module"
-        s.onload = resolve;
-        s.onerror = reject;
-        document.head.appendChild(s);
-      });
-    }
-
-    // -------- Pixels loader (runs after 3s) --------
-    function loadPixels(){
-      // Facebook Pixel
-      !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-      n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
-      n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
-      t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script',
-      'https://connect.facebook.net/en_US/fbevents.js');
-      try{
-        fbq('init', '1072283127290819');
-        fbq('track', 'PageView');
-      }catch(e){}
-
-      // TikTok Pixel
-      !function (w, d, t) {
-        w.TiktokAnalyticsObject=t;var ttq=w[t]=w[t]||[];
-        ttq.methods=["page","track","identify","instances","debug","on","off","once","ready","alias","group","enableCookie","disableCookie","holdConsent","revokeConsent","grantConsent"];
-        ttq.setAndDefer=function(t,e){t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}};for(var i=0;i<ttq.methods.length;i++)ttq.setAndDefer(ttq,ttq.methods[i]);
-        ttq.instance=function(t){for(var e=ttq._i[t]||[],n=0;n<ttq.methods.length;n++)ttq.setAndDefer(e,ttq.methods[n]);return e};
-        ttq.load=function(e,n){var r="https://analytics.tiktok.com/i18n/pixel/events.js",o=n&&n.partner;ttq._i=ttq._i||{},ttq._i[e]=[],ttq._i[e]._u=r,ttq._t=ttq._t||{},ttq._t[e]=+new Date,ttq._o=ttq._o||{},ttq._o[e]=n||{};
-        n=document.createElement("script");n.type="text/javascript",n.async=!0,n.src=r+"?sdkid="+e+"&lib="+t;e=document.getElementsByTagName("script")[0];e.parentNode.insertBefore(n,e)};
-        ttq.load('D2D02JBC77U4ENLN9SBG');
-        ttq.page();
-      }(window, document, 'ttq');
-
-      // mark ready, flush queued Lead events
-      __pixelsReady = true;
-      flushLeadQueue();
-    }
-
-    // -------- Init (renders immediately) --------
-    async function init(){
-      // hide loader immediately (page opens)
-      const loader = document.getElementById("page-loader");
-      if(loader) loader.style.display = "none";
-
-      // initial lang
-      const urlLang = params.get("lang");
-      if(urlLang) lang = urlLang === "he" ? "he" : "ar";
-      else lang = navigator.language && navigator.language.startsWith("ar") ? "ar" : "he";
-
-      // set dirs early
-      document.documentElement.dir = (lang === "ar") ? "rtl" : "ltr";
-      document.body.dir = (lang === "ar") ? "rtl" : "ltr";
-      document.documentElement.lang = (lang === "ar") ? "ar" : "he";
-
-      try{
-        // Load branches + products (no external parsing libs)
-        const [branchesJSON, productsCSV] = await Promise.all([
-          fetchJSON(DATA_SOURCES.branchesUrl),
-          fetchText(DATA_SOURCES.productsCsvUrl)
-        ]);
-
-        const branches = extractBranches(branchesJSON);
-        if(!branches.length) throw new Error("No branches found in branches.json");
-
-        STATE.branch = branches.find(b => parseInt(b.id,10) === branchID) || branches[0];
-
-        STATE.products = parseProductsCSV(productsCSV);
-        if(!STATE.products.length) throw new Error("No products found in products.csv");
-
-        setLang(lang, true);
-
-        // popup
-        setTimeout(() => toggleSale(true), 3500);
-
-      }catch(err){
-        console.error(err);
-        setLang(lang, true);
-        showError(lang === "ar"
-          ? "خطأ: تعذّر تحميل بيانات الفروع/المنتجات. تأكد أن الملفات بجانب الصفحة وأسماء الروابط صحيحة."
-          : "שגיאה: לא ניתן לטעון נתוני סניפים/מוצרים. ודא שהקבצים נמצאים לצד הדף ושהנתיבים נכונים."
-        );
-      }
-
-      // load heavy scripts AFTER 3 seconds
-      setTimeout(async () => {
-        // 1) Zapier embed (module)
-        try{
-          await loadScript("https://interfaces.zapier.com/assets/web-components/zapier-interfaces/zapier-interfaces.esm.js", { type: "module" });
-          const ph = document.getElementById("zapier-placeholder");
-          const z = document.getElementById("zapier-embed");
-          if(ph) ph.style.display = "none";
-          if(z) z.style.display = "block";
-        }catch(e){}
-
-        // 2) Lucide icons (optional)
-        try{
-          await loadScript("https://unpkg.com/lucide@latest");
-          try{ if(window.lucide) lucide.createIcons(); }catch(e){}
-        }catch(e){}
-
-        // 3) Pixels LAST ✅
-        try{ loadPixels(); }catch(e){}
-      }, 3000);
-    }
-
-    init();
-  </script>
+        // Initial render
+        window.onload = render;
+    </script>
 </body>
 </html>
