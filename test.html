@@ -1,42 +1,202 @@
 <!doctype html>
-<html lang="he" dir="rtl">
+<html lang="ar" dir="rtl">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Opening WhatsApp…</title>
+  <title>MAD | Smart WhatsApp</title>
+  <meta name="robots" content="noindex,nofollow">
+  <style>
+    :root{ --bg:#0b0b0f; --card:#12121a; --txt:#fff; --muted:rgba(255,255,255,.72); --gold:#d7b56d; }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Arial; background:radial-gradient(1000px 700px at 20% 0%, #1a1722 0%, var(--bg) 65%); color:var(--txt)}
+    .wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:22px}
+    .card{width:min(980px,100%);background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+      border:1px solid rgba(255,255,255,.08); border-radius:18px; overflow:hidden; box-shadow:0 18px 60px rgba(0,0,0,.45)}
+    .top{display:flex;gap:18px; padding:18px; align-items:center; border-bottom:1px solid rgba(255,255,255,.08)}
+    .logo{font-weight:900; letter-spacing:.5px}
+    .pill{margin-inline-start:auto; padding:8px 12px;border:1px solid rgba(255,255,255,.14); border-radius:999px; color:var(--muted); font-size:13px}
+    .grid{display:grid; grid-template-columns: 1.1fr .9fr; gap:18px; padding:18px}
+    @media(max-width:860px){ .grid{grid-template-columns:1fr} .pill{margin-inline-start:0} }
+    .hero{background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.08); border-radius:16px; overflow:hidden}
+    .hero img{width:100%; height:auto; display:block; background:#000}
+    .content{background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.08); border-radius:16px; padding:16px}
+    h1{margin:0 0 10px; font-size:22px}
+    .muted{color:var(--muted); font-size:14px; line-height:1.6}
+    .box{margin-top:12px; padding:12px; border:1px dashed rgba(255,255,255,.18); border-radius:14px; background:rgba(0,0,0,.18)}
+    textarea{width:100%; min-height:170px; padding:12px; border-radius:12px; border:1px solid rgba(255,255,255,.14);
+      background:rgba(0,0,0,.25); color:#fff; font-size:14px; line-height:1.6; resize:vertical}
+    .row{display:flex; gap:10px; flex-wrap:wrap; margin-top:12px}
+    .btn{display:inline-flex; align-items:center; justify-content:center; gap:10px; padding:14px 16px; border-radius:14px;
+      text-decoration:none; font-weight:900; cursor:pointer; border:1px solid rgba(255,255,255,.12)}
+    .btnPrimary{background:#ffffff; color:#111}
+    .btnGhost{background:transparent; color:#fff}
+    .note{margin-top:10px; font-size:12px; color:rgba(255,255,255,.6)}
+    .gold{color:var(--gold); font-weight:800}
+    .small{font-size:12px; opacity:.7}
+  </style>
 </head>
-<body style="font-family:Arial;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;background:#fff;">
-  <div style="text-align:center;max-width:520px;padding:24px;">
-    <div style="font-size:18px;font-weight:800;margin-bottom:8px;">פותחים וואטסאפ…</div>
-    <div style="opacity:.75;margin-bottom:16px;">אם לא נפתח אוטומטית, לחץ על הכפתור:</div>
 
-    <a id="fallback"
-       style="display:inline-flex;align-items:center;justify-content:center;padding:14px 18px;border-radius:14px;text-decoration:none;font-weight:800;background:#111;color:#fff;"
-       href="#">
-      פתיחה ידנית
-    </a>
+<body>
+<div class="wrap">
+  <div class="card">
+    <div class="top">
+      <div class="logo">MAD PARFUMEUR</div>
+      <div class="pill" id="pill">Smart Link</div>
+    </div>
+
+    <div class="grid">
+      <div class="hero">
+        <img id="heroImg" alt="Offer" />
+      </div>
+
+      <div class="content">
+        <h1 id="title">فتح واتساب…</h1>
+        <div class="muted" id="subtitle">نجهّز الرسالة حسب اللغة والتمبلت.</div>
+
+        <div class="box">
+          <div class="small">📩 الرسالة الجاهزة (تقدر تعدّلها إذا بدك):</div>
+          <textarea id="msg"></textarea>
+        </div>
+
+        <div class="row">
+          <button class="btn btnPrimary" id="openBtn">تواصل على واتساب</button>
+          <button class="btn btnGhost" id="copyBtn">نسخ الرسالة</button>
+        </div>
+
+        <div class="note" id="note"></div>
+      </div>
+    </div>
   </div>
+</div>
 
 <script>
-(function(){
-  var phone = "972509787730";
-
-  // النص اللي بدك يطلع جاهز داخل المحادثة
-  var msg =
-"💝 عرض عيد الحب من MAD Parfumeur\n" +
+/**
+ * ✅ SMART TEMPLATE DEFINITIONS
+ * t = template key in URL (?t=valentine)
+ * img = template image (default) — can be overridden by ?img=
+ * text = per language
+ */
+const TEMPLATES = {
+  valentine: {
+    name: { ar: "عرض عيد الحب", he: "מבצע ולנטיין" },
+    img: "https://www.mad-parfumeur.com/assets/hero/valentine.webp",
+    text: {
+      ar:
+"عرض عيد الحب من MAD Parfumeur\n" +
 "5 عطور فاخرة + العطر السادس هدية\n\n" +
 "تشكيلة نسائية ورجالية راقية\n" +
 "توصيل سريع لجميع المناطق\n" +
 "الدفع عند الاستلام\n\n" +
 "السعر: 500₪ شامل التوصيل\n" +
-"يمكن اختيار عطور أخرى حسب رغبتك — تواصل معنا الآن";
+"يمكن اختيار عطور أخرى حسب رغبتك — تواصل معنا الآن",
+      he:
+"מבצע ולנטיין מ-MAD Parfumeur\n" +
+"5 בשמים יוקרתיים + הבושם השישי מתנה\n\n" +
+"קולקציה נשית וגברית יוקרתית\n" +
+"משלוח מהיר לכל הארץ\n" +
+"תשלום במזומן בקבלה\n\n" +
+"מחיר: 500₪ כולל משלוח\n" +
+"ניתן לבחור בשמים אחרים לפי בקשה — צרו קשר עכשיו"
+    }
+  },
 
-  var url = "https://api.whatsapp.com/send?phone=" + phone + "&text=" + encodeURIComponent(msg);
+  // تقدر تضيف تمبلتات ثانية هنا:
+  // summer: { ... }
+};
 
-  document.getElementById("fallback").href = url;
+function qs(name, def=null){
+  const u = new URL(location.href);
+  return u.searchParams.get(name) ?? def;
+}
 
-  // Redirect auto
-  window.location.replace(url);
+function detectLang(){
+  // 1) URL param
+  const p = (qs("lang","") || "").toLowerCase();
+  if (p === "ar" || p === "he") return p;
+
+  // 2) device language
+  const nav = (navigator.language || "").toLowerCase();
+  if (nav.startsWith("he")) return "he";
+  return "ar"; // default
+}
+
+function setDirLang(lang){
+  document.documentElement.lang = lang;
+  document.documentElement.dir = (lang === "he") ? "ltr" : "rtl";
+}
+
+function buildWhatsAppUrl(phone, msg){
+  // ✅ safer than wa.me for redirects
+  return "https://api.whatsapp.com/send?phone=" + encodeURIComponent(phone) +
+         "&text=" + encodeURIComponent(msg);
+}
+
+(function init(){
+  const phone = (qs("phone","972509787730") || "").replace(/[^0-9]/g,'');
+  const tKey = (qs("t","valentine") || "valentine").toLowerCase();
+  const lang = detectLang();
+  setDirLang(lang);
+
+  const t = TEMPLATES[tKey] || TEMPLATES.valentine;
+
+  // image: from ?img= or from template default
+  const img = qs("img", t.img);
+  const heroImg = document.getElementById("heroImg");
+  heroImg.src = img;
+  heroImg.onerror = () => { heroImg.style.display="none"; };
+
+  // title/subtitle
+  const title = document.getElementById("title");
+  const subtitle = document.getElementById("subtitle");
+  title.textContent = (lang === "he") ? "מעבירים לוואטסאפ…" : "فتح واتساب…";
+  subtitle.textContent = (lang === "he")
+    ? ("תבנית: " + (t.name.he || tKey) + " | טלפון: " + phone)
+    : ("التمبلت: " + (t.name.ar || tKey) + " | الرقم: " + phone);
+
+  // message (can be overridden by ?text=)
+  const overrideText = qs("text", null);
+  const msg = overrideText ? decodeURIComponent(overrideText) : (t.text[lang] || t.text.ar);
+  const msgEl = document.getElementById("msg");
+  msgEl.value = msg;
+
+  // pill
+  document.getElementById("pill").textContent =
+    "t=" + tKey + " • lang=" + lang + " • phone=" + phone;
+
+  // buttons
+  const openBtn = document.getElementById("openBtn");
+  const copyBtn = document.getElementById("copyBtn");
+
+  openBtn.textContent = (lang === "he") ? "פתח וואטסאפ" : "تواصل على واتساب";
+  copyBtn.textContent = (lang === "he") ? "העתק הודעה" : "نسخ الرسالة";
+
+  openBtn.onclick = () => {
+    const url = buildWhatsAppUrl(phone, msgEl.value);
+    window.location.href = url; // redirect to whatsapp
+  };
+
+  copyBtn.onclick = async () => {
+    try{
+      await navigator.clipboard.writeText(msgEl.value);
+      document.getElementById("note").innerHTML =
+        (lang === "he") ? "✅ ההודעה הועתקה" : "✅ تم نسخ الرسالة";
+    }catch(e){
+      document.getElementById("note").innerHTML =
+        (lang === "he") ? "انسخ ידנית מהתיבה" : "انسخ يدويًا من المربع";
+    }
+  };
+
+  // optional auto-open (if ?auto=1)
+  const auto = qs("auto","0");
+  if (auto === "1") {
+    setTimeout(() => openBtn.click(), 350);
+  }
+
+  // footer note
+  document.getElementById("note").innerHTML =
+    (lang === "he")
+      ? '💡 טיפ: אפשר לשנות שפה עם <span class="gold">?lang=he</span> או <span class="gold">?lang=ar</span> ולהחליף תבנית עם <span class="gold">?t=valentine</span>.'
+      : '💡 تلميح: غيّر اللغة عبر <span class="gold">?lang=ar</span> أو <span class="gold">?lang=he</span> وغيّر التمبلت عبر <span class="gold">?t=valentine</span>.';
 })();
 </script>
 </body>
