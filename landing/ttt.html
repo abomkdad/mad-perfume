@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>MAD Parfumeur | تجربة الفخامة العطرية</title>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Google Fonts: Cairo -->
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --primary-gold: #d4af37;
+      --deep-emerald: #064e3b;
+      --soft-beige: #f4f1ea;
+    }
+
+    body { 
+      font-family: 'Cairo', sans-serif; 
+      background-color: var(--soft-beige);
+      color: #1f2937;
+      overflow-x: hidden;
+    }
+    
+    .phone-shell { 
+      max-width: 480px; 
+      margin: 0 auto;
+      background: white;
+    }
+
+    .luxury-card {
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(212, 175, 55, 0.2);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    }
+
+    .gold-gradient-text {
+      background: linear-gradient(to right, #bf953f, #fcf6ba, #b38728, #fbf5b7, #aa771c);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .carousel-container {
+      position: relative;
+      overflow: hidden;
+      border-radius: 30px;
+      aspect-ratio: 4 / 5; 
+      box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+      background: #f8f8f8;
+    }
+
+    .carousel-track {
+      display: flex;
+      height: 100%;
+      transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+    }
+
+    .carousel-slide {
+      min-width: 100%;
+      height: 100%;
+      object-fit: cover; 
+    }
+
+    .btn-gold {
+      background: linear-gradient(135deg, #b38728 0%, #d4af37 50%, #b38728 100%);
+      color: white;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+    }
+
+    .input-premium {
+      border: 1px solid rgba(0,0,0,0.08);
+      background: #fdfdfd;
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.8s ease-out;
+    }
+    .reveal.active {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .selection-badge {
+      animation: pulse-gold 2s infinite;
+    }
+
+    @keyframes pulse-gold {
+      0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.7); }
+      70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(212, 175, 55, 0); }
+      100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(212, 175, 55, 0); }
+    }
+
+    .payment-btn { 
+      background: #fff; border-color: rgba(0,0,0,0.05); color: #64748b;
+      transition: all 0.2s;
+    }
+    .payment-btn.active { 
+      background: #fdfaf3; border-color: #d4af37; color: #b38728; 
+    }
+
+    .dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: rgba(0,0,0,0.1); transition: all 0.3s;
+    }
+    .dot.active {
+      width: 24px; border-radius: 10px; background: var(--primary-gold) !important;
+    }
+
+    details > summary {
+      list-style: none;
+    }
+    details > summary::-webkit-details-marker {
+      display: none;
+    }
+  </style>
+</head>
+
+<body class="p-2 sm:p-4">
+
+  <div class="phone-shell rounded-[40px] overflow-hidden shadow-2xl relative border border-white/50">
+    
+    <!-- Header -->
+    <div class="pt-10 pb-6 px-6 text-center bg-white">
+      <div class="inline-block px-4 py-1 rounded-full border border-[#d4af37] mb-4 bg-amber-50">
+        <span class="text-[10px] font-bold tracking-[0.2em] text-[#b38728] uppercase">The Art of Perfumery</span>
+      </div>
+      <h1 class="text-4xl font-black text-slate-900 leading-tight tracking-tight">MAD <span class="gold-gradient-text">PARFUMEUR</span></h1>
+      <div class="h-1 w-20 bg-[#d4af37] mx-auto mt-2 rounded-full opacity-50"></div>
+      <p class="text-lg mt-4 font-semibold text-slate-500">
+        عروض ملكية بأسعار حصرية<br>
+        <span class="text-sm opacity-60 font-bold">السعر موضح داخل كل صورة - شامل التوصيل</span>
+      </p>
+    </div>
+
+    <!-- Carousel Section -->
+    <div class="px-6 reveal">
+      <div class="carousel-container border-[6px] border-white relative">
+        <div class="selection-badge absolute top-5 right-5 z-30 bg-[#b38728] text-white px-4 py-2 rounded-xl text-[10px] font-black shadow-lg flex items-center gap-2">
+            <div class="w-1.5 h-1.5 bg-white rounded-full animate-ping"></div>
+            <span>اطلب هذا العرض الآن</span>
+        </div>
+
+        <div id="carouselTrack" class="carousel-track"></div>
+
+        <button onclick="movePrev()" class="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/90 text-[#b38728] flex items-center justify-center shadow-lg z-20">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7"/></svg>
+        </button>
+        <button onclick="moveNext()" class="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/90 text-[#b38728] flex items-center justify-center shadow-lg z-20">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7"/></svg>
+        </button>
+
+        <div id="carouselDots" class="absolute bottom-6 left-0 right-0 flex justify-center gap-2 z-20"></div>
+      </div>
+
+      <!-- Trust Badges -->
+      <div class="flex justify-between items-center mt-6 px-2">
+        <div class="text-center">
+            <div class="w-10 h-10 bg-emerald-50 rounded-full flex items-center justify-center mx-auto mb-1"><span>🚚</span></div>
+            <span class="text-[9px] font-black text-slate-400 uppercase">توصيل مجاني</span>
+        </div>
+        <div class="text-center">
+            <div class="w-10 h-10 bg-amber-50 rounded-full flex items-center justify-center mx-auto mb-1"><span>💎</span></div>
+            <span class="text-[9px] font-black text-slate-400 uppercase">جودة ملكية</span>
+        </div>
+        <div class="text-center">
+            <div class="w-10 h-10 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-1"><span>🛡️</span></div>
+            <span class="text-[9px] font-black text-slate-400 uppercase">ضمان استبدال</span>
+        </div>
+        <div class="text-center">
+            <div class="w-10 h-10 bg-purple-50 rounded-full flex items-center justify-center mx-auto mb-1"><span>💵</span></div>
+            <span class="text-[9px] font-black text-slate-400 uppercase">دفع آمن</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Booking Form -->
+    <div class="px-6 mt-10 reveal">
+      <div class="luxury-card p-6 rounded-[35px] shadow-xl">
+        <h2 class="text-2xl font-black text-slate-800 text-center mb-6">احجز عرضك الآن</h2>
+        <div class="space-y-4">
+          <input type="text" id="custName" class="w-full input-premium rounded-2xl px-5 py-4 font-bold text-slate-700 outline-none focus:ring-1 focus:ring-amber-400" placeholder="الاسم الكامل">
+          <input type="tel" id="custPhone" class="w-full input-premium rounded-2xl px-5 py-4 font-bold text-slate-700 outline-none text-right" placeholder="رقم الهاتف">
+          <input type="text" id="custAddress" class="w-full input-premium rounded-2xl px-5 py-4 font-bold text-slate-700 outline-none" placeholder="المدينة / العنوان بالتفصيل">
+          
+          <div class="grid grid-cols-2 gap-3 pt-2">
+            <button onclick="setPayment('cash')" id="btnCash" class="payment-btn active py-4 rounded-2xl font-black text-sm border-2">كاش 💵</button>
+            <button onclick="setPayment('card')" id="btnCard" class="payment-btn py-4 rounded-2xl font-black text-sm border-2">فيزا 💳</button>
+          </div>
+
+          <button onclick="submitToWhatsapp()" class="btn-gold w-full py-5 rounded-[25px] font-black text-lg flex items-center justify-center gap-3 shadow-xl transition hover:opacity-90 active:scale-95">
+            <span>تأكيد الحجز عبر الواتساب</span>
+            <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.89 9.884 0 2.225.659 3.891 1.746 5.634l-.999 3.648 3.743-.981zm11.387-5.464c-.301-.15-1.779-.879-2.053-.979-.275-.101-.475-.149-.675.15-.199.299-.775.979-.95 1.174-.175.196-.35.223-.651.074-.3-.15-1.265-.467-2.41-1.485-.89-.794-1.49-1.775-1.665-2.074-.175-.3-.019-.461.13-.611.135-.133.301-.35.451-.524.15-.175.199-.299.3-.499.1-.2.05-.374-.025-.524-.075-.15-.675-1.625-.925-2.224-.244-.583-.493-.503-.675-.512-.175-.01-.375-.011-.575-.011-.2 0-.525.075-.799.374-.275.3-.1.724 0 1.148 0 .424.1.849.15 1.249.05.349.1.624.15.824 0 .05.5 2.1 2.5 3.5 1.15.8 2.3 1.1 3.3 1.1 1.2 0 2.2-.5 3-.7.5-.15.9-.3 1.1-.5.2-.1.4-.3.5-.6.1-.3.1-.6 0-.8z"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6 Comparisons -->
+    <div class="px-6 mt-16 reveal">
+      <h3 class="text-2xl font-black text-slate-800 text-center mb-8 uppercase tracking-widest"><span class="gold-gradient-text">MAD</span> مقابل الآخرين</h3>
+      <div class="grid gap-3">
+        <div class="grid grid-cols-2 gap-3">
+            <div class="luxury-card p-4 rounded-2xl text-center bg-emerald-50/30">
+                <span class="block font-black text-emerald-900 text-xs mb-1">عطورنا (MAD)</span>
+                <p class="text-[10px] font-bold text-emerald-700">أصلية وبزيوت فرنسية ✅</p>
+            </div>
+            <div class="luxury-card p-4 rounded-2xl text-center opacity-50 bg-slate-50">
+                <span class="block font-black text-slate-800 text-xs mb-1">المنافسين</span>
+                <p class="text-[10px] font-bold text-slate-500">تقليد غير مضمون ❌</p>
+            </div>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+            <div class="luxury-card p-4 rounded-2xl text-center bg-emerald-50/30">
+                <p class="text-[10px] font-bold text-emerald-700">ثبات 24 ساعة+ ✅</p>
+            </div>
+            <div class="luxury-card p-4 rounded-2xl text-center opacity-50 bg-slate-50">
+                <p class="text-[10px] font-bold text-slate-500">يختفي بعد ساعة ❌</p>
+            </div>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+            <div class="luxury-card p-4 rounded-2xl text-center bg-emerald-50/30">
+                <p class="text-[10px] font-bold text-emerald-700">فوحان يملأ المكان ✅</p>
+            </div>
+            <div class="luxury-card p-4 rounded-2xl text-center opacity-50 bg-slate-50">
+                <p class="text-[10px] font-bold text-slate-500">فوحان ضعيف جداً ❌</p>
+            </div>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+            <div class="luxury-card p-4 rounded-2xl text-center bg-emerald-50/30">
+                <p class="text-[10px] font-bold text-emerald-700">تغليف فخم للهدايا ✅</p>
+            </div>
+            <div class="luxury-card p-4 rounded-2xl text-center opacity-50 bg-slate-50">
+                <p class="text-[10px] font-bold text-slate-500">تغليف بسيط ❌</p>
+            </div>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+            <div class="luxury-card p-4 rounded-2xl text-center bg-emerald-50/30">
+                <p class="text-[10px] font-bold text-emerald-700">ضمان استبدال حقيقي ✅</p>
+            </div>
+            <div class="luxury-card p-4 rounded-2xl text-center opacity-50 bg-slate-50">
+                <p class="text-[10px] font-bold text-slate-500">لا يوجد أي ضمان ❌</p>
+            </div>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+            <div class="luxury-card p-4 rounded-2xl text-center bg-emerald-50/30">
+                <p class="text-[10px] font-bold text-emerald-700">زيوت فرنسية نقية ✅</p>
+            </div>
+            <div class="luxury-card p-4 rounded-2xl text-center opacity-50 bg-slate-50">
+                <p class="text-[10px] font-bold text-slate-500">مكونات كيميائية ❌</p>
+            </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6 FAQ Section -->
+    <div class="px-6 mt-16 reveal">
+        <div class="luxury-card p-6 rounded-[35px]">
+            <h3 class="text-xl font-black text-slate-900 mb-6 text-center italic">Luxury Questions</h3>
+            <div class="space-y-4" id="faq-list"></div>
+        </div>
+    </div>
+
+    <!-- Reviews Section -->
+    <div class="px-6 mt-16 pb-12 reveal">
+      <div class="text-center mb-8">
+        <h3 class="text-3xl font-black text-slate-800">آراء زبائننا الملكية</h3>
+        <p class="text-slate-400 font-bold text-sm mt-1">أكثر من 10,000 عميل يثق بنا</p>
+      </div>
+
+      <!-- Add Review Input (11th Review) -->
+      <div class="luxury-card p-6 rounded-[35px] mb-10 text-center border-amber-200 shadow-inner">
+        <span class="text-xs font-bold text-slate-400 mb-3 block">شاركنا تجربتك وتقييمك</span>
+        <div id="starInput" class="flex justify-center gap-2 mb-4 text-3xl transition-all">
+            <span data-value="1" class="cursor-pointer text-amber-400 hover:scale-110 transition">★</span>
+            <span data-value="2" class="cursor-pointer text-amber-400 hover:scale-110 transition">★</span>
+            <span data-value="3" class="cursor-pointer text-amber-400 hover:scale-110 transition">★</span>
+            <span data-value="4" class="cursor-pointer text-amber-400 hover:scale-110 transition">★</span>
+            <span data-value="5" class="cursor-pointer text-amber-400 hover:scale-110 transition">★</span>
+        </div>
+        <input type="text" id="reviewName" class="w-full input-premium rounded-xl px-4 py-3 text-sm font-bold mb-3 outline-none focus:border-amber-400" placeholder="اسمك الكريم">
+        <textarea id="reviewText" class="w-full input-premium rounded-xl px-4 py-3 text-sm font-bold h-24 mb-4 outline-none focus:border-amber-400" placeholder="ما رأيك بجودة عطورنا؟"></textarea>
+        <button onclick="addUserReview()" class="w-full bg-slate-900 text-white font-black py-4 rounded-2xl text-xs hover:bg-slate-800 transition shadow-lg">نشر المراجعة</button>
+      </div>
+
+      <!-- List of 10+ Reviews -->
+      <div id="reviewsList" class="space-y-4"></div>
+
+      <!-- Overall Rating Block -->
+      <div class="mt-12 rounded-[40px] bg-gradient-to-br from-[#064e3b] to-[#1a3a2a] text-white p-8 relative overflow-hidden shadow-2xl">
+        <div class="relative z-10 flex flex-col items-center">
+            <span class="text-[10px] font-black tracking-widest opacity-60 mb-2 uppercase">Average Satisfaction</span>
+            <div class="text-[72px] font-black leading-none mb-2 tracking-tighter">4.9</div>
+            <div class="flex text-amber-400 text-2xl mb-4 tracking-widest">★★★★★</div>
+            <p class="text-[11px] font-bold opacity-70 text-center">بناءً على تقييمات موثقة من زبائننا في الداخل والضفة</p>
+        </div>
+        <div class="absolute -top-10 -left-10 w-40 h-40 bg-white/5 rounded-full blur-3xl"></div>
+        <div class="absolute -bottom-10 -right-10 w-40 h-40 bg-amber-400/10 rounded-full blur-2xl"></div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="text-center pb-10 text-slate-400 text-[10px] font-bold bg-white">
+      جميع الحقوق محفوظة MAD Parfumeur Luxury Collection © 2026
+    </div>
+  </div>
+
+  <script>
+    const PHONE_NUMBER = "972509787730";
+    const IMAGE_BASE = "https://www.mad-parfumeur.com/assets/hero/";
+    const IMAGE_EXT = ".webp";
+    const TOTAL_SLIDES = 10;
+    
+    let currentIndex = 0;
+    let paymentMethod = "نقداً عند الاستلام";
+    let currentStarRating = 5;
+
+    // 10 Static Reviews
+    const staticReviews = [
+      { name: "محمد العلي", text: "أفضل عطور جربتها، الثبات فعلاً بضل أيام على الملابس والريحة بتجنن!", rating: 5 },
+      { name: "سارة خليل", text: "الخدمة سريعة والتغليف فخم جداً، العطر وصلني وكأنه هدية غالية.", rating: 5 },
+      { name: "أحمد ناصر", text: "ريحة بتجنن وفوحان ملحوظ، كل اللي حولي سألوني عن نوع العطر.", rating: 5 },
+      { name: "ليلى حسن", text: "شكراً MAD، فعلاً الجودة بتنافس العطور العالمية وبسعر توفير.", rating: 5 },
+      { name: "يوسف عمر", text: "اشتريت العرض وما ندمت أبداً، العطور متنوعة والروائح راقية جداً.", rating: 4 },
+      { name: "مريم يحيى", text: "الثبات والفوحان 10/10، بنصح الجميع يتعامل معهم بدون تردد.", rating: 5 },
+      { name: "خالد وليد", text: "تعامل راقي وسرعة في التوصيل، المندوب كان محترم والمنتج أصلي.", rating: 5 },
+      { name: "ريم سعيد", text: "تجربة ممتازة، الروائح ناعمة وفخمة بنفس الوقت، رح أطلب كمان مرة.", rating: 5 },
+      { name: "فادي مطر", text: "أروع عطور فرنسية بتركيز عالي، شكراً على المصداقية في العرض.", rating: 5 },
+      { name: "جنى علي", text: "العرض جداً مغري والجودة فوق التوقعات، الريحة بتضل ثابتة.", rating: 5 }
+    ];
+
+    // 6 FAQ Items
+    const faqs = [
+      { q: "هل جودة العطور مطابقة للأصلي؟", a: "نعم، نستخدم أنقى الزيوت الفرنسية بتركيز Extrait de Parfum لتطابق الروائح العالمية بنسبة 99%." },
+      { q: "كم يستغرق التوصيل لباب البيت؟", a: "يصلك مندوبنا خلال 24 إلى 72 ساعة كحد أقصى لجميع مناطق الضفة والقدس والداخل." },
+      { q: "هل يمكنني فحص المنتج قبل الدفع؟", a: "بالتأكيد، يحق لك معاينة المنتج والتأكد من التغليف قبل دفع المبلغ للمندوب لضمان رضاك." },
+      { q: "كيف يتم اختيار الروائح في العرض؟", a: "بمجرد إتمام الطلب، سيتواصل معك مستشار العطور لمساعدتك في اختيار الروائح التي تناسب ذوقك." },
+      { q: "هل العطور آمنة على الجلد والحساسية؟", a: "نعم، جميع مكوناتنا معتمدة طبياً وآمنة تماماً على البشرة ولا تسبب أي تهيج." },
+      { q: "كيف أعرف سعر العرض المختار؟", a: "السعر مكتوب بوضوح على كل صورة في الكرسولة أعلاه، وهو سعر نهائي يشمل التوصيل." }
+    ];
+
+    function initPage() {
+      // 1. Build Carousel
+      const track = document.getElementById('carouselTrack');
+      const dotsContainer = document.getElementById('carouselDots');
+      for (let i = 1; i <= TOTAL_SLIDES; i++) {
+        const img = document.createElement('img');
+        img.src = `${IMAGE_BASE}${i}${IMAGE_EXT}`;
+        img.className = 'carousel-slide';
+        img.onerror = function() { this.src = 'https://via.placeholder.com/400x500?text=MAD+Parfumeur'; };
+        track.appendChild(img);
+
+        const dot = document.createElement('div');
+        dot.className = `dot ${i === 1 ? 'active' : ''}`;
+        dot.onclick = () => goToSlide(i - 1);
+        dotsContainer.appendChild(dot);
+      }
+
+      // 2. Build FAQs
+      const faqList = document.getElementById('faq-list');
+      faqs.forEach(item => {
+        const details = document.createElement('details');
+        details.className = 'group luxury-card rounded-2xl p-1 mb-2 border-none shadow-none';
+        details.innerHTML = `
+          <summary class="flex justify-between items-center cursor-pointer font-bold text-slate-800 text-[13px] p-4">
+            <span>${item.q}</span>
+            <span class="text-amber-500 transition group-open:rotate-45">+</span>
+          </summary>
+          <div class="px-4 pb-4 text-[11px] text-slate-500 font-semibold leading-relaxed">${item.a}</div>
+        `;
+        faqList.appendChild(details);
+      });
+
+      // 3. Scroll Reveal Observer
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('active'); });
+      }, { threshold: 0.1 });
+      document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+      // 4. Star Input Logic
+      const stars = document.querySelectorAll('#starInput span');
+      stars.forEach(star => {
+        star.onclick = function() {
+          currentStarRating = parseInt(this.getAttribute('data-value'));
+          stars.forEach(s => {
+            const val = parseInt(s.getAttribute('data-value'));
+            s.style.color = val <= currentStarRating ? '#fbbf24' : '#d1d5db';
+          });
+        };
+      });
+
+      renderReviews();
+    }
+
+    function renderReviews() {
+      const list = document.getElementById('reviewsList');
+      list.innerHTML = '';
+      
+      // User's private review from LocalStorage
+      const saved = localStorage.getItem('userReviewLux');
+      if (saved) {
+        const d = JSON.parse(saved);
+        list.appendChild(createReviewCard(d.name, d.text, d.stars, true));
+      }
+
+      // Static reviews
+      staticReviews.forEach(r => list.appendChild(createReviewCard(r.name, r.text, r.rating, false)));
+    }
+
+    function createReviewCard(name, text, stars, isUser) {
+      const div = document.createElement('div');
+      div.className = `luxury-card p-4 rounded-2xl ${isUser ? 'border-amber-400 border-2' : ''}`;
+      let starHtml = '';
+      for(let i=1; i<=5; i++) starHtml += `<span class="${i<=stars ? 'text-amber-400' : 'text-slate-200'}">★</span>`;
+      div.innerHTML = `
+        <div class="flex justify-between items-center mb-1">
+            <span class="font-black text-slate-800 text-[13px]">${name}</span>
+            <div class="text-[10px]">${starHtml}</div>
+        </div>
+        <p class="text-[11px] font-bold text-slate-500 italic">"${text}"</p>
+        ${isUser ? '<div class="text-[8px] text-amber-600 font-black mt-1">تقييمك الشخصي</div>' : ''}
+      `;
+      return div;
+    }
+
+    function addUserReview() {
+      const name = document.getElementById('reviewName').value.trim();
+      const text = document.getElementById('reviewText').value.trim();
+      if (!name || !text) { alert("لطفاً، أكمل التقييم"); return; }
+      
+      localStorage.setItem('userReviewLux', JSON.stringify({ name, text, stars: currentStarRating }));
+      renderReviews();
+      document.getElementById('reviewName').value = '';
+      document.getElementById('reviewText').value = '';
+    }
+
+    function updateCarousel() {
+      // Adjusted for dir="rtl" - translateX usually positive index * 100
+      document.getElementById('carouselTrack').style.transform = `translateX(${currentIndex * 100}%)`;
+      document.querySelectorAll('.dot').forEach((dot, idx) => dot.classList.toggle('active', idx === currentIndex));
+    }
+
+    function moveNext() { currentIndex = (currentIndex + 1) % TOTAL_SLIDES; updateCarousel(); }
+    function movePrev() { currentIndex = (currentIndex - 1 + TOTAL_SLIDES) % TOTAL_SLIDES; updateCarousel(); }
+    function goToSlide(idx) { currentIndex = idx; updateCarousel(); }
+
+    function setPayment(type) {
+      document.getElementById('btnCash').classList.toggle('active', type==='cash');
+      document.getElementById('btnCard').classList.toggle('active', type==='card');
+      paymentMethod = type === 'cash' ? "نقداً عند الاستلام" : "بطاقة ائتمان (فيزا)";
+    }
+
+    function submitToWhatsapp() {
+      const name = document.getElementById('custName').value.trim();
+      const phone = document.getElementById('custPhone').value.trim();
+      const addr = document.getElementById('custAddress').value.trim();
+      
+      if (!name || !phone || !addr) { alert("لطفاً، أكمل البيانات"); return; }
+      
+      const offerNum = currentIndex + 1;
+      const imageUrl = `${IMAGE_BASE}${offerNum}${IMAGE_EXT}`;
+      
+      const message = `*طلب ملكي جديد من MAD Parfumeur* 💎\n\n` +
+                      `👤 *العميل:* ${name}\n` +
+                      `📞 *الهاتف:* ${phone}\n` +
+                      `📍 *العنوان:* ${addr}\n` +
+                      `💳 *طريقة الدفع:* ${paymentMethod}\n\n` +
+                      `⭐ *العرض المختار:* عرض رقم ${offerNum}\n` +
+                      `💰 *السعر:* موضح على صورة العرض المرفقة\n` +
+                      `🔗 *صورة العرض:* ${imageUrl}\n\n` +
+                      `يرجى التواصل لتأكيد الطلب.`;
+
+      const encodedMsg = encodeURIComponent(message);
+      window.open(`https://api.whatsapp.com/send?phone=${PHONE_NUMBER}&text=${encodedMsg}`, '_blank');
+    }
+
+    setInterval(moveNext, 6000);
+    window.onload = initPage;
+  </script>
+</body>
+</html>
