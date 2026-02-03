@@ -2,26 +2,27 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>MAD Manager - Ultra Simple</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <title>MAD Manager - Easy Mode</title>
   <link rel="icon" type="image/png" href="https://www.mad-parfumeur.com/assets/hero/logo.png">
+
   <style>
     :root{
       --bg:#071022; --card:#0d1a33; --line:#1e2b47;
       --text:#f8fafc; --muted:#9fb0c6;
-      --primary:#2563eb; --success:#16a34a; --warn:#f59e0b; --danger:#ef4444;
+      --success:#16a34a; --warn:#f59e0b; --primary:#2563eb; --danger:#ef4444;
       --shadow:0 12px 35px rgba(0,0,0,.45);
-      --r:20px;
+      --r:22px;
     }
     *{box-sizing:border-box}
     body{
       margin:0; font-family:system-ui,"Segoe UI",Tahoma,Arial;
-      background:radial-gradient(1200px 600px at 20% 0%, rgba(37,99,235,.18), transparent 55%),
-                 radial-gradient(1000px 700px at 80% 15%, rgba(245,158,11,.12), transparent 55%),
+      background:radial-gradient(1200px 600px at 20% 0%, rgba(37,99,235,.14), transparent 55%),
+                 radial-gradient(1000px 700px at 80% 15%, rgba(245,158,11,.10), transparent 55%),
                  var(--bg);
       color:var(--text);
       display:flex; justify-content:center;
-      padding-bottom:90px;
+      padding-bottom:110px;
     }
     .app{width:100%; max-width:980px}
     .top{
@@ -32,7 +33,7 @@
     }
     .head{display:flex; gap:10px; align-items:center}
     .logo{
-      width:44px; height:44px; border-radius:16px; overflow:hidden;
+      width:46px; height:46px; border-radius:16px; overflow:hidden;
       border:1px solid var(--line); background:#0b1730; box-shadow:var(--shadow);
       flex:0 0 auto;
     }
@@ -46,48 +47,63 @@
       background:#0b1730; color:var(--text);
       box-shadow:var(--shadow);
       cursor:pointer; font-size:18px; font-weight:1000;
+      flex:0 0 auto;
     }
-    .row{display:flex; gap:10px; margin-top:10px; flex-wrap:wrap}
+    .dash{
+      display:flex; gap:8px; margin-top:10px; flex-wrap:wrap;
+    }
+    .stat{
+      flex:1; min-width:140px;
+      background:rgba(13,26,51,.92);
+      border:1px solid var(--line);
+      border-radius:18px;
+      padding:10px;
+      box-shadow:var(--shadow);
+      display:flex; justify-content:space-between; align-items:center;
+      font-weight:1000;
+    }
+    .stat small{color:var(--muted); font-weight:900}
+    .stat .n{font-size:18px}
+    .sNew{border-bottom:3px solid var(--warn)}
+    .sPrep{border-bottom:3px solid var(--primary)}
+    .sReady{border-bottom:3px solid var(--success)}
+
     .search{
-      flex:1; min-width:220px;
+      width:100%;
       border-radius:18px; border:1px solid var(--line);
       background:#071331; color:var(--text);
       padding:14px 14px; font-weight:1000;
       outline:none; box-shadow:var(--shadow);
       font-size:16px;
+      margin-top:10px;
     }
-    .btn{
-      border:none; cursor:pointer;
-      border-radius:18px; padding:14px 16px;
-      font-weight:1000; font-size:16px; color:var(--text);
+
+    .tabs{
+      display:flex; gap:8px; margin-top:10px; flex-wrap:wrap;
+    }
+    .tab{
+      border:1px solid var(--line);
+      background:#0b1730;
+      color:var(--muted);
+      padding:10px 12px;
+      border-radius:16px;
+      font-weight:1000;
+      cursor:pointer;
       box-shadow:var(--shadow);
-      transition:.12s; user-select:none;
-      display:flex; align-items:center; justify-content:center; gap:8px;
-      white-space:nowrap;
+      flex:1; min-width:160px;
+      text-align:center;
     }
-    .btn:active{transform:scale(.98)}
-    .btnPrimary{background:var(--primary)}
-    .btnSuccess{background:var(--success)}
-    .btnWarn{background:var(--warn); color:#0b1020}
-    .btnDanger{background:var(--danger)}
+    .tab.active{color:var(--text); border-color:rgba(37,99,235,.6); background:rgba(37,99,235,.15)}
     .content{padding:14px}
-    .sec{
-      margin:16px 0 10px;
+    .sectionTitle{
       display:flex; justify-content:space-between; align-items:center;
-      padding-bottom:8px; border-bottom:1px solid var(--line);
-      color:var(--muted); font-weight:1000;
+      padding:10px 6px;
+      margin:10px 0;
+      color:var(--muted);
+      font-weight:1100;
+      border-bottom:1px solid rgba(255,255,255,.10);
     }
-    .sec strong{color:var(--text); font-size:15px}
-    .sec span{background:#0b1730; border:1px solid var(--line); padding:6px 10px; border-radius:999px; color:var(--text)}
-    .grid{
-      display:grid;
-      grid-template-columns: 1.2fr 1fr 1fr;
-      gap:10px;
-      margin-top:12px;
-    }
-    @media (max-width: 900px){
-      .grid{grid-template-columns:1fr}
-    }
+
     .card{
       background:linear-gradient(180deg, rgba(13,26,51,.92), rgba(13,26,51,.78));
       border:1px solid var(--line);
@@ -98,55 +114,98 @@
       position:relative;
       overflow:hidden;
     }
+    .stripe{
+      position:absolute; top:0; right:0; width:10px; height:100%;
+      background:#475569;
+    }
+    .stripe.new{background:var(--warn)}
+    .stripe.prep{background:var(--primary)}
+    .stripe.ready{background:var(--success)}
+
+    .rowTop{
+      display:flex; gap:10px; align-items:center; flex-wrap:wrap;
+    }
     .badge{
-      position:absolute; top:12px; left:12px;
-      font-size:11px; font-weight:1000;
-      padding:6px 10px; border-radius:999px;
-      border:1px solid var(--line);
-      background:#0b1730; color:var(--text);
+      padding:6px 10px;
+      border-radius:999px;
+      font-weight:1100;
+      font-size:12px;
+      background:rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.10);
+      color:var(--text);
     }
-    .badge.new{border-color:rgba(245,158,11,.4); background:rgba(245,158,11,.12); color:#fde68a}
-    .badge.sent{border-color:rgba(37,99,235,.4); background:rgba(37,99,235,.12); color:#bfdbfe}
-    .badge.ready{border-color:rgba(22,163,74,.45); background:rgba(22,163,74,.12); color:#bbf7d0}
-    .idLine{
-      display:flex; justify-content:flex-end;
-      font-size:12px; color:var(--muted); font-weight:1000;
-      margin-bottom:8px;
+    .badge.new{background:rgba(245,158,11,.16); border-color:rgba(245,158,11,.35)}
+    .badge.prep{background:rgba(37,99,235,.16); border-color:rgba(37,99,235,.35)}
+    .badge.ready{background:rgba(22,163,74,.16); border-color:rgba(22,163,74,.35)}
+
+    .oid{color:#bfdbfe; font-weight:1100}
+    .grid{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:10px;
+      margin-top:12px;
     }
-    .bigBox{
-      background:rgba(7,19,49,.75);
-      border:1px solid var(--line);
-      border-radius:18px;
-      padding:12px;
-      margin-top:10px;
+    @media (max-width: 820px){
+      .grid{grid-template-columns:1fr}
     }
     .field{
-      background:#ffffff;
-      border-radius:16px;
-      border:2px solid rgba(37,99,235,.22);
-      padding:10px;
+      background:#fff;
+      border-radius:18px;
+      border:2px solid rgba(37,99,235,.18);
+      padding:12px;
       color:#0b1020;
     }
-    .field label{
-      display:block; font-size:11px; font-weight:1000;
-      margin-bottom:6px; color:#0b1020;
-    }
-    .field input,.field select,.field textarea{
+    .field label{display:block; font-size:11px; font-weight:1100; margin-bottom:6px; color:#0b1020}
+    .field input,.field textarea,.field select{
       width:100%; border:none; outline:none; background:transparent;
-      font-size:16px; font-weight:1000; color:#0b1020;
+      font-size:18px; font-weight:1100; color:#0b1020;
     }
     .field textarea{resize:vertical}
-    .mini{
+    .full{grid-column: 1 / -1;}
+    .btns{
+      display:grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap:10px;
+      margin-top:12px;
+    }
+    @media (max-width: 820px){
+      .btns{grid-template-columns:1fr}
+    }
+    .btn{
+      border:none; cursor:pointer;
+      border-radius:18px; padding:16px 14px;
+      font-weight:1100; font-size:18px;
+      box-shadow:var(--shadow);
+      transition:.12s; user-select:none;
+      display:flex; align-items:center; justify-content:center; gap:10px;
+    }
+    .btn:active{transform:scale(.98)}
+    .btnSave{background:var(--primary); color:white}
+    .btnSend{background:var(--success); color:white}
+    .btnWA{background:#065f46; color:#d1fae5}
+    .btnConfirm{background:#0ea5e9; color:#001019}
+    .btnDel{background:#7c3aed; color:white}
+    .btnCancel{background:var(--danger); color:white}
+    .btn:disabled{opacity:.25; cursor:not-allowed}
+
+    .hint{
       margin-top:10px;
-      display:flex; gap:10px; flex-wrap:wrap;
+      padding:10px 12px;
+      border-radius:18px;
+      border:1px dashed rgba(255,255,255,.18);
+      color:var(--muted);
+      font-weight:1000;
+      text-align:center;
     }
-    .mini .field{flex:1; min-width:180px}
-    .actions{
-      display:grid; grid-template-columns: repeat(4, 1fr);
-      gap:10px; margin-top:12px;
-    }
-    @media (max-width: 900px){
-      .actions{grid-template-columns:1fr 1fr}
+    .empty{
+      text-align:center;
+      color:var(--muted);
+      padding:20px;
+      font-weight:1100;
+      background:rgba(13,26,51,.65);
+      border:1px solid var(--line);
+      border-radius:22px;
+      box-shadow:var(--shadow);
     }
     .toast{
       position:fixed; top:-120px; left:50%;
@@ -157,15 +216,29 @@
       transition:.5s; z-index:2000;
     }
     .toast.show{top:16px}
-    .err{
-      margin-top:10px;
-      background:rgba(239,68,68,.15);
-      border:1px solid rgba(239,68,68,.35);
-      padding:10px; border-radius:16px;
-      color:#fecaca; font-weight:1000;
+
+    /* Bottom bar (Add new order) */
+    .bottomBar{
+      position:fixed; bottom:0; left:0; right:0;
+      display:flex; justify-content:center;
+      padding:10px;
+      background:rgba(7,16,34,.92); backdrop-filter:blur(10px);
+      border-top:1px solid var(--line);
+      z-index:1000;
+    }
+    .addBtn{
+      width:100%; max-width:980px;
+      border:none; cursor:pointer;
+      border-radius:18px;
+      padding:16px 14px;
+      font-weight:1100; font-size:18px;
+      background:rgba(245,158,11,.18);
+      color:#fff;
+      border:1px solid rgba(245,158,11,.35);
+      box-shadow:var(--shadow);
     }
 
-    /* Modal (Add New) */
+    /* Modal add new order */
     .modalWrap{
       position:fixed; inset:0;
       background:rgba(0,0,0,.55);
@@ -173,17 +246,19 @@
       padding:16px; z-index:3000;
     }
     .modal{
-      width:100%; max-width:720px;
+      width:100%; max-width:820px;
       background:var(--card);
       border:1px solid var(--line);
       border-radius:24px;
       padding:14px;
       box-shadow:var(--shadow);
     }
-    .modal h3{margin:0 0 10px 0; font-size:18px; font-weight:1000}
+    .modal h3{margin:0 0 10px 0; font-size:18px; font-weight:1100}
     .modalActions{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:12px}
+    .btnClose{background:var(--danger); color:white}
   </style>
 </head>
+
 <body>
   <div class="toast" id="toast">تم ✅</div>
 
@@ -192,65 +267,80 @@
       <div class="head">
         <div class="logo"><img src="https://www.mad-parfumeur.com/assets/hero/logo.png" alt="MAD"></div>
         <div class="title">
-          <b>نسخة المدير (تعديل مباشر لكل طلب)</b>
-          <span>عدّل أي خانة ثم اضغط (حفظ) — ثم (إرسال للتجهيز) / (إلغاء) / (تسليم)</span>
+          <b>نسخة المدير (سهل جدًا)</b>
+          <span>طلبات جديدة → إرسال للتجهيز → جاهز → تسليم للمندوب</span>
         </div>
         <button class="iconBtn" onclick="sync()" title="تحديث">↻</button>
       </div>
 
-      <div class="row">
-        <input id="q" class="search" placeholder="بحث بالاسم/الهاتف/العرض..." oninput="render()">
-        <button class="btn btnWarn" onclick="openAdd()">➕ طلب جديد</button>
+      <div class="dash">
+        <div class="stat sNew"><small>جديد</small><span class="n" id="cNew">0</span></div>
+        <div class="stat sPrep"><small>تم الإرسال للتجهيز</small><span class="n" id="cPrep">0</span></div>
+        <div class="stat sReady"><small>جاهز</small><span class="n" id="cReady">0</span></div>
       </div>
-      <div id="errBox"></div>
+
+      <input id="q" class="search" placeholder="بحث: اسم / هاتف / طلب..." oninput="render()">
+
+      <div class="tabs">
+        <button class="tab active" id="tab_new" onclick="setView('new')">🟠 جديد</button>
+        <button class="tab" id="tab_prep" onclick="setView('prep')">🔵 تم الإرسال للتجهيز</button>
+        <button class="tab" id="tab_ready" onclick="setView('ready')">🟢 جاهز</button>
+      </div>
     </div>
 
     <div class="content" id="list"></div>
   </div>
 
+  <!-- Bottom Add Button -->
+  <div class="bottomBar">
+    <button class="addBtn" onclick="openAdd()">➕ إضافة طلب جديد (مع السعر)</button>
+  </div>
+
   <!-- Add Modal -->
-  <div class="modalWrap" id="modalWrap" onclick="closeModal(event)">
+  <div class="modalWrap" id="addWrap" onclick="closeAdd(event)">
     <div class="modal" onclick="event.stopPropagation()">
       <h3>➕ إضافة طلب جديد</h3>
 
       <div class="grid">
-        <div class="field"><label>اسم الزبون</label><input id="a_name"></div>
-        <div class="field"><label>الهاتف</label><input id="a_phone"></div>
-        <div class="field"><label>المدينة / العنوان</label><input id="a_city"></div>
+        <div class="field"><label>اسم الزبون</label><input id="a_name" placeholder="مثال: محمد"></div>
+        <div class="field"><label>الهاتف</label><input id="a_phone" inputmode="tel" placeholder="05X... أو 972..."></div>
 
-        <div class="field"><label>الطلب (C)</label><input id="a_offer"></div>
+        <div class="field full"><label>المدينة / العنوان</label><input id="a_city" placeholder="العنوان كامل"></div>
+
+        <div class="field full"><label>الطلب (C)</label><input id="a_offer" placeholder="W183 X102 ... he"></div>
+
         <div class="field"><label>السعر ₪</label><input id="a_price" inputmode="numeric" value="150"></div>
-        <div class="field">
-          <label>شركة توصيل</label>
-          <select id="a_delivery">
-            <option value="">-- اختر --</option>
-            <option value="High Express">High Express</option>
-            <option value="Marwah Delivery">Marwah Delivery</option>
-            <option value="Lama Delivery">Lama Delivery</option>
-            <option value="Areen Delivery">Areen Delivery</option>
-          </select>
-        </div>
 
-        <div class="field" style="grid-column:1/-1"><label>ملاحظات</label><textarea id="a_notes" rows="3"></textarea></div>
+        <div class="field"><label>ملاحظات</label><input id="a_notes" placeholder="مثال: order_confirmation_he / عرض خاص"></div>
       </div>
 
       <div class="modalActions">
-        <button class="btn btnDanger" onclick="closeModal()">إغلاق</button>
-        <button class="btn btnSuccess" onclick="saveAdd()">✅ حفظ الطلب</button>
+        <button class="btn btnClose" onclick="closeAdd()">إلغاء</button>
+        <button class="btn btnSend" onclick="addOrder()">✅ حفظ الطلب</button>
       </div>
     </div>
   </div>
 
 <script>
-  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxKQZk5SJZ2w5XENWzxRL5Vf5UPwW0OtTMsz3RV4i-Pp3swg2KVh_6FaSnDkacPR8Kd/exec";
+  // ✅ ضع رابط السكربت تبعك
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw2QxGHOxMv7_uNbMulwO60IHOcKj16rbBJRfoltkwcdb2Bg4zrVjyMt_lf9KgnyyXl/exec";
+  const CUSTOMER_SERVICE = "9935";
 
   let all = [];
+  let view = "new";
 
   function toast(msg){
     const t = document.getElementById("toast");
     t.textContent = msg;
     t.classList.add("show");
     setTimeout(()=>t.classList.remove("show"), 2200);
+  }
+
+  function setView(v){
+    view = v;
+    document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
+    document.getElementById("tab_"+v).classList.add("active");
+    render();
   }
 
   function isApproved(s){ s=String(s||""); return s.includes("Approved") || s.includes("מאושר"); }
@@ -263,212 +353,240 @@
     return m ? m[1] : "";
   }
 
+  function extractPrice(o){
+    // prefer o.price
+    let p = String(o.price||"").replace(/[^\d]/g,"");
+    if(p) return p;
+
+    // try notes: Price: 500 ₪
+    const notes = String(o.notes||"");
+    let m = notes.match(/Price:\s*([0-9]{2,6})\s*₪/i);
+    if(m) return m[1];
+
+    // try offerRaw: "= 500 ₪" or "500 ₪"
+    const offerRaw = String(o.offerRaw || o.offer || "");
+    m = offerRaw.match(/=\s*([0-9]{2,6})/);
+    if(m) return m[1];
+    m = offerRaw.match(/([0-9]{2,6})\s*₪/);
+    if(m) return m[1];
+
+    return "150";
+  }
+
+  function escapeHtml(str){
+    return String(str ?? "").replace(/[&<>"']/g, s => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[s]));
+  }
+
+  function safeId(x){
+    return String(x).replace(/[^\w-]/g,"_");
+  }
+
   async function sync(){
-    document.getElementById("errBox").innerHTML = "";
     try{
       const res = await fetch(`${SCRIPT_URL}?action=get&t=${Date.now()}`, { cache:"no-store" });
       const data = await res.json();
-
-      if (!Array.isArray(data)) {
-        document.getElementById("errBox").innerHTML =
-          `<div class="err">⚠️ خطأ من السيرفر: ${escapeHtml(JSON.stringify(data))}</div>`;
-        all = [];
-      } else {
-        all = data;
-      }
-
+      all = Array.isArray(data) ? data : [];
+      updateDash();
       render();
     }catch(e){
-      document.getElementById("errBox").innerHTML = `<div class="err">⚠️ فشل اتصال: ${escapeHtml(String(e))}</div>`;
       all = [];
+      updateDash();
       render();
+      toast("⚠️ مشكلة اتصال");
     }
+  }
+
+  function updateDash(){
+    let n=0,p=0,r=0;
+    all.forEach(o=>{
+      const s = String(o.status||"");
+      if(isDelivered(s) || isCanceled(s)) return;
+      if(isReady(s)) r++;
+      else if(isApproved(s)) p++;
+      else n++;
+    });
+    document.getElementById("cNew").innerText = n;
+    document.getElementById("cPrep").innerText = p;
+    document.getElementById("cReady").innerText = r;
   }
 
   function render(){
     const q = (document.getElementById("q").value||"").toLowerCase();
     const rev = all.slice().reverse();
 
-    const news = [];
-    const sent = [];
-    const ready = [];
-
-    rev.forEach(o=>{
+    const filtered = rev.filter(o=>{
       const s = String(o.status||"");
-      if (isDelivered(s) || isCanceled(s)) return;
+      if(isDelivered(s) || isCanceled(s)) return false;
 
+      if(view==="new"){
+        if(isApproved(s) || isReady(s)) return false;
+      } else if(view==="prep"){
+        if(!isApproved(s) || isReady(s)) return false;
+      } else if(view==="ready"){
+        if(!isReady(s)) return false;
+      }
+
+      if(!q) return true;
       const match = String(o.name||"").toLowerCase().includes(q) ||
                     String(o.phone||"").includes(q) ||
-                    String(o.offer||"").toLowerCase().includes(q);
-      if (q && !match) return;
-
-      if (isReady(s)) ready.push(o);
-      else if (isApproved(s)) sent.push(o);
-      else news.push(o);
+                    String(o.offer||"").toLowerCase().includes(q) ||
+                    String(o.offerRaw||"").toLowerCase().includes(q) ||
+                    String(o.orderId||"").toLowerCase().includes(q);
+      return match;
     });
 
-    let html = "";
-    html += `<div class="sec"><strong>🟠 طلبات جديدة (غير معتمدة)</strong><span>${news.length}</span></div>`;
-    html += news.length ? news.map(o=>card(o,"new")).join("") : `<div class="card"><div style="text-align:center;color:var(--muted);font-weight:1000">لا يوجد</div></div>`;
-
-    html += `<div class="sec"><strong>🔵 تم إرسالها للتجهيز</strong><span>${sent.length}</span></div>`;
-    html += sent.length ? sent.map(o=>card(o,"sent")).join("") : `<div class="card"><div style="text-align:center;color:var(--muted);font-weight:1000">لا يوجد</div></div>`;
-
-    html += `<div class="sec"><strong>🟢 جاهز (تم التجهيز)</strong><span>${ready.length}</span></div>`;
-    html += ready.length ? ready.map(o=>card(o,"ready")).join("") : `<div class="card"><div style="text-align:center;color:var(--muted);font-weight:1000">لا يوجد</div></div>`;
-
-    document.getElementById("list").innerHTML = html;
-  }
-
-  function card(o, type){
-    const row = o.rowIndex;
-    const oid = o.orderId || "";
-    const s = String(o.status||"");
-    const del = parseDeliveryFromStatus(s);
-    const price = String(o.price||"").replace(/[^\d]/g,"") || "150";
-
-    const badge =
-      type==="new" ? `<div class="badge new">جديد</div>` :
-      type==="sent" ? `<div class="badge sent">أُرسل للتجهيز</div>` :
-      `<div class="badge ready">جاهز</div>`;
-
-    const statusSelectDisabled = (type==="ready") ? "disabled" : "";
-    const currentStage =
-      (type==="ready") ? "READY" : (type==="sent" ? "APPROVED" : "NEW");
-
-    return `
-      <div class="card" id="card_${row}">
-        ${badge}
-        <div class="idLine">رقم الطلب: <span style="color:var(--text);margin-right:6px">${escapeHtml(oid || ("ROW-"+row))}</span></div>
-
-        <div class="grid">
-          <div class="field">
-            <label>اسم الزبون</label>
-            <input id="f_name_${row}" value="${escAttr(o.name||"")}">
-          </div>
-          <div class="field">
-            <label>الهاتف</label>
-            <input id="f_phone_${row}" value="${escAttr(o.phone||"")}">
-          </div>
-          <div class="field">
-            <label>المدينة / العنوان</label>
-            <input id="f_city_${row}" value="${escAttr(o.city||"")}">
-          </div>
-
-          <div class="field" style="grid-column:1/-1">
-            <label>الطلب (C)</label>
-            <input id="f_offer_${row}" value="${escAttr(o.offer||"")}">
-          </div>
-
-          <div class="field">
-            <label>السعر ₪</label>
-            <input id="f_price_${row}" inputmode="numeric" value="${escAttr(price)}">
-          </div>
-
-          <div class="field">
-            <label>شركة التوصيل</label>
-            <select id="f_delivery_${row}">
-              <option value="">-- اختر --</option>
-              <option value="High Express" ${del==="High Express"?"selected":""}>High Express</option>
-              <option value="Marwah Delivery" ${del==="Marwah Delivery"?"selected":""}>Marwah Delivery</option>
-              <option value="Lama Delivery" ${del==="Lama Delivery"?"selected":""}>Lama Delivery</option>
-              <option value="Areen Delivery" ${del==="Areen Delivery"?"selected":""}>Areen Delivery</option>
-            </select>
-          </div>
-
-          <div class="field">
-            <label>الحالة (للعرض فقط / تعديلها عبر الأزرار)</label>
-            <select id="f_stage_${row}" ${statusSelectDisabled}>
-              <option value="NEW" ${currentStage==="NEW"?"selected":""}>جديد / قيد المعالجة</option>
-              <option value="APPROVED" ${currentStage==="APPROVED"?"selected":""}>أرسل للتجهيز</option>
-              <option value="READY" ${currentStage==="READY"?"selected":""} disabled>جاهز (الموظف يحددها)</option>
-              <option value="DELIVERED" ${isDelivered(s)?"selected":""}>تم تسليم للمندوب</option>
-              <option value="CANCELED" ${isCanceled(s)?"selected":""}>ملغي</option>
-            </select>
-          </div>
-
-          <div class="field" style="grid-column:1/-1">
-            <label>ملاحظات</label>
-            <textarea id="f_notes_${row}" rows="3">${escapeHtml(o.notes||"")}</textarea>
-          </div>
-        </div>
-
-        <div class="actions">
-          <button class="btn btnPrimary" onclick="saveRow(${row}, '${escAttr(oid)}', '${type}')">💾 حفظ التعديل</button>
-
-          ${type!=="ready"
-            ? `<button class="btn btnSuccess" onclick="sendToPrep(${row}, '${escAttr(oid)}')">✅ إرسال للتجهيز</button>`
-            : `<button class="btn btnWarn" onclick="markDelivered(${row}, '${escAttr(oid)}')">✅ تسليم للمندوب</button>`
-          }
-
-          <button class="btn btnDanger" onclick="cancelOrder(${row}, '${escAttr(oid)}')">❌ إلغاء</button>
-
-          <button class="btn btnWarn" onclick="forceRefresh()">↻ تحديث</button>
-        </div>
-
-        ${type==="sent" ? `<div class="bigBox" style="margin-top:12px;font-weight:1000;color:#bfdbfe">✅ المدير: تم إرسال هذا الطلب للتجهيز</div>` : ""}
-        ${type==="ready" ? `<div class="bigBox" style="margin-top:12px;font-weight:1000;color:#bbf7d0">✅ جاهز — الموظف أنهى التجهيز</div>` : ""}
-      </div>
-    `;
-  }
-
-  function getRowValues(row){
-    const name = (document.getElementById(`f_name_${row}`).value||"").trim();
-    const phone = (document.getElementById(`f_phone_${row}`).value||"").trim();
-    const city = (document.getElementById(`f_city_${row}`).value||"").trim();
-    const offer = (document.getElementById(`f_offer_${row}`).value||"").trim();
-    const price = String(document.getElementById(`f_price_${row}`).value||"150").replace(/[^\d]/g,"") || "150";
-    const notes = (document.getElementById(`f_notes_${row}`).value||"").trim();
-    const delivery = (document.getElementById(`f_delivery_${row}`).value||"").trim();
-    return { name, phone, city, offer, price, notes, delivery };
-  }
-
-  async function saveRow(row, orderId, type){
-    const v = getRowValues(row);
-    if(!v.name || !v.phone || !v.offer){
-      toast("❌ لازم الاسم + الهاتف + الطلب");
+    if(!filtered.length){
+      document.getElementById("list").innerHTML = `<div class="empty">لا يوجد طلبات في هذا القسم ✅</div>`;
       return;
     }
 
-    try{
-      await fetch(`${SCRIPT_URL}?action=updateOrder&row=${encodeURIComponent(row)}&orderId=${encodeURIComponent(orderId)}`
-        + `&name=${encodeURIComponent(v.name)}&phone=${encodeURIComponent(v.phone)}&city=${encodeURIComponent(v.city)}`
-        + `&offer=${encodeURIComponent(v.offer)}&price=${encodeURIComponent(v.price)}&notes=${encodeURIComponent(v.notes)}`
-        + `&address=${encodeURIComponent(v.city)}&t=${Date.now()}`, { cache:"no-store" });
+    document.getElementById("list").innerHTML = filtered.map(o=>{
+      const s = String(o.status||"");
+      const delivery = parseDeliveryFromStatus(s) || "";
+      const price = extractPrice(o);
+      const orderId = o.orderId || ("ROW-"+o.rowIndex);
 
-      toast("✅ تم حفظ التعديل");
-      setTimeout(sync, 400);
-    }catch(e){
-      toast("⚠️ فشل الحفظ (افحص السكربت)");
+      const stripe = view==="new" ? "new" : (view==="prep" ? "prep" : "ready");
+      const badge = view==="new" ? "new" : (view==="prep" ? "prep" : "ready");
+      const badgeText = view==="new" ? "طلب جديد" : (view==="prep" ? "تم إرساله للتجهيز" : "جاهز للتوصيل");
+
+      const rid = safeId(o.rowIndex);
+
+      return `
+        <div class="card">
+          <div class="stripe ${stripe}"></div>
+
+          <div class="rowTop">
+            <span class="badge ${badge}">${badgeText}</span>
+            <span class="oid">رقم: ${escapeHtml(orderId)}</span>
+            <span class="badge" style="margin-inline-start:auto">${escapeHtml(s||"—")}</span>
+          </div>
+
+          <div class="grid">
+            <div class="field"><label>اسم الزبون</label>
+              <input id="name_${rid}" value="${escapeHtml(o.name||"")}" />
+            </div>
+
+            <div class="field"><label>الهاتف</label>
+              <input id="phone_${rid}" value="${escapeHtml(o.phone||"")}" />
+            </div>
+
+            <div class="field full"><label>المدينة / العنوان</label>
+              <input id="city_${rid}" value="${escapeHtml(o.city||"")}" />
+            </div>
+
+            <div class="field full"><label>الطلب (C)</label>
+              <input id="offer_${rid}" value="${escapeHtml(o.offer||o.offerRaw||"")}" />
+            </div>
+
+            <div class="field"><label>السعر ₪</label>
+              <input id="price_${rid}" inputmode="numeric" value="${escapeHtml(price)}" />
+            </div>
+
+            <div class="field"><label>شركة التوصيل</label>
+              <select id="del_${rid}">
+                <option value="">-- اختر --</option>
+                <option ${delivery==="High Express"?"selected":""} value="High Express">High Express</option>
+                <option ${delivery==="Marwah Delivery"?"selected":""} value="Marwah Delivery">Marwah Delivery</option>
+                <option ${delivery==="Lama Delivery"?"selected":""} value="Lama Delivery">Lama Delivery</option>
+                <option ${delivery==="Areen Delivery"?"selected":""} value="Areen Delivery">Areen Delivery</option>
+              </select>
+            </div>
+
+            <div class="field full"><label>الحالة (تقدر تعدلها)</label>
+              <input id="status_${rid}" value="${escapeHtml(s||"")}" placeholder="مثال: Approved ✅ (משלוח: High Express)" />
+            </div>
+
+            <div class="field full"><label>ملاحظات</label>
+              <textarea id="notes_${rid}" rows="2">${escapeHtml(o.notes||"")}</textarea>
+            </div>
+          </div>
+
+          <div class="btns">
+            <button class="btn btnSave" onclick="saveAll(${o.rowIndex}, '${escapeHtml(orderId)}')">💾 حفظ التعديل</button>
+
+            <button class="btn btnSend" ${view!=="new" ? "disabled" : ""} onclick="sendToPrep(${o.rowIndex}, '${escapeHtml(orderId)}')">
+              ✅ إرسال للتجهيز
+            </button>
+
+            <button class="btn btnConfirm" onclick="confirmCustomer(${o.rowIndex}, '${escapeHtml(orderId)}')">✅ تأكيد للعميل</button>
+
+            <button class="btn btnWA" onclick="openWA(${o.rowIndex}, '${escapeHtml(orderId)}')">💬 واتساب</button>
+
+            <button class="btn btnDel" ${view!=="ready" ? "disabled" : ""} onclick="markDelivered(${o.rowIndex}, '${escapeHtml(orderId)}')">
+              ✅ تسليم للمندوب
+            </button>
+
+            <button class="btn btnCancel" onclick="cancelOrder(${o.rowIndex}, '${escapeHtml(orderId)}')">❌ إلغاء</button>
+          </div>
+
+          <div class="hint">
+            ⚠️ إذا ما ظهر “إرسال للتجهيز” فعّال: هذا الطلب ليس جديدًا أو تم اعتماده سابقًا.
+          </div>
+        </div>
+      `;
+    }).join("");
+  }
+
+  function getVals(row){
+    const rid = safeId(row);
+    const name = (document.getElementById("name_"+rid).value||"").trim();
+    const phone = (document.getElementById("phone_"+rid).value||"").trim();
+    const city = (document.getElementById("city_"+rid).value||"").trim();
+    const offer = (document.getElementById("offer_"+rid).value||"").trim();
+    const price = String(document.getElementById("price_"+rid).value||"150").replace(/[^\d]/g,"") || "150";
+    const notes = (document.getElementById("notes_"+rid).value||"").trim();
+    const status = (document.getElementById("status_"+rid).value||"").trim();
+    const delivery = (document.getElementById("del_"+rid).value||"").trim();
+    return {name, phone, city, offer, price, notes, status, delivery};
+  }
+
+  async function saveAll(row, orderId){
+    const v = getVals(row);
+
+    // ✅ notes standardized (لو بتحب)
+    // خلّيها مثل النظام:
+    // Price: 500 ₪ | Pay: Cash | Proc: Direct | Addr: xxx
+    // إذا المستخدم كتب notes مختلفة، ما بنفرض عليه.
+    await updateOrder(row, orderId, v);
+
+    // إذا المدير عدّل الحالة يدويًا
+    if(v.status){
+      await updateStatus(row, orderId, v.status);
     }
+
+    toast("✅ تم الحفظ");
+    setTimeout(sync, 500);
   }
 
   async function sendToPrep(row, orderId){
-    const v = getRowValues(row);
+    const v = getVals(row);
     if(!v.delivery){
-      toast("❌ اختر شركة توصيل");
+      toast("❌ اختر شركة توصيل أولاً");
       return;
     }
 
-    // احفظ التعديل أولاً
-    await saveRow(row, orderId, "new");
+    // احفظ كل التعديلات أولاً
+    await updateOrder(row, orderId, v);
 
-    const status = `Approved ✅ (משלוח: ${v.delivery})`;
-    await updateStatus(row, orderId, status);
-    toast("✅ تم إرسال للتجهيز");
-    setTimeout(sync, 400);
-  }
+    // ثم غيّر الحالة إلى Approved مع شركة التوصيل
+    const newStatus = `Approved ✅ (משלוח: ${v.delivery})`;
+    await updateStatus(row, orderId, newStatus);
 
-  async function cancelOrder(row, orderId){
-    await updateStatus(row, orderId, "Canceled ❌");
-    toast("✅ تم الإلغاء");
-    setTimeout(sync, 400);
+    toast("✅ تم إرسال الطلب للتجهيز");
+    setTimeout(sync, 600);
   }
 
   async function markDelivered(row, orderId){
     await updateStatus(row, orderId, "Delivered ✅");
     toast("✅ تم التسليم للمندوب");
-    setTimeout(sync, 400);
+    setTimeout(sync, 600);
+  }
+
+  async function cancelOrder(row, orderId){
+    await updateStatus(row, orderId, "Canceled ❌");
+    toast("✅ تم الإلغاء");
+    setTimeout(sync, 600);
   }
 
   async function updateStatus(row, orderId, status){
@@ -479,67 +597,150 @@
     }
   }
 
-  function openAdd(){
-    document.getElementById("a_name").value = "";
-    document.getElementById("a_phone").value = "";
-    document.getElementById("a_city").value = "";
-    document.getElementById("a_offer").value = "";
-    document.getElementById("a_price").value = "150";
-    document.getElementById("a_delivery").value = "";
-    document.getElementById("a_notes").value = "";
-    document.getElementById("modalWrap").style.display = "flex";
+  async function updateOrder(row, orderId, v){
+    try{
+      // نرسل address=city كمان للتوافق
+      await fetch(`${SCRIPT_URL}?action=updateOrder&row=${encodeURIComponent(row)}&orderId=${encodeURIComponent(orderId)}`
+        + `&name=${encodeURIComponent(v.name)}`
+        + `&phone=${encodeURIComponent(v.phone)}`
+        + `&city=${encodeURIComponent(v.city)}`
+        + `&address=${encodeURIComponent(v.city)}`
+        + `&offer=${encodeURIComponent(v.offer)}`
+        + `&price=${encodeURIComponent(v.price)}`
+        + `&notes=${encodeURIComponent(v.notes)}`
+        + `&t=${Date.now()}`, { cache:"no-store" });
+    }catch(e){
+      toast("⚠️ فشل حفظ التعديل");
+    }
   }
-  function closeModal(){ document.getElementById("modalWrap").style.display = "none"; }
 
-  async function saveAdd(){
+  // ===== WhatsApp Buttons =====
+  function toWA_(phone){
+    let p = String(phone||"").replace(/\D/g,"");
+    if (!p) return "";
+    if (p.startsWith("00")) p = p.slice(2);
+    if (p.startsWith("9720")) p = "972" + p.slice(4);
+    if (p.startsWith("0") && p.length >= 9) p = "972" + p.slice(1);
+    return p;
+  }
+
+  function detectLang_(name, offer, notes){
+    const n = String(name||"");
+    const o = String(offer||"").toLowerCase();
+    const no = String(notes||"").toLowerCase();
+    if (/[\u0590-\u05FF]/.test(n)) return "he";
+    if (o.includes(" he") || o.endsWith("he") || no.includes("order_confirmation_he")) return "he";
+    return "ar";
+  }
+
+  function confirmCustomer(row, orderId){
+    const v = getVals(row);
+    const phone = toWA_(v.phone);
+    if(!phone){ toast("❌ رقم غير صحيح"); return; }
+
+    const lang = detectLang_(v.name, v.offer, v.notes);
+    const price = String(v.price||"150").replace(/[^\d]/g,"") || "150";
+    const addr = v.city || "-";
+    const offer = v.offer || "-";
+    const id = orderId || ("ROW-" + row);
+
+    let msg = "";
+    if(lang === "he"){
+      msg =
+`*MAD Parfumeur* ✅
+שלום ${v.name} 🌿
+הזמנתך התקבלה ונרשמה אצלנו.
+
+🧾 הזמנה: ${offer}
+💰 סה"כ: ₪${price}
+📍 כתובת: ${addr}
+🆔 מס' הזמנה: ${id}
+
+כדי לאשר – השב/י: *כן*
+לביטול – השב/י: *לא*
+שירות לקוחות: *${CUSTOMER_SERVICE}*`;
+    } else {
+      msg =
+`*MAD Parfumeur* ✅
+أهلاً ${v.name} 🌿
+تم استلام طلبك وتسجيله لدينا.
+
+🧾 الطلب: ${offer}
+💰 الإجمالي: ₪${price}
+📍 العنوان: ${addr}
+🆔 رقم الطلب: ${id}
+
+للتأكيد: اكتب *نعم*
+للإلغاء: اكتب *لا*
+خدمة العملاء: *${CUSTOMER_SERVICE}*`;
+    }
+    window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, "_blank");
+  }
+
+  function openWA(row, orderId){
+    const v = getVals(row);
+    const phone = toWA_(v.phone);
+    if(!phone){ toast("❌ رقم غير صحيح"); return; }
+
+    const msg =
+`MAD ✅
+الاسم: ${v.name}
+الطلب: ${v.offer}
+السعر: ₪${v.price}
+العنوان: ${v.city}
+رقم الطلب: ${orderId}`;
+    window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, "_blank");
+  }
+
+  // ===== Add New Order =====
+  function openAdd(){ document.getElementById("addWrap").style.display="flex"; }
+  function closeAdd(){ document.getElementById("addWrap").style.display="none"; }
+
+  async function addOrder(){
     const name = (document.getElementById("a_name").value||"").trim();
     const phone = (document.getElementById("a_phone").value||"").trim();
-    const city = (document.getElementById("a_city").value||"").trim() || "-";
+    const city = (document.getElementById("a_city").value||"").trim();
     const offer = (document.getElementById("a_offer").value||"").trim();
     const price = String(document.getElementById("a_price").value||"150").replace(/[^\d]/g,"") || "150";
     const notes = (document.getElementById("a_notes").value||"").trim();
-    const delivery = (document.getElementById("a_delivery").value||"").trim();
 
-    if(!name || !phone || !offer){
-      toast("❌ لازم الاسم + الهاتف + الطلب");
+    if(!name || !phone){
+      toast("❌ اكتب الاسم والهاتف");
       return;
     }
 
+    // نرسل POST للنظام (يحفظ في الشيت)
+    // status افتراضي Processing... (أو خليها "New")
     const payload = {
-      name, phone,
-      address: city,
-      offer,
+      name, phone, address: city, offer,
       price,
       notes,
-      source: "Manager Manual",
-      lang: "ar",
+      status: "New ✅",
+      source: "Manager-App",
       payment: "Cash",
       process: "Direct",
-      status: "Processing..."
+      lang: detectLang_(name, offer, notes)
     };
 
-    // احفظ
-    fetch(SCRIPT_URL, { method:"POST", mode:"no-cors", body: JSON.stringify(payload) });
-
-    // إذا اختار توصيل، اعتمده مباشرة بعد ما ينحفظ بالسجل (سهل)
-    closeModal();
-    toast("✅ تم حفظ الطلب");
-
-    setTimeout(sync, 800);
-
-    // ملاحظة: الاعتماد المباشر يتطلب orderId معروف — هنا تركناه يدوي من المدير داخل الطلب بعد ظهوره.
-    // لو بدك “يحفظ ويعتمد فورًا” بنضيف توليد orderId من الواجهة ونرسله مع POST.
+    try{
+      await fetch(SCRIPT_URL, {
+        method:"POST",
+        mode:"no-cors",
+        headers:{ "Content-Type":"application/json" },
+        body: JSON.stringify(payload)
+      });
+      toast("✅ تم حفظ الطلب");
+      closeAdd();
+      // مسح
+      ["a_name","a_phone","a_city","a_offer","a_notes"].forEach(id=>document.getElementById(id).value="");
+      document.getElementById("a_price").value="150";
+      setTimeout(sync, 800);
+    }catch(e){
+      toast("⚠️ فشل حفظ الطلب");
+    }
   }
 
-  function forceRefresh(){ sync(); }
-
-  function escapeHtml(str){
-    return String(str ?? "").replace(/[&<>"']/g, s => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[s]));
-  }
-  function escAttr(str){
-    return String(str ?? "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;");
-  }
-
+  // init
   sync();
   setInterval(sync, 20000);
 </script>
