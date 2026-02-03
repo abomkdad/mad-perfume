@@ -5,16 +5,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>מערכת MAD</title>
     
-    <!-- إعدادات تطبيق الويب (PWA) لجعله مثل التطبيق عند إنشاء اختصار -->
+    <!-- إعدادات تطبيق الويب (PWA) المتقدمة لإصلاح الأيقونة -->
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="MAD System">
-    <link rel="apple-touch-icon" href="https://www.mad-parfumeur.com/assets/hero/logo.png">
-    <link rel="icon" href="https://www.mad-parfumeur.com/assets/hero/logo.png">
     
-    <!-- manifest JSON لتثبيت التطبيق -->
-    <link rel="manifest" href='data:application/manifest+json,{"name":"MAD System","short_name":"MAD","start_url":".","display":"standalone","background_color":"#0f172a","theme_color":"#1e293b","icons":[{"src":"https://www.mad-parfumeur.com/assets/hero/logo.png","sizes":"192x192","type":"image/png"}]}'>
+    <!-- أيقونات iOS (iPhone/iPad) -->
+    <link rel="apple-touch-icon" href="https://www.mad-parfumeur.com/assets/hero/logo.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="https://www.mad-parfumeur.com/assets/hero/logo.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="https://www.mad-parfumeur.com/assets/hero/logo.png">
+    <link rel="apple-touch-icon" sizes="167x167" href="https://www.mad-parfumeur.com/assets/hero/logo.png">
+    
+    <!-- أيقونات الأندرويد والمتصفحات -->
+    <link rel="icon" type="image/png" sizes="192x192" href="https://www.mad-parfumeur.com/assets/hero/logo.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="https://www.mad-parfumeur.com/assets/hero/logo.png">
+    
+    <!-- Manifest JSON مطور لضمان التعرف على الأيقونة -->
+    <link rel="manifest" href='data:application/manifest+json,{"name":"MAD System","short_name":"MAD","start_url":".","display":"standalone","background_color":"#0f172a","theme_color":"#1e293b","icons":[{"src":"https://www.mad-parfumeur.com/assets/hero/logo.png","sizes":"192x192","type":"image/png","purpose":"any maskable"},{"src":"https://www.mad-parfumeur.com/assets/hero/logo.png","sizes":"512x512","type":"image/png","purpose":"any maskable"}]}'>
 
     <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
     <style>
@@ -53,12 +61,12 @@
             display: flex; flex-direction: column;
         }
 
-        /* تنسيق الشعار الصغير في الزاوية */
+        /* شعار صغير جداً في الزاوية */
         .app-logo {
             position: absolute;
-            top: 15px;
-            left: 15px; /* الزاوية اليسرى العلوية */
-            width: 45px;
+            top: 12px;
+            left: 12px;
+            width: 35px;
             height: auto;
             filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
             z-index: 1001;
@@ -71,7 +79,7 @@
             border-radius: 12px;
             margin-bottom: 12px;
             text-align: center;
-            width: 90%;
+            width: 85%;
             margin-right: auto;
         }
         .audio-btn {
@@ -152,7 +160,7 @@
         #print-container { display: none; }
         @media print {
             body { background: white !important; color: black !important; }
-            #app-ui, .bottom-nav, .header-ui, #notification-toast { display: none !important; }
+            #app-ui, .bottom-nav, .header-ui { display: none !important; }
             #print-container { display: block !important; width: 100%; }
             .print-page { display: block !important; page-break-after: always; margin: 0 auto; background: white !important; color: black !important; }
             .invoice-size { width: 210mm; min-height: 297mm; padding: 15mm; box-sizing: border-box; }
@@ -170,12 +178,12 @@
 
 <div id="app-ui">
     <div class="header-ui">
-        <!-- شعار التطبيق الصغير في الزاوية -->
+        <!-- شعار صغير جداً في الزاوية -->
         <img src="https://www.mad-parfumeur.com/assets/hero/logo.png" alt="MAD Logo" class="app-logo">
         
         <div id="audioActivation" class="audio-activation-wrap">
             <button class="audio-btn" onclick="activateRingingSystem()">
-                <span>🔊</span> הפעלת רטט וצליל (تفعيل الرنين)
+                <span>🔊</span> הפעלת התראות (تفعيل جرس التنبيه)
             </button>
         </div>
         
@@ -375,9 +383,9 @@
                 <div class="print-page invoice-size" dir="rtl">
                     <div class="inv-header"><h1 style="font-size:26pt; color:#1e3a8a; margin:0;">מערכת MAD לניהול הזמנות</h1><p style="font-size:14pt; color:#444;">אלגנטיות ודיוק בכל הזמנה</p></div>
                     <div style="display:flex; justify-content:space-between; font-weight:bold; color:black;"><div>מספר הזמנה: ${o.orderId || 'MAD-NEW'}</div><div>תאריך הנפקה: ${date}</div></div>
-                    <div class="inv-client-box"><b>חשבונית עבור:</b><br>שם: ${o.name}<br>כתובة: ${o.address || o.city || "-"}<br>טלפון: ${o.phone}<br>חברת משלוחים: ${deliveryName}</div>
-                    <table class="inv-table"><thead><tr style="background:#f1f5f9;"><th>תיאור ומוצר</th><th>סטטוס</th><th>מחיר</th></tr></thead><tbody><tr><td><b>${o.offer}</b></td><td>בטיפול</td><td><b>₪ 150.00</b></td></tr></tbody></table>
-                    <div style="border:1.5px solid #b91c1c; padding:10px; text-align:center; color:#b91c1c; font-weight:bold;">** תנאי החלפה: החלפה תתבצע אך ורק בתנאי שאריזת הניילון לא נפתחה.</div>
+                    <div class="inv-client-box"><b>חשבונית עבור:</b><br>שם: ${o.name}<br>כתובת: ${o.address || o.city || "-"}<br>טלפון: ${o.phone}<br>חברת משלוחים: ${deliveryName}</div>
+                    <table class="inv-table"><thead><tr style="background:#f1f5f9;"><th>תיאור ומוצר</th><th>סטטوس</th><th>מחיר</th></tr></thead><tbody><tr><td><b>${o.offer}</b></td><td>בטיפול</td><td><b>₪ 150.00</b></td></tr></tbody></table>
+                    <div style="border:1.5px solid #b91c1c; padding:10px; text-align:center; color:#b91c1c; font-weight:bold;">** תנאי الحלפה: الحلפה ستتم فقط في حالة عدم فتح غلاف النايلون.</div>
                     <div style="margin-top:20px; font-size:11pt; color:black;">החשבונית תישלח במייל לאחר קבלת המשלוח. נא לשלוח את כתובת המייל לשירות הלקוחות.</div>
                     <div style="text-align:center; margin-top:50px;"><svg id="bp"></svg><br><b>שירות לקוחות: *9935</b></div>
                 </div>`;
@@ -385,10 +393,10 @@
             document.title = `Sticker_${o.name}`;
             container.innerHTML = `
                 <div class="print-page sticker-size" dir="rtl">
-                    <div style="text-align:center; border-bottom:2px solid #000; font-weight:bold; font-size:18pt; color:black;">מערכת MAD</div>
-                    <div style="font-size:12pt; line-height:1.5; margin:10px 0; color:black;">שם: ${o.name}<br>כתובת: ${o.address || o.city || "-"}<br>טלפון: ${o.phone}<br>משלוח: ${deliveryName}</div>
+                    <div style="text-align:center; border-bottom:2px solid #000; font-weight:bold; font-size:18pt;">מערכת MAD</div>
+                    <div style="font-size:12pt; line-height:1.5; margin:10px 0; color:black;">שם: ${o.name}<br>כתובת: ${o.address || o.city || "-"}<br>טלפון: ${o.phone}<br>משלוح: ${deliveryName}</div>
                     <div style="border:2.2px solid #000; padding:8px; background:#f9f9f9; color:black;">תיאור: ${o.offer}</div>
-                    <div style="font-size:8.5pt; border:1.1px solid red; color:red; text-align:center; font-weight:bold; padding:4px; margin-top:10px;">החלפה אך ורק בתנאי שהניילون לא נפתח</div>
+                    <div style="font-size:8.5pt; border:1.1px solid red; color:red; text-align:center; font-weight:bold; padding:4px; margin-top:10px;">החלפה אך وרק בתנאי שהניילون לא נפתח</div>
                     <div style="text-align:center; margin-top:10px;"><svg id="bp"></svg></div>
                 </div>`;
         }
