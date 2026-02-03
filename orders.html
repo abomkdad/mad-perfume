@@ -30,7 +30,7 @@
             padding-bottom: 80px;
         }
 
-        /* إشعار الطلب الجديد المحسن */
+        /* إشعار الطلب الجديد */
         #notification-toast {
             position: fixed;
             top: -100px;
@@ -59,7 +59,6 @@
             box-shadow: 0 4px 10px rgba(0,0,0,0.3);
         }
 
-        /* زر تفعيل الصوت الصريح */
         .audio-activation-wrap {
             background: #27272a;
             border: 1px solid #3f3f46;
@@ -121,6 +120,10 @@
         .delivery-select {
             width: 100%; background: transparent; color: #000000; border: none; font-size: 15px; font-weight: bold; outline: none; cursor: pointer;
         }
+        .other-delivery-input {
+            width: 100%; background: #f1f5f9; color: #000000; border: 1px solid #cbd5e1; border-radius: 5px; 
+            margin-top: 5px; padding: 8px; font-size: 13px; display: none; font-weight: bold;
+        }
 
         .actions-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-top: 12px; }
         .btn-op {
@@ -141,6 +144,7 @@
         .nav-item { flex: 1; padding: 15px; text-align: center; border: none; background: none; font-weight: bold; color: var(--text-muted); cursor: pointer; }
         .nav-item.active { color: var(--primary); border-top: 3px solid var(--primary); background: #0f172a; }
 
+        /* نظام الطباعة */
         #print-container { display: none; }
         @media print {
             body { background: white !important; color: black !important; }
@@ -162,10 +166,9 @@
 
 <div id="app-ui">
     <div class="header-ui">
-        <!-- قسم تفعيل التنبيهات -->
         <div id="audioActivation" class="audio-activation-wrap">
             <button class="audio-btn" onclick="activateRingingSystem()">
-                <span>🔊</span> לחץ כאن להפעלת רנין הזמנות (تفعيل جرس الطلبات)
+                <span>🔊</span> לחץ כאן להפעלת רטט וצליל (تفعيل الرنين والاهتزاز)
             </button>
         </div>
         
@@ -178,7 +181,7 @@
         </div>
     </div>
     <div class="container" id="mainContainer">
-        <div id="ordersList"><p style="text-align:center; padding:20px; color:var(--text-muted);">טוען נתונים... (جاري التحميل)</p></div>
+        <div id="ordersList"></div>
     </div>
 </div>
 
@@ -200,29 +203,19 @@
     let ringingEnabled = false;
     let audioContext;
 
-    // تفعيل نظام الرنين عبر تفاعل المستخدم
     function activateRingingSystem() {
         ringingEnabled = true;
         document.getElementById('audioActivation').style.display = 'none';
-        
-        // إنشاء الـ AudioContext وتفعيله فوراً
         audioContext = new (window.AudioContext || window.webkitAudioContext)();
         if (audioContext.state === 'suspended') audioContext.resume();
-        
-        // اختبار رنة سريعة للتأكد
-        playRingtone(2); 
+        playRingtone(1); 
     }
 
     async function fetchOrders() {
         try {
             const res = await fetch(`${SCRIPT_URL}?action=get&t=${Date.now()}`);
             const data = await res.json();
-            
-            // إذا وجدنا طلبات جديدة (العدد الحالي أكبر من السابق)
-            if (!isFirstLoad && data.length > lastOrderCount) {
-                notifyNewOrder();
-            }
-            
+            if (!isFirstLoad && data.length > lastOrderCount) notifyNewOrder();
             lastOrderCount = data.length;
             isFirstLoad = false;
             allData = data;
@@ -231,33 +224,19 @@
     }
 
     function notifyNewOrder() {
-        // 1. البانر العلوي
         const toast = document.getElementById('notification-toast');
         toast.classList.add('show');
         setTimeout(() => toast.classList.remove('show'), 9000);
-
-        // 2. الرنين الصوتي
-        if (ringingEnabled) {
-            playRingtone(5); // رنين لمدة 5 دورات
-        }
-
-        // 3. الاهتزاز (للموبايل)
-        if (navigator.vibrate) {
-            navigator.vibrate([500, 200, 500, 200, 500]);
-        }
+        if (ringingEnabled) playRingtone(5);
+        if (navigator.vibrate) navigator.vibrate([500, 200, 500]);
     }
 
-    // دالة توليد نغمة رنين تشبه الهاتف
     function playRingtone(repeats) {
         if (!audioContext) return;
-        
         let startTime = audioContext.currentTime;
         for (let i = 0; i < repeats; i++) {
             const time = startTime + (i * 1.2);
-            
-            // النغمة الأولى
             createTone(660, time, 0.4);
-            // النغمة الثانية
             createTone(440, time + 0.2, 0.4);
         }
     }
@@ -265,17 +244,13 @@
     function createTone(freq, start, duration) {
         const osc = audioContext.createOscillator();
         const gain = audioContext.createGain();
-        
         osc.type = 'sine';
         osc.frequency.setValueAtTime(freq, start);
         osc.frequency.exponentialRampToValueAtTime(freq / 2, start + duration);
-        
         gain.gain.setValueAtTime(0.3, start);
         gain.gain.exponentialRampToValueAtTime(0.01, start + duration);
-        
         osc.connect(gain);
         gain.connect(audioContext.destination);
-        
         osc.start(start);
         osc.stop(start + duration);
     }
@@ -290,38 +265,28 @@
     function handleFilter() {
         const query = document.getElementById('searchInput').value.toLowerCase();
         let filtered = [...allData].reverse();
-
         filtered.forEach(o => {
             const uniqueKey = o.orderId || o.phone;
             if(localSessionStore[uniqueKey]) o.status = localSessionStore[uniqueKey];
         });
-
         if (currentTab === 'new') filtered = filtered.filter(o => !o.status || o.status.includes('Processing') || o.status.includes('ממתין'));
         else if (currentTab === 'prep') filtered = filtered.filter(o => o.status === 'בוצעה שיחה');
         else filtered = filtered.slice(0, 20);
-
-        if (query) {
-            filtered = filtered.filter(o => (o.name && o.name.toLowerCase().includes(query)) || (o.phone && o.phone.includes(query)));
-        }
+        if (query) filtered = filtered.filter(o => (o.name && o.name.toLowerCase().includes(query)) || (o.phone && o.phone.includes(query)));
         renderOrders(filtered);
     }
 
     function renderOrders(orders) {
         const list = document.getElementById('ordersList');
         list.innerHTML = '';
-        if (orders.length === 0) {
-            list.innerHTML = '<p style="text-align:center; padding:30px; color:var(--text-muted);">אין הזמנות להצגה (لا يوجد طلبات)</p>';
-            return;
-        }
-
         orders.forEach(o => {
             const uniqueKey = o.orderId || o.phone;
-            let status = o.status || 'ממתין לשיחה';
-            if (status === 'Processing...') status = 'ממתין לשיחה';
-            
+            let status = o.status || 'ממתיن لשיחה';
+            if (status === 'Processing...') status = 'ממתיن לשיחה';
             const isContacted = status === 'בוצעה שיחה' || status.includes('Delivered');
             const isDone = status.includes('Delivered');
             const isCanceled = status.includes('מבוטל');
+            const deliveryData = localDeliveryStore[uniqueKey] || { company: "", custom: "" };
             
             const card = document.createElement('div');
             let statusClass = "status-waiting";
@@ -345,13 +310,17 @@
                 <div class="delivery-box" style="${isDone || isCanceled ? 'opacity:0.4; pointer-events:none;' : ''}">
                     <span class="delivery-label">חברת משלוחים / شركة التوصيل:</span>
                     <select class="delivery-select" onchange="updateDeliveryLocal('${uniqueKey}', this.value)">
-                        <option value="" ${localDeliveryStore[uniqueKey]?.company === "" ? "selected" : ""}>בחר חברה / اختر الشركة</option>
-                        <option value="هاي اكسبرس" ${localDeliveryStore[uniqueKey]?.company === "هاي اكسبرس" ? "selected" : ""}>هاي اكسبرس</option>
-                        <option value="لمى" ${localDeliveryStore[uniqueKey]?.company === "لمى" ? "selected" : ""}>لمى</option>
-                        <option value="مروه" ${localDeliveryStore[uniqueKey]?.company === "مروه" ? "selected" : ""}>مروه</option>
-                        <option value="عرين" ${localDeliveryStore[uniqueKey]?.company === "عرين" ? "selected" : ""}>عرين</option>
-                        <option value="آخر" ${localDeliveryStore[uniqueKey]?.company === "آخر" ? "selected" : ""}>آخر (מפורט)</option>
+                        <option value="" ${deliveryData.company === "" ? "selected" : ""}>בחר חברה / اختر الشركة</option>
+                        <option value="High Express" ${deliveryData.company === "High Express" ? "selected" : ""}>High Express</option>
+                        <option value="Lama Delivery" ${deliveryData.company === "Lama Delivery" ? "selected" : ""}>Lama Delivery</option>
+                        <option value="Marwah Delivery" ${deliveryData.company === "Marwah Delivery" ? "selected" : ""}>Marwah Delivery</option>
+                        <option value="Areen Delivery" ${deliveryData.company === "Areen Delivery" ? "selected" : ""}>Areen Delivery</option>
+                        <option value="Other" ${deliveryData.company === "Other" ? "selected" : ""}>Other (Open Text)</option>
                     </select>
+                    <input type="text" class="other-delivery-input" id="other-${uniqueKey}" 
+                           placeholder="Enter company name..." value="${deliveryData.custom}"
+                           style="${deliveryData.company === "Other" ? "display:block" : "none"}"
+                           oninput="updateDeliveryCustom('${uniqueKey}', this.value)">
                 </div>
 
                 <div class="actions-grid" style="${isDone || isCanceled ? 'opacity: 0.3; pointer-events: none;' : ''}">
@@ -372,10 +341,18 @@
     function updateDeliveryLocal(idKey, val) {
         if (!localDeliveryStore[idKey]) localDeliveryStore[idKey] = { company: "", custom: "" };
         localDeliveryStore[idKey].company = val;
+        const input = document.getElementById(`other-${idKey}`);
+        if (val === "Other") input.style.display = "block";
+        else { input.style.display = "none"; localDeliveryStore[idKey].custom = ""; }
+    }
+
+    function updateDeliveryCustom(idKey, val) {
+        if (!localDeliveryStore[idKey]) localDeliveryStore[idKey] = { company: "Other", custom: "" };
+        localDeliveryStore[idKey].custom = val;
     }
 
     async function updateStatusLocal(idKey, row, s) {
-        if(s === 'מבוטל ❌' && !confirm("האם לבטל הזמנה זו? (هل تريد إلغاء الطلب؟)")) return;
+        if(s === 'מבוטל ❌' && !confirm("האם לבטל הזמנה זו?")) return;
         localSessionStore[idKey] = s;
         handleFilter();
         try { fetch(`${SCRIPT_URL}?action=updateStatus&row=${row}&status=${encodeURIComponent(s)}`); } catch(e) {}
@@ -383,8 +360,19 @@
 
     function sendInvoiceWA(phone, name, offer, id, city, idKey) {
         const delData = localDeliveryStore[idKey] || { company: "-", custom: "" };
-        const deliveryName = delData.company || "בטיפול";
-        const msg = `*תודה רבה מכל הלב - MAD SYSTEM* ❤️\n\nשלום *${name}*,\nאנו מודים לך מאוד על בחירתך בנו! להלן פרטי ההזמנה שלך:\n\n📄 *חשבונית:* ${id || "MAD-SYS"}\n📦 *הפריט:* ${offer}\n📍 *כתובת:* ${city || "-"}\n🚚 *חברת משלוחים:* ${deliveryName}\n💰 *סה"כ לתשלום:* ₪150.00\n\nתודה שוב על האמון שלך! ✨\n*שירות לקוחות: 9935**`;
+        const deliveryName = delData.company === "Other" ? delData.custom : (delData.company || "בטיפול");
+        
+        const msg = `*תודה רבה מכל הלב - MAD SYSTEM* ❤️\n\n` +
+                    `שלום *${name}*,\n` +
+                    `אנו מודים לך מאוד על בחירתך בנו! להלن פרטי ההזמנה שלך:\n\n` +
+                    `📄 *חשבונית:* ${id || "MAD-SYS"}\n` +
+                    `📦 *הפריט:* ${offer}\n` +
+                    `📍 *כתובת:* ${city || "-"}\n` +
+                    `🚚 *חברת משלוחים:* ${deliveryName}\n` +
+                    `💰 *סה"כ לתשלום:* ₪150.00\n\n` +
+                    `תודה שוב על האמון שלך, אנו מעריכים זאת מאוד! ✨\n` +
+                    `*שירות לקוחות: 9935**`;
+
         const cp = phone.startsWith('0') ? '972' + phone.substring(1) : phone;
         window.open(`https://wa.me/${cp.replace(/\D/g, '')}?text=${encodeURIComponent(msg)}`, '_blank');
     }
@@ -395,18 +383,18 @@
         const date = new Date().toLocaleDateString('he-IL');
         const uniqueKey = o.orderId || o.phone;
         const delData = localDeliveryStore[uniqueKey] || { company: "-", custom: "" };
-        const deliveryName = delData.company;
+        const deliveryName = delData.company === "Other" ? delData.custom : delData.company;
 
         if (type === 'invoice') {
             document.title = `Invoice_${o.name}`;
             container.innerHTML = `
                 <div class="print-page invoice-size" dir="rtl">
-                    <div class="inv-header"><h1 style="font-size:26pt; color:#1e3a8a; margin:0;">מערכת MAD לניהול הזמנות</h1><p style="font-size:14pt; color:#444;">אלגנטיות ודיוק בכל הזמנה</p></div>
+                    <div class="inv-header"><h1 style="font-size:26pt; color:#1e3a8a; margin:0;">מערכת MAD לניהול הזמנות</h1><p style="font-size:14pt; color:#444;">אלגنتيות וديوك בכל הזמנה</p></div>
                     <div style="display:flex; justify-content:space-between; font-weight:bold; color:black;"><div>מספר הזמנה: ${o.orderId || 'MAD-NEW'}</div><div>תאריך הנפקה: ${date}</div></div>
                     <div class="inv-client-box"><b>חשבונית עבור:</b><br>שם: ${o.name}<br>כתובת: ${o.address || o.city || "-"}<br>טלפון: ${o.phone}<br>חברת משלוחים: ${deliveryName || "-"}</div>
                     <table class="inv-table"><thead><tr style="background:#f1f5f9;"><th>תיאור ומוצר</th><th>סטטוס</th><th>מחיר</th></tr></thead><tbody><tr><td><b>${o.offer}</b></td><td>בטיפול</td><td><b>₪ 150.00</b></td></tr></tbody></table>
-                    <div style="border:1.5px solid #b91c1c; padding:10px; text-align:center; color:#b91c1c; font-weight:bold;">** תנאי החלפה: החלפה תתבצע אך ורק בתנאי שאריזת הניילון לא נפתחה.</div>
-                    <div style="margin-top:20px; font-size:11pt; color:black;">בטיפול. החשבונית תישלח במייל לאחר קבלת המשלוח. נא לשלוח את כתובת המייל לשירות הלקוחות.</div>
+                    <div style="border:1.5px solid #b91c1c; padding:10px; text-align:center; color:#b91c1c; font-weight:bold;">** תנאי החלפה: החלפה תתבצע אך ורק בתנאי שאריזת הניילون לא נפתחה.</div>
+                    <div style="margin-top:20px; font-size:11pt; color:black;">בטיפול. החשבונית תישלח במייל לאחר קבלת המשלוح. נא לשלוח את כתובת המייל לשירות הלקוחות.</div>
                     <div style="text-align:center; margin-top:50px;"><svg id="bp"></svg><br><b>שירות לקוחות: *9935</b></div>
                 </div>`;
         } else {
@@ -414,9 +402,9 @@
             container.innerHTML = `
                 <div class="print-page sticker-size" dir="rtl">
                     <div style="text-align:center; border-bottom:2px solid #000; font-weight:bold; font-size:18pt;">מערכת MAD</div>
-                    <div style="font-size:12pt; line-height:1.5; margin:10px 0;">שם: ${o.name}<br>כתובת: ${o.address || o.city || "-"}<br>טלפון: ${o.phone}<br>משלוח: ${deliveryName || "-"}</div>
+                    <div style="font-size:12pt; line-height:1.5; margin:10px 0;">שם: ${o.name}<br>כתובת: ${o.address || o.city || "-"}<br>טלפון: ${o.phone}<br>משלוح: ${deliveryName || "-"}</div>
                     <div style="border:2.2px solid #000; padding:8px; background:#f9f9f9;">תיאור: ${o.offer}</div>
-                    <div style="font-size:8.5pt; border:1.1px solid red; color:red; text-align:center; font-weight:bold; padding:4px; margin-top:10px;">החלפה אך ורק בתנאי שהניילון לא נפתח</div>
+                    <div style="font-size:8.5pt; border:1.1px solid red; color:red; text-align:center; font-weight:bold; padding:3px; margin-top:10px;">החלפה אך وרק בתנאי שהניילون לא נפתח</div>
                     <div style="text-align:center; margin-top:10px;"><svg id="bp"></svg></div>
                 </div>`;
         }
@@ -424,9 +412,8 @@
         setTimeout(() => { window.print(); document.title = "מערכת MAD"; }, 600);
     }
 
-    // التشغيل التلقائي
     window.onload = fetchOrders;
-    setInterval(fetchOrders, 30000); // تحديث كل 30 ثانية
+    setInterval(fetchOrders, 30000);
 </script>
 </body>
 </html>
