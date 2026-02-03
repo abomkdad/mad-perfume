@@ -1,519 +1,292 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>MAD Prep - Big Order Box + Print</title>
-  <link rel="icon" type="image/png" href="https://www.mad-parfumeur.com/assets/hero/logo.png">
-
-  <!-- ✅ Barcode -->
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
+  <title>MAD Preparer</title>
   <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
-
   <style>
-    :root{
-      --bg:#071022; --card:#0d1a33; --line:#1e2b47;
-      --text:#f8fafc; --muted:#9fb0c6;
-      --success:#16a34a; --warn:#f59e0b; --primary:#2563eb; --danger:#ef4444;
-      --shadow:0 12px 35px rgba(0,0,0,.45);
-      --r:22px;
-
-      /* ✅ Label size (عدلها حسب اللي عندك) */
-      --label-w: 100mm;
-      --label-h: 100mm;
-    }
-    *{box-sizing:border-box}
-    body{
-      margin:0; font-family:system-ui,"Segoe UI",Tahoma,Arial;
-      background:radial-gradient(1200px 600px at 20% 0%, rgba(22,163,74,.14), transparent 55%),
-                 radial-gradient(1000px 700px at 80% 15%, rgba(245,158,11,.10), transparent 55%),
-                 var(--bg);
-      color:var(--text); display:flex; justify-content:center;
-      padding-bottom:80px;
-    }
-    .app{width:100%; max-width:900px}
-    .top{
-      position:sticky; top:0; z-index:999;
-      background:rgba(7,16,34,.92); backdrop-filter:blur(10px);
-      border-bottom:1px solid var(--line);
-      padding:14px;
-    }
-    .head{display:flex; gap:10px; align-items:center}
-    .logo{
-      width:46px; height:46px; border-radius:16px; overflow:hidden;
-      border:1px solid var(--line); background:#0b1730; box-shadow:var(--shadow);
-    }
-    .logo img{width:100%; height:100%; object-fit:cover}
-    .title{flex:1; line-height:1.1}
-    .title b{display:block; font-size:18px}
-    .title span{display:block; margin-top:4px; font-size:12px; font-weight:900; color:var(--muted)}
-    .iconBtn{
-      width:48px; height:48px; border-radius:16px;
-      border:1px solid var(--line);
-      background:#0b1730; color:var(--text);
-      box-shadow:var(--shadow);
-      cursor:pointer; font-size:18px; font-weight:1000;
-    }
-    .row{display:flex; gap:10px; margin-top:10px; flex-wrap:wrap}
-    .boxWhite{
-      flex:1; min-width:240px;
-      background:#fff;
-      border-radius:18px;
-      border:2px solid rgba(37,99,235,.22);
-      padding:12px;
-      color:#0b1020;
-      box-shadow:var(--shadow);
-    }
-    .boxWhite label{display:block; font-size:11px; font-weight:1000; margin-bottom:6px}
-    .boxWhite select,.boxWhite input{
-      width:100%; border:none; outline:none; background:transparent;
-      font-size:18px; font-weight:1000; color:#0b1020;
-    }
-    .search{
-      width:100%;
-      border-radius:18px; border:1px solid var(--line);
-      background:#071331; color:var(--text);
-      padding:14px 14px; font-weight:1000;
-      outline:none; box-shadow:var(--shadow);
-      font-size:16px;
-      margin-top:10px;
-    }
-    .content{padding:14px}
-    .card{
-      background:linear-gradient(180deg, rgba(13,26,51,.92), rgba(13,26,51,.78));
-      border:1px solid var(--line);
-      border-radius:var(--r);
-      padding:14px;
-      box-shadow:var(--shadow);
-      margin-bottom:14px;
-    }
-
-    /* BIG ORDER BOX */
-    .orderBox{
-      background:rgba(7,19,49,.78);
-      border:2px solid rgba(255,255,255,.10);
-      border-radius:20px;
-      padding:14px;
-    }
-    .boxTitle{
-      text-align:center;
-      font-weight:1100;
-      font-size:18px;
-      padding-bottom:10px;
-      border-bottom:1px solid rgba(255,255,255,.12);
-      margin-bottom:10px;
-      color:#bfdbfe;
-    }
-    .infoRow{
-      display:flex;
-      justify-content:space-between;
-      gap:10px;
-      padding:10px 0;
-      border-bottom:1px solid rgba(255,255,255,.08);
-      align-items:center;
-    }
-    .infoRow:last-child{border-bottom:none}
-    .lbl{
-      color:var(--muted);
-      font-weight:1000;
-      font-size:13px;
-      min-width:120px;
-    }
-    .val{
-      color:var(--text);
-      font-weight:1100;
-      font-size:16px;
-      text-align:left;
-      direction:ltr;
-      word-break:break-word;
-    }
-    .val.rtl{
-      direction:rtl;
-      text-align:right;
-    }
-    .offerBox{
-      margin-top:12px;
-      padding:12px;
-      border-radius:18px;
-      background:rgba(0,0,0,.18);
-      border:1px solid rgba(255,255,255,.10);
-      font-weight:1100;
-      font-size:18px;
-    }
-
-    .btns{
-      display:grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap:10px;
-      margin-top:12px;
-    }
-    @media (max-width: 700px){
-      .btns{grid-template-columns:1fr}
-    }
-    .btn{
-      border:none; cursor:pointer;
-      border-radius:18px; padding:16px 14px;
-      font-weight:1100; font-size:18px;
-      box-shadow:var(--shadow);
-      transition:.12s; user-select:none;
-      display:flex; align-items:center; justify-content:center; gap:10px;
-    }
-    .btn:active{transform:scale(.98)}
-    .btnReady{background:var(--success); color:white}
-    .btnEdit{background:var(--warn); color:#0b1020}
-    .btnPrint{background:var(--primary); color:white}
-    .btn:disabled{opacity:.25; cursor:not-allowed}
-
-    .empty{
-      text-align:center;
-      color:var(--muted);
-      padding:20px;
-      font-weight:1100;
-      background:rgba(13,26,51,.65);
-      border:1px solid var(--line);
-      border-radius:22px;
-      box-shadow:var(--shadow);
-    }
-
-    .toast{
-      position:fixed; top:-120px; left:50%;
-      transform:translateX(-50%);
-      background:var(--warn); color:#0b1020;
-      font-weight:1000; padding:12px 16px; border-radius:999px;
-      box-shadow:var(--shadow);
-      transition:.5s; z-index:2000;
-    }
-    .toast.show{top:16px}
-
-    /* Modal edit */
-    .modalWrap{
-      position:fixed; inset:0;
-      background:rgba(0,0,0,.55);
-      display:none; align-items:center; justify-content:center;
-      padding:16px; z-index:3000;
-    }
-    .modal{
-      width:100%; max-width:720px;
-      background:var(--card);
-      border:1px solid var(--line);
-      border-radius:24px;
-      padding:14px;
-      box-shadow:var(--shadow);
-    }
-    .modal h3{margin:0 0 10px 0; font-size:18px; font-weight:1100}
-    .field{
-      background:#fff;
-      border-radius:18px;
-      border:2px solid rgba(37,99,235,.22);
-      padding:12px;
-      color:#0b1020;
-      margin-top:10px;
-    }
-    .field label{display:block; font-size:11px; font-weight:1100; margin-bottom:6px}
-    .field input,.field textarea{
-      width:100%; border:none; outline:none; background:transparent;
-      font-size:18px; font-weight:1100;
-    }
-    .field textarea{resize:vertical}
-    .modalActions{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:12px}
-    .btnClose{background:var(--danger); color:white}
-    .btnSave{background:var(--primary); color:white}
-
-    /* ✅ PRINT */
-    #print-container{ display:none; }
+    :root{--bg:#070d18;--card:#0f1a33;--line:#1f2f55;--muted:#9fb0d1;--ok:#10b981;--blue:#3b82f6;--orange:#f59e0b;}
+    body{margin:0;background:var(--bg);color:#fff;font-family:system-ui,-apple-system,Segoe UI,Tahoma;padding-bottom:90px}
+    header{position:sticky;top:0;background:rgba(15,26,51,.95);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);z-index:9}
+    .wrap{max-width:520px;margin:0 auto;padding:12px}
+    h1{margin:0;font-size:16px}
+    input,select,textarea{width:100%;box-sizing:border-box;border:1px solid var(--line);background:#0b1220;color:#fff;border-radius:14px;padding:14px;font-size:15px;outline:none}
+    textarea{min-height:80px;resize:vertical}
+    .pill{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+    .pill span{background:#0b1220;border:1px solid var(--line);padding:6px 10px;border-radius:999px;font-size:12px;color:#cfe0ff}
+    .card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:14px;margin:12px 0}
+    .big{background:#ffffff;color:#000;border-radius:18px;padding:14px;margin-top:10px}
+    .big .row{display:flex;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid #e5e7eb}
+    .big .row:last-child{border-bottom:none}
+    .lab{font-weight:900;color:#111827}
+    .val{font-weight:800;text-align:left;direction:ltr}
+    .btns{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+    .btn{border:none;border-radius:16px;padding:16px 12px;font-weight:1000;cursor:pointer;font-size:15px}
+    .bgreen{background:var(--ok);color:#052014}
+    .bblue{background:var(--blue);color:#fff}
+    .borange{background:var(--orange);color:#2a1700}
+    /* print */
+    #printArea{display:none}
     @media print{
-      @page { size: var(--label-w) var(--label-h); margin: 0; }
-      body * { visibility:hidden !important; }
-      #print-container, #print-container * { visibility:visible !important; }
-      #print-container{
-        display:block !important;
-        position:fixed; left:0; top:0;
-        width: var(--label-w);
-        height: var(--label-h);
-        background:#fff !important;
-        color:#000 !important;
-      }
-      .print-page{
-        width: var(--label-w);
-        height: var(--label-h);
-        padding: 4mm;
-        box-sizing:border-box;
-        font-family: Arial, Tahoma, sans-serif;
-      }
+      body *{visibility:hidden}
+      #printArea, #printArea *{visibility:visible}
+      #printArea{display:block;position:absolute;left:0;top:0;width:100%}
+      .label{width:100mm;height:100mm;margin:0 auto;padding:6mm;box-sizing:border-box;background:#fff;color:#000;border:1px solid #000}
+      .label h2{margin:0 0 6px;font-size:14pt}
+      .label .t{font-size:11pt;margin:4px 0}
+      .label .box{border:1px solid #000;padding:6px;margin-top:6px;font-weight:900}
+      .label .warn{margin-top:6px;color:#b91c1c;font-weight:900;font-size:9pt;border:1px dashed #b91c1c;padding:6px;text-align:center}
     }
+    /* login */
+    .lock{position:fixed;inset:0;background:rgba(0,0,0,.75);display:flex;align-items:center;justify-content:center;z-index:9999}
+    .lockbox{width:min(420px,92%);background:#0f172a;border:1px solid var(--line);border-radius:18px;padding:16px}
+    .lockbox h2{margin:0 0 10px;font-size:16px}
+    .lockbox p{margin:0 0 12px;color:var(--muted);font-size:12px}
   </style>
 </head>
-
 <body>
-  <div class="toast" id="toast">تم ✅</div>
 
-  <div class="app">
-    <div class="top">
-      <div class="head">
-        <div class="logo"><img src="https://www.mad-parfumeur.com/assets/hero/logo.png" alt="MAD"></div>
-        <div class="title">
-          <b>نسخة التجهيز (بوكس كبير + طباعة)</b>
-          <span>تظهر فقط الطلبات المُرسلة للتجهيز — (طباعة) ثم (تم تجهيز)</span>
-        </div>
-        <button class="iconBtn" onclick="sync()" title="تحديث">↻</button>
-      </div>
-
-      <div class="row">
-        <div class="boxWhite">
-          <label>👤 اسم الموظفة</label>
-          <select id="emp" onchange="saveEmp()">
-            <option value="">-- اختاري اسمك --</option>
-            <option value="عبير (עביר)">عبير (עביר)</option>
-            <option value="ألاء (אלאא)">ألاء (אלאא)</option>
-            <option value="ليلى (ליילא)">ليلى (ליילא)</option>
-          </select>
-        </div>
-      </div>
-
-      <input id="q" class="search" placeholder="بحث..." oninput="render()">
-    </div>
-
-    <div class="content" id="list"></div>
-  </div>
-
-  <!-- Print Container -->
-  <div id="print-container"></div>
-
-  <!-- Edit Modal -->
-  <div class="modalWrap" id="modalWrap" onclick="closeModal(event)">
-    <div class="modal" onclick="event.stopPropagation()">
-      <h3>✏️ تعديل הזמנה (للموظف)</h3>
-
-      <div class="field"><label>المدينة / כתובת</label><input id="m_city"></div>
-      <div class="field"><label>הזמנה (C)</label><input id="m_offer"></div>
-      <div class="field"><label>מחיר ₪</label><input id="m_price" inputmode="numeric"></div>
-      <div class="field"><label>הערות</label><textarea id="m_notes" rows="3"></textarea></div>
-
-      <div class="modalActions">
-        <button class="btn btnClose" onclick="closeModal()">إغلاق</button>
-        <button class="btn btnSave" onclick="saveEdit()">✅ حفظ التعديل</button>
-      </div>
+<!-- LOGIN -->
+<div class="lock" id="lock">
+  <div class="lockbox">
+    <h2>🔒 دخول التجهيز</h2>
+    <p>كلمة السر مطلوبة.</p>
+    <input id="pw" placeholder="كلمة السر" type="password" />
+    <div class="btns">
+      <button class="btn bblue" onclick="login()">دخول</button>
+      <button class="btn borange" onclick="document.getElementById('pw').value=''">مسح</button>
     </div>
   </div>
+</div>
+
+<header>
+  <div class="wrap">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:10px">
+      <h1>📦 نسخة التجهيز (سهل جداً)</h1>
+      <div class="btns" style="grid-template-columns:1fr 1fr; margin:0; width:210px">
+        <button class="btn bblue" onclick="sync()">⟲</button>
+        <button class="btn borange" onclick="logout()">خروج</button>
+      </div>
+    </div>
+
+    <div class="pill">
+      <span>طلبات للتجهيز: <b id="cPrep">0</b></span>
+    </div>
+
+    <div style="margin-top:10px">
+      <select id="emp" onchange="saveEmp()">
+        <option value="">-- اختر اسم الموظف --</option>
+        <option value="عبير (עביר)">عبير (עביר)</option>
+        <option value="ألاء (אלאא)">ألاء (אלאא)</option>
+        <option value="ليلى (ליילא)">ليلى (ליילא)</option>
+      </select>
+    </div>
+
+    <div style="margin-top:10px">
+      <input id="q" placeholder="بحث سريع (اسم/هاتف/كود)" oninput="render()">
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <div id="list"></div>
+</div>
+
+<div id="printArea"></div>
 
 <script>
+  const APP_PASSWORD = "12345678";
   const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw2QxGHOxMv7_uNbMulwO60IHOcKj16rbBJRfoltkwcdb2Bg4zrVjyMt_lf9KgnyyXl/exec";
 
-  let all = [];
-  let editing = null;
+  let orders = [];
 
-  function toast(msg){
-    const t = document.getElementById("toast");
-    t.textContent = msg;
-    t.classList.add("show");
-    setTimeout(()=>t.classList.remove("show"), 2200);
+  function login(){
+    const v = document.getElementById("pw").value;
+    if(v === APP_PASSWORD){
+      localStorage.setItem("mad_auth_prep","1");
+      document.getElementById("lock").style.display="none";
+      loadEmp(); sync();
+    }else alert("كلمة السر خطأ");
   }
-
-  function isApproved(s){ s=String(s||""); return s.includes("Approved") || s.includes("מאושר"); }
-  function isReady(s){ s=String(s||""); return s.includes("מוכן"); }
-  function isDelivered(s){ s=String(s||""); return s.includes("Delivered"); }
-  function isCanceled(s){ s=String(s||""); return s.includes("Canceled") || s.includes("❌"); }
-
-  function parseDeliveryFromStatus(s){
-    const m = String(s||"").match(/\(משלוח:\s*(.*?)\)/);
-    return m ? m[1] : "غير محدد";
+  function logout(){
+    localStorage.removeItem("mad_auth_prep");
+    location.reload();
   }
+  (function boot(){
+    if(localStorage.getItem("mad_auth_prep")==="1"){
+      document.getElementById("lock").style.display="none";
+      loadEmp(); sync();
+    }
+  })();
 
+  function loadEmp(){
+    const v = localStorage.getItem("mad_emp") || "";
+    document.getElementById("emp").value = v;
+  }
   function saveEmp(){
     localStorage.setItem("mad_emp", document.getElementById("emp").value || "");
-    toast("✅ تم");
-    render();
   }
-  function loadEmp(){
-    document.getElementById("emp").value = localStorage.getItem("mad_emp") || "";
+
+  function isHebrewText(s){ return /[\u0590-\u05FF]/.test(s||""); }
+  function isArabicText(s){ return /[\u0600-\u06FF]/.test(s||""); }
+  function normStatus(s){ return String(s||"").toLowerCase(); }
+  function isReady(s){ return /מוכן|ready|جاهز/.test(normStatus(s)); }
+  function isDelivered(s){ return /delivered|تم\s*التسليم|נמסר/.test(normStatus(s)); }
+  function isCanceled(s){ return /canceled|ملغ|إلغاء|בוטל/.test(normStatus(s)); }
+  function isApproved(s){
+    const t = normStatus(s);
+    return /approved|מאושר|اعتماد|تم\s*ارسال\s*هذا\s*الطلب\s*للتجهيز|قيد\s*التجهيز/.test(t);
+  }
+  function extractPrice(offer, notes){
+    const t = (offer||"") + " " + (notes||"");
+    let m = t.match(/₪\s*([0-9]{2,6})/); if(m) return m[1];
+    m = t.match(/=\s*₪\s*([0-9]{2,6})/); if(m) return m[1];
+    m = t.match(/Price:\s*([0-9]{2,6})/i); if(m) return m[1];
+    return "150";
+  }
+  function offerNoPrice(offer){
+    return String(offer||"").replace(/\s*=\s*₪?\s*\d{2,6}\s*$/,"").trim();
+  }
+  function esc(s){ return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+  function toWaPhone(p){
+    const d = String(p||"").replace(/\D/g,"");
+    if(d.startsWith("0") && d.length>=9) return ("972"+d.slice(1));
+    return d;
   }
 
   async function sync(){
     try{
-      const res = await fetch(`${SCRIPT_URL}?action=get&t=${Date.now()}`, { cache:"no-store" });
-      const data = await res.json();
-      all = Array.isArray(data) ? data : [];
+      const r = await fetch(`${SCRIPT_URL}?action=get&t=${Date.now()}`);
+      const d = await r.json();
+      orders = Array.isArray(d)? d : [];
       render();
-    }catch(e){
-      all = [];
-      render();
-      toast("⚠️ اتصال");
-    }
+    }catch(e){ console.log(e); }
   }
 
   function render(){
     const q = (document.getElementById("q").value||"").toLowerCase();
-    const emp = document.getElementById("emp").value || "";
-    const rev = all.slice().reverse();
+    const prep = [...orders].reverse()
+      .filter(o => isApproved(o.status||"") && !isReady(o.status||"") && !isDelivered(o.status||"") && !isCanceled(o.status||""))
+      .filter(o => (`${o.name||""} ${o.phone||""} ${o.offer||""} ${o.orderId||""}`).toLowerCase().includes(q));
 
-    const arr = rev.filter(o=>{
-      const s = String(o.status||"");
-      if (isDelivered(s) || isCanceled(s) || isReady(s)) return false;
-      if (!isApproved(s)) return false;
-      const match = String(o.name||"").toLowerCase().includes(q) ||
-                    String(o.phone||"").includes(q) ||
-                    String(o.offer||"").toLowerCase().includes(q);
-      if(q && !match) return false;
-      return true;
-    });
+    document.getElementById("cPrep").innerText = prep.length;
+    document.getElementById("list").innerHTML = prep.map(card).join("") || `<div class="card">لا توجد طلبات للتجهيز الآن ✅</div>`;
+  }
 
-    if(!arr.length){
-      document.getElementById("list").innerHTML = `<div class="empty">لا يوجد طلبات للتجهيز الآن ✅</div>`;
-      return;
-    }
+  function card(o){
+    const row = o.rowIndex;
+    const price = extractPrice(o.offer, o.notes);
+    const offerPure = offerNoPrice(o.offer);
+    const he = isHebrewText(o.name) || /\bhe\b/i.test(o.offer||"");
 
-    document.getElementById("list").innerHTML = arr.map(o=>{
-      const delivery = parseDeliveryFromStatus(o.status||"");
-      const price = String(o.price||"").replace(/[^\d]/g,"") || "150";
-      const orderId = o.orderId || ("ROW-"+o.rowIndex);
+    return `
+      <div class="card">
+        <div class="big">
+          <div class="row"><div class="lab">رقم الطلب</div><div class="val">${esc(o.orderId||"")}</div></div>
+          <div class="row"><div class="lab">اسم الزبون</div><div class="val" style="direction:rtl;text-align:right">${esc(o.name||"")}</div></div>
+          <div class="row"><div class="lab">الهاتف</div><div class="val">${esc(o.phone||"")}</div></div>
+          <div class="row"><div class="lab">المدينة / العنوان</div><div class="val" style="direction:rtl;text-align:right">${esc(o.city||"-")}</div></div>
+          <div class="row"><div class="lab">الطلب</div><div class="val" style="direction:rtl;text-align:right">${esc(offerPure)}</div></div>
+          <div class="row"><div class="lab">السعر</div><div class="val">₪${esc(price)}</div></div>
+          <div class="row"><div class="lab">ملاحظات</div><div class="val" style="direction:rtl;text-align:right">${esc(o.notes||"")}</div></div>
+        </div>
 
-      return `
-        <div class="card">
-          <div class="orderBox">
-            <div class="boxTitle">📦 مربع הזמנה (كل المعلومات)</div>
+        <div class="btns">
+          <button class="btn bblue" onclick="printLabel('${esc(o.orderId)}','${esc(o.name)}','${esc(o.phone)}','${esc(o.city)}','${esc(offerPure)}','${esc(price)}','${he ? "he":"ar"}')">🖨️ طباعة</button>
+          <button class="btn borange" onclick="editMini(${row},'${esc(o.orderId)}')">✏️ تعديل</button>
+        </div>
 
-            <div class="infoRow"><span class="lbl">رقم הזמנה</span><span class="val rtl">${escapeHtml(orderId)}</span></div>
-            <div class="infoRow"><span class="lbl">اسم العميل</span><span class="val rtl">${escapeHtml(o.name||"-")}</span></div>
-            <div class="infoRow"><span class="lbl">טלפון</span><span class="val">${escapeHtml(o.phone||"-")}</span></div>
-            <div class="infoRow"><span class="lbl">المدينة/כתובת</span><span class="val rtl">${escapeHtml(o.city||"-")}</span></div>
-            <div class="infoRow"><span class="lbl">شركة משלוח</span><span class="val rtl">${escapeHtml(delivery)}</span></div>
-            <div class="infoRow"><span class="lbl">מחיר</span><span class="val rtl">₪${escapeHtml(price)}</span></div>
+        <div class="btns">
+          <button class="btn bgreen" onclick="markReady(${row},'${esc(o.orderId)}')">✅ تم تجهيز الطلب</button>
+          <button class="btn bblue" onclick="openWA('${esc(o.phone)}','${esc(o.name)}','${esc(o.orderId)}')">💬 واتساب</button>
+        </div>
 
-            <div class="offerBox">🧾 הזמנה: ${escapeHtml(o.offer||"-")}</div>
-
-            <div class="infoRow" style="border-bottom:none;padding-bottom:0">
-              <span class="lbl">הערות</span>
-              <span class="val rtl" style="direction:rtl;text-align:right">${escapeHtml(o.notes||"—")}</span>
-            </div>
-          </div>
-
+        <div id="edit_${row}" style="display:none; margin-top:10px">
+          <input id="e_offer_${row}" placeholder="تعديل الطلب" value="${esc(offerPure)}">
+          <input id="e_price_${row}" placeholder="تعديل السعر ₪" value="${esc(price)}">
+          <textarea id="e_notes_${row}" placeholder="تعديل الملاحظات">${esc(o.notes||"")}</textarea>
           <div class="btns">
-            <button class="btn btnPrint" onclick='printOrder(${safeJson(o)})'>🖨️ طباعة</button>
-            <button class="btn btnEdit" onclick='openEdit(${safeJson(o)})'>✏️ تعديل</button>
-            <button class="btn btnReady" ${emp ? "" : "disabled"} onclick='finalize(${safeJson(o)})'>✅ تم تجهيز הזמנה</button>
+            <button class="btn bblue" onclick="saveMini(${row},'${esc(o.orderId)}')">💾 حفظ</button>
+            <button class="btn borange" onclick="document.getElementById('edit_${row}').style.display='none'">إغلاق</button>
           </div>
-
-          ${emp ? "" : `<div style="margin-top:10px;color:#f59e0b;font-weight:1100;text-align:center">⚠️ اختاري اسمك لتفعيل زر التجهيز</div>`}
-        </div>
-      `;
-    }).join("");
-  }
-
-  async function finalize(o){
-    const emp = document.getElementById("emp").value || "";
-    if(!emp){ toast("❌ اختاري اسمك"); return; }
-
-    const s = String(o.status||"");
-    const m = s.match(/\(משלוח:\s*(.*?)\)/);
-    const del = m ? m[1] : "غير محدد";
-
-    const status = `מוכן על ידי ${emp} (משלוח: ${del})`;
-    await updateStatus(o.rowIndex, o.orderId, status);
-    toast("✅ تم تجهيز הזמנה");
-    setTimeout(sync, 500);
-  }
-
-  async function updateStatus(row, orderId, status){
-    try{
-      await fetch(`${SCRIPT_URL}?action=updateStatus&row=${encodeURIComponent(row)}&orderId=${encodeURIComponent(orderId)}&status=${encodeURIComponent(status)}&t=${Date.now()}`, { cache:"no-store" });
-    }catch(e){
-      toast("⚠️ فشل تحديث الحالة");
-    }
-  }
-
-  function openEdit(o){
-    editing = { rowIndex: o.rowIndex, orderId: o.orderId };
-    const price = String(o.price||"").replace(/[^\d]/g,"") || "150";
-    document.getElementById("m_city").value = o.city || "";
-    document.getElementById("m_offer").value = o.offer || "";
-    document.getElementById("m_price").value = price;
-    document.getElementById("m_notes").value = o.notes || "";
-    document.getElementById("modalWrap").style.display = "flex";
-  }
-
-  function closeModal(){ document.getElementById("modalWrap").style.display = "none"; }
-
-  async function saveEdit(){
-    if(!editing) return;
-
-    const city = (document.getElementById("m_city").value||"").trim();
-    const offer = (document.getElementById("m_offer").value||"").trim();
-    const price = String(document.getElementById("m_price").value||"150").replace(/[^\d]/g,"") || "150";
-    const notes = (document.getElementById("m_notes").value||"").trim();
-
-    try{
-      await fetch(`${SCRIPT_URL}?action=updateOrder&row=${encodeURIComponent(editing.rowIndex)}&orderId=${encodeURIComponent(editing.orderId)}`
-        + `&city=${encodeURIComponent(city)}&offer=${encodeURIComponent(offer)}&price=${encodeURIComponent(price)}&notes=${encodeURIComponent(notes)}`
-        + `&address=${encodeURIComponent(city)}&t=${Date.now()}`, { cache:"no-store" });
-
-      toast("✅ تم التعديل");
-      closeModal();
-      setTimeout(sync, 500);
-    }catch(e){
-      toast("⚠️ فشل التعديل");
-    }
-  }
-
-  // ✅ PRINT ORDER (TSC DA220)
-  function printOrder(o){
-    const delivery = parseDeliveryFromStatus(o.status||"");
-    const price = String(o.price||"").replace(/[^\d]/g,"") || "150";
-    const orderId = o.orderId || ("ROW-"+o.rowIndex);
-
-    const container = document.getElementById("print-container");
-    container.innerHTML = `
-      <div class="print-page" dir="rtl">
-        <div style="display:flex;align-items:center;justify-content:space-between;border-bottom:2px solid #000;padding-bottom:2mm;">
-          <div style="font-size:14pt;font-weight:900;">MAD</div>
-          <div style="font-size:10pt;font-weight:700;">Order: ${escapeHtml(orderId)}</div>
-        </div>
-
-        <div style="margin-top:3mm;font-size:10.5pt;line-height:1.35">
-          <div><b>שם:</b> ${escapeHtml(o.name||"-")}</div>
-          <div><b>טלפון:</b> ${escapeHtml(o.phone||"-")}</div>
-          <div><b>כתובת:</b> ${escapeHtml(o.city||"-")}</div>
-          <div><b>משלוח:</b> ${escapeHtml(delivery)}</div>
-          <div><b>מחיר:</b> ₪${escapeHtml(price)}</div>
-        </div>
-
-        <div style="margin-top:3mm;border:1.5px solid #000;padding:2mm;background:#f3f4f6;font-size:11pt;font-weight:900;">
-          ${escapeHtml(o.offer||"-")}
-        </div>
-
-        <div style="margin-top:2mm;font-size:8.5pt;color:#111;">
-          <b>הערות:</b> ${escapeHtml(o.notes||"—")}
-        </div>
-
-        <div style="margin-top:3mm;text-align:center;">
-          <svg id="bcode_gen"></svg>
-          <div style="font-size:8pt;margin-top:1mm;">${escapeHtml(o.phone||"")}</div>
-        </div>
-
-        <div style="margin-top:2mm;border:1px dashed #d00;color:#d00;padding:1.5mm;text-align:center;font-size:8pt;font-weight:900;">
-          החלפה רק אם הניילון לא נפתח
         </div>
       </div>
     `;
+  }
 
-    // باركود (هاتف أو OrderID)
+  function editMini(row){
+    const el = document.getElementById(`edit_${row}`);
+    el.style.display = (el.style.display==="none") ? "block" : "none";
+  }
+
+  async function saveMini(row, orderId){
+    const offer = document.getElementById(`e_offer_${row}`).value.trim();
+    const price = document.getElementById(`e_price_${row}`).value.trim();
+    const notes = document.getElementById(`e_notes_${row}`).value.trim();
+
+    const qs = new URLSearchParams({
+      action:"updateOrder",
+      row:String(row),
+      orderId,
+      offer,
+      price,
+      notes
+    });
+
+    await fetch(`${SCRIPT_URL}?${qs.toString()}`);
+    await sync();
+  }
+
+  async function markReady(row, orderId){
+    const emp = document.getElementById("emp").value || localStorage.getItem("mad_emp") || "";
+    if(!emp) return alert("اختار اسم الموظف أولاً");
+    const status = `مוכן על ידי ${emp}`;
+    const qs = new URLSearchParams({action:"updateStatus", row:String(row), orderId, status});
+    await fetch(`${SCRIPT_URL}?${qs.toString()}`);
+    await sync();
+  }
+
+  function openWA(phone, name, orderId){
+    const wa = toWaPhone(phone);
+    const msg = `MAD ✅\n${name}\nOrder: ${orderId}`;
+    window.open(`https://wa.me/${wa}?text=${encodeURIComponent(msg)}`,'_blank');
+  }
+
+  function printLabel(orderId, name, phone, city, offer, price, lang){
+    const area = document.getElementById("printArea");
+    const isHe = (lang==="he");
+
+    const title = isHe ? "מערכת MAD" : "MAD SYSTEM";
+    const nLab = isHe ? "שם" : "الاسم";
+    const pLab = isHe ? "טלפון" : "الهاتف";
+    const aLab = isHe ? "כתובת" : "العنوان";
+    const oLab = isHe ? "הזמנה" : "الطلب";
+    const prLab = isHe ? "סכום" : "السعر";
+    const warn = isHe ? "החלפה רק אם הניילון לא נפתח" : "الاستبدال فقط إذا لم يتم فتح النايلون";
+
+    area.innerHTML = `
+      <div class="label" dir="${isHe?'rtl':'rtl'}">
+        <h2 style="text-align:center">${title}</h2>
+        <div class="t"><b>${nLab}:</b> ${name}</div>
+        <div class="t"><b>${pLab}:</b> ${phone}</div>
+        <div class="t"><b>${aLab}:</b> ${city}</div>
+        <div class="box"><b>${oLab}:</b> ${offer}</div>
+        <div class="t"><b>${prLab}:</b> ₪${price}</div>
+        <div style="text-align:center;margin-top:10px"><svg id="bcode"></svg></div>
+        <div class="warn">${warn}</div>
+      </div>
+    `;
+
     try{
-      const code = String(o.phone||orderId||"").replace(/\D/g,"") || String(orderId||"");
-      JsBarcode("#bcode_gen", code, { format:"CODE128", width:2, height:42, displayValue:false, margin:0 });
+      JsBarcode("#bcode", String(orderId||phone), { format:"CODE128", width:2, height:55, displayValue:false });
     }catch(e){}
 
-    // اطبع
-    setTimeout(()=>window.print(), 200);
+    setTimeout(()=>window.print(), 300);
   }
 
-  function escapeHtml(str){
-    return String(str ?? "").replace(/[&<>"']/g, s => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[s]));
-  }
-  function safeJson(obj){
-    return JSON.stringify(obj).replace(/</g,"\\u003c").replace(/>/g,"\\u003e").replace(/&/g,"\\u0026");
-  }
-
-  loadEmp();
-  sync();
-  setInterval(sync, 20000);
+  // auto refresh
+  setInterval(sync, 25000);
 </script>
 </body>
 </html>
