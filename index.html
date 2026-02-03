@@ -170,7 +170,7 @@
 
 <body>
 
-  <a href="https://madperfume.co.il/" target="_blank" class="online-store-float">
+  <a href="https://madperfume.co.il/" target="_blank" class="online-store-float" id="storeFloat">
     <i class="fas fa-shopping-cart"></i>
     <span id="l-store-btn"></span>
   </a>
@@ -179,7 +179,7 @@
     <div class="logo"><img src="https://abomkdad.github.io/Digital-Business-Card/logo.png"></div>
     <div class="brand-name">MAD PARFUMEUR ISRAEL</div>
     <div class="action-grid">
-      <a href="tel:*9935" class="action-item">
+      <a href="tel:*9935" class="action-item" id="csBtn">
         <i class="fas fa-phone-alt"></i>
         <span id="l-cs"></span>
         <div class="hotline">*9935</div>
@@ -189,7 +189,7 @@
         <span id="l-wa"></span>
         <div class="hotline">050-978-7730</div>
       </a>
-      <a href="https://www.mad-parfumeur.com/frangaize.html" target="_blank" class="action-item">
+      <a href="https://www.mad-parfumeur.com/frangaize.html" target="_blank" class="action-item" id="agentBtn">
         <i class="fas fa-certificate"></i>
         <span id="l-agent"></span>
         <div class="hotline">Official Agent</div>
@@ -225,7 +225,6 @@
   <script>
     /* =========================
        ✅ SAFE DOM SETTERS
-       prevents page from stopping if any element was removed
     ========================== */
     const $id = (id) => document.getElementById(id);
     function setText(id, value) { const el = $id(id); if (el) el.textContent = value; }
@@ -247,7 +246,6 @@
       }
     })[userLang];
 
-    // Apply translations safely
     setText('l-cs', t.cs);
     setText('l-wa', t.wa);
     setText('l-agent', t.agent);
@@ -260,40 +258,68 @@
     setHref('wa-corp-btn', `https://wa.me/972509787730?text=${encodeURIComponent(t.wa_msg)}`);
 
     /* =========================
-       ✅ TRACK ALL EVENTS (NO UI CHANGES)
-       - Meta: Lead
-       - TikTok: Lead
-       - Snap: SIGN_UP (Lead-like)
+       ✅ PRECISE TRACKING MAP
+       فتح الصفحة: (already) PageView + ttq.page + PAGE_VIEW
+       مشاهدة: Meta ViewContent / TikTok ViewContent / Snap VIEW_CONTENT
+       ليد:   Meta Lead / TikTok Lead / Snap SIGN_UP
     ========================== */
-    function trackAll(action, extra = {}) {
+
+    function eid() {
+      return 'e' + Date.now().toString(36) + Math.random().toString(36).slice(2,8);
+    }
+
+    function trackView(action, extra = {}) {
+      const eventID = eid();
       const payload = Object.assign({
         action,
         lang: userLang,
         page: location.pathname,
         url: location.href
       }, extra || {});
-      try { if (typeof fbq === 'function') fbq('track', 'Lead', payload); } catch(e) {}
+
+      // Meta: ViewContent
+      try { if (typeof fbq === 'function') fbq('track', 'ViewContent', payload, { eventID }); } catch(e) {}
+
+      // TikTok: ViewContent
+      try { if (typeof ttq !== 'undefined' && ttq && typeof ttq.track === 'function') ttq.track('ViewContent', payload); } catch(e) {}
+
+      // Snap: VIEW_CONTENT
+      try { if (typeof snaptr === 'function') snaptr('track', 'VIEW_CONTENT', payload); } catch(e) {}
+    }
+
+    function trackLead(action, extra = {}) {
+      const eventID = eid();
+      const payload = Object.assign({
+        action,
+        lang: userLang,
+        page: location.pathname,
+        url: location.href
+      }, extra || {});
+
+      // Meta: Lead
+      try { if (typeof fbq === 'function') fbq('track', 'Lead', payload, { eventID }); } catch(e) {}
+
+      // TikTok: Lead
       try { if (typeof ttq !== 'undefined' && ttq && typeof ttq.track === 'function') ttq.track('Lead', payload); } catch(e) {}
+
+      // Snap: SIGN_UP (lead-like)
       try { if (typeof snaptr === 'function') snaptr('track', 'SIGN_UP', payload); } catch(e) {}
     }
 
-    // page loaded signal
-    try { trackAll('page_loaded'); } catch(e) {}
+    // ✅ Page open (فتح الصفحة) is already tracked by pixels (PageView/page/PAGE_VIEW)
+    // If you also want "view_portal" as ViewContent, uncomment next line:
+    // trackView('view_portal');
 
-    // global click tracking
+    /* =========================
+       ✅ Click Tracking (exact per your list)
+    ========================== */
     document.addEventListener('click', function(e) {
       const a = e.target.closest('a');
       if (!a) return;
 
       const href = (a.getAttribute('href') || '').trim();
-      const isStore = a.classList.contains('online-store-float');
-      const isCorpWA = (a.id === 'wa-corp-btn');
-      const isTel = href.startsWith('tel:');
-      const isAgent = href.includes('/frangaize.html');
-      const isBranchWA = a.classList.contains('bg-wa') && href.includes('wa.me');
-      const isWaze = a.classList.contains('bg-waze');
-      const isEnter = a.classList.contains('bg-enter');
 
+      // Detect branch name (if clicked inside a branch card)
       let branchName = '';
       const card = a.closest('.branch-card');
       if (card) {
@@ -301,30 +327,64 @@
         branchName = title ? title.textContent.trim() : '';
       }
 
-      if (isStore) trackAll('click_store', { href });
-      else if (isTel) trackAll('click_customer_service', { href });
-      else if (isCorpWA) trackAll('click_corp_whatsapp', { href });
-      else if (isAgent) trackAll('click_official_agent', { href });
-      else if (isBranchWA) trackAll('click_branch_whatsapp', { href, branch: branchName });
-      else if (isWaze) trackAll('click_waze', { href, branch: branchName });
-      else if (isEnter) trackAll('click_enter_branch', { href, branch: branchName });
+      // 1) مشاهدة متجر اونلاين
+      if (a.id === 'storeFloat' || a.classList.contains('online-store-float')) {
+        trackView('view_store', { href });
+        return;
+      }
 
+      // 2) مشاهدة وكيل معتمد
+      if (a.id === 'agentBtn' || href.includes('/frangaize.html')) {
+        trackView('view_official_agent', { href });
+        return;
+      }
+
+      // 3) خدمة الزباين = ليد
+      if (a.id === 'csBtn' || href.startsWith('tel:')) {
+        trackLead('lead_customer_service', { href });
+        return;
+      }
+
+      // 4) واتساب الشركة = ليد
+      if (a.id === 'wa-corp-btn') {
+        trackLead('lead_whatsapp_company', { href });
+        return;
+      }
+
+      // Branch dynamic buttons
+      const isBranchWA = a.classList.contains('bg-wa') && href.includes('wa.me');
+      const isWaze = a.classList.contains('bg-waze');
+      const isEnter = a.classList.contains('bg-enter');
+
+      // 5) واتساب الفرع = ليد
+      if (isBranchWA) {
+        trackLead('lead_whatsapp_branch', { href, branch: branchName });
+        return;
+      }
+
+      // 6) ويز = ليد
+      if (isWaze) {
+        trackLead('lead_waze', { href, branch: branchName });
+        return;
+      }
+
+      // 7) دخول الفرع = مشاهدة
+      if (isEnter) {
+        trackView('view_enter_branch', { href, branch: branchName });
+        return;
+      }
     }, true);
 
-    document.addEventListener('DOMContentLoaded', () => {
-      const gpsBtn = document.querySelector('.gps-trigger');
-      if (gpsBtn) gpsBtn.addEventListener('click', () => trackAll('click_gps_button'));
-    });
-
+    /* =========================
+       ✅ Branch loading (same as before)
+    ========================== */
     let allBranches = [];
 
     async function fetchBranchesJson() {
-      // Try same folder first, then root folder
       const candidates = [
         `branches.json?v=${Date.now()}`,
         `/branches.json?v=${Date.now()}`
       ];
-
       for (const url of candidates) {
         try {
           const res = await fetch(url, { cache: 'no-store' });
@@ -333,7 +393,7 @@
           return { data, used: url };
         } catch (e) {}
       }
-      throw new Error('branches.json not found in same folder or root');
+      throw new Error('branches.json not found');
     }
 
     async function loadInitial() {
@@ -344,53 +404,38 @@
         const out = await fetchBranchesJson();
         const data = out.data;
 
-        // Accept both formats: {branches:[]} OR []
         const branches = Array.isArray(data) ? data : (data && data.branches ? data.branches : []);
         allBranches = branches;
 
         render(allBranches);
-        trackAll('branches_loaded', { count: Array.isArray(allBranches) ? allBranches.length : 0, source: out.used });
       } catch(e) {
         console.error(e);
-        trackAll('branches_load_error');
-        // keep UI unchanged: leave "..." (no extra message)
       }
     }
 
     function requestLocation() {
-      trackAll('gps_request_started');
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
           pos => {
-            trackAll('gps_permission_granted');
             const uLat = pos.coords.latitude, uLng = pos.coords.longitude;
-
             allBranches.forEach(b => {
               if (typeof b.lat !== 'number' || typeof b.lng !== 'number') return;
               const dLat = (b.lat-uLat)*Math.PI/180, dLon = (b.lng-uLng)*Math.PI/180;
               const a = Math.sin(dLat/2)**2 + Math.cos(uLat*Math.PI/180)*Math.cos(b.lat*Math.PI/180)*Math.sin(dLon/2)**2;
               b.dist = 6371 * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)));
             });
-
             allBranches.sort((a,b) => (a.dist ?? 1e9) - (b.dist ?? 1e9));
             render(allBranches);
-            trackAll('gps_sorted_branches');
           },
-          err => {
-            console.error(err);
-            trackAll('gps_permission_denied');
-          },
+          err => console.error(err),
           { enableHighAccuracy: true, timeout: 8000, maximumAge: 0 }
         );
-      } else {
-        trackAll('gps_not_supported');
       }
     }
 
     function render(list) {
       const container = $id('branchesList');
       if (!container) return;
-
       container.innerHTML = '';
 
       (list || []).forEach(b => {
@@ -422,11 +467,6 @@
         `;
         container.appendChild(card);
       });
-
-      // If list is empty, keep original behavior (nothing extra)
-      if (!list || list.length === 0) {
-        // leave empty
-      }
     }
 
     function isBranchOpen(b) {
@@ -446,10 +486,8 @@
     function toggleOverlay(show) {
       const ov = $id('trust-overlay');
       if (!ov) return;
-
       ov.style.display = show ? 'flex' : 'none';
       document.body.style.overflow = show ? 'hidden' : 'auto';
-      trackAll(show ? 'open_trust_overlay' : 'close_trust_overlay');
     }
 
     loadInitial();
