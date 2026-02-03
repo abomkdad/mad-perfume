@@ -30,7 +30,7 @@
             padding-bottom: 80px;
         }
 
-        /* إشعار الطلب الجديد */
+        /* إشعار الطلب الجديد المحسن */
         #notification-toast {
             position: fixed;
             top: -100px;
@@ -38,18 +38,19 @@
             transform: translateX(-50%);
             background: var(--warning);
             color: #000;
-            padding: 15px 30px;
+            padding: 18px 35px;
             border-radius: 50px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.6);
             z-index: 10000;
-            font-weight: bold;
+            font-weight: 800;
             display: flex;
             align-items: center;
-            gap: 10px;
-            transition: top 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
-            font-size: 16px;
+            gap: 12px;
+            transition: top 0.6s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+            font-size: 18px;
+            border: 2px solid #fff;
         }
-        #notification-toast.show { top: 20px; }
+        #notification-toast.show { top: 30px; }
 
         .header-ui {
             width: 100%; max-width: 600px; background: #1e293b;
@@ -58,18 +59,29 @@
             box-shadow: 0 4px 10px rgba(0,0,0,0.3);
         }
 
-        .audio-activation {
+        /* زر تفعيل الصوت الصريح */
+        .audio-activation-wrap {
+            background: #27272a;
+            border: 1px solid #3f3f46;
+            padding: 10px;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            text-align: center;
+        }
+        .audio-btn {
             background: var(--success);
             color: white;
-            padding: 8px;
+            padding: 10px 20px;
             border-radius: 8px;
-            text-align: center;
-            font-size: 12px;
-            margin-bottom: 10px;
+            font-size: 14px;
             cursor: pointer;
             border: none;
             width: 100%;
             font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
 
         .search-input {
@@ -81,8 +93,8 @@
 
         .tabs-container { display: flex; gap: 8px; }
         .tab-btn {
-            flex: 1; padding: 10px; border-radius: 10px; border: 1px solid #334155;
-            background: #334155; font-size: 11px; font-weight: bold; cursor: pointer; color: var(--text-muted);
+            flex: 1; padding: 12px; border-radius: 10px; border: 1px solid #334155;
+            background: #334155; font-size: 12px; font-weight: bold; cursor: pointer; color: var(--text-muted);
         }
         .tab-btn.active { background: var(--accent); color: white; border-color: var(--accent); }
 
@@ -119,7 +131,6 @@
         }
         .btn-wa { background: #065f46; color: #a7f3d0; }
         .btn-print { background: #1e3a8a; color: #bfdbfe; }
-        .btn-invoice { background: #701a75; color: #f5d0fe; }
         .btn-contact { background: #1e40af; color: white; }
         .btn-cancel { background: #7f1d1d; color: #fecaca; }
 
@@ -146,13 +157,17 @@
 <body>
 
 <div id="notification-toast">
-    <span>🔔</span> יש לך הזמנה חדשה! (طلب جديد)
+    <span>🔔</span> יש לך הזמנה חדשה! (وصل طلب جديد)
 </div>
 
 <div id="app-ui">
     <div class="header-ui">
-        <!-- زر تفعيل الرنين (ضروري للمتصفحات) -->
-        <button id="audioBtn" class="audio-activation" onclick="enableAudio()">לחץ כאן להפעלת צליל התראות (اضغط هنا لتفعيل الرنين)</button>
+        <!-- قسم تفعيل التنبيهات -->
+        <div id="audioActivation" class="audio-activation-wrap">
+            <button class="audio-btn" onclick="activateRingingSystem()">
+                <span>🔊</span> לחץ כאن להפעלת רנין הזמנות (تفعيل جرس الطلبات)
+            </button>
+        </div>
         
         <input type="text" class="search-input" id="searchInput" placeholder="חפש לפי שם או טלפון..." oninput="handleFilter()">
         
@@ -163,7 +178,7 @@
         </div>
     </div>
     <div class="container" id="mainContainer">
-        <div id="ordersList"></div>
+        <div id="ordersList"><p style="text-align:center; padding:20px; color:var(--text-muted);">טוען נתונים... (جاري التحميل)</p></div>
     </div>
 </div>
 
@@ -182,14 +197,20 @@
     
     let lastOrderCount = 0;
     let isFirstLoad = true;
-    let audioEnabled = false;
+    let ringingEnabled = false;
+    let audioContext;
 
-    function enableAudio() {
-        audioEnabled = true;
-        document.getElementById('audioBtn').style.display = 'none';
-        // تشغيل صوت صامت لتفعيل المحرك
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        if (audioCtx.state === 'suspended') audioCtx.resume();
+    // تفعيل نظام الرنين عبر تفاعل المستخدم
+    function activateRingingSystem() {
+        ringingEnabled = true;
+        document.getElementById('audioActivation').style.display = 'none';
+        
+        // إنشاء الـ AudioContext وتفعيله فوراً
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioContext.state === 'suspended') audioContext.resume();
+        
+        // اختبار رنة سريعة للتأكد
+        playRingtone(2); 
     }
 
     async function fetchOrders() {
@@ -197,50 +218,66 @@
             const res = await fetch(`${SCRIPT_URL}?action=get&t=${Date.now()}`);
             const data = await res.json();
             
+            // إذا وجدنا طلبات جديدة (العدد الحالي أكبر من السابق)
             if (!isFirstLoad && data.length > lastOrderCount) {
-                triggerOrderAlert();
+                notifyNewOrder();
             }
             
             lastOrderCount = data.length;
             isFirstLoad = false;
             allData = data;
             handleFilter();
-        } catch(e) { console.error("Sync Error"); }
+        } catch(e) { console.error("Fetch Error"); }
     }
 
-    function triggerOrderAlert() {
+    function notifyNewOrder() {
+        // 1. البانر العلوي
         const toast = document.getElementById('notification-toast');
         toast.classList.add('show');
-        setTimeout(() => toast.classList.remove('show'), 8000);
+        setTimeout(() => toast.classList.remove('show'), 9000);
 
-        if (audioEnabled) {
-            playPhoneRing();
+        // 2. الرنين الصوتي
+        if (ringingEnabled) {
+            playRingtone(5); // رنين لمدة 5 دورات
+        }
+
+        // 3. الاهتزاز (للموبايل)
+        if (navigator.vibrate) {
+            navigator.vibrate([500, 200, 500, 200, 500]);
         }
     }
 
-    // محاكاة رنين الهاتف (نغمتين متناوبتين)
-    function playPhoneRing() {
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    // دالة توليد نغمة رنين تشبه الهاتف
+    function playRingtone(repeats) {
+        if (!audioContext) return;
         
-        function ring(time) {
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.type = 'sine';
-            osc.frequency.setValueAtTime(660, time);
-            osc.frequency.exponentialRampToValueAtTime(440, time + 0.4);
-            gain.gain.setValueAtTime(0.5, time);
-            gain.gain.exponentialRampToValueAtTime(0.01, time + 0.4);
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-            osc.start(time);
-            osc.stop(time + 0.4);
+        let startTime = audioContext.currentTime;
+        for (let i = 0; i < repeats; i++) {
+            const time = startTime + (i * 1.2);
+            
+            // النغمة الأولى
+            createTone(660, time, 0.4);
+            // النغمة الثانية
+            createTone(440, time + 0.2, 0.4);
         }
+    }
 
-        // تكرار الرنة 4 مرات
-        for (let i = 0; i < 4; i++) {
-            ring(audioCtx.currentTime + (i * 0.8));
-            ring(audioCtx.currentTime + (i * 0.8) + 0.2);
-        }
+    function createTone(freq, start, duration) {
+        const osc = audioContext.createOscillator();
+        const gain = audioContext.createGain();
+        
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, start);
+        osc.frequency.exponentialRampToValueAtTime(freq / 2, start + duration);
+        
+        gain.gain.setValueAtTime(0.3, start);
+        gain.gain.exponentialRampToValueAtTime(0.01, start + duration);
+        
+        osc.connect(gain);
+        gain.connect(audioContext.destination);
+        
+        osc.start(start);
+        osc.stop(start + duration);
     }
 
     function setFilter(tab) {
@@ -272,6 +309,11 @@
     function renderOrders(orders) {
         const list = document.getElementById('ordersList');
         list.innerHTML = '';
+        if (orders.length === 0) {
+            list.innerHTML = '<p style="text-align:center; padding:30px; color:var(--text-muted);">אין הזמנות להצגה (لا يوجد طلبات)</p>';
+            return;
+        }
+
         orders.forEach(o => {
             const uniqueKey = o.orderId || o.phone;
             let status = o.status || 'ממתין לשיחה';
@@ -280,7 +322,6 @@
             const isContacted = status === 'בוצעה שיחה' || status.includes('Delivered');
             const isDone = status.includes('Delivered');
             const isCanceled = status.includes('מבוטל');
-            const deliveryData = localDeliveryStore[uniqueKey] || { company: "", custom: "" };
             
             const card = document.createElement('div');
             let statusClass = "status-waiting";
@@ -304,12 +345,12 @@
                 <div class="delivery-box" style="${isDone || isCanceled ? 'opacity:0.4; pointer-events:none;' : ''}">
                     <span class="delivery-label">חברת משלוחים / شركة التوصيل:</span>
                     <select class="delivery-select" onchange="updateDeliveryLocal('${uniqueKey}', this.value)">
-                        <option value="" ${deliveryData.company === "" ? "selected" : ""}>בחר חברה / اختر الشركة</option>
-                        <option value="هاي اكسبرس" ${deliveryData.company === "هاي اكسبرس" ? "selected" : ""}>هاي اكسبرس</option>
-                        <option value="لمى" ${deliveryData.company === "لمى" ? "selected" : ""}>لمى</option>
-                        <option value="مروه" ${deliveryData.company === "مروه" ? "selected" : ""}>مروه</option>
-                        <option value="عرين" ${deliveryData.company === "عرين" ? "selected" : ""}>عرين</option>
-                        <option value="آخر" ${deliveryData.company === "آخر" ? "selected" : ""}>آخر (מפורט)</option>
+                        <option value="" ${localDeliveryStore[uniqueKey]?.company === "" ? "selected" : ""}>בחר חברה / اختر الشركة</option>
+                        <option value="هاي اكسبرس" ${localDeliveryStore[uniqueKey]?.company === "هاي اكسبرس" ? "selected" : ""}>هاي اكسبرس</option>
+                        <option value="لمى" ${localDeliveryStore[uniqueKey]?.company === "لمى" ? "selected" : ""}>لمى</option>
+                        <option value="مروه" ${localDeliveryStore[uniqueKey]?.company === "مروه" ? "selected" : ""}>مروه</option>
+                        <option value="عرين" ${localDeliveryStore[uniqueKey]?.company === "عرين" ? "selected" : ""}>عرين</option>
+                        <option value="آخر" ${localDeliveryStore[uniqueKey]?.company === "آخر" ? "selected" : ""}>آخر (מפורט)</option>
                     </select>
                 </div>
 
@@ -334,7 +375,7 @@
     }
 
     async function updateStatusLocal(idKey, row, s) {
-        if(s === 'מבוטל ❌' && !confirm("האם לבטל הזמנה זו?")) return;
+        if(s === 'מבוטל ❌' && !confirm("האם לבטל הזמנה זו? (هل تريد إلغاء الطلب؟)")) return;
         localSessionStore[idKey] = s;
         handleFilter();
         try { fetch(`${SCRIPT_URL}?action=updateStatus&row=${row}&status=${encodeURIComponent(s)}`); } catch(e) {}
@@ -361,7 +402,7 @@
             container.innerHTML = `
                 <div class="print-page invoice-size" dir="rtl">
                     <div class="inv-header"><h1 style="font-size:26pt; color:#1e3a8a; margin:0;">מערכת MAD לניהול הזמנות</h1><p style="font-size:14pt; color:#444;">אלגנטיות ודיוק בכל הזמנה</p></div>
-                    <div style="display:flex; justify-content:space-between; font-weight:bold; color:black;"><div>מספר הזמנה: ${o.orderId || 'MAD-NEW'}</div><div>תאריך: ${date}</div></div>
+                    <div style="display:flex; justify-content:space-between; font-weight:bold; color:black;"><div>מספר הזמנה: ${o.orderId || 'MAD-NEW'}</div><div>תאריך הנפקה: ${date}</div></div>
                     <div class="inv-client-box"><b>חשבונית עבור:</b><br>שם: ${o.name}<br>כתובת: ${o.address || o.city || "-"}<br>טלפון: ${o.phone}<br>חברת משלוחים: ${deliveryName || "-"}</div>
                     <table class="inv-table"><thead><tr style="background:#f1f5f9;"><th>תיאור ומוצר</th><th>סטטוס</th><th>מחיר</th></tr></thead><tbody><tr><td><b>${o.offer}</b></td><td>בטיפול</td><td><b>₪ 150.00</b></td></tr></tbody></table>
                     <div style="border:1.5px solid #b91c1c; padding:10px; text-align:center; color:#b91c1c; font-weight:bold;">** תנאי החלפה: החלפה תתבצע אך ורק בתנאי שאריזת הניילון לא נפתחה.</div>
@@ -375,7 +416,7 @@
                     <div style="text-align:center; border-bottom:2px solid #000; font-weight:bold; font-size:18pt;">מערכת MAD</div>
                     <div style="font-size:12pt; line-height:1.5; margin:10px 0;">שם: ${o.name}<br>כתובת: ${o.address || o.city || "-"}<br>טלפון: ${o.phone}<br>משלוח: ${deliveryName || "-"}</div>
                     <div style="border:2.2px solid #000; padding:8px; background:#f9f9f9;">תיאור: ${o.offer}</div>
-                    <div style="font-size:8.5pt; border:1.1px solid red; color:red; text-align:center; font-weight:bold; padding:4px; margin-top:10px;">החלפה אך ורק בתנאי שהניילون לא נפתח</div>
+                    <div style="font-size:8.5pt; border:1.1px solid red; color:red; text-align:center; font-weight:bold; padding:4px; margin-top:10px;">החלפה אך ורק בתנאי שהניילון לא נפתח</div>
                     <div style="text-align:center; margin-top:10px;"><svg id="bp"></svg></div>
                 </div>`;
         }
@@ -383,8 +424,9 @@
         setTimeout(() => { window.print(); document.title = "מערכת MAD"; }, 600);
     }
 
+    // التشغيل التلقائي
     window.onload = fetchOrders;
-    setInterval(fetchOrders, 30000);
+    setInterval(fetchOrders, 30000); // تحديث كل 30 ثانية
 </script>
 </body>
 </html>
