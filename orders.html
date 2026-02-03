@@ -95,17 +95,25 @@
         .check-green { color: var(--success); font-weight: bold; margin-left: 8px; font-size: 20px; }
         .x-red { color: var(--danger); font-weight: bold; margin-left: 8px; font-size: 20px; }
 
-        /* Delivery Company Box - White BG, Black Text */
+        /* Delivery Company Box - Enforced Visuals */
         .delivery-box {
             margin-top: 10px; padding: 10px; background: #ffffff; border-radius: 10px; border: 2px solid var(--primary);
+            transition: all 0.3s;
         }
+        .delivery-box.required {
+            border-color: var(--danger);
+            box-shadow: 0 0 10px rgba(239, 68, 68, 0.4);
+            animation: pulse-red 2s infinite;
+        }
+        @keyframes pulse-red {
+            0% { border-color: var(--danger); }
+            50% { border-color: #fca5a5; }
+            100% { border-color: var(--danger); }
+        }
+
         .delivery-label { font-size: 11px; color: #000; font-weight: bold; margin-bottom: 5px; display: block; }
         .delivery-select {
             width: 100%; background: transparent; color: #000000; border: none; font-size: 15px; font-weight: 900; outline: none; cursor: pointer;
-        }
-        .other-delivery-input {
-            width: 100%; background: #f1f5f9; color: #000; border: 1px solid #000; border-radius: 5px; 
-            margin-top: 5px; padding: 5px; font-size: 13px; display: none; font-weight: bold;
         }
 
         .actions-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-top: 12px; }
@@ -113,6 +121,10 @@
             padding: 10px 4px; border-radius: 8px; font-size: 11px; font-weight: bold;
             border: none; cursor: pointer; display: flex; flex-direction: column;
             align-items: center; gap: 4px; background: #334155; color: white;
+            transition: opacity 0.3s;
+        }
+        .btn-op:disabled {
+            opacity: 0.2; cursor: not-allowed; filter: grayscale(1);
         }
         .btn-wa-ar { background: #065f46; color: #a7f3d0; }
         .btn-wa-he { background: #064e3b; color: #6ee7b7; }
@@ -153,10 +165,10 @@
         <img src="https://www.mad-parfumeur.com/assets/hero/logo.png" alt="MAD Logo" class="app-logo">
         <div id="audioActivation" class="audio-activation-wrap">
             <button class="audio-btn" onclick="activateRingingSystem()">
-                <span>🔊</span> הפעלת התראות (תפעיל פעם אחת)
+                <span>🔊</span> הפעלת התראות (تفعيل جرس التنبيه)
             </button>
         </div>
-        <input type="text" class="search-input" id="searchInput" placeholder="חפש לפי שם או טלפון..." oninput="handleFilter()">
+        <input type="text" class="search-input" id="searchInput" placeholder="חפש לפי שם לקוח או טלפון..." oninput="handleFilter()">
         <div class="tabs-container">
             <button class="tab-btn active" id="tab-all" onclick="setFilter('all')">20 אחרונות</button>
             <button class="tab-btn" id="tab-new" onclick="setFilter('new')">ממתין לשיחה</button>
@@ -260,13 +272,15 @@
         list.innerHTML = '';
         orders.forEach(o => {
             const uniqueKey = o.orderId || o.phone;
-            let status = o.status || 'ממתין לשיחה';
-            if (status === 'Processing...') status = 'ממתין לשיחה';
+            let status = o.status || 'ממתיن לשיחה';
+            if (status === 'Processing...') status = 'ממתיن لשיחה';
             const isContacted = status === 'בוצעה שיחה' || status.includes('Delivered');
             const isDone = status.includes('Delivered');
             const isCanceled = status.includes('מבוטל');
-            const deliveryData = localDeliveryStore[uniqueKey] || { company: "", custom: "" };
             
+            const deliveryData = localDeliveryStore[uniqueKey] || { company: "", custom: "" };
+            const isDeliverySelected = deliveryData.company !== "";
+
             const card = document.createElement('div');
             let statusClass = "status-waiting";
             if (isContacted) statusClass = "status-contacted";
@@ -286,8 +300,8 @@
                 <div style="font-size:13px; margin:5px 0; color:var(--text-muted);">📞 ${o.phone} | 📍 ${o.city || '-'}</div>
                 <div style="background:#0f172a; padding:8px; border-radius:8px; font-size:12px; border:1px solid #334155; color:var(--text-main);"><b>הזמנה:</b> ${o.offer}</div>
 
-                <div class="delivery-box" style="${isDone || isCanceled ? 'opacity:0.4; pointer-events:none;' : ''}">
-                    <span class="delivery-label">חברת משלוחים / شركة التوصيل:</span>
+                <div class="delivery-box ${!isDeliverySelected && !isCanceled && !isDone ? 'required' : ''}" style="${isDone || isCanceled ? 'opacity:0.4; pointer-events:none;' : ''}">
+                    <span class="delivery-label">חברת משלוחים / شركة التوصيل (חובה):</span>
                     <select class="delivery-select" onchange="updateDeliveryLocal('${uniqueKey}', this.value)">
                         <option value="" ${deliveryData.company === "" ? "selected" : ""}>בחר חברה / اختر الشركة</option>
                         <option value="High Express" ${deliveryData.company === "High Express" ? "selected" : ""}>High Express</option>
@@ -296,23 +310,22 @@
                         <option value="Areen Delivery" ${deliveryData.company === "Areen Delivery" ? "selected" : ""}>Areen Delivery</option>
                         <option value="Other" ${deliveryData.company === "Other" ? "selected" : ""}>Other</option>
                     </select>
-                    <input type="text" class="other-delivery-input" id="other-${uniqueKey}" 
-                           placeholder="Enter company name..." value="${deliveryData.custom}"
-                           style="${deliveryData.company === "Other" ? "display:block" : "none"}"
-                           oninput="updateDeliveryCustom('${uniqueKey}', this.value)">
                 </div>
 
                 <div class="actions-grid" style="${isDone || isCanceled ? 'opacity: 0.3; pointer-events: none;' : ''}">
-                    <button class="btn-op btn-invoice" onclick="generatePDF('invoice', ${JSON.stringify(o).replace(/"/g, '&quot;')})">📄 חשבונית PDF</button>
-                    <button class="btn-op btn-print" onclick="generatePDF('sticker', ${JSON.stringify(o).replace(/"/g, '&quot;')})">🖨️ מדבקה</button>
-                    <button class="btn-op btn-wa-ar" onclick="sendInvoiceWA('AR', '${o.phone}', '${o.name}', '${o.offer}', '${o.orderId}', '${o.city}', '${uniqueKey}')">💬 WA AR</button>
-                    <button class="btn-op btn-wa-he" onclick="sendInvoiceWA('HE', '${o.phone}', '${o.name}', '${o.offer}', '${o.orderId}', '${o.city}', '${uniqueKey}')">💬 WA HE</button>
-                    <button class="btn-op ${isContacted ? '' : 'btn-contact'}" onclick="updateStatusLocal('${uniqueKey}', '${o.rowIndex}', 'בוצעה שיחה')">
-                        ${isContacted ? '✅ בוצעה שיחה' : '📞 בוצע שיחה'}
+                    <button class="btn-op btn-invoice" ${!isDeliverySelected ? 'disabled' : ''} onclick="generatePDF('invoice', ${JSON.stringify(o).replace(/"/g, '&quot;')})">📄 חשבונית PDF</button>
+                    <button class="btn-op btn-print" ${!isDeliverySelected ? 'disabled' : ''} onclick="generatePDF('sticker', ${JSON.stringify(o).replace(/"/g, '&quot;')})">🖨️ מדבקה</button>
+                    
+                    <button class="btn-op btn-wa-ar" ${!isDeliverySelected ? 'disabled' : ''} onclick="sendInvoiceWA('AR', '${o.phone}', '${o.name}', '${o.offer}', '${o.orderId}', '${o.city}', '${uniqueKey}')">💬 WA AR</button>
+                    <button class="btn-op btn-wa-he" ${!isDeliverySelected ? 'disabled' : ''} onclick="sendInvoiceWA('HE', '${o.phone}', '${o.name}', '${o.offer}', '${o.orderId}', '${o.city}', '${uniqueKey}')">💬 WA HE</button>
+                    
+                    <button class="btn-op ${isContacted ? '' : 'btn-contact'}" ${!isDeliverySelected ? 'disabled' : ''} onclick="updateStatusLocal('${uniqueKey}', '${o.rowIndex}', 'בוצעה שיחה')">
+                        ${isContacted ? '✅ בוצעה שיחה' : '📞 בוצעה שיחה'}
                     </button>
-                    <button class="btn-op btn-cancel" onclick="updateStatusLocal('${uniqueKey}', '${o.rowIndex}', 'מבוטל ❌')">❌ ביטול</button>
-                    <button class="btn-op" style="background:var(--success); color:white;" onclick="updateStatusLocal('${uniqueKey}', '${o.rowIndex}', 'Delivered ✅')">✅ נמסר</button>
+                    <button class="btn-op btn-cancel" onclick="updateStatusLocal('${uniqueKey}', '${o.rowIndex}', 'מבוטל ❌')">❌ ביטول</button>
+                    <button class="btn-op" style="background:var(--success); color:white;" ${!isDeliverySelected ? 'disabled' : ''} onclick="updateStatusLocal('${uniqueKey}', '${o.rowIndex}', 'Delivered ✅')">✅ נמסر</button>
                 </div>
+                ${!isDeliverySelected && !isCanceled && !isDone ? '<div style="color:var(--danger); font-size:10px; font-weight:bold; margin-top:5px; text-align:center;">* נא לבחור חברת משלוחים</div>' : ''}
             `;
             list.appendChild(card);
         });
@@ -321,14 +334,7 @@
     function updateDeliveryLocal(idKey, val) {
         if (!localDeliveryStore[idKey]) localDeliveryStore[idKey] = { company: "", custom: "" };
         localDeliveryStore[idKey].company = val;
-        const input = document.getElementById(`other-${idKey}`);
-        if (val === "Other") input.style.display = "block";
-        else { input.style.display = "none"; localDeliveryStore[idKey].custom = ""; }
-    }
-
-    function updateDeliveryCustom(idKey, val) {
-        if (!localDeliveryStore[idKey]) localDeliveryStore[idKey] = { company: "Other", custom: "" };
-        localDeliveryStore[idKey].custom = val;
+        handleFilter();
     }
 
     async function updateStatusLocal(idKey, row, s) {
@@ -340,7 +346,7 @@
 
     function sendInvoiceWA(lang, phone, name, offer, id, city, idKey) {
         const delData = localDeliveryStore[idKey] || { company: "-", custom: "" };
-        const deliveryName = delData.company === "Other" ? delData.custom : (delData.company || "Processing / בטיפול");
+        const deliveryName = delData.company || "Processing / בטיפול";
         let msg = "";
 
         if (lang === 'HE') {
@@ -377,18 +383,18 @@
         const date = new Date().toLocaleDateString('he-IL');
         const uniqueKey = o.orderId || o.phone;
         const delData = localDeliveryStore[uniqueKey] || { company: "-", custom: "" };
-        const deliveryName = delData.company === "Other" ? delData.custom : delData.company;
+        const deliveryName = delData.company || "-";
 
         if (type === 'invoice') {
             document.title = `Invoice_${o.name}`;
             container.innerHTML = `
                 <div class="print-page invoice-size" dir="rtl">
                     <div class="inv-header"><h1 style="font-size:26pt; color:#1e3a8a; margin:0;">מערכת MAD לניהול הזמנות</h1><p style="font-size:14pt; color:#444;">אלגנטיות ודיוק בכל הזמנה</p></div>
-                    <div style="display:flex; justify-content:space-between; font-weight:bold; color:black;"><div>מספר הזמנה: ${o.orderId || 'MAD-NEW'}</div><div>תאריך: ${date}</div></div>
+                    <div style="display:flex; justify-content:space-between; font-weight:bold; color:black;"><div>מספר הזמנה: ${o.orderId || 'MAD-NEW'}</div><div>תאריך הנפקה: ${date}</div></div>
                     <div class="inv-client-box"><b>חשבונית עבור:</b><br>שם: ${o.name}<br>כתובת: ${o.address || o.city || "-"}<br>טלפון: ${o.phone}<br>חברת משלוחים: ${deliveryName}</div>
-                    <table class="inv-table"><thead><tr style="background:#f1f5f9;"><th>תיאור ומוצר</th><th>סטטוס</th><th>מחיר</th></tr></thead><tbody><tr><td><b>${o.offer}</b></td><td>בטיפול</td><td><b>₪ 150.00</b></td></tr></tbody></table>
-                    <div style="border:1.5px solid #b91c1c; padding:10px; text-align:center; color:#b91c1c; font-weight:bold;">** תנאי החלפה: החלפה תתבצע אך ורק בתנאי שאריזת הניילון לא נפתחה.</div>
-                    <div style="margin-top:20px; font-size:11pt; color:black;">החשבונית תישלח במייל לאחר המסירה. נא לשלוח כתובת מייל.</div>
+                    <table class="inv-table"><thead><tr style="background:#f1f5f9;"><th>תיאور ומוצר</th><th>סטטوس</th><th>מחיר</th></tr></thead><tbody><tr><td><b>${o.offer}</b></td><td>בטיפול</td><td><b>₪ 150.00</b></td></tr></tbody></table>
+                    <div style="border:1.5px solid #b91c1c; padding:10px; text-align:center; color:#b91c1c; font-weight:bold;">** תנאי החלפה: החלפה תתبצע אך وרק בתנאי שאריזת הניילون לא נפתحة.</div>
+                    <div style="margin-top:20px; font-size:11pt; color:black;">החשبوנית תישלח במייל לאחר המסירה. נא לשלוح כתובת מייل.</div>
                     <div style="text-align:center; margin-top:50px;"><svg id="bp"></svg><br><b>שירות לקוחות: *9935</b></div>
                 </div>`;
         } else {
@@ -396,9 +402,9 @@
             container.innerHTML = `
                 <div class="print-page sticker-size" dir="rtl">
                     <div style="text-align:center; border-bottom:2px solid #000; font-weight:bold; font-size:18pt; color:black;">מערכת MAD</div>
-                    <div style="font-size:12pt; line-height:1.5; margin:10px 0; color:black;">שם: ${o.name}<br>כתובת: ${o.address || o.city || "-"}<br>טלפון: ${o.phone}<br>משלוח: ${deliveryName}</div>
+                    <div style="font-size:12pt; line-height:1.5; margin:10px 0; color:black;">שם: ${o.name}<br>כתوبת: ${o.address || o.city || "-"}<br>טלפון: ${o.phone}<br>משלוח: ${deliveryName}</div>
                     <div style="border:2.2px solid #000; padding:8px; background:#f9f9f9; color:black;">תיאור: ${o.offer}</div>
-                    <div style="font-size:8.5pt; border:1.1px solid red; color:red; text-align:center; font-weight:bold; padding:4px; margin-top:10px;">החלפה אך ורק בתנאי שהניילון לא נפתח</div>
+                    <div style="font-size:8.5pt; border:1.1px solid red; color:red; text-align:center; font-weight:bold; padding:4px; margin-top:10px;">החלפה אך وרק בתנאי שהניילون לא נפתח</div>
                     <div style="text-align:center; margin-top:10px;"><svg id="bp"></svg></div>
                 </div>`;
         }
