@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>מערכת MAD - ניהול הזמנות</title>
+    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+    <style>
+        :root {
+            /* نظام الألوان الداكن */
+            --primary: #60a5fa; /* أزرق مشرق للبروز */
+            --accent: #3b82f6;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg-dark: #0f172a; /* خلفية داكنة جداً */
+            --card-dark: #1e293b; /* خلفية الكروت */
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --cancel-bg: #450a0a;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            margin: 0; padding: 0;
+            display: flex; flex-direction: column; align-items: center;
+            min-height: 100vh;
+            padding-bottom: 80px;
+        }
+
+        /* واجهة المستخدم */
+        #app-ui { width: 100%; display: flex; flex-direction: column; align-items: center; }
+
+        .header-ui {
+            width: 100%; max-width: 600px; background: #1e293b;
+            padding: 15px; box-sizing: border-box;
+            position: sticky; top: 0; z-index: 900;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+
+        .search-input {
+            width: 100%; padding: 12px; border: 1px solid #334155;
+            border-radius: 12px; font-size: 16px; margin-bottom: 10px;
+            box-sizing: border-box; outline: none; text-align: right;
+            background: #0f172a; color: white;
+        }
+
+        .tabs-container { display: flex; gap: 8px; }
+        .tab-btn {
+            flex: 1; padding: 10px; border-radius: 10px; border: 1px solid #334155;
+            background: #334155; font-size: 11px; font-weight: bold; cursor: pointer; color: var(--text-muted);
+        }
+        .tab-btn.active { background: var(--accent); color: white; border-color: var(--accent); }
+
+        .container { width: 95%; max-width: 500px; margin-top: 15px; }
+
+        /* كرت الطلب */
+        .order-card {
+            background: var(--card-dark); border-radius: 16px; padding: 15px;
+            margin-bottom: 15px; border-right: 8px solid #475569;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
+            transition: transform 0.2s;
+        }
+        .order-card:active { transform: scale(0.98); }
+        
+        .status-waiting { border-right-color: var(--warning); }
+        .status-contacted { border-right-color: var(--primary); }
+        .status-delivered { border-right-color: var(--success); }
+        .status-canceled { border-right-color: var(--danger); background: var(--cancel-bg); opacity: 0.8; }
+
+        .check-green { color: var(--success); font-weight: bold; margin-left: 8px; font-size: 20px; }
+        .x-red { color: var(--danger); font-weight: bold; margin-left: 8px; font-size: 20px; }
+
+        .actions-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-top: 12px; }
+        .btn-op {
+            padding: 10px 4px; border-radius: 8px; font-size: 11px;
+            font-weight: bold; border: none; cursor: pointer;
+            display: flex; flex-direction: column; align-items: center; gap: 4px;
+            background: #334155; color: white;
+        }
+        .btn-wa { background: #065f46; color: #a7f3d0; }
+        .btn-print { background: #1e3a8a; color: #bfdbfe; }
+        .btn-invoice { background: #701a75; color: #f5d0fe; }
+        .btn-contact { background: #1e40af; color: white; }
+        .btn-cancel { background: #7f1d1d; color: #fecaca; }
+
+        .bottom-nav {
+            position: fixed; bottom: 0; width: 100%; max-width: 600px;
+            background: #1e293b; display: flex; box-shadow: 0 -4px 10px rgba(0,0,0,0.3); z-index: 1000;
+        }
+        .nav-item { flex: 1; padding: 15px; text-align: center; border: none; background: none; font-weight: bold; color: var(--text-muted); }
+        .nav-item.active { color: var(--primary); border-top: 3px solid var(--primary); background: #0f172a; }
+
+        /* نظام الطباعة المعزول (خلفية بيضاء دائماً) */
+        #print-container { display: none; }
+        @media print {
+            body { background: white !important; color: black !important; }
+            #app-ui, .bottom-nav, .header-ui { display: none !important; }
+            #print-container { display: block !important; width: 100%; }
+            .print-page { display: block !important; page-break-after: always; margin: 0 auto; background: white !important; color: black !important; }
+            .invoice-size { width: 210mm; min-height: 297mm; padding: 15mm; box-sizing: border-box; }
+            .sticker-size { width: 100mm; height: 100mm; padding: 5mm; box-sizing: border-box; }
+            @page { margin: 0; }
+            svg { display: inline-block !important; }
+        }
+
+        /* ستايلات الفاتورة A4 الاحترافية */
+        .inv-header { text-align: center; border-bottom: 4px solid #1e3a8a; padding-bottom: 10px; margin-bottom: 20px; }
+        .inv-title { font-size: 26pt; font-weight: 900; color: #1e3a8a; margin: 0; }
+        .inv-client-box { background: #f8fafc; padding: 15px; border-radius: 8px; margin: 20px 0; border-right: 6px solid #1e3a8a; font-size: 13pt; line-height: 1.8; color: black; }
+        .inv-table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 13pt; color: black; }
+        .inv-table th { background: #f1f5f9; padding: 12px; text-align: right; border-bottom: 2px solid #1e3a8a; color: black; }
+        .inv-table td { padding: 12px; border-bottom: 1px solid #e2e8f0; color: black; }
+        .warn-box { border: 1.5px solid #b91c1c; padding: 10px; text-align: center; color: #b91c1c; font-weight: bold; margin-top: 15px; }
+    </style>
+</head>
+<body>
+
+<div id="app-ui">
+    <div id="header-ui" class="header-ui">
+        <input type="text" class="search-input" id="searchInput" placeholder="חפש לפי שם או טלפון..." oninput="handleFilter()">
+        <div class="tabs-container">
+            <button class="tab-btn active" id="tab-all" onclick="setFilter('all')">20 אחרונות</button>
+            <button class="tab-btn" id="tab-new" onclick="setFilter('new')">ממתין לשיחה</button>
+            <button class="tab-btn" id="tab-prep" onclick="setFilter('prep')">בוצעה שיחה</button>
+        </div>
+    </div>
+    <div class="container" id="mainContainer">
+        <div id="ordersList"></div>
+    </div>
+</div>
+
+<div class="bottom-nav">
+    <button class="nav-item active" onclick="location.reload()">הזמנות</button>
+</div>
+
+<!-- حاوية الطباعة -->
+<div id="print-container"></div>
+
+<script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw2QxGHOxMv7_uNbMulwO60IHOcKj16rbBJRfoltkwcdb2Bg4zrVjyMt_lf9KgnyyXl/exec";
+    let allData = [];
+    let currentTab = 'all';
+    let localSessionStore = {}; 
+
+    async function fetchOrders() {
+        try {
+            const res = await fetch(`${SCRIPT_URL}?action=get&t=${Date.now()}`);
+            const data = await res.json();
+            allData = data;
+            handleFilter();
+        } catch(e) { console.error("Sync Error"); }
+    }
+
+    function setFilter(tab) {
+        currentTab = tab;
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById('tab-' + tab).classList.add('active');
+        handleFilter();
+    }
+
+    function handleFilter() {
+        const query = document.getElementById('searchInput').value.toLowerCase();
+        let filtered = [...allData].reverse();
+
+        filtered.forEach(o => {
+            const uniqueKey = o.orderId || o.phone;
+            if(localSessionStore[uniqueKey]) o.status = localSessionStore[uniqueKey];
+        });
+
+        if (currentTab === 'new') filtered = filtered.filter(o => !o.status || o.status.includes('Processing') || o.status.includes('ממתין'));
+        else if (currentTab === 'prep') filtered = filtered.filter(o => o.status === 'בוצעה שיחה');
+        else filtered = filtered.slice(0, 20);
+
+        if (query) {
+            filtered = filtered.filter(o => (o.name && o.name.toLowerCase().includes(query)) || (o.phone && o.phone.includes(query)));
+        }
+        renderOrders(filtered);
+    }
+
+    function renderOrders(orders) {
+        const list = document.getElementById('ordersList');
+        list.innerHTML = '';
+        orders.forEach(o => {
+            let status = o.status || 'ממתין לשיחה';
+            if (status === 'Processing...') status = 'ממתין לשיחה';
+            
+            const isContacted = status === 'בוצעה שיחה' || status.includes('Delivered');
+            const isDone = status.includes('Delivered');
+            const isCanceled = status.includes('מבוטל');
+            
+            const card = document.createElement('div');
+            let statusClass = "status-waiting";
+            if (isContacted) statusClass = "status-contacted";
+            if (isDone) statusClass = "status-delivered";
+            if (isCanceled) statusClass = "status-canceled";
+
+            card.className = `order-card ${statusClass}`;
+            card.innerHTML = `
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <b style="font-size:17px; color:${isCanceled ? '#64748b' : 'var(--text-main)'}; ${isCanceled ? 'text-decoration:line-through;' : ''}">
+                        ${isContacted && !isCanceled ? '<span class="check-green">✔</span>' : ''}
+                        ${isCanceled ? '<span class="x-red">❌</span>' : ''}
+                        ${o.name}
+                    </b>
+                    <span style="font-size:10px; background:#334155; padding:2px 6px; border-radius:4px; font-weight:bold; color:var(--text-muted);">
+                        ${status}
+                    </span>
+                </div>
+                <div style="font-size:13px; margin:5px 0; color:var(--text-muted);">📞 ${o.phone} | 📍 ${o.city || '-'}</div>
+                <div style="background:#0f172a; padding:8px; border-radius:8px; font-size:12px; border:1px solid #334155; color:var(--text-main);">
+                    <b>הזמנה:</b> ${o.offer}
+                </div>
+                <div class="actions-grid" style="${isDone || isCanceled ? 'opacity: 0.3; pointer-events: none;' : ''}">
+                    <button class="btn-op btn-invoice" onclick="generatePDF('invoice', ${JSON.stringify(o).replace(/"/g, '&quot;')})">📄 חשבונית PDF</button>
+                    <button class="btn-op btn-print" onclick="generatePDF('sticker', ${JSON.stringify(o).replace(/"/g, '&quot;')})">🖨️ מדבקה</button>
+                    <button class="btn-op btn-wa" onclick="sendWA('${o.phone}', '${o.name}', '${o.offer}')">💬 וואטסאפ</button>
+                    <button class="btn-op ${isContacted ? '' : 'btn-contact'}" onclick="updateStatusLocal('${o.orderId || o.phone}', '${o.rowIndex}', 'בוצעה שיחה')">
+                        ${isContacted ? '✅ בוצעה שיחה' : '📞 בוצע שיחה'}
+                    </button>
+                    <button class="btn-op btn-cancel" onclick="updateStatusLocal('${o.orderId || o.phone}', '${o.rowIndex}', 'מבוטל ❌')">❌ ביטול</button>
+                    <button class="btn-op" style="background:var(--success); color:white;" onclick="updateStatusLocal('${o.orderId || o.phone}', '${o.rowIndex}', 'Delivered ✅')">✅ נמסר</button>
+                </div>
+            `;
+            list.appendChild(card);
+        });
+    }
+
+    async function updateStatusLocal(idKey, row, s) {
+        if(s === 'מבוטל ❌' && !confirm("האם אתה בטוח שברצונך לבטל? (هل أنت متأكد من الإلغاء؟)")) return;
+        localSessionStore[idKey] = s;
+        handleFilter();
+        try { fetch(`${SCRIPT_URL}?action=updateStatus&row=${row}&status=${encodeURIComponent(s)}`); } catch(e) {}
+    }
+
+    function generatePDF(type, o) {
+        const container = document.getElementById('print-container');
+        container.innerHTML = '';
+        const date = new Date().toLocaleDateString('he-IL');
+
+        if (type === 'invoice') {
+            document.title = `Invoice_${o.name}`;
+            container.innerHTML = `
+                <div class="print-page invoice-size" dir="rtl">
+                    <div class="inv-header">
+                        <h1 class="inv-title">מערכת MAD לניהול הזמנות</h1>
+                        <p style="font-size:14pt; color:#444; margin:5px 0;">אלגנטיות ודיוק בכל הזמנה</p>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; font-weight:bold; color:black;">
+                        <div>מספר הזמנה: ${o.orderId || 'MAD-NEW'}</div>
+                        <div>תאריך הנפקה: ${date}</div>
+                    </div>
+                    <div class="inv-client-box">
+                        <b style="font-size:16pt; color:#1e3a8a;">חשבונית עבור: (تفاصيل العميل)</b><br>
+                        שם: ${o.name}<br>כתובת: ${o.address || o.city || "-"}<br>טלפון: ${o.phone}
+                    </div>
+                    <table class="inv-table">
+                        <thead><tr style="background:#f1f5f9;"><th>תיאור ומוצר (C)</th><th>סטטוס</th><th>מחיר</th></tr></thead>
+                        <tbody><tr><td><b>${o.offer}</b></td><td>בטיפול</td><td><b>₪ 150.00</b></td></tr></tbody>
+                    </table>
+                    <div class="warn-box">** תנאי החלפה: החלפה תתבצע אך ורק בתנאי שאריזת הניילון לא נפתחה.<br>التبديل خلال 14 يوم بشرط عدم فتح النايلون</div>
+                    <div style="margin-top:20px; font-size:11pt; color:black; line-height:1.5;">
+                        החשבונית תישלח במייל לאחר קבלת המשלוח. נא לשלוח את כתובת המייל לשירות הלקוחות.<br>
+                        سنرسل الفاتورة بالإيميل بعد تسليم الطلب - يرجى إرسال الإيميل لخدمة العملاء.
+                    </div>
+                    <div style="text-align:center; margin-top:50px;"><svg id="bp"></svg><br><b style="color:black;">שירות לקוחות: *9935</b></div>
+                </div>`;
+        } else {
+            document.title = `Sticker_${o.name}`;
+            container.innerHTML = `
+                <div class="print-page sticker-size" dir="rtl">
+                    <div style="text-align:center; border-bottom:2px solid #000; padding-bottom:5px; font-weight:bold; font-size:18pt;">מערכת MAD</div>
+                    <div style="font-size:12pt; line-height:1.5; margin:10px 0; color:black;">
+                        שם: ${o.name}<br>כתובת: ${o.address || o.city || "-"}<br>טלפון: ${o.phone}
+                    </div>
+                    <div style="border:2.2px solid #000; padding:8px; font-size:11pt; background:#f9f9f9; color:black;">תיאור: ${o.offer}</div>
+                    <div style="font-size:8.5pt; border:1.1px solid red; color:red; text-align:center; font-weight:bold; padding:3px; margin-top:10px;">החלפה אך ורק בתנאי שהניילון לא נפתח</div>
+                    <div style="text-align:center; margin-top:10px;"><svg id="bp"></svg></div>
+                </div>`;
+        }
+        JsBarcode("#bp", o.phone, { format: "CODE128", width: 2, height: 40, displayValue: false });
+        setTimeout(() => { window.print(); document.title = "מערכת MAD"; }, 600);
+    }
+
+    function sendWA(p, n, off) {
+        const cp = p.startsWith('0') ? '972' + p.substring(1) : p;
+        const msg = `*שלום ${n}, הזמנתך ב-MAD התקבלה*\n📦 פריט: ${off}\n📢 החלפה תוך 14 יום בתנאי שהניילון סגור.`;
+        window.open(`https://wa.me/${cp}?text=${encodeURIComponent(msg)}`, '_blank');
+    }
+
+    window.onload = fetchOrders;
+    setInterval(fetchOrders, 45000);
+</script>
+</body>
+</html>
