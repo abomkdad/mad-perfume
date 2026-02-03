@@ -117,10 +117,12 @@
       background: var(--btn-gray); border: 1px solid rgba(212,175,55,0.4);
       padding: 12px 5px; border-radius: 15px; text-decoration: none; color: white;
       display: flex; flex-direction: column; align-items: center; justify-content: center;
+      min-height: 78px;
     }
     .action-item i { font-size: 18px; color: var(--gold); margin-bottom: 6px; }
     .action-item span { font-size: 11px; font-weight: 900; }
-    .action-item .hotline { font-size: 10px; color: var(--gold); font-weight: 900; }
+    .action-item .desc { font-size: 10px; font-weight: 800; opacity: .9; margin-top: 3px; }
+    .action-item .hotline { font-size: 10px; color: var(--gold); font-weight: 900; margin-top: 3px; }
 
     .container { max-width: 800px; margin: -25px auto 50px; padding: 0 15px; }
 
@@ -128,7 +130,15 @@
       background: var(--gold); color: #000; border: none; padding: 12px 20px;
       border-radius: 30px; font-weight: 900; font-size: 14px; cursor: pointer;
       display: flex; align-items: center; justify-content: center; gap: 10px;
-      margin: 0 auto 25px; box-shadow: 0 6px 20px rgba(212,175,55,0.4);
+      margin: 0 auto 10px; box-shadow: 0 6px 20px rgba(212,175,55,0.4);
+    }
+    .gps-sub {
+      text-align: center;
+      font-size: 11px;
+      font-weight: 900;
+      color: rgba(212,175,55,.95);
+      margin-bottom: 25px;
+      opacity: .95;
     }
 
     .branch-card {
@@ -142,7 +152,16 @@
     .distance-tag { font-size: 10px; color: var(--gold); margin-top: 4px; display: block; }
 
     .btn-group { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
-    .btn { padding: 10px 5px; border-radius: 10px; text-decoration: none; color: white; font-weight: 800; font-size: 11px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+    .btn {
+      padding: 10px 5px; border-radius: 10px; text-decoration: none; color: white;
+      font-weight: 900; font-size: 11px; text-align: center;
+      display: flex; flex-direction: column; align-items: center; gap: 4px;
+      line-height: 1.05;
+      min-height: 58px;
+      justify-content: center;
+    }
+    .btn span { font-size: 11px; font-weight: 900; }
+    .btn small { font-size: 9px; font-weight: 800; opacity: .95; }
     .bg-wa { background: var(--wa-green); }
     .bg-waze { background: var(--waze-blue); color: #000; }
     .bg-enter { background: var(--btn-gray); }
@@ -178,20 +197,26 @@
   <header>
     <div class="logo"><img src="https://abomkdad.github.io/Digital-Business-Card/logo.png"></div>
     <div class="brand-name">MAD PARFUMEUR ISRAEL</div>
+
     <div class="action-grid">
       <a href="tel:*9935" class="action-item" id="csBtn">
         <i class="fas fa-phone-alt"></i>
         <span id="l-cs"></span>
+        <div class="desc" id="l-cs-desc"></div>
         <div class="hotline">*9935</div>
       </a>
+
       <a id="wa-corp-btn" href="#" class="action-item">
         <i class="fab fa-whatsapp"></i>
         <span id="l-wa"></span>
+        <div class="desc" id="l-wa-desc"></div>
         <div class="hotline">050-978-7730</div>
       </a>
+
       <a href="https://www.mad-parfumeur.com/frangaize.html" target="_blank" class="action-item" id="agentBtn">
         <i class="fas fa-certificate"></i>
         <span id="l-agent"></span>
+        <div class="desc" id="l-agent-desc"></div>
         <div class="hotline">Official Agent</div>
       </a>
     </div>
@@ -202,11 +227,13 @@
       <i class="fas fa-location-arrow"></i>
       <span id="l-gps-btn"></span>
     </button>
+    <div class="gps-sub" id="l-gps-sub"></div>
+
     <div id="branchesList">...</div>
   </div>
 
   <div class="trust-bar" id="trustBar" onclick="toggleOverlay(true)">
-    <div class="btn bg-wa" style="padding: 5px 12px; font-size:10px; flex-direction: row; gap:5px; height: auto;">
+    <div class="btn bg-wa" style="padding: 5px 12px; font-size:10px; flex-direction: row; gap:5px; height: auto; min-height: unset;">
       <span id="l-cta"></span> <i class="fas fa-chevron-left"></i>
     </div>
     <div style="text-align: right;">
@@ -224,33 +251,108 @@
 
   <script>
     /* =========================
-       ✅ SAFE DOM SETTERS
+       ✅ SAFE DOM HELPERS
     ========================== */
     const $id = (id) => document.getElementById(id);
     function setText(id, value) { const el = $id(id); if (el) el.textContent = value; }
     function setHref(id, value) { const el = $id(id); if (el) el.href = value; }
 
-    const userLang = (navigator.language || '').startsWith("he") ? "he" : "ar";
+    /* =========================
+       ✅ AUTO LANGUAGE FIX (AR/HE + iw)
+       - supports: he / iw / ar
+       - respects navigator.languages order
+       - optional override: ?lang=ar OR ?lang=he (and saves to localStorage)
+    ========================== */
+    function detectLang() {
+      try {
+        const qs = new URLSearchParams(location.search);
+        const urlLang = (qs.get('lang') || '').toLowerCase();
+        if (urlLang === 'ar' || urlLang === 'he') {
+          localStorage.setItem('lang', urlLang);
+          return urlLang;
+        }
+
+        const saved = (localStorage.getItem('lang') || '').toLowerCase();
+        if (saved === 'ar' || saved === 'he') return saved;
+
+        const langs = (navigator.languages && navigator.languages.length ? navigator.languages : [navigator.language || ''])
+          .map(x => String(x || '').toLowerCase());
+
+        // respect order: first matching wins
+        for (const l of langs) {
+          if (l.startsWith('ar')) return 'ar';
+          if (l.startsWith('he') || l.startsWith('iw')) return 'he';
+        }
+
+        return 'ar';
+      } catch(e) {
+        return 'ar';
+      }
+    }
+
+    const userLang = detectLang();
+    document.documentElement.lang = userLang;
+    document.documentElement.dir = 'rtl';
+
     const t = ({
       ar: {
-        cs: "خدمة الزبائن", wa: "واتساب الشركة", agent: "وكيل معتمد", store: "المتجر أونلاين",
-        gps_btn: "تحديد الفرع الأقرب لي", bar_main: "عطور أصلية بمعايير عالمية", cta: "اكتشف الفرق",
-        open: "مفتوح الآن", closed: "مغلق حالياً", enter: "دخول الفرع", wa_btn: "واتساب",
-        dist: "على بعد {d} كم", wa_msg: "مرحباً MAD، أريد الاستفسار عن عطوركم.", close: "إغلاق ✕"
+        cs: "خدمة الزبائن",
+        cs_desc: "اتصال مباشر للدعم",
+        wa: "واتساب الشركة",
+        wa_desc: "استفسارات وطلبات",
+        agent: "وكيل معتمد",
+        agent_desc: "شهادة موثوقة",
+        store: "المتجر أونلاين",
+        gps_btn: "تحديد الفرع الأقرب لي",
+        gps_sub: "رتّب الفروع حسب موقعك",
+        bar_main: "عطور أصلية بمعايير عالمية",
+        cta: "اكتشف الفرق",
+        open: "مفتوح الآن",
+        closed: "مغلق حالياً",
+        enter: "دخول الفرع",
+        wa_btn: "واتساب",
+        wa_btn_desc: "طلب واستفسار",
+        waze_desc: "موقع على الخريطة",
+        enter_desc: "عروض الفرع",
+        dist: "على بعد {d} كم",
+        wa_msg: "مرحباً MAD، أريد الاستفسار عن عطوركم.",
+        close: "إغلاق ✕"
       },
       he: {
-        cs: "שירות לקוחות", wa: "וואטסאפ חברה", agent: "משווק מורשה", store: "חנות אונליין",
-        gps_btn: "מצא את הסניף הקרוב אלי", bar_main: "בשמים מקוריים בסטנדרט עולמי", cta: "גלה את ההבדל",
-        open: "פתוח עכשיו", closed: "סגור כעת", enter: "כניסה לסניף", wa_btn: "וואטסאפ",
-        dist: "במרחק {d} ק\"מ", wa_msg: "שלום MAD، אני מעוניין לקבל פרטים על הבשמים שלכם.", close: "סגור ✕"
+        cs: "שירות לקוחות",
+        cs_desc: "תמיכה טלפונית מהירה",
+        wa: "וואטסאפ חברה",
+        wa_desc: "ייעוץ והזמנות",
+        agent: "משווק מורשה",
+        agent_desc: "אישור רשמי",
+        store: "חנות אונליין",
+        gps_btn: "מצא את הסניף הקרוב אלי",
+        gps_sub: "ממיין סניפים לפי מיקום",
+        bar_main: "בשמים מקוריים בסטנדרט עולמי",
+        cta: "גלה את ההבדל",
+        open: "פתוח עכשיו",
+        closed: "סגור כעת",
+        enter: "כניסה לסניף",
+        wa_btn: "וואטסאפ",
+        wa_btn_desc: "הזמנה/פרטים",
+        waze_desc: "ניווט לסניף",
+        enter_desc: "צפה במבצעים",
+        dist: "במרחק {d} ק\"מ",
+        wa_msg: "שלום MAD، אני מעוניין לקבל פרטים על הבשמים שלכם.",
+        close: "סגור ✕"
       }
     })[userLang];
 
+    // Apply translations
     setText('l-cs', t.cs);
+    setText('l-cs-desc', t.cs_desc);
     setText('l-wa', t.wa);
+    setText('l-wa-desc', t.wa_desc);
     setText('l-agent', t.agent);
+    setText('l-agent-desc', t.agent_desc);
     setText('l-store-btn', t.store);
     setText('l-gps-btn', t.gps_btn);
+    setText('l-gps-sub', t.gps_sub);
     setText('l-bar-main', t.bar_main);
     setText('l-cta', t.cta);
     setText('l-close', t.close);
@@ -258,12 +360,11 @@
     setHref('wa-corp-btn', `https://wa.me/972509787730?text=${encodeURIComponent(t.wa_msg)}`);
 
     /* =========================
-       ✅ PRECISE TRACKING MAP
-       فتح الصفحة: (already) PageView + ttq.page + PAGE_VIEW
-       مشاهدة: Meta ViewContent / TikTok ViewContent / Snap VIEW_CONTENT
-       ليد:   Meta Lead / TikTok Lead / Snap SIGN_UP
+       ✅ PRECISE TRACKING MAP (as you requested)
+       فتح الصفحة: done by pixels (Meta PageView / TikTok page / Snap PAGE_VIEW)
+       مشاهدة: ViewContent (Meta/TikTok/Snap)
+       ليد:   Lead (Meta/TikTok) + SIGN_UP (Snap)
     ========================== */
-
     function eid() {
       return 'e' + Date.now().toString(36) + Math.random().toString(36).slice(2,8);
     }
@@ -276,14 +377,8 @@
         page: location.pathname,
         url: location.href
       }, extra || {});
-
-      // Meta: ViewContent
       try { if (typeof fbq === 'function') fbq('track', 'ViewContent', payload, { eventID }); } catch(e) {}
-
-      // TikTok: ViewContent
       try { if (typeof ttq !== 'undefined' && ttq && typeof ttq.track === 'function') ttq.track('ViewContent', payload); } catch(e) {}
-
-      // Snap: VIEW_CONTENT
       try { if (typeof snaptr === 'function') snaptr('track', 'VIEW_CONTENT', payload); } catch(e) {}
     }
 
@@ -295,31 +390,18 @@
         page: location.pathname,
         url: location.href
       }, extra || {});
-
-      // Meta: Lead
       try { if (typeof fbq === 'function') fbq('track', 'Lead', payload, { eventID }); } catch(e) {}
-
-      // TikTok: Lead
       try { if (typeof ttq !== 'undefined' && ttq && typeof ttq.track === 'function') ttq.track('Lead', payload); } catch(e) {}
-
-      // Snap: SIGN_UP (lead-like)
       try { if (typeof snaptr === 'function') snaptr('track', 'SIGN_UP', payload); } catch(e) {}
     }
 
-    // ✅ Page open (فتح الصفحة) is already tracked by pixels (PageView/page/PAGE_VIEW)
-    // If you also want "view_portal" as ViewContent, uncomment next line:
-    // trackView('view_portal');
-
-    /* =========================
-       ✅ Click Tracking (exact per your list)
-    ========================== */
+    // Click tracking exactly
     document.addEventListener('click', function(e) {
       const a = e.target.closest('a');
       if (!a) return;
 
       const href = (a.getAttribute('href') || '').trim();
 
-      // Detect branch name (if clicked inside a branch card)
       let branchName = '';
       const card = a.closest('.branch-card');
       if (card) {
@@ -327,48 +409,47 @@
         branchName = title ? title.textContent.trim() : '';
       }
 
-      // 1) مشاهدة متجر اونلاين
+      // مشاهدة متجر اونلاين
       if (a.id === 'storeFloat' || a.classList.contains('online-store-float')) {
         trackView('view_store', { href });
         return;
       }
 
-      // 2) مشاهدة وكيل معتمد
+      // مشاهدة وكيل معتمد
       if (a.id === 'agentBtn' || href.includes('/frangaize.html')) {
         trackView('view_official_agent', { href });
         return;
       }
 
-      // 3) خدمة الزباين = ليد
+      // خدمة الزباين = ليد
       if (a.id === 'csBtn' || href.startsWith('tel:')) {
         trackLead('lead_customer_service', { href });
         return;
       }
 
-      // 4) واتساب الشركة = ليد
+      // واتساب الشركة = ليد
       if (a.id === 'wa-corp-btn') {
         trackLead('lead_whatsapp_company', { href });
         return;
       }
 
-      // Branch dynamic buttons
       const isBranchWA = a.classList.contains('bg-wa') && href.includes('wa.me');
       const isWaze = a.classList.contains('bg-waze');
       const isEnter = a.classList.contains('bg-enter');
 
-      // 5) واتساب الفرع = ليد
+      // واتساب الفرع = ليد
       if (isBranchWA) {
         trackLead('lead_whatsapp_branch', { href, branch: branchName });
         return;
       }
 
-      // 6) ويز = ليد
+      // ويز = ليد
       if (isWaze) {
         trackLead('lead_waze', { href, branch: branchName });
         return;
       }
 
-      // 7) دخول الفرع = مشاهدة
+      // دخول الفرع = مشاهدة
       if (isEnter) {
         trackView('view_enter_branch', { href, branch: branchName });
         return;
@@ -376,7 +457,7 @@
     }, true);
 
     /* =========================
-       ✅ Branch loading (same as before)
+       ✅ Branch loading (safe)
     ========================== */
     let allBranches = [];
 
@@ -433,6 +514,19 @@
       }
     }
 
+    function isBranchOpen(b) {
+      const now = new Date();
+      const days = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
+      const day = days[now.getDay()];
+      const current = now.getHours() * 60 + now.getMinutes();
+      if (!b || !b.schedule || !b.schedule[day]) return false;
+      return b.schedule[day].some(r => {
+        const [sH, sM] = r[0].split(':').map(Number);
+        const [eH, eM] = r[1].split(':').map(Number);
+        return current >= (sH*60+sM) && current < (eH*60+eM);
+      });
+    }
+
     function render(list) {
       const container = $id('branchesList');
       if (!container) return;
@@ -459,27 +553,28 @@
               ● ${isOpen ? t.open : t.closed}
             </div>
           </div>
+
           <div class="btn-group">
-            <a href="https://wa.me/${phone}?text=${encodeURIComponent(t.wa_msg)}" class="btn bg-wa"><i class="fab fa-whatsapp"></i>${t.wa_btn}</a>
-            <a href="${waze}" target="_blank" class="btn bg-waze"><i class="fab fa-waze"></i>Waze</a>
-            <a href="offer.html?branch=${encodeURIComponent(id)}" class="btn bg-enter"><i class="fas fa-gift"></i>${t.enter}</a>
+            <a href="https://wa.me/${phone}?text=${encodeURIComponent(t.wa_msg)}" class="btn bg-wa">
+              <i class="fab fa-whatsapp"></i>
+              <span>${t.wa_btn}</span>
+              <small>${t.wa_btn_desc}</small>
+            </a>
+
+            <a href="${waze}" target="_blank" class="btn bg-waze">
+              <i class="fab fa-waze"></i>
+              <span>Waze</span>
+              <small>${t.waze_desc}</small>
+            </a>
+
+            <a href="offer.html?branch=${encodeURIComponent(id)}" class="btn bg-enter">
+              <i class="fas fa-gift"></i>
+              <span>${t.enter}</span>
+              <small>${t.enter_desc}</small>
+            </a>
           </div>
         `;
         container.appendChild(card);
-      });
-    }
-
-    function isBranchOpen(b) {
-      const now = new Date();
-      const days = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
-      const day = days[now.getDay()];
-      const current = now.getHours() * 60 + now.getMinutes();
-      if (!b || !b.schedule || !b.schedule[day]) return false;
-
-      return b.schedule[day].some(r => {
-        const [sH, sM] = r[0].split(':').map(Number);
-        const [eH, eM] = r[1].split(':').map(Number);
-        return current >= (sH*60+sM) && current < (eH*60+eM);
       });
     }
 
