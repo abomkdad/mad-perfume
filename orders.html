@@ -3,683 +3,330 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>MAD Manager</title>
-
+  <title>MAD Manager - Simple</title>
   <link rel="icon" type="image/png" href="https://www.mad-parfumeur.com/assets/hero/logo.png">
-  <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
-
   <style>
     :root{
-      --bg:#0b1220;
-      --card:#111c33;
-      --line:#22304d;
-      --text:#f8fafc;
-      --muted:#9fb0c6;
-      --primary:#60a5fa;
-      --success:#22c55e;
-      --warn:#f59e0b;
-      --danger:#ef4444;
-      --darkbtn:#0e1830;
-      --shadow: 0 10px 30px rgba(0,0,0,.35);
-      --radius:18px;
+      --bg:#0b1220; --card:#111c33; --line:#22304d; --text:#f8fafc; --muted:#9fb0c6;
+      --primary:#2563eb; --success:#16a34a; --warn:#d97706; --danger:#b91c1c;
+      --shadow:0 10px 30px rgba(0,0,0,.35); --r:18px;
     }
-    *{ box-sizing:border-box; }
-    body{
-      margin:0;
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
-      background:var(--bg);
-      color:var(--text);
-      display:flex;
-      justify-content:center;
-      padding-bottom:90px;
-    }
-    .app{
-      width:100%;
-      max-width:650px;
-    }
-    .top{
-      position:sticky;
-      top:0;
-      z-index:999;
-      background:rgba(11,18,32,.92);
-      backdrop-filter: blur(8px);
-      border-bottom:1px solid var(--line);
-      padding:14px 14px 10px;
-    }
-    .topRow{
-      display:flex;
-      align-items:center;
-      gap:10px;
-    }
-    .logo{
-      width:42px;height:42px;border-radius:12px;
-      background:#0f172a;
-      border:1px solid var(--line);
-      display:flex;align-items:center;justify-content:center;
-      overflow:hidden;
-      box-shadow: var(--shadow);
-      flex:0 0 auto;
-    }
-    .logo img{ width:100%; height:100%; object-fit:cover; }
-    .title{
-      flex:1;
-      line-height:1.1;
-    }
-    .title b{ display:block; font-size:18px; }
-    .title span{ display:block; color:var(--muted); font-weight:800; font-size:12px; margin-top:4px; }
-    .btn{
-      border:none;
-      cursor:pointer;
-      border-radius:14px;
-      padding:12px 12px;
-      font-weight:1000;
-      color:var(--text);
-      background:var(--darkbtn);
-      border:1px solid var(--line);
-      box-shadow: var(--shadow);
-      transition:.15s;
-      user-select:none;
-    }
-    .btn:active{ transform:scale(.98); }
-    .btnWide{
-      width:100%;
-      display:flex;
-      gap:10px;
-      justify-content:center;
-      align-items:center;
-      font-size:16px;
-      padding:14px;
-      border-radius:16px;
-    }
-    .btnPrimary{ background:rgba(96,165,250,.18); border-color:rgba(96,165,250,.35); }
-    .btnSuccess{ background:rgba(34,197,94,.18); border-color:rgba(34,197,94,.35); }
-    .btnWarn{ background:rgba(245,158,11,.18); border-color:rgba(245,158,11,.35); color:#fff; }
-    .btnDanger{ background:rgba(239,68,68,.18); border-color:rgba(239,68,68,.35); }
-    .btnSolidPrimary{ background: #2563eb; border-color:#2563eb; }
-    .btnSolidSuccess{ background: #16a34a; border-color:#16a34a; }
-    .btnSolidDanger{ background: #b91c1c; border-color:#b91c1c; }
-    .btnSolidWarn{ background:#d97706; border-color:#d97706; }
-
-    .stats{
-      margin-top:10px;
-      display:grid;
-      grid-template-columns:1fr 1fr 1fr;
-      gap:8px;
-    }
-    .stat{
-      background:rgba(17,28,51,.7);
-      border:1px solid var(--line);
-      border-radius:16px;
-      padding:10px;
-      text-align:center;
-      box-shadow: var(--shadow);
-      font-weight:1000;
-    }
-    .stat small{ display:block; color:var(--muted); font-size:11px; margin-bottom:6px; }
-    .stat b{ font-size:18px; }
-    .statNew{ border-bottom:4px solid var(--warn); }
-    .statWork{ border-bottom:4px solid var(--primary); }
-    .statReady{ border-bottom:4px solid var(--success); }
-
-    .searchRow{
-      display:flex;
-      gap:8px;
-      margin-top:10px;
-    }
-    .search{
-      flex:1;
-      border-radius:16px;
-      border:1px solid var(--line);
-      background:#081127;
-      color:var(--text);
-      padding:14px;
-      font-weight:900;
-      outline:none;
-      box-shadow: var(--shadow);
-    }
-    .search::placeholder{ color:#6b7d98; font-weight:900; }
-
-    .content{
-      padding:14px;
-    }
-    .sectionTitle{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      margin:14px 0 10px;
-      color:var(--muted);
-      font-weight:1000;
-      font-size:13px;
-      border-bottom:1px solid var(--line);
-      padding-bottom:8px;
-    }
-    .sectionTitle strong{ color:var(--text); }
-    .card{
-      background:var(--card);
-      border:1px solid var(--line);
-      border-radius:var(--radius);
-      padding:14px;
-      box-shadow: var(--shadow);
-      margin-bottom:12px;
-    }
-    .cardHead{
-      display:flex;
-      justify-content:space-between;
-      gap:10px;
-      align-items:flex-start;
-    }
-    .name{
-      font-size:18px;
-      font-weight:1000;
-      line-height:1.2;
-    }
-    .badge{
-      font-size:12px;
-      font-weight:1000;
-      padding:6px 10px;
-      border-radius:999px;
-      border:1px solid var(--line);
-      background:#0a1430;
-      color:var(--muted);
-      white-space:nowrap;
-    }
-    .meta{
-      margin-top:8px;
-      display:flex;
-      flex-wrap:wrap;
-      gap:8px;
-      color:var(--muted);
-      font-weight:900;
-      font-size:12px;
-    }
-    .offer{
-      margin-top:10px;
-      background:#0a1430;
-      border:1px solid var(--line);
-      border-radius:16px;
-      padding:12px;
-      font-weight:1000;
-      font-size:14px;
-    }
-    .row2{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:10px;
-      margin-top:10px;
-    }
-    .field{
-      background:#ffffff;
-      border-radius:16px;
-      border:2px solid rgba(96,165,250,.45);
-      padding:10px;
-      color:#000;
-    }
-    .field label{
-      display:block;
-      font-size:11px;
-      font-weight:1000;
-      margin-bottom:6px;
-      color:#0b1220;
-    }
-    .field input, .field select{
-      width:100%;
-      border:none;
-      outline:none;
-      background:transparent;
-      font-size:18px;
-      font-weight:1000;
-      color:#000;
-    }
-
-    .actions{
-      display:grid;
-      grid-template-columns:1fr 1fr 1fr;
-      gap:10px;
-      margin-top:12px;
-    }
-    .actions .btnWide{ padding:14px 10px; font-size:15px; }
-
-    .bottomBar{
-      position:fixed;
-      bottom:0;
-      left:50%;
-      transform:translateX(-50%);
-      width:100%;
-      max-width:650px;
-      display:flex;
-      gap:10px;
-      padding:10px 14px;
-      background:rgba(11,18,32,.95);
-      border-top:1px solid var(--line);
-      z-index:1000;
-    }
-    .bottomBar .btn{ flex:1; padding:14px; font-size:16px; }
-
-    /* Modal */
-    .modalWrap{
-      position:fixed;
-      inset:0;
-      background:rgba(0,0,0,.55);
-      display:none;
-      align-items:center;
-      justify-content:center;
-      padding:16px;
-      z-index:2000;
-    }
-    .modal{
-      width:100%;
-      max-width:520px;
-      background:var(--card);
-      border:1px solid var(--line);
-      border-radius:22px;
-      padding:14px;
-      box-shadow: var(--shadow);
-    }
-    .modal h3{
-      margin:0 0 12px 0;
-      font-size:18px;
-      font-weight:1000;
-    }
-    .formGrid{
-      display:grid;
-      grid-template-columns:1fr;
-      gap:10px;
-    }
-    .in{
-      width:100%;
-      border-radius:16px;
-      border:1px solid var(--line);
-      background:#081127;
-      color:var(--text);
-      padding:14px;
-      font-weight:900;
-      outline:none;
-      font-size:15px;
-    }
-    textarea.in{ min-height:90px; resize:none; }
-    .modalActions{
-      display:flex;
-      gap:10px;
-      margin-top:12px;
-    }
-    .modalActions .btn{ flex:1; }
-
-    /* Toast */
-    .toast{
-      position:fixed;
-      top:-120px;
-      left:50%;
-      transform:translateX(-50%);
-      background:var(--warn);
-      color:#000;
-      font-weight:1000;
-      padding:14px 18px;
-      border-radius:999px;
-      box-shadow: var(--shadow);
-      transition:.5s;
-      z-index:3000;
-    }
-    .toast.show{ top:18px; }
-
-    .empty{
-      text-align:center;
-      color:var(--muted);
-      padding:26px 10px;
-      font-weight:1000;
-    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:system-ui,Segoe UI,Arial;background:var(--bg);color:var(--text);display:flex;justify-content:center;padding-bottom:80px}
+    .app{width:100%;max-width:680px}
+    .top{position:sticky;top:0;z-index:999;background:rgba(11,18,32,.93);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);padding:14px}
+    .head{display:flex;gap:10px;align-items:center}
+    .logo{width:44px;height:44px;border-radius:14px;overflow:hidden;border:1px solid var(--line);box-shadow:var(--shadow);background:#0f172a}
+    .logo img{width:100%;height:100%;object-fit:cover}
+    .title{flex:1;line-height:1.1}
+    .title b{display:block;font-size:18px}
+    .title span{display:block;margin-top:4px;font-size:12px;font-weight:900;color:var(--muted)}
+    .row{display:flex;gap:10px;margin-top:10px}
+    .search{flex:1;border-radius:16px;border:1px solid var(--line);background:#081127;color:var(--text);padding:14px;font-weight:900;outline:none;box-shadow:var(--shadow)}
+    .btn{border:none;cursor:pointer;border-radius:16px;padding:14px;font-weight:1000;font-size:16px;color:var(--text);box-shadow:var(--shadow);transition:.12s;user-select:none}
+    .btn:active{transform:scale(.98)}
+    .btnPrimary{background:var(--primary)}
+    .btnSuccess{background:var(--success)}
+    .btnWarn{background:var(--warn)}
+    .btnDanger{background:var(--danger)}
+    .content{padding:14px}
+    .sec{margin:14px 0 10px;padding-bottom:8px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;color:var(--muted);font-weight:1000}
+    .sec strong{color:var(--text)}
+    .card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:14px;box-shadow:var(--shadow);margin-bottom:12px}
+    .name{font-size:20px;font-weight:1000}
+    .meta{margin-top:8px;display:flex;flex-wrap:wrap;gap:8px;color:var(--muted);font-weight:900;font-size:12px}
+    .offer{margin-top:10px;background:#0a1430;border:1px solid var(--line);border-radius:16px;padding:12px;font-weight:1000}
+    .bigLine{margin-top:10px;padding:10px;border-radius:14px;border:1px dashed rgba(22,163,74,.7);background:rgba(22,163,74,.12);font-weight:1000}
+    .field{margin-top:10px;background:#fff;border-radius:16px;border:2px solid rgba(37,99,235,.35);padding:10px;color:#000}
+    .field label{display:block;font-size:11px;font-weight:1000;margin-bottom:6px}
+    .field input,.field select,.field textarea{width:100%;border:none;outline:none;background:transparent;font-size:16px;font-weight:1000}
+    .actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+    .actions3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:12px}
+    .empty{text-align:center;color:var(--muted);padding:20px;font-weight:1000}
+    .toast{position:fixed;top:-120px;left:50%;transform:translateX(-50%);background:#f59e0b;color:#000;font-weight:1000;padding:12px 16px;border-radius:999px;box-shadow:var(--shadow);transition:.5s;z-index:2000}
+    .toast.show{top:16px}
+    .err{margin-top:10px;background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.35);padding:10px;border-radius:14px;color:#fecaca;font-weight:1000}
+    /* modal */
+    .modalWrap{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;padding:16px;z-index:3000}
+    .modal{width:100%;max-width:560px;background:var(--card);border:1px solid var(--line);border-radius:22px;padding:14px;box-shadow:var(--shadow)}
+    .modal h3{margin:0 0 12px 0;font-size:18px;font-weight:1000}
+    .grid{display:grid;grid-template-columns:1fr;gap:10px}
   </style>
 </head>
-
 <body>
   <div class="toast" id="toast">تم ✅</div>
 
   <div class="app">
     <div class="top">
-      <div class="topRow">
-        <div class="logo">
-          <img src="https://www.mad-parfumeur.com/assets/hero/logo.png" alt="MAD">
-        </div>
+      <div class="head">
+        <div class="logo"><img src="https://www.mad-parfumeur.com/assets/hero/logo.png" alt="MAD"></div>
         <div class="title">
-          <b>نسخة المدير ✅</b>
-          <span>اعتماد + شركة توصيل + تعديل السعر + إلغاء + تسليم للمندوب</span>
+          <b>نسخة المدير (سهل جدًا)</b>
+          <span>زر إرسال للتجهيز + زر تعديل + زر إلغاء</span>
         </div>
-        <button class="btn btnPrimary" onclick="activateAudio()">🔔 صوت</button>
+        <button class="btn btnPrimary" onclick="sync()">↻</button>
       </div>
 
-      <div class="stats">
-        <div class="stat statNew"><small>طلبات جديدة</small><b id="cNew">0</b></div>
-        <div class="stat statWork"><small>قيد التجهيز</small><b id="cWork">0</b></div>
-        <div class="stat statReady"><small>جاهز للتسليم</small><b id="cReady">0</b></div>
-      </div>
-
-      <div class="searchRow">
+      <div class="row">
         <input id="q" class="search" placeholder="ابحث بالاسم أو الهاتف..." oninput="render()">
-        <button class="btn btnPrimary" onclick="sync()">🔄 تحديث</button>
+        <button class="btn btnWarn" onclick="openAdd()">➕</button>
       </div>
+      <div id="errBox"></div>
     </div>
 
-    <div class="content">
-      <div id="list"></div>
-    </div>
-
-    <div class="bottomBar">
-      <button class="btn btnSolidPrimary" onclick="openAdd()">➕ إضافة طلب</button>
-      <button class="btn btnSuccess" onclick="sync()">↻ تحديث الآن</button>
-    </div>
+    <div class="content" id="list"></div>
   </div>
 
-  <!-- Add Modal -->
-  <div class="modalWrap" id="modalWrap" onclick="closeAdd(event)">
+  <!-- Edit/Add Modal -->
+  <div class="modalWrap" id="modalWrap" onclick="closeModal(event)">
     <div class="modal" onclick="event.stopPropagation()">
-      <h3>➕ إضافة طلب جديد (يدوي)</h3>
-      <div class="formGrid">
-        <input id="in_name" class="in" placeholder="اسم الزبون">
-        <input id="in_phone" class="in" placeholder="الهاتف">
-        <input id="in_addr" class="in" placeholder="العنوان / المدينة">
-        <input id="in_offer" class="in" placeholder="الطلب (C)">
-        <input id="in_price" class="in" placeholder="السعر ₪ (مثال 500)" value="500" inputmode="numeric">
-        <textarea id="in_notes" class="in" placeholder="ملاحظات (اختياري)"></textarea>
+      <h3 id="modalTitle">✏️ تعديل الطلب</h3>
+      <div class="grid">
+        <div class="field"><label>اسم</label><input id="m_name"></div>
+        <div class="field"><label>هاتف</label><input id="m_phone"></div>
+        <div class="field"><label>مدينة / عنوان</label><input id="m_city"></div>
+        <div class="field"><label>الطلب (C)</label><input id="m_offer"></div>
+        <div class="field"><label>السعر ₪</label><input id="m_price" inputmode="numeric"></div>
+        <div class="field"><label>ملاحظات</label><textarea id="m_notes" rows="3"></textarea></div>
       </div>
-
-      <div class="modalActions">
-        <button class="btn btnDanger" onclick="closeAdd()">إغلاق</button>
-        <button class="btn btnSolidSuccess" onclick="saveOrder()">✅ حفظ</button>
+      <div class="actions" style="margin-top:12px">
+        <button class="btn btnDanger" onclick="closeModal()">إغلاق</button>
+        <button class="btn btnSuccess" onclick="saveEdit()">✅ حفظ</button>
       </div>
     </div>
   </div>
 
 <script>
-  // ✅ رابط الـ Apps Script Web App
-  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw2QxGHOxMv7_uNbMulwO60IHOcKj16rbBJRfoltkwcdb2Bg4zrVjyMt_lf9KgnyyXl/exec";
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzNkx4pMGWNhH8BBBI_7qC61iYUgLjRlfJ877cwiQtKQaY5sXqq9Pmcg8zeCDaM9G9r/exec";
 
   let all = [];
-  let audioCtx = null;
-
-  // Persist maps
-  let deliveryMap = JSON.parse(localStorage.getItem("mad_delivery_map") || "{}");
-  let priceMap = JSON.parse(localStorage.getItem("mad_price_map") || "{}");
-  let statusLocal = JSON.parse(localStorage.getItem("mad_status_map") || "{}"); // optional local cache
+  let editing = null; // {rowIndex, orderId}
 
   function toast(msg){
     const t = document.getElementById("toast");
     t.textContent = msg;
     t.classList.add("show");
-    setTimeout(()=>t.classList.remove("show"), 2500);
-  }
-
-  function activateAudio(){
-    try{
-      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      toast("🔔 تم تفعيل الصوت");
-    }catch(e){
-      toast("❌ جهازك لا يدعم الصوت");
-    }
+    setTimeout(()=>t.classList.remove("show"), 2200);
   }
 
   async function sync(){
+    document.getElementById("errBox").innerHTML = "";
     try{
       const res = await fetch(`${SCRIPT_URL}?action=get&t=${Date.now()}`, { cache:"no-store" });
       const data = await res.json();
-      all = Array.isArray(data) ? data : [];
+
+      if (!Array.isArray(data)) {
+        document.getElementById("errBox").innerHTML =
+          `<div class="err">⚠️ خطأ بالـ GET: ${escapeHtml(JSON.stringify(data))}</div>`;
+        all = [];
+      } else {
+        all = data;
+      }
+
       render();
     }catch(e){
-      console.error(e);
-      toast("❌ مشكلة اتصال");
+      document.getElementById("errBox").innerHTML = `<div class="err">⚠️ فشل اتصال: ${escapeHtml(String(e))}</div>`;
+      all = [];
+      render();
     }
   }
 
-  function getS(o){
-    return String(statusLocal[o.orderId] || o.status || "");
-  }
-  function setS(orderId, s){
-    statusLocal[orderId] = s;
-    localStorage.setItem("mad_status_map", JSON.stringify(statusLocal));
-  }
-  function getPrice(o){
-    const p = priceMap[o.orderId] ?? o.price ?? "500";
-    const only = String(p).replace(/[^\d]/g,"");
-    return only || "150";
-  }
-  function saveMaps(){
-    localStorage.setItem("mad_delivery_map", JSON.stringify(deliveryMap));
-    localStorage.setItem("mad_price_map", JSON.stringify(priceMap));
-  }
-
-  function updateCounters(){
-    let n=0,w=0,r=0;
-    all.forEach(o=>{
-      const s = getS(o);
-      if (s.includes("Canceled") || s.includes("❌")) return;
-      if (s.includes("Delivered")) return;
-
-      if (s.includes("מוכן")) r++;
-      else if (s.includes("Approved") || s.includes("מאושר")) w++;
-      else n++;
-    });
-    document.getElementById("cNew").textContent = n;
-    document.getElementById("cWork").textContent = w;
-    document.getElementById("cReady").textContent = r;
-  }
-
-  function normalizePhone(p){
-    let d = String(p||"").replace(/[^\d]/g,"");
-    if (d.startsWith("00")) d = d.slice(2);
-    if (d.startsWith("9720")) d = "972" + d.slice(4);
-    if (d.startsWith("0")) {
-      if (d.startsWith("059") && d.length >= 10) d = "970" + d.slice(1);
-      else if (d.startsWith("05") && d.length >= 10) d = "972" + d.slice(1);
-      else if (d.length >= 9) d = "972" + d.slice(1);
-    }
-    if (d.length === 9 && d.startsWith("5")) d = "972" + d;
-    if (d.length === 9 && d.startsWith("59")) d = "970" + d;
-    return d;
-  }
-
-  function sendWA(phone, name, offer, orderId, price){
-    const p = normalizePhone(phone);
-    const total = `₪${(price||"150")}.00`;
-    const msg =
-`*MAD* 🖤
-أهلاً بك *${name}*
-📦 الطلب: ${offer}
-📄 رقم: ${orderId}
-💰 الإجمالي: ${total}
-✨ خدمة العملاء: 9935*`;
-    window.open(`https://wa.me/${p}?text=${encodeURIComponent(msg)}`, "_blank");
-  }
-
-  async function updateStatus(rowIndex, orderId, status){
-    setS(orderId, status);
-    render();
-
-    try{
-      await fetch(`${SCRIPT_URL}?action=updateStatus&row=${encodeURIComponent(rowIndex)}&orderId=${encodeURIComponent(orderId)}&status=${encodeURIComponent(status)}&t=${Date.now()}`, { cache:"no-store" });
-      toast("✅ تم تحديث الحالة");
-    }catch(e){
-      toast("⚠️ تم محليًا (تحقق من السكربت)");
-    }
-  }
-
-  async function updatePrice(rowIndex, orderId, price){
-    const p = String(price||"").replace(/[^\d]/g,"");
-    if(!p){ toast("❌ أدخل سعر صحيح"); return; }
-    priceMap[orderId] = p;
-    saveMaps();
-    render();
-
-    try{
-      await fetch(`${SCRIPT_URL}?action=updatePrice&row=${encodeURIComponent(rowIndex)}&orderId=${encodeURIComponent(orderId)}&price=${encodeURIComponent(p)}&t=${Date.now()}`, { cache:"no-store" });
-      toast("✅ تم حفظ السعر");
-    }catch(e){
-      toast("⚠️ تم محليًا (تحقق من السكربت)");
-    }
-  }
-
-  function card(o){
-    const s = getS(o);
-    const q = (document.getElementById("q").value || "").toLowerCase();
-    const name = String(o.name || "-");
-    const phone = String(o.phone || "-");
-    const city = String(o.city || "-");
-    const offer = String(o.offer || "-");
-    const row = o.rowIndex;
-    const orderId = o.orderId || "";
-    const price = getPrice(o);
-
-    const match = name.toLowerCase().includes(q) || phone.includes(q) || offer.toLowerCase().includes(q);
-    if(q && !match) return "";
-
-    const isDelivered = s.includes("Delivered");
-    const isCanceled = s.includes("Canceled") || s.includes("❌");
-    const isReady = s.includes("מוכן") && !isDelivered && !isCanceled;
-    const isApproved = (s.includes("Approved") || s.includes("מאושר")) && !isReady && !isDelivered && !isCanceled;
-    const isNew = !isApproved && !isReady && !isDelivered && !isCanceled;
-
-    let badge = "جديد";
-    if(isApproved) badge = "معتمد / قيد التجهيز";
-    if(isReady) badge = "جاهز للتسليم";
-    if(isDelivered) badge = "تم التسليم";
-    if(isCanceled) badge = "ملغي";
-
-    const del = deliveryMap[orderId] || "";
-    const approveDisabled = (!del || !isNew);
-
-    return `
-      <div class="card">
-        <div class="cardHead">
-          <div>
-            <div class="name">${escapeHtml(name)}</div>
-            <div class="meta">
-              <span>📞 ${escapeHtml(phone)}</span>
-              <span>📍 ${escapeHtml(city)}</span>
-              <span>💰 ₪${escapeHtml(price)}</span>
-            </div>
-          </div>
-          <div class="badge">${escapeHtml(badge)}</div>
-        </div>
-
-        <div class="offer">📦 ${escapeHtml(offer)}</div>
-
-        <div class="row2">
-          <div class="field">
-            <label>💰 تعديل السعر (₪)</label>
-            <input type="number" inputmode="numeric" min="0" value="${escapeHtml(price)}"
-              oninput="priceMap['${escapeAttr(orderId)}']=this.value; saveMaps()">
-            <button class="btn btnSolidWarn btnWide" style="margin-top:8px" onclick="updatePrice('${row}','${escapeAttr(orderId)}', priceMap['${escapeAttr(orderId)}'] || '${escapeAttr(price)}')">💾 حفظ السعر</button>
-          </div>
-
-          <div class="field">
-            <label>🚚 شركة التوصيل (مطلوب للاعتماد)</label>
-            <select onchange="deliveryMap['${escapeAttr(orderId)}']=this.value; saveMaps(); render()">
-              <option value="">-- اختر شركة --</option>
-              <option value="High Express" ${del==="High Express"?"selected":""}>High Express</option>
-              <option value="Marwah Delivery" ${del==="Marwah Delivery"?"selected":""}>Marwah Delivery</option>
-              <option value="Lama Delivery" ${del==="Lama Delivery"?"selected":""}>Lama Delivery</option>
-              <option value="Areen Delivery" ${del==="Areen Delivery"?"selected":""}>Areen Delivery</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="actions">
-          <button class="btn btnSolidSuccess btnWide" ${approveDisabled?"disabled":""}
-            onclick="updateStatus('${row}','${escapeAttr(orderId)}','Approved ✅ (משלוח: ${escapeAttr(del)})')">✅ اعتماد</button>
-
-          <button class="btn btnSolidPrimary btnWide" onclick="sendWA('${escapeAttr(phone)}','${escapeAttr(name)}','${escapeAttr(offer)}','${escapeAttr(orderId)}','${escapeAttr(priceMap[orderId]||price)}')">💬 واتساب</button>
-
-          ${isReady
-            ? `<button class="btn btnSolidWarn btnWide" onclick="updateStatus('${row}','${escapeAttr(orderId)}','Delivered ✅')">✅ تسليم للمندوب</button>`
-            : `<button class="btn btnSolidDanger btnWide" ${(!isNew && !isApproved)?"disabled":""} onclick="updateStatus('${row}','${escapeAttr(orderId)}','Canceled ❌')">❌ إلغاء</button>`
-          }
-        </div>
-      </div>
-    `;
-  }
+  function isApproved(s){ s=String(s||""); return s.includes("Approved") || s.includes("מאושר"); }
+  function isReady(s){ s=String(s||""); return s.includes("מוכן"); }
+  function isDelivered(s){ s=String(s||""); return s.includes("Delivered"); }
+  function isCanceled(s){ s=String(s||""); return s.includes("Canceled") || s.includes("❌"); }
 
   function render(){
-    updateCounters();
+    const q = (document.getElementById("q").value||"").toLowerCase();
+    const rev = all.slice().reverse();
 
-    const newList = [];
-    const workList = [];
-    const readyList = [];
+    const news = [];
+    const sent = [];
+    const ready = [];
 
-    all.slice().reverse().forEach(o=>{
-      const s = getS(o);
-      if (s.includes("Delivered")) return;
-      if (s.includes("Canceled") || s.includes("❌")) return;
+    rev.forEach(o=>{
+      const s = String(o.status||"");
+      if (isDelivered(s) || isCanceled(s)) return;
 
-      if (s.includes("מוכן")) readyList.push(o);
-      else if (s.includes("Approved") || s.includes("מאושר")) workList.push(o);
-      else newList.push(o);
+      const match = String(o.name||"").toLowerCase().includes(q) ||
+                    String(o.phone||"").includes(q) ||
+                    String(o.offer||"").toLowerCase().includes(q);
+      if (q && !match) return;
+
+      if (isReady(s)) ready.push(o);
+      else if (isApproved(s)) sent.push(o);
+      else news.push(o);
     });
 
     let html = "";
-    html += `<div class="sectionTitle"><strong>طلبات جديدة</strong><span>${newList.length}</span></div>`;
-    html += newList.length ? newList.map(card).join("") : `<div class="empty">لا يوجد طلبات جديدة</div>`;
+    html += `<div class="sec"><strong>🟠 طلبات جديدة (لم تُعتمد)</strong><span>${news.length}</span></div>`;
+    html += news.length ? news.map(cardNew).join("") : `<div class="empty">لا يوجد</div>`;
 
-    html += `<div class="sectionTitle"><strong>قيد التجهيز</strong><span>${workList.length}</span></div>`;
-    html += workList.length ? workList.map(card).join("") : `<div class="empty">لا يوجد</div>`;
+    html += `<div class="sec"><strong>🔵 تم إرسالها للتجهيز</strong><span>${sent.length}</span></div>`;
+    html += sent.length ? sent.map(cardSent).join("") : `<div class="empty">لا يوجد</div>`;
 
-    html += `<div class="sectionTitle"><strong>جاهز للتسليم</strong><span>${readyList.length}</span></div>`;
-    html += readyList.length ? readyList.map(card).join("") : `<div class="empty">لا يوجد</div>`;
+    html += `<div class="sec"><strong>🟢 جاهز (تم التجهيز)</strong><span>${ready.length}</span></div>`;
+    html += ready.length ? ready.map(cardReady).join("") : `<div class="empty">لا يوجد</div>`;
 
     document.getElementById("list").innerHTML = html;
   }
 
-  function openAdd(){
+  function cardBase(o, extraTopHtml, buttonsHtml){
+    const price = String(o.price||"").replace(/[^\d]/g,"") || "150";
+    return `
+      <div class="card">
+        ${extraTopHtml || ""}
+        <div class="name">${escapeHtml(o.name||"-")}</div>
+        <div class="meta">
+          <span>📞 ${escapeHtml(o.phone||"-")}</span>
+          <span>📍 ${escapeHtml(o.city||"-")}</span>
+          <span>💰 ₪${escapeHtml(price)}</span>
+        </div>
+        <div class="offer">📦 ${escapeHtml(o.offer||"-")}</div>
+        ${o.notes ? `<div class="meta" style="margin-top:10px">📝 ${escapeHtml(o.notes)}</div>` : ""}
+        ${buttonsHtml}
+      </div>
+    `;
+  }
+
+  function cardNew(o){
+    const orderId = o.orderId || "";
+    const row = o.rowIndex;
+
+    const extra = `
+      <div class="field" style="margin-top:0">
+        <label>🚚 اختر شركة توصيل (ضروري)</label>
+        <select id="del_${escapeAttr(orderId)}">
+          <option value="">-- اختر --</option>
+          <option value="High Express">High Express</option>
+          <option value="Marwah Delivery">Marwah Delivery</option>
+          <option value="Lama Delivery">Lama Delivery</option>
+          <option value="Areen Delivery">Areen Delivery</option>
+        </select>
+      </div>
+    `;
+
+    const btns = `
+      <div class="actions3">
+        <button class="btn btnSuccess" onclick="sendToPrep('${row}','${escapeAttr(orderId)}')">✅ إرسال للتجهيز</button>
+        <button class="btn btnPrimary" onclick='openEdit(${safeJson(o)})'>✏️ تعديل</button>
+        <button class="btn btnDanger" onclick="updateStatus('${row}','${escapeAttr(orderId)}','Canceled ❌')">❌ إلغاء</button>
+      </div>
+    `;
+
+    return cardBase(o, extra, btns);
+  }
+
+  function cardSent(o){
+    const btns = `
+      <div class="bigLine">✅ تم إرسال هذا الطلب للتجهيز</div>
+      <div class="actions">
+        <button class="btn btnPrimary" onclick='openEdit(${safeJson(o)})'>✏️ تعديل</button>
+        <button class="btn btnDanger" onclick="updateStatus('${o.rowIndex}','${escapeAttr(o.orderId||"")}','Canceled ❌')">❌ إلغاء</button>
+      </div>
+    `;
+    return cardBase(o, "", btns);
+  }
+
+  function cardReady(o){
+    const btns = `
+      <div class="bigLine">✅ تم التجهيز — جاهز للتسليم</div>
+      <div class="actions">
+        <button class="btn btnWarn" onclick="updateStatus('${o.rowIndex}','${escapeAttr(o.orderId||"")}','Delivered ✅')">✅ تسليم للمندوب</button>
+        <button class="btn btnPrimary" onclick='openEdit(${safeJson(o)})'>✏️ تعديل</button>
+      </div>
+    `;
+    return cardBase(o, "", btns);
+  }
+
+  async function sendToPrep(row, orderId){
+    const sel = document.getElementById(`del_${orderId}`);
+    const del = sel ? sel.value : "";
+    if(!del){ toast("❌ اختر شركة توصيل"); return; }
+    const status = `Approved ✅ (משלוח: ${del})`;
+    await updateStatus(row, orderId, status);
+    toast("✅ تم إرسال للتجهيز");
+  }
+
+  async function updateStatus(row, orderId, status){
+    try{
+      await fetch(`${SCRIPT_URL}?action=updateStatus&row=${encodeURIComponent(row)}&orderId=${encodeURIComponent(orderId)}&status=${encodeURIComponent(status)}&t=${Date.now()}`, { cache:"no-store" });
+      // update local copy
+      const idx = all.findIndex(x => String(x.orderId) === String(orderId));
+      if(idx >= 0) all[idx].status = status;
+      render();
+    }catch(e){
+      toast("⚠️ فشل تحديث (افحص السكربت)");
+    }
+  }
+
+  function openEdit(o){
+    editing = { rowIndex: o.rowIndex, orderId: o.orderId };
+    document.getElementById("modalTitle").textContent = "✏️ تعديل الطلب";
+    document.getElementById("m_name").value = o.name || "";
+    document.getElementById("m_phone").value = o.phone || "";
+    document.getElementById("m_city").value = o.city || "";
+    document.getElementById("m_offer").value = o.offer || "";
+    document.getElementById("m_price").value = (String(o.price||"").replace(/[^\d]/g,"") || "150");
+    document.getElementById("m_notes").value = o.notes || "";
     document.getElementById("modalWrap").style.display = "flex";
   }
-  function closeAdd(e){
-    document.getElementById("modalWrap").style.display = "none";
+
+  function openAdd(){
+    editing = { rowIndex: "", orderId: "" }; // new -> POST
+    document.getElementById("modalTitle").textContent = "➕ إضافة طلب جديد";
+    ["m_name","m_phone","m_city","m_offer","m_notes"].forEach(id=>document.getElementById(id).value="");
+    document.getElementById("m_price").value = "150";
+    document.getElementById("modalWrap").style.display = "flex";
   }
 
-  async function saveOrder(){
-    const name = document.getElementById("in_name").value.trim();
-    const phone = document.getElementById("in_phone").value.trim();
-    const address = document.getElementById("in_addr").value.trim();
-    const offer = document.getElementById("in_offer").value.trim();
-    const price = String(document.getElementById("in_price").value || "150").replace(/[^\d]/g,"") || "150";
-    const notes = document.getElementById("in_notes").value.trim();
+  function closeModal(){ document.getElementById("modalWrap").style.display = "none"; }
 
-    if(!name || !phone || !offer){ toast("❌ اكتب الاسم + الهاتف + الطلب"); return; }
+  async function saveEdit(){
+    const name = (document.getElementById("m_name").value||"").trim();
+    const phone = (document.getElementById("m_phone").value||"").trim();
+    const city = (document.getElementById("m_city").value||"").trim();
+    const offer = (document.getElementById("m_offer").value||"").trim();
+    const price = String(document.getElementById("m_price").value||"150").replace(/[^\d]/g,"") || "150";
+    const notes = (document.getElementById("m_notes").value||"").trim();
 
-    const payload = {
-      name, phone,
-      address: address || "-",
-      offer,
-      price,
-      notes,
-      source: "Manager Manual",
-      lang: "ar",
-      payment: "Cash",
-      process: "Direct",
-      status: "Processing..."
-    };
-
-    try{
+    // NEW order -> POST
+    if(!editing || !editing.orderId){
+      if(!name || !phone || !offer){ toast("❌ اكتب الاسم + الهاتف + الطلب"); return; }
+      const payload = { name, phone, address: city || "-", offer, price, notes, source:"Manager Manual", lang:"ar", payment:"Cash", process:"Direct", status:"Processing..." };
       fetch(SCRIPT_URL, { method:"POST", mode:"no-cors", body: JSON.stringify(payload) });
       toast("✅ تم حفظ الطلب");
-      closeAdd();
-      // clear
-      ["in_name","in_phone","in_addr","in_offer","in_notes"].forEach(id=>document.getElementById(id).value="");
-      document.getElementById("in_price").value = "150";
-      setTimeout(sync, 600);
+      closeModal();
+      setTimeout(sync, 700);
+      return;
+    }
+
+    // update existing
+    const row = editing.rowIndex;
+    const orderId = editing.orderId;
+
+    try{
+      await fetch(`${SCRIPT_URL}?action=updateOrder&row=${encodeURIComponent(row)}&orderId=${encodeURIComponent(orderId)}&name=${encodeURIComponent(name)}&phone=${encodeURIComponent(phone)}&city=${encodeURIComponent(city)}&offer=${encodeURIComponent(offer)}&price=${encodeURIComponent(price)}&notes=${encodeURIComponent(notes)}&t=${Date.now()}`, { cache:"no-store" });
+      toast("✅ تم التعديل");
+      closeModal();
+      setTimeout(sync, 500);
     }catch(e){
-      toast("❌ فشل الحفظ");
+      toast("⚠️ فشل التعديل");
     }
   }
 
   function escapeHtml(str){
-    return String(str ?? "").replace(/[&<>"']/g, s => ({
-      "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
-    }[s]));
+    return String(str ?? "").replace(/[&<>"']/g, s => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[s]));
   }
   function escapeAttr(str){
-    return String(str ?? "").replace(/'/g, "\\'").replace(/"/g, '\\"');
+    return String(str ?? "").replace(/'/g,"\\'").replace(/"/g,'\\"');
+  }
+  function safeJson(obj){
+    return JSON.stringify(obj).replace(/</g,"\\u003c").replace(/>/g,"\\u003e").replace(/&/g,"\\u0026");
   }
 
-  // Start
   sync();
-  setInterval(sync, 25000);
+  setInterval(sync, 20000);
 </script>
 </body>
 </html>
