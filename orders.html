@@ -7,7 +7,6 @@
     <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
     <style>
         :root {
-            /* نظام الألوان الداكن المتميز */
             --primary: #60a5fa;
             --accent: #3b82f6;
             --success: #10b981;
@@ -31,13 +30,46 @@
             padding-bottom: 80px;
         }
 
-        #app-ui { width: 100%; display: flex; flex-direction: column; align-items: center; }
+        /* إشعار الطلب الجديد */
+        #notification-toast {
+            position: fixed;
+            top: -100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--warning);
+            color: #000;
+            padding: 15px 30px;
+            border-radius: 50px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            z-index: 10000;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: top 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+            font-size: 16px;
+        }
+        #notification-toast.show { top: 20px; }
 
         .header-ui {
             width: 100%; max-width: 600px; background: #1e293b;
             padding: 15px; box-sizing: border-box;
             position: sticky; top: 0; z-index: 900;
             box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+
+        .audio-activation {
+            background: var(--success);
+            color: white;
+            padding: 8px;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 12px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            border: none;
+            width: 100%;
+            font-weight: bold;
         }
 
         .search-input {
@@ -56,7 +88,6 @@
 
         .container { width: 95%; max-width: 500px; margin-top: 15px; }
 
-        /* كرت الطلب */
         .order-card {
             background: var(--card-dark); border-radius: 16px; padding: 15px;
             margin-bottom: 15px; border-right: 8px solid #475569;
@@ -71,21 +102,12 @@
         .check-green { color: var(--success); font-weight: bold; margin-left: 8px; font-size: 20px; }
         .x-red { color: var(--danger); font-weight: bold; margin-left: 8px; font-size: 20px; }
 
-        /* قسم شركة التوصيل - تحديث اللون للأسود */
         .delivery-box {
-            margin-top: 10px;
-            padding: 10px;
-            background: #ffffff; /* خلفية بيضاء لبروز النص الأسود */
-            border-radius: 10px;
-            border: 2px solid var(--primary);
+            margin-top: 10px; padding: 10px; background: #ffffff; border-radius: 10px; border: 2px solid var(--primary);
         }
         .delivery-label { font-size: 11px; color: #1e293b; font-weight: bold; margin-bottom: 5px; display: block; }
         .delivery-select {
             width: 100%; background: transparent; color: #000000; border: none; font-size: 15px; font-weight: bold; outline: none; cursor: pointer;
-        }
-        .other-delivery-input {
-            width: 100%; background: #f1f5f9; color: #000000; border: 1px solid #cbd5e1; border-radius: 5px; 
-            margin-top: 5px; padding: 8px; font-size: 13px; display: none; font-weight: bold;
         }
 
         .actions-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-top: 12px; }
@@ -105,14 +127,13 @@
             position: fixed; bottom: 0; width: 100%; max-width: 600px;
             background: #1e293b; display: flex; box-shadow: 0 -4px 10px rgba(0,0,0,0.3); z-index: 1000;
         }
-        .nav-item { flex: 1; padding: 15px; text-align: center; border: none; background: none; font-weight: bold; color: var(--text-muted); }
+        .nav-item { flex: 1; padding: 15px; text-align: center; border: none; background: none; font-weight: bold; color: var(--text-muted); cursor: pointer; }
         .nav-item.active { color: var(--primary); border-top: 3px solid var(--primary); background: #0f172a; }
 
-        /* نظام الطباعة */
         #print-container { display: none; }
         @media print {
             body { background: white !important; color: black !important; }
-            #app-ui, .bottom-nav, .header-ui { display: none !important; }
+            #app-ui, .bottom-nav, .header-ui, #notification-toast { display: none !important; }
             #print-container { display: block !important; width: 100%; }
             .print-page { display: block !important; page-break-after: always; margin: 0 auto; background: white !important; color: black !important; }
             .invoice-size { width: 210mm; min-height: 297mm; padding: 15mm; box-sizing: border-box; }
@@ -124,9 +145,17 @@
 </head>
 <body>
 
+<div id="notification-toast">
+    <span>🔔</span> יש לך הזמנה חדשה! (طلب جديد)
+</div>
+
 <div id="app-ui">
-    <div id="header-ui" class="header-ui">
+    <div class="header-ui">
+        <!-- زر تفعيل الرنين (ضروري للمتصفحات) -->
+        <button id="audioBtn" class="audio-activation" onclick="enableAudio()">לחץ כאן להפעלת צליל התראות (اضغط هنا لتفعيل الرنين)</button>
+        
         <input type="text" class="search-input" id="searchInput" placeholder="חפש לפי שם או טלפון..." oninput="handleFilter()">
+        
         <div class="tabs-container">
             <button class="tab-btn active" id="tab-all" onclick="setFilter('all')">20 אחרונות</button>
             <button class="tab-btn" id="tab-new" onclick="setFilter('new')">ממתין לשיחה</button>
@@ -142,7 +171,6 @@
     <button class="nav-item active" onclick="location.reload()">הזמנות</button>
 </div>
 
-<!-- حاوية الطباعة -->
 <div id="print-container"></div>
 
 <script>
@@ -151,14 +179,68 @@
     let currentTab = 'all';
     let localSessionStore = {}; 
     let localDeliveryStore = {}; 
+    
+    let lastOrderCount = 0;
+    let isFirstLoad = true;
+    let audioEnabled = false;
+
+    function enableAudio() {
+        audioEnabled = true;
+        document.getElementById('audioBtn').style.display = 'none';
+        // تشغيل صوت صامت لتفعيل المحرك
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+    }
 
     async function fetchOrders() {
         try {
             const res = await fetch(`${SCRIPT_URL}?action=get&t=${Date.now()}`);
             const data = await res.json();
+            
+            if (!isFirstLoad && data.length > lastOrderCount) {
+                triggerOrderAlert();
+            }
+            
+            lastOrderCount = data.length;
+            isFirstLoad = false;
             allData = data;
             handleFilter();
         } catch(e) { console.error("Sync Error"); }
+    }
+
+    function triggerOrderAlert() {
+        const toast = document.getElementById('notification-toast');
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 8000);
+
+        if (audioEnabled) {
+            playPhoneRing();
+        }
+    }
+
+    // محاكاة رنين الهاتف (نغمتين متناوبتين)
+    function playPhoneRing() {
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        
+        function ring(time) {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(660, time);
+            osc.frequency.exponentialRampToValueAtTime(440, time + 0.4);
+            gain.gain.setValueAtTime(0.5, time);
+            gain.gain.exponentialRampToValueAtTime(0.01, time + 0.4);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start(time);
+            osc.stop(time + 0.4);
+        }
+
+        // تكرار الرنة 4 مرات
+        for (let i = 0; i < 4; i++) {
+            ring(audioCtx.currentTime + (i * 0.8));
+            ring(audioCtx.currentTime + (i * 0.8) + 0.2);
+        }
     }
 
     function setFilter(tab) {
@@ -198,7 +280,6 @@
             const isContacted = status === 'בוצעה שיחה' || status.includes('Delivered');
             const isDone = status.includes('Delivered');
             const isCanceled = status.includes('מבוטל');
-
             const deliveryData = localDeliveryStore[uniqueKey] || { company: "", custom: "" };
             
             const card = document.createElement('div');
@@ -215,14 +296,10 @@
                         ${isCanceled ? '<span class="x-red">❌</span>' : ''}
                         ${o.name}
                     </b>
-                    <span style="font-size:10px; background:#334155; padding:2px 6px; border-radius:4px; font-weight:bold; color:var(--text-muted);">
-                        ${status}
-                    </span>
+                    <span style="font-size:10px; background:#334155; padding:2px 6px; border-radius:4px; font-weight:bold; color:var(--text-muted);">${status}</span>
                 </div>
                 <div style="font-size:13px; margin:5px 0; color:var(--text-muted);">📞 ${o.phone} | 📍 ${o.city || '-'}</div>
-                <div style="background:#0f172a; padding:8px; border-radius:8px; font-size:12px; border:1px solid #334155; color:var(--text-main);">
-                    <b>הזמנה:</b> ${o.offer}
-                </div>
+                <div style="background:#0f172a; padding:8px; border-radius:8px; font-size:12px; border:1px solid #334155; color:var(--text-main);"><b>הזמנה:</b> ${o.offer}</div>
 
                 <div class="delivery-box" style="${isDone || isCanceled ? 'opacity:0.4; pointer-events:none;' : ''}">
                     <span class="delivery-label">חברת משלוחים / شركة التوصيل:</span>
@@ -234,10 +311,6 @@
                         <option value="عرين" ${deliveryData.company === "عرين" ? "selected" : ""}>عرين</option>
                         <option value="آخر" ${deliveryData.company === "آخر" ? "selected" : ""}>آخر (מפורט)</option>
                     </select>
-                    <input type="text" class="other-delivery-input" id="other-${uniqueKey}" 
-                           placeholder="اسم الموصل..." value="${deliveryData.custom}"
-                           style="${deliveryData.company === "آخر" ? "display:block" : "display:none"}"
-                           oninput="updateDeliveryCustom('${uniqueKey}', this.value)">
                 </div>
 
                 <div class="actions-grid" style="${isDone || isCanceled ? 'opacity: 0.3; pointer-events: none;' : ''}">
@@ -258,14 +331,6 @@
     function updateDeliveryLocal(idKey, val) {
         if (!localDeliveryStore[idKey]) localDeliveryStore[idKey] = { company: "", custom: "" };
         localDeliveryStore[idKey].company = val;
-        const input = document.getElementById(`other-${idKey}`);
-        if (val === "آخر") input.style.display = "block";
-        else { input.style.display = "none"; localDeliveryStore[idKey].custom = ""; }
-    }
-
-    function updateDeliveryCustom(idKey, val) {
-        if (!localDeliveryStore[idKey]) localDeliveryStore[idKey] = { company: "آخر", custom: "" };
-        localDeliveryStore[idKey].custom = val;
     }
 
     async function updateStatusLocal(idKey, row, s) {
@@ -275,22 +340,10 @@
         try { fetch(`${SCRIPT_URL}?action=updateStatus&row=${row}&status=${encodeURIComponent(s)}`); } catch(e) {}
     }
 
-    // وظيفة إرسال واتساب (نسخة فاتورة مع شكر دافئ وبدون شروط)
     function sendInvoiceWA(phone, name, offer, id, city, idKey) {
         const delData = localDeliveryStore[idKey] || { company: "-", custom: "" };
-        const deliveryName = delData.company === "آخر" ? delData.custom : (delData.company || "בטיפול");
-        
-        const msg = `*תודה רבה מכל הלב - MAD SYSTEM* ❤️\n\n` +
-                    `שלום *${name}*,\n` +
-                    `אנו מודים לך מאוד על בחירתך בנו! להלן פרטי ההזמנה שלך:\n\n` +
-                    `📄 *חשבונית הזמנה:* ${id || "MAD-SYS"}\n` +
-                    `📦 *הפריט:* ${offer}\n` +
-                    `📍 *כתובת:* ${city || "-"}\n` +
-                    `🚚 *חברת משלוחים:* ${deliveryName}\n` +
-                    `💰 *סה"כ לתשלום:* ₪150.00\n\n` +
-                    `תודה שוב על האמון שלך, אנו מעריכים זאת מאוד! ✨\n` +
-                    `*שירות לקוחות: 9935**`;
-
+        const deliveryName = delData.company || "בטיפול";
+        const msg = `*תודה רבה מכל הלב - MAD SYSTEM* ❤️\n\nשלום *${name}*,\nאנו מודים לך מאוד על בחירתך בנו! להלן פרטי ההזמנה שלך:\n\n📄 *חשבונית:* ${id || "MAD-SYS"}\n📦 *הפריט:* ${offer}\n📍 *כתובת:* ${city || "-"}\n🚚 *חברת משלוחים:* ${deliveryName}\n💰 *סה"כ לתשלום:* ₪150.00\n\nתודה שוב על האמון שלך! ✨\n*שירות לקוחות: 9935**`;
         const cp = phone.startsWith('0') ? '972' + phone.substring(1) : phone;
         window.open(`https://wa.me/${cp.replace(/\D/g, '')}?text=${encodeURIComponent(msg)}`, '_blank');
     }
@@ -301,47 +354,28 @@
         const date = new Date().toLocaleDateString('he-IL');
         const uniqueKey = o.orderId || o.phone;
         const delData = localDeliveryStore[uniqueKey] || { company: "-", custom: "" };
-        const deliveryName = delData.company === "آخر" ? delData.custom : delData.company;
+        const deliveryName = delData.company;
 
         if (type === 'invoice') {
             document.title = `Invoice_${o.name}`;
             container.innerHTML = `
                 <div class="print-page invoice-size" dir="rtl">
-                    <div class="inv-header">
-                        <h1 class="inv-title">מערכת MAD לניהול הזמנות</h1>
-                        <p style="font-size:14pt; color:#444; margin:5px 0;">אלגנטיות ודיוק בכל הזמנה</p>
-                    </div>
-                    <div style="display:flex; justify-content:space-between; font-weight:bold; color:black;">
-                        <div>מספר הזמנה: ${o.orderId || 'MAD-NEW'}</div>
-                        <div>תאריך הנפקה: ${date}</div>
-                    </div>
-                    <div class="inv-client-box">
-                        <b style="font-size:16pt; color:#1e3a8a;">חשבונית עבור:</b><br>
-                        שם: ${o.name}<br>כתובת: ${o.address || o.city || "-"}<br>טלפון: ${o.phone}<br>
-                        חברת משלוחים: ${deliveryName || "-"}
-                    </div>
-                    <table class="inv-table">
-                        <thead><tr style="background:#f1f5f9;"><th>תיאור ומוצר (C)</th><th>סטטוס</th><th>מחיר</th></tr></thead>
-                        <tbody><tr><td><b>${o.offer}</b></td><td>בטיפול</td><td><b>₪ 150.00</b></td></tr></tbody>
-                    </table>
-                    <div class="warn-box">** תנאי החלפה: החלפה תתבצע אך ורק בתנאי שאריזת הניילון לא נפתחה.</div>
-                    <div style="margin-top:20px; font-size:11pt; color:black; line-height:1.5;">
-                        החשבונית תישלח במייל לאחר קבלת המשלוח. נא לשלוח את כתובת המייל לשירות הלקוחות.<br>
-                        سنرسل الفاتورة بالإيميل بعد تسليم الطلب - يرجى إرسال الإيميل لخدمة العملاء.
-                    </div>
-                    <div style="text-align:center; margin-top:50px;"><svg id="bp"></svg><br><b style="color:black;">שירות לקוחות: *9935</b></div>
+                    <div class="inv-header"><h1 style="font-size:26pt; color:#1e3a8a; margin:0;">מערכת MAD לניהול הזמנות</h1><p style="font-size:14pt; color:#444;">אלגנטיות ודיוק בכל הזמנה</p></div>
+                    <div style="display:flex; justify-content:space-between; font-weight:bold; color:black;"><div>מספר הזמנה: ${o.orderId || 'MAD-NEW'}</div><div>תאריך: ${date}</div></div>
+                    <div class="inv-client-box"><b>חשבונית עבור:</b><br>שם: ${o.name}<br>כתובת: ${o.address || o.city || "-"}<br>טלפון: ${o.phone}<br>חברת משלוחים: ${deliveryName || "-"}</div>
+                    <table class="inv-table"><thead><tr style="background:#f1f5f9;"><th>תיאור ומוצר</th><th>סטטוס</th><th>מחיר</th></tr></thead><tbody><tr><td><b>${o.offer}</b></td><td>בטיפול</td><td><b>₪ 150.00</b></td></tr></tbody></table>
+                    <div style="border:1.5px solid #b91c1c; padding:10px; text-align:center; color:#b91c1c; font-weight:bold;">** תנאי החלפה: החלפה תתבצע אך ורק בתנאי שאריזת הניילון לא נפתחה.</div>
+                    <div style="margin-top:20px; font-size:11pt; color:black;">בטיפול. החשבונית תישלח במייל לאחר קבלת המשלוח. נא לשלוח את כתובת המייל לשירות הלקוחות.</div>
+                    <div style="text-align:center; margin-top:50px;"><svg id="bp"></svg><br><b>שירות לקוחות: *9935</b></div>
                 </div>`;
         } else {
             document.title = `Sticker_${o.name}`;
             container.innerHTML = `
                 <div class="print-page sticker-size" dir="rtl">
-                    <div style="text-align:center; border-bottom:2px solid #000; padding-bottom:5px; font-weight:bold; font-size:18pt; color:black;">מערכת MAD</div>
-                    <div style="font-size:12pt; line-height:1.5; margin:10px 0; color:black;">
-                        שם: ${o.name}<br>כתובת: ${o.address || o.city || "-"}<br>טלפון: ${o.phone}<br>
-                        משלוח: ${deliveryName || "-"}
-                    </div>
-                    <div style="border:2.2px solid #000; padding:8px; font-size:11pt; background:#f9f9f9; color:black;">תיאור: ${o.offer}</div>
-                    <div style="font-size:8.5pt; border:1.1px solid red; color:red; text-align:center; font-weight:bold; padding:3px; margin-top:10px;">החלפה אך وרק בתנאי שהניילون לא נפתח</div>
+                    <div style="text-align:center; border-bottom:2px solid #000; font-weight:bold; font-size:18pt;">מערכת MAD</div>
+                    <div style="font-size:12pt; line-height:1.5; margin:10px 0;">שם: ${o.name}<br>כתובת: ${o.address || o.city || "-"}<br>טלפון: ${o.phone}<br>משלוח: ${deliveryName || "-"}</div>
+                    <div style="border:2.2px solid #000; padding:8px; background:#f9f9f9;">תיאור: ${o.offer}</div>
+                    <div style="font-size:8.5pt; border:1.1px solid red; color:red; text-align:center; font-weight:bold; padding:4px; margin-top:10px;">החלפה אך ורק בתנאי שהניילون לא נפתח</div>
                     <div style="text-align:center; margin-top:10px;"><svg id="bp"></svg></div>
                 </div>`;
         }
@@ -350,7 +384,7 @@
     }
 
     window.onload = fetchOrders;
-    setInterval(fetchOrders, 45000);
+    setInterval(fetchOrders, 30000);
 </script>
 </body>
 </html>
