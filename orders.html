@@ -1,419 +1,730 @@
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>מערכת MAD</title>
-    
-    <!-- PWA Settings -->
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="MAD System">
-    <link rel="apple-touch-icon" href="https://www.mad-parfumeur.com/assets/hero/logo.png">
-    <link rel="icon" href="https://www.mad-parfumeur.com/assets/hero/logo.png">
-    <link rel="manifest" href='data:application/manifest+json,{"name":"MAD System","short_name":"MAD","start_url":".","display":"standalone","background_color":"#0f172a","theme_color":"#1e293b","icons":[{"src":"https://www.mad-parfumeur.com/assets/hero/logo.png","sizes":"192x192","type":"image/png"}]}'>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>MAD System - Smart Integration</title>
 
-    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
-    <style>
-        :root {
-            --primary: #60a5fa;
-            --accent: #3b82f6;
-            --success: #10b981;
-            --warning: #f59e0b;
-            --danger: #ef4444;
-            --bg-dark: #0f172a;
-            --card-dark: #1e293b;
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-            --input-bg: #0f172a;
-            --cancel-bg: #450a0a;
-        }
+  <!-- PWA Settings -->
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="MAD System">
+  <link rel="apple-touch-icon" href="https://www.mad-parfumeur.com/assets/hero/logo.png">
+  <link rel="icon" type="image/png" href="https://www.mad-parfumeur.com/assets/hero/logo.png">
+  <link rel="manifest" href='data:application/manifest+json,{"name":"MAD System","short_name":"MAD","start_url":".","display":"standalone","background_color":"#0f172a","theme_color":"#1e293b","icons":[{"src":"https://www.mad-parfumeur.com/assets/hero/logo.png","sizes":"192x192","type":"image/png"}]}'>
 
-        body {
-            font-family: 'Segoe UI', Tahoma, sans-serif;
-            background-color: var(--bg-dark);
-            color: var(--text-main);
-            margin: 0; padding: 0;
-            display: flex; flex-direction: column; align-items: center;
-            min-height: 100vh;
-            padding-bottom: 80px;
-            -webkit-tap-highlight-color: transparent;
-        }
+  <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
 
-        #app-ui { width: 100%; display: flex; flex-direction: column; align-items: center; }
+  <style>
+    :root {
+      --primary: #60a5fa;
+      --accent: #3b82f6;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --bg-dark: #0f172a;
+      --card-dark: #1e293b;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+    }
 
-        .header-ui {
-            width: 100%; max-width: 600px; background: #1e293b;
-            padding: 15px; box-sizing: border-box;
-            position: sticky; top: 0; z-index: 900;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-            display: flex; flex-direction: column;
-        }
+    body {
+      font-family: 'Segoe UI', Tahoma, sans-serif;
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      margin: 0; padding: 0;
+      display: flex; flex-direction: column; align-items: center;
+      min-height: 100vh;
+      padding-bottom: 100px;
+      overflow-x: hidden;
+    }
 
-        .app-logo {
-            position: absolute; top: 12px; left: 12px; width: 35px; height: auto;
-            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)); z-index: 1001;
-        }
+    .header-ui {
+      width: 100%; max-width: 600px; background: #1e293b;
+      padding: 15px; box-sizing: border-box;
+      position: sticky; top: 0; z-index: 2000;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+    }
 
-        .audio-activation-wrap {
-            background: #27272a; border: 1px solid #3f3f46; padding: 8px; border-radius: 12px;
-            margin-bottom: 12px; text-align: center; width: 85%; margin-right: auto;
-        }
-        .audio-btn {
-            background: var(--success); color: white; padding: 10px; border-radius: 8px;
-            font-size: 13px; cursor: pointer; border: none; width: 100%; font-weight: bold;
-            display: flex; align-items: center; justify-content: center; gap: 8px;
-        }
+    .app-logo {
+      position: absolute; top: 12px; left: 12px; width: 38px; height: auto;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+    }
 
-        .search-input {
-            width: 100%; padding: 12px; border: 1px solid #334155; border-radius: 12px;
-            font-size: 16px; margin-bottom: 10px; box-sizing: border-box; outline: none;
-            text-align: right; background: var(--input-bg); color: white;
-        }
+    .view-title { margin-bottom: 10px; font-weight: bold; font-size: 14px; color: var(--primary); padding-right: 45px; }
 
-        .tabs-container { display: flex; gap: 8px; width: 100%; }
-        .tab-btn {
-            flex: 1; padding: 12px; border-radius: 10px; border: 1px solid #334155;
-            background: #334155; font-size: 12px; font-weight: bold; cursor: pointer; color: var(--text-muted);
-        }
-        .tab-btn.active { background: var(--accent); color: white; border-color: var(--accent); }
+    .dash-bar { display: flex; gap: 5px; margin-bottom: 10px; }
+    .stat-item { flex: 1; padding: 8px 5px; border-radius: 8px; text-align: center; font-size: 10px; font-weight: bold; background: #0f172a; border: 1px solid #334155; }
+    .stat-new { border-bottom: 3px solid var(--warning); }
+    .stat-prep { border-bottom: 3px solid var(--accent); }
+    .stat-ready { border-bottom: 3px solid var(--success); }
 
-        .container { width: 95%; max-width: 500px; margin-top: 15px; }
+    .search-input{
+      width:100%;
+      box-sizing:border-box;
+      padding:12px 14px;
+      border-radius:12px;
+      border:1px solid #334155;
+      background:#0b1220;
+      color:var(--text-main);
+      outline:none;
+      font-weight:800;
+    }
+    .search-input::placeholder{ color:#64748b; font-weight:800; }
 
-        .order-card {
-            background: var(--card-dark); border-radius: 16px; padding: 15px;
-            margin-bottom: 15px; border-right: 8px solid #475569;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2); position: relative;
-        }
-        
-        .status-waiting { border-right-color: var(--warning); }
-        .status-contacted { border-right-color: var(--primary); }
-        .status-delivered { border-right-color: var(--success); }
-        .status-canceled { border-right-color: var(--danger); background: var(--cancel-bg); opacity: 0.8; }
+    .bottom-nav {
+      position: fixed; bottom: 0; width: 100%; max-width: 600px;
+      background: #1e293b; display: flex; box-shadow: 0 -4px 15px rgba(0,0,0,0.5); z-index: 2000;
+    }
+    .nav-item { flex: 1; padding: 15px 5px; text-align: center; border: none; background: none; color: var(--text-muted); cursor: pointer; font-weight: bold; font-size: 11px; }
+    .nav-item.active { color: var(--primary); border-top: 3px solid var(--primary); background: #0f172a; }
 
-        .check-green { color: var(--success); font-weight: bold; margin-left: 8px; font-size: 20px; }
-        .x-red { color: var(--danger); font-weight: bold; margin-left: 8px; font-size: 20px; }
+    .section { display: none; width: 95%; max-width: 500px; margin-top: 15px; }
+    .section.active { display: block; animation: slideUp 0.3s ease; }
+    @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; } }
 
-        /* Delivery Company Box - Enforced Visuals */
-        .delivery-box {
-            margin-top: 10px; padding: 10px; background: #ffffff; border-radius: 10px; border: 2px solid var(--primary);
-            transition: all 0.3s;
-        }
-        .delivery-box.required {
-            border-color: var(--danger);
-            box-shadow: 0 0 10px rgba(239, 68, 68, 0.4);
-            animation: pulse-red 2s infinite;
-        }
-        @keyframes pulse-red {
-            0% { border-color: var(--danger); }
-            50% { border-color: #fca5a5; }
-            100% { border-color: var(--danger); }
-        }
+    .order-card {
+      background: var(--card-dark); border-radius: 20px; padding: 20px;
+      margin-bottom: 15px; border-right: 12px solid #475569;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.4); position: relative;
+    }
+    .status-new { border-right-color: var(--warning); }
+    .status-approved { border-right-color: var(--accent); }
+    .status-ready { border-right-color: var(--success); }
 
-        .delivery-label { font-size: 11px; color: #000; font-weight: bold; margin-bottom: 5px; display: block; }
-        .delivery-select {
-            width: 100%; background: transparent; color: #000000; border: none; font-size: 15px; font-weight: 900; outline: none; cursor: pointer;
-        }
+    .section-divider {
+      color: var(--text-muted); font-size: 11px; font-weight: bold;
+      margin: 25px 0 10px 0; border-bottom: 1px solid #334155; padding-bottom: 5px;
+      text-align: right; display: flex; justify-content: space-between;
+    }
 
-        .actions-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-top: 12px; }
-        .btn-op {
-            padding: 10px 4px; border-radius: 8px; font-size: 11px; font-weight: bold;
-            border: none; cursor: pointer; display: flex; flex-direction: column;
-            align-items: center; gap: 4px; background: #334155; color: white;
-            transition: opacity 0.3s;
-        }
-        .btn-op:disabled {
-            opacity: 0.2; cursor: not-allowed; filter: grayscale(1);
-        }
-        .btn-wa-ar { background: #065f46; color: #a7f3d0; }
-        .btn-wa-he { background: #064e3b; color: #6ee7b7; }
-        .btn-print { background: #1e3a8a; color: #bfdbfe; }
-        .btn-contact { background: #1e40af; color: white; }
-        .btn-cancel { background: #7f1d1d; color: #fecaca; }
+    .info-container { background: #0f172a; padding: 15px; border-radius: 12px; margin: 10px 0; border: 1px solid #334155; }
+    .info-row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #1e293b; }
+    .info-row:last-child { border-bottom: none; }
+    .info-label { color: var(--text-muted); font-size: 12px; font-weight: bold; }
+    .info-val { color: var(--text-main); font-size: 14px; text-align: left; }
 
-        #notification-toast {
-            position: fixed; top: -100px; left: 50%; transform: translateX(-50%);
-            background: var(--warning); color: #000; padding: 18px 35px;
-            border-radius: 50px; box-shadow: 0 15px 35px rgba(0,0,0,0.6);
-            z-index: 10000; font-weight: 800; display: flex; align-items: center; gap: 12px;
-            transition: top 0.6s cubic-bezier(0.68, -0.55, 0.27, 1.55); font-size: 18px; border: 2px solid #fff;
-        }
-        #notification-toast.show { top: 30px; }
+    .select-box { margin-top: 10px; padding: 12px; background: #ffffff; border-radius: 12px; border: 2.5px solid var(--primary); }
+    .select-label { font-size: 11px; color: #000; font-weight: bold; display: block; margin-bottom: 5px; }
+    .select-input { width: 100%; background: transparent; color: #000; border: none; font-size: 15px; font-weight: 900; outline: none; cursor: pointer; }
 
-        #print-container { display: none; }
-        @media print {
-            body { background: white !important; color: black !important; }
-            #app-ui, .bottom-nav, .header-ui, #notification-toast { display: none !important; }
-            #print-container { display: block !important; width: 100%; }
-            .print-page { display: block !important; page-break-after: always; margin: 0 auto; background: white !important; color: black !important; }
-            .invoice-size { width: 210mm; min-height: 297mm; padding: 15mm; box-sizing: border-box; }
-            .sticker-size { width: 100mm; height: 100mm; padding: 5mm; box-sizing: border-box; }
-            @page { margin: 0; }
-            svg { display: inline-block !important; }
-        }
-    </style>
+    .actions-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-top: 15px; }
+    .btn {
+      padding: 12px 5px; border-radius: 10px; font-size: 11px; font-weight: bold;
+      border: none; cursor: pointer; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 4px; transition: 0.2s;
+    }
+    .btn:disabled { opacity: 0.2; cursor: not-allowed; filter: grayscale(1); }
+    .btn-approve { background: var(--accent); color: white; }
+    .btn-wa { background: #065f46; color: #a7f3d0; }
+    .btn-print { background: #1e3a8a; color: #bfdbfe; }
+    .btn-ready { background: #6b21a8; color: #f3e8ff; }
+    .btn-danger { background: #7f1d1d; color: #fecaca; }
+
+    .form-group{ display:flex; flex-direction:column; gap:6px; margin-bottom:12px; }
+    .form-group label{ color:var(--text-muted); font-weight:800; font-size:12px; }
+    .form-group input, .form-group textarea{
+      background:#0b1220; color:var(--text-main); border:1px solid #334155; border-radius:12px;
+      padding:12px 12px; outline:none; font-weight:800;
+    }
+
+    #notification-toast {
+      position: fixed; top: -100px; left: 50%; transform: translateX(-50%);
+      background: var(--warning); color: #000; padding: 15px 30px;
+      border-radius: 50px; z-index: 10001; font-weight: 800; transition: 0.6s;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+    }
+    #notification-toast.show { top: 25px; }
+
+    #print-container { display: none; }
+    @media print {
+      body * { visibility: hidden; }
+      #print-container, #print-container * { visibility: visible; }
+      #print-container { display: block !important; position: absolute; left: 0; top: 0; width: 100%; }
+      .print-page { width: 100mm; height: 100mm; margin: 0 auto; padding: 5mm; box-sizing: border-box; background: white; color: black; }
+    }
+
+    .hint {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 6px;
+      line-height: 1.4;
+    }
+  </style>
 </head>
+
 <body>
+  <div id="notification-toast">🔔 הזמנה חדשה במערכת!</div>
 
-<div id="notification-toast">
-    <span>🔔</span> יש לך הזמנה חדשה!
-</div>
-
-<div id="app-ui">
+  <div id="app-ui">
     <div class="header-ui">
-        <img src="https://www.mad-parfumeur.com/assets/hero/logo.png" alt="MAD Logo" class="app-logo">
-        <div id="audioActivation" class="audio-activation-wrap">
-            <button class="audio-btn" onclick="activateRingingSystem()">
-                <span>🔊</span> הפעלת התראות (تفعيل جرس التنبيه)
-            </button>
-        </div>
-        <input type="text" class="search-input" id="searchInput" placeholder="חפש לפי שם לקוח או טלפון..." oninput="handleFilter()">
-        <div class="tabs-container">
-            <button class="tab-btn active" id="tab-all" onclick="setFilter('all')">20 אחרונות</button>
-            <button class="tab-btn" id="tab-new" onclick="setFilter('new')">ממתין לשיחה</button>
-            <button class="tab-btn" id="tab-prep" onclick="setFilter('prep')">בוצעה שיחה</button>
-        </div>
+      <img src="https://www.mad-parfumeur.com/assets/hero/logo.png" alt="MAD Logo" class="app-logo">
+      <div id="view-label" class="view-title">לוח בקרה מנהל</div>
+
+      <div class="dash-bar">
+        <div class="stat-item stat-new">חדש: <span id="count-new">0</span></div>
+        <div class="stat-item stat-prep">בתהליך: <span id="count-prep">0</span></div>
+        <div class="stat-item stat-ready">מוכן: <span id="count-ready">0</span></div>
+      </div>
+
+      <div id="audioActivation" style="margin-bottom: 10px;">
+        <button class="btn" style="width: 100%; background: var(--success); color:white; flex-direction: row; font-size: 13px;" onclick="activateAudio()">
+          <span>🔊</span> הפעלת רטט וצליל (تفعيل جرس التنبيه)
+        </button>
+      </div>
+
+      <input type="text" class="search-input" id="searchInput" placeholder="חיפוש לפי שם أو طלפון..." oninput="renderTab()">
     </div>
-    <div class="container" id="mainContainer">
-        <div id="ordersList"></div>
+
+    <!-- Manager -->
+    <div id="section-manage" class="section">
+      <div id="managerList"></div>
     </div>
-</div>
 
-<div class="bottom-nav">
-    <button class="nav-item active" onclick="location.reload()">הזמנות</button>
-</div>
+    <!-- Preparer -->
+    <div id="section-prep" class="section">
+      <div id="preparerList"></div>
+    </div>
 
-<div id="print-container"></div>
+    <!-- Add -->
+    <div id="section-add" class="section">
 
-<script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw2QxGHOxMv7_uNbMulwO60IHOcKj16rbBJRfoltkwcdb2Bg4zrVjyMt_lf9KgnyyXl/exec";
-    let allData = [];
-    let currentTab = 'all';
-    let localSessionStore = {}; 
-    let localDeliveryStore = {}; 
-    
-    let lastOrderCount = 0;
-    let isFirstLoad = true;
-    let ringingEnabled = false;
-    let audioContext;
+      <!-- ✅ WhatsApp Smart Box -->
+      <div class="card" style="background: var(--card-dark); padding: 20px; border-radius: 16px; border: 1px solid #334155; margin-bottom: 14px;">
+        <h4 style="margin:0 0 12px 0; text-align: center; color: var(--success);">📥 بوكس واتساب ذكي — تحليل + اعتماد + إرسال</h4>
 
-    function activateRingingSystem() {
-        ringingEnabled = true;
-        document.getElementById('audioActivation').style.display = 'none';
-        audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        if (audioContext.state === 'suspended') audioContext.resume();
-        playRingtone(1); 
+        <div class="form-group">
+          <label>الصق رسالة واتساب هنا (أي شكل)</label>
+          <textarea id="wa_raw" rows="5" placeholder="الصق الرسالة هنا..."></textarea>
+          <div class="hint">✅ النظام يلتقط تلقائيًا: الاسم + الهاتف + العنوان + الكود/العرض (إذا موجود)</div>
+        </div>
+
+        <button class="btn" style="width: 100%; background: #0ea5e9; color:white; padding: 14px; font-size: 14px; margin-bottom: 10px;" onclick="parseWhatsAppToForm()">
+          🧠 تحليل الرسالة وتعبئة الحقول
+        </button>
+
+        <div class="select-box" style="margin-top: 10px;">
+          <span class="select-label">اختر شركة التوصيل (مطلوب للاعتماد):</span>
+          <select class="select-input" id="wa_delivery">
+            <option value="">-- اختر شركة --</option>
+            <option value="High Express">High Express</option>
+            <option value="Marwah Delivery">Marwah Delivery</option>
+            <option value="Lama Delivery">Lama Delivery</option>
+            <option value="Areen Delivery">Areen Delivery</option>
+          </select>
+        </div>
+
+        <button class="btn" style="width: 100%; background: var(--success); color:white; padding: 15px; font-size: 15px; margin-top: 10px;" onclick="sendSmartApproved()">
+          ✅ إرسال واعتماد مباشرة للشيت
+        </button>
+
+        <div class="hint">بعد الإرسال: الطلب يدخل الشيت بحالة <b>Approved ✅</b> ويظهر فورًا في <b>📦 הכנה</b>.</div>
+      </div>
+
+      <!-- Manual Add (كما هو عندك) -->
+      <div class="card" style="background: var(--card-dark); padding: 20px; border-radius: 16px; border: 1px solid #334155;">
+        <h4 style="margin:0 0 15px 0; text-align: center; color: var(--primary);">📝 רישום הזמנה חדשה (يدوي)</h4>
+        <div class="form-group"><label>اسم الزبون</label><input type="text" id="in_name"></div>
+        <div class="form-group"><label>الهاتف</label><input type="tel" id="in_phone"></div>
+        <div class="form-group"><label>العنوان</label><input type="text" id="in_addr"></div>
+        <div class="form-group"><label>الطلب (C)</label><input type="text" id="in_offer"></div>
+        <div class="form-group"><label>ملاحظات (G)</label><textarea id="in_notes" rows="2"></textarea></div>
+        <button class="btn" style="width: 100%; background: var(--accent); color: white; padding: 15px; font-size: 15px;" onclick="saveOrder()">שמירת הזמנה ✅</button>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="bottom-nav">
+    <button class="nav-item active" id="nav-manage" onclick="switchTab('manage')">⚙️ מנהל</button>
+    <button class="nav-item" id="nav-prep" onclick="switchTab('prep')">📦 הכנה</button>
+    <button class="nav-item" id="nav-add" onclick="switchTab('add')">➕ הוספה</button>
+  </div>
+
+  <div id="print-container"></div>
+
+  <script>
+    // ✅ حط رابط Apps Script Web App (ينتهي بـ /exec)
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyR8AwEGGN6ZoOGE16GhtN1JhE9i2GVezREghPTBrnJVfIxoC-qsAWE5StzQPR3XoRc/exec";
+    const MANAGER_PHONE = "972509787730";
+
+    let allOrders = [];
+    let currentTab = 'manage';
+    let localStatusMap = {};
+    let managerDeliveryMap = {};
+    let employeeNameMap = {};
+
+    let lastTotalCount = 0;
+    let isInitialLoad = true;
+    let audioCtx;
+
+    function switchTab(tab) {
+      currentTab = tab;
+      document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      document.getElementById('section-' + tab).classList.add('active');
+      document.getElementById('nav-' + tab).classList.add('active');
+
+      const labels = {
+        'manage': 'לוח בקרה מנהל - אישור ומتابعة',
+        'prep': 'מערכת הכנה - مربعات מלאים',
+        'add': 'רישום הזמנה חדשה + بوكس واتساب ذكي'
+      };
+      document.getElementById('view-label').innerText = labels[tab];
+      syncData();
     }
 
-    async function fetchOrders() {
-        try {
-            const res = await fetch(`${SCRIPT_URL}?action=get&t=${Date.now()}`);
-            const data = await res.json();
-            if (!isFirstLoad && data.length > lastOrderCount) notifyNewOrder();
-            lastOrderCount = data.length;
-            isFirstLoad = false;
-            allData = data;
-            handleFilter();
-        } catch(e) { console.error("Fetch Error"); }
-    }
+    async function syncData() {
+      try {
+        const res = await fetch(`${SCRIPT_URL}?action=get&t=${Date.now()}`);
+        const data = await res.json();
 
-    function notifyNewOrder() {
-        const toast = document.getElementById('notification-toast');
-        toast.classList.add('show');
-        setTimeout(() => toast.classList.remove('show'), 9000);
-        if (ringingEnabled) playRingtone(5);
-        if (navigator.vibrate) navigator.vibrate([500, 200, 500]);
-    }
-
-    function playRingtone(repeats) {
-        if (!audioContext) return;
-        let startTime = audioContext.currentTime;
-        for (let i = 0; i < repeats; i++) {
-            const time = startTime + (i * 1.2);
-            createTone(660, time, 0.4);
-            createTone(440, time + 0.2, 0.4);
-        }
-    }
-
-    function createTone(freq, start, duration) {
-        const osc = audioContext.createOscillator();
-        const gain = audioContext.createGain();
-        osc.type = 'sine'; osc.frequency.setValueAtTime(freq, start);
-        osc.frequency.exponentialRampToValueAtTime(freq / 2, start + duration);
-        gain.gain.setValueAtTime(0.3, start); gain.gain.exponentialRampToValueAtTime(0.01, start + duration);
-        osc.connect(gain); gain.connect(audioContext.destination);
-        osc.start(start); osc.stop(start + duration);
-    }
-
-    function setFilter(tab) {
-        currentTab = tab;
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById('tab-' + tab).classList.add('active');
-        handleFilter();
-    }
-
-    function handleFilter() {
-        const query = document.getElementById('searchInput').value.toLowerCase();
-        let filtered = [...allData].reverse();
-        filtered.forEach(o => {
-            const uniqueKey = o.orderId || o.phone;
-            if(localSessionStore[uniqueKey]) o.status = localSessionStore[uniqueKey];
-        });
-        if (currentTab === 'new') filtered = filtered.filter(o => !o.status || o.status.includes('Processing') || o.status.includes('ממתין'));
-        else if (currentTab === 'prep') filtered = filtered.filter(o => o.status === 'בוצעה שיחה');
-        else filtered = filtered.slice(0, 20);
-        if (query) filtered = filtered.filter(o => (o.name && o.name.toLowerCase().includes(query)) || (o.phone && o.phone.includes(query)));
-        renderOrders(filtered);
-    }
-
-    function renderOrders(orders) {
-        const list = document.getElementById('ordersList');
-        list.innerHTML = '';
-        orders.forEach(o => {
-            const uniqueKey = o.orderId || o.phone;
-            let status = o.status || 'ממתיن לשיחה';
-            if (status === 'Processing...') status = 'ממתיن لשיחה';
-            const isContacted = status === 'בוצעה שיחה' || status.includes('Delivered');
-            const isDone = status.includes('Delivered');
-            const isCanceled = status.includes('מבוטל');
-            
-            const deliveryData = localDeliveryStore[uniqueKey] || { company: "", custom: "" };
-            const isDeliverySelected = deliveryData.company !== "";
-
-            const card = document.createElement('div');
-            let statusClass = "status-waiting";
-            if (isContacted) statusClass = "status-contacted";
-            if (isDone) statusClass = "status-delivered";
-            if (isCanceled) statusClass = "status-canceled";
-
-            card.className = `order-card ${statusClass}`;
-            card.innerHTML = `
-                <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <b style="font-size:17px; color:${isCanceled ? '#64748b' : 'var(--text-main)'}; ${isCanceled ? 'text-decoration:line-through;' : ''}">
-                        ${isContacted && !isCanceled ? '<span class="check-green">✔</span>' : ''}
-                        ${isCanceled ? '<span class="x-red">❌</span>' : ''}
-                        ${o.name}
-                    </b>
-                    <span style="font-size:10px; background:#334155; padding:2px 6px; border-radius:4px; font-weight:bold; color:var(--text-muted);">${status}</span>
-                </div>
-                <div style="font-size:13px; margin:5px 0; color:var(--text-muted);">📞 ${o.phone} | 📍 ${o.city || '-'}</div>
-                <div style="background:#0f172a; padding:8px; border-radius:8px; font-size:12px; border:1px solid #334155; color:var(--text-main);"><b>הזמנה:</b> ${o.offer}</div>
-
-                <div class="delivery-box ${!isDeliverySelected && !isCanceled && !isDone ? 'required' : ''}" style="${isDone || isCanceled ? 'opacity:0.4; pointer-events:none;' : ''}">
-                    <span class="delivery-label">חברת משלוחים / شركة التوصيل (חובה):</span>
-                    <select class="delivery-select" onchange="updateDeliveryLocal('${uniqueKey}', this.value)">
-                        <option value="" ${deliveryData.company === "" ? "selected" : ""}>בחר חברה / اختر الشركة</option>
-                        <option value="High Express" ${deliveryData.company === "High Express" ? "selected" : ""}>High Express</option>
-                        <option value="Marwah Delivery" ${deliveryData.company === "Marwah Delivery" ? "selected" : ""}>Marwah Delivery</option>
-                        <option value="Lama Delivery" ${deliveryData.company === "Lama Delivery" ? "selected" : ""}>Lama Delivery</option>
-                        <option value="Areen Delivery" ${deliveryData.company === "Areen Delivery" ? "selected" : ""}>Areen Delivery</option>
-                        <option value="Other" ${deliveryData.company === "Other" ? "selected" : ""}>Other</option>
-                    </select>
-                </div>
-
-                <div class="actions-grid" style="${isDone || isCanceled ? 'opacity: 0.3; pointer-events: none;' : ''}">
-                    <button class="btn-op btn-invoice" ${!isDeliverySelected ? 'disabled' : ''} onclick="generatePDF('invoice', ${JSON.stringify(o).replace(/"/g, '&quot;')})">📄 חשבונית PDF</button>
-                    <button class="btn-op btn-print" ${!isDeliverySelected ? 'disabled' : ''} onclick="generatePDF('sticker', ${JSON.stringify(o).replace(/"/g, '&quot;')})">🖨️ מדבקה</button>
-                    
-                    <button class="btn-op btn-wa-ar" ${!isDeliverySelected ? 'disabled' : ''} onclick="sendInvoiceWA('AR', '${o.phone}', '${o.name}', '${o.offer}', '${o.orderId}', '${o.city}', '${uniqueKey}')">💬 WA AR</button>
-                    <button class="btn-op btn-wa-he" ${!isDeliverySelected ? 'disabled' : ''} onclick="sendInvoiceWA('HE', '${o.phone}', '${o.name}', '${o.offer}', '${o.orderId}', '${o.city}', '${uniqueKey}')">💬 WA HE</button>
-                    
-                    <button class="btn-op ${isContacted ? '' : 'btn-contact'}" ${!isDeliverySelected ? 'disabled' : ''} onclick="updateStatusLocal('${uniqueKey}', '${o.rowIndex}', 'בוצעה שיחה')">
-                        ${isContacted ? '✅ בוצעה שיחה' : '📞 בוצעה שיחה'}
-                    </button>
-                    <button class="btn-op btn-cancel" onclick="updateStatusLocal('${uniqueKey}', '${o.rowIndex}', 'מבוטל ❌')">❌ ביטول</button>
-                    <button class="btn-op" style="background:var(--success); color:white;" ${!isDeliverySelected ? 'disabled' : ''} onclick="updateStatusLocal('${uniqueKey}', '${o.rowIndex}', 'Delivered ✅')">✅ נמסر</button>
-                </div>
-                ${!isDeliverySelected && !isCanceled && !isDone ? '<div style="color:var(--danger); font-size:10px; font-weight:bold; margin-top:5px; text-align:center;">* נא לבחור חברת משלוחים</div>' : ''}
-            `;
-            list.appendChild(card);
-        });
-    }
-
-    function updateDeliveryLocal(idKey, val) {
-        if (!localDeliveryStore[idKey]) localDeliveryStore[idKey] = { company: "", custom: "" };
-        localDeliveryStore[idKey].company = val;
-        handleFilter();
-    }
-
-    async function updateStatusLocal(idKey, row, s) {
-        if(s === 'מבוטל ❌' && !confirm("האם לבטל הזמנה זו?")) return;
-        localSessionStore[idKey] = s;
-        handleFilter();
-        try { fetch(`${SCRIPT_URL}?action=updateStatus&row=${row}&status=${encodeURIComponent(s)}`); } catch(e) {}
-    }
-
-    function sendInvoiceWA(lang, phone, name, offer, id, city, idKey) {
-        const delData = localDeliveryStore[idKey] || { company: "-", custom: "" };
-        const deliveryName = delData.company || "Processing / בטיפול";
-        let msg = "";
-
-        if (lang === 'HE') {
-            msg = `*תודה רבה מכל הלב - MAD SYSTEM* ❤️\n\n` +
-                  `שלום *${name}*,\n` +
-                  `אנו מודים לך מאוד על בחירתך בנו! להלן פרטי ההזמנה שלך:\n\n` +
-                  `📄 *חשבונית:* ${id || "MAD-SYS"}\n` +
-                  `📦 *הפריט:* ${offer}\n` +
-                  `📍 *כתובת:* ${city || "-"}\n` +
-                  `🚚 *חברת משלוחים:* ${deliveryName}\n` +
-                  `💰 *סה"כ לתשלום:* ₪150.00\n\n` +
-                  `תודה שוב על האמון שלך! ✨\n` +
-                  `*שירות לקוחות: 9935**`;
-        } else {
-            msg = `*شكر دافئ من القلب - MAD SYSTEM* ❤️\n\n` +
-                  `أهلاً بك *${name}*،\n` +
-                  `نشكرك جزيلاً على اختيارك لنا! إليك تفاصيل طلبيتك:\n\n` +
-                  `📄 *رقم الفاتورة:* ${id || "MAD-SYS"}\n` +
-                  `📦 *المنتج:* ${offer}\n` +
-                  `📍 *العنوان:* ${city || "-"}\n` +
-                  `🚚 *شركة التوصيل:* ${deliveryName}\n` +
-                  `💰 *المبلغ الإجمالي:* ₪150.00\n\n` +
-                  `شكراً مرة أخرى على ثقتك بنا! ✨\n` +
-                  `*خدمة العملاء: 9935**`;
+        if (!isInitialLoad && Array.isArray(data) && data.length > lastTotalCount) {
+          triggerAlert("הזמנה חדשה במערכת!");
         }
 
-        const cp = phone.startsWith('0') ? '972' + phone.substring(1) : phone;
-        window.open(`https://wa.me/${cp.replace(/\D/g, '')}?text=${encodeURIComponent(msg)}`, '_blank');
+        lastTotalCount = Array.isArray(data) ? data.length : 0;
+        isInitialLoad = false;
+
+        allOrders = Array.isArray(data) ? data : [];
+        updateDashboard(allOrders);
+        renderTab();
+      } catch(e) { console.error("Sync Error", e); }
     }
 
-    function generatePDF(type, o) {
-        const container = document.getElementById('print-container');
-        container.innerHTML = '';
-        const date = new Date().toLocaleDateString('he-IL');
-        const uniqueKey = o.orderId || o.phone;
-        const delData = localDeliveryStore[uniqueKey] || { company: "-", custom: "" };
-        const deliveryName = delData.company || "-";
+    function updateDashboard(data) {
+      const stats = { new: 0, prep: 0, ready: 0 };
+      data.forEach(o => {
+        const s = localStatusMap[o.orderId] || o.status || "";
+        if (String(s).includes("Canceled") || String(s).includes("❌")) return;
+        if (String(s).includes("Delivered")) return;
 
-        if (type === 'invoice') {
-            document.title = `Invoice_${o.name}`;
-            container.innerHTML = `
-                <div class="print-page invoice-size" dir="rtl">
-                    <div class="inv-header"><h1 style="font-size:26pt; color:#1e3a8a; margin:0;">מערכת MAD לניהול הזמנות</h1><p style="font-size:14pt; color:#444;">אלגנטיות ודיוק בכל הזמנה</p></div>
-                    <div style="display:flex; justify-content:space-between; font-weight:bold; color:black;"><div>מספר הזמנה: ${o.orderId || 'MAD-NEW'}</div><div>תאריך הנפקה: ${date}</div></div>
-                    <div class="inv-client-box"><b>חשבונית עבור:</b><br>שם: ${o.name}<br>כתובת: ${o.address || o.city || "-"}<br>טלפון: ${o.phone}<br>חברת משלוחים: ${deliveryName}</div>
-                    <table class="inv-table"><thead><tr style="background:#f1f5f9;"><th>תיאور ומוצר</th><th>סטטوس</th><th>מחיר</th></tr></thead><tbody><tr><td><b>${o.offer}</b></td><td>בטיפול</td><td><b>₪ 150.00</b></td></tr></tbody></table>
-                    <div style="border:1.5px solid #b91c1c; padding:10px; text-align:center; color:#b91c1c; font-weight:bold;">** תנאי החלפה: החלפה תתبצע אך وרק בתנאי שאריזת הניילون לא נפתحة.</div>
-                    <div style="margin-top:20px; font-size:11pt; color:black;">החשبوנית תישלח במייל לאחר המסירה. נא לשלוح כתובת מייل.</div>
-                    <div style="text-align:center; margin-top:50px;"><svg id="bp"></svg><br><b>שירות לקוחות: *9935</b></div>
-                </div>`;
-        } else {
-            document.title = `Sticker_${o.name}`;
-            container.innerHTML = `
-                <div class="print-page sticker-size" dir="rtl">
-                    <div style="text-align:center; border-bottom:2px solid #000; font-weight:bold; font-size:18pt; color:black;">מערכת MAD</div>
-                    <div style="font-size:12pt; line-height:1.5; margin:10px 0; color:black;">שם: ${o.name}<br>כתوبת: ${o.address || o.city || "-"}<br>טלפון: ${o.phone}<br>משלוח: ${deliveryName}</div>
-                    <div style="border:2.2px solid #000; padding:8px; background:#f9f9f9; color:black;">תיאור: ${o.offer}</div>
-                    <div style="font-size:8.5pt; border:1.1px solid red; color:red; text-align:center; font-weight:bold; padding:4px; margin-top:10px;">החלפה אך وרק בתנאי שהניילون לא נפתח</div>
-                    <div style="text-align:center; margin-top:10px;"><svg id="bp"></svg></div>
-                </div>`;
+        if (String(s).includes("מוכן")) stats.ready++;
+        else if (String(s).includes("Approved") || String(s).includes("מאושר")) stats.prep++;
+        else stats.new++;
+      });
+      document.getElementById('count-new').innerText = stats.new;
+      document.getElementById('count-prep').innerText = stats.prep;
+      document.getElementById('count-ready').innerText = stats.ready;
+    }
+
+    function renderTab() {
+      const query = (document.getElementById('searchInput').value || "").toLowerCase();
+      let data = [...allOrders].reverse();
+
+      if (currentTab === 'manage') {
+        const filtered = data.filter(o => (String(o.name||"").toLowerCase().includes(query) || String(o.phone||"").includes(query)));
+        renderManager(filtered);
+      } else if (currentTab === 'prep') {
+        const prepData = data.filter(o => {
+          const s = localStatusMap[o.orderId] || o.status || "";
+          return (String(s).includes("Approved") || String(s).includes("מאושר")) &&
+                 !String(s).includes("Delivered") && !String(s).includes("מוכן") && !String(s).includes("Canceled");
+        }).filter(o => (String(o.name||"").toLowerCase().includes(query) || String(o.phone||"").includes(query)));
+        renderPreparer(prepData);
+      }
+    }
+
+    function renderManager(orders) {
+      const list = document.getElementById('managerList');
+
+      const newOrders = orders.filter(o => {
+        const s = localStatusMap[o.orderId] || o.status || "";
+        return !String(s).includes("Approved") && !String(s).includes("מאושר") && !String(s).includes("מוכן") &&
+               !String(s).includes("Delivered") && !String(s).includes("Canceled");
+      });
+
+      const inWorkOrders = orders.filter(o => {
+        const s = localStatusMap[o.orderId] || o.status || "";
+        return (String(s).includes("Approved") || String(s).includes("מאושר")) &&
+               !String(s).includes("מוכן") && !String(s).includes("Delivered") && !String(s).includes("Canceled");
+      });
+
+      const readyOrders = orders.filter(o => {
+        const s = localStatusMap[o.orderId] || o.status || "";
+        return String(s).includes("מוכן") && !String(s).includes("Delivered") && !String(s).includes("Canceled");
+      });
+
+      let html = '<div class="section-divider">הזמנות חדשות (بانتظار الاعتماد) <span>'+newOrders.length+'</span></div>';
+      html += newOrders.map(o => createManagerCard(o, 'new')).join('');
+
+      html += '<div class="section-divider">בטיפול עובדות (قيد التجهيز) <span>'+inWorkOrders.length+'</span></div>';
+      html += inWorkOrders.map(o => createManagerCard(o, 'approved')).join('');
+
+      html += '<div class="section-divider" style="color:var(--success)">הזמנות מוכנות (جاهز للتوصيل ✅) <span>'+readyOrders.length+'</span></div>';
+      html += readyOrders.map(o => createManagerCard(o, 'ready')).join('');
+
+      list.innerHTML = html;
+    }
+
+    function createManagerCard(o, type) {
+      const s = localStatusMap[o.orderId] || o.status || "חדש";
+      const delivery = managerDeliveryMap[o.orderId] || "";
+      const isReady = type === 'ready';
+      const isApproved = type === 'approved' || isReady;
+
+      return `
+        <div class="order-card ${isReady ? 'status-ready' : (isApproved ? 'status-approved' : 'status-new')}">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <b style="font-size:16px;">${o.name || "-"}</b>
+            <span style="font-size:9px; background:#334155; padding:2px 6px; border-radius:4px;">${s}</span>
+          </div>
+          <div style="font-size:12px; color:var(--text-muted); margin:4px 0;">📞 ${o.phone || "-"} | 📍 ${o.city || '-'}</div>
+          <div style="font-size:13px; background:#0f172a; padding:10px; border-radius:10px; margin-top:5px; border:1px solid #1e293b;">📦 ${o.offer || "-"}</div>
+
+          ${!isReady ? `
+          <div class="select-box" style="${isApproved ? 'opacity:0.5; pointer-events:none;' : ''}">
+            <span class="select-label">בחר חברת משלוחים:</span>
+            <select class="select-input" onchange="managerDeliveryMap['${o.orderId}']=this.value; renderTab();">
+              <option value="">-- בחר חברה --</option>
+              <option value="High Express" ${delivery==='High Express'?'selected':''}>High Express</option>
+              <option value="Marwah Delivery" ${delivery==='Marwah Delivery'?'selected':''}>Marwah Delivery</option>
+              <option value="Lama Delivery" ${delivery==='Lama Delivery'?'selected':''}>Lama Delivery</option>
+              <option value="Areen Delivery" ${delivery==='Areen Delivery'?'selected':''}>Areen Delivery</option>
+            </select>
+          </div>` : ''}
+
+          <div class="actions-grid">
+            ${!isReady ? `<button class="btn btn-approve" ${isApproved || !delivery ? 'disabled' : ''} onclick="updateStatus('${o.orderId}', '${o.rowIndex}', 'Approved ✅ (משלוח: ${delivery})')">✅ اعتماد</button>` : ''}
+            <button class="btn btn-wa" onclick="sendWA('AR', '${o.phone || ''}', '${o.name || ''}', '${o.offer || ''}', '${o.orderId || ''}')">💬 واتساب</button>
+            ${isReady
+              ? `<button class="btn" style="background:var(--success); color:white;" onclick="updateStatus('${o.orderId}', '${o.rowIndex}', 'Delivered ✅')">✅ تسليم للمندوب</button>`
+              : `<button class="btn btn-danger" onclick="updateStatus('${o.orderId}', '${o.rowIndex}', 'Canceled ❌')">❌ إلغاء</button>`
+            }
+          </div>
+
+          ${isReady ? `<div style="margin-top:10px; padding:5px; background:rgba(16,185,129,0.1); border-radius:8px; color:var(--success); font-weight:bold; font-size:11px; text-align:center; border:1px dashed var(--success);">${s}</div>` : ''}
+        </div>
+      `;
+    }
+
+    function renderPreparer(orders) {
+      const list = document.getElementById('preparerList');
+      if (orders.length === 0) {
+        list.innerHTML = '<p style="text-align:center; padding:30px; color:var(--text-muted);">אין הזמנות מאושרות (لا توجد طلبات معتمدة)</p>';
+        return;
+      }
+
+      list.innerHTML = orders.map(o => {
+        const id = o.orderId || o.phone;
+        const s = localStatusMap[o.orderId] || o.status || "";
+        const empName = employeeNameMap[id] || "";
+        const delMatch = String(s).match(/\(משלוח: (.*?)\)/);
+        const delCompany = delMatch ? delMatch[1] : "لم يحدد";
+
+        return `
+          <div class="order-card status-approved">
+            <div style="text-align:center; border-bottom:1px solid #334155; padding-bottom:10px; margin-bottom:10px;">
+              <b style="font-size:18px; color:var(--primary);">פרטי הזמנה - مربع كامل</b>
+            </div>
+
+            <div class="info-container">
+              <div class="info-row"><span class="info-label">שם לקוח:</span><span class="info-val">${o.name || "-"}</span></div>
+              <div class="info-row"><span class="info-label">טלפון:</span><span class="info-val">${o.phone || "-"}</span></div>
+              <div class="info-row"><span class="info-label">כתובת:</span><span class="info-val">${o.city || '-'}</span></div>
+              <div class="info-row" style="margin-top:8px; border-top:1px dashed #334155; padding-top:8px;">
+                <span class="info-label">הזמנה (C):</span><span class="info-val" style="color:var(--warning); font-weight:bold;">${o.offer || "-"}</span>
+              </div>
+              <div class="info-row"><span class="info-label">הערות:</span><span class="info-val">${o.notes || 'אין'}</span></div>
+              <div class="info-row" style="background:var(--accent); color:white; padding:6px; border-radius:8px; margin-top:8px;">
+                <span class="info-label" style="color:white;">חברת משלוח:</span><span class="info-val" style="font-weight:900;">${delCompany}</span>
+              </div>
+            </div>
+
+            <div class="select-box ${!empName ? 'required' : ''}">
+              <span class="select-label">מי מכינה? (عبير، ألاء، ليلى):</span>
+              <select class="select-input" onchange="employeeNameMap['${id}']=this.value; renderTab();">
+                <option value="">-- בחר שם עובדת --</option>
+                <option value="عبير (עביר)" ${empName==='عبير (עביר)'?'selected':''}>عبير (עביר)</option>
+                <option value="ألاء (אלאא)" ${empName==='ألاء (אלאא)'?'selected':''}>ألاء (אלאא)</option>
+                <option value="ليلى (ליילא)" ${empName==='ليلى (ליילא)'?'selected':''}>ليلى (ליילא)</option>
+              </select>
+            </div>
+
+            <div class="actions-grid">
+              <button class="btn btn-print" onclick="printSticker(${JSON.stringify(o).replace(/"/g, '&quot;')}, '${delCompany}')">🖨️ ملصق</button>
+              <button class="btn btn-ready" ${!empName ? 'disabled' : ''} onclick="finalizeReady('${o.orderId}', '${o.rowIndex}', '${o.name || ''}', '${delCompany}')">📦 تم التجهيز</button>
+              <button class="btn btn-wa" style="background:#064e3b;" onclick="sendWA('HE', '${o.phone || ''}', '${o.name || ''}', '${o.offer || ''}', '${o.orderId || ''}')">💬 WhatsApp</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function saveOrder() {
+      const d = {
+        name: document.getElementById('in_name').value,
+        phone: document.getElementById('in_phone').value,
+        address: document.getElementById('in_addr').value,
+        offer: document.getElementById('in_offer').value,
+        notes: document.getElementById('in_notes').value,
+        source: "Web-App",
+        lang: "ar",
+        price: "150",
+        payment: "Cash",
+        process: "Direct"
+      };
+      if(!d.name || !d.phone) return alert("נא למלא פרטים");
+      fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(d) });
+      alert("נשמר! עובר לניהול מנהל.");
+      syncData();
+      switchTab('manage');
+    }
+
+    async function updateStatus(orderId, row, s) {
+      localStatusMap[orderId] = s;
+      renderTab();
+      updateDashboard(allOrders);
+      try { fetch(`${SCRIPT_URL}?action=updateStatus&row=${encodeURIComponent(row)}&orderId=${encodeURIComponent(orderId)}&status=${encodeURIComponent(s)}&t=${Date.now()}`); } catch(e) {}
+    }
+
+    async function finalizeReady(orderId, row, custName, delivery) {
+      const emp = employeeNameMap[orderId] || "";
+      const status = `מוכן על ידי ${emp} (משלוח: ${delivery})`;
+      updateStatus(orderId, row, status);
+
+      const msg = `*עדכון تجهيز - MAD SYSTEM* 📢\n\nالطلب الخاص بـ *${custName}* جاهز الآن!\n👤 الموظفة: ${emp}\n🚚 الشركة: ${delivery}\n✅ الحالة: تم التجهيز وجاهز للمرسول.`;
+      window.open(`https://wa.me/${MANAGER_PHONE}?text=${encodeURIComponent(msg)}`, '_blank');
+    }
+
+    function printSticker(o, delivery) {
+      const container = document.getElementById('print-container');
+      container.innerHTML = `
+        <div class="print-page" dir="rtl">
+          <div style="text-align:center; border-bottom:2px solid #000; font-weight:bold; font-size:16pt;">מערכת MAD</div>
+          <div style="font-size:12pt; margin:10px 0;"><b>שם:</b> ${o.name}<br><b>טלפון:</b> ${o.phone}<br><b>משלוח:</b> ${delivery}</div>
+          <div style="border:1.5px solid #000; padding:5px; background:#eee;">${o.offer}</div>
+          <div style="font-size:8pt; border:1px solid red; color:red; text-align:center; font-weight:bold; margin-top:8px;">החלפה אך ורק בתנאי שהניילון לא נפתח</div>
+          <div style="text-align:center; margin-top:10px;"><svg id="bcode_gen"></svg></div>
+        </div>`;
+      JsBarcode("#bcode_gen", String(o.phone||""), { format: "CODE128", width: 1.8, height: 40, displayValue: false });
+      setTimeout(() => window.print(), 500);
+    }
+
+    function sendWA(lang, phone, name, offer, id) {
+      let msg = `*شكر دافئ من القلب - MAD* ❤️\nأهلاً بك *${name}*، نشكرك على اختيارك لنا! تفاصيل طلبيتك:\n📦 المنتج: ${offer}\n📄 رقم الطلب: ${id || 'חדש'}\n💰 الإجمالي: ₪150.00\n✨ خدمة العملاء: 9935*`;
+      if(lang==='HE') msg = `*תודה רבה מכל הלב - MAD* ❤️\nשלום *${name}*,\nתודה على طلبك! تفاصيل الطلب:\n📦 פריט: ${offer}\n💰 סה"כ: ₪150.00\n✨ שירות לקוחות: 9935*`;
+      const cp = String(phone||"").startsWith('0') ? ('972' + String(phone||"").substring(1)) : String(phone||"");
+      window.open(`https://wa.me/${cp.replace(/\D/g, '')}?text=${encodeURIComponent(msg)}`, '_blank');
+    }
+
+    function activateAudio() {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      document.getElementById('audioActivation').style.display = 'none';
+    }
+
+    function triggerAlert(text) {
+      const toast = document.getElementById('notification-toast');
+      toast.innerText = text;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 6000);
+      if (audioCtx) {
+        const osc = audioCtx.createOscillator();
+        const g = audioCtx.createGain();
+        osc.connect(g); g.connect(audioCtx.destination);
+        osc.start(); osc.stop(audioCtx.currentTime + 0.6);
+      }
+      if (navigator.vibrate) navigator.vibrate([500, 200, 500]);
+    }
+
+    /* ---------------------------
+       ✅ WhatsApp Smart Box Logic
+    ---------------------------- */
+
+    function hasHebrew_(s){ return /[\u0590-\u05FF]/.test(s || ""); }
+
+    function normalizeDigits_(s){
+      const map = {'٠':'0','١':'1','٢':'2','٣':'3','٤':'4','٥':'5','٦':'6','٧':'7','٨':'8','٩':'9'};
+      return String(s||"").replace(/[٠-٩]/g, d => map[d] || d);
+    }
+
+    function cleanText_(s){
+      return normalizeDigits_(s).replace(/\r/g,'').trim();
+    }
+
+    function pickBestPhoneCandidate_(cands){
+      // score candidates: prefer 05, 059, 972, 970
+      let best = "";
+      let bestScore = -1;
+      cands.forEach(x=>{
+        const d = x;
+        let score = 0;
+        if (d.startsWith("05")) score += 5;
+        if (d.startsWith("059")) score += 5;
+        if (d.startsWith("972")) score += 4;
+        if (d.startsWith("970")) score += 4;
+        if (d.length >= 9 && d.length <= 13) score += 2;
+        if (score > bestScore){ bestScore = score; best = d; }
+      });
+      return best;
+    }
+
+    function normalizePhone_(p){
+      if(!p) return "";
+      let d = String(p).replace(/[^\d]/g,'');
+      if (d.startsWith('00')) d = d.slice(2);
+      if (d.startsWith('9720')) d = '972' + d.slice(4);
+
+      if (d.startsWith('0')) {
+        if (d.startsWith('059') && d.length >= 10) d = '970' + d.slice(1);
+        else if (d.startsWith('05') && d.length >= 10) d = '972' + d.slice(1);
+        else if (d.length >= 9) d = '972' + d.slice(1);
+      }
+
+      if (d.length === 9 && d.startsWith('5')) d = '972' + d;
+      if (d.length === 9 && d.startsWith('59')) d = '970' + d;
+
+      return d;
+    }
+
+    function extractPhone_(text){
+      const t = cleanText_(text);
+      const digitGroups = t.match(/\d[\d\s\-\(\)]{7,16}\d/g) || [];
+      const cands = digitGroups.map(g => g.replace(/[^\d]/g,'')).filter(x => x.length >= 9 && x.length <= 13);
+      const best = pickBestPhoneCandidate_(cands);
+      return normalizePhone_(best);
+    }
+
+    function extractOffer_(lines, text){
+      // code patterns like W183, A118, X102, etc
+      const t = cleanText_(text);
+      const codeMatch = t.match(/\b[A-Za-z]{1,3}\s*[- ]?\s*\d{2,4}\b/g);
+      if (codeMatch && codeMatch.length) return codeMatch[0].replace(/\s+/g,'').replace('-', '');
+
+      // line fallback: look for keyword lines
+      const keys = [/العرض/i,/كود/i,/code/i,/offer/i,/الطلب/i,/product/i,/מוצר/i,/פריט/i,/קוד/i];
+      for (const ln of lines){
+        for (const k of keys){
+          if (k.test(ln)) {
+            // take after ":" if exists
+            const parts = ln.split(/[:\-]/);
+            if (parts.length > 1) return parts.slice(1).join(':').trim();
+            return ln.trim();
+          }
         }
-        JsBarcode("#bp", o.phone, { format: "CODE128", width: 2, height: 40, displayValue: false });
-        setTimeout(() => { window.print(); document.title = "מערכת MAD"; }, 600);
+      }
+      // last fallback: return empty
+      return "";
     }
 
-    window.onload = fetchOrders;
-    setInterval(fetchOrders, 30000);
-</script>
+    function extractFieldAfterLabel_(lines, labelRegex){
+      for (const ln of lines){
+        if (labelRegex.test(ln)){
+          const parts = ln.split(/[:\-]/);
+          if (parts.length > 1) return parts.slice(1).join(':').trim();
+          // if no colon, take remainder
+          return ln.replace(labelRegex,'').trim();
+        }
+      }
+      return "";
+    }
+
+    function extractAddress_(lines){
+      const addr = extractFieldAfterLabel_(lines, /^(العنوان|عنوان|address|כתובת)\s*[:\-]?\s*/i);
+      if (addr) return addr;
+
+      // heuristic: line contains street keywords
+      const streetKey = /(شارع|حارة|حي|منطقة|دير|بيت|street|st\.|road|ave|דירה|רחוב|שכונה|עיר)/i;
+      const cand = lines.find(ln => streetKey.test(ln));
+      return cand ? cand.trim() : "";
+    }
+
+    function extractName_(lines){
+      const name = extractFieldAfterLabel_(lines, /^(الاسم|اسم|name|שם)\s*[:\-]?\s*/i);
+      if (name) return name;
+
+      // heuristic: first line that has letters and is not obviously address/phone
+      const badKey = /(شارع|عنوان|address|כתובת|رقم|phone|טלפון|050|052|053|054|055|056|057|058|059|972|970|كود|code|offer|العرض|الطلب)/i;
+      for (const ln of lines){
+        const hasLetters = /[A-Za-z\u0590-\u05FF\u0600-\u06FF]/.test(ln);
+        const hasDigits = /\d/.test(ln);
+        if (hasLetters && !badKey.test(ln) && !hasDigits && ln.length <= 40) return ln.trim();
+      }
+      return "";
+    }
+
+    function parseWhatsAppText_(raw){
+      const text = cleanText_(raw);
+      const lines = text.split('\n').map(x => x.trim()).filter(Boolean);
+
+      const phone = extractPhone_(text);
+      const offer = extractOffer_(lines, text);
+      const name = extractName_(lines);
+      const address = extractAddress_(lines);
+
+      // always keep original message for notes
+      return {
+        name: name || "Customer",
+        phone: phone || "",
+        address: address || "",
+        offer: offer || "",
+        notes: "WA_RAW: " + text
+      };
+    }
+
+    function parseWhatsAppToForm(){
+      const raw = document.getElementById('wa_raw').value || "";
+      if (!raw.trim()) {
+        triggerAlert("❌ الصق رسالة واتساب أولاً");
+        return;
+      }
+      const parsed = parseWhatsAppText_(raw);
+
+      document.getElementById('in_name').value = parsed.name || "";
+      document.getElementById('in_phone').value = parsed.phone || "";
+      document.getElementById('in_addr').value = parsed.address || "";
+      document.getElementById('in_offer').value = parsed.offer || "";
+      document.getElementById('in_notes').value = parsed.notes || "";
+
+      triggerAlert("✅ تم تحليل الرسالة وتعبئة الحقول");
+    }
+
+    function sendSmartApproved(){
+      const raw = document.getElementById('wa_raw').value || "";
+      if (!raw.trim()) { triggerAlert("❌ الصق رسالة واتساب أولاً"); return; }
+
+      const delivery = document.getElementById('wa_delivery').value || "";
+      if (!delivery) { triggerAlert("❌ اختر شركة التوصيل أولاً"); return; }
+
+      const parsed = parseWhatsAppText_(raw);
+      const lang = hasHebrew_(raw) ? "he" : "ar";
+
+      // ✅ status معتمد مباشرة + شركة التوصيل داخل status (حتى يظهر في التحضير)
+      const status = `Approved ✅ (משלוח: ${delivery})`;
+
+      const payload = {
+        name: parsed.name,
+        phone: parsed.phone,
+        address: parsed.address || "-",
+        offer: parsed.offer || "WhatsApp-Order",
+        notes: parsed.notes,
+        source: "WhatsApp Smart Box",
+        lang: lang,
+        price: "150",
+        payment: "Cash",
+        process: "Direct",
+        status: status
+      };
+
+      // إرسال للشيت
+      fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
+
+      // تأكيد داخل التطبيق
+      triggerAlert("✅ تم الاعتماد وإرسال الطلب للشيت");
+      // تنظيف
+      document.getElementById('wa_raw').value = "";
+      document.getElementById('wa_delivery').value = "";
+
+      // تحديث
+      setTimeout(() => {
+        syncData();
+        switchTab('prep');
+      }, 600);
+    }
+
+    window.onload = () => switchTab('manage');
+    setInterval(syncData, 35000);
+  </script>
 </body>
 </html>
