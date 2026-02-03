@@ -3,8 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>MAD Prep - Big Order Box</title>
+  <title>MAD Prep - Big Order Box + Print</title>
   <link rel="icon" type="image/png" href="https://www.mad-parfumeur.com/assets/hero/logo.png">
+
+  <!-- ✅ Barcode -->
+  <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+
   <style>
     :root{
       --bg:#071022; --card:#0d1a33; --line:#1e2b47;
@@ -12,6 +16,10 @@
       --success:#16a34a; --warn:#f59e0b; --primary:#2563eb; --danger:#ef4444;
       --shadow:0 12px 35px rgba(0,0,0,.45);
       --r:22px;
+
+      /* ✅ Label size (عدلها حسب اللي عندك) */
+      --label-w: 100mm;
+      --label-h: 100mm;
     }
     *{box-sizing:border-box}
     body{
@@ -67,6 +75,7 @@
       padding:14px 14px; font-weight:1000;
       outline:none; box-shadow:var(--shadow);
       font-size:16px;
+      margin-top:10px;
     }
     .content{padding:14px}
     .card{
@@ -114,7 +123,7 @@
       font-weight:1100;
       font-size:16px;
       text-align:left;
-      direction:ltr; /* للهواتف والأرقام */
+      direction:ltr;
       word-break:break-word;
     }
     .val.rtl{
@@ -133,7 +142,7 @@
 
     .btns{
       display:grid;
-      grid-template-columns:1.3fr 1fr;
+      grid-template-columns: 1fr 1fr 1fr;
       gap:10px;
       margin-top:12px;
     }
@@ -151,6 +160,7 @@
     .btn:active{transform:scale(.98)}
     .btnReady{background:var(--success); color:white}
     .btnEdit{background:var(--warn); color:#0b1020}
+    .btnPrint{background:var(--primary); color:white}
     .btn:disabled{opacity:.25; cursor:not-allowed}
 
     .empty{
@@ -207,8 +217,32 @@
     .modalActions{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:12px}
     .btnClose{background:var(--danger); color:white}
     .btnSave{background:var(--primary); color:white}
+
+    /* ✅ PRINT */
+    #print-container{ display:none; }
+    @media print{
+      @page { size: var(--label-w) var(--label-h); margin: 0; }
+      body * { visibility:hidden !important; }
+      #print-container, #print-container * { visibility:visible !important; }
+      #print-container{
+        display:block !important;
+        position:fixed; left:0; top:0;
+        width: var(--label-w);
+        height: var(--label-h);
+        background:#fff !important;
+        color:#000 !important;
+      }
+      .print-page{
+        width: var(--label-w);
+        height: var(--label-h);
+        padding: 4mm;
+        box-sizing:border-box;
+        font-family: Arial, Tahoma, sans-serif;
+      }
+    }
   </style>
 </head>
+
 <body>
   <div class="toast" id="toast">تم ✅</div>
 
@@ -217,8 +251,8 @@
       <div class="head">
         <div class="logo"><img src="https://www.mad-parfumeur.com/assets/hero/logo.png" alt="MAD"></div>
         <div class="title">
-          <b>نسخة التجهيز (بوكس كبير واضح)</b>
-          <span>تظهر فقط الطلبات المُرسلة للتجهيز — زر واحد: تم تجهيز الطلب</span>
+          <b>نسخة التجهيز (بوكس كبير + طباعة)</b>
+          <span>تظهر فقط الطلبات المُرسلة للتجهيز — (طباعة) ثم (تم تجهيز)</span>
         </div>
         <button class="iconBtn" onclick="sync()" title="تحديث">↻</button>
       </div>
@@ -241,6 +275,9 @@
     <div class="content" id="list"></div>
   </div>
 
+  <!-- Print Container -->
+  <div id="print-container"></div>
+
   <!-- Edit Modal -->
   <div class="modalWrap" id="modalWrap" onclick="closeModal(event)">
     <div class="modal" onclick="event.stopPropagation()">
@@ -259,10 +296,10 @@
   </div>
 
 <script>
-  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxKQZk5SJZ2w5XENWzxRL5Vf5UPwW0OtTMsz3RV4i-Pp3swg2KVh_6FaSnDkacPR8Kd/exec";
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw2QxGHOxMv7_uNbMulwO60IHOcKj16rbBJRfoltkwcdb2Bg4zrVjyMt_lf9KgnyyXl/exec";
 
   let all = [];
-  let editing = null; // {rowIndex, orderId, delivery}
+  let editing = null;
 
   function toast(msg){
     const t = document.getElementById("toast");
@@ -311,7 +348,7 @@
     const arr = rev.filter(o=>{
       const s = String(o.status||"");
       if (isDelivered(s) || isCanceled(s) || isReady(s)) return false;
-      if (!isApproved(s)) return false; // فقط المُرسلة للتجهيز
+      if (!isApproved(s)) return false;
       const match = String(o.name||"").toLowerCase().includes(q) ||
                     String(o.phone||"").includes(q) ||
                     String(o.offer||"").toLowerCase().includes(q);
@@ -327,17 +364,19 @@
     document.getElementById("list").innerHTML = arr.map(o=>{
       const delivery = parseDeliveryFromStatus(o.status||"");
       const price = String(o.price||"").replace(/[^\d]/g,"") || "150";
+      const orderId = o.orderId || ("ROW-"+o.rowIndex);
+
       return `
         <div class="card">
           <div class="orderBox">
             <div class="boxTitle">📦 مربع الطلب (كل المعلومات)</div>
 
+            <div class="infoRow"><span class="lbl">رقم الطلب</span><span class="val rtl">${escapeHtml(orderId)}</span></div>
             <div class="infoRow"><span class="lbl">اسم العميل</span><span class="val rtl">${escapeHtml(o.name||"-")}</span></div>
             <div class="infoRow"><span class="lbl">الهاتف</span><span class="val">${escapeHtml(o.phone||"-")}</span></div>
             <div class="infoRow"><span class="lbl">المدينة/العنوان</span><span class="val rtl">${escapeHtml(o.city||"-")}</span></div>
             <div class="infoRow"><span class="lbl">شركة التوصيل</span><span class="val rtl">${escapeHtml(delivery)}</span></div>
             <div class="infoRow"><span class="lbl">السعر</span><span class="val rtl">₪${escapeHtml(price)}</span></div>
-            <div class="infoRow"><span class="lbl">رقم الطلب</span><span class="val rtl">${escapeHtml(o.orderId || ("ROW-"+o.rowIndex))}</span></div>
 
             <div class="offerBox">🧾 الطلب: ${escapeHtml(o.offer||"-")}</div>
 
@@ -348,8 +387,9 @@
           </div>
 
           <div class="btns">
-            <button class="btn btnReady" ${emp ? "" : "disabled"} onclick='finalize(${safeJson(o)})'>✅ تم تجهيز الطلب</button>
+            <button class="btn btnPrint" onclick='printOrder(${safeJson(o)})'>🖨️ طباعة</button>
             <button class="btn btnEdit" onclick='openEdit(${safeJson(o)})'>✏️ تعديل</button>
+            <button class="btn btnReady" ${emp ? "" : "disabled"} onclick='finalize(${safeJson(o)})'>✅ تم تجهيز الطلب</button>
           </div>
 
           ${emp ? "" : `<div style="margin-top:10px;color:#f59e0b;font-weight:1100;text-align:center">⚠️ اختاري اسمك لتفعيل زر التجهيز</div>`}
@@ -411,6 +451,57 @@
     }catch(e){
       toast("⚠️ فشل التعديل");
     }
+  }
+
+  // ✅ PRINT ORDER (TSC DA220)
+  function printOrder(o){
+    const delivery = parseDeliveryFromStatus(o.status||"");
+    const price = String(o.price||"").replace(/[^\d]/g,"") || "150";
+    const orderId = o.orderId || ("ROW-"+o.rowIndex);
+
+    const container = document.getElementById("print-container");
+    container.innerHTML = `
+      <div class="print-page" dir="rtl">
+        <div style="display:flex;align-items:center;justify-content:space-between;border-bottom:2px solid #000;padding-bottom:2mm;">
+          <div style="font-size:14pt;font-weight:900;">MAD</div>
+          <div style="font-size:10pt;font-weight:700;">Order: ${escapeHtml(orderId)}</div>
+        </div>
+
+        <div style="margin-top:3mm;font-size:10.5pt;line-height:1.35">
+          <div><b>الاسم:</b> ${escapeHtml(o.name||"-")}</div>
+          <div><b>الهاتف:</b> ${escapeHtml(o.phone||"-")}</div>
+          <div><b>العنوان:</b> ${escapeHtml(o.city||"-")}</div>
+          <div><b>التوصيل:</b> ${escapeHtml(delivery)}</div>
+          <div><b>السعر:</b> ₪${escapeHtml(price)}</div>
+        </div>
+
+        <div style="margin-top:3mm;border:1.5px solid #000;padding:2mm;background:#f3f4f6;font-size:11pt;font-weight:900;">
+          ${escapeHtml(o.offer||"-")}
+        </div>
+
+        <div style="margin-top:2mm;font-size:8.5pt;color:#111;">
+          <b>ملاحظات:</b> ${escapeHtml(o.notes||"—")}
+        </div>
+
+        <div style="margin-top:3mm;text-align:center;">
+          <svg id="bcode_gen"></svg>
+          <div style="font-size:8pt;margin-top:1mm;">${escapeHtml(o.phone||"")}</div>
+        </div>
+
+        <div style="margin-top:2mm;border:1px dashed #d00;color:#d00;padding:1.5mm;text-align:center;font-size:8pt;font-weight:900;">
+          الاستبدال فقط إذا لم يتم فتح النايلون
+        </div>
+      </div>
+    `;
+
+    // باركود (هاتف أو OrderID)
+    try{
+      const code = String(o.phone||orderId||"").replace(/\D/g,"") || String(orderId||"");
+      JsBarcode("#bcode_gen", code, { format:"CODE128", width:2, height:42, displayValue:false, margin:0 });
+    }catch(e){}
+
+    // اطبع
+    setTimeout(()=>window.print(), 200);
   }
 
   function escapeHtml(str){
