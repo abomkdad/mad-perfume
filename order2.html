@@ -1,292 +1,216 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
-  <title>MAD Preparer</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>MAD Prep</title>
+
   <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+
   <style>
-    :root{--bg:#070d18;--card:#0f1a33;--line:#1f2f55;--muted:#9fb0d1;--ok:#10b981;--blue:#3b82f6;--orange:#f59e0b;}
-    body{margin:0;background:var(--bg);color:#fff;font-family:system-ui,-apple-system,Segoe UI,Tahoma;padding-bottom:90px}
-    header{position:sticky;top:0;background:rgba(15,26,51,.95);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);z-index:9}
-    .wrap{max-width:520px;margin:0 auto;padding:12px}
-    h1{margin:0;font-size:16px}
-    input,select,textarea{width:100%;box-sizing:border-box;border:1px solid var(--line);background:#0b1220;color:#fff;border-radius:14px;padding:14px;font-size:15px;outline:none}
-    textarea{min-height:80px;resize:vertical}
-    .pill{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
-    .pill span{background:#0b1220;border:1px solid var(--line);padding:6px 10px;border-radius:999px;font-size:12px;color:#cfe0ff}
-    .card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:14px;margin:12px 0}
-    .big{background:#ffffff;color:#000;border-radius:18px;padding:14px;margin-top:10px}
-    .big .row{display:flex;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid #e5e7eb}
-    .big .row:last-child{border-bottom:none}
-    .lab{font-weight:900;color:#111827}
-    .val{font-weight:800;text-align:left;direction:ltr}
-    .btns{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
-    .btn{border:none;border-radius:16px;padding:16px 12px;font-weight:1000;cursor:pointer;font-size:15px}
-    .bgreen{background:var(--ok);color:#052014}
-    .bblue{background:var(--blue);color:#fff}
-    .borange{background:var(--orange);color:#2a1700}
-    /* print */
-    #printArea{display:none}
-    @media print{
-      body *{visibility:hidden}
-      #printArea, #printArea *{visibility:visible}
-      #printArea{display:block;position:absolute;left:0;top:0;width:100%}
-      .label{width:100mm;height:100mm;margin:0 auto;padding:6mm;box-sizing:border-box;background:#fff;color:#000;border:1px solid #000}
-      .label h2{margin:0 0 6px;font-size:14pt}
-      .label .t{font-size:11pt;margin:4px 0}
-      .label .box{border:1px solid #000;padding:6px;margin-top:6px;font-weight:900}
-      .label .warn{margin-top:6px;color:#b91c1c;font-weight:900;font-size:9pt;border:1px dashed #b91c1c;padding:6px;text-align:center}
+    :root{
+      --bg:#0b1220; --card:#0f1b34; --line:#22314f; --txt:#f3f6ff; --muted:#9fb0d0;
+      --green:#10b981; --blue:#3b82f6; --yellow:#f59e0b;
     }
-    /* login */
-    .lock{position:fixed;inset:0;background:rgba(0,0,0,.75);display:flex;align-items:center;justify-content:center;z-index:9999}
-    .lockbox{width:min(420px,92%);background:#0f172a;border:1px solid var(--line);border-radius:18px;padding:16px}
-    .lockbox h2{margin:0 0 10px;font-size:16px}
-    .lockbox p{margin:0 0 12px;color:var(--muted);font-size:12px}
+    body{margin:0;background:var(--bg);color:var(--txt);font-family:system-ui,-apple-system,"Segoe UI",Tahoma,Arial; padding-bottom:90px;}
+    .wrap{max-width:720px;margin:0 auto;padding:12px;}
+    .top{position:sticky;top:0;background:rgba(11,18,32,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);z-index:5}
+    .bar{display:flex;gap:10px;align-items:center;justify-content:space-between;padding:10px 0}
+    .search{width:100%;padding:12px;border-radius:14px;border:1px solid var(--line);background:var(--card);color:var(--txt);outline:none;font-weight:900}
+    .select{width:100%;padding:12px;border-radius:14px;border:1px solid var(--line);background:var(--card);color:var(--txt);outline:none;font-weight:900}
+    .box{
+      background:var(--card); border:1px solid var(--line); border-radius:22px;
+      padding:14px; margin:12px 0;
+    }
+    .bigline{font-size:20px;font-weight:1000}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+    .kv{background:#0b1630;border:1px solid var(--line);border-radius:16px;padding:12px}
+    .k{color:var(--muted);font-size:12px;font-weight:900}
+    .v{font-size:16px;font-weight:1000;margin-top:4px}
+    .btns{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+    .btn{border:0;border-radius:16px;padding:14px;font-weight:1000;cursor:pointer}
+    .b-print{background:var(--blue);color:white}
+    .b-ready{background:var(--green);color:#062217}
+    .hint{color:var(--muted);font-size:12px;font-weight:800;margin-top:6px}
+    .fixednav{position:fixed;bottom:0;left:0;right:0;background:rgba(11,18,32,.92);backdrop-filter:blur(10px);border-top:1px solid var(--line)}
+    .fixednav .wrap{display:flex;gap:10px}
+    .big{flex:1;padding:14px;border-radius:16px;background:var(--yellow);color:#201205;font-weight:1000;border:0;cursor:pointer}
+
+    #print-container { display:none; }
+    @media print{
+      body *{visibility:hidden;}
+      #print-container, #print-container *{visibility:visible;}
+      #print-container{display:block !important; position:absolute; left:0; top:0; width:100%;}
+      .print-page{width:100mm;height:100mm;margin:0 auto;padding:5mm;box-sizing:border-box;background:white;color:black;}
+    }
   </style>
 </head>
 <body>
 
-<!-- LOGIN -->
-<div class="lock" id="lock">
-  <div class="lockbox">
-    <h2>🔒 دخول التجهيز</h2>
-    <p>كلمة السر مطلوبة.</p>
-    <input id="pw" placeholder="كلمة السر" type="password" />
-    <div class="btns">
-      <button class="btn bblue" onclick="login()">دخول</button>
-      <button class="btn borange" onclick="document.getElementById('pw').value=''">مسح</button>
-    </div>
-  </div>
-</div>
-
-<header>
+<div class="top">
   <div class="wrap">
-    <div style="display:flex;justify-content:space-between;align-items:center;gap:10px">
-      <h1>📦 نسخة التجهيز (سهل جداً)</h1>
-      <div class="btns" style="grid-template-columns:1fr 1fr; margin:0; width:210px">
-        <button class="btn bblue" onclick="sync()">⟲</button>
-        <button class="btn borange" onclick="logout()">خروج</button>
-      </div>
+    <div class="bar">
+      <div style="font-size:16px;font-weight:1000">MAD • Prep</div>
+      <div style="font-weight:1000;color:var(--yellow)" id="count">0</div>
     </div>
 
-    <div class="pill">
-      <span>طلبات للتجهيز: <b id="cPrep">0</b></span>
-    </div>
+    <select id="emp" class="select" onchange="saveEmp()">
+      <option value="">اختر اسم الموظف (إجباري للتجهيز)</option>
+      <option value="عبير (עביר)">عبير (עביר)</option>
+      <option value="ألاء (אלאא)">ألاء (אלאא)</option>
+      <option value="ليلى (ליילא)">ليلى (ליילא)</option>
+    </select>
 
-    <div style="margin-top:10px">
-      <select id="emp" onchange="saveEmp()">
-        <option value="">-- اختر اسم الموظف --</option>
-        <option value="عبير (עביר)">عبير (עביר)</option>
-        <option value="ألاء (אלאא)">ألاء (אלאא)</option>
-        <option value="ليلى (ליילא)">ليلى (ליילא)</option>
-      </select>
-    </div>
-
-    <div style="margin-top:10px">
-      <input id="q" placeholder="بحث سريع (اسم/هاتف/كود)" oninput="render()">
-    </div>
+    <div style="height:8px"></div>
+    <input id="q" class="search" placeholder="بحث بالاسم أو التلفون..." oninput="render()"/>
+    <div class="hint">يظهر هنا فقط الطلبات المعتمدة (Approved) — زر واحد للتجهيز + زر طباعة</div>
   </div>
-</header>
-
-<div class="wrap">
-  <div id="list"></div>
 </div>
 
-<div id="printArea"></div>
+<div class="wrap" id="list"></div>
+
+<div class="fixednav">
+  <div class="wrap">
+    <button class="big" onclick="sync()">🔄 تحديث</button>
+  </div>
+</div>
+
+<div id="print-container"></div>
 
 <script>
-  const APP_PASSWORD = "12345678";
-  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw2QxGHOxMv7_uNbMulwO60IHOcKj16rbBJRfoltkwcdb2Bg4zrVjyMt_lf9KgnyyXl/exec";
+  const SCRIPT_URL = "PUT_YOUR_SCRIPT_WEBAPP_URL_HERE";
+  const DASH_KEY = "12345678";
 
   let orders = [];
 
-  function login(){
-    const v = document.getElementById("pw").value;
-    if(v === APP_PASSWORD){
-      localStorage.setItem("mad_auth_prep","1");
-      document.getElementById("lock").style.display="none";
-      loadEmp(); sync();
-    }else alert("كلمة السر خطأ");
+  function saveEmp(){
+    localStorage.setItem("mad_emp", document.getElementById("emp").value);
   }
-  function logout(){
-    localStorage.removeItem("mad_auth_prep");
-    location.reload();
-  }
-  (function boot(){
-    if(localStorage.getItem("mad_auth_prep")==="1"){
-      document.getElementById("lock").style.display="none";
-      loadEmp(); sync();
-    }
-  })();
-
   function loadEmp(){
     const v = localStorage.getItem("mad_emp") || "";
     document.getElementById("emp").value = v;
   }
-  function saveEmp(){
-    localStorage.setItem("mad_emp", document.getElementById("emp").value || "");
-  }
 
-  function isHebrewText(s){ return /[\u0590-\u05FF]/.test(s||""); }
-  function isArabicText(s){ return /[\u0600-\u06FF]/.test(s||""); }
-  function normStatus(s){ return String(s||"").toLowerCase(); }
-  function isReady(s){ return /מוכן|ready|جاهز/.test(normStatus(s)); }
-  function isDelivered(s){ return /delivered|تم\s*التسليم|נמסר/.test(normStatus(s)); }
-  function isCanceled(s){ return /canceled|ملغ|إلغاء|בוטל/.test(normStatus(s)); }
-  function isApproved(s){
-    const t = normStatus(s);
-    return /approved|מאושר|اعتماد|تم\s*ارسال\s*هذا\s*الطلب\s*للتجهيز|قيد\s*التجهيز/.test(t);
-  }
-  function extractPrice(offer, notes){
-    const t = (offer||"") + " " + (notes||"");
-    let m = t.match(/₪\s*([0-9]{2,6})/); if(m) return m[1];
-    m = t.match(/=\s*₪\s*([0-9]{2,6})/); if(m) return m[1];
-    m = t.match(/Price:\s*([0-9]{2,6})/i); if(m) return m[1];
-    return "150";
-  }
-  function offerNoPrice(offer){
-    return String(offer||"").replace(/\s*=\s*₪?\s*\d{2,6}\s*$/,"").trim();
-  }
-  function esc(s){ return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
-  function toWaPhone(p){
-    const d = String(p||"").replace(/\D/g,"");
-    if(d.startsWith("0") && d.length>=9) return ("972"+d.slice(1));
-    return d;
-  }
+  function isApproved(s){ s=String(s||""); return s.includes("Approved") || s.includes("מאושר") || s.includes("Sent to Prep"); }
+  function isReady(s){ s=String(s||""); return s.includes("מוכן") || s.toLowerCase().includes("ready"); }
+  function isDelivered(s){ s=String(s||""); return s.includes("Delivered"); }
 
   async function sync(){
     try{
-      const r = await fetch(`${SCRIPT_URL}?action=get&t=${Date.now()}`);
-      const d = await r.json();
-      orders = Array.isArray(d)? d : [];
+      const res = await fetch(`${SCRIPT_URL}?action=get&t=${Date.now()}`);
+      orders = await res.json();
       render();
-    }catch(e){ console.log(e); }
+    }catch(e){
+      console.error(e);
+      alert("مشكلة في جلب البيانات");
+    }
   }
 
   function render(){
-    const q = (document.getElementById("q").value||"").toLowerCase();
-    const prep = [...orders].reverse()
-      .filter(o => isApproved(o.status||"") && !isReady(o.status||"") && !isDelivered(o.status||"") && !isCanceled(o.status||""))
-      .filter(o => (`${o.name||""} ${o.phone||""} ${o.offer||""} ${o.orderId||""}`).toLowerCase().includes(q));
+    const q = (document.getElementById("q").value||"").toLowerCase().trim();
+    let a = [...(orders||[])].reverse();
 
-    document.getElementById("cPrep").innerText = prep.length;
-    document.getElementById("list").innerHTML = prep.map(card).join("") || `<div class="card">لا توجد طلبات للتجهيز الآن ✅</div>`;
-  }
-
-  function card(o){
-    const row = o.rowIndex;
-    const price = extractPrice(o.offer, o.notes);
-    const offerPure = offerNoPrice(o.offer);
-    const he = isHebrewText(o.name) || /\bhe\b/i.test(o.offer||"");
-
-    return `
-      <div class="card">
-        <div class="big">
-          <div class="row"><div class="lab">رقم الطلب</div><div class="val">${esc(o.orderId||"")}</div></div>
-          <div class="row"><div class="lab">اسم الزبون</div><div class="val" style="direction:rtl;text-align:right">${esc(o.name||"")}</div></div>
-          <div class="row"><div class="lab">الهاتف</div><div class="val">${esc(o.phone||"")}</div></div>
-          <div class="row"><div class="lab">المدينة / العنوان</div><div class="val" style="direction:rtl;text-align:right">${esc(o.city||"-")}</div></div>
-          <div class="row"><div class="lab">الطلب</div><div class="val" style="direction:rtl;text-align:right">${esc(offerPure)}</div></div>
-          <div class="row"><div class="lab">السعر</div><div class="val">₪${esc(price)}</div></div>
-          <div class="row"><div class="lab">ملاحظات</div><div class="val" style="direction:rtl;text-align:right">${esc(o.notes||"")}</div></div>
-        </div>
-
-        <div class="btns">
-          <button class="btn bblue" onclick="printLabel('${esc(o.orderId)}','${esc(o.name)}','${esc(o.phone)}','${esc(o.city)}','${esc(offerPure)}','${esc(price)}','${he ? "he":"ar"}')">🖨️ طباعة</button>
-          <button class="btn borange" onclick="editMini(${row},'${esc(o.orderId)}')">✏️ تعديل</button>
-        </div>
-
-        <div class="btns">
-          <button class="btn bgreen" onclick="markReady(${row},'${esc(o.orderId)}')">✅ تم تجهيز الطلب</button>
-          <button class="btn bblue" onclick="openWA('${esc(o.phone)}','${esc(o.name)}','${esc(o.orderId)}')">💬 واتساب</button>
-        </div>
-
-        <div id="edit_${row}" style="display:none; margin-top:10px">
-          <input id="e_offer_${row}" placeholder="تعديل الطلب" value="${esc(offerPure)}">
-          <input id="e_price_${row}" placeholder="تعديل السعر ₪" value="${esc(price)}">
-          <textarea id="e_notes_${row}" placeholder="تعديل الملاحظات">${esc(o.notes||"")}</textarea>
-          <div class="btns">
-            <button class="btn bblue" onclick="saveMini(${row},'${esc(o.orderId)}')">💾 حفظ</button>
-            <button class="btn borange" onclick="document.getElementById('edit_${row}').style.display='none'">إغلاق</button>
-          </div>
-        </div>
-      </div>
-    `;
-  }
-
-  function editMini(row){
-    const el = document.getElementById(`edit_${row}`);
-    el.style.display = (el.style.display==="none") ? "block" : "none";
-  }
-
-  async function saveMini(row, orderId){
-    const offer = document.getElementById(`e_offer_${row}`).value.trim();
-    const price = document.getElementById(`e_price_${row}`).value.trim();
-    const notes = document.getElementById(`e_notes_${row}`).value.trim();
-
-    const qs = new URLSearchParams({
-      action:"updateOrder",
-      row:String(row),
-      orderId,
-      offer,
-      price,
-      notes
+    a = a.filter(o=>{
+      const s=o.status||"";
+      if(isDelivered(s)) return false;
+      return isApproved(s) && !isReady(s);
     });
 
-    await fetch(`${SCRIPT_URL}?${qs.toString()}`);
+    if(q){
+      a = a.filter(o=>(String(o.name||"").toLowerCase().includes(q) || String(o.phone||"").includes(q)));
+    }
+
+    document.getElementById("count").innerText = a.length;
+
+    const list = document.getElementById("list");
+    if(!a.length){
+      list.innerHTML = `<div class="hint" style="text-align:center;padding:30px">لا توجد طلبات للتجهيز</div>`;
+      return;
+    }
+
+    list.innerHTML = a.map(o=>box(o)).join("");
+  }
+
+  function detectArabic(name){
+    return /[\u0600-\u06FF]/.test(String(name||""));
+  }
+
+  async function updateStatus(row, status){
+    await fetch(`${SCRIPT_URL}?action=updateStatus&key=${encodeURIComponent(DASH_KEY)}&row=${encodeURIComponent(row)}&status=${encodeURIComponent(status)}&t=${Date.now()}`);
     await sync();
   }
 
-  async function markReady(row, orderId){
-    const emp = document.getElementById("emp").value || localStorage.getItem("mad_emp") || "";
-    if(!emp) return alert("اختار اسم الموظف أولاً");
-    const status = `مוכן על ידי ${emp}`;
-    const qs = new URLSearchParams({action:"updateStatus", row:String(row), orderId, status});
-    await fetch(`${SCRIPT_URL}?${qs.toString()}`);
-    await sync();
-  }
+  function box(o){
+    const addr = o.addr || o.city || "-";
+    const delivery = o.delivery || "لم يحدد";
+    const price = o.price || "150";
 
-  function openWA(phone, name, orderId){
-    const wa = toWaPhone(phone);
-    const msg = `MAD ✅\n${name}\nOrder: ${orderId}`;
-    window.open(`https://wa.me/${wa}?text=${encodeURIComponent(msg)}`,'_blank');
-  }
+    return `
+      <div class="box">
+        <div class="bigline">${o.name || "-"}</div>
+        <div class="hint">🆔 ${o.orderId || ""} • 📞 ${o.phone || ""}</div>
 
-  function printLabel(orderId, name, phone, city, offer, price, lang){
-    const area = document.getElementById("printArea");
-    const isHe = (lang==="he");
+        <div class="grid">
+          <div class="kv"><div class="k">العنوان</div><div class="v">${escapeHtml(addr)}</div></div>
+          <div class="kv"><div class="k">شركة التوصيل</div><div class="v">${escapeHtml(delivery)}</div></div>
+          <div class="kv"><div class="k">الطلب (العطور)</div><div class="v">${escapeHtml(o.offer||"")}</div></div>
+          <div class="kv"><div class="k">السعر</div><div class="v">₪${escapeHtml(price)}</div></div>
+        </div>
 
-    const title = isHe ? "מערכת MAD" : "MAD SYSTEM";
-    const nLab = isHe ? "שם" : "الاسم";
-    const pLab = isHe ? "טלפון" : "الهاتف";
-    const aLab = isHe ? "כתובת" : "العنوان";
-    const oLab = isHe ? "הזמנה" : "الطلب";
-    const prLab = isHe ? "סכום" : "السعر";
-    const warn = isHe ? "החלפה רק אם הניילון לא נפתח" : "الاستبدال فقط إذا لم يتم فتح النايلون";
-
-    area.innerHTML = `
-      <div class="label" dir="${isHe?'rtl':'rtl'}">
-        <h2 style="text-align:center">${title}</h2>
-        <div class="t"><b>${nLab}:</b> ${name}</div>
-        <div class="t"><b>${pLab}:</b> ${phone}</div>
-        <div class="t"><b>${aLab}:</b> ${city}</div>
-        <div class="box"><b>${oLab}:</b> ${offer}</div>
-        <div class="t"><b>${prLab}:</b> ₪${price}</div>
-        <div style="text-align:center;margin-top:10px"><svg id="bcode"></svg></div>
-        <div class="warn">${warn}</div>
+        <div class="btns">
+          <button class="btn b-print" onclick='printSticker(${JSON.stringify(o).replace(/"/g,"&quot;")})'>🖨️ طباعة (TSC)</button>
+          <button class="btn b-ready" onclick="markReady(${o.rowIndex})">📦 تم تجهيز الطلب</button>
+        </div>
       </div>
     `;
+  }
 
-    try{
-      JsBarcode("#bcode", String(orderId||phone), { format:"CODE128", width:2, height:55, displayValue:false });
-    }catch(e){}
+  function markReady(row){
+    const emp = document.getElementById("emp").value;
+    if(!emp){ alert("لازم تختار اسم الموظف"); return; }
+    const o = orders.find(x=>x.rowIndex==row);
+    if(!o) return;
+    const delivery = o.delivery || "";
+    const status = `מוכן על ידי ${emp}${delivery ? ` (משלוח: ${delivery})` : ""}`;
+    updateStatus(row, status);
+  }
 
+  function printSticker(o){
+    const isAr = detectArabic(o.name);
+    const delivery = o.delivery || "";
+    const price = o.price || "150";
+
+    const labels = isAr
+      ? {title:"MAD System", name:"الاسم", phone:"الهاتف", del:"التوصيل", offer:"الطلب", price:"السعر", rule:"الاستبدال فقط إذا لم يُفتح النايلون"}
+      : {title:"מערכת MAD", name:"שם", phone:"טלפון", del:"משלוח", offer:"הזמנה", price:"מחיר", rule:"החלפה רק אם הניילון לא נפתח"};
+
+    const container = document.getElementById("print-container");
+    container.innerHTML = `
+      <div class="print-page" dir="rtl">
+        <div style="text-align:center;border-bottom:2px solid #000;font-weight:900;font-size:16pt">${labels.title}</div>
+        <div style="font-size:12pt;margin:10px 0;line-height:1.6">
+          <b>${labels.name}:</b> ${escapeHtml(o.name)}<br>
+          <b>${labels.phone}:</b> ${escapeHtml(o.phone)}<br>
+          <b>${labels.del}:</b> ${escapeHtml(delivery)}<br>
+          <b>${labels.price}:</b> ₪${escapeHtml(price)}
+        </div>
+        <div style="border:1.5px solid #000;padding:6px;background:#eee;font-size:12pt"><b>${labels.offer}:</b> ${escapeHtml(o.offer||"")}</div>
+        <div style="font-size:8pt;border:1px solid red;color:red;text-align:center;font-weight:900;margin-top:10px;padding:6px">
+          ${labels.rule}
+        </div>
+        <div style="text-align:center;margin-top:10px"><svg id="bcode_gen"></svg></div>
+      </div>
+    `;
+    JsBarcode("#bcode_gen", String(o.phone||"").replace(/\D/g,""), { format:"CODE128", width:1.8, height:40, displayValue:false });
     setTimeout(()=>window.print(), 300);
   }
 
-  // auto refresh
-  setInterval(sync, 25000);
+  function escapeHtml(s){
+    return String(s||"").replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+  }
+
+  loadEmp();
+  sync();
 </script>
 </body>
 </html>
