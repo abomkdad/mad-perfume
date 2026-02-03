@@ -1,756 +1,685 @@
 <!DOCTYPE html>
-<html lang="he" dir="rtl">
+<html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>MAD System - Smart Integration</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>MAD Manager</title>
 
-  <!-- PWA -->
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="MAD System">
-  <link rel="apple-touch-icon" href="https://www.mad-parfumeur.com/assets/hero/logo.png">
   <link rel="icon" type="image/png" href="https://www.mad-parfumeur.com/assets/hero/logo.png">
-  <link rel="manifest" href='data:application/manifest+json,{"name":"MAD System","short_name":"MAD","start_url":".","display":"standalone","background_color":"#0f172a","theme_color":"#1e293b","icons":[{"src":"https://www.mad-parfumeur.com/assets/hero/logo.png","sizes":"192x192","type":"image/png"}]}'>
-
   <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
 
   <style>
-    :root {
-      --primary: #60a5fa;
-      --accent: #3b82f6;
-      --success: #10b981;
-      --warning: #f59e0b;
-      --danger: #ef4444;
-      --bg-dark: #0f172a;
-      --card-dark: #1e293b;
-      --text-main: #f8fafc;
-      --text-muted: #94a3b8;
+    :root{
+      --bg:#0b1220;
+      --card:#111c33;
+      --line:#22304d;
+      --text:#f8fafc;
+      --muted:#9fb0c6;
+      --primary:#60a5fa;
+      --success:#22c55e;
+      --warn:#f59e0b;
+      --danger:#ef4444;
+      --darkbtn:#0e1830;
+      --shadow: 0 10px 30px rgba(0,0,0,.35);
+      --radius:18px;
     }
-
-    body {
-      font-family: 'Segoe UI', Tahoma, sans-serif;
-      background-color: var(--bg-dark);
-      color: var(--text-main);
-      margin: 0; padding: 0;
-      display: flex; flex-direction: column; align-items: center;
-      min-height: 100vh;
-      padding-bottom: 100px;
-      overflow-x: hidden;
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      background:var(--bg);
+      color:var(--text);
+      display:flex;
+      justify-content:center;
+      padding-bottom:90px;
     }
-
-    .header-ui {
-      width: 100%; max-width: 600px; background: #1e293b;
-      padding: 15px; box-sizing: border-box;
-      position: sticky; top: 0; z-index: 2000;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.4);
-    }
-
-    .app-logo {
-      position: absolute; top: 12px; left: 12px; width: 38px; height: auto;
-      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
-    }
-
-    .view-title { margin-bottom: 10px; font-weight: bold; font-size: 14px; color: var(--primary); padding-right: 45px; }
-
-    .dash-bar { display: flex; gap: 5px; margin-bottom: 10px; }
-    .stat-item { flex: 1; padding: 8px 5px; border-radius: 8px; text-align: center; font-size: 10px; font-weight: bold; background: #0f172a; border: 1px solid #334155; }
-    .stat-new { border-bottom: 3px solid var(--warning); }
-    .stat-prep { border-bottom: 3px solid var(--accent); }
-    .stat-ready { border-bottom: 3px solid var(--success); }
-
-    .search-input{
+    .app{
       width:100%;
-      box-sizing:border-box;
-      padding:12px 14px;
-      border-radius:12px;
-      border:1px solid #334155;
-      background:#0b1220;
-      color:var(--text-main);
+      max-width:650px;
+    }
+    .top{
+      position:sticky;
+      top:0;
+      z-index:999;
+      background:rgba(11,18,32,.92);
+      backdrop-filter: blur(8px);
+      border-bottom:1px solid var(--line);
+      padding:14px 14px 10px;
+    }
+    .topRow{
+      display:flex;
+      align-items:center;
+      gap:10px;
+    }
+    .logo{
+      width:42px;height:42px;border-radius:12px;
+      background:#0f172a;
+      border:1px solid var(--line);
+      display:flex;align-items:center;justify-content:center;
+      overflow:hidden;
+      box-shadow: var(--shadow);
+      flex:0 0 auto;
+    }
+    .logo img{ width:100%; height:100%; object-fit:cover; }
+    .title{
+      flex:1;
+      line-height:1.1;
+    }
+    .title b{ display:block; font-size:18px; }
+    .title span{ display:block; color:var(--muted); font-weight:800; font-size:12px; margin-top:4px; }
+    .btn{
+      border:none;
+      cursor:pointer;
+      border-radius:14px;
+      padding:12px 12px;
+      font-weight:1000;
+      color:var(--text);
+      background:var(--darkbtn);
+      border:1px solid var(--line);
+      box-shadow: var(--shadow);
+      transition:.15s;
+      user-select:none;
+    }
+    .btn:active{ transform:scale(.98); }
+    .btnWide{
+      width:100%;
+      display:flex;
+      gap:10px;
+      justify-content:center;
+      align-items:center;
+      font-size:16px;
+      padding:14px;
+      border-radius:16px;
+    }
+    .btnPrimary{ background:rgba(96,165,250,.18); border-color:rgba(96,165,250,.35); }
+    .btnSuccess{ background:rgba(34,197,94,.18); border-color:rgba(34,197,94,.35); }
+    .btnWarn{ background:rgba(245,158,11,.18); border-color:rgba(245,158,11,.35); color:#fff; }
+    .btnDanger{ background:rgba(239,68,68,.18); border-color:rgba(239,68,68,.35); }
+    .btnSolidPrimary{ background: #2563eb; border-color:#2563eb; }
+    .btnSolidSuccess{ background: #16a34a; border-color:#16a34a; }
+    .btnSolidDanger{ background: #b91c1c; border-color:#b91c1c; }
+    .btnSolidWarn{ background:#d97706; border-color:#d97706; }
+
+    .stats{
+      margin-top:10px;
+      display:grid;
+      grid-template-columns:1fr 1fr 1fr;
+      gap:8px;
+    }
+    .stat{
+      background:rgba(17,28,51,.7);
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:10px;
+      text-align:center;
+      box-shadow: var(--shadow);
+      font-weight:1000;
+    }
+    .stat small{ display:block; color:var(--muted); font-size:11px; margin-bottom:6px; }
+    .stat b{ font-size:18px; }
+    .statNew{ border-bottom:4px solid var(--warn); }
+    .statWork{ border-bottom:4px solid var(--primary); }
+    .statReady{ border-bottom:4px solid var(--success); }
+
+    .searchRow{
+      display:flex;
+      gap:8px;
+      margin-top:10px;
+    }
+    .search{
+      flex:1;
+      border-radius:16px;
+      border:1px solid var(--line);
+      background:#081127;
+      color:var(--text);
+      padding:14px;
+      font-weight:900;
       outline:none;
-      font-weight:800;
+      box-shadow: var(--shadow);
     }
-    .search-input::placeholder{ color:#64748b; font-weight:800; }
+    .search::placeholder{ color:#6b7d98; font-weight:900; }
 
-    .bottom-nav {
-      position: fixed; bottom: 0; width: 100%; max-width: 600px;
-      background: #1e293b; display: flex; box-shadow: 0 -4px 15px rgba(0,0,0,0.5); z-index: 2000;
+    .content{
+      padding:14px;
     }
-    .nav-item { flex: 1; padding: 15px 5px; text-align: center; border: none; background: none; color: var(--text-muted); cursor: pointer; font-weight: bold; font-size: 11px; }
-    .nav-item.active { color: var(--primary); border-top: 3px solid var(--primary); background: #0f172a; }
-
-    .section { display: none; width: 95%; max-width: 500px; margin-top: 15px; }
-    .section.active { display: block; animation: slideUp 0.3s ease; }
-    @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; } }
-
-    .order-card {
-      background: var(--card-dark); border-radius: 20px; padding: 20px;
-      margin-bottom: 15px; border-right: 12px solid #475569;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.4); position: relative;
+    .sectionTitle{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      margin:14px 0 10px;
+      color:var(--muted);
+      font-weight:1000;
+      font-size:13px;
+      border-bottom:1px solid var(--line);
+      padding-bottom:8px;
     }
-    .status-new { border-right-color: var(--warning); }
-    .status-approved { border-right-color: var(--accent); }
-    .status-ready { border-right-color: var(--success); }
-
-    .section-divider {
-      color: var(--text-muted); font-size: 11px; font-weight: bold;
-      margin: 25px 0 10px 0; border-bottom: 1px solid #334155; padding-bottom: 5px;
-      text-align: right; display: flex; justify-content: space-between;
+    .sectionTitle strong{ color:var(--text); }
+    .card{
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      padding:14px;
+      box-shadow: var(--shadow);
+      margin-bottom:12px;
+    }
+    .cardHead{
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      align-items:flex-start;
+    }
+    .name{
+      font-size:18px;
+      font-weight:1000;
+      line-height:1.2;
+    }
+    .badge{
+      font-size:12px;
+      font-weight:1000;
+      padding:6px 10px;
+      border-radius:999px;
+      border:1px solid var(--line);
+      background:#0a1430;
+      color:var(--muted);
+      white-space:nowrap;
+    }
+    .meta{
+      margin-top:8px;
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      color:var(--muted);
+      font-weight:900;
+      font-size:12px;
+    }
+    .offer{
+      margin-top:10px;
+      background:#0a1430;
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:12px;
+      font-weight:1000;
+      font-size:14px;
+    }
+    .row2{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+      margin-top:10px;
+    }
+    .field{
+      background:#ffffff;
+      border-radius:16px;
+      border:2px solid rgba(96,165,250,.45);
+      padding:10px;
+      color:#000;
+    }
+    .field label{
+      display:block;
+      font-size:11px;
+      font-weight:1000;
+      margin-bottom:6px;
+      color:#0b1220;
+    }
+    .field input, .field select{
+      width:100%;
+      border:none;
+      outline:none;
+      background:transparent;
+      font-size:18px;
+      font-weight:1000;
+      color:#000;
     }
 
-    .info-container { background: #0f172a; padding: 15px; border-radius: 12px; margin: 10px 0; border: 1px solid #334155; }
-    .info-row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #1e293b; }
-    .info-row:last-child { border-bottom: none; }
-    .info-label { color: var(--text-muted); font-size: 12px; font-weight: bold; }
-    .info-val { color: var(--text-main); font-size: 14px; text-align: left; }
-
-    .select-box { margin-top: 10px; padding: 12px; background: #ffffff; border-radius: 12px; border: 2.5px solid var(--primary); }
-    .select-label { font-size: 11px; color: #000; font-weight: bold; display: block; margin-bottom: 5px; }
-    .select-input { width: 100%; background: transparent; color: #000; border: none; font-size: 15px; font-weight: 900; outline: none; cursor: pointer; }
-
-    .actions-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-top: 15px; }
-    .btn {
-      padding: 12px 5px; border-radius: 10px; font-size: 11px; font-weight: bold;
-      border: none; cursor: pointer; display: flex; flex-direction: column;
-      align-items: center; justify-content: center; gap: 4px; transition: 0.2s;
+    .actions{
+      display:grid;
+      grid-template-columns:1fr 1fr 1fr;
+      gap:10px;
+      margin-top:12px;
     }
-    .btn:disabled { opacity: 0.2; cursor: not-allowed; filter: grayscale(1); }
-    .btn-approve { background: var(--accent); color: white; }
-    .btn-wa { background: #065f46; color: #a7f3d0; }
-    .btn-print { background: #1e3a8a; color: #bfdbfe; }
-    .btn-ready { background: #6b21a8; color: #f3e8ff; }
-    .btn-danger { background: #7f1d1d; color: #fecaca; }
+    .actions .btnWide{ padding:14px 10px; font-size:15px; }
 
-    .form-group{ display:flex; flex-direction:column; gap:6px; margin-bottom:12px; }
-    .form-group label{ color:var(--text-muted); font-weight:800; font-size:12px; }
-    .form-group input, .form-group textarea{
-      background:#0b1220; color:var(--text-main); border:1px solid #334155; border-radius:12px;
-      padding:12px 12px; outline:none; font-weight:800;
+    .bottomBar{
+      position:fixed;
+      bottom:0;
+      left:50%;
+      transform:translateX(-50%);
+      width:100%;
+      max-width:650px;
+      display:flex;
+      gap:10px;
+      padding:10px 14px;
+      background:rgba(11,18,32,.95);
+      border-top:1px solid var(--line);
+      z-index:1000;
     }
+    .bottomBar .btn{ flex:1; padding:14px; font-size:16px; }
 
-    #notification-toast {
-      position: fixed; top: -100px; left: 50%; transform: translateX(-50%);
-      background: var(--warning); color: #000; padding: 15px 30px;
-      border-radius: 50px; z-index: 10001; font-weight: 800; transition: 0.6s;
-      box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+    /* Modal */
+    .modalWrap{
+      position:fixed;
+      inset:0;
+      background:rgba(0,0,0,.55);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding:16px;
+      z-index:2000;
     }
-    #notification-toast.show { top: 25px; }
-
-    #print-container { display: none; }
-    @media print {
-      body * { visibility: hidden; }
-      #print-container, #print-container * { visibility: visible; }
-      #print-container { display: block !important; position: absolute; left: 0; top: 0; width: 100%; }
-      .print-page { width: 100mm; height: 100mm; margin: 0 auto; padding: 5mm; box-sizing: border-box; background: white; color: black; }
+    .modal{
+      width:100%;
+      max-width:520px;
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:22px;
+      padding:14px;
+      box-shadow: var(--shadow);
     }
+    .modal h3{
+      margin:0 0 12px 0;
+      font-size:18px;
+      font-weight:1000;
+    }
+    .formGrid{
+      display:grid;
+      grid-template-columns:1fr;
+      gap:10px;
+    }
+    .in{
+      width:100%;
+      border-radius:16px;
+      border:1px solid var(--line);
+      background:#081127;
+      color:var(--text);
+      padding:14px;
+      font-weight:900;
+      outline:none;
+      font-size:15px;
+    }
+    textarea.in{ min-height:90px; resize:none; }
+    .modalActions{
+      display:flex;
+      gap:10px;
+      margin-top:12px;
+    }
+    .modalActions .btn{ flex:1; }
 
-    .hint {
-      font-size: 11px;
-      color: var(--text-muted);
-      margin-top: 6px;
-      line-height: 1.4;
+    /* Toast */
+    .toast{
+      position:fixed;
+      top:-120px;
+      left:50%;
+      transform:translateX(-50%);
+      background:var(--warn);
+      color:#000;
+      font-weight:1000;
+      padding:14px 18px;
+      border-radius:999px;
+      box-shadow: var(--shadow);
+      transition:.5s;
+      z-index:3000;
+    }
+    .toast.show{ top:18px; }
+
+    .empty{
+      text-align:center;
+      color:var(--muted);
+      padding:26px 10px;
+      font-weight:1000;
     }
   </style>
 </head>
 
 <body>
-  <div id="notification-toast">🔔 הזמנה חדשה במערכת!</div>
+  <div class="toast" id="toast">تم ✅</div>
 
-  <div id="app-ui">
-    <div class="header-ui">
-      <img src="https://www.mad-parfumeur.com/assets/hero/logo.png" alt="MAD Logo" class="app-logo">
-      <div id="view-label" class="view-title">לוח בקרה מנהל</div>
-
-      <div class="dash-bar">
-        <div class="stat-item stat-new">חדש: <span id="count-new">0</span></div>
-        <div class="stat-item stat-prep">בתהליך: <span id="count-prep">0</span></div>
-        <div class="stat-item stat-ready">מוכן: <span id="count-ready">0</span></div>
+  <div class="app">
+    <div class="top">
+      <div class="topRow">
+        <div class="logo">
+          <img src="https://www.mad-parfumeur.com/assets/hero/logo.png" alt="MAD">
+        </div>
+        <div class="title">
+          <b>نسخة المدير ✅</b>
+          <span>اعتماد + شركة توصيل + تعديل السعر + إلغاء + تسليم للمندوب</span>
+        </div>
+        <button class="btn btnPrimary" onclick="activateAudio()">🔔 صوت</button>
       </div>
 
-      <div id="audioActivation" style="margin-bottom: 10px;">
-        <button class="btn" style="width: 100%; background: var(--success); color:white; flex-direction: row; font-size: 13px;" onclick="activateAudio()">
-          <span>🔊</span> הפעלת רטט וצליל (تفعيل جرس التنبيه)
-        </button>
+      <div class="stats">
+        <div class="stat statNew"><small>طلبات جديدة</small><b id="cNew">0</b></div>
+        <div class="stat statWork"><small>قيد التجهيز</small><b id="cWork">0</b></div>
+        <div class="stat statReady"><small>جاهز للتسليم</small><b id="cReady">0</b></div>
       </div>
 
-      <input type="text" class="search-input" id="searchInput" placeholder="חיפוש לפי שם أو طלפון..." oninput="renderTab()">
+      <div class="searchRow">
+        <input id="q" class="search" placeholder="ابحث بالاسم أو الهاتف..." oninput="render()">
+        <button class="btn btnPrimary" onclick="sync()">🔄 تحديث</button>
+      </div>
     </div>
 
-    <!-- Manager -->
-    <div id="section-manage" class="section">
-      <div id="managerList"></div>
+    <div class="content">
+      <div id="list"></div>
     </div>
 
-    <!-- Preparer -->
-    <div id="section-prep" class="section">
-      <div id="preparerList"></div>
-    </div>
-
-    <!-- Add -->
-    <div id="section-add" class="section">
-
-      <!-- ✅ WhatsApp Smart Box -->
-      <div class="card" style="background: var(--card-dark); padding: 20px; border-radius: 16px; border: 1px solid #334155; margin-bottom: 14px;">
-        <h4 style="margin:0 0 12px 0; text-align: center; color: var(--success);">📥 بوكس واتساب ذكي — تحليل + اعتماد + إرسال</h4>
-
-        <div class="form-group">
-          <label>الصق رسالة واتساب هنا (أي شكل)</label>
-          <textarea id="wa_raw" rows="5" placeholder="الصق الرسالة هنا..."></textarea>
-          <div class="hint">✅ النظام يلتقط تلقائيًا: الاسم + الهاتف + العنوان + الكود/العرض (إذا موجود)</div>
-        </div>
-
-        <div class="form-group">
-          <label>السعر (₪) — للطلب</label>
-          <input type="number" id="wa_price" value="150" min="0" inputmode="numeric">
-        </div>
-
-        <button class="btn" style="width: 100%; background: #0ea5e9; color:white; padding: 14px; font-size: 14px; margin-bottom: 10px;" onclick="parseWhatsAppToForm()">
-          🧠 تحليل الرسالة وتعبئة الحقول
-        </button>
-
-        <div class="select-box" style="margin-top: 10px;">
-          <span class="select-label">اختر شركة التوصيل (مطلوب للاعتماد):</span>
-          <select class="select-input" id="wa_delivery">
-            <option value="">-- اختر شركة --</option>
-            <option value="High Express">High Express</option>
-            <option value="Marwah Delivery">Marwah Delivery</option>
-            <option value="Lama Delivery">Lama Delivery</option>
-            <option value="Areen Delivery">Areen Delivery</option>
-          </select>
-        </div>
-
-        <button class="btn" style="width: 100%; background: var(--success); color:white; padding: 15px; font-size: 15px; margin-top: 10px;" onclick="sendSmartApproved()">
-          ✅ إرسال واعتماد مباشرة للشيت
-        </button>
-
-        <div class="hint">بعد الإرسال: الطلب يدخل الشيت بحالة <b>Approved ✅</b> ويظهر فورًا في <b>📦 הכנה</b>.</div>
-      </div>
-
-      <!-- Manual Add -->
-      <div class="card" style="background: var(--card-dark); padding: 20px; border-radius: 16px; border: 1px solid #334155;">
-        <h4 style="margin:0 0 15px 0; text-align: center; color: var(--primary);">📝 ريشום הזמנה חדשה (يدوي)</h4>
-
-        <div class="form-group"><label>اسم الزبون</label><input type="text" id="in_name"></div>
-        <div class="form-group"><label>الهاتف</label><input type="tel" id="in_phone"></div>
-        <div class="form-group"><label>العنوان</label><input type="text" id="in_addr"></div>
-        <div class="form-group"><label>الطلب (C)</label><input type="text" id="in_offer"></div>
-
-        <div class="form-group"><label>السعر (₪)</label><input type="number" id="in_price" value="150" min="0" inputmode="numeric"></div>
-
-        <div class="form-group"><label>ملاحظات (G)</label><textarea id="in_notes" rows="2"></textarea></div>
-
-        <button class="btn" style="width: 100%; background: var(--accent); color: white; padding: 15px; font-size: 15px;" onclick="saveOrder()">שמירת הזמנה ✅</button>
-      </div>
-
+    <div class="bottomBar">
+      <button class="btn btnSolidPrimary" onclick="openAdd()">➕ إضافة طلب</button>
+      <button class="btn btnSuccess" onclick="sync()">↻ تحديث الآن</button>
     </div>
   </div>
 
-  <div class="bottom-nav">
-    <button class="nav-item active" id="nav-manage" onclick="switchTab('manage')">⚙️ מנהל</button>
-    <button class="nav-item" id="nav-prep" onclick="switchTab('prep')">📦 הכנה</button>
-    <button class="nav-item" id="nav-add" onclick="switchTab('add')">➕ הוספה</button>
+  <!-- Add Modal -->
+  <div class="modalWrap" id="modalWrap" onclick="closeAdd(event)">
+    <div class="modal" onclick="event.stopPropagation()">
+      <h3>➕ إضافة طلب جديد (يدوي)</h3>
+      <div class="formGrid">
+        <input id="in_name" class="in" placeholder="اسم الزبون">
+        <input id="in_phone" class="in" placeholder="الهاتف">
+        <input id="in_addr" class="in" placeholder="العنوان / المدينة">
+        <input id="in_offer" class="in" placeholder="الطلب (C)">
+        <input id="in_price" class="in" placeholder="السعر ₪ (مثال 150)" value="150" inputmode="numeric">
+        <textarea id="in_notes" class="in" placeholder="ملاحظات (اختياري)"></textarea>
+      </div>
+
+      <div class="modalActions">
+        <button class="btn btnDanger" onclick="closeAdd()">إغلاق</button>
+        <button class="btn btnSolidSuccess" onclick="saveOrder()">✅ حفظ</button>
+      </div>
+    </div>
   </div>
 
-  <div id="print-container"></div>
+<script>
+  // ✅ رابط الـ Apps Script Web App
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw2QxGHOxMv7_uNbMulwO60IHOcKj16rbBJRfoltkwcdb2Bg4zrVjyMt_lf9KgnyyXl/exec";
 
-  <script>
-    // ✅ ضع رابط Apps Script Web App /exec
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz90B0wz9cj9XcVlrW3tg9i2Af2a2aIo86nfgY9lopfFnx4KGVBwjZ91g-1uP6UaX8Y/exec";
-    const MANAGER_PHONE = "972509787730";
+  let all = [];
+  let audioCtx = null;
 
-    let allOrders = [];
-    let currentTab = 'manage';
-    let localStatusMap = {};
-    let managerDeliveryMap = {};
-    let employeeNameMap = {};
-    let localPriceMap = {}; // ✅ أسعار محلية حتى الحفظ
+  // Persist maps
+  let deliveryMap = JSON.parse(localStorage.getItem("mad_delivery_map") || "{}");
+  let priceMap = JSON.parse(localStorage.getItem("mad_price_map") || "{}");
+  let statusLocal = JSON.parse(localStorage.getItem("mad_status_map") || "{}"); // optional local cache
 
-    let lastTotalCount = 0;
-    let isInitialLoad = true;
-    let audioCtx;
+  function toast(msg){
+    const t = document.getElementById("toast");
+    t.textContent = msg;
+    t.classList.add("show");
+    setTimeout(()=>t.classList.remove("show"), 2500);
+  }
 
-    function switchTab(tab) {
-      currentTab = tab;
-      document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-      document.getElementById('section-' + tab).classList.add('active');
-      document.getElementById('nav-' + tab).classList.add('active');
-
-      const labels = {
-        'manage': 'לוח בקרה מנהל - אישור ומتابعة',
-        'prep': 'מערכת הכנה - مربعات מלאים',
-        'add': 'رישום הזמנה חדשה + بوكس واتساب ذكي'
-      };
-      document.getElementById('view-label').innerText = labels[tab];
-      syncData();
-    }
-
-    async function syncData() {
-      try {
-        const res = await fetch(`${SCRIPT_URL}?action=get&t=${Date.now()}`);
-        const data = await res.json();
-
-        if (!isInitialLoad && Array.isArray(data) && data.length > lastTotalCount) {
-          triggerAlert("הזמנה חדשה במערכת!");
-        }
-
-        lastTotalCount = Array.isArray(data) ? data.length : 0;
-        isInitialLoad = false;
-
-        allOrders = Array.isArray(data) ? data : [];
-        updateDashboard(allOrders);
-        renderTab();
-      } catch(e) { console.error("Sync Error", e); }
-    }
-
-    function updateDashboard(data) {
-      const stats = { new: 0, prep: 0, ready: 0 };
-      data.forEach(o => {
-        const s = localStatusMap[o.orderId] || o.status || "";
-        if (String(s).includes("Canceled") || String(s).includes("❌")) return;
-        if (String(s).includes("Delivered")) return;
-
-        if (String(s).includes("מוכן")) stats.ready++;
-        else if (String(s).includes("Approved") || String(s).includes("מאושר")) stats.prep++;
-        else stats.new++;
-      });
-      document.getElementById('count-new').innerText = stats.new;
-      document.getElementById('count-prep').innerText = stats.prep;
-      document.getElementById('count-ready').innerText = stats.ready;
-    }
-
-    function getOrderPrice_(o){
-      const p = localPriceMap[o.orderId] || o.price || "150";
-      return String(p).replace(/[^\d]/g,'') || "150";
-    }
-
-    function renderTab() {
-      const query = (document.getElementById('searchInput').value || "").toLowerCase();
-      let data = [...allOrders].reverse();
-
-      if (currentTab === 'manage') {
-        const filtered = data.filter(o => (String(o.name||"").toLowerCase().includes(query) || String(o.phone||"").includes(query)));
-        renderManager(filtered);
-      } else if (currentTab === 'prep') {
-        const prepData = data.filter(o => {
-          const s = localStatusMap[o.orderId] || o.status || "";
-          return (String(s).includes("Approved") || String(s).includes("מאושר")) &&
-                 !String(s).includes("Delivered") && !String(s).includes("מוכן") && !String(s).includes("Canceled");
-        }).filter(o => (String(o.name||"").toLowerCase().includes(query) || String(o.phone||"").includes(query)));
-        renderPreparer(prepData);
-      }
-    }
-
-    function renderManager(orders) {
-      const list = document.getElementById('managerList');
-
-      const newOrders = orders.filter(o => {
-        const s = localStatusMap[o.orderId] || o.status || "";
-        return !String(s).includes("Approved") && !String(s).includes("מאושר") && !String(s).includes("מוכן") &&
-               !String(s).includes("Delivered") && !String(s).includes("Canceled");
-      });
-
-      const inWorkOrders = orders.filter(o => {
-        const s = localStatusMap[o.orderId] || o.status || "";
-        return (String(s).includes("Approved") || String(s).includes("מאושר")) &&
-               !String(s).includes("מוכן") && !String(s).includes("Delivered") && !String(s).includes("Canceled");
-      });
-
-      const readyOrders = orders.filter(o => {
-        const s = localStatusMap[o.orderId] || o.status || "";
-        return String(s).includes("מוכן") && !String(s).includes("Delivered") && !String(s).includes("Canceled");
-      });
-
-      let html = '<div class="section-divider">הזמנות חדשות (بانتظار الاعتماد) <span>'+newOrders.length+'</span></div>';
-      html += newOrders.map(o => createManagerCard(o, 'new')).join('');
-
-      html += '<div class="section-divider">בטיפול עובדות (قيد التجهيز) <span>'+inWorkOrders.length+'</span></div>';
-      html += inWorkOrders.map(o => createManagerCard(o, 'approved')).join('');
-
-      html += '<div class="section-divider" style="color:var(--success)">הזמנות מוכנות (جاهز للتوصيل ✅) <span>'+readyOrders.length+'</span></div>';
-      html += readyOrders.map(o => createManagerCard(o, 'ready')).join('');
-
-      list.innerHTML = html;
-    }
-
-    function createManagerCard(o, type) {
-      const s = localStatusMap[o.orderId] || o.status || "חדש";
-      const delivery = managerDeliveryMap[o.orderId] || "";
-      const isReady = type === 'ready';
-      const isApproved = type === 'approved' || isReady;
-
-      const price = getOrderPrice_(o);
-
-      return `
-        <div class="order-card ${isReady ? 'status-ready' : (isApproved ? 'status-approved' : 'status-new')}">
-          <div style="display:flex; justify-content:space-between; align-items:center;">
-            <b style="font-size:16px;">${o.name || "-"}</b>
-            <span style="font-size:9px; background:#334155; padding:2px 6px; border-radius:4px;">${s}</span>
-          </div>
-          <div style="font-size:12px; color:var(--text-muted); margin:4px 0;">
-            📞 ${o.phone || "-"} | 📍 ${o.city || '-'} | 💰 ₪${price}
-          </div>
-
-          <div style="font-size:13px; background:#0f172a; padding:10px; border-radius:10px; margin-top:5px; border:1px solid #1e293b;">
-            📦 ${o.offer || "-"}
-          </div>
-
-          <!-- ✅ Price Edit for Manager -->
-          <div class="select-box" style="border-color: var(--warning);">
-            <span class="select-label">💰 تعديل السعر (₪):</span>
-            <input
-              style="width:100%; background:transparent; border:none; outline:none; font-size:18px; font-weight:900; color:#000;"
-              type="number" min="0" value="${price}"
-              oninput="localPriceMap['${o.orderId}']=this.value"
-            />
-            <button class="btn" style="margin-top:10px; width:100%; background: var(--warning); color:#000; flex-direction:row;"
-              onclick="updatePrice('${o.orderId}', '${o.rowIndex}', (localPriceMap['${o.orderId}']||'${price}'))">
-              💾 حفظ السعر
-            </button>
-          </div>
-
-          ${!isReady ? `
-          <div class="select-box" style="${isApproved ? 'opacity:0.5; pointer-events:none;' : ''}">
-            <span class="select-label">בחר חברת משלוחים:</span>
-            <select class="select-input" onchange="managerDeliveryMap['${o.orderId}']=this.value; renderTab();">
-              <option value="">-- בחר חברה --</option>
-              <option value="High Express" ${delivery==='High Express'?'selected':''}>High Express</option>
-              <option value="Marwah Delivery" ${delivery==='Marwah Delivery'?'selected':''}>Marwah Delivery</option>
-              <option value="Lama Delivery" ${delivery==='Lama Delivery'?'selected':''}>Lama Delivery</option>
-              <option value="Areen Delivery" ${delivery==='Areen Delivery'?'selected':''}>Areen Delivery</option>
-            </select>
-          </div>` : ''}
-
-          <div class="actions-grid">
-            ${!isReady ? `<button class="btn btn-approve" ${isApproved || !delivery ? 'disabled' : ''} onclick="updateStatus('${o.orderId}', '${o.rowIndex}', 'Approved ✅ (משלוח: ${delivery})')">✅ اعتماد</button>` : ''}
-            <button class="btn btn-wa" onclick="sendWA('AR', '${o.phone || ''}', '${o.name || ''}', '${o.offer || ''}', '${o.orderId || ''}', '${price}')">💬 واتساب</button>
-            ${isReady
-              ? `<button class="btn" style="background:var(--success); color:white;" onclick="updateStatus('${o.orderId}', '${o.rowIndex}', 'Delivered ✅')">✅ تسليم للمندوب</button>`
-              : `<button class="btn btn-danger" onclick="updateStatus('${o.orderId}', '${o.rowIndex}', 'Canceled ❌')">❌ إلغاء</button>`
-            }
-          </div>
-
-          ${isReady ? `<div style="margin-top:10px; padding:5px; background:rgba(16,185,129,0.1); border-radius:8px; color:var(--success); font-weight:bold; font-size:11px; text-align:center; border:1px dashed var(--success);">${s}</div>` : ''}
-        </div>
-      `;
-    }
-
-    function renderPreparer(orders) {
-      const list = document.getElementById('preparerList');
-      if (orders.length === 0) {
-        list.innerHTML = '<p style="text-align:center; padding:30px; color:var(--text-muted);">אין הזמנות מאושרות (لا توجد طلبات معتمدة)</p>';
-        return;
-      }
-
-      list.innerHTML = orders.map(o => {
-        const id = o.orderId || o.phone;
-        const s = localStatusMap[o.orderId] || o.status || "";
-        const empName = employeeNameMap[id] || "";
-        const delMatch = String(s).match(/\(משלוח: (.*?)\)/);
-        const delCompany = delMatch ? delMatch[1] : "لم يحدد";
-        const price = getOrderPrice_(o);
-
-        return `
-          <div class="order-card status-approved">
-            <div style="text-align:center; border-bottom:1px solid #334155; padding-bottom:10px; margin-bottom:10px;">
-              <b style="font-size:18px; color:var(--primary);">פרטי הזמנה - مربع كامل</b>
-            </div>
-
-            <div class="info-container">
-              <div class="info-row"><span class="info-label">שם לקוח:</span><span class="info-val">${o.name || "-"}</span></div>
-              <div class="info-row"><span class="info-label">טלפון:</span><span class="info-val">${o.phone || "-"}</span></div>
-              <div class="info-row"><span class="info-label">כתובת:</span><span class="info-val">${o.city || '-'}</span></div>
-              <div class="info-row"><span class="info-label">מחיר:</span><span class="info-val" style="font-weight:900; color: var(--warning);">₪${price}</span></div>
-              <div class="info-row" style="margin-top:8px; border-top:1px dashed #334155; padding-top:8px;">
-                <span class="info-label">הזמנה (C):</span><span class="info-val" style="color:var(--warning); font-weight:bold;">${o.offer || "-"}</span>
-              </div>
-              <div class="info-row"><span class="info-label">הערות:</span><span class="info-val">${o.notes || 'אין'}</span></div>
-              <div class="info-row" style="background:var(--accent); color:white; padding:6px; border-radius:8px; margin-top:8px;">
-                <span class="info-label" style="color:white;">חברת משלוח:</span><span class="info-val" style="font-weight:900;">${delCompany}</span>
-              </div>
-            </div>
-
-            <div class="select-box ${!empName ? 'required' : ''}">
-              <span class="select-label">מי מכינה? (عبير، ألاء، ليلى):</span>
-              <select class="select-input" onchange="employeeNameMap['${id}']=this.value; renderTab();">
-                <option value="">-- בחר שם עובדת --</option>
-                <option value="عبير (עביר)" ${empName==='عبير (עביר)'?'selected':''}>عبير (עביר)</option>
-                <option value="ألاء (אלאא)" ${empName==='ألاء (אלאא)'?'selected':''}>ألاء (אלאא)</option>
-                <option value="ليلى (ליילא)" ${empName==='ليلى (ליילא)'?'selected':''}>ليلى (ליילא)</option>
-              </select>
-            </div>
-
-            <div class="actions-grid">
-              <button class="btn btn-print" onclick="printSticker(${JSON.stringify(o).replace(/"/g, '&quot;')}, '${delCompany}', '${price}')">🖨️ ملصق</button>
-              <button class="btn btn-ready" ${!empName ? 'disabled' : ''} onclick="finalizeReady('${o.orderId}', '${o.rowIndex}', '${o.name || ''}', '${delCompany}')">📦 تم التجهيز</button>
-              <button class="btn btn-wa" style="background:#064e3b;" onclick="sendWA('HE', '${o.phone || ''}', '${o.name || ''}', '${o.offer || ''}', '${o.orderId || ''}', '${price}')">💬 WhatsApp</button>
-            </div>
-          </div>
-        `;
-      }).join('');
-    }
-
-    async function saveOrder() {
-      const d = {
-        name: document.getElementById('in_name').value,
-        phone: document.getElementById('in_phone').value,
-        address: document.getElementById('in_addr').value,
-        offer: document.getElementById('in_offer').value,
-        notes: document.getElementById('in_notes').value,
-        price: document.getElementById('in_price').value || "150",
-        source: "Web-App",
-        lang: "ar",
-        payment: "Cash",
-        process: "Direct"
-      };
-      if(!d.name || !d.phone) return alert("נא למלא פרטים");
-      fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(d) });
-      alert("נשמר! עובר לניהול מנהל.");
-      syncData();
-      switchTab('manage');
-    }
-
-    async function updateStatus(orderId, row, s) {
-      localStatusMap[orderId] = s;
-      renderTab();
-      updateDashboard(allOrders);
-      try {
-        fetch(`${SCRIPT_URL}?action=updateStatus&row=${encodeURIComponent(row)}&orderId=${encodeURIComponent(orderId)}&status=${encodeURIComponent(s)}&t=${Date.now()}`);
-      } catch(e) {}
-    }
-
-    async function updatePrice(orderId, row, price) {
-      const p = String(price || "").replace(/[^\d]/g,'');
-      if(!p) { triggerAlert("❌ أدخل سعر صحيح"); return; }
-      localPriceMap[orderId] = p;
-      renderTab();
-      try {
-        fetch(`${SCRIPT_URL}?action=updatePrice&row=${encodeURIComponent(row)}&orderId=${encodeURIComponent(orderId)}&price=${encodeURIComponent(p)}&t=${Date.now()}`);
-      } catch(e) {}
-      triggerAlert("✅ تم حفظ السعر");
-    }
-
-    async function finalizeReady(orderId, row, custName, delivery) {
-      const emp = employeeNameMap[orderId] || "";
-      const status = `מוכן על ידי ${emp} (משלוח: ${delivery})`;
-      updateStatus(orderId, row, status);
-
-      const msg = `*עדכון تجهيز - MAD SYSTEM* 📢\n\nالطلب الخاص بـ *${custName}* جاهز الآن!\n👤 الموظفة: ${emp}\n🚚 الشركة: ${delivery}\n✅ الحالة: تم التجهيز وجاهز للمرسول.`;
-      window.open(`https://wa.me/${MANAGER_PHONE}?text=${encodeURIComponent(msg)}`, '_blank');
-    }
-
-    function printSticker(o, delivery, price) {
-      const container = document.getElementById('print-container');
-      container.innerHTML = `
-        <div class="print-page" dir="rtl">
-          <div style="text-align:center; border-bottom:2px solid #000; font-weight:bold; font-size:16pt;">מערכת MAD</div>
-          <div style="font-size:12pt; margin:10px 0;">
-            <b>שם:</b> ${o.name}<br>
-            <b>טלפון:</b> ${o.phone}<br>
-            <b>מחיר:</b> ₪${price || (o.price||'150')}<br>
-            <b>משלוח:</b> ${delivery}
-          </div>
-          <div style="border:1.5px solid #000; padding:5px; background:#eee;">${o.offer}</div>
-          <div style="font-size:8pt; border:1px solid red; color:red; text-align:center; font-weight:bold; margin-top:8px;">החלפה אך ורק בתנאי שהניילון לא נפתח</div>
-          <div style="text-align:center; margin-top:10px;"><svg id="bcode_gen"></svg></div>
-        </div>`;
-      JsBarcode("#bcode_gen", String(o.phone||""), { format: "CODE128", width: 1.8, height: 40, displayValue: false });
-      setTimeout(() => window.print(), 500);
-    }
-
-    function sendWA(lang, phone, name, offer, id, price) {
-      const total = price ? `₪${price}.00` : `₪150.00`;
-      let msg = `*شكر دافئ من القلب - MAD* ❤️\nأهلاً بك *${name}*، نشكرك على اختيارك لنا! تفاصيل طلبيتك:\n📦 المنتج: ${offer}\n📄 رقم الطلب: ${id || 'חדש'}\n💰 الإجمالي: ${total}\n✨ خدمة العملاء: 9935*`;
-      if(lang==='HE') msg = `*תודה רבה מכל הלב - MAD* ❤️\nשלום *${name}*,\nתודה על طلبك! تفاصيل الطلب:\n📦 פריט: ${offer}\n📄 מספר הזמנה: ${id || 'חדש'}\n💰 סה"כ: ${total}\n✨ שירות לקוחות: 9935*`;
-      const cp = String(phone||"").startsWith('0') ? ('972' + String(phone||"").substring(1)) : String(phone||"");
-      window.open(`https://wa.me/${cp.replace(/\D/g, '')}?text=${encodeURIComponent(msg)}`, '_blank');
-    }
-
-    function activateAudio() {
+  function activateAudio(){
+    try{
       audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      document.getElementById('audioActivation').style.display = 'none';
+      toast("🔔 تم تفعيل الصوت");
+    }catch(e){
+      toast("❌ جهازك لا يدعم الصوت");
     }
+  }
 
-    function triggerAlert(text) {
-      const toast = document.getElementById('notification-toast');
-      toast.innerText = text;
-      toast.classList.add('show');
-      setTimeout(() => toast.classList.remove('show'), 6000);
-      if (audioCtx) {
-        const osc = audioCtx.createOscillator();
-        const g = audioCtx.createGain();
-        osc.connect(g); g.connect(audioCtx.destination);
-        osc.start(); osc.stop(audioCtx.currentTime + 0.6);
-      }
-      if (navigator.vibrate) navigator.vibrate([500, 200, 500]);
+  async function sync(){
+    try{
+      const res = await fetch(`${SCRIPT_URL}?action=get&t=${Date.now()}`, { cache:"no-store" });
+      const data = await res.json();
+      all = Array.isArray(data) ? data : [];
+      render();
+    }catch(e){
+      console.error(e);
+      toast("❌ مشكلة اتصال");
     }
+  }
 
-    /* ---------------------------
-       ✅ WhatsApp Smart Box Parser
-    ---------------------------- */
-    function hasHebrew_(s){ return /[\u0590-\u05FF]/.test(s || ""); }
-    function normalizeDigits_(s){
-      const map = {'٠':'0','١':'1','٢':'2','٣':'3','٤':'4','٥':'5','٦':'6','٧':'7','٨':'8','٩':'9'};
-      return String(s||"").replace(/[٠-٩]/g, d => map[d] || d);
+  function getS(o){
+    return String(statusLocal[o.orderId] || o.status || "");
+  }
+  function setS(orderId, s){
+    statusLocal[orderId] = s;
+    localStorage.setItem("mad_status_map", JSON.stringify(statusLocal));
+  }
+  function getPrice(o){
+    const p = priceMap[o.orderId] ?? o.price ?? "150";
+    const only = String(p).replace(/[^\d]/g,"");
+    return only || "150";
+  }
+  function saveMaps(){
+    localStorage.setItem("mad_delivery_map", JSON.stringify(deliveryMap));
+    localStorage.setItem("mad_price_map", JSON.stringify(priceMap));
+  }
+
+  function updateCounters(){
+    let n=0,w=0,r=0;
+    all.forEach(o=>{
+      const s = getS(o);
+      if (s.includes("Canceled") || s.includes("❌")) return;
+      if (s.includes("Delivered")) return;
+
+      if (s.includes("מוכן")) r++;
+      else if (s.includes("Approved") || s.includes("מאושר")) w++;
+      else n++;
+    });
+    document.getElementById("cNew").textContent = n;
+    document.getElementById("cWork").textContent = w;
+    document.getElementById("cReady").textContent = r;
+  }
+
+  function normalizePhone(p){
+    let d = String(p||"").replace(/[^\d]/g,"");
+    if (d.startsWith("00")) d = d.slice(2);
+    if (d.startsWith("9720")) d = "972" + d.slice(4);
+    if (d.startsWith("0")) {
+      if (d.startsWith("059") && d.length >= 10) d = "970" + d.slice(1);
+      else if (d.startsWith("05") && d.length >= 10) d = "972" + d.slice(1);
+      else if (d.length >= 9) d = "972" + d.slice(1);
     }
-    function cleanText_(s){ return normalizeDigits_(s).replace(/\r/g,'').trim(); }
+    if (d.length === 9 && d.startsWith("5")) d = "972" + d;
+    if (d.length === 9 && d.startsWith("59")) d = "970" + d;
+    return d;
+  }
 
-    function normalizePhone_(p){
-      if(!p) return "";
-      let d = String(p).replace(/[^\d]/g,'');
-      if (d.startsWith('00')) d = d.slice(2);
-      if (d.startsWith('9720')) d = '972' + d.slice(4);
-      if (d.startsWith('0')) {
-        if (d.startsWith('059') && d.length >= 10) d = '970' + d.slice(1);
-        else if (d.startsWith('05') && d.length >= 10) d = '972' + d.slice(1);
-        else if (d.length >= 9) d = '972' + d.slice(1);
-      }
-      if (d.length === 9 && d.startsWith('5')) d = '972' + d;
-      if (d.length === 9 && d.startsWith('59')) d = '970' + d;
-      return d;
+  function sendWA(phone, name, offer, orderId, price){
+    const p = normalizePhone(phone);
+    const total = `₪${(price||"150")}.00`;
+    const msg =
+`*MAD* 🖤
+أهلاً بك *${name}*
+📦 الطلب: ${offer}
+📄 رقم: ${orderId}
+💰 الإجمالي: ${total}
+✨ خدمة العملاء: 9935*`;
+    window.open(`https://wa.me/${p}?text=${encodeURIComponent(msg)}`, "_blank");
+  }
+
+  async function updateStatus(rowIndex, orderId, status){
+    setS(orderId, status);
+    render();
+
+    try{
+      await fetch(`${SCRIPT_URL}?action=updateStatus&row=${encodeURIComponent(rowIndex)}&orderId=${encodeURIComponent(orderId)}&status=${encodeURIComponent(status)}&t=${Date.now()}`, { cache:"no-store" });
+      toast("✅ تم تحديث الحالة");
+    }catch(e){
+      toast("⚠️ تم محليًا (تحقق من السكربت)");
     }
+  }
 
-    function extractPhone_(text){
-      const t = cleanText_(text);
-      const digitGroups = t.match(/\d[\d\s\-\(\)]{7,16}\d/g) || [];
-      const cands = digitGroups.map(g => g.replace(/[^\d]/g,'')).filter(x => x.length >= 9 && x.length <= 13);
-      let best = "";
-      let bestScore = -1;
-      cands.forEach(d=>{
-        let score = 0;
-        if (d.startsWith("05")) score += 5;
-        if (d.startsWith("059")) score += 5;
-        if (d.startsWith("972")) score += 4;
-        if (d.startsWith("970")) score += 4;
-        if (d.length >= 9 && d.length <= 13) score += 2;
-        if (score > bestScore){ bestScore = score; best = d; }
-      });
-      return normalizePhone_(best);
+  async function updatePrice(rowIndex, orderId, price){
+    const p = String(price||"").replace(/[^\d]/g,"");
+    if(!p){ toast("❌ أدخل سعر صحيح"); return; }
+    priceMap[orderId] = p;
+    saveMaps();
+    render();
+
+    try{
+      await fetch(`${SCRIPT_URL}?action=updatePrice&row=${encodeURIComponent(rowIndex)}&orderId=${encodeURIComponent(orderId)}&price=${encodeURIComponent(p)}&t=${Date.now()}`, { cache:"no-store" });
+      toast("✅ تم حفظ السعر");
+    }catch(e){
+      toast("⚠️ تم محليًا (تحقق من السكربت)");
     }
+  }
 
-    function extractFieldAfterLabel_(lines, labelRegex){
-      for (const ln of lines){
-        if (labelRegex.test(ln)){
-          const parts = ln.split(/[:\-]/);
-          if (parts.length > 1) return parts.slice(1).join(':').trim();
-          return ln.replace(labelRegex,'').trim();
-        }
-      }
-      return "";
-    }
+  function card(o){
+    const s = getS(o);
+    const q = (document.getElementById("q").value || "").toLowerCase();
+    const name = String(o.name || "-");
+    const phone = String(o.phone || "-");
+    const city = String(o.city || "-");
+    const offer = String(o.offer || "-");
+    const row = o.rowIndex;
+    const orderId = o.orderId || "";
+    const price = getPrice(o);
 
-    function extractOffer_(lines, text){
-      const t = cleanText_(text);
-      const codeMatch = t.match(/\b[A-Za-z]{1,3}\s*[- ]?\s*\d{2,4}\b/g);
-      if (codeMatch && codeMatch.length) return codeMatch[0].replace(/\s+/g,'').replace('-', '');
-      const keys = [/العرض/i,/كود/i,/code/i,/offer/i,/الطلب/i,/product/i,/מוצר/i,/פריט/i,/קוד/i];
-      for (const ln of lines){
-        for (const k of keys){
-          if (k.test(ln)) {
-            const parts = ln.split(/[:\-]/);
-            if (parts.length > 1) return parts.slice(1).join(':').trim();
-            return ln.trim();
+    const match = name.toLowerCase().includes(q) || phone.includes(q) || offer.toLowerCase().includes(q);
+    if(q && !match) return "";
+
+    const isDelivered = s.includes("Delivered");
+    const isCanceled = s.includes("Canceled") || s.includes("❌");
+    const isReady = s.includes("מוכן") && !isDelivered && !isCanceled;
+    const isApproved = (s.includes("Approved") || s.includes("מאושר")) && !isReady && !isDelivered && !isCanceled;
+    const isNew = !isApproved && !isReady && !isDelivered && !isCanceled;
+
+    let badge = "جديد";
+    if(isApproved) badge = "معتمد / قيد التجهيز";
+    if(isReady) badge = "جاهز للتسليم";
+    if(isDelivered) badge = "تم التسليم";
+    if(isCanceled) badge = "ملغي";
+
+    const del = deliveryMap[orderId] || "";
+    const approveDisabled = (!del || !isNew);
+
+    return `
+      <div class="card">
+        <div class="cardHead">
+          <div>
+            <div class="name">${escapeHtml(name)}</div>
+            <div class="meta">
+              <span>📞 ${escapeHtml(phone)}</span>
+              <span>📍 ${escapeHtml(city)}</span>
+              <span>💰 ₪${escapeHtml(price)}</span>
+            </div>
+          </div>
+          <div class="badge">${escapeHtml(badge)}</div>
+        </div>
+
+        <div class="offer">📦 ${escapeHtml(offer)}</div>
+
+        <div class="row2">
+          <div class="field">
+            <label>💰 تعديل السعر (₪)</label>
+            <input type="number" inputmode="numeric" min="0" value="${escapeHtml(price)}"
+              oninput="priceMap['${escapeAttr(orderId)}']=this.value; saveMaps()">
+            <button class="btn btnSolidWarn btnWide" style="margin-top:8px" onclick="updatePrice('${row}','${escapeAttr(orderId)}', priceMap['${escapeAttr(orderId)}'] || '${escapeAttr(price)}')">💾 حفظ السعر</button>
+          </div>
+
+          <div class="field">
+            <label>🚚 شركة التوصيل (مطلوب للاعتماد)</label>
+            <select onchange="deliveryMap['${escapeAttr(orderId)}']=this.value; saveMaps(); render()">
+              <option value="">-- اختر شركة --</option>
+              <option value="High Express" ${del==="High Express"?"selected":""}>High Express</option>
+              <option value="Marwah Delivery" ${del==="Marwah Delivery"?"selected":""}>Marwah Delivery</option>
+              <option value="Lama Delivery" ${del==="Lama Delivery"?"selected":""}>Lama Delivery</option>
+              <option value="Areen Delivery" ${del==="Areen Delivery"?"selected":""}>Areen Delivery</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button class="btn btnSolidSuccess btnWide" ${approveDisabled?"disabled":""}
+            onclick="updateStatus('${row}','${escapeAttr(orderId)}','Approved ✅ (משלוח: ${escapeAttr(del)})')">✅ اعتماد</button>
+
+          <button class="btn btnSolidPrimary btnWide" onclick="sendWA('${escapeAttr(phone)}','${escapeAttr(name)}','${escapeAttr(offer)}','${escapeAttr(orderId)}','${escapeAttr(priceMap[orderId]||price)}')">💬 واتساب</button>
+
+          ${isReady
+            ? `<button class="btn btnSolidWarn btnWide" onclick="updateStatus('${row}','${escapeAttr(orderId)}','Delivered ✅')">✅ تسليم للمندوب</button>`
+            : `<button class="btn btnSolidDanger btnWide" ${(!isNew && !isApproved)?"disabled":""} onclick="updateStatus('${row}','${escapeAttr(orderId)}','Canceled ❌')">❌ إلغاء</button>`
           }
-        }
-      }
-      return "";
+        </div>
+      </div>
+    `;
+  }
+
+  function render(){
+    updateCounters();
+
+    const newList = [];
+    const workList = [];
+    const readyList = [];
+
+    all.slice().reverse().forEach(o=>{
+      const s = getS(o);
+      if (s.includes("Delivered")) return;
+      if (s.includes("Canceled") || s.includes("❌")) return;
+
+      if (s.includes("מוכן")) readyList.push(o);
+      else if (s.includes("Approved") || s.includes("מאושר")) workList.push(o);
+      else newList.push(o);
+    });
+
+    let html = "";
+    html += `<div class="sectionTitle"><strong>طلبات جديدة</strong><span>${newList.length}</span></div>`;
+    html += newList.length ? newList.map(card).join("") : `<div class="empty">لا يوجد طلبات جديدة</div>`;
+
+    html += `<div class="sectionTitle"><strong>قيد التجهيز</strong><span>${workList.length}</span></div>`;
+    html += workList.length ? workList.map(card).join("") : `<div class="empty">لا يوجد</div>`;
+
+    html += `<div class="sectionTitle"><strong>جاهز للتسليم</strong><span>${readyList.length}</span></div>`;
+    html += readyList.length ? readyList.map(card).join("") : `<div class="empty">لا يوجد</div>`;
+
+    document.getElementById("list").innerHTML = html;
+  }
+
+  function openAdd(){
+    document.getElementById("modalWrap").style.display = "flex";
+  }
+  function closeAdd(e){
+    document.getElementById("modalWrap").style.display = "none";
+  }
+
+  async function saveOrder(){
+    const name = document.getElementById("in_name").value.trim();
+    const phone = document.getElementById("in_phone").value.trim();
+    const address = document.getElementById("in_addr").value.trim();
+    const offer = document.getElementById("in_offer").value.trim();
+    const price = String(document.getElementById("in_price").value || "150").replace(/[^\d]/g,"") || "150";
+    const notes = document.getElementById("in_notes").value.trim();
+
+    if(!name || !phone || !offer){ toast("❌ اكتب الاسم + الهاتف + الطلب"); return; }
+
+    const payload = {
+      name, phone,
+      address: address || "-",
+      offer,
+      price,
+      notes,
+      source: "Manager Manual",
+      lang: "ar",
+      payment: "Cash",
+      process: "Direct",
+      status: "Processing..."
+    };
+
+    try{
+      fetch(SCRIPT_URL, { method:"POST", mode:"no-cors", body: JSON.stringify(payload) });
+      toast("✅ تم حفظ الطلب");
+      closeAdd();
+      // clear
+      ["in_name","in_phone","in_addr","in_offer","in_notes"].forEach(id=>document.getElementById(id).value="");
+      document.getElementById("in_price").value = "150";
+      setTimeout(sync, 600);
+    }catch(e){
+      toast("❌ فشل الحفظ");
     }
+  }
 
-    function extractAddress_(lines){
-      const addr = extractFieldAfterLabel_(lines, /^(العنوان|عنوان|address|כתובת)\s*[:\-]?\s*/i);
-      if (addr) return addr;
-      const streetKey = /(شارع|حارة|حي|منطقة|street|st\.|road|ave|דירה|רחוב|שכונה|עיר)/i;
-      const cand = lines.find(ln => streetKey.test(ln));
-      return cand ? cand.trim() : "";
-    }
+  function escapeHtml(str){
+    return String(str ?? "").replace(/[&<>"']/g, s => ({
+      "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+    }[s]));
+  }
+  function escapeAttr(str){
+    return String(str ?? "").replace(/'/g, "\\'").replace(/"/g, '\\"');
+  }
 
-    function extractName_(lines){
-      const name = extractFieldAfterLabel_(lines, /^(الاسم|اسم|name|שם)\s*[:\-]?\s*/i);
-      if (name) return name;
-      const badKey = /(شارع|عنوان|address|כתובת|رقم|phone|טלפון|050|052|053|054|055|056|057|058|059|972|970|كود|code|offer|العرض|الطلب)/i;
-      for (const ln of lines){
-        const hasLetters = /[A-Za-z\u0590-\u05FF\u0600-\u06FF]/.test(ln);
-        const hasDigits = /\d/.test(ln);
-        if (hasLetters && !badKey.test(ln) && !hasDigits && ln.length <= 40) return ln.trim();
-      }
-      return "";
-    }
-
-    function parseWhatsAppText_(raw){
-      const text = cleanText_(raw);
-      const lines = text.split('\n').map(x => x.trim()).filter(Boolean);
-
-      const phone = extractPhone_(text);
-      const offer = extractOffer_(lines, text);
-      const name = extractName_(lines);
-      const address = extractAddress_(lines);
-
-      return {
-        name: name || "Customer",
-        phone: phone || "",
-        address: address || "",
-        offer: offer || "",
-        notes: "WA_RAW: " + text
-      };
-    }
-
-    function parseWhatsAppToForm(){
-      const raw = document.getElementById('wa_raw').value || "";
-      if (!raw.trim()) { triggerAlert("❌ الصق رسالة واتساب أولاً"); return; }
-      const parsed = parseWhatsAppText_(raw);
-
-      document.getElementById('in_name').value = parsed.name || "";
-      document.getElementById('in_phone').value = parsed.phone || "";
-      document.getElementById('in_addr').value = parsed.address || "";
-      document.getElementById('in_offer').value = parsed.offer || "";
-      document.getElementById('in_notes').value = parsed.notes || "";
-
-      triggerAlert("✅ تم تحليل الرسالة وتعبئة الحقول");
-    }
-
-    function sendSmartApproved(){
-      const raw = document.getElementById('wa_raw').value || "";
-      if (!raw.trim()) { triggerAlert("❌ الصق رسالة واتساب أولاً"); return; }
-
-      const delivery = document.getElementById('wa_delivery').value || "";
-      if (!delivery) { triggerAlert("❌ اختر شركة التوصيل أولاً"); return; }
-
-      const price = String(document.getElementById('wa_price').value || "150").replace(/[^\d]/g,'') || "150";
-      const parsed = parseWhatsAppText_(raw);
-      const lang = hasHebrew_(raw) ? "he" : "ar";
-
-      const status = `Approved ✅ (משלוח: ${delivery})`;
-
-      const payload = {
-        name: parsed.name,
-        phone: parsed.phone,
-        address: parsed.address || "-",
-        offer: parsed.offer || "WhatsApp-Order",
-        notes: parsed.notes,
-        source: "WhatsApp Smart Box",
-        lang: lang,
-        price: price,
-        payment: "Cash",
-        process: "Direct",
-        status: status
-      };
-
-      fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
-
-      triggerAlert("✅ تم الاعتماد وإرسال الطلب للشيت");
-      document.getElementById('wa_raw').value = "";
-      document.getElementById('wa_delivery').value = "";
-      document.getElementById('wa_price').value = "150";
-
-      setTimeout(() => {
-        syncData();
-        switchTab('prep');
-      }, 600);
-    }
-
-    window.onload = () => switchTab('manage');
-    setInterval(syncData, 35000);
-  </script>
+  // Start
+  sync();
+  setInterval(sync, 25000);
+</script>
 </body>
 </html>
