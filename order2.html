@@ -15,7 +15,6 @@
       --success: #16a34a;
       --text: #1e293b;
       --border: #e2e8f0;
-      /* צבעי כפתורים חדשים */
       --btn-print-bg: linear-gradient(135deg, #3b82f6, #2563eb);
       --btn-ready-bg: linear-gradient(135deg, #22c55e, #15803d);
     }
@@ -29,7 +28,6 @@
       background: var(--primary); color: white; padding: 15px;
       position: sticky; top: 0; z-index: 100; display: flex;
       justify-content: space-between; align-items: center;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
     }
 
     .container { padding: 12px; max-width: 600px; margin: auto; }
@@ -40,30 +38,23 @@
       box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
     }
     .prep-header { display: flex; justify-content: space-between; border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 10px; }
-    .order-num { font-weight: 900; font-size: 22px; color: #000; }
+    .order-num { font-weight: 900; font-size: 22px; }
     
     .item-list { background: #fff1f2; padding: 12px; border-radius: 8px; font-weight: 800; font-size: 19px; margin: 10px 0; color: #e11d48; border-right: 4px solid #e11d48; }
     
+    /* עיצוב חברת שליחויות בכרטיס */
+    .courier-badge {
+      display: inline-block; background: #fef9c3; color: #854d0e; 
+      padding: 4px 10px; border-radius: 20px; font-size: 13px; font-weight: bold; margin-bottom: 10px;
+    }
+
     .btn {
       padding: 14px; border-radius: 10px; border: none; font-weight: bold;
-      display: flex; align-items: center; justify-content: center; gap: 8px; 
-      cursor: pointer; transition: transform 0.1s, opacity 0.2s;
-      text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+      display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer;
     }
-    .btn:active { transform: scale(0.98); }
+    .btn-print { background: var(--btn-print-bg); color: white; width: 100%; margin-bottom: 10px; font-size: 16px; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3); }
+    .btn-ready { background: var(--btn-ready-bg); color: white; width: 100%; font-size: 16px; box-shadow: 0 4px 12px rgba(21, 128, 61, 0.3); }
 
-    .btn-print { 
-        background: var(--btn-print-bg); 
-        color: white; width: 100%; margin-bottom: 10px; font-size: 16px;
-        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
-    }
-    .btn-ready { 
-        background: var(--btn-ready-bg); 
-        color: white; width: 100%; font-size: 16px;
-        box-shadow: 0 4px 12px rgba(21, 128, 61, 0.3);
-    }
-
-    /* הגדרות הדפסה בגודל 98x98 מ"מ */
     @media print {
       body * { visibility: hidden; }
       #printSection, #printSection * { visibility: visible; }
@@ -75,22 +66,19 @@
         display: flex; flex-direction: column; justify-content: space-between;
       }
       @page { size: 98mm 98mm; margin: 0; }
-      .no-print { display: none; }
     }
 
     .label-box {
       width: 98mm; height: 98mm; border: 1px solid #000; padding: 10px;
-      display: none; 
-      font-family: Arial, sans-serif; background: white; color: black;
+      display: none; font-family: Arial, sans-serif; background: white; color: black;
     }
     .label-header { text-align: center; border-bottom: 2px solid #000; padding-bottom: 5px; }
-    .label-body { margin-top: 10px; font-size: 16px; flex-grow: 1; }
+    .label-body { margin-top: 10px; font-size: 15px; flex-grow: 1; }
     .label-footer { text-align: center; font-size: 12px; border-top: 1px solid #000; padding-top: 5px; }
     
     .bottom-nav {
       position: fixed; bottom: 0; left: 0; right: 0;
       background: white; display: flex; border-top: 1px solid var(--border);
-      box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
     }
     .nav-item { flex: 1; text-align: center; padding: 12px; color: #64748b; text-decoration: none; font-size: 14px; }
     .nav-item.active { color: #2563eb; font-weight: bold; }
@@ -99,8 +87,8 @@
 <body>
 
 <div class="header">
-  <div style="font-weight: 900; letter-spacing: 1px;">MAD <span style="color:#22c55e">PREP STATION</span></div>
-  <div id="status" style="font-size: 12px; background: rgba(255,255,255,0.2); padding: 4px 8px; border-radius: 4px;">טוען...</div>
+  <div style="font-weight: 900;">MAD <span style="color:#22c55e">PREP STATION</span></div>
+  <div id="status" style="font-size: 12px;">טוען...</div>
 </div>
 
 <div class="container" id="ordersList"></div>
@@ -113,21 +101,24 @@
 
 <div id="printSection" class="label-box">
   <div class="label-header">
-    <h1 style="margin:0; font-size: 24px;">MAD Parfumeur</h1>
-    <div id="p_delivery" style="font-weight: bold; font-size: 18px; border: 1px solid #000; display: inline-block; padding: 2px 10px;"></div>
+    <h1 style="margin:0; font-size: 22px;">MAD Parfumeur</h1>
+    <div style="display: flex; justify-content: center; gap: 10px; margin-top: 5px;">
+        <div id="p_delivery" style="font-weight: bold; font-size: 16px; border: 1px solid #000; padding: 1px 8px;"></div>
+        <div id="p_company_label" style="font-weight: bold; font-size: 16px; background: #000; color: #fff; padding: 1px 8px;"></div>
+    </div>
   </div>
   <div class="label-body">
-    <div style="font-size: 22px; font-weight: 900;">הזמנה: <span id="p_id"></span></div>
-    <div style="margin-top: 8px;">
-        <strong>לקוח:</strong> <span id="p_name"></span><br>
-        <strong>טלפון:</strong> <span id="p_phone"></span><br>
-        <strong>כתובת:</strong> <span id="p_addr"></span>
+    <div style="font-size: 20px; font-weight: 900;">הזמנה: <span id="p_id"></span></div>
+    <div style="margin-top: 5px;">
+        <strong>לקוח:</strong> <span id="p_name"></span> | <span id="p_phone"></span><br>
+        <strong>כתובת:</strong> <span id="p_addr"></span><br>
+        <strong>חברת שליחויות:</strong> <span id="p_courier_val" style="font-weight: bold;"></span>
     </div>
-    <div style="margin-top: 10px; padding: 5px; border: 2px dashed #000; min-height: 80px;">
+    <div style="margin-top: 8px; padding: 5px; border: 2px dashed #000; min-height: 70px;">
         <strong>מוצרים:</strong><br>
-        <div id="p_offer" style="font-size: 19px; font-weight: bold;"></div>
+        <div id="p_offer" style="font-size: 18px; font-weight: bold;"></div>
     </div>
-    <div style="margin-top: 8px; font-size: 20px; font-weight: bold; text-align: center; background: #eee;">
+    <div style="margin-top: 8px; font-size: 19px; font-weight: bold; text-align: center; background: #f3f4f6; padding: 4px;">
         לתשלום: <span id="p_price"></span> ₪ | <span id="p_payment"></span>
     </div>
   </div>
@@ -144,12 +135,6 @@ let allOrders = [];
 
 async function load(filterStatus = 'Approved') {
   document.getElementById('status').textContent = "מעדכן...";
-  
-  // עדכון ויזואלי של התפריט התחתון
-  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-  if(filterStatus === 'Approved') document.querySelectorAll('.nav-item')[0].classList.add('active');
-  if(filterStatus === 'READY') document.querySelectorAll('.nav-item')[1].classList.add('active');
-
   try {
     const res = await fetch(`${SCRIPT_URL}?action=get&_=${Date.now()}`);
     const data = await res.json();
@@ -168,22 +153,19 @@ async function load(filterStatus = 'Approved') {
 
 function render() {
   const container = document.getElementById('ordersList');
-  if(allOrders.length === 0) {
-      container.innerHTML = '<div style="text-align:center; margin-top:50px; color:#94a3b8;">אין הזמנות חדשות</div>';
-      return;
-  }
   container.innerHTML = allOrders.map(o => `
     <div class="prep-card">
       <div class="prep-header">
         <span class="order-num">#${o.orderId}</span>
-        <span style="font-weight:bold; background:#e2e8f0; padding:2px 8px; border-radius:4px; font-size:14px;">${o.delivery || 'משלוח רגיל'}</span>
+        <span style="font-weight:bold;">${o.delivery || 'משלוח'}</span>
       </div>
       <div>
+        <div class="courier-badge"><i class="fa fa-truck"></i> חברת שליחויות: ${o.courier || 'טרם נקבע'}</div><br>
         <strong style="font-size:18px;">${o.name}</strong> | ${o.phone}
         <div class="item-list">${o.offer}</div>
-        <div style="font-size:14px; color:#64748b; margin-top:5px;"><i class="fa fa-map-marker-alt"></i> ${o.addr || o.city || 'לא צוין'}</div>
+        <div style="font-size:14px; color:#64748b;">כתובת: ${o.addr || o.city || 'לא צוין'}</div>
       </div>
-      <div style="margin-top:20px;">
+      <div style="margin-top:15px;">
         <button class="btn btn-print" onclick="printLabel(${o.rowIndex})"><i class="fa fa-print"></i> הדפס מדבקה (98x98)</button>
         <button class="btn btn-ready" onclick="markReady(${o.rowIndex})"><i class="fa fa-check"></i> סמן כהושלם (מוכן)</button>
       </div>
@@ -202,7 +184,9 @@ function printLabel(rowIndex) {
   document.getElementById('p_offer').textContent = o.offer;
   document.getElementById('p_price').textContent = o.price;
   document.getElementById('p_delivery').textContent = o.delivery || "משלוח";
-  
+  document.getElementById('p_courier_val').textContent = o.courier || "כללי";
+  document.getElementById('p_company_label').textContent = o.courier || "MAD";
+
   let payHe = o.payment;
   if(payHe === "نقداً" || payHe === "Cash") payHe = "מזומן";
   if(payHe === "مدفوع" || payHe === "Paid") payHe = "שולם";
@@ -213,7 +197,7 @@ function printLabel(rowIndex) {
 
 async function markReady(row) {
   if(!confirm("האם ההזמנה מוכנה למשלוח?")) return;
-  const url = `${SCRIPT_URL}?action=updateStatus&key=${DASH_KEY}&row=${row}&status=${encodeURIComponent("READY ✅ (מוכן / مجهز)")}`;
+  const url = `${SCRIPT_URL}?action=updateStatus&key=${DASH_KEY}&row=${row}&status=${encodeURIComponent("READY ✅ (מוכן)")}`;
   await fetch(url);
   load('Approved');
 }
