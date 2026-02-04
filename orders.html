@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=0"/>
-  <title>MAD Manager v4.0 - English Companies & Local Numbers</title>
+  <title>MAD Manager v4.6 - Latest Orders First</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
   <style>
@@ -81,13 +81,17 @@
       display: none; align-items: center; justify-content: center; z-index: 2000; padding: 20px;
     }
     .modal-overlay.show { display: flex; }
-    .modal-content { background: var(--card); width: 100%; max-width: 420px; padding: 28px; border-radius: 32px; border: 1px solid var(--border); overflow-y: auto; max-height: 85vh; }
+    .modal-content { background: var(--card); width: 100%; max-width: 450px; padding: 24px; border-radius: 32px; border: 1px solid var(--border); overflow-y: auto; max-height: 90vh; }
+
+    .smart-box { background: rgba(59, 130, 246, 0.1); border: 1px dashed var(--primary); padding: 15px; border-radius: 16px; margin-bottom: 20px; }
+    .smart-box h4 { margin: 0 0 10px 0; font-size: 14px; color: var(--primary); display: flex; align-items: center; gap: 8px; }
+
+    input, select, textarea { width: 100%; padding: 12px; margin-bottom: 12px; border-radius: 12px; border: 1px solid var(--border); background: rgba(0,0,0,0.2); color: white; outline: none; font-size: 15px; box-sizing: border-box; }
+    input:focus, textarea:focus { border-color: var(--primary); background: rgba(0,0,0,0.4); }
 
     .invoice-box { background: white; color: black; width: 98mm; height: 98mm; padding: 8mm; box-sizing: border-box; display: flex; flex-direction: column; position: relative; border-radius: 2px; }
     .inv-header { text-align: center; border-bottom: 2px solid #000; padding-bottom: 8px; margin-bottom: 10px; }
     .inv-footer { border-top: 2px solid #000; padding-top: 8px; display: flex; justify-content: space-between; align-items: flex-end; }
-
-    input, select, textarea { width: 100%; padding: 12px; margin-bottom: 12px; border-radius: 12px; border: 1px solid var(--border); background: rgba(0,0,0,0.2); color: white; outline: none; font-size: 15px; }
 
     #toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: #10b981; color: white; padding: 14px 28px; border-radius: 50px; font-weight: 700; z-index: 3000; display: none; box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
     #loadingOverlay { position: fixed; inset: 0; background: rgba(6, 9, 20, 0.7); z-index: 4000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
@@ -138,17 +142,25 @@
   </div>
 </div>
 
-<!-- Edit Order Modal -->
-<div class="modal-overlay" id="editModal">
+<!-- Order Modal (Add/Edit) -->
+<div class="modal-overlay" id="orderModal">
   <div class="modal-content">
-    <h3>تعديل تفاصيل الطلب</h3>
-    <label>الاسم</label><input type="text" id="f_name">
-    <label>الهاتف</label><input type="tel" id="f_phone">
-    <label>الأصناف</label><textarea id="f_offer" rows="2"></textarea>
+    <h3 id="modalTitle" style="margin-top:0;">إضافة طلب جديد</h3>
+    
+    <!-- Smart Analysis Section -->
+    <div class="smart-box" id="smartSection">
+        <h4><i class="fa fa-magic"></i> المحلل الذكي للبيانات</h4>
+        <textarea id="smartInput" placeholder="الصق نص الطلب هنا (الاسم، الهاتف، العنوان...) ثم اضغط تحليل..." style="height: 80px; margin-bottom: 8px; font-size: 13px;"></textarea>
+        <button class="btn btn-primary" onclick="analyzeText()" style="width: 100%; flex-direction: row; height: 35px; font-size: 13px;">تحليل وتعبئة تلقائية</button>
+    </div>
+
+    <label>الاسم الكامل</label><input type="text" id="f_name">
+    <label>رقم الهاتف</label><input type="tel" id="f_phone">
+    <label>الأصناف المطلوبة</label><textarea id="f_offer" rows="2"></textarea>
     <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
       <div><label>السعر (₪)</label><input type="number" id="f_price"></div>
       <div>
-        <label>الدفع</label>
+        <label>طريقة الدفع</label>
         <select id="f_payment">
           <option value="دفع عند الاستلام">دفع عند الاستلام</option>
           <option value="شراء من الموقع - مدفوع">شراء من الموقع - مدفوع</option>
@@ -157,7 +169,7 @@
       </div>
     </div>
     <label>المدينة</label><input type="text" id="f_city">
-    <label>ملاحظات إضافية (العمود G)</label><textarea id="f_notes" rows="2" placeholder="أضف ملاحظة اختيارية هنا..."></textarea>
+    <label>ملاحظات إضافية</label><textarea id="f_notes" rows="2"></textarea>
     <label>شركة التوصيل</label>
     <select id="f_delivery">
       <option value="">-- اختر شركة الشحن --</option>
@@ -168,8 +180,8 @@
       <option value="Pickup">Pickup</option>
     </select>
     <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:10px;">
-      <button class="btn btn-outline" onclick="closeModal('editModal')">إلغاء</button>
-      <button class="btn btn-primary" onclick="saveOrder()">حفظ وتنظيف السطر ✨</button>
+      <button class="btn btn-outline" onclick="closeModal('orderModal')">إلغاء</button>
+      <button class="btn btn-primary" onclick="saveOrder()" id="saveBtn">حفظ الطلب ✨</button>
     </div>
   </div>
 </div>
@@ -200,7 +212,6 @@ function showToast(m) { const t = document.getElementById('toast'); t.textConten
 
 const safe = (v) => (v === undefined || v === null || String(v).toLowerCase()==="undefined" || String(v).toLowerCase()==="null") ? "" : String(v).trim();
 
-// دالة لتحويل أرقام الهواتف للصيغة المحلية (05...)
 function formatLocalPhone(p) {
   if(!p) return "";
   let d = String(p).replace(/\D/g, "");
@@ -209,11 +220,36 @@ function formatLocalPhone(p) {
   return d;
 }
 
-// دالة مخصصة لروابط واتساب (تحتاج لـ 972)
 function normalizePhoneForLink(p) { 
   let d = String(p||"").replace(/\D/g, ""); 
   if (d.startsWith("0")) d = "972" + d.substring(1); 
   return d; 
+}
+
+function analyzeText() {
+    const raw = document.getElementById('smartInput').value;
+    if(!raw.trim()) return showToast("الصق نصاً أولاً");
+
+    const phoneMatch = raw.match(/(?:05|972|5)\d{8,11}/);
+    if(phoneMatch) document.getElementById('f_phone').value = formatLocalPhone(phoneMatch[0]);
+
+    const priceMatch = raw.match(/(\d{2,4})\s*(?:₪|shekel|ILS|السعر)/i) || raw.match(/(?:₪|السعر|Price)\s*:?\s*(\d{2,4})/i);
+    if(priceMatch) document.getElementById('f_price').value = priceMatch[1];
+
+    const nameMatch = raw.match(/(?:الاسم|Name)\s*:?\s*([^\n|]+)/i);
+    if(nameMatch) {
+        document.getElementById('f_name').value = nameMatch[1].trim();
+    } else {
+        const firstLine = raw.split('\n')[0].trim();
+        if(firstLine.length < 30) document.getElementById('f_name').value = firstLine;
+    }
+
+    const cityMatch = raw.match(/(?:المدينة|city|عنوان|من)\s*:?\s*([^\n|]+)/i);
+    if(cityMatch) document.getElementById('f_city').value = cityMatch[1].trim();
+
+    document.getElementById('f_offer').value = raw.substring(0, 100).trim();
+
+    showToast("تم تحليل البيانات بنجاح ⚡");
 }
 
 async function load() {
@@ -232,13 +268,20 @@ function filterOrders() {
     renderOrders(filtered);
 }
 
+/**
+ * دالة العرض - تم تعديلها لعرض آخر طلب في البداية
+ */
 function renderOrders(list) {
   const container = document.getElementById('ordersList');
   if (list.length === 0) {
     container.innerHTML = `<div style="text-align:center; padding:50px; color:var(--muted);">لا توجد طلبات لعرضها</div>`;
     return;
   }
-  container.innerHTML = list.filter(o => o.rowIndex).map(o => {
+  
+  // نقوم بنسخ القائمة وعكسها لعرض الأحدث أولاً
+  const reversedList = [...list].filter(o => o.rowIndex).reverse();
+
+  container.innerHTML = reversedList.map(o => {
     const isPrep = (o.status || "").includes("تجهيز");
     return `
     <div class="order-card">
@@ -274,16 +317,13 @@ function renderOrders(list) {
 async function sendMsg(row, lang) {
   const o = allOrders.find(x => x.rowIndex == row);
   if(!o) return;
-
   const paymentMethod = safe(o.payment) || "دفع عند الاستلام";
   const note = safe(o.notes) ? `%0A📝 ملاحظة: ${safe(o.notes)}` : "";
   const deliveryComp = safe(o.delivery) ? `%0A🚚 شركة التوصيل: ${safe(o.delivery)}` : "";
   const customerPhone = formatLocalPhone(o.phone);
-
   const msg = lang === 'ar' ? 
     `أهلاً بك ${safe(o.name)} في MAD Parfumeur 🖤%0Aيسعدنا تأكيد طلبك المميز!%0A💎 العرض: ${safe(o.offer)}%0A📍 العنوان: ${safe(o.city)}%0A💰 السعر: ${safe(o.price)} ₪%0A💳 الدفع: ${paymentMethod}${deliveryComp}${note}%0A📞 هاتف التواصل: ${customerPhone}` :
     `שלום ${safe(o.name)} 👋, תודה שהזמנת מ-MAD Parfumeur%0A📦 המוצר: ${safe(o.offer)}%0A📍 כתובת: ${safe(o.city)}%0A💰 מחיר: ${safe(o.price)} ₪%0A💳 תשלום: ${paymentMethod}${deliveryComp}%0A📞 טלפון: ${customerPhone}`;
-  
   window.open(`https://wa.me/${normalizePhoneForLink(o.phone)}?text=${msg}`, '_blank');
 }
 
@@ -304,10 +344,26 @@ async function approve(row) {
   } catch(e) { showToast("فشل التحديث", true); showLoading(false); }
 }
 
+function openAddModal() {
+  editingRow = null;
+  document.getElementById('modalTitle').textContent = "إضافة طلب جديد";
+  document.getElementById('smartSection').style.display = 'block';
+  document.getElementById('smartInput').value = "";
+  document.getElementById('f_name').value = "";
+  document.getElementById('f_phone').value = "";
+  document.getElementById('f_offer').value = "";
+  document.getElementById('f_price').value = "";
+  document.getElementById('f_city').value = "";
+  document.getElementById('f_notes').value = "";
+  document.getElementById('orderModal').classList.add('show');
+}
+
 function openEditModal(row) {
   const o = allOrders.find(x => x.rowIndex == row);
   if(!o) return;
   editingRow = row;
+  document.getElementById('modalTitle').textContent = "تعديل تفاصيل الطلب";
+  document.getElementById('smartSection').style.display = 'none';
   document.getElementById('f_name').value = safe(o.name);
   document.getElementById('f_phone').value = formatLocalPhone(o.phone);
   document.getElementById('f_offer').value = safe(o.offer);
@@ -316,14 +372,16 @@ function openEditModal(row) {
   document.getElementById('f_city').value = safe(o.city);
   document.getElementById('f_notes').value = safe(o.notes);
   document.getElementById('f_delivery').value = safe(o.delivery);
-  document.getElementById('editModal').classList.add('show');
+  document.getElementById('orderModal').classList.add('show');
 }
 
 async function saveOrder() {
-  if (!editingRow) return showToast("يرجى اختيار طلب لتعديله");
+  const isAdd = !editingRow;
   showLoading(true);
   const payload = {
-    action: "updateOrder", key: DASH_KEY, row: editingRow,
+    action: isAdd ? "addOrder" : "updateOrder", 
+    key: DASH_KEY, 
+    row: editingRow || "",
     name: safe(document.getElementById('f_name').value),
     phone: safe(document.getElementById('f_phone').value),
     offer: safe(document.getElementById('f_offer').value),
@@ -332,14 +390,14 @@ async function saveOrder() {
     notes: safe(document.getElementById('f_notes').value),
     payment: safe(document.getElementById('f_payment').value),
     delivery: safe(document.getElementById('f_delivery').value),
-    status: "NEW"
+    status: isAdd ? "NEW" : "NEW"
   };
   try {
     const res = await fetch(`${SCRIPT_URL}?` + new URLSearchParams(payload).toString());
     const data = await res.json();
     if(data.result === "SUCCESS") {
-      showToast("تم الحفظ بنجاح ✨");
-      closeModal('editModal');
+      showToast(isAdd ? "تمت إضافة الطلب بنجاح ✨" : "تم الحفظ بنجاح ✨");
+      closeModal('orderModal');
       load();
     }
   } catch(e) { showToast("فشل الحفظ", true); showLoading(false); }
@@ -357,13 +415,12 @@ function openPrintModal(row, lang) {
     const c = document.getElementById('p_content_lang');
     c.style.direction = "rtl";
     c.innerHTML = lang === 'ar' ? 
-      `<strong>الاسم:</strong> ${safe(o.name)}<br><strong>الهاتف:</strong> ${formatLocalPhone(o.phone)}<br><strong>العنوان:</strong> ${safe(o.city)}<br><strong>التوصيل:</strong> ${safe(o.delivery)}<br><strong>الدفع:</strong> ${safe(o.payment)}<br><strong>الأصناف:</strong> ${safe(o.offer)}<br><strong>ملاحظة:</strong> ${safe(o.notes)}` :
+      `<strong>الاسم:</strong> ${safe(o.name)}<br><strong>الهاتف:</strong> ${formatLocalPhone(o.phone)}<br><strong>العنوان:</strong> ${safe(o.city)}<br><strong>التوصيل:</strong> ${safe(o.delivery)}<br><strong>الدفع:</strong> ${safe(o.payment)}<br><strong>الأصناف:</strong> ${safe(o.offer)}` :
       `<strong>לכבוד:</strong> ${safe(o.name)}<br><strong>טלפון:</strong> ${formatLocalPhone(o.phone)}<br><strong>כתובת:</strong> ${safe(o.city)}<br><strong>משלוח:</strong> ${safe(o.delivery)}<br><strong>תשלום:</strong> ${safe(o.payment)}<br><strong>פריטים:</strong> ${safe(o.offer)}`;
     document.getElementById('printModal').classList.add('show');
 }
 
 function closeModal(id) { document.getElementById(id).classList.remove('show'); }
-function openAddModal() { showToast("يرجى استخدام نموذج الإضافة من الموقع الرئيسي"); }
 
 window.onload = load;
 </script>
