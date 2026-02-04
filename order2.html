@@ -2,84 +2,73 @@
 <html lang="he" dir="rtl">
 <head>
   <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>MAD SYSTEM v4.5 | Optimized</title>
+  <title>MAD SYSTEM v5.0 | النسخة المبسطة</title>
   
   <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;700;800&family=Rubik:wght@500;700;900&display=swap" rel="stylesheet">
 
   <style>
-    :root { 
-      --bg-main: #0f172a; --bg-card: #1e293b; --primary: #3b82f6; 
-      --accent: #f59e0b; --success: #10b981; --text-main: #f8fafc;
-    }
+    /* تصميم الواجهة - ألوان مريحة للعين */
+    body { font-family: system-ui, -apple-system, sans-serif; background: #0f172a; color: white; margin: 0; padding: 0; direction: rtl; }
+    header { background: #1e293b; padding: 20px; display: flex; align-items: center; gap: 20px; border-bottom: 2px solid #334155; }
+    
+    /* صندوق البحث */
+    .search-bar { flex: 1; position: relative; }
+    .search-bar input { width: 100%; padding: 12px; border-radius: 10px; border: none; font-size: 18px; }
 
-    body { margin: 0; font-family: 'Assistant', sans-serif; background: var(--bg-main); color: var(--text-main); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+    /* شبكة الطلبات */
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; padding: 20px; }
+    .card { background: #1e293b; padding: 15px; border-radius: 12px; border: 1px solid #334155; cursor: pointer; transition: 0.3s; position: relative; }
+    .card:hover { border-color: #3b82f6; background: #263345; }
+    .card input[type="checkbox"] { position: absolute; top: 15px; left: 15px; width: 20px; height: 20px; }
+    
+    .price { color: #10b981; font-size: 24px; font-weight: bold; }
 
-    /* --- Header & Search --- */
-    .header { background: #1e293b; padding: 1rem 2rem; display: flex; align-items: center; border-bottom: 1px solid #334155; }
-    .search-container { flex: 1; max-width: 600px; margin: 0 2rem; position: relative; }
-    .search-input { width: 100%; padding: 12px 45px 12px 15px; background: #0f172a; border: 1px solid #334155; border-radius: 12px; color: white; font-size: 1.1rem; }
-    .search-icon { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: #94a3b8; }
+    /* شريط الإجراءات الأسفل */
+    .action-bar { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: white; color: black; padding: 15px 30px; border-radius: 50px; display: none; gap: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 100; }
+    .action-bar.show { display: flex; align-items: center; }
+    .btn-print { background: #3b82f6; color: white; border: none; padding: 10px 20px; border-radius: 20px; font-weight: bold; cursor: pointer; }
 
-    /* --- Workspace --- */
-    .workspace { flex: 1; overflow-y: auto; padding: 2rem; }
-    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem; padding-bottom: 100px; }
-
-    /* --- Card --- */
-    .card { background: var(--bg-card); border-radius: 12px; padding: 1.2rem; border: 1px solid #334155; position: relative; cursor: pointer; transition: 0.2s; }
-    .card:hover { border-color: var(--primary); transform: translateY(-3px); }
-    .card-checkbox { position: absolute; top: 1rem; right: 1rem; width: 22px; height: 22px; cursor: pointer; }
-    .price-tag { font-size: 1.5rem; font-weight: 900; color: var(--success); }
-
-    /* --- Floating Bar --- */
-    .bulk-bar { position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%) translateY(150px); background: #fff; color: #000; padding: 15px 35px; border-radius: 50px; display: flex; align-items: center; gap: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); transition: 0.4s; z-index: 9999; }
-    .bulk-bar.active { transform: translateX(-50%) translateY(0); }
-    .btn-print { background: var(--primary); color: white; border: none; padding: 10px 25px; border-radius: 20px; font-weight: 700; cursor: pointer; }
-
-    /* --- Print Styles (100x100mm) --- */
+    /* إعدادات الطباعة - قياس 10x10 سم */
     @media print {
       body * { visibility: hidden; }
       #printArea, #printArea * { visibility: visible; }
       #printArea { position: absolute; left: 0; top: 0; width: 100mm; }
       @page { size: 100mm 100mm; margin: 0; }
-      .label-page { 
-        width: 100mm; height: 100mm; padding: 6mm; box-sizing: border-box;
+      .label { 
+        width: 100mm; height: 100mm; padding: 5mm; box-sizing: border-box;
+        background: white !important; color: black !important;
         display: flex; flex-direction: column; page-break-after: always;
-        background: white !important; color: black !important; font-family: 'Rubik', sans-serif;
+        border: 1px solid #eee;
       }
     }
 
-    .label-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4mm; }
-    .label-title { background: #000; color: #fbbf24; text-align: center; padding: 4px; font-weight: 900; border-radius: 4px; font-size: 11pt; margin-bottom: 4mm; }
-    .label-row { display: grid; grid-template-columns: 75px 1fr; gap: 2px; font-size: 12.5pt; line-height: 1.3; margin-bottom: 2mm; }
-    .label-row b { font-weight: 800; }
-    .label-offer { border-top: 1px solid #000; margin-top: 2mm; padding-top: 2mm; font-size: 10.5pt; font-weight: bold; height: 18mm; overflow: hidden; }
-    .label-price { border: 3px solid #000; text-align: center; font-size: 26pt; font-weight: 900; border-radius: 8px; margin: 2mm 0; }
+    /* شكل التيكت (الملصق) */
+    .label { font-family: Arial, sans-serif; color: black; direction: rtl; }
+    .label-header { display: flex; justify-content: space-between; margin-bottom: 5px; }
+    .label-row { font-size: 14pt; margin-bottom: 4px; border-bottom: 1px solid #eee; padding-bottom: 2px; }
+    .label-price { font-size: 32pt; font-weight: 900; text-align: center; border: 4px solid black; margin: 5px 0; border-radius: 10px; }
     .label-footer { display: flex; justify-content: space-between; align-items: center; margin-top: auto; }
+    #printArea { display: none; }
   </style>
 </head>
 <body>
 
-<header class="header">
-  <div style="font-size:1.8rem; font-weight:900;">MAD <span style="color:var(--primary)">V4.5</span></div>
-  <div class="search-container">
-    <i class="fas fa-search search-icon"></i>
-    <input type="text" id="searchInput" class="search-input" placeholder="חיפוש לפי שם או טלפון (גם עם מקפים)..." oninput="app.render()">
+<header>
+  <h2 style="margin:0">MAD <span style="color:#3b82f6">V5</span></h2>
+  <div class="search-bar">
+    <input type="text" id="search" placeholder="ابحث بالاسم أو الهاتف (يتجاهل الشرطات)..." oninput="app.render()">
   </div>
-  <button onclick="app.loadData()" style="background:#334155; color:white; border:none; padding:10px 20px; border-radius:8px; cursor:pointer;">רענן ↻</button>
+  <button onclick="app.fetchData()" style="padding:10px; cursor:pointer">تحديث ↻</button>
 </header>
 
-<main class="workspace">
-  <div id="grid" class="grid"></div>
-</main>
+<div class="grid" id="grid"></div>
 
-<div id="bulkBar" class="bulk-bar">
-  <span id="selectedCount" style="font-weight:900">0 נבחרו</span>
-  <button class="btn-print" onclick="app.printSelected()">הדפס תוויות נבחרות 🖨️</button>
-  <button onclick="app.clearSelection()" style="background:none; border:none; text-decoration:underline; cursor:pointer; color:#666">ביטול</button>
+<div class="action-bar" id="actionBar">
+  <span id="count">0 طلبات مختارة</span>
+  <button class="btn-print" onclick="app.printAll()">طباعة الملصقات 🖨️</button>
+  <button onclick="app.clear()" style="background:none; border:none; color:gray; text-decoration:underline; cursor:pointer">إلغاء</button>
 </div>
 
 <div id="printArea"></div>
@@ -87,148 +76,118 @@
 <script>
 class MadSystem {
   constructor() {
-    this.scriptUrl = "https://script.google.com/macros/s/AKfycbyLjLFa8AaH82Ip7m747WC-KSUUEaU_M70S0I9Mda14XbnmcuEfZ7pBnF_zzJYZuXmZ/exec";
-    this.orders = [];
+    this.url = "https://script.google.com/macros/s/AKfycbyLjLFa8AaH82Ip7m747WC-KSUUEaU_M70S0I9Mda14XbnmcuEfZ7pBnF_zzJYZuXmZ/exec";
+    this.data = [];
     this.selected = new Set();
     
-    // מילון תרגום לעברית
-    this.translateMap = {
-      "cash": "מזומן",
-      "credit": "אשראי",
-      "bit": "ביט",
-      "delivered": "נמסר",
-      "pending": "ממתין",
-      "jerusalem": "ירושלים",
-      "tel aviv": "תל אביב",
-      "haifa": "חיפה"
-      // ניתן להוסיף כאן ערים נוספות אם הן מגיעות באנגלית מהדאטה
+    // قاموس الترجمة التلقائية
+    this.dict = {
+      "cash": "مزومين (نقد)", "credit": "ائتمان", "bit": "بيت", "cod": "دفع عند الاستلام",
+      "jerusalem": "القدس", "haifa": "حيفا", "tel aviv": "تل أبيب", "nazareth": "الناصرة"
     };
 
-    this.init();
+    this.fetchData();
   }
 
-  async init() {
-    this.loadData();
-    setInterval(() => this.loadData(true), 30000);
-  }
-
-  async loadData(silent = false) {
+  async fetchData() {
     try {
-      const res = await fetch(`${this.scriptUrl}?action=get`);
-      this.orders = await res.json();
+      const r = await fetch(`${this.url}?action=get`);
+      this.data = await r.json();
       this.render();
-    } catch(e) { console.error(e); }
+    } catch(e) { alert("خطأ في جلب البيانات"); }
   }
 
-  // תרגום חכם לעברית
-  toHebrew(text) {
-    if(!text) return "";
-    const clean = text.toString().toLowerCase().trim();
-    return this.translateMap[clean] || text;
+  // ترجمة أي كلمة للعربية
+  translate(txt) {
+    if(!txt) return "غير محدد";
+    let k = txt.toString().toLowerCase().trim();
+    return this.dict[k] || txt;
   }
 
-  // ניקוי מספר טלפון לחיפוש (מסיר מקפים ורווחים)
-  cleanStr(s) {
-    return String(s || "").replace(/[-\s]/g, "");
-  }
+  // تنظيف النص من الرموز للبحث الذكي
+  clean(s) { return String(s || "").replace(/[^a-zA-Z0-9أ-ת]/g, ""); }
 
   render() {
-    const rawQuery = document.getElementById('searchInput').value;
-    const query = this.cleanStr(rawQuery).toLowerCase();
-    const grid = document.getElementById('grid');
+    const q = this.clean(document.getElementById('search').value).toLowerCase();
+    const container = document.getElementById('grid');
     
-    const filtered = this.orders.filter(o => {
-      const searchData = this.cleanStr(`${o.name}${o.phone}${o.orderId}${o.city}`).toLowerCase();
-      return searchData.includes(query);
+    const list = this.data.filter(item => {
+      const searchKey = this.clean(item.name + item.phone + item.city).toLowerCase();
+      return searchKey.includes(q);
     });
 
-    grid.innerHTML = filtered.map(o => {
-      const idx = this.orders.indexOf(o);
-      const isSelected = this.selected.has(idx);
+    container.innerHTML = list.map(item => {
+      const id = this.data.indexOf(item);
+      const isSel = this.selected.has(id);
       return `
-        <div class="card" onclick="app.toggleSelect(${idx})">
-          <input type="checkbox" class="card-checkbox" ${isSelected ? 'checked' : ''} onclick="event.stopPropagation(); app.toggleSelect(${idx})">
-          <div style="color:#94a3b8; font-size:0.8rem">#${o.orderId}</div>
-          <div style="font-size:1.3rem; font-weight:800; margin:5px 0">${o.name}</div>
-          <div style="font-size:1rem; color:#cbd5e1"><i class="fas fa-phone"></i> ${o.phone}</div>
-          <div style="font-size:0.9rem; color:#f59e0b; margin-top:5px">📍 ${this.toHebrew(o.city)}</div>
-          <div style="margin:10px 0; font-size:0.85rem; color:#94a3b8; height:40px; overflow:hidden">${o.offer || ''}</div>
-          <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid #334155; padding-top:10px">
-             <span style="font-weight:bold">${this.toHebrew(o.payment)}</span>
-             <span class="price-tag">₪${o.price}</span>
+        <div class="card" onclick="app.toggle(${id})">
+          <input type="checkbox" ${isSel ? 'checked' : ''}>
+          <div style="font-size:12px; color:#94a3b8">#${item.orderId}</div>
+          <div style="font-size:20px; font-weight:bold; margin:5px 0">${item.name}</div>
+          <div style="color:#cbd5e1">📞 ${item.phone}</div>
+          <div style="color:#f59e0b">📍 ${this.translate(item.city)}</div>
+          <div style="margin-top:10px; display:flex; justify-content:space-between; align-items:center">
+            <span style="font-weight:bold">${this.translate(item.payment)}</span>
+            <span class="price">₪${item.price}</span>
           </div>
         </div>
       `;
     }).join("");
   }
 
-  toggleSelect(idx) {
-    this.selected.has(idx) ? this.selected.delete(idx) : this.selected.add(idx);
-    const bar = document.getElementById('bulkBar');
-    document.getElementById('selectedCount').innerText = `${this.selected.size} נבחרו`;
-    this.selected.size > 0 ? bar.classList.add('active') : bar.classList.remove('active');
+  toggle(id) {
+    this.selected.has(id) ? this.selected.delete(id) : this.selected.add(id);
+    const bar = document.getElementById('actionBar');
+    document.getElementById('count').innerText = `${this.selected.size} طلبات مختارة`;
+    this.selected.size > 0 ? bar.classList.add('show') : bar.classList.remove('show');
     this.render();
   }
 
-  clearSelection() {
+  clear() {
     this.selected.clear();
-    document.getElementById('bulkBar').classList.remove('active');
+    document.getElementById('actionBar').classList.remove('show');
     this.render();
   }
 
-  generateLabelHtml(o, id) {
+  // قالب الملصق للطباعة
+  createLabel(item, i) {
     return `
-      <div class="label-page" dir="rtl">
+      <div class="label">
         <div class="label-header">
-          <img src="https://www.madparfum.com/logo.svg" style="width:38mm">
-          <div style="text-align:left; font-size:9pt; font-weight:bold;">
-            DATE: ${new Date().toLocaleDateString('he-IL')}<br>
-            ORD: ${o.orderId}
-          </div>
+          <b style="font-size:18pt">MAD PARFUM</b>
+          <span>#${item.orderId}</span>
         </div>
-        
-        <div class="label-title">צלם את הרגע וקבל מתנה 🎁</div>
-        
-        <div class="label-row"><b>לכבוד:</b> <span>${o.name}</span></div>
-        <div class="label-row"><b>טלפון:</b> <span dir="ltr" style="text-align:right">${o.phone}</span></div>
-        <div class="label-row"><b>עיר:</b> <span>${this.toHebrew(o.city)}</span></div>
-        <div class="label-row"><b>תשלום:</b> <span>${this.toHebrew(o.payment || "מזומן")}</span></div>
-        <div class="label-row"><b>חברה:</b> <span>${o.delivery || "High Express"}</span></div>
-
-        <div class="label-offer">${o.offer || ''}</div>
-        
-        <div class="label-price">₪${o.price}</div>
-
+        <div style="background:black; color:yellow; text-align:center; padding:3px; font-weight:bold; margin-bottom:10px">صور اللحظة واحصل على هدية 🎁</div>
+        <div class="label-row"><b>الاسم:</b> ${item.name}</div>
+        <div class="label-row"><b>الهاتف:</b> <span dir="ltr">${item.phone}</span></div>
+        <div class="label-row"><b>البلد:</b> ${this.translate(item.city)}</div>
+        <div class="label-row"><b>الدفع:</b> ${this.translate(item.payment)}</div>
+        <div style="height:50px; overflow:hidden; font-size:11pt; margin-top:5px; border-top:1px dashed #ccc">${item.offer || ''}</div>
+        <div class="label-price">₪${item.price}</div>
         <div class="label-footer">
-          <div style="background:#000; color:#fff; padding:5px; border-radius:5px; font-size:7.5pt; width:65%; font-weight:bold">
-            1. סרוק את הקוד<br>2. שלח סרטון ל-WhatsApp<br>3. קבל מתנה!
-          </div>
-          <div id="qr_${id}"></div>
+          <div style="font-size:9pt; width:60%">سجل فيديو للمنتج وأرسله للواتساب الخاص بنا واربح!</div>
+          <div id="qr_${i}"></div>
         </div>
-        <div style="text-align:center; margin-top:3mm">
-          <svg id="bar_${id}"></svg>
-        </div>
+        <div style="text-align:center; margin-top:5px"><svg id="barcode_${i}"></svg></div>
       </div>
     `;
   }
 
-  printSelected() {
-    const list = Array.from(this.selected).map(idx => this.orders[idx]);
+  printAll() {
+    const list = Array.from(this.selected).map(id => this.data[id]);
     const area = document.getElementById('printArea');
-    area.innerHTML = list.map((o, i) => this.generateLabelHtml(o, `p${i}`)).join("");
-    
-    list.forEach((o, i) => {
-      const cleanPhone = String(o.phone).replace(/\D/g, "");
-      JsBarcode(`#bar_p${i}`, cleanPhone, { height: 25, fontSize: 10, displayValue: false, margin: 0 });
-      new QRCode(document.getElementById(`qr_p${i}`), { text: "https://wa.me/972549634449", width: 55, height: 55 });
+    area.innerHTML = list.map((item, i) => this.createLabel(item, i)).join("");
+
+    list.forEach((item, i) => {
+      // توليد الباركود
+      JsBarcode(`#barcode_${i}`, item.phone.replace(/\D/g,''), {height: 30, displayValue: false});
+      // توليد الـ QR
+      new QRCode(document.getElementById(`qr_${i}`), {text: "https://wa.me/972549634449", width: 50, height: 50});
     });
 
     setTimeout(() => {
       window.print();
-      if(confirm("לסמן את כולם כ-READY?")) {
-         list.forEach(o => fetch(`${this.scriptUrl}?action=updateStatus&key=12345678&row=${o.rowIndex}&status=READY ✅`));
-         this.clearSelection();
-      }
+      this.clear();
     }, 500);
   }
 }
