@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=0"/>
-  <title>MAD Mobile Manager v2</title>
+  <title>MAD Mobile Manager v2 - Print Edition</title>
   
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -45,7 +45,6 @@
       font-size: 16px; box-sizing: border-box; outline: none;
     }
     input:focus { border-color: var(--primary); }
-    select { padding-right: 12px; appearance: none; background-image: url("data:image/svg+xml,..."); }
 
     /* Orders List */
     .container { padding: 12px; }
@@ -63,11 +62,11 @@
     .price-tag { font-size: 18px; font-weight: 800; color: var(--success); margin-top: 10px; display: block; }
 
     /* Buttons */
-    .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
+    .actions { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-top: 15px; }
     .btn {
-      padding: 12px; border-radius: 12px; border: none; font-weight: bold;
-      display: flex; align-items: center; justify-content: center; gap: 8px;
-      cursor: pointer; font-size: 14px; transition: 0.2s;
+      padding: 10px; border-radius: 12px; border: none; font-weight: bold;
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+      cursor: pointer; font-size: 13px; transition: 0.2s;
     }
     .btn-primary { background: var(--primary); color: white; }
     .btn-success { background: var(--success); color: white; }
@@ -95,29 +94,42 @@
     .modal.show { display: block; }
     .modal-content { background: var(--card); padding: 20px; border-radius: 24px; border: 1px solid var(--border); }
     .field-label { display: block; font-size: 13px; color: var(--muted); margin: 10px 5px 5px 0; }
-    
     .badge { position: absolute; top: -5px; left: 50%; transform: translateX(5px); background: var(--danger); font-size: 10px; padding: 2px 6px; border-radius: 10px; color: #fff; }
+
+    /* Print Styles */
+    @media print {
+      body * { visibility: hidden; }
+      #printArea, #printArea * { visibility: visible; }
+      #printArea {
+        position: fixed; left: 0; top: 0; width: 98mm; height: 98mm;
+        background: #fff !important; color: #000 !important;
+        padding: 8mm; box-sizing: border-box; display: block !important;
+      }
+      @page { size: 98mm 98mm; margin: 0; }
+    }
+    #printArea { display: none; }
   </style>
 </head>
 <body>
+
+<div id="printArea"></div>
 
 <div class="header">
   <div style="font-weight: 900; font-size: 22px; letter-spacing: -1px;">MAD <span style="color:var(--primary)">MANAGER</span></div>
   <div style="display:flex; gap:10px;">
     <button class="btn btn-outline" onclick="load()" style="padding: 8px; border-radius: 50%; width: 40px; height: 40px;"><i class="fa fa-sync"></i></button>
-    <button class="btn btn-primary" onclick="openAddModal()" style="padding: 8px 15px; border-radius: 12px;"><i class="fa fa-plus"></i> طلب جديد</button>
+    <button class="btn btn-primary" onclick="openAddModal()" style="padding: 8px 15px; border-radius: 12px;"><i class="fa fa-plus"></i></button>
   </div>
 </div>
 
 <div class="search-area">
   <div class="input-group">
     <i class="fa fa-search"></i>
-    <input type="text" id="searchInput" placeholder="بحث باسم العميل، الرقم، أو الكود..." oninput="renderOrders()">
+    <input type="text" id="searchInput" placeholder="بحث..." oninput="renderOrders()">
   </div>
 </div>
 
-<div class="container" id="ordersList">
-  </div>
+<div class="container" id="ordersList"></div>
 
 <div class="bottom-nav">
   <a href="#" class="nav-item active" onclick="setFilter('NEW', this)">
@@ -126,7 +138,7 @@
   </a>
   <a href="#" class="nav-item" onclick="setFilter('PREP', this)">
     <i class="fa fa-tools"></i>
-    <span>للتجهيز</span>
+    <span>تجهيز</span>
   </a>
   <a href="#" class="nav-item" onclick="setFilter('READY', this)">
     <i class="fa fa-shipping-fast"></i>
@@ -144,74 +156,51 @@
         <h2 id="modalTitle" style="margin:0; font-size:20px;">إضافة طلب</h2>
         <button onclick="closeModal()" style="background:none; border:none; color:var(--muted); font-size:24px;">&times;</button>
     </div>
-    
     <div style="background:rgba(255,255,255,0.03); padding:12px; border-radius:15px; margin-bottom:15px;">
-        <label class="field-label" style="margin-top:0;">التحليل الذكي (الصق نص الواتساب هنا)</label>
+        <label class="field-label" style="margin-top:0;">التحليل الذكي (واتساب)</label>
         <div style="display:flex; gap:8px;">
-            <textarea id="rawText" placeholder="الاسم، الرقم، العطر، السعر..." style="height: 70px; padding:10px;"></textarea>
-            <button class="btn btn-primary" onclick="magicParse()" style="width:60px;"><i class="fa fa-wand-magic-sparkles" style="font-size:20px;"></i></button>
+            <textarea id="rawText" placeholder="الصق النص هنا..." style="height: 60px;"></textarea>
+            <button class="btn btn-primary" onclick="magicParse()" style="width:50px;"><i class="fa fa-wand-magic-sparkles"></i></button>
         </div>
     </div>
-
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-        <div>
-            <label class="field-label">اسم العميل</label>
-            <input type="text" id="f_name" placeholder="الاسم">
-        </div>
-        <div>
-            <label class="field-label">رقم الهاتف</label>
-            <input type="tel" id="f_phone" placeholder="05x-xxxxxxx">
-        </div>
+        <input type="text" id="f_name" placeholder="اسم العميل">
+        <input type="tel" id="f_phone" placeholder="رقم الهاتف">
     </div>
-
-    <label class="field-label">الطلبات (الأكواد)</label>
+    <label class="field-label">الطلبات</label>
     <input type="text" id="f_offer" placeholder="W101, M202...">
-
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-        <div>
-            <label class="field-label">السعر (₪)</label>
-            <input type="number" id="f_price" placeholder="0.00">
-        </div>
-        <div>
-            <label class="field-label">طريقة الدفع</label>
-            <select id="f_payment">
-                <option value="نقداً">نقداً (מזומן)</option>
-                <option value="مدفوع">مدفوع (שולם)</option>
-                <option value="مدفوع بالرابط">مدفوع بالرابط</option>
-            </select>
-        </div>
+        <input type="number" id="f_price" placeholder="السعر">
+        <select id="f_payment">
+            <option value="نقداً">نقداً</option>
+            <option value="مدفوع">مدفوع</option>
+            <option value="مدفوع بالرابط">رابط</option>
+        </select>
     </div>
-
-    <label class="field-label">شركة التوصيل 🚚</label>
-    <select id="f_delivery">
-        <option value="">-- اختر الشركة --</option>
-        <option value="High Express">High Express (هاي اكسبرس)</option>
-        <option value="Marwah Delivery">Marwah (مروة)</option>
-        <option value="Lama Delivery">Lama (لمى)</option>
-        <option value="Areen Delivery">Areen (عرين)</option>
-        <option value="Pickup">استلام ذاتي</option>
+    <label class="field-label">التوصيل والعنوان</label>
+    <select id="f_delivery" style="margin-bottom:10px;">
+        <option value="">-- شركة التوصيل --</option>
+        <option value="High Express">High Express</option>
+        <option value="Marwah Delivery">Marwah</option>
+        <option value="Lama Delivery">Lama</option>
+        <option value="Areen Delivery">Areen</option>
+        <option value="Pickup">استلام</option>
     </select>
-
-    <label class="field-label">العنوان / البلد</label>
-    <input type="text" id="f_addr" placeholder="البلد، الحي، الشارع...">
-
-    <div class="actions" style="margin-top:25px;">
-      <button class="btn btn-outline" onclick="closeModal()">إغلاق</button>
+    <input type="text" id="f_addr" placeholder="المدينة / العنوان">
+    <div class="actions" style="margin-top:25px; grid-template-columns: 1fr 1fr;">
+      <button class="btn btn-outline" onclick="closeModal()">إلغاء</button>
       <button class="btn btn-success" onclick="saveOrder(true)">حفظ واعتماد ✅</button>
     </div>
   </div>
 </div>
 
 <script>
-// الإعدادات - تأكد من صحة الرابط والـ Key
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyLjLFa8AaH82Ip7m747WC-KSUUEaU_M70S0I9Mda14XbnmcuEfZ7pBnF_zzJYZuXmZ/exec";
 const DASH_KEY = "12345678";
-
 let allOrders = [];
 let currentFilter = 'NEW';
 let editingRow = null;
 
-// تشغيل النظام
 async function load() {
   document.body.style.opacity = "0.7";
   try {
@@ -220,7 +209,7 @@ async function load() {
     allOrders = data.filter(o => o.rowIndex);
     updateStats();
     renderOrders();
-  } catch (e) { console.error("Data fetch error"); }
+  } catch (e) { console.error("Load error"); }
   document.body.style.opacity = "1";
 }
 
@@ -236,7 +225,6 @@ function setFilter(f, el) {
   renderOrders();
 }
 
-// قواعد التحقق من الحالة
 const isNew = (o) => {
     const s = (o.status || "").toLowerCase();
     return s.includes('new') || s === "" || s.includes('inbox') || s.includes('pending');
@@ -244,88 +232,93 @@ const isNew = (o) => {
 const isPrep = (o) => (o.status || "").includes('Approved') || (o.status || "").includes('تجهيز');
 const isReady = (o) => (o.status || "").includes('READY') || (o.status || "").includes('جاهز');
 
-// عرض الطلبات
 function renderOrders() {
   const container = document.getElementById('ordersList');
-  const query = document.getElementById('searchInput').value.replace(/[-\s]/g, "").toLowerCase(); // تجاوز الأشرطة في البحث
+  const query = document.getElementById('searchInput').value.replace(/[-\s]/g, "").toLowerCase();
   
   let filtered = allOrders.filter(o => {
     const cleanPhone = String(o.phone || "").replace(/[-\s]/g, "");
     const blob = (o.name + o.orderId + cleanPhone + o.offer + (o.addr||"") + (o.city||"")).toLowerCase();
-    const matchSearch = blob.includes(query);
-    
-    if (currentFilter === 'NEW') return matchSearch && isNew(o);
-    if (currentFilter === 'PREP') return matchSearch && isPrep(o);
-    if (currentFilter === 'READY') return matchSearch && isReady(o);
-    return matchSearch;
+    return blob.includes(query) && (
+      currentFilter === 'NEW' ? isNew(o) :
+      currentFilter === 'PREP' ? isPrep(o) :
+      currentFilter === 'READY' ? isReady(o) : true
+    );
   });
 
   filtered.sort((a,b) => b.rowIndex - a.rowIndex);
-
   if(filtered.length === 0) {
-    container.innerHTML = `<div style="text-align:center; padding:50px; color:var(--muted);">لا يوجد طلبات حالياً</div>`;
+    container.innerHTML = `<div style="text-align:center; padding:50px; color:var(--muted);">لا يوجد نتائج</div>`;
     return;
   }
 
   container.innerHTML = filtered.map(o => `
     <div class="order-card">
       <div class="order-header">
-        <span class="order-id"><i class="fa fa-hashtag"></i> ${o.orderId}</span>
+        <span class="order-id">#${o.orderId}</span>
         <span class="status-pill">${o.status || 'جديد'}</span>
       </div>
       <div onclick="openEditModal(${o.rowIndex})">
-        <h3>${o.name || 'عميل جديد'}</h3>
+        <h3 style="margin-bottom:10px;">${o.name || 'بدون اسم'}</h3>
         <div class="info-row"><i class="fa fa-phone"></i> ${o.phone}</div>
         <div class="info-row"><i class="fa fa-shopping-bag"></i> ${o.offer}</div>
-        <div class="info-row"><i class="fa fa-truck"></i> ${o.delivery || 'توصيل عادي'}</div>
-        <div class="info-row"><i class="fa fa-map-marker-alt"></i> ${o.addr || o.city || 'العنوان غير محدد'}</div>
-        <span class="price-tag">${o.price} ₪ <small style="font-size:12px; color:var(--muted)">(${o.payment || 'نقداً'})</small></span>
+        <div class="info-row"><i class="fa fa-map-marker-alt"></i> ${o.addr || o.city || '...'}</div>
+        <span class="price-tag">${o.price} ₪ <small style="font-size:12px; color:var(--muted)">(${o.payment})</small></span>
       </div>
       <div class="actions">
-        <a href="https://wa.me/${normalizePhone(o.phone)}" target="_blank" class="btn btn-wa"><i class="fab fa-whatsapp"></i> واتساب</a>
+        <a href="https://wa.me/${normalizePhone(o.phone)}" target="_blank" class="btn btn-wa"><i class="fab fa-whatsapp"></i></a>
+        <button class="btn btn-outline" onclick="printInvoice(${o.rowIndex})"><i class="fa fa-print"></i> فاتورة</button>
         ${isNew(o) ? 
-          `<button class="btn btn-success" onclick="quickApprove(${o.rowIndex})"><i class="fa fa-check"></i> اعتماد</button>` : 
-          `<button class="btn btn-outline" onclick="openEditModal(${o.rowIndex})"><i class="fa fa-edit"></i> تعديل</button>`
+          `<button class="btn btn-success" onclick="quickApprove(${o.rowIndex})"><i class="fa fa-check"></i></button>` : 
+          `<button class="btn btn-primary" onclick="openEditModal(${o.rowIndex})"><i class="fa fa-edit"></i></button>`
         }
       </div>
     </div>
   `).join('');
 }
 
-// التحليل الذكي المحسن
+function printInvoice(row) {
+    const o = allOrders.find(x => x.rowIndex == row);
+    if (!o) return;
+    const p = document.getElementById('printArea');
+    p.innerHTML = `
+        <div style="direction:rtl; text-align:center; font-family:sans-serif;">
+            <h2 style="margin:0 0 5px 0; border-bottom:2px solid #000; padding-bottom:5px;">MAD MANAGER</h2>
+            <p style="font-size:14px; margin:5px 0;">رقم الطلب: <strong>#${o.orderId}</strong></p>
+            <div style="text-align:right; margin-top:10px; font-size:15px; line-height:1.4;">
+                <p><strong>العميل:</strong> ${o.name}</p>
+                <p><strong>الهاتف:</strong> ${o.phone}</p>
+                <p><strong>العنوان:</strong> ${o.addr || o.city || '---'}</p>
+                <p><strong>الطلب:</strong> ${o.offer}</p>
+                <p><strong>شركة التوصيل:</strong> ${o.delivery}</p>
+            </div>
+            <div style="margin-top:15px; border-top:1px dashed #000; padding-top:10px; font-size:18px;">
+                <strong>المجموع: ${o.price} ₪</strong>
+                <div style="font-size:12px;">(${o.payment})</div>
+            </div>
+            <p style="font-size:10px; margin-top:15px; opacity:0.7;">شكراً لتعاملكم معنا ✨</p>
+        </div>
+    `;
+    window.print();
+}
+
 function magicParse() {
   const text = document.getElementById('rawText').value;
   if(!text) return;
-  
-  // تنظيف الرقم من الأشرطة فوراً عند اللصق
   const phoneMatch = text.replace(/[-\s]/g, "").match(/(05\d{8})/);
   const priceMatch = text.match(/(\d{2,4})\s*(₪|شيكل|ils|nis)/i);
-  
   if(phoneMatch) document.getElementById('f_phone').value = phoneMatch[1];
   if(priceMatch) document.getElementById('f_price').value = priceMatch[1];
-  
-  // كشف الشركة
   if(/هاي|High|Express/i.test(text)) document.getElementById('f_delivery').value = "High Express";
   else if(/مروة|Marwah/i.test(text)) document.getElementById('f_delivery').value = "Marwah Delivery";
-  else if(/لمى|Lama/i.test(text)) document.getElementById('f_delivery').value = "Lama Delivery";
-  else if(/عرين|Areen/i.test(text)) document.getElementById('f_delivery').value = "Areen Delivery";
-
-  // الدفع
-  if(/مدفوع|شולם|paid/i.test(text)) document.getElementById('f_payment').value = "مدفوع";
-  if(/رابط|קישור|link/i.test(text)) document.getElementById('f_payment').value = "مدفوع بالرابط";
-
-  // استخراج الاسم (أول سطر ليس فيه أرقام كثيرة)
-  const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 2);
-  if(lines.length > 0) document.getElementById('f_name').value = lines[0];
-
-  alert("تم التحليل الذكي وتحديث الحقول ✨");
+  const lines = text.split('\n').filter(l => l.trim().length > 2);
+  if(lines.length > 0) document.getElementById('f_name').value = lines[0].trim();
 }
 
 async function saveOrder(approve = false) {
   const payload = {
     action: editingRow ? "updateOrder" : "addOrder",
-    key: DASH_KEY,
-    row: editingRow,
+    key: DASH_KEY, row: editingRow,
     name: document.getElementById('f_name').value,
     phone: document.getElementById('f_phone').value.replace(/[-\s]/g, ""),
     offer: document.getElementById('f_offer').value,
@@ -335,23 +328,18 @@ async function saveOrder(approve = false) {
     delivery: document.getElementById('f_delivery').value,
     status: approve ? "Approved ✅ (Sent to Prep)" : "NEW"
   };
-
-  if(!payload.phone) return alert("رقم الهاتف مطلوب");
-  
+  if(!payload.phone) return alert("الرقم مطلوب");
   closeModal();
   try {
-    const res = await fetch(`${SCRIPT_URL}?` + new URLSearchParams(payload).toString());
-    const data = await res.json();
-    if(data.result === "SUCCESS") load();
-  } catch(e) { alert("تم الحفظ بنجاح (يرجى التحديث)"); load(); }
+    await fetch(`${SCRIPT_URL}?` + new URLSearchParams(payload).toString());
+    load();
+  } catch(e) { load(); }
 }
 
 function openAddModal() {
   editingRow = null;
-  document.getElementById('modalTitle').textContent = "إضافة طلب جديد";
+  document.getElementById('modalTitle').textContent = "طلب جديد";
   ['f_name','f_phone','f_offer','f_price','f_addr','rawText'].forEach(id => document.getElementById(id).value = "");
-  document.getElementById('f_delivery').value = "";
-  document.getElementById('f_payment').value = "نقداً";
   document.getElementById('orderModal').classList.add('show');
 }
 
@@ -384,9 +372,7 @@ function normalizePhone(p) {
   return d;
 }
 
-// بدء التحميل عند فتح الصفحة
 window.onload = load;
 </script>
-
 </body>
 </html>
