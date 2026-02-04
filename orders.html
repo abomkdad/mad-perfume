@@ -2,1309 +2,503 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>MAD Manager</title>
-
-  <!-- PDF.js (لاستخراج النص من PDF داخل المتصفح) -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <title>MAD SYSTEM v5.5 | Auto-Sync</title>
+  
+  <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
   <style>
-    :root{
-      --bg:#060914;
-      --card1:rgba(255,255,255,.10);
-      --card2:rgba(255,255,255,.06);
-      --border:rgba(255,255,255,.12);
-      --muted:rgba(255,255,255,.72);
-      --green:#16a34a;
-      --blue:#2563eb;
-      --orange:#f59e0b;
-      --red:#dc2626;
-      --gray:rgba(255,255,255,.12);
-      --pink:#db2777;
-      --cyan:#06b6d4;
-      --violet:#7c3aed;
-    }
-    body{margin:0;font-family:system-ui,Segoe UI,Tahoma,Arial;background:var(--bg);color:#fff}
-    .top{
-      position:sticky;top:0;z-index:50;
-      background:rgba(6,9,20,.92);backdrop-filter:blur(10px);
-      border-bottom:1px solid var(--border);
-      padding:14px;
-    }
-    .wrap{max-width:1200px;margin:0 auto;padding:16px}
-    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-    .title{font-weight:1000;font-size:18px}
-    .tag{
-      padding:7px 11px;border-radius:999px;
-      background:rgba(255,255,255,.10);
-      border:1px solid rgba(255,255,255,.10);
-      font-weight:1000;
-    }
-    input,select,textarea{
-      font:inherit;border-radius:14px;border:1px solid var(--border);
-      background:rgba(255,255,255,.06);color:#fff;padding:12px 12px;outline:none
-    }
-    select{appearance:none}
-    textarea{min-height:110px;resize:vertical}
-    button{font:inherit;border:none;cursor:pointer}
-    .btn{padding:12px 14px;border-radius:14px;font-weight:1100}
-    .bgray{background:var(--gray)}
-    .bgreen{background:var(--green)}
-    .bblue{background:var(--blue)}
-    .borange{background:var(--orange);color:#111}
-    .bred{background:var(--red)}
-    .bpink{background:var(--pink)}
-    .bcyan{background:var(--cyan);color:#001018}
-    .bviolet{background:var(--violet)}
-    .tabs{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
-    .tab{
-      padding:10px 12px;border-radius:999px;
-      border:1px solid rgba(255,255,255,.14);
-      background:rgba(255,255,255,.08);
-      font-weight:1000;opacity:.95
-    }
-    .tab.active{background:rgba(37,99,235,.30);border-color:rgba(37,99,235,.65)}
-    .split{display:grid;grid-template-columns: 1.2fr .8fr;gap:14px}
-    @media(max-width:980px){.split{grid-template-columns:1fr}}
-    .card{
-      background:linear-gradient(180deg,var(--card1),var(--card2));
-      border:1px solid var(--border);
-      border-radius:20px;
-      padding:16px;
-      margin:14px 0;
-      box-shadow:0 14px 50px rgba(0,0,0,.35);
-    }
-    .head{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
-    .oid{font-size:18px;font-weight:1000}
-    .status{font-weight:1000;background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.10);padding:8px 12px;border-radius:999px}
-    .badges{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
-    .badge{
-      padding:6px 10px;border-radius:999px;font-weight:1000;
-      border:1px solid rgba(255,255,255,.14);
-      background:rgba(255,255,255,.08);
-    }
-    .badge.ok{background:rgba(22,163,74,.18);border-color:rgba(22,163,74,.35)}
-    .badge.no{background:rgba(220,38,38,.16);border-color:rgba(220,38,38,.35)}
-    .badge.info{background:rgba(6,182,212,.18);border-color:rgba(6,182,212,.35)}
-    .badge.warn{background:rgba(245,158,11,.16);border-color:rgba(245,158,11,.35)}
-    .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
-    @media(max-width:820px){.grid{grid-template-columns:1fr}}
-    .field{
-      background:rgba(255,255,255,.06);
-      border:1px solid rgba(255,255,255,.12);
-      border-radius:16px;
-      padding:10px;
-    }
-    .label{opacity:.85;font-weight:1000;margin-bottom:6px}
-    .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace}
-    .actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
-    @media(max-width:820px){.actions{grid-template-columns:1fr}}
-    .hugeBtn{padding:18px 16px;border-radius:18px;font-size:18px;font-weight:1200}
-    .subactions{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
-    .small{font-size:12px;opacity:.8}
-    .muted{opacity:.82;color:var(--muted)}
-    .empty{
-      padding:24px;border:1px dashed rgba(255,255,255,.18);
-      border-radius:18px;text-align:center;opacity:.88;margin-top:16px
-    }
-    table{width:100%;border-collapse:separate;border-spacing:0 10px}
-    th{font-size:12px;opacity:.8;text-align:right;padding:0 10px}
-    td{
-      background:rgba(255,255,255,.06);
-      border:1px solid rgba(255,255,255,.12);
-      padding:10px;border-left:none;border-right:none
-    }
-    tr td:first-child{border-top-right-radius:14px;border-bottom-right-radius:14px;border-right:1px solid rgba(255,255,255,.12)}
-    tr td:last-child{border-top-left-radius:14px;border-bottom-left-radius:14px;border-left:1px solid rgba(255,255,255,.12)}
-    .rowBtn{padding:8px 10px;border-radius:12px;font-weight:1100;background:rgba(37,99,235,.22);border:1px solid rgba(37,99,235,.45); color:#fff}
-    .dangerBtn{padding:8px 10px;border-radius:12px;font-weight:1100;background:rgba(220,38,38,.22);border:1px solid rgba(220,38,38,.45); color:#fff}
-    .okBtn{padding:8px 10px;border-radius:12px;font-weight:1100;background:rgba(22,163,74,.18);border:1px solid rgba(22,163,74,.45); color:#fff}
-    .vioBtn{padding:8px 10px;border-radius:12px;font-weight:1100;background:rgba(124,58,237,.18);border:1px solid rgba(124,58,237,.55); color:#fff}
+    :root { --bg: #0f172a; --card: #1e293b; --blue: #3b82f6; --text: #f8fafc; --green: #10b981; --red: #ef4444; --orange: #f59e0b; }
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg); color: var(--text); margin: 0; direction: rtl; }
+    
+    /* Header & Search */
+    header { background: var(--card); padding: 15px 25px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #334155; position: sticky; top: 0; z-index: 90; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+    .search-box { flex: 1; max-width: 500px; margin: 0 20px; position: relative; }
+    .search-box input { width: 100%; padding: 12px 20px; border-radius: 50px; border: 1px solid #334155; background: #0f172a; color: white; font-size: 16px; outline: none; transition: 0.3s; }
+    .search-box input:focus { border-color: var(--blue); box-shadow: 0 0 10px rgba(59, 130, 246, 0.3); }
 
-    .modal{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;z-index:999}
-    .modal .box{width:min(980px,92vw);max-height:90vh;overflow:auto;background:rgba(8,12,26,.96);border:1px solid rgba(255,255,255,.12);border-radius:18px;padding:16px}
-    .modal.show{display:flex}
+    /* Grid Layout */
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 25px; padding: 25px; }
+    
+    /* Card Design */
+    .card { background: var(--card); border-radius: 16px; overflow: hidden; border: 1px solid #334155; transition: all 0.3s ease; display: flex; flex-direction: column; position: relative; }
+    .card:hover { transform: translateY(-5px); box-shadow: 0 15px 30px rgba(0,0,0,0.4); border-color: var(--blue); }
+    .card.selected { border: 2px solid var(--blue); background: #232f42; }
+    
+    /* Status Badge */
+    .status-badge { position: absolute; top: 15px; left: 15px; padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; color: white; box-shadow: 0 2px 5px rgba(0,0,0,0.2); cursor: pointer; z-index: 10; }
+    .status-pending { background: var(--orange); animation: pulse 2s infinite; }
+    .status-ready { background: var(--green); }
+    
+    @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
 
-    .hr{height:1px;background:rgba(255,255,255,.10);margin:12px 0}
-    .two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-    @media(max-width:820px){.two{grid-template-columns:1fr}}
-    .hint{padding:10px 12px;border-radius:14px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.06)}
+    .card-content { padding: 20px; flex-grow: 1; }
+    .card-id { font-size: 13px; color: #94a3b8; font-weight: bold; margin-bottom: 5px; }
+    .card-name { font-size: 20px; font-weight: 800; margin-bottom: 10px; color: #fff; }
+    
+    .info-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; color: #cbd5e1; font-size: 14px; }
+    .info-row i { width: 20px; text-align: center; color: var(--blue); }
+
+    /* Products Section */
+    .products-box { background: #0f172a; border-radius: 8px; padding: 10px; margin-top: 15px; border: 1px dashed #334155; }
+    .products-title { font-size: 11px; color: #64748b; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; }
+    .product-item { font-size: 13px; color: #e2e8f0; display: flex; justify-content: space-between; padding: 3px 0; border-bottom: 1px solid #1e293b; }
+    .product-item:last-child { border-bottom: none; }
+
+    .card-price { font-size: 28px; font-weight: 900; color: var(--green); margin-top: 15px; text-align: left; direction: ltr; }
+
+    /* Actions Bar */
+    .card-actions { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; background: #161e2e; border-top: 1px solid #334155; }
+    .btn-action { border: none; background: transparent; color: #94a3b8; padding: 12px 0; cursor: pointer; font-size: 13px; display: flex; flex-direction: column; align-items: center; gap: 5px; transition: 0.2s; border-left: 1px solid #334155; }
+    .btn-action:last-child { border-left: none; }
+    .btn-action:hover { background: #1e293b; color: white; }
+    .btn-status:hover { color: var(--orange); }
+
+    /* Bulk Bar */
+    .bulk-bar { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px); background: white; color: black; padding: 12px 30px; border-radius: 50px; display: flex; align-items: center; gap: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.6); z-index: 1000; transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); opacity: 0; }
+    .bulk-bar.active { transform: translateX(-50%) translateY(0); opacity: 1; }
+    
+    /* Edit Modal */
+    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 2000; display: none; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
+    .modal { background: var(--card); padding: 30px; border-radius: 20px; width: 90%; max-width: 500px; border: 1px solid #334155; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); }
+    .modal h2 { margin-top: 0; color: white; border-bottom: 1px solid #334155; padding-bottom: 15px; }
+    .form-group { margin-bottom: 15px; }
+    .form-group label { display: block; color: #94a3b8; font-size: 13px; margin-bottom: 5px; }
+    .form-group input, .form-group textarea { width: 100%; padding: 10px; background: #0f172a; border: 1px solid #334155; border-radius: 8px; color: white; box-sizing: border-box; }
+    .modal-btns { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
+    .btn-save { background: var(--blue); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; }
+    .btn-close { background: #334155; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; }
+
+    /* Notification Toast */
+    #toast { position: fixed; top: 20px; right: 20px; background: var(--green); color: white; padding: 15px 25px; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); transform: translateX(150%); transition: 0.3s; z-index: 3000; display: flex; align-items: center; gap: 10px; font-weight: bold; }
+    #toast.show { transform: translateX(0); }
+
+    /* Print Styles */
+    @media print {
+      body * { visibility: hidden; }
+      #printArea, #printArea * { visibility: visible; }
+      #printArea { position: absolute; left: 0; top: 0; width: 100%; }
+      @page { size: 100mm 100mm; margin: 0; }
+      .label { 
+          width: 100mm; height: 100mm; padding: 5mm; 
+          background: white !important; color: black !important; 
+          display: flex; flex-direction: column; page-break-after: always; 
+          box-sizing: border-box; font-family: sans-serif; position: relative; 
+          border: 2px dashed #333;
+          -webkit-print-color-adjust: exact; 
+      }
+      .label-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid #000; padding-bottom: 10px; margin-bottom: 15px; }
+      .label-row { font-size: 13pt; margin-bottom: 6px; line-height: 1.3; display: flex; }
+      .label-key { width: 75px; font-weight: bold; }
+      .label-val { flex: 1; font-weight: bold; }
+      .label-products { border-top: 2px solid #000; margin-top: 5px; padding-top: 5px; font-size: 11pt; height: 110px; overflow: hidden; }
+      .label-footer { margin-top: auto; text-align: center; border: 3px solid #000; border-radius: 15px; padding: 5px; display: flex; align-items: center; justify-content: space-between; }
+      .label-price { font-size: 24pt; font-weight: 900; }
+      .barcode-container { text-align: center; margin-top: 5px; }
+      .barcode-container svg { height: 40px; width: 100%; }
+    }
+    #printArea { display: none; }
   </style>
 </head>
 <body>
 
-<!-- =========================
-   عدّل فقط هذه القيم
-========================= -->
-<script>
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyLjLFa8AaH82Ip7m747WC-KSUUEaU_M70S0I9Mda14XbnmcuEfZ7pBnF_zzJYZuXmZ/exec";
-const DASH_KEY   = "12345678"; // للعمليات (بدون باسورد للمستخدم)
+<header>
+  <div style="font-size: 24px; font-weight: 900; display:flex; align-items:center; gap:10px;">
+    <span>MAD</span> <span style="color:var(--blue)">SYS v5.5</span>
+    <span id="loader" style="font-size:12px; font-weight:normal; color:#64748b; margin-right:15px; opacity:0; transition:0.3s"><i class="fas fa-circle-notch fa-spin"></i> مزامنة...</span>
+  </div>
+  
+  <div class="search-box">
+    <input type="text" id="searchInput" placeholder="ابحث عن اسم، هاتف، أو رقم طلب..." oninput="app.render()">
+  </div>
 
-// PDF.js Worker
-pdfjsLib.GlobalWorkerOptions.workerSrc =
-  "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
-</script>
+  <button onclick="app.manualRefresh()" style="background: #1e293b; color: white; border: 1px solid #334155; padding: 10px 20px; border-radius: 10px; cursor: pointer; font-weight: bold; transition:0.2s">
+    <i class="fas fa-sync-alt"></i> تحديث
+  </button>
+</header>
 
-<div class="top">
-  <div class="wrap">
-    <div class="row">
-      <div class="title">نسخة المدير ✅ (PDF + Smart Parse)</div>
-      <span class="tag" id="stat">...</span>
+<div class="grid" id="grid"></div>
 
-      <button class="btn bgray" onclick="manualRefresh()">تحديث ↻</button>
-      <button class="btn bviolet" onclick="openSmartNew()">➕ إضافة طلب (نص/ PDF)</button>
+<div class="bulk-bar" id="bulkBar">
+  <span id="selectedCount" style="font-weight: bold; min-width: 100px;">0 مختار</span>
+  <button onclick="app.printSelected()" style="background: black; color: white; border: none; padding: 10px 25px; border-radius: 30px; cursor: pointer; font-weight: bold;">
+    <i class="fas fa-print"></i> طباعة المحدد
+  </button>
+  <button onclick="app.clearSelection()" style="background: none; border: none; color: #ef4444; cursor: pointer; font-weight:bold;">إلغاء</button>
+</div>
 
-      <button class="btn bblue" id="modeBtn" onclick="toggleMode()">الواجهة: سريعة ⚡</button>
-
-      <input id="q" placeholder="بحث: اسم / رقم / كود / OrderId / مدينة" style="flex:1;min-width:280px" oninput="render()"/>
-
-      <select id="filter" onchange="render()">
-        <option value="NEW" selected>طلبات جديدة (غير معتمدة)</option>
-        <option value="INBOX">واتساب Inbox (رسائل/PDF)</option>
-        <option value="PREP">تم إرسال للتجهيز</option>
-        <option value="READY">جاهزة</option>
-        <option value="ALL">الكل</option>
-      </select>
-
-      <button class="btn bblue" onclick="enableNotify()">تفعيل إشعار المتصفح</button>
-      <span class="small" id="notifyState"></span>
+<div class="modal-overlay" id="editModal">
+  <div class="modal">
+    <h2>تعديل الطلب <span id="editIdStr"></span></h2>
+    <input type="hidden" id="editRealId">
+    <div class="form-group">
+      <label>اسم العميل</label>
+      <input type="text" id="editName">
     </div>
-
-    <div class="tabs">
-      <button class="tab active" id="tabQuick" onclick="setTab('quick')">⚡ عمل سريع</button>
-      <button class="tab" id="tabPro" onclick="setTab('pro')">🧠 متطوّر جدًا</button>
-      <span class="small muted">ارفع PDF أو الصق نص واتساب → تحليل تلقائي → تعديل → تأكيد.</span>
+    <div class="form-group">
+      <label>الهاتف</label>
+      <input type="text" id="editPhone">
+    </div>
+    <div class="form-group">
+      <label>المدينة / العنوان</label>
+      <input type="text" id="editCity">
+    </div>
+    <div class="form-group">
+      <label>المنتجات (افصل بفاصلة)</label>
+      <textarea id="editProducts" rows="3"></textarea>
+    </div>
+    <div class="form-group">
+      <label>السعر</label>
+      <input type="number" id="editPrice">
+    </div>
+    <div class="modal-btns">
+      <button class="btn-close" onclick="app.closeModal()">إغلاق</button>
+      <button class="btn-save" onclick="app.saveEdit()">حفظ التعديلات</button>
     </div>
   </div>
 </div>
 
-<div class="wrap">
-  <div id="quickView"></div>
-  <div id="proView" style="display:none"></div>
-</div>
-
-<!-- Modal (Pro editor) -->
-<div class="modal" id="modal">
-  <div class="box">
-    <div class="row" style="justify-content:space-between">
-      <div class="title" id="modalTitle">...</div>
-      <button class="btn bgray" onclick="closeModal()">إغلاق ✖</button>
-    </div>
-    <div id="modalBody" style="margin-top:12px"></div>
-  </div>
-</div>
+<div id="toast"><i class="fas fa-bell"></i> <span>طلب جديد وصل!</span></div>
+<div id="printArea"></div>
 
 <script>
-let orders = [];
-let mode = localStorage.getItem("mad_manager_mode") || "quick";
-let tab  = localStorage.getItem("mad_manager_tab")  || "quick";
-let firstLoad = true;
-let lastNewKey = "";
+class MadSystem {
+  constructor() {
+    // IMPORTANT: Replace this URL with your actual Google Apps Script Web App URL
+    this.scriptUrl = "https://script.google.com/macros/s/AKfycbyLjLFa8AaH82Ip7m747WC-KSUUEaU_M70S0I9Mda14XbnmcuEfZ7pBnF_zzJYZuXmZ/exec";
+    this.orders = [];
+    this.selected = new Set();
+    this.localStatus = JSON.parse(localStorage.getItem('mad_status_v5') || '{}');
+    this.lastOrderCount = 0;
+    this.editingId = null;
 
-const PAYMENT_OPTIONS = [
-  {value:"Cash",     label:"نقداً / מזומן"},
-  {value:"Paid",     label:"مدفوع / שולם"},
-  {value:"PaidLink", label:"مدفوع بالرابط / שולם בקישור"}
-];
-
-const SOURCE_OPTIONS = [
-  {value:"WhatsApp",            label:"واتساب"},
-  {value:"WhatsApp-Sheet",      label:"واتساب (شيت)"},
-  {value:"Site-HE-Paid",        label:"موقع عبري (مدفوع)"},
-  {value:"Site-HE-COD",         label:"موقع عبري (نقداً)"},
-  {value:"Site-AR-Paid",        label:"موقع عربي (مدفوع)"},
-  {value:"Site-AR-COD",         label:"موقع عربي (نقداً)"},
-  {value:"TikTok",              label:"تيك توك"},
-  {value:"Facebook",            label:"فيس"},
-  {value:"Manual",              label:"يدوي"}
-];
-
-start();
-
-async function start(){
-  applyTab();
-  setModeButton();
-  await load();
-  setInterval(load, 10000);
-}
-
-function setTab(t){
-  tab = t;
-  localStorage.setItem("mad_manager_tab", tab);
-  applyTab();
-  render();
-}
-function applyTab(){
-  document.getElementById("tabQuick").classList.toggle("active", tab==="quick");
-  document.getElementById("tabPro").classList.toggle("active", tab==="pro");
-  document.getElementById("quickView").style.display = (tab==="quick") ? "block" : "none";
-  document.getElementById("proView").style.display   = (tab==="pro") ? "block" : "none";
-}
-function toggleMode(){
-  mode = (mode === "quick") ? "pro" : "quick";
-  localStorage.setItem("mad_manager_mode", mode);
-  setModeButton();
-  setTab(mode === "quick" ? "quick" : "pro");
-}
-function setModeButton(){
-  document.getElementById("modeBtn").textContent = (mode==="quick") ? "الواجهة: سريعة ⚡" : "الواجهة: متطوّرة 🧠";
-}
-function manualRefresh(){ load(); }
-
-async function load(){
-  try{
-    const res = await fetch(`${SCRIPT_URL}?action=get&_=${Date.now()}`);
-    const data = await res.json();
-    orders = Array.isArray(data) ? data : [];
-    document.getElementById("stat").textContent = `كل السجلات: ${orders.length}`;
-    render();
-    pingNewOrders();
-  }catch(e){
-    document.getElementById("stat").textContent = "خطأ اتصال";
-  }
-}
-
-/* ================= Helpers ================= */
-function esc(s){ return String(s||"").replace(/[&<>"']/g,m=>({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[m])); }
-function toLower(s){ return String(s||"").toLowerCase(); }
-function waLink(phone){
-  const p = String(phone||"").replace(/[^\d]/g,"");
-  if(!p) return "#";
-  return `https://wa.me/${p}`;
-}
-function getVal(id){ return (document.getElementById(id)?.value || "").trim(); }
-function findByRow(row){ return orders.find(x => Number(x.rowIndex) === Number(row)); }
-function badge(text, kind="info"){ return `<span class="badge ${kind}">${esc(text)}</span>`; }
-function extractCityLocal(addr){
-  const s = String(addr||"").trim();
-  if(!s) return "-";
-  return s.split(/[\s,]+/)[0] || "-";
-}
-function isHebrewText(s){ return /[\u0590-\u05FF]/.test(String(s||"")); }
-
-function isInbox(o){
-  const offer = toLower(o.offer);
-  const notes = toLower(o.notes);
-  const src = toLower(o.source);
-  return src.includes("whatsapp") && (notes.includes("wa_inbox") || offer.includes("whatsapp"));
-}
-function isNewUnapproved(o){
-  const st = toLower(o.status);
-  if(isInbox(o) && st.includes("new")) return true;
-  return st === "" || st.includes("new") || st.includes("processing") || st.includes("pending");
-}
-function isPrep(o){
-  const st = toLower(o.status);
-  return st.includes("approved") || st.includes("sent to prep") || st.includes("prep") || st.includes("تم ارسال للتجهيز");
-}
-function isReady(o){
-  const st = toLower(o.status);
-  return st.includes("ready") || st.includes("مجهز") || st.includes("מוכן");
-}
-function isCancelled(o){
-  const st = toLower(o.status);
-  return st.includes("cancel") || st.includes("ملغي") || st.includes("إلغاء");
-}
-function flagCustSent(o){
-  const s = (toLower(o.notes) + " " + toLower(o.status));
-  return s.includes("flag:cust_sent") || s.includes("تم ارسال للعميل") || s.includes("cust:✅");
-}
-function flagPrepSent(o){
-  const s = (toLower(o.notes) + " " + toLower(o.status));
-  return s.includes("flag:prep_sent") || s.includes("sent to prep") || s.includes("approved") || s.includes("تم ارسال للتجهيز");
-}
-
-function selectHtml(id, options, current){
-  const cur = String(current||"").trim();
-  return `
-    <select id="${id}">
-      <option value="" ${cur===""?"selected":""}>— اختياري —</option>
-      ${options.map(o => `<option value="${esc(o.value)}" ${o.value===cur?"selected":""}>${esc(o.label)}</option>`).join("")}
-    </select>
-  `;
-}
-
-/* ======== Smart Parse ======== */
-function normalizePhoneLocal(p){
-  if(!p) return "";
-  let d = String(p).replace(/[^\d]/g,"");
-  if(d.startsWith("00")) d = d.slice(2);
-  if(d.startsWith("9720")) d = "972" + d.slice(4);
-  if(d.startsWith("059") && d.length >= 10) return "970" + d.slice(1);
-  if(d.startsWith("05") && d.length >= 10) return "972" + d.slice(1);
-  if(d.startsWith("972") || d.startsWith("970")) return d;
-  if(d.length === 10 && d.startsWith("0")) return "972" + d.slice(1);
-  if(d.length === 9 && d.startsWith("5")) return "972" + d;
-  if(d.length === 9 && d.startsWith("59")) return "970" + d;
-  return d;
-}
-
-function smartParse(txt){
-  const t0 = String(txt||"").replace(/\u200f|\u200e/g,"").replace(/\n+/g," ").trim();
-  const t = t0.replace(/[|]+/g," | ");
-
-  const phoneMatch = t.match(/(\+?972\d{9}|\b05\d{8}\b|\b0?59\d{7,8}\b)/);
-  let phone = phoneMatch ? phoneMatch[1] : "";
-  phone = normalizePhoneLocal(phone);
-
-  let price = "";
-  const m1 = t.match(/₪\s*(\d{2,5})/);
-  if(m1) price = m1[1];
-  const m2 = t.match(/\b(\d{2,5})\s*(?:₪|شيكل|shekel|nis|ils)\b/i);
-  if(!price && m2) price = m2[1];
-  if(!price){
-    const tailNum = t.match(/\b(\d{2,5})\b(?!.*\b(\d{2,5})\b)/);
-    if(tailNum) price = tailNum[1];
+    this.init();
   }
 
-  let payment = "";
-  if(/مدفوع بالرابط|paid link|בקישור/i.test(t)) payment = "PaidLink";
-  else if(/مدفوع|paid|אשראי|כרטיס|בכרטיס|credit/i.test(t)) payment = "Paid";
-  else if(/نقد|cash|מזומן/i.test(t)) payment = "Cash";
-
-  let delivery = "";
-  if(/High\s*Express/i.test(t)) delivery = "High Express";
-  else if(/Marwah/i.test(t)) delivery = "Marwah Delivery";
-  else if(/Lama/i.test(t)) delivery = "Lama Delivery";
-  else if(/Areen/i.test(t)) delivery = "Areen Delivery";
-
-  const tokens = t.replace(/[:,]/g," ").split(/\s+/).filter(Boolean);
-  const codes = tokens.filter(x => /^[A-Za-z]{1,3}\d{2,4}$/i.test(x) || x.toLowerCase()==="he" || x.toLowerCase()==="ar");
-  let offer = codes.length ? codes.join(" ") : "";
-
-  let addr = "";
-  const addrHe = t.match(/(?:כתובת|‏כתובת|address)\s*[:：]\s*([^|]+?)(?=(\s{2,}|$|🚀|סטטוס|status))/i);
-  if(addrHe) addr = addrHe[1].trim();
-  const addrAr = t.match(/(?:العنوان|عنوان)\s*[:：]\s*([^|]+?)(?=(\s{2,}|$|🚚|شركة|الدفع|الإجراء))/i);
-  if(!addr && addrAr) addr = addrAr[1].trim();
-
-  let name = "";
-  let city = "";
-  if(phoneMatch){
-    const before = t.slice(0, phoneMatch.index).trim();
-    const parts = before.split(/\s+/).filter(Boolean);
-    name = parts[0] || "";
-    city = parts.slice(1).join(" ") || "";
-  }
-  if(!addr) addr = city || "";
-
-  let proc = "";
-  if(/direct|دون تواصل|بدون تواصل|ללא קשר/i.test(t)) proc = "Direct";
-  if(/call|اتصال|تواصل|טלפון/i.test(t)) proc = proc || "Call";
-
-  if(!offer){
-    const prodHe = t.match(/(?:המוצר|מוצר)\s*[:：]\s*([^|]+?)(?=(\s{2,}|$|💳|שיטת|סטטוס|🚀))/i);
-    if(prodHe) offer = prodHe[1].trim();
-    const prodAr = t.match(/(?:المنتج|العطر)\s*[:：]\s*([^|]+?)(?=(\s{2,}|$|💰|الدفع|📍|العنوان))/i);
-    if(!offer && prodAr) offer = prodAr[1].trim();
+  async init() {
+    await this.loadData();
+    setInterval(() => this.loadData(true), 5000);
   }
 
-  return { name, phone, offer, price, payment, proc, addr, delivery, raw:t0 };
-}
+  async loadData(isAuto = false) {
+    if(isAuto) document.getElementById('loader').style.opacity = '1';
+    
+    try {
+      // Added error handling for network requests
+      const res = await fetch(`${this.scriptUrl}?action=get`);
+      if (!res.ok) throw new Error('Network response was not ok');
+      const data = await res.json();
+      
+      if (this.lastOrderCount > 0 && data.length > this.lastOrderCount) {
+        this.showToast();
+        this.playNotificationSound();
+      }
+      this.lastOrderCount = data.length;
+      
+      this.orders = data.map(o => {
+          const id = String(o.orderId || o.id || '0'); // Force ID to string
+          return {
+              id: id,
+              name: o.name || o.customer || 'بدون اسم',
+              phone: o.phone || o.tel || '',
+              city: o.city || o.address || '',
+              payment: o.payment || '',
+              price: o.price || '0',
+              products: o.products || o.items || '',
+              status: this.localStatus[id] || (o.status || 'pending')
+          };
+      });
 
-function getRawFromNotes(o){
-  const notes = String(o.notes||"");
-  const m = notes.match(/RAW\s*:\s*(.+)$/i);
-  if(m) return m[1].trim();
-  if(/WA_INBOX/i.test(notes)){
-    const parts = notes.split("|").map(x=>x.trim()).filter(Boolean);
-    if(parts.length) return parts[parts.length-1];
-  }
-  return notes;
-}
-
-/* ================= PDF Extract ================= */
-async function extractTextFromPdfFile(file){
-  const buf = await file.arrayBuffer();
-  const pdf = await pdfjsLib.getDocument({data: buf}).promise;
-  let full = "";
-  for(let p=1; p<=pdf.numPages; p++){
-    const page = await pdf.getPage(p);
-    const tc = await page.getTextContent();
-    const line = tc.items.map(it => it.str).join(" ");
-    full += line + "\n";
-  }
-  return full.trim();
-}
-
-/* ================= Render ================= */
-function render(){
-  if(tab === "quick") renderQuick();
-  else renderPro();
-}
-
-function filtered(){
-  const q = toLower(document.getElementById("q").value.trim());
-  const f = document.getElementById("filter").value;
-
-  let arr = orders.slice();
-
-  arr = arr.filter(o=>{
-    if(!o.name) return false;
-    if(isCancelled(o)) return false;
-    if(f==="NEW") return isNewUnapproved(o) && !isPrep(o) && !isReady(o);
-    if(f==="INBOX") return isInbox(o);
-    if(f==="PREP") return isPrep(o) && !isReady(o);
-    if(f==="READY") return isReady(o);
-    return true;
-  });
-
-  if(q){
-    arr = arr.filter(o=>{
-      const blob = toLower(`${o.orderId} ${o.name} ${o.phone} ${o.offer} ${o.city} ${o.notes} ${o.status} ${o.source}`);
-      return blob.includes(q);
-    });
-  }
-
-  arr.sort((a,b)=>(b.rowIndex||0)-(a.rowIndex||0));
-  return arr;
-}
-
-/* ================= Quick View ================= */
-function renderQuick(){
-  const list = document.getElementById("quickView");
-  const arr = filtered();
-
-  if(!arr.length){
-    list.innerHTML = `<div class="empty">لا يوجد نتائج حسب الفلتر الحالي ✅</div>`;
-    return;
-  }
-
-  list.innerHTML = arr.map(o => quickCard(o)).join("");
-}
-
-function quickCard(o){
-  const custOk = flagCustSent(o);
-  const prepOk = flagPrepSent(o);
-
-  const addr = o.addr || o.city || "";
-  const price = o.price || "";
-  const pay = o.payment || "";     // يجي من notes parsing
-  const proc = o.proc || "";
-  const del = o.delivery || "";
-  const src = o.source || "";
-  const inbox = isInbox(o);
-
-  return `
-    <div class="card" id="c${o.rowIndex}">
-      <div class="head">
-        <div class="oid">🧾 ${esc(o.orderId)} <span class="small">#${o.rowIndex}</span></div>
-        <div class="status">${esc(o.status||"")}</div>
-      </div>
-
-      <div class="badges">
-        ${badge(prepOk ? "✅ تم إرسال للتجهيز" : "❌ غير مُرسل للتجهيز", prepOk?"ok":"no")}
-        ${badge(custOk ? "✅ تم إرسال للعميل" : "❌ لم يتم إرسال للعميل", custOk?"ok":"no")}
-        ${inbox ? badge("📩 WA_INBOX", "warn") : ""}
-        ${src ? badge("🌐 " + src, "info") : ""}
-      </div>
-
-      <div class="grid">
-        ${fieldInput("الاسم", `name_${o.rowIndex}`, o.name||"")}
-        ${fieldInput("الهاتف", `phone_${o.rowIndex}`, o.phone||"", true)}
-        ${fieldInput("الطلب (C)", `offer_${o.rowIndex}`, o.offer||"", true)}
-        ${fieldInput("السعر", `price_${o.rowIndex}`, price, true)}
-
-        <div class="field">
-          <div class="label">طريقة الدفع</div>
-          ${selectHtml(`payment_${o.rowIndex}`, PAYMENT_OPTIONS, pay)}
-        </div>
-
-        ${fieldInput("الإجراء", `proc_${o.rowIndex}`, proc || "Direct")}
-        ${fieldInput("العنوان", `addr_${o.rowIndex}`, addr)}
-
-        <div class="field">
-          <div class="label">مصدر الطلب (اختياري)</div>
-          ${selectHtml(`source_${o.rowIndex}`, SOURCE_OPTIONS, src)}
-        </div>
-
-        ${fieldInput("شركة التوصيل", `delivery_${o.rowIndex}`, del)}
-
-        <div class="field" style="grid-column:1/-1">
-          <div class="label">ملاحظات (تظهر كاملة)</div>
-          <div class="muted" style="white-space:pre-wrap;word-break:break-word">${esc(o.notes||"")}</div>
-        </div>
-      </div>
-
-      <div class="actions">
-        <button class="btn bgreen hugeBtn" onclick="approveToPrep(${o.rowIndex})">✅ اعتماد + إرسال للتجهيز</button>
-        <button class="btn bblue hugeBtn" onclick="sendConfirm(${o.rowIndex})">📩 تأكيد للعميل</button>
-      </div>
-
-      <div class="subactions">
-        <button class="btn bviolet" onclick="smartFillFromNotes(${o.rowIndex})">🧠 تحليل (من Notes)</button>
-        <button class="btn bviolet" onclick="openPdfForRow(${o.rowIndex})">📄 إضافة PDF</button>
-        <button class="btn borange" onclick="saveQuick(${o.rowIndex})">💾 حفظ التعديل</button>
-        <a class="btn bcyan" href="${waLink(o.phone)}" target="_blank" style="text-decoration:none;display:inline-block">💬 فتح واتساب</a>
-        <button class="btn bgray" onclick="markReady(${o.rowIndex})">✅ جاهز</button>
-        <button class="btn bred" onclick="cancelOrder(${o.rowIndex})">🛑 إلغاء</button>
-        <button class="btn bgray" onclick="copySummary(${o.rowIndex})">📋 نسخ</button>
-      </div>
-
-      <div class="small muted" style="margin-top:10px">
-        لو هذا سجل واتساب Inbox: اضغط “🧠 تحليل” أو “📄 PDF” ثم “💾 حفظ” ثم “✅ اعتماد”.
-      </div>
-    </div>
-  `;
-}
-
-function fieldInput(label, id, value, mono=false){
-  return `
-    <div class="field">
-      <div class="label">${esc(label)}</div>
-      <input id="${id}" value="${esc(value)}" class="${mono?'mono':''}" />
-    </div>
-  `;
-}
-
-/* ================= Pro View ================= */
-function renderPro(){
-  const host = document.getElementById("proView");
-  const arr = filtered();
-
-  const bulkHtml = `
-    <div class="card">
-      <div class="head">
-        <div class="title">🧠 أدوات متطورة (Bulk)</div>
-        <div class="small muted">حدد عدة طلبات ثم نفّذ إجراء واحد عليهم</div>
-      </div>
-      <div class="row">
-        <button class="btn bgray" onclick="selectAll(true)">تحديد الكل</button>
-        <button class="btn bgray" onclick="selectAll(false)">إلغاء التحديد</button>
-
-        <select id="bulkStatus" style="min-width:260px">
-          <option value="Approved ✅ (Sent to Prep) | FLAG:PREP_SENT">اعتماد + إرسال للتجهيز</option>
-          <option value="READY ✅ (מוכן / مجهز)">جاهز</option>
-          <option value="CANCELLED ❌">إلغاء</option>
-        </select>
-        <button class="btn bblue" onclick="bulkUpdateStatus()">تحديث الحالة للطلبات المحددة</button>
-
-        <button class="btn bblue" onclick="bulkSendConfirm()">تأكيد للعميل (للمحدد)</button>
-      </div>
-      <div class="small muted" style="margin-top:10px">
-        افتح أي طلب واضغط “تحليل” أو “PDF” لملء الحقول.
-      </div>
-    </div>
-  `;
-
-  if(!arr.length){
-    host.innerHTML = bulkHtml + `<div class="empty">لا يوجد نتائج حسب الفلتر الحالي ✅</div>`;
-    return;
-  }
-
-  const table = `
-    <div class="card">
-      <div class="head">
-        <div class="title">جدول الطلبات</div>
-        <div class="small muted">اضغط "فتح" للتعديل الكامل</div>
-      </div>
-
-      <table>
-        <thead>
-          <tr>
-            <th>✓</th>
-            <th>OrderId</th>
-            <th>الاسم</th>
-            <th>الهاتف</th>
-            <th>الطلب</th>
-            <th>₪</th>
-            <th>الحالة</th>
-            <th>المصدر</th>
-            <th>أوامر</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${arr.map(o=>proRow(o)).join("")}
-        </tbody>
-      </table>
-    </div>
-  `;
-
-  host.innerHTML = bulkHtml + table;
-}
-
-function proRow(o){
-  const price = o.price || "";
-  return `
-    <tr>
-      <td><input type="checkbox" class="sel" data-row="${o.rowIndex}"></td>
-      <td class="mono">${esc(o.orderId)}</td>
-      <td>${esc(o.name||"")}</td>
-      <td class="mono">${esc(o.phone||"")}</td>
-      <td class="mono">${esc(o.offer||"")}</td>
-      <td class="mono">${esc(price)}</td>
-      <td>${esc(o.status||"")}</td>
-      <td>${esc(o.source||"")}</td>
-      <td>
-        <button class="rowBtn" onclick="openEditor(${o.rowIndex})">فتح</button>
-        <button class="vioBtn" onclick="smartFillFromNotes(${o.rowIndex});openEditor(${o.rowIndex})">تحليل</button>
-        <button class="vioBtn" onclick="openPdfForRow(${o.rowIndex})">PDF</button>
-        <button class="okBtn" onclick="approveToPrep(${o.rowIndex})">إرسال للتجهيز</button>
-        <button class="rowBtn" onclick="sendConfirm(${o.rowIndex})">تأكيد</button>
-        <button class="dangerBtn" onclick="cancelOrder(${o.rowIndex})">إلغاء</button>
-      </td>
-    </tr>
-  `;
-}
-
-/* ================= Actions (shared) ================= */
-async function saveQuick(row){
-  const addr = getVal(`addr_${row}`);
-  const source = getVal(`source_${row}`);
-  const payment = getVal(`payment_${row}`);
-  const delivery = getVal(`delivery_${row}`);
-
-  // إذا سكربتك لا يدعم source كعمود، رح ينضاف كـ Note تلقائيًا
-  const extra = [
-    source ? `SOURCE_UI:${source}` : "",
-    delivery ? `DELIVERY_UI:${delivery}` : ""
-  ].filter(Boolean).join(" | ");
-
-  const payload = {
-    action:"updateOrder",
-    key:DASH_KEY,
-    row,
-    name: getVal(`name_${row}`),
-    phone: getVal(`phone_${row}`),
-    offer: getVal(`offer_${row}`),
-    price: getVal(`price_${row}`),
-    payment: payment,
-    proc: getVal(`proc_${row}`),
-    addr: addr,
-    city: extractCityLocal(addr),
-    source: source,            // ✅ لو السكربت يدعم
-    delivery: delivery,        // ✅ لو السكربت يدعم
-    extraNotes: extra
-  };
-
-  const url = `${SCRIPT_URL}?` + new URLSearchParams(payload).toString();
-  const res = await fetch(url);
-  const j = await res.json().catch(()=>({}));
-  if(j.result !== "SUCCESS") alert("❌ فشل الحفظ: " + (j.message||""));
-  else { alert("✅ تم الحفظ"); await load(); }
-}
-
-async function approveToPrep(row){
-  if(!confirm("تأكيد: اعتماد الطلب وإرساله للتجهيز؟")) return;
-  const status = "Approved ✅ (Sent to Prep) | FLAG:PREP_SENT";
-  await setStatus(row, status);
-}
-
-async function markReady(row){
-  if(!confirm("تأكيد: وضع الحالة جاهز؟")) return;
-  const status = "READY ✅ (מוכן / مجهز)";
-  await setStatus(row, status);
-}
-
-async function cancelOrder(row){
-  if(!confirm("تأكيد: إلغاء الطلب؟")) return;
-  const status = "CANCELLED ❌";
-  await setStatus(row, status);
-}
-
-async function setStatus(row, status){
-  const url = `${SCRIPT_URL}?action=updateStatus&key=${encodeURIComponent(DASH_KEY)}&row=${row}&status=${encodeURIComponent(status)}`;
-  const res = await fetch(url);
-  const j = await res.json().catch(()=>({}));
-  if(j.result !== "SUCCESS") alert("❌ فشل: " + (j.message||""));
-  else { alert("✅ تم تحديث الحالة"); await load(); }
-}
-
-/* ======== Confirm customer (API if exists / fallback to wa.me) ======== */
-function buildCustomerConfirmMessage(o){
-  const name = o.name || "عميلنا";
-  const offer = o.offer || "";
-  const price = o.price ? `₪${o.price}` : "";
-  const payment = o.payment || "";
-  const addr = o.addr || o.city || "";
-  const orderId = o.orderId || "";
-  const days = "3";
-
-  const he = isHebrewText(name) || isHebrewText(addr) || / he\b/i.test(String(o.offer||""));
-  if(he){
-    const payTxt = payment==="PaidLink" ? "שולם בקישור" : (payment==="Paid" ? "שולם" : (payment==="Cash" ? "מזומן" : payment));
-    return (
-      `שלום ${name} 👋\n`+
-      `תודה שהזמנת מ-MAD Parfumeur 🖤\n\n`+
-      `📦 מוצר: ${offer}\n`+
-      `💰 סכום: ${price}\n`+
-      `💳 תשלום: ${payTxt}\n`+
-      `📍 כתובת: ${addr}\n`+
-      `🧾 הזמנה: ${orderId}\n\n`+
-      `ההזמנה תטופל ותישלח תוך ${days} ימי עסקים.\n`+
-      `לשירות לקוחות: 9935`
-    );
-  }
-
-  const payTxt = payment==="PaidLink" ? "مدفوع بالرابط" : (payment==="Paid" ? "مدفوع" : (payment==="Cash" ? "نقداً" : payment));
-  return (
-    `أهلاً بك ${name} في عالم MAD Parfumeur 🖤\n`+
-    `تم تأكيد طلبك بنجاح ✅\n\n`+
-    `📦 الطلب: ${offer}\n`+
-    `💰 السعر: ${price}\n`+
-    `💳 الدفع: ${payTxt}\n`+
-    `📍 العنوان: ${addr}\n`+
-    `🧾 رقم الطلب: ${orderId}\n\n`+
-    `سنقوم بتجهيز شحنتك وإرسالها خلال ${days} أيام عمل.\n`+
-    `📞 خدمة العملاء: 9935`
-  );
-}
-
-async function sendConfirm(row){
-  const o = findByRow(row);
-  if(!o){ alert("❌ لم يتم العثور على الطلب"); return; }
-
-  if(!confirm("إرسال رسالة تأكيد محترمة للعميل؟")) return;
-
-  // أولاً: جرّب endpoint من السكربت (إذا موجود)
-  try{
-    const url = `${SCRIPT_URL}?action=sendCustomerConfirm&key=${encodeURIComponent(DASH_KEY)}&row=${row}`;
-    const res = await fetch(url);
-    const j = await res.json().catch(()=>null);
-
-    if(j && j.result === "SUCCESS"){
-      await appendFlagToNotes(row, "FLAG:CUST_SENT | تم ارسال للعميل ✅");
-      alert("✅ تم إرسال التأكيد (API)");
-      await load();
-      return;
+      this.render();
+      
+    } catch (e) {
+      console.error("Connection Error", e);
+      // Optional: Show error in UI
+    } finally {
+      if(isAuto) setTimeout(() => document.getElementById('loader').style.opacity = '0', 1000);
     }
-  }catch(e){}
+  }
 
-  // fallback: افتح واتساب مع رسالة جاهزة
-  const msg = buildCustomerConfirmMessage(o);
-  const link = waLink(o.phone) + "?text=" + encodeURIComponent(msg);
-  window.open(link, "_blank");
+  manualRefresh() {
+    this.loadData();
+  }
 
-  await appendFlagToNotes(row, "FLAG:CUST_SENT | تم ارسال للعميل ✅");
-  alert("✅ تم فتح واتساب برسالة جاهزة");
-  await load();
-}
+  translate(type, val) {
+    if(!val) return "---";
+    const v = val.toString().toLowerCase().trim();
+    
+    if(type === 'payment') {
+      if(v.includes('cash') || v.includes('מזומן')) return 'نقدي';
+      if(v.includes('bit') || v.includes('ביט')) return 'Bit';
+      if(v.includes('credit') || v.includes('אשראי')) return 'بطاقة ائتمان';
+      if(v.includes('pending')) return 'عند الاستلام';
+      return val;
+    }
+    
+    if(type === 'city') {
+      const map = {
+        'haifa': 'حيفا', 'חיפה': 'حيفا',
+        'acre': 'عكا', 'akko': 'عكا', 'עכו': 'عكا',
+        'nazareth': 'الناصرة', 'נצרת': 'الناصرة',
+        'tel aviv': 'تل أبيب', 'תל אביב': 'تل أبيب',
+        'jerusalem': 'القدس', 'ירושלים': 'القدس'
+      };
+      return map[v] || val; 
+    }
+    return val;
+  }
 
-async function appendFlagToNotes(row, flagText){
-  try{
-    const o = findByRow(row);
+  render() {
+    const query = document.getElementById('searchInput').value.toLowerCase().trim();
+    const grid = document.getElementById('grid');
+    
+    // Sort: Pending first
+    let displayList = [...this.orders].sort((a, b) => {
+        const sA = a.status === 'ready' ? 1 : 0;
+        const sB = b.status === 'ready' ? 1 : 0;
+        return sA - sB;
+    });
+
+    if(query) {
+      displayList = displayList.filter(o => 
+        o.name.toLowerCase().includes(query) || 
+        o.phone.includes(query) || 
+        String(o.id).includes(query)
+      );
+    }
+
+    grid.innerHTML = displayList.map(o => {
+      // Use ID for selection check instead of Index
+      const isSel = this.selected.has(o.id);
+      const isReady = o.status === 'ready';
+      
+      let prodHTML = '';
+      if(o.products) {
+          // Safe split fix
+          const pList = String(o.products).split(/,|،|\n/).filter(p => p.trim() !== '');
+          if(pList.length > 0) {
+              prodHTML = `<div class="products-box"><div class="products-title">المنتجات</div>` + 
+                         pList.map(p => `<div class="product-item"><span>- ${p}</span></div>`).join('') + 
+                         `</div>`;
+          }
+      }
+
+      // Pass ID string specifically using quotes
+      return `
+        <div class="card ${isSel ? 'selected' : ''}">
+          <div class="status-badge ${isReady ? 'status-ready' : 'status-pending'}" onclick="app.toggleStatus('${o.id}', event)">
+            ${isReady ? 'جاهز للتسليم <i class="fas fa-check"></i>' : 'انتظار التجهيز <i class="fas fa-clock"></i>'}
+          </div>
+
+          <div class="card-content">
+            <div class="card-id">ORDER #${o.id}</div>
+            <div class="card-name">${o.name}</div>
+            
+            <div class="info-row"><i class="fas fa-phone"></i> ${o.phone}</div>
+            <div class="info-row"><i class="fas fa-map-marker-alt"></i> ${this.translate('city', o.city)}</div>
+            <div class="info-row"><i class="fas fa-wallet"></i> ${this.translate('payment', o.payment)}</div>
+            
+            ${prodHTML}
+            
+            <div class="card-price">₪${o.price}</div>
+          </div>
+          
+          <div class="card-actions">
+            <button class="btn-action" onclick="app.printSingle('${o.id}')">
+              <i class="fas fa-print"></i> طباعة
+            </button>
+            <button class="btn-action" onclick="app.openEdit('${o.id}')">
+              <i class="fas fa-edit"></i> تعديل
+            </button>
+             <button class="btn-action btn-status" onclick="app.toggleStatus('${o.id}', event)">
+              <i class="fas fa-exchange-alt"></i> الحالة
+            </button>
+            <button class="btn-action" onclick="app.toggleSelect('${o.id}')" style="color:${isSel?'var(--blue)':'inherit'}">
+              <i class="fas ${isSel ? 'fa-check-square' : 'fa-square'}"></i> تحديد
+            </button>
+          </div>
+        </div>
+      `;
+    }).join("");
+  }
+
+  // --- Logic Helper ---
+  findOrder(id) {
+    return this.orders.find(o => o.id === id);
+  }
+
+  toggleStatus(id, e) {
+    if(e) e.stopPropagation();
+    const o = this.findOrder(id);
     if(!o) return;
 
-    const addr = o.addr || o.city || "";
-    const payload = {
-      action:"updateOrder",
-      key:DASH_KEY,
-      row,
-      name: o.name || "",
-      phone: o.phone || "",
-      offer: o.offer || "",
-      price: o.price || "",
-      payment: o.payment || "",
-      proc: o.proc || "",
-      addr: addr,
-      city: o.city || extractCityLocal(addr),
-      source: o.source || "",
-      delivery: o.delivery || "",
-      extraNotes: flagText
-    };
-    const url = `${SCRIPT_URL}?` + new URLSearchParams(payload).toString();
-    await fetch(url);
-  }catch(e){}
-}
-
-function copySummary(row){
-  const o = findByRow(row);
-  if(!o){ alert("❌ لم يتم العثور على الطلب"); return; }
-
-  const txt =
-    `OrderId: ${o.orderId}\n`+
-    `Name: ${o.name}\n`+
-    `Phone: ${o.phone}\n`+
-    `Offer: ${o.offer}\n`+
-    `Price: ${o.price||""}\n`+
-    `Payment: ${o.payment||""}\n`+
-    `Proc: ${o.proc||""}\n`+
-    `Addr: ${o.addr||o.city||""}\n`+
-    `Delivery: ${o.delivery||""}\n`+
-    `Source: ${o.source||""}\n`+
-    `Status: ${o.status||""}`;
-
-  navigator.clipboard.writeText(txt).then(()=> alert("✅ تم النسخ")).catch(()=> prompt("انسخ:", txt));
-}
-
-/* ================= Smart Fill (From Notes) ================= */
-function smartFillFromNotes(row){
-  const o = findByRow(row);
-  if(!o){ alert("❌ لم يتم العثور"); return; }
-
-  const raw = getRawFromNotes(o);
-  const parsed = smartParse(raw);
-
-  if(!parsed || (!parsed.phone && !parsed.offer && !parsed.price && !parsed.name)){
-    alert("❌ لم يتم التعرف على البيانات من Notes");
-    return;
+    o.status = o.status === 'ready' ? 'pending' : 'ready';
+    this.localStatus[o.id] = o.status;
+    localStorage.setItem('mad_status_v5', JSON.stringify(this.localStatus));
+    this.render();
   }
 
-  const set = (id, v)=>{
-    const el = document.getElementById(id);
-    if(el && v) el.value = v;
-  };
-
-  set(`name_${row}`, parsed.name || o.name || "");
-  set(`phone_${row}`, parsed.phone || o.phone || "");
-  set(`offer_${row}`, parsed.offer || o.offer || "");
-  set(`price_${row}`, parsed.price || o.price || "");
-  if(parsed.payment) set(`payment_${row}`, parsed.payment);
-  set(`proc_${row}`, parsed.proc || o.proc || "Direct");
-  set(`addr_${row}`, parsed.addr || (o.addr||o.city||""));
-  set(`delivery_${row}`, parsed.delivery || o.delivery || "");
-
-  alert("✅ تم التحليل وتعبئة الحقول");
-}
-
-/* ================= PDF for existing row ================= */
-function openPdfForRow(row){
-  const o = findByRow(row);
-  if(!o){ alert("❌ لم يتم العثور"); return; }
-
-  document.getElementById("modalTitle").textContent = `📄 إضافة PDF — ${o.orderId} (#${row})`;
-  document.getElementById("modalBody").innerHTML = `
-    <div class="card" style="margin:0">
-      <div class="hint">
-        ارفع PDF (طلب موقع) → سيتم استخراج النص وتحليله وتعبئة الحقول في الكرت مباشرة.
-      </div>
-      <div class="row" style="margin-top:10px">
-        <input id="pdf_file" type="file" accept="application/pdf"/>
-        <button class="btn bviolet" onclick="pdfParseToRow(${row})">🧠 تحليل PDF</button>
-        <button class="btn bgray" onclick="closeModal()">إغلاق</button>
-      </div>
-      <div class="hr"></div>
-      <div class="field">
-        <div class="label">النص المستخرج من PDF</div>
-        <textarea id="pdf_text" placeholder="سيظهر هنا النص بعد التحليل..."></textarea>
-      </div>
-      <div class="small muted">بعد التحليل: اضغط “💾 حفظ التعديل” من الكرت.</div>
-    </div>
-  `;
-  document.getElementById("modal").classList.add("show");
-}
-
-async function pdfParseToRow(row){
-  const f = document.getElementById("pdf_file").files[0];
-  if(!f){ alert("اختر ملف PDF"); return; }
-
-  try{
-    const text = await extractTextFromPdfFile(f);
-    document.getElementById("pdf_text").value = text;
-
-    const parsed = smartParse(text);
-
-    // اكتب في Inputs في الكرت
-    const set = (id, v)=>{
-      const el = document.getElementById(id);
-      if(el && v) el.value = v;
-    };
-
-    set(`name_${row}`, parsed.name || getVal(`name_${row}`));
-    set(`phone_${row}`, parsed.phone || getVal(`phone_${row}`));
-    set(`offer_${row}`, parsed.offer || getVal(`offer_${row}`));
-    set(`price_${row}`, parsed.price || getVal(`price_${row}`));
-    if(parsed.payment) set(`payment_${row}`, parsed.payment);
-    set(`proc_${row}`, parsed.proc || getVal(`proc_${row}`) || "Direct");
-    set(`addr_${row}`, parsed.addr || getVal(`addr_${row}`));
-    set(`delivery_${row}`, parsed.delivery || getVal(`delivery_${row}`));
-
-    alert("✅ تم تحليل PDF وتعبئة الحقول — الآن احفظ التعديل");
-  }catch(e){
-    alert("❌ فشل تحليل PDF");
-  }
-}
-
-/* ================= Pro editor modal ================= */
-function openEditor(row){
-  const o = findByRow(row);
-  if(!o){ alert("❌ لم يتم العثور"); return; }
-
-  const raw = getRawFromNotes(o);
-
-  document.getElementById("modalTitle").textContent = `تعديل متقدّم — ${o.orderId} (#${row})`;
-  document.getElementById("modalBody").innerHTML = `
-    <div class="split">
-      <div class="card" style="margin:0">
-        <div class="head">
-          <div class="oid">🧾 ${esc(o.orderId)} <span class="small">#${row}</span></div>
-          <div class="status">${esc(o.status||"")}</div>
-        </div>
-
-        <div class="two">
-          <button class="btn bviolet" onclick="modalSmartParse(${row})">🧠 تحليل (من النص)</button>
-          <button class="btn bviolet" onclick="modalPdfParse(${row})">📄 تحليل PDF</button>
-        </div>
-
-        <div class="two" style="margin-top:10px">
-          <button class="btn borange" onclick="modalSave(${row})">💾 حفظ التعديل</button>
-          <button class="btn bblue" onclick="sendConfirm(${row})">📩 تأكيد للعميل</button>
-        </div>
-
-        <div class="hr"></div>
-
-        <div class="grid">
-          ${fieldInput("الاسم", `m_name`, o.name||"")}
-          ${fieldInput("الهاتف", `m_phone`, o.phone||"", true)}
-          ${fieldInput("المدينة", `m_city`, o.city||"")}
-          ${fieldInput("العنوان", `m_addr`, (o.addr||o.city||""))}
-          ${fieldInput("الطلب (C)", `m_offer`, o.offer||"", true)}
-          ${fieldInput("السعر", `m_price`, (o.price||""), true)}
-
-          <div class="field">
-            <div class="label">طريقة الدفع</div>
-            ${selectHtml(`m_payment`, PAYMENT_OPTIONS, (o.payment||""))}
-          </div>
-
-          ${fieldInput("الإجراء", `m_proc`, (o.proc||"Direct"))}
-
-          <div class="field">
-            <div class="label">مصدر الطلب (اختياري)</div>
-            ${selectHtml(`m_source`, SOURCE_OPTIONS, (o.source||""))}
-          </div>
-
-          ${fieldInput("شركة التوصيل", `m_delivery`, (o.delivery||""))}
-
-          <div class="field" style="grid-column:1/-1">
-            <div class="label">نص واتساب / نص PDF (للتحليل)</div>
-            <textarea id="m_raw">${esc(raw)}</textarea>
-            <div class="row" style="margin-top:10px">
-              <input id="m_pdf_file" type="file" accept="application/pdf"/>
-              <span class="small muted">ارفع PDF ثم اضغط “📄 تحليل PDF”.</span>
-            </div>
-          </div>
-
-          <div class="field" style="grid-column:1/-1">
-            <div class="label">ملاحظات إضافية (تنضاف على Notes)</div>
-            <textarea id="m_extraNotes" placeholder="مثال: ملاحظة للموظف / ملاحظة للمدير"></textarea>
-          </div>
-
-          <div class="field" style="grid-column:1/-1">
-            <div class="label">Notes الحالية</div>
-            <div class="muted" style="white-space:pre-wrap;word-break:break-word">${esc(o.notes||"")}</div>
-          </div>
-        </div>
-
-        <div class="actions">
-          <button class="btn bgreen hugeBtn" onclick="approveToPrep(${row})">✅ إرسال للتجهيز</button>
-          <button class="btn bgray hugeBtn" onclick="markReady(${row})">✅ جاهز</button>
-        </div>
-
-        <div class="subactions">
-          <a class="btn bcyan" href="${waLink(o.phone)}" target="_blank" style="text-decoration:none;display:inline-block">💬 فتح واتساب</a>
-          <button class="btn bred" onclick="cancelOrder(${row})">🛑 إلغاء</button>
-          <button class="btn bgray" onclick="copySummary(${row})">📋 نسخ</button>
-        </div>
-      </div>
-
-      <div class="card" style="margin:0">
-        <div class="head">
-          <div class="title">حالات جاهزة (Preset)</div>
-        </div>
-
-        <div class="row" style="flex-direction:column;align-items:stretch">
-          <button class="btn bblue" onclick="setStatus(${row}, 'NEW')">NEW</button>
-          <button class="btn bgreen" onclick="setStatus(${row}, 'Approved ✅ (Sent to Prep) | FLAG:PREP_SENT')">Approved ✅</button>
-          <button class="btn bgray" onclick="setStatus(${row}, 'In Prep ⏳')">In Prep ⏳</button>
-          <button class="btn bgreen" onclick="setStatus(${row}, 'READY ✅ (מוכן / مجهز)')">READY ✅</button>
-          <button class="btn borange" onclick="setStatus(${row}, 'Delivery Requested 🚚')">Delivery Requested 🚚</button>
-          <button class="btn bred" onclick="setStatus(${row}, 'CANCELLED ❌')">CANCELLED ❌</button>
-        </div>
-
-        <div class="small muted" style="margin-top:12px">
-          لو سجل واتساب Inbox: الصق النص أو ارفع PDF ثم “تحليل” → “حفظ” → “Approved ✅”.
-        </div>
-      </div>
-    </div>
-  `;
-  document.getElementById("modal").classList.add("show");
-}
-
-function closeModal(){ document.getElementById("modal").classList.remove("show"); }
-
-function modalSmartParse(row){
-  const raw = getVal("m_raw");
-  const parsed = smartParse(raw);
-
-  const set = (id, v)=>{
-    const el = document.getElementById(id);
-    if(el && v) el.value = v;
-  };
-
-  set("m_name", parsed.name);
-  set("m_phone", parsed.phone);
-  set("m_offer", parsed.offer);
-  set("m_price", parsed.price);
-  if(parsed.payment) set("m_payment", parsed.payment);
-  set("m_proc", parsed.proc || "Direct");
-  set("m_addr", parsed.addr);
-  set("m_delivery", parsed.delivery);
-
-  if(!getVal("m_city") && parsed.addr){
-    document.getElementById("m_city").value = extractCityLocal(parsed.addr);
+  toggleSelect(id) {
+    this.selected.has(id) ? this.selected.delete(id) : this.selected.add(id);
+    this.updateBulkUI();
+    this.render();
   }
 
-  alert("✅ تم التحليل وتعبئة الحقول");
-}
-
-async function modalPdfParse(row){
-  const f = document.getElementById("m_pdf_file").files[0];
-  if(!f){ alert("اختر ملف PDF"); return; }
-  try{
-    const text = await extractTextFromPdfFile(f);
-    document.getElementById("m_raw").value = text;
-    modalSmartParse(row);
-  }catch(e){
-    alert("❌ فشل تحليل PDF");
-  }
-}
-
-async function modalSave(row){
-  const addr = getVal("m_addr");
-  const source = getVal("m_source");
-  const delivery = getVal("m_delivery");
-
-  const extra = [
-    getVal("m_extraNotes"),
-    source ? `SOURCE_UI:${source}` : "",
-    delivery ? `DELIVERY_UI:${delivery}` : ""
-  ].filter(Boolean).join(" | ");
-
-  const payload = {
-    action:"updateOrder",
-    key:DASH_KEY,
-    row,
-    name: getVal("m_name"),
-    phone: getVal("m_phone"),
-    city:  getVal("m_city") || extractCityLocal(addr),
-    addr:  addr,
-    offer: getVal("m_offer"),
-    price: getVal("m_price"),
-    payment: getVal("m_payment"),
-    proc: getVal("m_proc"),
-    source: source,
-    delivery: delivery,
-    extraNotes: extra
-  };
-
-  const url = `${SCRIPT_URL}?` + new URLSearchParams(payload).toString();
-  const res = await fetch(url);
-  const j = await res.json().catch(()=>({}));
-  if(j.result !== "SUCCESS") alert("❌ فشل الحفظ: " + (j.message||""));
-  else { alert("✅ تم الحفظ"); await load(); }
-}
-
-/* ================= Smart New Order (Text/PDF) ================= */
-function openSmartNew(){
-  document.getElementById("modalTitle").textContent = "➕ إضافة طلب (نص/ PDF) — Smart Parse";
-  document.getElementById("modalBody").innerHTML = `
-    <div class="card" style="margin:0">
-      <div class="hint">الصق نص واتساب أو ارفع PDF من موقعك — ثم تحليل — ثم حفظ.</div>
-
-      <div class="row" style="margin-top:10px">
-        <button class="btn bviolet" onclick="sn_parse()">🧠 تحليل النص</button>
-        <button class="btn bviolet" onclick="sn_pdf()">📄 تحليل PDF</button>
-        <button class="btn bgreen" onclick="sn_save()">✅ حفظ كطلب (جاهز للتجهيز)</button>
-        <button class="btn bgray" onclick="sn_fillExample()">🎯 مثال</button>
-      </div>
-
-      <div class="row" style="margin-top:10px">
-        <input id="sn_pdf_file" type="file" accept="application/pdf"/>
-        <span class="small muted">ارفع PDF ثم اضغط “📄 تحليل PDF”.</span>
-      </div>
-
-      <div class="hr"></div>
-
-      <div class="field">
-        <div class="label">النص</div>
-        <textarea id="sn_raw" placeholder="مثال: محمد القدس 0525105889 W183 X102 P104 L102 A115 he 500 مدفوع High Express"></textarea>
-      </div>
-
-      <div class="hr"></div>
-
-      <div class="grid">
-        ${fieldInput("الاسم", "sn_name", "")}
-        ${fieldInput("الهاتف", "sn_phone", "", true)}
-        ${fieldInput("الطلب (C)", "sn_offer", "", true)}
-        ${fieldInput("السعر", "sn_price", "", true)}
-
-        <div class="field">
-          <div class="label">طريقة الدفع</div>
-          ${selectHtml("sn_payment", PAYMENT_OPTIONS, "")}
-        </div>
-
-        ${fieldInput("الإجراء", "sn_proc", "Direct")}
-        ${fieldInput("العنوان", "sn_addr", "")}
-
-        <div class="field">
-          <div class="label">مصدر الطلب (اختياري)</div>
-          ${selectHtml("sn_source", SOURCE_OPTIONS, "Manual")}
-        </div>
-
-        ${fieldInput("شركة التوصيل", "sn_delivery", "")}
-      </div>
-
-      <div class="small muted" style="margin-top:10px">
-        الحفظ يتم عبر POST إلى السكربت.
-      </div>
-    </div>
-  `;
-  document.getElementById("modal").classList.add("show");
-}
-
-function sn_fillExample(){
-  document.getElementById("sn_raw").value = "محمد القدس 0525105889 W183 X102 P104 L102 A115 he 500 مدفوع High Express";
-}
-
-function sn_parse(){
-  const raw = getVal("sn_raw");
-  const p = smartParse(raw);
-  const set = (id,v)=>{ const el=document.getElementById(id); if(el) el.value = v||""; };
-  set("sn_name", p.name);
-  set("sn_phone", p.phone);
-  set("sn_offer", p.offer);
-  set("sn_price", p.price);
-  if(p.payment) set("sn_payment", p.payment);
-  set("sn_proc", p.proc || "Direct");
-  set("sn_addr", p.addr);
-  set("sn_delivery", p.delivery);
-  alert("✅ تم التحليل");
-}
-
-async function sn_pdf(){
-  const f = document.getElementById("sn_pdf_file").files[0];
-  if(!f){ alert("اختر ملف PDF"); return; }
-  try{
-    const text = await extractTextFromPdfFile(f);
-    document.getElementById("sn_raw").value = text;
-    sn_parse();
-  }catch(e){
-    alert("❌ فشل تحليل PDF");
-  }
-}
-
-async function sn_save(){
-  const name = getVal("sn_name") || "Customer";
-  const phone = getVal("sn_phone");
-  const offer = getVal("sn_offer") || "Manual-Order";
-  const price = getVal("sn_price") || "";
-  const payment = getVal("sn_payment") || "";
-  const proc = getVal("sn_proc") || "Direct";
-  const addr = getVal("sn_addr") || "-";
-  const delivery = getVal("sn_delivery") || "";
-  const source = getVal("sn_source") || "Manual";
-
-  if(!phone){
-    alert("❌ لازم رقم هاتف");
-    return;
+  updateBulkUI() {
+    const bar = document.getElementById('bulkBar');
+    document.getElementById('selectedCount').innerText = `${this.selected.size} طلبات`;
+    this.selected.size > 0 ? bar.classList.add('active') : bar.classList.remove('active');
   }
 
-  const body = {
-    name,
-    phone,
-    offer,
-    price,
-    payment,
-    process: proc,
-    address: addr,
-    source: source,
-    status: "Approved ✅ (Sent to Prep) | FLAG:PREP_SENT",
-    extraNotes: delivery ? ("Delivery: " + delivery) : ""
-  };
+  clearSelection() {
+    this.selected.clear();
+    this.updateBulkUI();
+    this.render();
+  }
 
-  try{
-    const res = await fetch(SCRIPT_URL, {
-      method:"POST",
-      headers:{ "Content-Type":"application/json" },
-      body: JSON.stringify(body)
+  // --- Edit System ---
+  openEdit(id) {
+    this.editingId = id;
+    const o = this.findOrder(id);
+    if(!o) return;
+
+    document.getElementById('editIdStr').innerText = `#${o.id}`;
+    document.getElementById('editRealId').value = o.id;
+    document.getElementById('editName').value = o.name;
+    document.getElementById('editPhone').value = o.phone;
+    document.getElementById('editCity').value = o.city;
+    document.getElementById('editPrice').value = o.price;
+    document.getElementById('editProducts').value = o.products;
+    
+    document.getElementById('editModal').style.display = 'flex';
+  }
+
+  closeModal() {
+    document.getElementById('editModal').style.display = 'none';
+    this.editingId = null;
+  }
+
+  saveEdit() {
+    if (this.editingId === null) return;
+    const o = this.findOrder(this.editingId);
+    if(!o) return;
+    
+    o.name = document.getElementById('editName').value;
+    o.phone = document.getElementById('editPhone').value;
+    o.city = document.getElementById('editCity').value;
+    o.price = document.getElementById('editPrice').value;
+    o.products = document.getElementById('editProducts').value;
+    
+    this.closeModal();
+    this.render();
+    // Warning persists because backend sync is not implemented in this snippet
+    alert("تم التحديث محلياً فقط.");
+  }
+
+  // --- Printing System ---
+  printSingle(id) {
+    const o = this.findOrder(id);
+    if(!o) return;
+    this.executePrint([o]);
+  }
+
+  printSelected() {
+    // Convert Set of IDs back to Order Objects
+    const list = Array.from(this.selected).map(id => this.findOrder(id)).filter(x => x);
+    if(list.length === 0) return alert("اختر طلبات أولاً");
+    this.executePrint(list);
+  }
+
+  executePrint(list) {
+    const area = document.getElementById('printArea');
+    area.innerHTML = list.map(o => this.generateLabel(o)).join("");
+    
+    // Generate Barcodes
+    list.forEach(o => {
+      try {
+        JsBarcode(`#barcode-${o.id}`, o.id, {
+          format: "CODE128",
+          lineColor: "#000",
+          width: 2,
+          height: 30,
+          displayValue: false
+        });
+      } catch(e) { console.log('Barcode Err', e); }
     });
-    const j = await res.json().catch(()=>({}));
-    if(j.result !== "SUCCESS"){
-      alert("❌ فشل الحفظ: " + (j.message||""));
-      return;
-    }
-    alert("✅ تم حفظ الطلب: " + (j.message||""));
-    closeModal();
-    await load();
-  }catch(e){
-    alert("❌ خطأ اتصال");
+
+    setTimeout(() => {
+        window.print();
+        // Optional: clear selection after print
+        // this.clearSelection(); 
+    }, 500);
+  }
+
+  generateLabel(o) {
+    const date = new Date().toLocaleDateString('ar-EG');
+    const cityAr = this.translate('city', o.city);
+    const payAr = this.translate('payment', o.payment);
+    const safeProd = o.products ? String(o.products).replace(/,|،/g, '<br>') : '---';
+    
+    return `
+      <div class="label" dir="rtl">
+        <div class="label-header">
+          <div style="font-size:18pt; font-weight:900;">MAD PARFUM</div>
+          <div style="font-size:14pt;">#${o.id}</div>
+        </div>
+
+        <div class="label-row">
+          <div class="label-key">العميل:</div>
+          <div class="label-val">${o.name}</div>
+        </div>
+        <div class="label-row">
+          <div class="label-key">الهاتف:</div>
+          <div class="label-val" dir="ltr" style="text-align:right">${o.phone}</div>
+        </div>
+        <div class="label-row">
+          <div class="label-key">المدينة:</div>
+          <div class="label-val">${cityAr}</div>
+        </div>
+         <div class="label-row">
+          <div class="label-key">الدفع:</div>
+          <div class="label-val">${payAr}</div>
+        </div>
+
+        <div class="label-products">
+          <b>المنتجات:</b><br>
+          ${safeProd}
+        </div>
+
+        <div class="label-footer">
+          <div>
+            <div style="font-size:10pt;">المطلوب للدفع</div>
+            <div class="label-price">₪${o.price}</div>
+          </div>
+          <div style="text-align:left">
+             <div class="barcode-container">
+                <svg id="barcode-${o.id}"></svg>
+             </div>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  // --- Notifications ---
+  showToast() {
+    const t = document.getElementById('toast');
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 4000);
+  }
+
+  playNotificationSound() {
+    // Improved sound handling
+    const audio = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
+    audio.volume = 0.5;
+    audio.play().catch(e => console.log("Audio requires interaction first"));
   }
 }
 
-/* ================= Bulk ================= */
-function selectedRows(){
-  return Array.from(document.querySelectorAll(".sel"))
-    .filter(x=>x.checked)
-    .map(x=>Number(x.getAttribute("data-row")));
-}
-function selectAll(on){ document.querySelectorAll(".sel").forEach(x=>x.checked = !!on); }
-
-async function bulkUpdateStatus(){
-  const rows = selectedRows();
-  if(!rows.length){ alert("حدد طلبات أولاً"); return; }
-  const status = document.getElementById("bulkStatus").value;
-  if(!confirm(`تطبيق الحالة "${status}" على ${rows.length} طلب؟`)) return;
-
-  for(const r of rows){
-    await setStatus(r, status);
-  }
-  await load();
-}
-
-async function bulkSendConfirm(){
-  const rows = selectedRows();
-  if(!rows.length){ alert("حدد طلبات أولاً"); return; }
-  if(!confirm(`إرسال تأكيد للعميل لـ ${rows.length} طلب؟`)) return;
-
-  for(const r of rows){
-    await sendConfirm(r);
-  }
-  await load();
-}
-
-/* ================= Notifications ================= */
-function enableNotify(){
-  if(!("Notification" in window)){
-    document.getElementById("notifyState").textContent = "متصفحك لا يدعم إشعارات";
-    return;
-  }
-  Notification.requestPermission().then(p=>{
-    document.getElementById("notifyState").textContent = (p === "granted") ? "✅ الإشعارات مفعّلة" : "❌ تم رفض الإشعارات";
-  });
-}
-
-function pingNewOrders(){
-  const newOnes = orders.filter(o => isNewUnapproved(o) && !isPrep(o) && !isReady(o) && !isCancelled(o));
-  newOnes.sort((a,b)=>(b.rowIndex||0)-(a.rowIndex||0));
-  const newest = newOnes[0] ? `${newOnes[0].orderId}_${newOnes[0].rowIndex}` : "";
-
-  if(firstLoad){
-    lastNewKey = newest;
-    firstLoad = false;
-    return;
-  }
-
-  if(newest && newest !== lastNewKey){
-    lastNewKey = newest;
-
-    try{
-      const ctx = new (window.AudioContext||window.webkitAudioContext)();
-      const o = ctx.createOscillator();
-      const g = ctx.createGain();
-      o.type="sine"; o.frequency.value=880; g.gain.value=0.08;
-      o.connect(g); g.connect(ctx.destination);
-      o.start(); setTimeout(()=>{o.stop();ctx.close();},180);
-    }catch(e){}
-
-    if("Notification" in window && Notification.permission === "granted"){
-      new Notification("MAD Manager", { body: "طلب جديد غير معتمد دخل النظام ✅" });
-    }
-
-    document.title = "🟢 طلب جديد - MAD Manager";
-    setTimeout(()=> document.title = "MAD Manager", 5000);
-  }
-}
+const app = new MadSystem();
 </script>
-
 </body>
 </html>
