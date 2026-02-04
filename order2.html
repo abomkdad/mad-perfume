@@ -3,65 +3,46 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>MAD Prep | محرر الملصقات</title>
+  <title>MAD Prep | طباعة جماعية</title>
   
   <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
 
   <style>
     :root {
-      --bg: #070b16;
-      --card: #1e293b;
-      --primary: #3b82f6;
-      --success: #10b981;
-      --text: #f8fafc;
+      --bg: #070b16; --card: #1e293b; --primary: #3b82f6; --success: #10b981; --text: #f8fafc;
     }
-
     body { margin: 0; font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); color: var(--text); }
     .container { max-width: 900px; margin: 0 auto; padding: 20px; }
-    
-    /* Dashboard UI */
     .top-nav { background: rgba(30, 41, 59, 0.8); backdrop-filter: blur(10px); padding: 15px; position: sticky; top: 0; z-index: 50; border-bottom: 1px solid rgba(255,255,255,0.1); }
     .search-input { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #334155; background: #0f172a; color: white; margin-top: 10px; }
     .order-card { background: var(--card); border-radius: 15px; padding: 20px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
     .btn { cursor: pointer; border: none; border-radius: 8px; padding: 10px 20px; font-weight: bold; transition: 0.3s; }
     .btn-edit { background: var(--primary); color: white; }
-    .btn-done { background: var(--success); color: white; margin-right: 10px; }
+    .btn-all { background: #f59e0b; color: #000; margin-right: 10px; }
+    .btn-done { background: var(--success); color: white; }
 
-    /* Modal (المربع الأبيض للتعديل قبل الطباعة) */
-    #editModal { 
-      display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); 
-      z-index: 1000; justify-content: center; align-items: center; overflow-y: auto; 
-    }
-    .modal-content { 
-      background: white; color: black; width: 100mm; padding: 20px; border-radius: 8px; 
-      box-shadow: 0 0 50px rgba(0,0,0,0.5); position: relative;
-    }
-    .modal-content input, .modal-content textarea { 
-      width: 100%; border: 1px solid #ddd; padding: 5px; margin-bottom: 8px; font-size: 11pt; font-weight: bold;
-    }
-    .modal-actions { display: flex; gap: 10px; margin-top: 15px; }
-    .btn-print-now { background: #000; color: #fff; flex: 1; }
-    .btn-cancel { background: #64748b; color: #fff; }
+    /* Modal Styling */
+    #editModal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 1000; justify-content: center; align-items: center; overflow-y: auto; }
+    .modal-content { background: white; color: black; width: 110mm; padding: 20px; border-radius: 8px; box-shadow: 0 0 50px rgba(0,0,0,0.5); }
+    .modal-content input { width: 100%; border: 1px solid #ddd; padding: 5px; margin-bottom: 8px; font-weight: bold; }
 
-    /* الشكل النهائي للملصق (المطابق للصورة) */
+    /* Label Design */
     .label-preview { 
-      width: 100mm; height: 100mm; background: #fff; color: #000; 
-      padding: 5mm; box-sizing: border-box; border: 1px solid #eee; display: flex; flex-direction: column;
+      width: 100mm; height: 100mm; background: #fff; color: #000; padding: 5mm; 
+      box-sizing: border-box; border: 1px solid #eee; display: flex; flex-direction: column;
+      page-break-after: always; /* للفصل بين الملصقات عند طباعة الكل */
     }
     .label-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #000; padding-bottom: 5px; margin-bottom: 10px; }
     .mad-logo { font-size: 24pt; font-weight: 900; }
-    .field-row { display: flex; justify-content: flex-start; margin-bottom: 4px; font-size: 11pt; }
-    .field-label { font-weight: bold; margin-left: 8px; min-width: 60px; }
     .price-box { border: 2px solid #000; padding: 8px; text-align: center; font-size: 16pt; font-weight: 900; margin: 10px 0; }
     .barcode-area { text-align: center; margin-top: auto; }
     .policy-text { border: 1px dashed #000; padding: 5px; text-align: center; font-size: 9pt; font-weight: bold; margin-top: 10px; }
 
-    /* الطباعة الحقيقية */
     @media print {
       body * { visibility: hidden !important; }
-      #labelToPrint, #labelToPrint * { visibility: visible !important; }
-      #labelToPrint { position: absolute; left: 0; top: 0; width: 100mm; height: 100mm; display: block !important; }
+      #printArea, #printArea * { visibility: visible !important; }
+      #printArea { position: absolute; left: 0; top: 0; width: 100mm; display: block !important; }
       @page { size: 100mm 100mm; margin: 0; }
     }
   </style>
@@ -70,9 +51,12 @@
 
 <div class="top-nav">
   <div class="container">
-    <div style="display:flex; justify-content:space-between">
+    <div style="display:flex; justify-content:space-between; align-items:center">
       <span style="font-weight:900; font-size:1.5rem">MAD PREP ⚡</span>
-      <button class="btn btn-edit" onclick="load()">تحديث ↻</button>
+      <div style="display:flex">
+        <button class="btn btn-all" onclick="printAllOrders()">🖨️ طباعة الكل</button>
+        <button class="btn btn-edit" onclick="load()">تحديث ↻</button>
+      </div>
     </div>
     <input type="text" id="searchBox" class="search-input" placeholder="ابحث عن اسم العميل أو رقم الطلب..." oninput="render()">
   </div>
@@ -80,50 +64,17 @@
 
 <div class="container" id="orderList"></div>
 
+<div id="printArea"></div>
+
 <div id="editModal">
-  <div class="modal-content" dir="rtl">
-    <h3 style="margin-top:0; border-bottom:1px solid #eee; padding-bottom:10px">مراجعة وتعديل الملصق</h3>
-    
-    <div id="labelToPrint" class="label-preview">
-      <div class="label-header">
-        <div style="font-size: 10pt; font-weight: bold;">Order: <span id="m_orderId"></span></div>
-        <div class="mad-logo">MAD</div>
-      </div>
-
-      <div class="field-row"><span class="field-label">الاسم:</span> <input id="i_name"></div>
-      <div class="field-row"><span class="field-label">الهاتف:</span> <input id="i_phone"></div>
-      <div class="field-row"><span class="field-label">العنوان:</span> <input id="i_addr"></div>
-      <div class="field-row"><span class="field-label">التوصيل:</span> <input id="i_delivery"></div>
-      
-      <div class="price-box">
-        ₪ <input id="i_price" style="width:60px; border:none; text-align:center; font-size:16pt"> = <span id="m_price_val"></span>
-      </div>
-
-      <div style="font-size: 9pt;">ملاحظات: <input id="i_notes" style="font-weight: normal; font-size: 9pt;"></div>
-
-      <div class="barcode-area">
-        <svg id="barcodeImg"></svg>
-        <div id="qrCodeImg" style="display: flex; justify-content: center; margin-top: 5px;"></div>
-      </div>
-
-      <div class="policy-text">
-        ניתן להחליף רק אם הניילون לא נפתח <br>
-        الاستبدال فقط إذا لم يتم فتح النايلون
-      </div>
+  <div class="modal-content" dir="rtl" id="modalEditor">
     </div>
-
-    <div class="modal-actions">
-      <button class="btn btn-print-now" onclick="executePrint()">طباعة الآن 🖨️</button>
-      <button class="btn btn-cancel" onclick="closeModal()">إلغاء</button>
-    </div>
-  </div>
 </div>
 
 <script>
   const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyLjLFa8AaH82Ip7m747WC-KSUUEaU_M70S0I9Mda14XbnmcuEfZ7pBnF_zzJYZuXmZ/exec";
   const DASH_KEY = "12345678";
   let currentOrders = [];
-  let activeRow = null;
 
   async function load() {
     document.getElementById('orderList').innerHTML = "جاري التحميل...";
@@ -132,68 +83,86 @@
     render();
   }
 
+  function getPrepOrders() {
+    return currentOrders.filter(o => {
+      const st = (o.status || "");
+      return (st.includes("Prep") || st.includes("Approved")) && !st.includes("READY");
+    });
+  }
+
   function render() {
     const q = document.getElementById('searchBox').value.toLowerCase();
-    const filtered = currentOrders.filter(o => {
-      const isPending = (o.status || "").includes("Prep") || (o.status || "").includes("Approved");
-      const matches = `${o.name} ${o.orderId} ${o.phone}`.toLowerCase().includes(q);
-      return isPending && matches;
-    });
+    const filtered = getPrepOrders().filter(o => `${o.name} ${o.orderId}`.toLowerCase().includes(q));
 
     document.getElementById('orderList').innerHTML = filtered.map(o => `
       <div class="order-card">
         <div>
-          <div style="font-weight:bold; font-size:1.1rem">${o.name}</div>
-          <div style="font-size:0.9rem; opacity:0.7">رقم الطلب: ${o.orderId} | الهاتف: ${o.phone}</div>
+          <div style="font-weight:bold">${o.name}</div>
+          <div style="font-size:0.8rem">ID: ${o.orderId} | ₪${o.price}</div>
         </div>
-        <div style="display:flex">
-          <button class="btn btn-edit" onclick="openEdit(${o.rowIndex})">تجهيز الملصق 🏷️</button>
-          <button class="btn btn-done" onclick="markDone(${o.rowIndex})">تم ✅</button>
-        </div>
+        <button class="btn btn-edit" onclick="openEdit(${o.rowIndex})">تجهيز 🏷️</button>
       </div>
     `).join("");
   }
 
+  function createLabelHtml(o, isEditable = false) {
+    const idSuffix = isEditable ? 'edit' : o.rowIndex;
+    return `
+      <div class="label-preview" dir="rtl">
+        <div class="label-header">
+          <div style="font-size: 10pt; font-weight: bold;">Order: ${o.orderId}</div>
+          <div class="mad-logo">MAD</div>
+        </div>
+        <div style="margin-bottom:5px"><b>الاسم:</b> ${isEditable ? `<input id="i_name" value="${o.name}">` : o.name}</div>
+        <div style="margin-bottom:5px"><b>الهاتف:</b> ${isEditable ? `<input id="i_phone" value="${o.phone}">` : o.phone}</div>
+        <div style="margin-bottom:5px"><b>العنوان:</b> ${isEditable ? `<input id="i_addr" value="${o.city} ${o.addr||''}">` : (o.city + " " + (o.addr||''))}</div>
+        <div class="price-box">₪ ${isEditable ? `<input id="i_price" style="width:60px; text-align:center" value="${o.price}">` : o.price}</div>
+        <div class="barcode-area">
+          <svg id="bar_${idSuffix}"></svg>
+        </div>
+        <div class="policy-text">ניתן להחליף רק אם הניילון לא נפתח | التبديل فقط إذا لم يفتح النايلون</div>
+      </div>
+    `;
+  }
+
   function openEdit(rowIndex) {
     const o = currentOrders.find(x => x.rowIndex == rowIndex);
-    activeRow = rowIndex;
-    
-    // تعبئة المربع الأبيض
-    document.getElementById('m_orderId').innerText = o.orderId;
-    document.getElementById('i_name').value = o.name;
-    document.getElementById('i_phone').value = o.phone;
-    document.getElementById('i_addr').value = o.city + " " + (o.addr || "");
-    document.getElementById('i_delivery').value = o.delivery || "High Express";
-    document.getElementById('i_price').value = o.price;
-    document.getElementById('m_price_val').innerText = o.price;
-    document.getElementById('i_notes').value = "order_confirmation_he";
-
-    // توليد الباركود
-    JsBarcode("#barcodeImg", o.phone || "0000", { format: "CODE128", height: 30, displayValue: true });
-    
-    // توليد الـ QR
-    const qrDiv = document.getElementById("qrCodeImg");
-    qrDiv.innerHTML = "";
-    new QRCode(qrDiv, { text: `Order: ${o.orderId}\nCustomer: ${o.name}`, width: 50, height: 50 });
-
+    const modal = document.getElementById('modalEditor');
+    modal.innerHTML = `
+      ${createLabelHtml(o, true)}
+      <div style="display:flex; gap:10px; margin-top:15px">
+        <button class="btn btn-done" style="flex:1" onclick="printSingle()">طباعة الآن 🖨️</button>
+        <button class="btn btn-edit" style="background:#64748b" onclick="document.getElementById('editModal').style.display='none'">إلغاء</button>
+      </div>
+    `;
     document.getElementById('editModal').style.display = "flex";
+    JsBarcode("#bar_edit", o.phone || "0000", { format: "CODE128", height: 30, displayValue: true });
   }
 
-  function closeModal() { document.getElementById('editModal').style.display = "none"; }
-
-  function executePrint() {
+  function printSingle() {
+    const pa = document.getElementById('printArea');
+    pa.innerHTML = document.querySelector('.label-preview').outerHTML;
     window.print();
-    closeModal();
+    document.getElementById('editModal').style.display = 'none';
   }
 
-  async function markDone(row) {
-    if(!confirm("نقل الطلب إلى 'مجهز'؟")) return;
-    await fetch(`${SCRIPT_URL}?action=updateStatus&key=${DASH_KEY}&row=${row}&status=READY ✅`);
-    load();
+  function printAllOrders() {
+    const ordersToPrint = getPrepOrders();
+    if(ordersToPrint.length === 0) return alert("لا توجد طلبات للتجهيز");
+    
+    const pa = document.getElementById('printArea');
+    pa.innerHTML = ordersToPrint.map(o => createLabelHtml(o)).join("");
+    
+    // توليد الباركودات لكل ملصق
+    setTimeout(() => {
+      ordersToPrint.forEach(o => {
+        JsBarcode(`#bar_${o.rowIndex}`, o.phone || "0000", { format: "CODE128", height: 30, displayValue: true });
+      });
+      window.print();
+    }, 500);
   }
 
-  load(); // البدء عند التحميل
+  load();
 </script>
-
 </body>
 </html>
