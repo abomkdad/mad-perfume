@@ -1,466 +1,202 @@
 <!doctype html>
-<html lang="ar" dir="rtl">
+<html lang="he" dir="rtl">
 <head>
   <meta charset="utf-8"/>
-  <title>MAD SYSTEM v5.3 | Auto-Sync</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=0"/>
+  <title>MAD Prep Station | תחנת הכנה</title>
   
-  <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
   <style>
-    :root { --bg: #0f172a; --card: #1e293b; --blue: #3b82f6; --text: #f8fafc; --green: #10b981; --red: #ef4444; --orange: #f59e0b; }
-    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg); color: var(--text); margin: 0; direction: rtl; }
+    :root {
+      --bg: #f8fafc;
+      --card: #ffffff;
+      --primary: #000000;
+      --success: #16a34a;
+      --text: #1e293b;
+      --border: #e2e8f0;
+    }
+
+    body {
+      margin: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: var(--bg); color: var(--text); padding-bottom: 70px;
+    }
+
+    .header {
+      background: var(--primary); color: white; padding: 15px;
+      position: sticky; top: 0; z-index: 100; display: flex;
+      justify-content: space-between; align-items: center;
+    }
+
+    .container { padding: 12px; max-width: 600px; margin: auto; }
+
+    /* كرت التجهيز */
+    .prep-card {
+      background: var(--card); border-radius: 12px; padding: 15px;
+      margin-bottom: 15px; border: 2px solid var(--border);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    .prep-header { display: flex; justify-content: space-between; border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 10px; }
+    .order-num { font-weight: 900; font-size: 20px; }
     
-    /* Header & Search */
-    header { background: var(--card); padding: 15px 25px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #334155; position: sticky; top: 0; z-index: 90; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
-    .search-box { flex: 1; max-width: 500px; margin: 0 20px; position: relative; }
-    .search-box input { width: 100%; padding: 12px 20px; border-radius: 50px; border: 1px solid #334155; background: #0f172a; color: white; font-size: 16px; outline: none; transition: 0.3s; }
-    .search-box input:focus { border-color: var(--blue); box-shadow: 0 0 10px rgba(59, 130, 246, 0.3); }
-
-    /* Grid Layout */
-    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 25px; padding: 25px; }
+    .item-list { background: #f1f5f9; padding: 10px; border-radius: 8px; font-weight: 800; font-size: 18px; margin: 10px 0; color: #ef4444; }
     
-    /* Card Design */
-    .card { background: var(--card); border-radius: 16px; overflow: hidden; border: 1px solid #334155; transition: all 0.3s ease; display: flex; flex-direction: column; position: relative; }
-    .card:hover { transform: translateY(-5px); box-shadow: 0 15px 30px rgba(0,0,0,0.4); border-color: var(--blue); }
-    .card.selected { border: 2px solid var(--blue); background: #232f42; }
-    
-    /* Status Badge */
-    .status-badge { position: absolute; top: 15px; left: 15px; padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; color: white; box-shadow: 0 2px 5px rgba(0,0,0,0.2); cursor: pointer; }
-    .status-pending { background: var(--orange); animation: pulse 2s infinite; }
-    .status-ready { background: var(--green); }
-    
-    @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
+    .btn {
+      padding: 12px; border-radius: 8px; border: none; font-weight: bold;
+      display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer;
+    }
+    .btn-print { background: #334155; color: white; width: 100%; margin-bottom: 8px; font-size: 16px; }
+    .btn-ready { background: var(--success); color: white; width: 100%; font-size: 16px; }
 
-    .card-content { padding: 20px; flex-grow: 1; }
-    .card-id { font-size: 13px; color: #94a3b8; font-weight: bold; margin-bottom: 5px; }
-    .card-name { font-size: 20px; font-weight: 800; margin-bottom: 10px; color: #fff; }
-    
-    .info-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; color: #cbd5e1; font-size: 14px; }
-    .info-row i { width: 20px; text-align: center; color: var(--blue); }
-
-    /* Products Section */
-    .products-box { background: #0f172a; border-radius: 8px; padding: 10px; margin-top: 15px; border: 1px dashed #334155; }
-    .products-title { font-size: 11px; color: #64748b; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; }
-    .product-item { font-size: 13px; color: #e2e8f0; display: flex; justify-content: space-between; padding: 3px 0; border-bottom: 1px solid #1e293b; }
-    .product-item:last-child { border-bottom: none; }
-
-    .card-price { font-size: 28px; font-weight: 900; color: var(--green); margin-top: 15px; text-align: left; }
-
-    /* Actions Bar */
-    .card-actions { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; background: #161e2e; border-top: 1px solid #334155; }
-    .btn-action { border: none; background: transparent; color: #94a3b8; padding: 12px 0; cursor: pointer; font-size: 13px; display: flex; flex-direction: column; align-items: center; gap: 5px; transition: 0.2s; border-left: 1px solid #334155; }
-    .btn-action:last-child { border-left: none; }
-    .btn-action:hover { background: #1e293b; color: white; }
-    .btn-status:hover { color: var(--orange); }
-
-    /* Bulk Bar */
-    .bulk-bar { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px); background: white; color: black; padding: 12px 30px; border-radius: 50px; display: flex; align-items: center; gap: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.6); z-index: 1000; transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); opacity: 0; }
-    .bulk-bar.active { transform: translateX(-50%) translateY(0); opacity: 1; }
-    
-    /* Edit Modal */
-    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 2000; display: none; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
-    .modal { background: var(--card); padding: 30px; border-radius: 20px; width: 90%; max-width: 500px; border: 1px solid #334155; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); }
-    .modal h2 { margin-top: 0; color: white; border-bottom: 1px solid #334155; padding-bottom: 15px; }
-    .form-group { margin-bottom: 15px; }
-    .form-group label { display: block; color: #94a3b8; font-size: 13px; margin-bottom: 5px; }
-    .form-group input, .form-group textarea { width: 100%; padding: 10px; background: #0f172a; border: 1px solid #334155; border-radius: 8px; color: white; box-sizing: border-box; }
-    .modal-btns { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
-    .btn-save { background: var(--blue); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; }
-    .btn-close { background: #334155; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; }
-
-    /* Notification Toast */
-    #toast { position: fixed; top: 20px; right: 20px; background: var(--green); color: white; padding: 15px 25px; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); transform: translateX(150%); transition: 0.3s; z-index: 3000; display: flex; align-items: center; gap: 10px; font-weight: bold; }
-    #toast.show { transform: translateX(0); }
-
-    /* Print Styles */
+    /* تصميم الملصق للطباعة */
     @media print {
       body * { visibility: hidden; }
-      #printArea, #printArea * { visibility: visible; }
-      #printArea { position: absolute; left: 0; top: 0; width: 100%; }
-      @page { size: 100mm 100mm; margin: 0; }
-      .label { width: 100mm; height: 100mm; padding: 5mm; background: white !important; color: black !important; display: flex; flex-direction: column; page-break-after: always; box-sizing: border-box; font-family: sans-serif; position: relative; border: 1px dashed #ccc; }
-      .label-header { display: flex; justify-content: space-between; border-bottom: 3px solid #000; padding-bottom: 10px; margin-bottom: 15px; }
-      .label-row { font-size: 14pt; margin-bottom: 8px; line-height: 1.4; display: flex; }
-      .label-key { width: 80px; font-weight: bold; }
-      .label-val { flex: 1; font-weight: bold; }
-      .label-products { border-top: 2px solid #000; margin-top: 10px; padding-top: 5px; font-size: 12pt; height: 120px; overflow: hidden; }
-      .label-footer { margin-top: auto; text-align: center; border: 3px solid #000; border-radius: 15px; padding: 10px; }
-      .label-price { font-size: 32pt; font-weight: 900; }
+      #printSection, #printSection * { visibility: visible; }
+      #printSection {
+        position: absolute; left: 0; top: 0;
+        width: 10cm; height: 10cm;
+        padding: 5mm; box-sizing: border-box;
+        border: 1px solid #000; direction: rtl;
+        display: flex; flex-direction: column; justify-content: space-between;
+      }
+      .no-print { display: none; }
     }
-    #printArea { display: none; }
+
+    .label-box {
+      width: 10cm; height: 10cm; border: 1px solid #000; padding: 10px;
+      display: none; /* مخفي في العرض العادي */
+      font-family: Arial, sans-serif; background: #white; color: black;
+    }
+    .label-header { text-align: center; border-bottom: 2px solid #000; padding-bottom: 5px; }
+    .label-body { margin-top: 10px; font-size: 16px; }
+    .label-footer { text-align: center; font-size: 12px; border-top: 1px solid #000; padding-top: 5px; }
+    
+    .bottom-nav {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      background: white; display: flex; border-top: 1px solid var(--border);
+    }
+    .nav-item { flex: 1; text-align: center; padding: 12px; color: #64748b; text-decoration: none; font-size: 14px; }
+    .nav-item.active { color: var(--success); font-weight: bold; }
   </style>
 </head>
 <body>
 
-<header>
-  <div style="font-size: 24px; font-weight: 900; display:flex; align-items:center; gap:10px;">
-    <span>MAD</span> <span style="color:var(--blue)">SYS v5.3</span>
-    <span id="loader" style="font-size:12px; font-weight:normal; color:#64748b; margin-right:15px; opacity:0; transition:0.3s"><i class="fas fa-circle-notch fa-spin"></i> مزامنة...</span>
-  </div>
-  
-  <div class="search-box">
-    <input type="text" id="searchInput" placeholder="ابحث عن اسم، هاتف، أو رقم طلب..." oninput="app.render()">
-  </div>
-
-  <button onclick="app.manualRefresh()" style="background: #1e293b; color: white; border: 1px solid #334155; padding: 10px 20px; border-radius: 10px; cursor: pointer; font-weight: bold; transition:0.2s">
-    <i class="fas fa-sync-alt"></i> تحديث
-  </button>
-</header>
-
-<div class="grid" id="grid"></div>
-
-<div class="bulk-bar" id="bulkBar">
-  <span id="selectedCount" style="font-weight: bold; min-width: 100px;">0 مختار</span>
-  <button onclick="app.printSelected()" style="background: black; color: white; border: none; padding: 10px 25px; border-radius: 30px; cursor: pointer; font-weight: bold;">
-    <i class="fas fa-print"></i> طباعة المحدد
-  </button>
-  <button onclick="app.clearSelection()" style="background: none; border: none; color: #ef4444; cursor: pointer; font-weight:bold;">إلغاء</button>
+<div class="header">
+  <div>MAD <span style="color:#22c55e">PREP STATION</span></div>
+  <div id="status" style="font-size: 12px;">טוען...</div>
 </div>
 
-<div class="modal-overlay" id="editModal">
-  <div class="modal">
-    <h2>تعديل الطلب <span id="editIdStr"></span></h2>
-    <div class="form-group">
-      <label>اسم العميل</label>
-      <input type="text" id="editName">
-    </div>
-    <div class="form-group">
-      <label>الهاتف</label>
-      <input type="text" id="editPhone">
-    </div>
-    <div class="form-group">
-      <label>المدينة / العنوان</label>
-      <input type="text" id="editCity">
-    </div>
-    <div class="form-group">
-      <label>المنتجات (افصل بفاصلة)</label>
-      <textarea id="editProducts" rows="3"></textarea>
-    </div>
-    <div class="form-group">
-      <label>السعر</label>
-      <input type="number" id="editPrice">
-    </div>
-    <div class="modal-btns">
-      <button class="btn-close" onclick="app.closeModal()">إغلاق</button>
-      <button class="btn-save" onclick="app.saveEdit()">حفظ التعديلات</button>
-    </div>
+<div class="container" id="ordersList">
   </div>
+
+<div class="bottom-nav">
+  <a href="#" class="nav-item active" onclick="load('Approved')"><i class="fa fa-box-open"></i><br>להכנה</a>
+  <a href="#" class="nav-item" onclick="load('READY')"><i class="fa fa-check-double"></i><br>מוכן</a>
+  <a href="#" class="nav-item" onclick="window.location.reload()"><i class="fa fa-sync"></i><br>רענן</a>
 </div>
 
-<div id="toast"><i class="fas fa-bell"></i> <span>طلب جديد وصل!</span></div>
-<div id="printArea"></div>
+<div id="printSection" class="label-box">
+  <div class="label-header">
+    <h1 style="margin:0; font-size: 24px;">MAD Parfumeur</h1>
+    <div id="p_delivery" style="font-weight: bold; font-size: 18px; border: 1px solid #000; display: inline-block; padding: 2px 10px;"></div>
+  </div>
+  <div class="label-body">
+    <div style="font-size: 22px; font-weight: 900;">הזמנה: <span id="p_id"></span></div>
+    <div style="margin-top: 10px;">
+        <strong>לקוח:</strong> <span id="p_name"></span><br>
+        <strong>טלפון:</strong> <span id="p_phone"></span><br>
+        <strong>כתובת:</strong> <span id="p_addr"></span>
+    </div>
+    <div style="margin-top: 10px; padding: 5px; border: 2px dashed #000; min-height: 60px;">
+        <strong>מוצרים:</strong><br>
+        <div id="p_offer" style="font-size: 20px; font-weight: bold;"></div>
+    </div>
+    <div style="margin-top: 10px; font-size: 20px; font-weight: bold; text-align: center;">
+        לתשלום: <span id="p_price"></span> ₪ | <span id="p_payment"></span>
+    </div>
+  </div>
+  <div class="label-footer">
+    תודה שבחרת MAD Parfumeur | שירות לקוחות: *9935
+  </div>
+</div>
 
 <script>
-class MadSystem {
-  constructor() {
-    this.scriptUrl = "https://script.google.com/macros/s/AKfycbyLjLFa8AaH82Ip7m747WC-KSUUEaU_M70S0I9Mda14XbnmcuEfZ7pBnF_zzJYZuXmZ/exec";
-    this.orders = [];
-    this.selected = new Set();
-    this.localStatus = JSON.parse(localStorage.getItem('mad_status_v5') || '{}');
-    this.lastOrderCount = 0;
-    this.editingIdx = null;
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyLjLFa8AaH82Ip7m747WC-KSUUEaU_M70S0I9Mda14XbnmcuEfZ7pBnF_zzJYZuXmZ/exec";
+const DASH_KEY = "12345678";
 
-    this.init();
-  }
+let allOrders = [];
 
-  async init() {
-    await this.loadData();
-    // Auto refresh every 5 seconds
-    setInterval(() => this.loadData(true), 5000);
-  }
-
-  async loadData(isAuto = false) {
-    if(isAuto) document.getElementById('loader').style.opacity = '1';
-    
-    try {
-      const res = await fetch(`${this.scriptUrl}?action=get`);
-      const data = await res.json();
-      
-      // Check for new orders
-      if (this.lastOrderCount > 0 && data.length > this.lastOrderCount) {
-        this.showToast();
-        this.playNotificationSound();
-      }
-      this.lastOrderCount = data.length;
-      
-      // Merge with local updates (since we don't have a real backend save yet)
-      this.orders = data.map(o => {
-          // Normalize keys
-          const id = o.orderId || o.id || '0';
-          return {
-              id: id,
-              name: o.name || o.customer || '',
-              phone: o.phone || o.tel || '',
-              city: o.city || o.address || '',
-              payment: o.payment || '',
-              price: o.price || '0',
-              products: o.products || o.items || '',
-              // Local status override
-              status: this.localStatus[id] || (o.status || 'pending')
-          };
-      });
-
-      this.render();
-      
-    } catch (e) {
-      console.error("Connection Error", e);
-    } finally {
-      if(isAuto) setTimeout(() => document.getElementById('loader').style.opacity = '0', 1000);
-    }
-  }
-
-  manualRefresh() {
-    this.loadData();
-  }
-
-  // --- Translation Helper (Strict Arabic) ---
-  translate(type, val) {
-    if(!val) return "---";
-    const v = val.toString().toLowerCase().trim();
-    
-    if(type === 'payment') {
-      if(v.includes('cash') || v.includes('מזומן')) return 'نقدي';
-      if(v.includes('bit') || v.includes('ביט')) return 'Bit';
-      if(v.includes('credit') || v.includes('אשראי')) return 'بطاقة ائتمان';
-      if(v.includes('pending')) return 'عند الاستلام';
-      return v; // Return original if unknown, or map more
-    }
-    
-    if(type === 'city') {
-      // Basic Hebrew/English to Arabic mapping
-      const map = {
-        'haifa': 'حيفا', 'חיפה': 'حيفا',
-        'acre': 'عكا', 'akko': 'عكا', 'עכו': 'عكا',
-        'nazareth': 'الناصرة', 'נצרת': 'الناصرة',
-        'tel aviv': 'تل أبيب', 'תל אביב': 'تل أبيب',
-        'jerusalem': 'القدس', 'ירושלים': 'القدس'
-      };
-      // If found in map return it, else return original (assuming it might be already Arabic or unknown)
-      return map[v] || val; 
-    }
-    return val;
-  }
-
-  // --- Rendering & Logic ---
-  render() {
-    const query = document.getElementById('searchInput').value.toLowerCase().trim();
-    const grid = document.getElementById('grid');
-    
-    // Sort: Pending first, then Ready
-    let displayList = [...this.orders].sort((a, b) => {
-        const sA = a.status === 'ready' ? 1 : 0;
-        const sB = b.status === 'ready' ? 1 : 0;
-        return sA - sB; // 0 (pending) comes before 1 (ready)
+async function load(filterStatus = 'Approved') {
+  document.getElementById('status').textContent = "מעדכן...";
+  try {
+    const res = await fetch(`${SCRIPT_URL}?action=get&_=${Date.now()}`);
+    const data = await res.json();
+    allOrders = data.filter(o => {
+        const s = (o.status || "").toLowerCase();
+        if(filterStatus === 'Approved') return s.includes('approved');
+        if(filterStatus === 'READY') return s.includes('ready');
+        return false;
     });
-
-    if(query) {
-      displayList = displayList.filter(o => 
-        o.name.toLowerCase().includes(query) || 
-        o.phone.includes(query) || 
-        String(o.id).includes(query)
-      );
-    }
-
-    grid.innerHTML = displayList.map(o => {
-      const idx = this.orders.findIndex(x => x.id === o.id); // Find original index
-      const isSel = this.selected.has(idx);
-      const isReady = o.status === 'ready';
-      
-      // Format Products List
-      let prodHTML = '';
-      if(o.products) {
-          const pList = o.products.toString().split(/,|،|\n/);
-          prodHTML = `<div class="products-box"><div class="products-title">المنتجات</div>` + 
-                     pList.map(p => `<div class="product-item"><span>- ${p}</span></div>`).join('') + 
-                     `</div>`;
-      }
-
-      return `
-        <div class="card ${isSel ? 'selected' : ''}">
-          <div class="status-badge ${isReady ? 'status-ready' : 'status-pending'}" onclick="app.toggleStatus(${idx}, event)">
-            ${isReady ? 'جاهز للتسليم <i class="fas fa-check"></i>' : 'انتظار التجهيز <i class="fas fa-clock"></i>'}
-          </div>
-
-          <div class="card-content">
-            <div class="card-id">ORDER #${o.id}</div>
-            <div class="card-name">${o.name}</div>
-            
-            <div class="info-row"><i class="fas fa-phone"></i> ${o.phone}</div>
-            <div class="info-row"><i class="fas fa-map-marker-alt"></i> ${this.translate('city', o.city)}</div>
-            <div class="info-row"><i class="fas fa-wallet"></i> ${this.translate('payment', o.payment)}</div>
-            
-            ${prodHTML}
-            
-            <div class="card-price">₪${o.price}</div>
-          </div>
-          
-          <div class="card-actions">
-            <button class="btn-action" onclick="app.printSingle(${idx})">
-              <i class="fas fa-print"></i> طباعة
-            </button>
-            <button class="btn-action" onclick="app.openEdit(${idx})">
-              <i class="fas fa-edit"></i> تعديل
-            </button>
-             <button class="btn-action btn-status" onclick="app.toggleStatus(${idx}, event)">
-              <i class="fas fa-exchange-alt"></i> الحالة
-            </button>
-            <button class="btn-action" onclick="app.toggleSelect(${idx})" style="color:${isSel?'var(--blue)':'inherit'}">
-              <i class="fas ${isSel ? 'fa-check-square' : 'fa-square'}"></i> تحديد
-            </button>
-          </div>
-        </div>
-      `;
-    }).join("");
-  }
-
-  // --- Status System ---
-  toggleStatus(idx, e) {
-    if(e) e.stopPropagation();
-    const o = this.orders[idx];
-    o.status = o.status === 'ready' ? 'pending' : 'ready';
-    
-    // Save locally
-    this.localStatus[o.id] = o.status;
-    localStorage.setItem('mad_status_v5', JSON.stringify(this.localStatus));
-    
-    this.render();
-  }
-
-  // --- Selection System ---
-  toggleSelect(idx) {
-    this.selected.has(idx) ? this.selected.delete(idx) : this.selected.add(idx);
-    this.updateBulkUI();
-    this.render();
-  }
-
-  updateBulkUI() {
-    const bar = document.getElementById('bulkBar');
-    document.getElementById('selectedCount').innerText = `${this.selected.size} طلبات`;
-    this.selected.size > 0 ? bar.classList.add('active') : bar.classList.remove('active');
-  }
-
-  clearSelection() {
-    this.selected.clear();
-    this.updateBulkUI();
-    this.render();
-  }
-
-  // --- Edit System ---
-  openEdit(idx) {
-    this.editingIdx = idx;
-    const o = this.orders[idx];
-    document.getElementById('editIdStr').innerText = `#${o.id}`;
-    document.getElementById('editName').value = o.name;
-    document.getElementById('editPhone').value = o.phone;
-    document.getElementById('editCity').value = o.city;
-    document.getElementById('editPrice').value = o.price;
-    document.getElementById('editProducts').value = o.products;
-    
-    document.getElementById('editModal').style.display = 'flex';
-  }
-
-  closeModal() {
-    document.getElementById('editModal').style.display = 'none';
-    this.editingIdx = null;
-  }
-
-  saveEdit() {
-    if (this.editingIdx === null) return;
-    const o = this.orders[this.editingIdx];
-    
-    // Update local object
-    o.name = document.getElementById('editName').value;
-    o.phone = document.getElementById('editPhone').value;
-    o.city = document.getElementById('editCity').value;
-    o.price = document.getElementById('editPrice').value;
-    o.products = document.getElementById('editProducts').value;
-    
-    this.closeModal();
-    this.render();
-    alert("تم تحديث البيانات مؤقتاً في الشاشة. (ملاحظة: لا يتم الحفظ في Google Sheet في هذه النسخة)");
-  }
-
-  // --- Printing System ---
-  printSingle(idx) {
-    const area = document.getElementById('printArea');
-    area.innerHTML = this.generateLabel(this.orders[idx]);
-    setTimeout(() => window.print(), 300);
-  }
-
-  printSelected() {
-    const area = document.getElementById('printArea');
-    const list = Array.from(this.selected).map(idx => this.orders[idx]);
-    if(list.length === 0) return alert("اختر طلبات أولاً");
-    
-    area.innerHTML = list.map(o => this.generateLabel(o)).join("");
-    setTimeout(() => {
-      window.print();
-      this.clearSelection(); // Optional: clear selection after print
-    }, 500);
-  }
-
-  generateLabel(o) {
-    const date = new Date().toLocaleDateString('ar-EG');
-    const cityAr = this.translate('city', o.city);
-    const payAr = this.translate('payment', o.payment);
-    
-    return `
-      <div class="label" dir="rtl">
-        <div class="label-header">
-          <div style="font-size:18pt; font-weight:900;">MAD PARFUM</div>
-          <div style="font-size:14pt;">#${o.id}</div>
-        </div>
-
-        <div class="label-row">
-          <div class="label-key">العميل:</div>
-          <div class="label-val">${o.name}</div>
-        </div>
-        <div class="label-row">
-          <div class="label-key">الهاتف:</div>
-          <div class="label-val" dir="ltr" style="text-align:right">${o.phone}</div>
-        </div>
-        <div class="label-row">
-          <div class="label-key">المدينة:</div>
-          <div class="label-val">${cityAr}</div>
-        </div>
-         <div class="label-row">
-          <div class="label-key">الدفع:</div>
-          <div class="label-val">${payAr}</div>
-        </div>
-
-        <div class="label-products">
-          <b>الطلبات:</b><br>
-          ${o.products ? o.products.replace(/,/g, '<br>') : '---'}
-        </div>
-
-        <div class="label-footer">
-          <div>المبلغ المطلوب للدفع</div>
-          <div class="label-price">₪${o.price}</div>
-          <div style="font-size:10pt; margin-top:5px;">شكراً لطلبكم!</div>
-        </div>
-      </div>
-    `;
-  }
-
-  // --- Notifications ---
-  showToast() {
-    const t = document.getElementById('toast');
-    t.classList.add('show');
-    setTimeout(() => t.classList.remove('show'), 4000);
-  }
-
-  playNotificationSound() {
-    // Simple beep using AudioContext (browser allowed) or file
-    // For simplicity, we assume user interaction happened before
-    try {
-        const audio = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
-        audio.play();
-    } catch(e) {}
+    render();
+    document.getElementById('status').textContent = "עודכן";
+  } catch (e) {
+    document.getElementById('status').textContent = "שגיאה";
   }
 }
 
-const app = new MadSystem();
+function render() {
+  const container = document.getElementById('ordersList');
+  container.innerHTML = allOrders.map(o => `
+    <div class="prep-card">
+      <div class="prep-header">
+        <span class="order-num">#${o.orderId}</span>
+        <span style="font-weight:bold;">${o.delivery || 'משלוח רגיל'}</span>
+      </div>
+      <div>
+        <strong>${o.name}</strong> | ${o.phone}
+        <div class="item-list">${o.offer}</div>
+        <div style="font-size:14px; color:#666;">כתובת: ${o.addr || o.city || 'לא צוין'}</div>
+      </div>
+      <div style="margin-top:15px;">
+        <button class="btn btn-print" onclick="printLabel(${o.rowIndex})"><i class="fa fa-print"></i> הדפס מדבקה (10x10)</button>
+        <button class="btn btn-ready" onclick="markReady(${o.rowIndex})"><i class="fa fa-check"></i> סמן כהושלם (מוכן)</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function printLabel(rowIndex) {
+  const o = allOrders.find(x => x.rowIndex == rowIndex);
+  if(!o) return;
+
+  // تعبئة بيانات الملصق
+  document.getElementById('p_id').textContent = o.orderId;
+  document.getElementById('p_name').textContent = o.name;
+  document.getElementById('p_phone').textContent = o.phone;
+  document.getElementById('p_addr').textContent = o.addr || o.city || "";
+  document.getElementById('p_offer').textContent = o.offer;
+  document.getElementById('p_price').textContent = o.price;
+  document.getElementById('p_delivery').textContent = o.delivery || "משלוח";
+  
+  // ترجمة طريقة الدفع للعبرية
+  let payHe = o.payment;
+  if(payHe === "نقداً" || payHe === "Cash") payHe = "מזומן (Cash)";
+  if(payHe === "مدفوع" || payHe === "Paid") payHe = "שולם (Paid)";
+  document.getElementById('p_payment').textContent = payHe;
+
+  window.print();
+}
+
+async function markReady(row) {
+  if(!confirm("האם ההזמנה מוכנה למשלוח?")) return;
+  const url = `${SCRIPT_URL}?action=updateStatus&key=${DASH_KEY}&row=${row}&status=${encodeURIComponent("READY ✅ (מוכן / مجهز)")}`;
+  await fetch(url);
+  load();
+}
+
+// البدء
+window.onload = () => load('Approved');
 </script>
+
 </body>
 </html>
