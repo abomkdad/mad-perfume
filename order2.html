@@ -3,127 +3,274 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>MAD FINAL FIX</title>
+  <title>MAD PRO SYSTEM v2.0</title>
   
   <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 
   <style>
-    :root { --bg: #000000; --card: #18181b; --primary: #3b82f6; --text: #fff; --accent: #f59e0b; }
+    /* --- 1. הגדרות בסיס ומשתנים --- */
+    :root { 
+      --bg-dark: #0f172a;       /* רקע ראשי */
+      --bg-card: #1e293b;       /* רקע כרטיס */
+      --bg-card-hover: #334155; /* הובר כרטיס */
+      --primary: #3b82f6;       /* כחול ראשי */
+      --accent: #f59e0b;        /* זהב */
+      --success: #10b981;       /* ירוק */
+      --danger: #ef4444;        /* אדום */
+      --text-main: #f8fafc;     /* טקסט בהיר */
+      --text-muted: #94a3b8;    /* טקסט אפור */
+      --border: #334155;
+      --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+      --font: 'Rubik', sans-serif;
+    }
+
+    * { box-sizing: border-box; outline: none; }
     
-    body { margin: 0; font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); color: var(--text); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+    body { 
+      margin: 0; 
+      font-family: var(--font); 
+      background: var(--bg-dark); 
+      color: var(--text-main); 
+      height: 100vh; 
+      display: flex; 
+      flex-direction: column; 
+      overflow: hidden; 
+    }
 
-    /* --- الهيدر --- */
-    .header { background: #111; padding: 15px 20px; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
-    .brand { font-size: 1.5rem; font-weight: 900; color: #fff; letter-spacing: 1px; }
+    /* --- 2. רכיבי UI כלליים --- */
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: var(--bg-dark); }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
+
+    /* כפתורים */
+    .btn { 
+      cursor: pointer; border: none; padding: 10px 20px; border-radius: 8px; 
+      font-weight: 600; font-family: var(--font); transition: all 0.2s; 
+      display: flex; align-items: center; gap: 8px; font-size: 0.95rem;
+    }
+    .btn:active { transform: scale(0.97); }
+    .btn-primary { background: var(--primary); color: white; box-shadow: 0 0 15px rgba(59, 130, 246, 0.4); }
+    .btn-accent { background: var(--accent); color: #000; font-weight: 800; }
+    .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text-muted); }
+    .btn-outline:hover { border-color: var(--text-main); color: var(--text-main); }
+
+    /* Toast Notifications */
+    #toast-container { position: fixed; bottom: 20px; left: 20px; z-index: 10000; display: flex; flex-direction: column; gap: 10px; }
+    .toast { 
+      background: var(--bg-card); border-left: 4px solid var(--primary); color: white; 
+      padding: 15px 20px; border-radius: 4px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); 
+      display: flex; align-items: center; gap: 10px; animation: slideIn 0.3s ease; min-width: 250px;
+    }
+    @keyframes slideIn { from { transform: translateX(-100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+    /* --- 3. Header --- */
+    .header { 
+      background: rgba(30, 41, 59, 0.95); backdrop-filter: blur(10px); 
+      padding: 15px 30px; border-bottom: 1px solid var(--border); 
+      display: flex; align-items: center; justify-content: space-between; z-index: 100;
+    }
+    .brand { font-size: 1.6rem; font-weight: 900; letter-spacing: 1px; color: #fff; display: flex; align-items: center; gap: 10px; }
+    .brand i { color: var(--accent); }
+
+    .tabs { display: flex; background: #0f172a; padding: 4px; border-radius: 10px; border: 1px solid var(--border); }
+    .tab { 
+      padding: 8px 24px; cursor: pointer; border-radius: 8px; font-weight: 600; color: var(--text-muted); 
+      transition: 0.3s; display: flex; align-items: center; gap: 8px; font-size: 0.9rem;
+    }
+    .tab:hover { color: white; }
+    .tab.active { background: var(--primary); color: white; shadow: 0 2px 10px rgba(59, 130, 246, 0.3); }
+    .badge { background: rgba(0,0,0,0.3); padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; }
+
+    .search-wrap { flex: 1; max-width: 500px; margin: 0 30px; position: relative; }
+    .search-inp { 
+      width: 100%; padding: 12px 20px 12px 45px; border-radius: 10px; border: 1px solid var(--border); 
+      background: #0f172a; color: white; font-family: var(--font); font-size: 1rem; transition: 0.2s;
+    }
+    .search-inp:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
+    .search-icon { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
+
+    /* --- 4. אזור העבודה והכרטיסים --- */
+    .workspace { flex: 1; overflow-y: auto; padding: 30px; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 20px; }
+
+    .card { 
+      background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; 
+      position: relative; cursor: pointer; transition: all 0.2s ease; 
+      display: flex; flex-direction: column; gap: 12px;
+    }
+    .card:hover { transform: translateY(-5px); border-color: var(--primary); box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5); background: var(--bg-card-hover); }
     
-    .tabs { display: flex; gap: 10px; background: #222; padding: 5px; border-radius: 8px; }
-    .tab { padding: 8px 15px; cursor: pointer; border-radius: 5px; color: #888; font-weight: bold; }
-    .tab.active { background: var(--primary); color: #fff; }
+    .card-header { display: flex; justify-content: space-between; font-size: 0.85rem; color: var(--text-muted); font-weight: 600; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 10px; }
+    .card-title { font-size: 1.3rem; font-weight: 700; color: white; margin-top: 5px; }
+    .card-phone { font-family: 'Courier New', monospace; font-size: 1rem; color: var(--accent); letter-spacing: 0.5px; direction: ltr; text-align: right; }
     
-    .search-box { flex: 1; max-width: 400px; margin: 0 20px; padding: 10px; border-radius: 5px; border: 1px solid #444; background: #000; color: #fff; font-weight: bold; }
-
-    .btn { padding: 10px 20px; border-radius: 5px; font-weight: bold; cursor: pointer; border: none; color: #fff; display: flex; align-items: center; gap: 5px; }
-    .btn-all { background: var(--accent); color: #000; }
-    .btn-refresh { background: #333; }
-
-    /* --- منطقة العمل --- */
-    .workspace { flex: 1; overflow-y: auto; padding: 20px; }
-    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 15px; }
-
-    .card { background: var(--card); border: 1px solid #333; border-radius: 10px; padding: 15px; cursor: pointer; position: relative; border-right: 4px solid transparent; }
-    .card:hover { border-color: var(--primary); background: #222; }
+    .card-body { 
+      background: rgba(0,0,0,0.2); padding: 10px; border-radius: 8px; font-size: 0.9rem; 
+      color: #cbd5e1; line-height: 1.5; min-height: 60px; max-height: 80px; overflow: hidden;
+      border-right: 3px solid var(--border);
+    }
     
-    .card-top { display: flex; justify-content: space-between; color: #777; font-size: 0.9rem; margin-bottom: 5px; }
-    .card-name { font-size: 1.2rem; font-weight: 800; color: #fff; margin-bottom: 5px; }
-    .card-phone { font-family: monospace; color: #aaa; direction: ltr; text-align: right; }
-    .card-offer { background: #000; padding: 8px; border-radius: 5px; font-size: 0.9rem; margin-top: 10px; color: #ddd; max-height: 50px; overflow: hidden; }
-    .card-price { position: absolute; bottom: 15px; left: 15px; font-size: 1.2rem; font-weight: bold; color: #10b981; }
-
-    /* --- المودال --- */
-    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 1000; justify-content: center; align-items: center; }
-    .modal-box { width: 95%; max-width: 1100px; height: 90vh; background: #fff; color: #000; border-radius: 10px; display: flex; overflow: hidden; }
-    .editor { width: 35%; background: #f4f4f5; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
-    .preview { width: 65%; background: #e4e4e7; display: flex; align-items: center; justify-content: center; }
+    .card-footer { display: flex; justify-content: space-between; align-items: center; margin-top: auto; padding-top: 10px; }
+    .price-tag { color: var(--success); font-size: 1.4rem; font-weight: 800; text-shadow: 0 0 10px rgba(16, 185, 129, 0.2); }
     
-    .inp-group label { display: block; font-weight: bold; font-size: 0.85rem; }
-    .inp-group input, .inp-group textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; font-weight: bold; }
-    .btn-print-big { width: 100%; padding: 15px; background: #000; color: #fff; font-size: 1.2rem; margin-top: auto; border: none; cursor: pointer; font-weight: bold; }
+    .status-badge { font-size: 0.75rem; padding: 4px 10px; border-radius: 6px; background: #334155; color: #94a3b8; font-weight: 700; display: flex; align-items: center; gap: 5px; }
+    .status-badge.ready { background: rgba(16, 185, 129, 0.15); color: var(--success); border: 1px solid rgba(16, 185, 129, 0.3); }
 
-    /* --- الملصق --- */
+    /* --- 5. Modal Editor --- */
+    .modal-overlay { 
+      display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); 
+      backdrop-filter: blur(5px); z-index: 1000; justify-content: center; align-items: center; 
+      opacity: 0; transition: opacity 0.2s;
+    }
+    .modal-overlay.open { opacity: 1; }
+    
+    .modal-box { 
+      width: 95%; max-width: 1200px; height: 85vh; background: white; color: black; 
+      display: flex; border-radius: 16px; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    }
+    
+    .editor-pane { width: 35%; background: #f8fafc; padding: 30px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; border-left: 1px solid #e2e8f0; }
+    .preview-pane { width: 65%; background: #cbd5e1; display: flex; align-items: center; justify-content: center; padding: 20px; flex-direction: column; background-image: radial-gradient(#94a3b8 1px, transparent 1px); background-size: 20px 20px; }
+
+    .inp-group label { display: block; font-weight: 700; font-size: 0.8rem; margin-bottom: 6px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px; }
+    .inp-group input, .inp-group textarea { 
+      width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; 
+      font-weight: 500; font-family: var(--font); transition: 0.2s; font-size: 1rem;
+    }
+    .inp-group input:focus, .inp-group textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2); }
+    
+    .btn-print-modal { 
+      width: 100%; padding: 18px; background: #0f172a; color: white; font-size: 1.1rem; 
+      margin-top: auto; border: none; cursor: pointer; font-weight: 700; border-radius: 10px; 
+      display: flex; justify-content: center; align-items: center; gap: 10px;
+      transition: 0.2s;
+    }
+    .btn-print-modal:hover { background: #1e293b; transform: translateY(-2px); }
+
+    /* --- 6. תצוגת הדפסה (10x10) --- */
+    /* זהו הקוד שיוצר את המדבקה, זהה לדרישה המקורית אבל נקי יותר */
     .label-page { 
-      width: 100mm; height: 100mm; background: #fff; color: #000; padding: 3mm; 
+      width: 100mm; height: 100mm; background: #fff; color: #000; padding: 4mm; 
       box-sizing: border-box; border: 1px solid #ddd; display: flex; flex-direction: column; 
-      position: relative; overflow: hidden; page-break-after: always; direction: rtl;
+      position: relative; overflow: hidden; page-break-after: always; direction: rtl; font-family: sans-serif;
     }
     .l-head { display: flex; justify-content: space-between; height: 20mm; align-items: flex-start; }
-    .l-logo img { width: 35mm; }
-    .l-meta { text-align: left; font-size: 9pt; font-weight: 800; line-height: 1.2; }
-    
+    .l-logo img { width: 38mm; }
+    .l-meta { text-align: left; font-size: 9pt; font-weight: 800; line-height: 1.3; color: #000; }
     .l-banner { 
-      background: #18181b; color: #fbbf24; text-align: center; font-weight: 900; 
-      font-size: 11pt; padding: 4px; margin: 1mm 0 3mm 0; border-radius: 4px;
-      display: flex; align-items: center; justify-content: center; gap: 5px;
+      background: #000; color: #fbbf24; text-align: center; font-weight: 900; 
+      font-size: 11pt; padding: 5px; margin: 2mm 0 4mm 0; border-radius: 6px;
+      display: flex; align-items: center; justify-content: center; gap: 6px;
     }
-    
-    .l-info { font-size: 11pt; line-height: 1.35; margin-bottom: 2mm; }
-    .l-info b { font-weight: 800; min-width: 50px; display: inline-block; }
-    .l-products { font-size: 9.5pt; font-weight: bold; line-height: 1.2; margin-bottom: 2mm; max-height: 15mm; overflow: hidden; }
-    .l-price-box { border: 3px solid #000; font-size: 22pt; font-weight: 900; text-align: center; padding: 2px; margin-bottom: 2mm; }
-    
-    .l-footer { display: flex; justify-content: space-between; align-items: flex-end; margin-top: auto; border-top: 1px solid #000; padding-top: 2mm; }
-    .l-wa-text { font-size: 7.5pt; font-weight: 800; width: 68%; line-height: 1.2; background: #18181b; color: #fbbf24; padding: 5px; border-radius: 4px; }
+    .l-info { font-size: 11pt; line-height: 1.4; margin-bottom: 2mm; }
+    .l-info b { font-weight: 800; min-width: 55px; display: inline-block; }
+    .l-products { 
+      font-size: 10pt; font-weight: bold; line-height: 1.2; 
+      margin-bottom: 2mm; max-height: 16mm; overflow: hidden; border-right: 3px solid #000; padding-right: 5px;
+    }
+    .l-price-box { 
+      border: 3px solid #000; font-size: 24pt; font-weight: 900; 
+      text-align: center; padding: 4px; margin-bottom: 2mm; border-radius: 8px;
+    }
+    .l-footer { display: flex; justify-content: space-between; align-items: flex-end; margin-top: auto; border-top: 2px solid #000; padding-top: 3mm; }
+    .l-wa-text { 
+      font-size: 8pt; font-weight: 800; width: 65%; line-height: 1.3; 
+      background: #000; color: #fff; padding: 6px; border-radius: 6px;
+    }
+    .barcode-container { position: absolute; bottom: 2mm; width: 92%; text-align: center; left: 4%; }
 
-    /* --- إعدادات الطباعة المصححة --- */
     #printArea { display: none; }
     
+    /* Loading Spinner */
+    .loader { border: 4px solid #f3f3f3; border-top: 4px solid var(--primary); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 50px auto; }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+    /* Print Media Query */
     @media print {
-      /* إخفاء كل شيء ما عدا منطقة الطباعة */
-      body > *:not(#printArea) { display: none !important; }
-      #printArea { display: block !important; position: absolute; top: 0; left: 0; width: 100%; }
-      body { background: #fff; height: auto; overflow: visible; }
+      body * { visibility: hidden !important; }
+      #printArea, #printArea * { visibility: visible !important; }
+      #printArea { position: absolute; left: 0; top: 0; width: 100%; }
       @page { size: 100mm 100mm; margin: 0; }
-      .label-page { border: none; }
+      .label-page { border: none; } 
     }
   </style>
 </head>
 <body>
 
+<audio id="bell" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3"></audio>
+
+<div id="toast-container"></div>
+
 <div class="header">
-  <div class="brand">MAD SYSTEM</div>
-  <div class="tabs">
-    <div class="tab active" id="tab-pending" onclick="setTab('pending')">قيد التجهيز <span id="c-pending">0</span></div>
-    <div class="tab" id="tab-all" onclick="setTab('all')">الأرشيف <span id="c-all">0</span></div>
+  <div class="brand">
+    <i class="fas fa-cube"></i>
+    MAD <span style="color:var(--primary)">SYSTEM</span> <span style="font-size:0.8rem; opacity:0.5; margin-right:5px">PRO</span>
   </div>
-  <input class="search-box" id="search" placeholder="بحث..." oninput="render()">
-  <div style="display:flex; gap:10px">
-    <button class="btn btn-refresh" onclick="loadData()">تحديث ↻</button>
-    <button class="btn btn-all" onclick="printAll()">طباعة القائمة 🖨️</button>
+  
+  <div class="tabs">
+    <div class="tab active" id="tab-pending" onclick="app.setTab('pending')">
+      <i class="fas fa-clock"></i> <span>להכנה</span>
+      <span class="badge" id="count-pending">0</span>
+    </div>
+    <div class="tab" id="tab-all" onclick="app.setTab('all')">
+      <i class="fas fa-archive"></i> <span>ארכיון</span>
+      <span class="badge" id="count-all">0</span>
+    </div>
+  </div>
+
+  <div class="search-wrap">
+    <i class="fas fa-search search-icon"></i>
+    <input class="search-inp" id="search" placeholder="חיפוש לפי שם, טלפון או מס' הזמנה..." oninput="app.render()">
+  </div>
+
+  <div style="display:flex; gap:12px">
+    <button class="btn btn-outline" onclick="app.loadData()">
+      <i class="fas fa-sync-alt"></i> רענן
+    </button>
+    <button class="btn btn-accent" onclick="app.printAll()">
+      <i class="fas fa-print"></i> הדפס רשימה
+    </button>
   </div>
 </div>
 
 <div class="workspace">
-  <div class="grid" id="grid"></div>
+  <div class="grid" id="grid">
+    </div>
 </div>
 
 <div class="modal-overlay" id="editor">
   <div class="modal-box">
-    <div class="editor" dir="rtl">
-      <div style="display:flex; justify-content:space-between">
-        <h2>تعديل الطلب</h2>
-        <button onclick="closeModal()" style="border:none;background:none;font-size:2rem;cursor:pointer">&times;</button>
+    <div class="editor-pane" dir="rtl">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+        <h2 style="margin:0; font-weight:800; color:#1e293b"><i class="fas fa-edit"></i> עריכת הזמנה</h2>
+        <button onclick="app.closeModal()" style="border:none;background:none;font-size:1.2rem;cursor:pointer;color:#64748b"><i class="fas fa-times"></i></button>
       </div>
-      <div class="inp-group"><label>الاسم</label><input id="e_name" oninput="updatePreview()"></div>
-      <div class="inp-group"><label>الهاتف (تلقائي)</label><input id="e_phone" oninput="updatePreview()"></div>
-      <div class="inp-group"><label>العنوان</label><input id="e_city" oninput="updatePreview()"></div>
-      <div class="inp-group"><label>الشحن</label><input id="e_del" oninput="updatePreview()"></div>
-      <div class="inp-group"><label>المنتجات</label><textarea id="e_offer" oninput="updatePreview()" style="height:80px"></textarea></div>
-      <div class="inp-group"><label>السعر ₪</label><input id="e_price" type="number" oninput="updatePreview()" style="font-size:1.2rem; color:green"></div>
-      <button class="btn-print-big" onclick="printSingle()">طباعة (Enter) 🖨️</button>
+      
+      <div class="inp-group"><label>שם הלקוח</label><input id="e_name" oninput="app.updatePreview()"></div>
+      <div class="inp-group"><label>טלפון (פורמט אוטומטי)</label><input id="e_phone" oninput="app.updatePreview()"></div>
+      <div class="inp-group"><label>כתובת מלאה</label><input id="e_city" oninput="app.updatePreview()"></div>
+      <div class="inp-group"><label>חברת שילוח</label><input id="e_del" oninput="app.updatePreview()"></div>
+      
+      <div class="inp-group">
+        <label>פירוט מוצרים (Items)</label>
+        <textarea id="e_offer" oninput="app.updatePreview()" style="height:100px; resize:vertical"></textarea>
+      </div>
+      
+      <div class="inp-group"><label>לתשלום (₪)</label><input id="e_price" type="number" style="font-size:1.2rem;color:var(--success);font-weight:bold" oninput="app.updatePreview()"></div>
+      
+      <button class="btn-print-modal" onclick="app.printSingle()">
+        <i class="fas fa-print"></i> שמור והדפס (Enter)
+      </button>
     </div>
-    <div class="preview">
-      <div id="livePreview"></div>
+    
+    <div class="preview-pane">
+      <div style="margin-bottom:10px; font-weight:bold; color:#475569">תצוגה מקדימה חיה:</div>
+      <div id="livePreview" style="box-shadow: 0 20px 50px rgba(0,0,0,0.2); transform: scale(0.9);"></div>
     </div>
   </div>
 </div>
@@ -131,105 +278,188 @@
 <div id="printArea"></div>
 
 <script>
-  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyLjLFa8AaH82Ip7m747WC-KSUUEaU_M70S0I9Mda14XbnmcuEfZ7pBnF_zzJYZuXmZ/exec";
-  const PASS = "12345678";
-  
-  let orders = [];
-  let currentTab = 'pending';
-  let currentIndex = null;
+/**
+ * MAD SYSTEM PRO v2.0
+ * Logic separated into a class structure for cleanliness.
+ */
 
-  // 1. تحويل الرقم لـ 05X-XXXXXXX
-  function formatPhone(input) {
-    let p = String(input || "").replace(/[^0-9]/g, "");
-    if(!p) return "";
-    
-    // إزالة المقدمات الدولية
-    if(p.startsWith("972")) p = "0" + p.slice(3);
-    if(p.startsWith("970")) p = "0" + p.slice(3);
-    
-    // إصلاح أخطاء الكتابة (نسيان الصفر)
-    if(p.startsWith("5") && p.length === 9) p = "0" + p;
-    
-    // التنسيق الجمالي
-    if(p.length === 10) return p.slice(0,3) + "-" + p.slice(3);
-    return p;
+const CONFIG = {
+  SCRIPT_URL: "https://script.google.com/macros/s/AKfycbyLjLFa8AaH82Ip7m747WC-KSUUEaU_M70S0I9Mda14XbnmcuEfZ7pBnF_zzJYZuXmZ/exec",
+  PASS: "12345678",
+  REFRESH_RATE: 20000
+};
+
+class App {
+  constructor() {
+    this.orders = [];
+    this.currentTab = 'pending';
+    this.currentIndex = null;
+    this.lastCount = 0;
+    this.init();
   }
 
-  // 2. التحميل
-  (function(){
-    if(localStorage.getItem('mad_auth') !== PASS) {
-      if(prompt("Password:") === PASS) localStorage.setItem('mad_auth', PASS);
-      else { document.body.innerHTML="Access Denied"; return; }
-    }
-    loadData();
-    setInterval(loadData, 20000);
-  })();
-
-  async function loadData() {
-    try {
-      const res = await fetch(`${SCRIPT_URL}?action=get`);
-      orders = await res.json();
-      render();
-    } catch(e) {}
-  }
-
-  function setTab(t) {
-    currentTab = t;
-    document.querySelectorAll('.tab').forEach(e => e.classList.remove('active'));
-    document.getElementById('tab-'+t).classList.add('active');
-    render();
-  }
-
-  function render() {
-    const pendingList = orders.filter(o => {
-      const st = (o.status || "").toLowerCase();
-      return (st.includes("prep") || st.includes("approved")) && !st.includes("ready");
+  // אתחול המערכת
+  async init() {
+    this.checkAuth();
+    await this.loadData();
+    
+    // Auto refresh
+    setInterval(() => this.loadData(true), CONFIG.REFRESH_RATE);
+    
+    // Keyboard shortcuts
+    document.addEventListener('keydown', (e) => {
+      if (document.getElementById('editor').style.display === 'flex') {
+        if (e.key === "Escape") this.closeModal();
+      }
     });
+  }
+
+  checkAuth() {
+    if(localStorage.getItem('mad_auth') !== CONFIG.PASS) {
+      const input = prompt("🔐 מערכת מאובטחת. הזמן סיסמה:");
+      if(input === CONFIG.PASS) localStorage.setItem('mad_auth', CONFIG.PASS);
+      else {
+        document.body.innerHTML = "<div style='display:flex;justify-content:center;align-items:center;height:100vh;color:white;flex-direction:column'><h1>⛔ גישה נדחתה</h1><button onclick='location.reload()'>נסה שוב</button></div>";
+        throw new Error("Auth Failed");
+      }
+    }
+  }
+
+  // --- Data Handling ---
+
+  async loadData(silent = false) {
+    if (!silent) document.getElementById('grid').innerHTML = '<div class="loader"></div>';
     
-    document.getElementById('c-pending').innerText = pendingList.length;
-    document.getElementById('c-all').innerText = orders.length;
+    try {
+      const res = await fetch(`${CONFIG.SCRIPT_URL}?action=get`);
+      const data = await res.json();
+      this.orders = data;
+      
+      this.checkNewOrders();
+      this.render();
+      if(!silent) this.showToast("הנתונים סונכרנו בהצלחה", "success");
+    } catch(e) {
+      console.error(e);
+      if(!silent) this.showToast("שגיאה בטעינת נתונים", "error");
+    }
+  }
+
+  checkNewOrders() {
+    const newPending = this.orders.filter(o => this.isPending(o)).length;
+    if (newPending > this.lastCount && this.lastCount !== 0) {
+      this.showToast(`🔔 יש ${newPending - this.lastCount} הזמנות חדשות!`, "info");
+      document.getElementById('bell').play().catch(()=>{});
+    }
+    this.lastCount = newPending;
+  }
+
+  isPending(o) {
+    const st = (o.status || "").toLowerCase();
+    return (st.includes("prep") || st.includes("approved")) && !st.includes("ready");
+  }
+
+  setTab(tab) {
+    this.currentTab = tab;
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('tab-' + tab).classList.add('active');
+    this.render();
+  }
+
+  // --- Rendering ---
+
+  render() {
+    const pendingList = this.orders.filter(o => this.isPending(o));
+    const allList = this.orders;
+
+    // Update Badges
+    document.getElementById('count-pending').innerText = pendingList.length;
+    document.getElementById('count-all').innerText = allList.length;
+
+    let list = this.currentTab === 'pending' ? pendingList : allList;
     
-    let list = currentTab === 'pending' ? pendingList : orders;
+    // Filtering
     const q = document.getElementById('search').value.toLowerCase().trim();
-    
-    if(q) {
+    if (q) {
       list = list.filter(o => {
-        const pClean = formatPhone(o.phone).replace(/-/g, "");
-        return (o.name||"").toLowerCase().includes(q) || 
-               (o.orderId||"").toString().includes(q) ||
-               pClean.includes(q);
+        const p = this.formatPhone(o.phone).replace(/-/g, "");
+        return (o.name || "").toLowerCase().includes(q) ||
+               (o.orderId || "").toString().includes(q) ||
+               p.includes(q);
       });
     }
 
     const grid = document.getElementById('grid');
-    if(!list.length) {
-      grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:50px;color:#555">لا توجد طلبات</div>';
+    if (!list.length) {
+      grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:50px;color:var(--text-muted)">
+        <i class="fas fa-inbox" style="font-size:3rem;margin-bottom:10px"></i><br>לא נמצאו הזמנות
+      </div>`;
       return;
     }
 
     grid.innerHTML = list.map(o => {
-      const idx = orders.indexOf(o);
-      const isReady = (o.status||"").includes("READY");
+      const idx = this.orders.indexOf(o);
+      const isReady = (o.status || "").includes("READY");
+      
       return `
-        <div class="card" onclick="openEditor(${idx})" style="opacity:${isReady?0.6:1}">
-          <div class="card-top">
-            <span>#${o.orderId}</span>
-            <span>${o.delivery || 'Standard'}</span>
+        <div class="card" onclick="app.openEditor(${idx})" style="border-left: 4px solid ${isReady ? 'var(--success)' : 'var(--accent)'}">
+          <div class="card-header">
+            <span><i class="fas fa-hashtag"></i> ${o.orderId}</span>
+            <span style="color:${isReady ? 'var(--success)' : 'var(--accent)'}">${o.delivery || 'High Express'}</span>
           </div>
-          <div class="card-name">${o.name}</div>
-          <div class="card-phone">${formatPhone(o.phone)}</div>
-          <div class="card-offer">📦 ${o.offer || '...'}</div>
-          <div class="card-price">₪${o.price}</div>
+          <div class="card-title">${o.name}</div>
+          <div class="card-phone">${this.formatPhone(o.phone)}</div>
+          <div class="card-body">
+            ${o.offer || '<span style="opacity:0.5">אין פירוט מוצרים...</span>'}
+          </div>
+          <div class="card-footer">
+            <span class="status-badge ${isReady ? 'ready' : ''}">
+              <i class="fas ${isReady ? 'fa-check-circle' : 'fa-clock'}"></i>
+              ${isReady ? 'מוכן למשלוח' : 'ממתין להכנה'}
+            </span>
+            <span class="price-tag">₪${o.price}</span>
+          </div>
         </div>
       `;
     }).join("");
   }
 
-  // 3. تصميم الملصق
-  function getLabelHTML(o, idSuffix) {
+  // --- Helper Functions ---
+
+  formatPhone(input) {
+    let p = String(input || "").replace(/[^0-9]/g, "");
+    if (!p) return "";
+    if (p.startsWith("972")) p = "0" + p.slice(3);
+    if (p.startsWith("970")) p = "0" + p.slice(3);
+    if (p.startsWith("5") && p.length === 9) p = "0" + p;
+    if (p.length === 10) return p.slice(0,3) + "-" + p.slice(3);
+    return p;
+  }
+
+  showToast(msg, type = 'info') {
+    const container = document.getElementById('toast-container');
+    const toast = document.createElement('div');
+    toast.className = 'toast';
+    
+    let icon = 'info-circle';
+    if(type === 'success') { toast.style.borderLeftColor = 'var(--success)'; icon = 'check-circle'; }
+    if(type === 'error') { toast.style.borderLeftColor = 'var(--danger)'; icon = 'exclamation-circle'; }
+    
+    toast.innerHTML = `<i class="fas fa-${icon}"></i> <span>${msg}</span>`;
+    container.appendChild(toast);
+    
+    setTimeout(() => {
+      toast.style.opacity = '0';
+      toast.style.transform = 'translateX(-100%)';
+      setTimeout(() => toast.remove(), 300);
+    }, 4000);
+  }
+
+  // --- Label Generation ---
+
+  getLabelHTML(o, idSuffix) {
     const date = new Date().toLocaleDateString('he-IL');
-    const localPhone = formatPhone(o.phone);
-    const cleanPhone = localPhone.replace(/-/g, ""); // للباركود
+    const localPhone = this.formatPhone(o.phone);
+    const cleanPhone = localPhone.replace(/-/g, "");
     
     return `
       <div class="label-page" dir="rtl">
@@ -237,24 +467,29 @@
           <div class="l-logo"><img src="https://www.madparfum.com/logo.svg"></div>
           <div class="l-meta">
             DATE: ${date}<br>
-            ORD: ${o.orderId}
+            ORD: <b>${o.orderId}</b>
           </div>
         </div>
+
         <div class="l-banner">
           <i class="fas fa-gift"></i> צלם את הרגע וקבל מתנה
         </div>
+
         <div class="l-info">
           <div><b>לכבוד:</b> ${o.name}</div>
-          <div><b>טלפון:</b> <span dir="ltr" style="font-family:monospace; font-weight:900">${localPhone}</span></div>
+          <div><b>טלפון:</b> <span dir="ltr" style="font-family:monospace; font-weight:bold">${localPhone}</span></div>
           <div><b>כתובת:</b> ${o.city}</div>
           <div><b>משלוח:</b> ${o.delivery}</div>
         </div>
+
         <div class="l-products">
           <b>פריטים:</b> ${o.offer || ""}
         </div>
+
         <div class="l-price-box">
           לתשלום: ₪${o.price}
         </div>
+
         <div class="l-footer">
           <div class="l-wa-text">
              1. סרוק את הקוד <br>
@@ -263,47 +498,75 @@
           </div>
           <div id="qr_${idSuffix}"></div>
         </div>
-        <div style="position:absolute; bottom:2mm; width:94%; text-align:center">
+        
+        <div class="barcode-container">
            <svg id="bar_${idSuffix}" data-val="${cleanPhone}"></svg>
         </div>
       </div>
     `;
   }
 
-  // 4. المحرر والطباعة
-  function openEditor(idx) {
-    currentIndex = idx;
-    const o = orders[idx];
+  genCodes(suffix, phoneInput) {
+    setTimeout(() => {
+      try {
+        const cleanP = this.formatPhone(phoneInput).replace(/-/g, "");
+        const barEl = document.getElementById(`bar_${suffix}`);
+        if(barEl) JsBarcode(barEl, cleanP, { format: "CODE128", height: 25, fontSize: 10, displayValue: true, margin:0 });
+        
+        const qrEl = document.getElementById(`qr_${suffix}`);
+        if(qrEl) {
+          qrEl.innerHTML = "";
+          new QRCode(qrEl, { text: "https://wa.me/972549634449", width: 45, height: 45 });
+        }
+      } catch(e){}
+    }, 50);
+  }
+
+  // --- Editor & Printing ---
+
+  openEditor(idx) {
+    this.currentIndex = idx;
+    const o = this.orders[idx];
+    
+    // Populate Fields
     document.getElementById('e_name').value = o.name;
     document.getElementById('e_phone').value = o.phone;
-    document.getElementById('e_city').value = o.city + " " + (o.addr||"");
+    document.getElementById('e_city').value = o.city + (o.addr ? " " + o.addr : "");
     document.getElementById('e_del').value = o.delivery || "High Express";
     document.getElementById('e_offer').value = o.offer || "";
     document.getElementById('e_price').value = o.price;
     
-    document.getElementById('editor').style.display = 'flex';
-    updatePreview();
+    // Show Modal
+    const modal = document.getElementById('editor');
+    modal.style.display = 'flex';
+    setTimeout(() => modal.classList.add('open'), 10); // for animation
     
+    this.updatePreview();
+    
+    // Hotkey for print inside modal
     document.onkeydown = (e) => {
-      if(e.key === "Enter" && !e.shiftKey) { e.preventDefault(); printSingle(); }
-      if(e.key === "Escape") closeModal();
-    }
+      if(e.key === "Enter" && !e.shiftKey) { e.preventDefault(); this.printSingle(); }
+      if(e.key === "Escape") this.closeModal();
+    };
   }
 
-  function closeModal() {
-    document.getElementById('editor').style.display = 'none';
+  closeModal() {
+    const modal = document.getElementById('editor');
+    modal.classList.remove('open');
+    setTimeout(() => { modal.style.display = 'none'; }, 200);
     document.onkeydown = null;
   }
 
-  function updatePreview() {
-    const d = getFormData();
-    document.getElementById('livePreview').innerHTML = getLabelHTML(d, 'prev');
-    genCodes('prev', d.phone);
+  updatePreview() {
+    if (this.currentIndex === null) return;
+    const data = this.getFormData();
+    document.getElementById('livePreview').innerHTML = this.getLabelHTML(data, 'prev');
+    this.genCodes('prev', data.phone);
   }
 
-  function getFormData() {
+  getFormData() {
     return {
-      orderId: orders[currentIndex].orderId,
+      orderId: this.orders[this.currentIndex].orderId,
       name: document.getElementById('e_name').value,
       phone: document.getElementById('e_phone').value,
       city: document.getElementById('e_city').value,
@@ -313,70 +576,63 @@
     };
   }
 
-  function genCodes(s, phone) {
-    // التأخير ضروري لضمان وجود العنصر في DOM
-    setTimeout(() => {
+  async printSingle() {
+    const data = this.getFormData();
+    const area = document.getElementById('printArea');
+    area.innerHTML = this.getLabelHTML(data, 'print');
+    
+    this.genCodes('print', data.phone);
+    
+    setTimeout(async () => {
+      window.print();
+      
+      // Update Status Logic
+      const row = this.orders[this.currentIndex].rowIndex;
+      this.closeModal();
+      this.showToast("מעדכן סטטוס...", "info");
+      
       try {
-        const cleanP = formatPhone(phone).replace(/-/g, "");
-        const barEl = document.getElementById(`bar_${s}`);
-        if(barEl) JsBarcode(barEl, cleanP, { format: "CODE128", height: 25, fontSize: 10, displayValue: true, margin:0 });
-        
-        const qrEl = document.getElementById(`qr_${s}`);
-        if(qrEl) {
-          qrEl.innerHTML = "";
-          // رقم الواتساب ثابت +972
-          new QRCode(qrEl, { text: "https://wa.me/972549634449", width: 45, height: 45 });
-        }
-      } catch(e) { console.log(e); }
-    }, 50);
+        await fetch(`${CONFIG.SCRIPT_URL}?action=updateStatus&key=${CONFIG.PASS}&row=${row}&status=READY ✅`);
+        this.orders[this.currentIndex].status = "READY ✅";
+        this.render();
+        this.showToast("הסטטוס עודכן ל-READY", "success");
+      } catch(e) {
+        this.showToast("הדפסה בוצעה, אך עדכון הסטטוס נכשל", "error");
+      }
+    }, 500);
   }
 
-  function printSingle() {
-    const d = getFormData();
-    const area = document.getElementById('printArea');
-    area.innerHTML = getLabelHTML(d, 'print');
+  printAll() {
+    const list = this.currentTab === 'pending' ? this.orders.filter(o => this.isPending(o)) : this.orders;
+    if(!list.length) return this.showToast("אין הזמנות להדפסה", "error");
     
-    setTimeout(() => {
-      genCodes('print', d.phone);
-      setTimeout(async () => {
-        window.print();
-        
-        // التحديث
-        const r = orders[currentIndex].rowIndex;
-        closeModal();
-        await fetch(`${SCRIPT_URL}?action=updateStatus&key=${PASS}&row=${r}&status=READY ✅`);
-        orders[currentIndex].status = "READY ✅";
-        render();
-      }, 500);
-    }, 100);
-  }
-
-  function printAll() {
-    const list = currentTab === 'pending' ? orders.filter(o => {
-      const st = (o.status || "").toLowerCase();
-      return (st.includes("prep") || st.includes("approved")) && !st.includes("ready");
-    }) : orders;
-    
-    if(!list.length) return alert("القائمة فارغة!");
-    if(!confirm(`طباعة ${list.length} ملصق؟`)) return;
+    if(!confirm(`האם להדפיס ${list.length} מדבקות ברצף?`)) return;
 
     const area = document.getElementById('printArea');
-    area.innerHTML = list.map((o, i) => getLabelHTML(o, `bulk_${i}`)).join("");
+    area.innerHTML = list.map((o, i) => this.getLabelHTML(o, `bulk_${i}`)).join("");
 
     setTimeout(() => {
-      list.forEach((o, i) => genCodes(`bulk_${i}`, o.phone));
+      list.forEach((o, i) => this.genCodes(`bulk_${i}`, o.phone));
       setTimeout(() => {
         window.print();
-        if(currentTab === 'pending' && confirm("نقل إلى جاهز؟")) {
-          list.forEach(o => {
+        
+        if(this.currentTab === 'pending' && confirm("האם לסמן את כל המודפסים כ-READY?")) {
+           list.forEach(o => {
              o.status = "READY ✅";
-             fetch(`${SCRIPT_URL}?action=updateStatus&key=${PASS}&row=${o.rowIndex}&status=READY ✅`);
-          });
-          render();
+             // Fire and forget requests for bulk update
+             fetch(`${CONFIG.SCRIPT_URL}?action=updateStatus&key=${CONFIG.PASS}&row=${o.rowIndex}&status=READY ✅`);
+           });
+           this.render();
+           this.showToast("כל הסטטוסים עודכנו!", "success");
         }
-      }, 1500);
-    }, 200);
+      }, 2500); // More time for images to load
+    }, 500);
   }
+}
+
+// Initialize
+const app = new App();
+
 </script>
 </body>
 </html>
