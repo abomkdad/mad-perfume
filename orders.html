@@ -3,203 +3,512 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=0"/>
-  <title>MAD Manager v2 - Approved Print Edition</title>
+  <title>MAD Manager v2.5 - Arabic & Hebrew Invoices</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
   <style>
     :root {
-      --bg: #060914;
+      --bg: #0a0f1e;
       --card: #161b2c;
-      --primary: #2563eb;
-      --success: #16a34a;
-      --text: #ffffff;
+      --primary: #3b82f6;
+      --success: #10b981;
+      --ready: #f59e0b;
+      --hebrew: #8b5cf6;
+      --danger: #ef4444;
+      --text: #f8fafc;
       --muted: #94a3b8;
-      --border: rgba(255,255,255,0.1);
+      --border: rgba(255,255,255,0.08);
+      --grad: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
     }
 
     body {
-      margin: 0; font-family: system-ui, -apple-system, sans-serif;
+      margin: 0; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
       background: var(--bg); color: var(--text); padding-bottom: 90px;
+      line-height: 1.5;
     }
 
-    /* UI Layout */
-    .header { background: rgba(22, 27, 44, 0.9); padding: 15px; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
-    .container { padding: 12px; }
-    .order-card { background: var(--card); border-radius: 18px; padding: 16px; margin-bottom: 15px; border: 1px solid var(--border); }
-    .actions { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-top: 15px; }
-    .btn { padding: 10px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; }
-    .btn-primary { background: var(--primary); color: white; }
-    .btn-outline { background: rgba(255,255,255,0.05); color: white; border: 1px solid var(--border); }
-    .btn-wa { background: #075e54; color: white; }
+    .header {
+      background: rgba(16, 21, 36, 0.85); backdrop-filter: blur(12px);
+      padding: 12px 16px; position: sticky; top: 0; z-index: 100;
+      border-bottom: 1px solid var(--border);
+      display: flex; flex-direction: column; gap: 10px;
+    }
 
-    /* Print Preview Modal (مركز الشاشة للموبايل) */
+    .header-top { display: flex; justify-content: space-between; align-items: center; }
+    .logo { font-weight: 900; font-size: 22px; letter-spacing: -0.5px; }
+    .logo span { color: var(--primary); }
+
+    .search-container { position: relative; width: 100%; }
+    .search-input {
+      width: 100%; background: rgba(255,255,255,0.05); border: 1px solid var(--border);
+      border-radius: 12px; padding: 10px 40px 10px 12px; color: white; outline: none;
+      transition: all 0.3s; box-sizing: border-box; font-size: 14px;
+    }
+    .search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--muted); }
+
+    .container { padding: 16px; max-width: 600px; margin: 0 auto; }
+
+    .order-card {
+      background: var(--card); border-radius: 24px; padding: 20px;
+      margin-bottom: 20px; border: 1px solid var(--border);
+      box-shadow: 0 10px 25px -5px rgba(0,0,0,0.4);
+      transition: transform 0.2s, box-shadow 0.2s;
+      position: relative; overflow: hidden;
+    }
+
+    .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+    .order-id { font-family: monospace; font-size: 14px; color: var(--muted); background: rgba(255,255,255,0.05); padding: 2px 8px; border-radius: 6px; }
+
+    .status-pill { font-size: 11px; padding: 4px 12px; border-radius: 20px; font-weight: 700; text-transform: uppercase; }
+    .status-prep { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.2); }
+    .status-new { background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.2); }
+
+    .customer-name { font-size: 19px; font-weight: 800; margin-bottom: 2px; display: block; }
+    .customer-phone { color: var(--muted); font-size: 14px; display: flex; align-items: center; gap: 6px; }
+    .offer-details {
+      margin: 12px 0; padding: 12px; background: rgba(59, 130, 246, 0.05);
+      border-radius: 12px; font-size: 14px; color: #93c5fd; font-weight: 600;
+      border-right: 3px solid var(--primary);
+    }
+
+    .meta-info { display: flex; flex-wrap: wrap; gap: 12px; font-size: 12px; color: var(--muted); }
+    .meta-item { display: flex; align-items: center; gap: 4px; }
+
+    .actions-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 20px; }
+    .actions-secondary { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
+
+    .btn {
+      padding: 10px 4px; border-radius: 14px; border: none; font-weight: 700;
+      cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center;
+      font-size: 10px; transition: 0.2s; gap: 6px; text-decoration: none;
+    }
+    .btn i { font-size: 18px; }
+    .btn-primary { background: var(--grad); color: white; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3); }
+    .btn-success { background: #059669; color: white; }
+    .btn-ar { background: #d97706; color: white; }
+    .btn-he { background: #7c3aed; color: white; }
+    .btn-danger { background: var(--danger); color: white; }
+    .btn-outline { background: rgba(255,255,255,0.03); color: white; border: 1px solid var(--border); }
+
     .modal-overlay {
-      position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(5px);
-      display: none; align-items: center; justify-content: center; z-index: 2000; padding: 10px;
+      position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px);
+      display: none; align-items: center; justify-content: center; z-index: 2000; padding: 20px;
     }
     .modal-overlay.show { display: flex; }
-    
-    .invoice-container {
-      background: white; color: black; width: 98mm; height: 98mm;
-      padding: 6mm; box-sizing: border-box; border-radius: 4px;
-      display: flex; flex-direction: column; position: relative;
+
+    .invoice-box {
+        background: white; color: black; width: 98mm; height: 98mm;
+        padding: 8mm; box-sizing: border-box; display: flex;
+        flex-direction: column; position: relative; border-radius: 2px;
+    }
+    .inv-header { text-align: center; border-bottom: 2px solid #000; padding-bottom: 8px; margin-bottom: 10px; }
+    .inv-body { font-size: 12px; flex-grow: 1; line-height: 1.5; }
+    .inv-row { margin-bottom: 5px; display: flex; gap: 8px; }
+    .inv-footer { border-top: 2px solid #000; padding-top: 8px; display: flex; justify-content: space-between; align-items: flex-end; }
+
+    .modal-content {
+      background: var(--card); width: 100%; max-width: 420px; padding: 28px;
+      border-radius: 32px; border: 1px solid var(--border); overflow-y: auto; max-height: 85vh;
     }
 
-    /* Approved Design Styling */
-    .inv-header { text-align: center; margin-bottom: 5px; border-bottom: 1.5px solid #000; padding-bottom: 5px; }
-    .inv-logo-text { font-size: 28px; font-weight: 900; margin: 0; line-height: 1; letter-spacing: 2px; }
-    .inv-subtitle { font-size: 10px; font-weight: bold; margin-bottom: 5px; }
-    .inv-meta { display: flex; justify-content: space-between; font-size: 9px; font-weight: bold; margin-top: 2px; }
+    label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+    input, select, textarea {
+      width: 100%; padding: 14px; margin-bottom: 16px; border-radius: 14px;
+      border: 1px solid var(--border); background: rgba(0,0,0,0.2); color: white;
+      font-size: 16px; box-sizing: border-box; outline: none; transition: 0.3s;
+    }
 
-    .inv-body { font-size: 12px; margin-top: 10px; flex-grow: 1; line-height: 1.4; text-align: right; }
-    .inv-row { margin-bottom: 4px; border-bottom: 0.5px solid #eee; padding-bottom: 2px; }
-    .inv-row strong { font-weight: 900; }
+    #toast {
+      position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+      background: #10b981; color: white; padding: 14px 28px; border-radius: 50px;
+      font-weight: 700; z-index: 3000; display: none;
+    }
 
-    .inv-footer { border-top: 1.5px solid #000; padding-top: 8px; display: flex; justify-content: space-between; align-items: flex-end; }
-    .promo-section { text-align: center; flex: 1; }
-    .promo-title { font-size: 10px; font-weight: 900; margin-bottom: 3px; }
-    .promo-steps { font-size: 8.5px; line-height: 1.2; text-align: right; }
-    
-    .qr-area { text-align: center; margin-left: 10px; }
-    .qr-area img { width: 45px; height: 45px; border: 1px solid #000; }
-    .qr-phone { font-size: 8px; font-weight: bold; margin-top: 2px; }
-
-    .total-area { text-align: left; min-width: 60px; }
-    .total-label { font-size: 10px; font-weight: bold; }
-    .total-amount { font-size: 20px; font-weight: 900; }
-
-    /* Modal Controls */
-    .modal-btns { position: absolute; bottom: -60px; left: 0; right: 0; display: flex; gap: 10px; justify-content: center; }
+    #loadingOverlay {
+      position: fixed; inset: 0; background: rgba(6, 9, 20, 0.7); backdrop-filter: blur(4px); z-index: 4000;
+      display: none; align-items: center; justify-content: center;
+    }
+    .spinner { width: 44px; height: 44px; border: 4px solid rgba(59, 130, 246, 0.1); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
 
     @media print {
       body * { visibility: hidden; }
       #invoicePreview, #invoicePreview * { visibility: visible; }
-      #invoicePreview { position: fixed; left: 0; top: 0; width: 98mm; height: 98mm; margin: 0; padding: 6mm; border: none; }
-      .modal-btns { display: none; }
+      #invoicePreview { position: fixed; left: 0; top: 0; width: 98mm; height: 98mm; border: none; margin: 0; padding: 8mm; }
+      .no-print { display: none !important; }
       @page { size: 98mm 98mm; margin: 0; }
     }
   </style>
 </head>
 <body>
 
+<div id="loadingOverlay"><div class="spinner"></div></div>
+<div id="toast">✅ تم التحديث بنجاح</div>
+
+<!-- Invoice Preview Modal -->
 <div class="modal-overlay" id="printModal">
-    <div class="invoice-container" id="invoicePreview">
-        <div class="inv-header">
-            <h1 class="inv-logo-text">MAD</h1>
-            <div class="inv-subtitle">PARFUMEUR</div>
-            <div class="inv-meta">
-                <span>DATE: <span id="p_date">4.2.2026</span></span>
-                <span>ORD: <span id="p_ord">MAD-04752</span></span>
-            </div>
-        </div>
-
-        <div class="inv-body">
-            <div class="inv-row"><strong>לכבוד:</strong> <span id="p_name">Mohamad Basheer</span></div>
-            <div class="inv-row"><strong>טלפון:</strong> <span id="p_phone">054-9748773</span></div>
-            <div class="inv-row"><strong>כתובת:</strong> <span id="p_addr">شفاعمر - High Express</span></div>
-            <div style="margin-top: 8px;">
-                <strong>פריטים:</strong>
-                <div id="p_items" style="font-size: 10px; background: #f9f9f9; padding: 4px; margin-top: 2px;">W183, X102, P104</div>
-            </div>
-        </div>
-
-        <div class="inv-footer">
-            <div class="qr-area">
-                <img id="p_qr" src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=https://wa.me/972549748773" alt="QR">
-                <div class="qr-phone" id="p_phone_footer">0549748773</div>
-            </div>
-            
-            <div class="promo-section">
-                <div class="promo-title">צלם את הרגע וקבל מתנה</div>
-                <div class="promo-steps">
-                    1. סרוק את הקוד <br>
-                    2. שלח סרטון ל-WA <br>
-                    3. קבל מתנה!
-                </div>
-            </div>
-
-            <div class="total-area">
-                <div class="total-label">לתשלום:</div>
-                <div class="total-amount">₪<span id="p_total">20</span></div>
-            </div>
-        </div>
-
-        <div class="modal-btns">
-            <button class="btn btn-outline" onclick="closePrintModal()">إغلاق</button>
-            <button class="btn btn-primary" onclick="window.print()"><i class="fa fa-print"></i> طباعة الآن</button>
-        </div>
+  <div class="invoice-box" id="invoicePreview">
+    <div class="inv-header">
+      <h1 style="margin:0; font-size: 32px; letter-spacing: 4px; font-weight: 900;">MAD</h1>
+      <div style="font-size: 11px; font-weight: 800; color: #333;">PARFUMEUR</div>
+      <div style="display: flex; justify-content: space-between; font-size: 10px; font-weight: 900; margin-top:8px; border-top: 1px solid #eee; padding-top: 4px;">
+        <span id="p_date">DATE: 00.00.0000</span>
+        <span id="p_ord">ORD: MAD-00000</span>
+      </div>
     </div>
+    <div class="inv-body" id="p_content_lang"></div>
+    <div class="inv-footer">
+      <div style="text-align:center;">
+        <img id="p_qr" src="" style="width:48px; height:48px; border:1px solid #000; padding: 2px;">
+        <div id="p_footer_phone" style="font-size:9px; font-weight:900; margin-top:4px;"></div>
+      </div>
+      <div id="p_promo" style="font-size: 9px; text-align: center; flex: 1; padding: 0 8px; font-weight: 800; line-height: 1.2;"></div>
+      <div style="text-align: left;">
+        <div id="p_label_total" style="font-size: 11px; font-weight: 700;">TOTAL:</div>
+        <div style="font-size: 24px; font-weight: 900; color: #000;">₪<span id="p_total">0</span></div>
+      </div>
+    </div>
+    <div style="position: absolute; bottom: -75px; left: 0; right: 0; display: flex; gap: 12px; justify-content: center;" class="no-print">
+      <button class="btn btn-outline" onclick="closeModal('printModal')" style="padding: 12px 24px;">إلغاء</button>
+      <button class="btn btn-primary" onclick="window.print()" style="padding: 12px 24px;"><i class="fa fa-print"></i> طباعة</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add/Edit Modal -->
+<div class="modal-overlay" id="editModal">
+  <div class="modal-content">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+      <h3 id="modalTitle" style="margin:0; font-size: 22px;">تعديل الطلب</h3>
+      <button id="deleteBtn" class="btn btn-danger" onclick="deleteOrder()" style="padding: 8px 12px; flex-direction: row; font-size: 12px; gap: 6px;">
+        <i class="fa fa-trash"></i> حذف
+      </button>
+    </div>
+    <label>الاسم الكامل</label>
+    <input type="text" id="f_name">
+    <label>رقم الهاتف</label>
+    <input type="tel" id="f_phone">
+    <label>الأصناف</label>
+    <textarea id="f_offer" style="height:80px;"></textarea>
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
+      <div><label>السعر</label><input type="number" id="f_price"></div>
+      <div>
+        <label>طريقة الدفع</label>
+        <select id="f_payment">
+          <option value="نقداً">نقداً</option>
+          <option value="مدفوع">مدفوع</option>
+          <option value="مدفوع بالرابط">مدفوع بالرابط</option>
+        </select>
+      </div>
+    </div>
+    <label>العنوان</label>
+    <input type="text" id="f_addr">
+    <label>شركة الشحن</label>
+    <select id="f_delivery">
+      <option value="">-- اختر --</option>
+      <option value="High Express">High Express</option>
+      <option value="Marwah Delivery">Marwah Delivery</option>
+      <option value="Lama Delivery">Lama Delivery</option>
+      <option value="Areen Delivery">Areen Delivery</option>
+      <option value="Pickup">Pickup</option>
+    </select>
+    <div style="display:grid; grid-template-columns: 1fr 1.5fr; gap:12px; margin-top:15px;">
+      <button class="btn btn-outline" onclick="closeModal('editModal')" style="height: 50px;">إلغاء</button>
+      <button class="btn btn-primary" onclick="saveOrder()" style="height: 50px;">حفظ</button>
+    </div>
+  </div>
 </div>
 
 <div class="header">
-  <div style="font-weight: 900; font-size: 20px;">MAD <span style="color:var(--primary)">MANAGER</span></div>
-  <button class="btn btn-primary" onclick="load()"><i class="fa fa-sync"></i></button>
+  <div class="header-top">
+    <div class="logo">MAD <span>MANAGER</span></div>
+    <div style="display:flex; gap:10px;">
+      <button class="btn btn-outline" onclick="load()" style="width:42px; height:42px;"><i class="fa fa-sync"></i></button>
+      <button class="btn btn-primary" onclick="openAddModal()" style="width:42px; height:42px;"><i class="fa fa-plus"></i></button>
+    </div>
+  </div>
+  <div class="search-container">
+    <i class="fa fa-search search-icon"></i>
+    <input type="text" class="search-input" id="searchInput" placeholder="بحث..." oninput="filterOrders()">
+  </div>
 </div>
 
 <div class="container" id="ordersList"></div>
 
 <script>
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyLjLFa8AaH82Ip7m747WC-KSUUEaU_M70S0I9Mda14XbnmcuEfZ7pBnF_zzJYZuXmZ/exec";
+const DASH_KEY = "12345678";
 let allOrders = [];
+let editingRow = null;
+
+function showLoading(status) { document.getElementById('loadingOverlay').style.display = status ? 'flex' : 'none'; }
+function showToast(msg, isError = false) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.style.background = isError ? 'var(--danger)' : 'var(--success)';
+  t.style.display = 'block'; setTimeout(() => { t.style.display = 'none'; }, 2500);
+}
+
+/**
+ * تنظيف جذري لمنع ظهور "undefined" أو "null" في Google Sheets
+ * تضمن إرجاع نص فارغ دائماً في حالة عدم وجود قيمة
+ */
+const cleanVal = (val) => {
+  if (val === undefined || val === null) return "";
+  const s = String(val).trim();
+  if (s.toLowerCase() === "undefined" || s.toLowerCase() === "null") return "";
+  return s;
+};
+
+/**
+ * ✅ تنظيف/تحديث السطر محلياً بعد (حفظ/اعتماد) ليظهر فوراً بالمعلومات المعتمدة
+ * هذا لا يلغي التحديث على الشيت، لكنه يضمن أن الكارد يتحدث فوراً بدون انتظار reload
+ */
+function applyLocalClean(rowIndex, patch) {
+  const idx = allOrders.findIndex(x => String(x.rowIndex) === String(rowIndex));
+  if (idx === -1) return;
+  const o = allOrders[idx];
+  const cleanedPatch = {};
+  Object.keys(patch || {}).forEach(k => cleanedPatch[k] = cleanVal(patch[k]));
+  allOrders[idx] = { ...o, ...cleanedPatch };
+}
+
+function refreshView() {
+  const term = (document.getElementById('searchInput').value || "").trim();
+  if (term) filterOrders();
+  else renderOrders(allOrders);
+}
 
 async function load() {
-  document.body.style.opacity = "0.5";
+  showLoading(true);
   try {
     const res = await fetch(`${SCRIPT_URL}?action=get&_=${Date.now()}`);
     allOrders = await res.json();
-    renderOrders();
-  } catch (e) { console.error("Error loading data"); }
-  document.body.style.opacity = "1";
+    renderOrders(allOrders);
+  } catch (e) { showToast("خطأ في الاتصال", true); }
+  showLoading(false);
 }
 
-function renderOrders() {
+function filterOrders() {
+    const term = document.getElementById('searchInput').value.toLowerCase();
+    const filtered = allOrders.filter(o => cleanVal(o.name).toLowerCase().includes(term) || cleanVal(o.phone).includes(term));
+    renderOrders(filtered);
+}
+
+function renderOrders(ordersToRender) {
   const container = document.getElementById('ordersList');
-  container.innerHTML = allOrders.filter(o => o.rowIndex).map(o => `
+  container.innerHTML = ordersToRender.filter(o => o.rowIndex).map(o => {
+    const isPrep = (o.status || "").includes("تجهيز");
+    return `
     <div class="order-card">
-      <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
-        <strong>#${o.orderId}</strong>
-        <span style="font-size:12px;">${o.status || 'NEW'}</span>
+      <div class="card-header">
+        <span class="order-id">#${cleanVal(o.orderId) || '---'}</span>
+        <span class="status-pill ${isPrep ? 'status-prep' : 'status-new'}">${cleanVal(o.status) || 'جديد'}</span>
       </div>
-      <div>
-        <div style="font-size:16px; font-weight:bold;">${o.name}</div>
-        <div style="font-size:13px; color:var(--muted);">${o.phone}</div>
+      <div onclick="openEditModal(${o.rowIndex})">
+        <span class="customer-name">${cleanVal(o.name) || 'عميل'}</span>
+        <div class="customer-phone"><i class="fa fa-phone"></i> ${cleanVal(o.phone)}</div>
+        <div class="offer-details">${cleanVal(o.offer)}</div>
       </div>
-      <div class="actions">
-        <a href="https://wa.me/${o.phone}" class="btn btn-wa"><i class="fab fa-whatsapp"></i></a>
-        <button class="btn btn-outline" onclick="openPrintModal(${o.rowIndex})"><i class="fa fa-file-invoice"></i> فاتورة</button>
-        <button class="btn btn-primary" onclick="alert('تعديل')"><i class="fa fa-edit"></i></button>
+      <div class="actions-grid">
+        <button class="btn btn-ar" onclick="sendMsg(${o.rowIndex}, 'ar')"><i class="fa-brands fa-whatsapp"></i><span>عربي</span></button>
+        <button class="btn btn-he" onclick="sendMsg(${o.rowIndex}, 'he')"><i class="fa-brands fa-whatsapp"></i><span>עברית</span></button>
+        <button class="btn btn-success" onclick="updateToSent(${o.rowIndex})"><i class="fa fa-check-double"></i><span>اعتماد</span></button>
+        <button class="btn btn-outline" onclick="openEditModal(${o.rowIndex})"><i class="fa fa-sliders"></i><span>تحكم</span></button>
       </div>
-    </div>
-  `).join('');
+      <div class="actions-secondary">
+        <button class="btn btn-outline" onclick="openPrintModal(${o.rowIndex}, 'ar')"><i class="fa fa-file-invoice"></i><span>وصل ع</span></button>
+        <button class="btn btn-outline" onclick="openPrintModal(${o.rowIndex}, 'he')"><i class="fa fa-file-invoice"></i><span>وصل هـ</span></button>
+      </div>
+    </div>`;
+  }).join('');
 }
 
-function openPrintModal(row) {
-    const o = allOrders.find(x => x.rowIndex == row);
+async function sendMsg(row, lang) {
+  const o = allOrders.find(x => String(x.rowIndex) === String(row));
+  if(!o) return;
+  const msg = lang === 'ar' ? `أهلاً بك ${cleanVal(o.name)}...` : `שלום ${cleanVal(o.name)} 👋...`;
+  // ✅ Encoding لتفادي مشاكل المسافات/الأحرف
+  window.open(`https://wa.me/${normalizePhone(o.phone)}?text=${encodeURIComponent(msg)}`, '_blank');
+  // ✅ اعتماد صامت + تنظيف محلي للسطر (بدون انتظار reload)
+  updateToSent(row, true);
+}
+
+/**
+ * ✅ وظيفة الاعتماد: ترسل كل الحقول منظفة لإجبار الشيت على استبدال القيم (تنظيف السطر)
+ * وبنفس الوقت تحدث الكارد مباشرة بالمعلومات المعتمدة.
+ */
+async function updateToSent(row, silent = false) {
+  const o = allOrders.find(x => String(x.rowIndex) === String(row));
+  if(!o) return;
+
+  const payload = {
+    action: "updateOrder",
+    key: DASH_KEY,
+    row: row,
+    name: cleanVal(o.name),
+    phone: cleanVal(o.phone),
+    offer: cleanVal(o.offer),
+    price: cleanVal(o.price) || "0",
+    payment: cleanVal(o.payment) || "نقداً",
+    addr: cleanVal(o.addr),
+    delivery: cleanVal(o.delivery),
+    status: "بانتظار الإرسال للتجهيز",
+    // ✅ فلاغ اختياري (إذا حبيت لاحقاً تدعمه بالـ Apps Script)
+    clean: "1"
+  };
+
+  // ✅ تنظيف/تحديث محلي فوري
+  applyLocalClean(row, payload);
+  refreshView();
+
+  if(!silent) showLoading(true);
+  try {
+    const res = await fetch(`${SCRIPT_URL}?` + new URLSearchParams(payload).toString());
+    const data = await res.json();
+    if(data.result === "SUCCESS") {
+      if(!silent) {
+        showToast("تم الاعتماد بنجاح ✨");
+        // ✅ إعادة تحميل للتأكد من مطابقة الشيت (اختياري لكن أفضل للثبات)
+        load();
+      }
+    } else {
+      if(!silent) showToast("فشل الاعتماد", true);
+    }
+  } catch(e) {
+    if(!silent) showToast("خطأ في التحديث", true);
+  }
+  if(!silent) showLoading(false);
+}
+
+async function saveOrder() {
+  const isEdit = !!editingRow;
+  const old = isEdit ? (allOrders.find(x => String(x.rowIndex) === String(editingRow)) || {}) : {};
+
+  // ✅ كل القيم منظفة من المصدر (الفورم)
+  const name = cleanVal(document.getElementById('f_name').value);
+  const phone = cleanVal(document.getElementById('f_phone').value);
+  const offer = cleanVal(document.getElementById('f_offer').value);
+  const price = cleanVal(document.getElementById('f_price').value) || "0";
+  const payment = cleanVal(document.getElementById('f_payment').value) || "نقداً";
+  const addr = cleanVal(document.getElementById('f_addr').value);
+  const delivery = cleanVal(document.getElementById('f_delivery').value);
+
+  // ✅ الحالة: في التعديل نُبقي الحالة القديمة إن وجدت، وإلا نضع NEW
+  const status = isEdit ? (cleanVal(old.status) || "NEW") : "NEW";
+
+  const payload = {
+    action: isEdit ? "updateOrder" : "addOrder",
+    key: DASH_KEY,
+    row: isEdit ? editingRow : "",
+    name,
+    phone,
+    offer,
+    price,
+    payment,
+    addr,
+    delivery,
+    status,
+    // ✅ فلاغ اختياري (إذا حبيت لاحقاً تدعمه بالـ Apps Script)
+    clean: "1"
+  };
+
+  if (!payload.name || !payload.phone) return showToast("بيانات ناقصة", true);
+
+  closeModal('editModal');
+
+  // ✅ تنظيف/تحديث محلي فوري بعد الحفظ (عشان السطر يتنظف بالكارد فوراً)
+  if (isEdit) {
+    applyLocalClean(editingRow, payload);
+    refreshView();
+  }
+
+  showLoading(true);
+  try {
+    const res = await fetch(`${SCRIPT_URL}?` + new URLSearchParams(payload).toString());
+    const data = await res.json();
+    if(data.result === "SUCCESS") {
+      showToast("تم الحفظ بنجاح ✨");
+      // ✅ إعادة تحميل لتحديث أي حقول يولدها الشيت مثل orderId / timestamp
+      load();
+    } else {
+      showToast("فشلت العملية", true);
+      showLoading(false);
+    }
+  } catch(e) {
+    showToast("فشلت العملية", true);
+    showLoading(false);
+  }
+}
+
+function openPrintModal(row, lang) {
+    const o = allOrders.find(x => String(x.rowIndex) === String(row));
     if (!o) return;
-
-    // تعبئة البيانات بناءً على النسخة المعتمدة
-    document.getElementById('p_date').textContent = "4.2.2026"; // التاريخ الحالي حسب المطلوب 
-    document.getElementById('p_ord').textContent = "MAD-" + (o.orderId || "0000"); // [cite: 2]
-    document.getElementById('p_name').textContent = o.name; // לכבוד [cite: 6]
-    document.getElementById('p_phone').textContent = o.phone; // טלפון [cite: 7]
-    document.getElementById('p_addr').textContent = (o.addr || o.city || "") + " - " + (o.delivery || ""); // כתובת [cite: 8]
-    document.getElementById('p_items').textContent = o.offer; // פריטים [cite: 9]
-    document.getElementById('p_total').textContent = o.price; // לתשלום 
-    
-    // تحديث QR والترويج
-    const cleanPhone = String(o.phone).replace(/\D/g, "");
-    document.getElementById('p_qr').src = `https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=https://wa.me/${cleanPhone}`;
-    document.getElementById('p_phone_footer').textContent = cleanPhone;
-
+    const now = new Date();
+    document.getElementById('p_date').textContent = `DATE: ${now.getDate()}.${now.getMonth()+1}.${now.getFullYear()}`;
+    document.getElementById('p_ord').textContent = "ORD: MAD-" + (cleanVal(o.orderId) || "00000");
+    document.getElementById('p_total').textContent = cleanVal(o.price) || "0";
+    document.getElementById('p_qr').src = `https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=https://wa.me/${normalizePhone(o.phone)}`;
+    document.getElementById('p_footer_phone').textContent = cleanVal(o.phone);
+    const contentArea = document.getElementById('p_content_lang');
+    contentArea.style.direction = "rtl";
+    contentArea.innerHTML = lang === 'ar' ?
+      `<div class="inv-row"><strong>الاسم:</strong> ${cleanVal(o.name)}</div><div class="inv-row"><strong>الهاتف:</strong> ${cleanVal(o.phone)}</div><div class="inv-row"><strong>العنوان:</strong> ${cleanVal(o.addr)}</div><div class="inv-row"><strong>الأصناف:</strong> ${cleanVal(o.offer)}</div>` :
+      `<div class="inv-row"><strong>לכבוד:</strong> ${cleanVal(o.name)}</div><div class="inv-row"><strong>טלפון:</strong> ${cleanVal(o.phone)}</div><div class="inv-row"><strong>כתובת:</strong> ${cleanVal(o.addr)}</div><div class="inv-row"><strong>פריטים:</strong> ${cleanVal(o.offer)}</div>`;
     document.getElementById('printModal').classList.add('show');
 }
 
-function closePrintModal() {
-    document.getElementById('printModal').classList.remove('show');
+function openAddModal() {
+  editingRow = null; document.getElementById('modalTitle').textContent = "طلب جديد";
+  document.getElementById('deleteBtn').style.display = 'none';
+  ['f_name','f_phone','f_offer','f_price','f_addr'].forEach(id => document.getElementById(id).value = "");
+  document.getElementById('f_payment').value = "نقداً"; document.getElementById('f_delivery').value = "";
+  document.getElementById('editModal').classList.add('show');
+}
+
+function openEditModal(row) {
+  const o = allOrders.find(x => String(x.rowIndex) === String(row));
+  if (!o) return;
+  editingRow = row; document.getElementById('modalTitle').textContent = "تعديل الطلب";
+  document.getElementById('deleteBtn').style.display = 'block';
+  document.getElementById('f_name').value = cleanVal(o.name);
+  document.getElementById('f_phone').value = cleanVal(o.phone);
+  document.getElementById('f_offer').value = cleanVal(o.offer);
+  document.getElementById('f_price').value = cleanVal(o.price);
+  document.getElementById('f_payment').value = cleanVal(o.payment) || "نقداً";
+  document.getElementById('f_addr').value = cleanVal(o.addr);
+  document.getElementById('f_delivery').value = cleanVal(o.delivery);
+  document.getElementById('editModal').classList.add('show');
+}
+
+async function deleteOrder() {
+  if (!confirm("حذف الطلب؟")) return;
+  const payload = { action: "deleteOrder", key: DASH_KEY, row: editingRow };
+
+  // ✅ حذف محلي مباشر (لتنظيف السطر فوراً)
+  allOrders = allOrders.filter(x => String(x.rowIndex) !== String(editingRow));
+  refreshView();
+
+  closeModal('editModal'); showLoading(true);
+  try {
+    await fetch(`${SCRIPT_URL}?` + new URLSearchParams(payload).toString());
+    showToast("تم الحذف");
+    load();
+  } catch (e) {
+    showToast("خطأ", true);
+    showLoading(false);
+  }
+}
+
+function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+
+function normalizePhone(p) {
+  if(!p) return "";
+  let d = String(p).replace(/\D/g, "");
+  if (d.startsWith("0")) d = "972" + d.substring(1);
+  return d;
 }
 
 window.onload = load;
 </script>
-
 </body>
 </html>
