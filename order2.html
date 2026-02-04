@@ -3,171 +3,134 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>MAD MASTER SYSTEM</title>
+  <title>MAD SMART SYSTEM</title>
   
   <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
   <style>
     :root { 
-      --bg: #1e1e2e; --surface: #2b2b3b; --primary: #7289da; 
-      --success: #43b581; --danger: #f04747; --warning: #faa61a; --text: #fff;
+      --bg: #1a1a2e; --card: #16213e; --primary: #0f3460; 
+      --accent: #e94560; --text: #f1f1f1; --success: #22c55e;
     }
 
     body { margin: 0; font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); color: var(--text); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
-
-    /* --- الشريط العلوي --- */
-    .top-bar { 
-      background: rgba(0,0,0,0.3); padding: 15px 25px; border-bottom: 2px solid var(--primary);
-      display: flex; justify-content: space-between; align-items: center;
-    }
-    .tabs { display: flex; gap: 10px; background: #181825; padding: 5px; border-radius: 8px; }
-    .tab { padding: 8px 20px; cursor: pointer; border-radius: 6px; font-weight: bold; color: #aaa; transition: 0.3s; }
-    .tab.active { background: var(--primary); color: #fff; }
     
-    .search-box { background: #181825; border: 1px solid #444; color: #fff; padding: 10px; border-radius: 6px; width: 300px; }
-
-    /* --- منطقة العمل --- */
-    .workspace { flex: 1; padding: 20px; overflow-y: auto; }
-    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; }
-
-    /* --- بطاقة الطلب --- */
-    .card { 
-      background: var(--surface); border-radius: 12px; padding: 15px; border: 1px solid #3a3a4a; 
-      position: relative; transition: 0.2s; cursor: pointer; border-right: 5px solid transparent;
+    /* Header */
+    .header { 
+      background: rgba(0,0,0,0.8); padding: 10px 20px; border-bottom: 3px solid var(--accent);
+      display: flex; gap: 20px; align-items: center; justify-content: space-between;
     }
-    .card:hover { transform: translateY(-3px); background: #323242; }
-    .card.status-prep { border-right-color: var(--warning); } /* قيد التجهيز */
-    .card.status-ready { border-right-color: var(--success); opacity: 0.7; } /* جاهز */
-    .card.status-cancel { border-right-color: var(--danger); opacity: 0.5; } /* ملغي */
+    .search-container { flex: 1; display: flex; gap: 10px; max-width: 600px; }
+    .search-box { 
+      width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #444; 
+      background: #0f3460; color: white; font-size: 1.1rem; outline: none; transition: 0.3s;
+    }
+    .search-box:focus { border-color: var(--accent); background: #1a1a2e; }
 
-    .card-badges { display: flex; gap: 5px; margin-bottom: 10px; }
-    .badge { padding: 3px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; }
-    .badge-rush { background: var(--danger); color: white; }
-    .badge-exchange { background: var(--warning); color: black; }
+    .btn { cursor: pointer; border: none; padding: 10px 20px; border-radius: 6px; font-weight: bold; color: white; transition: 0.2s; font-size: 1rem; }
+    .btn-refresh { background: #333; }
+    .btn-all { background: var(--accent); }
+    .btn-all:hover { opacity: 0.8; }
 
-    .card-title { font-size: 1.2rem; font-weight: 800; margin-bottom: 5px; }
-    .card-info { font-size: 0.9rem; color: #bbb; line-height: 1.5; }
+    /* Workspace Grid */
+    .workspace { flex: 1; overflow-y: auto; padding: 20px; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 15px; }
+
+    .card { 
+      background: var(--card); border: 1px solid #2a2a40; border-radius: 12px; padding: 15px; 
+      cursor: pointer; position: relative; transition: transform 0.2s; border-right: 5px solid transparent;
+    }
+    .card:hover { transform: translateY(-5px); background: #1f2b4d; border-color: var(--accent); }
+    .card.rush { border-right-color: var(--accent); } 
+
+    .card-head { display: flex; justify-content: space-between; color: #888; font-size: 0.9rem; margin-bottom: 5px; }
+    .card-name { font-size: 1.3rem; font-weight: bold; color: #fff; margin-bottom: 5px; }
+    .card-sub { font-size: 0.95rem; color: #ccc; line-height: 1.4; }
     .card-price { position: absolute; bottom: 15px; left: 15px; font-size: 1.2rem; font-weight: bold; color: var(--success); }
 
-    /* --- النافذة المنبثقة (Modal) --- */
-    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 1000; justify-content: center; align-items: center; }
-    .modal-container { width: 95%; max-width: 1100px; height: 85vh; background: #fff; color: #000; border-radius: 10px; display: flex; overflow: hidden; }
+    /* Modal */
+    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 1000; justify-content: center; align-items: center; }
+    .modal-box { width: 90%; max-width: 1000px; height: 80vh; background: #fff; color: #000; display: flex; border-radius: 10px; overflow: hidden; }
     
-    /* يمين: أدوات التحكم */
-    .controls { width: 35%; background: #f4f5f7; padding: 25px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; border-left: 1px solid #ddd; }
-    .controls h2 { margin-top: 0; border-bottom: 2px solid #ddd; padding-bottom: 10px; }
+    .editor { width: 40%; background: #f4f4f4; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+    .preview { width: 60%; background: #ddd; display: flex; align-items: center; justify-content: center; padding: 20px; flex-direction: column; }
+
+    .inp-group label { display: block; font-weight: bold; font-size: 0.9rem; }
+    .inp-group input, .inp-group textarea { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; font-weight: bold; }
     
-    .form-group label { display: block; font-weight: bold; font-size: 0.9rem; margin-bottom: 3px; }
-    .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-family: inherit; font-weight: bold; box-sizing: border-box; }
-    .form-group textarea { height: 80px; resize: none; }
+    .btn-print-big { width: 100%; padding: 15px; background: #000; color: #fff; font-size: 1.2rem; margin-top: auto; border: none; cursor: pointer; font-weight: bold; }
 
-    .action-buttons { margin-top: auto; display: flex; flex-direction: column; gap: 10px; }
-    .btn { padding: 15px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 1rem; color: #fff; display: flex; justify-content: center; align-items: center; gap: 8px; }
-    .btn-print { background: #000; }
-    .btn-cancel { background: var(--danger); }
-    .btn-close { background: #666; }
-
-    /* يسار: معاينة الملصق */
-    .preview-area { width: 65%; background: #e0e0e0; display: flex; justify-content: center; align-items: center; flex-direction: column; }
-
-    /* --- تصميم الملصق 10x10 --- */
-    .label-box { 
-      width: 100mm; height: 100mm; background: #fff; color: #000; padding: 3mm; box-sizing: border-box; 
-      border: 1px solid #000; display: flex; flex-direction: column; overflow: hidden; page-break-after: always; direction: rtl;
+    /* ---------------------------------------------------- */
+    /* LABEL DESIGN (10x10cm) - FIXED FOR PRINTING */
+    /* ---------------------------------------------------- */
+    .label-canvas { 
+      width: 100mm; height: 100mm; background: #fff; color: #000; padding: 3mm; 
+      box-sizing: border-box; border: 1px solid #ccc; display: flex; flex-direction: column; 
+      overflow: hidden; position: relative; page-break-after: always; direction: rtl;
     }
     
-    /* شريط التبديل (يظهر فقط عند التبديل) */
-    .exchange-alert { 
-      display: none; background: #000; color: #fff; text-align: center; font-size: 14pt; font-weight: 900; 
-      padding: 5px; margin-bottom: 2mm; border: 2px dashed #000; 
-    }
-    .is-exchange .exchange-alert { display: block; } /* تفعيل التبديل */
-    .is-exchange .lbl-promo { display: none; } /* إخفاء الإعلان العادي */
-
-    .lbl-head { display: flex; justify-content: space-between; height: 20mm; }
-    .lbl-logo img { width: 32mm; }
+    .lbl-head { display: flex; justify-content: space-between; height: 20mm; border-bottom: 1px solid #000; }
+    .lbl-logo img { width: 35mm; }
     .lbl-meta { text-align: left; font-size: 9pt; font-weight: bold; }
     
-    .lbl-promo { background: #000; color: #fff; text-align: center; font-weight: 900; font-size: 10pt; padding: 2px; margin: 2mm 0; }
+    .lbl-promo { background: #000; color: #fff; text-align: center; font-weight: 900; font-size: 10pt; padding: 3px; margin: 2mm 0; }
     
-    .lbl-body { font-size: 11pt; line-height: 1.3; }
-    .lbl-content { border: 2px dashed #000; background: #f0f0f0; padding: 4px; margin: 2mm 0; font-size: 9pt; height: 15mm; overflow: hidden; font-weight: bold; }
-    .lbl-price { border: 3px solid #000; font-size: 20pt; font-weight: 900; text-align: center; padding: 2px; margin-bottom: 2mm; }
+    .lbl-info { font-size: 11pt; line-height: 1.3; font-weight: 600; }
+    .lbl-content { border: 2px dashed #000; background: #eee; padding: 5px; margin: 2mm 0; font-size: 9pt; height: 16mm; overflow: hidden; font-weight: bold; }
+    .lbl-price { border: 3px solid #000; font-size: 20pt; font-weight: 900; text-align: center; padding: 0; margin-bottom: 2mm; }
     
-    .lbl-footer { display: flex; justify-content: space-between; align-items: flex-end; margin-top: auto; border-top: 1px solid #000; padding-top: 2mm; }
+    .lbl-footer { display: flex; justify-content: space-between; align-items: flex-end; margin-top: auto; border-top: 1px solid #000; padding-top: 1mm; }
+    .lbl-wa { font-size: 8pt; font-weight: 800; width: 65%; }
 
+    /* Print Logic */
     #printArea { display: none; }
     @media print {
       body * { visibility: hidden !important; }
       #printArea, #printArea * { visibility: visible !important; }
-      #printArea { position: absolute; left: 0; top: 0; width: 100%; }
+      #printArea { 
+        display: block !important; position: absolute; left: 0; top: 0; width: 100%; height: 100%; 
+        background: white; z-index: 9999;
+      }
       @page { size: 100mm 100mm; margin: 0; }
-      .label-box { border: none; }
+      .label-canvas { border: none; }
     }
   </style>
 </head>
 <body>
 
-<div class="top-bar">
-  <div style="font-size:1.5rem; font-weight:900; color:var(--primary)">MAD MANAGER ⚡</div>
-  
-  <div class="tabs">
-    <div class="tab active" onclick="setTab('pending')" id="tab-pending">مطلوب للتجهيز (Pending)</div>
-    <div class="tab" onclick="setTab('all')" id="tab-all">كل الأرشيف (History)</div>
+<div class="header">
+  <div style="font-weight:900; font-size:1.5rem">MAD <span style="color:var(--accent)">SMART</span></div>
+  <div class="search-container">
+    <input class="search-box" id="search" placeholder="بحث ذكي: رقم هاتف / اسم / كود..." oninput="render()">
   </div>
-
-  <input class="search-box" id="searchInput" placeholder="بحث (اسم / رقم / هاتف)..." oninput="render()">
-  
-  <button class="tab" style="background:var(--success); color:#fff; border:none" onclick="printAllPending()">
-    <i class="fas fa-print"></i> طباعة كل الجديد
-  </button>
+  <div style="display:flex; gap:10px">
+    <button class="btn btn-refresh" onclick="loadData()">تحديث ↻</button>
+    <button class="btn btn-all" onclick="printAll()">طباعة الكل 🖨️</button>
+  </div>
 </div>
 
 <div class="workspace">
   <div class="grid" id="grid"></div>
 </div>
 
-<div class="modal-overlay" id="editorModal">
-  <div class="modal-container">
-    <div class="controls" dir="rtl">
-      <h2>📝 معالجة الطلب</h2>
-      
-      <div class="form-group">
-        <label>نوع العملية (Type):</label>
-        <select id="e_type" onchange="updatePreview()" style="background:#fff3cd">
-          <option value="normal">شحنة عادية (Regular)</option>
-          <option value="exchange">♻️ تبديل/إرجاع (Exchange)</option>
-        </select>
+<div class="modal-overlay" id="editor">
+  <div class="modal-box">
+    <div class="editor" dir="rtl">
+      <div style="display:flex; justify-content:space-between">
+        <h2>تعديل الطلب</h2>
+        <button onclick="closeModal()" style="border:none;background:none;font-size:1.5rem;cursor:pointer">✕</button>
       </div>
-
-      <div class="form-group"><label>الاسم:</label><input id="e_name" oninput="updatePreview()"></div>
-      <div class="form-group"><label>الهاتف:</label><input id="e_phone" oninput="updatePreview()"></div>
-      <div class="form-group"><label>العنوان:</label><input id="e_addr" oninput="updatePreview()"></div>
-      <div class="form-group"><label>شركة الشحن:</label><input id="e_del" oninput="updatePreview()"></div>
-      
-      <div class="form-group">
-        <label>محتوى الطرد (Items):</label>
-        <textarea id="e_content" oninput="updatePreview()"></textarea>
-      </div>
-      
-      <div class="form-group"><label>السعر (₪):</label><input id="e_price" type="number" style="font-size:1.2rem;color:green" oninput="updatePreview()"></div>
-
-      <div class="action-buttons">
-        <button class="btn btn-print" onclick="printSingle()">
-          <i class="fas fa-print"></i> طباعة وإنهاء (Enter)
-        </button>
-        <button class="btn btn-cancel" onclick="cancelOrder()">
-          <i class="fas fa-ban"></i> إلغاء الطلب (Cancel)
-        </button>
-        <button class="btn btn-close" onclick="closeModal()">إغلاق</button>
-      </div>
+      <div class="inp-group"><label>الاسم:</label><input id="e_name" oninput="updatePreview()"></div>
+      <div class="inp-group"><label>الهاتف:</label><input id="e_phone" oninput="updatePreview()"></div>
+      <div class="inp-group"><label>العنوان:</label><input id="e_city" oninput="updatePreview()"></div>
+      <div class="inp-group"><label>الشحن:</label><input id="e_del" oninput="updatePreview()"></div>
+      <div class="inp-group"><label>المحتوى:</label><textarea id="e_content" oninput="updatePreview()"></textarea></div>
+      <div class="inp-group"><label>السعر (₪):</label><input id="e_price" type="number" style="font-size:1.2rem;color:green" oninput="updatePreview()"></div>
+      <button class="btn-print-big" onclick="printSingle()">طباعة (Enter) 🖨️</button>
     </div>
-
-    <div class="preview-area">
-      <div id="livePreview" style="box-shadow: 0 0 20px rgba(0,0,0,0.2);"></div>
-      <div style="margin-top:15px; color:#555">معاينة حية للملصق (10x10)</div>
+    <div class="preview">
+      <div id="livePreview" style="box-shadow: 0 10px 40px rgba(0,0,0,0.5);"></div>
     </div>
   </div>
 </div>
@@ -176,73 +139,110 @@
 
 <script>
   const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyLjLFa8AaH82Ip7m747WC-KSUUEaU_M70S0I9Mda14XbnmcuEfZ7pBnF_zzJYZuXmZ/exec";
-  const PASS = "12345678";
-  
-  let allOrders = [];
-  let currentTab = 'pending';
+  const PASSWORD = "12345678";
+  let orders = [];
   let currentIndex = null;
-  let isEditing = false;
 
-  // التحقق والتحميل
-  if(localStorage.getItem('mad_auth') !== PASS) {
-    if(prompt("كلمة السر:") === PASS) localStorage.setItem('mad_auth', PASS);
-    else document.body.innerHTML = "Access Denied";
+  /* =========================================
+     1. Phone Normalization Logic (The Core)
+     ========================================= */
+  function normalizeILPSPhone(input) {
+    let d = String(input || "").replace(/[^0-9]/g, "");
+    if (!d) return { ok: false, reason: "EMPTY", e164: "", display: "" };
+
+    if (d.startsWith("00")) d = d.slice(2);
+    if (d.startsWith("9720")) d = "972" + d.slice(4);
+    if (d.startsWith("9700")) d = "970" + d.slice(4);
+
+    // If starts with 972/970
+    if (d.startsWith("972") || d.startsWith("970")) {
+      return { ok: true, e164: "+" + d, display: d };
+    }
+
+    // If starts with 0
+    if (d.startsWith("0")) {
+      // 059 -> 970
+      if (d.startsWith("059")) return { ok: true, e164: "+970" + d.slice(1), display: d };
+      // 05x -> 972
+      if (d.startsWith("05")) return { ok: true, e164: "+972" + d.slice(1), display: d };
+      // Fallback
+      return { ok: true, e164: "+972" + d.slice(1), display: d };
+    }
+
+    // If starts with 5 (missing 0)
+    if (d.startsWith("5")) {
+       if (d.startsWith("59")) return { ok: true, e164: "+970" + d, display: "0" + d };
+       return { ok: true, e164: "+972" + d, display: "0" + d };
+    }
+
+    return { ok: false, e164: "+" + d, display: d };
   }
-  
-  loadData();
-  setInterval(() => { if(!isEditing) loadData(); }, 15000); // تحديث تلقائي
+
+  // Init
+  (function(){
+    if(prompt("كلمة السر:") !== PASSWORD) document.body.innerHTML = "Access Denied";
+    else loadData();
+  })();
 
   async function loadData() {
     try {
       const res = await fetch(`${SCRIPT_URL}?action=get`);
-      allOrders = await res.json();
+      const all = await res.json();
+      orders = all.filter(o => {
+        const s = (o.status || "").toLowerCase();
+        return (s.includes("prep") || s.includes("approved")) && !s.includes("ready");
+      });
       render();
-    } catch(e) {}
+    } catch(e) { console.error(e); }
   }
 
-  function setTab(tab) {
-    currentTab = tab;
-    document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
-    document.getElementById(`tab-${tab}`).classList.add('active');
-    render();
-  }
-
+  /* =========================================
+     2. Smart Search Logic
+     ========================================= */
   function render() {
-    const q = document.getElementById('searchInput').value.toLowerCase();
+    const q = document.getElementById('search').value.toLowerCase().trim();
+    // Normalize the search query itself if it looks like a phone
+    const qNorm = normalizeILPSPhone(q).e164 || q; 
+    const qClean = qNorm.replace('+', ''); // Search both +972 and 972
+
     const grid = document.getElementById('grid');
     
-    // فلترة حسب التبويب
-    let filtered = allOrders.filter(o => {
-      const st = (o.status || "").toLowerCase();
-      if (currentTab === 'pending') return (st.includes("prep") || st.includes("approved")) && !st.includes("ready") && !st.includes("cancel");
-      return true; // History shows all
+    // Filter
+    const filtered = orders.filter(o => {
+      if(!q) return true;
+      
+      // Normalize Order Phone
+      const oPhoneInfo = normalizeILPSPhone(o.phone);
+      const oPhoneE164 = oPhoneInfo.e164.toLowerCase();
+      
+      // Check: Name OR OrderID OR Normalized Phone
+      return (o.name || "").toLowerCase().includes(q) ||
+             (o.orderId || "").toString().includes(q) ||
+             oPhoneE164.includes(qClean) || // Match +972...
+             (o.phone || "").includes(q);   // Match raw input
     });
 
-    // فلترة البحث
-    if(q) filtered = filtered.filter(o => JSON.stringify(o).toLowerCase().includes(q));
+    document.querySelector('.header div').innerHTML = `MAD <span style="color:var(--accent)">SMART</span> (${filtered.length})`;
+
+    if(filtered.length === 0) {
+      grid.innerHTML = '<div style="color:white;text-align:center;grid-column:1/-1;padding:50px">لا توجد نتائج / لا يوجد طلبات</div>';
+      return;
+    }
 
     grid.innerHTML = filtered.map((o, i) => {
-      // إيجاد المؤشر الأصلي في المصفوفة الكاملة
-      const realIndex = allOrders.indexOf(o);
-      const isExpress = (o.delivery || "").toLowerCase().includes("high");
-      
-      // تحديد حالة البطاقة للألوان
-      let statusClass = "status-prep";
-      if ((o.status||"").includes("READY")) statusClass = "status-ready";
-      if ((o.status||"").includes("CANCEL")) statusClass = "status-cancel";
-
+      // Find real index in main array
+      const realIndex = orders.indexOf(o);
+      const isRush = (o.delivery||"").includes("High");
       return `
-        <div class="card ${statusClass}" onclick="openEditor(${realIndex})">
-          <div class="card-badges">
-            <span class="badge" style="background:#555">#${o.orderId}</span>
-            ${isExpress ? '<span class="badge badge-rush">مستعجل</span>' : ''}
-            ${(o.status||"").includes("READY") ? '<span class="badge" style="background:green">جاهز</span>' : ''}
+        <div class="card ${isRush ? 'rush' : ''}" onclick="openEditor(${realIndex})">
+          <div class="card-head">
+            <span>#${o.orderId}</span>
+            <span>${o.delivery || 'Standard'}</span>
           </div>
-          <div class="card-title">${o.name}</div>
-          <div class="card-info">
-            📍 ${o.city}<br>
+          <div class="card-name">${o.name}</div>
+          <div class="card-sub">
             📞 ${o.phone}<br>
-            📦 ${o.offer ? o.offer.substring(0,30) : ''}
+            📍 ${o.city}
           </div>
           <div class="card-price">₪${o.price}</div>
         </div>
@@ -250,18 +250,20 @@
     }).join("");
   }
 
-  // --- HTML الملصق ---
-  function getLabelHTML(data, idSuffix, isExchange) {
+  /* =========================================
+     3. Label Template (10x10)
+     ========================================= */
+  function getLabelHTML(data, idSuffix) {
     const date = new Date().toLocaleDateString('he-IL');
-    const exchangeClass = isExchange ? "is-exchange" : "";
     
-    return `
-      <div class="label-box ${exchangeClass}" dir="rtl">
-        
-        <div class="exchange-alert">
-           ⚠️ איסוף והחזרה (تبديل) ⚠️
-        </div>
+    // Use the Logic function!
+    const phoneInfo = normalizeILPSPhone(data.phone);
+    const waLink = `https://wa.me/${phoneInfo.e164.replace('+','')}`; 
+    // Barcode: use clean digits (remove +)
+    const barcodeVal = phoneInfo.e164.replace('+','');
 
+    return `
+      <div class="label-canvas" dir="rtl">
         <div class="lbl-head">
           <div class="lbl-logo"><img src="https://www.madparfum.com/logo.svg"></div>
           <div class="lbl-meta">
@@ -269,12 +271,12 @@
             ORD: ${data.orderId}
           </div>
         </div>
-
+        
         <div class="lbl-promo">צלם את הרגע וקבל מתנה 🎁</div>
-
-        <div class="lbl-body">
+        
+        <div class="lbl-info">
           <div><b>לכבוד:</b> ${data.name}</div>
-          <div><b>טלפון:</b> ${data.phone}</div>
+          <div><b>טלפון:</b> <span dir="ltr">${phoneInfo.display}</span></div>
           <div><b>כתובת:</b> ${data.city}</div>
           <div><b>משלוח:</b> ${data.delivery}</div>
         </div>
@@ -287,37 +289,34 @@
         <div class="lbl-price">₪ ${data.price}</div>
 
         <div class="lbl-footer">
-          <div style="font-size:8pt; font-weight:bold; width:65%">
+          <div class="lbl-wa">
             WhatsApp Video = FREE GIFT<br>
-            +972 54-963-4449
+            ${phoneInfo.e164}
           </div>
           <div id="qr_${idSuffix}"></div>
         </div>
-        <div style="text-align:center; position:absolute; bottom:2mm; width:92%">
-           <svg id="bar_${idSuffix}"></svg>
+        <div style="position:absolute; bottom:2mm; width:92%; text-align:center">
+           <svg id="bar_${idSuffix}" data-val="${barcodeVal}"></svg>
         </div>
       </div>
     `;
   }
 
-  // --- المحرر ---
+  // --- Editor & Print Single ---
   function openEditor(idx) {
-    isEditing = true;
     currentIndex = idx;
-    const o = allOrders[idx];
+    const o = orders[idx];
     
     document.getElementById('e_name').value = o.name;
     document.getElementById('e_phone').value = o.phone;
-    document.getElementById('e_addr').value = o.city + " " + (o.addr || "");
+    document.getElementById('e_city').value = o.city + " " + (o.addr||"");
     document.getElementById('e_del').value = o.delivery || "High Express";
     document.getElementById('e_content').value = o.offer || "";
     document.getElementById('e_price').value = o.price;
-    document.getElementById('e_type').value = "normal"; // افتراضي
 
-    document.getElementById('editorModal').style.display = 'flex';
+    document.getElementById('editor').style.display = 'flex';
     updatePreview();
 
-    // اختصارات
     document.onkeydown = (e) => {
       if(e.key === "Enter" && !e.shiftKey) { e.preventDefault(); printSingle(); }
       if(e.key === "Escape") closeModal();
@@ -325,105 +324,100 @@
   }
 
   function closeModal() {
-    isEditing = false;
-    document.getElementById('editorModal').style.display = 'none';
+    document.getElementById('editor').style.display = 'none';
     document.onkeydown = null;
   }
 
   function updatePreview() {
     const data = getFormData();
-    const isExc = document.getElementById('e_type').value === 'exchange';
-    
-    document.getElementById('livePreview').innerHTML = getLabelHTML(data, 'prev', isExc);
-    
-    setTimeout(() => {
-      try {
-        JsBarcode("#bar_prev", data.phone, { format: "CODE128", height: 25, fontSize: 10, displayValue: false, margin:0 });
-        const q = document.getElementById("qr_prev"); q.innerHTML="";
-        new QRCode(q, { text: "https://wa.me/972549634449", width: 45, height: 45 });
-      } catch(e){}
-    }, 50);
+    document.getElementById('livePreview').innerHTML = getLabelHTML(data, 'prev');
+    generateCodes('prev');
   }
 
   function getFormData() {
     return {
-      orderId: allOrders[currentIndex].orderId,
+      orderId: orders[currentIndex].orderId,
       name: document.getElementById('e_name').value,
       phone: document.getElementById('e_phone').value,
-      city: document.getElementById('e_addr').value,
+      city: document.getElementById('e_city').value,
       delivery: document.getElementById('e_del').value,
       offer: document.getElementById('e_content').value,
       price: document.getElementById('e_price').value
     };
   }
 
-  // --- عمليات الطباعة والإلغاء ---
-  async function printSingle() {
+  /* =========================================
+     4. Robust Print Logic (With Delays)
+     ========================================= */
+  function generateCodes(suffix) {
+    // Generate QR
+    const qrEl = document.getElementById(`qr_${suffix}`);
+    if(qrEl) {
+      qrEl.innerHTML = "";
+      // Extract link from HTML logic or rebuild
+      const phoneVal = document.getElementById(`bar_${suffix}`)?.getAttribute('data-val');
+      if(phoneVal) {
+        new QRCode(qrEl, { text: `https://wa.me/${phoneVal}`, width: 45, height: 45 });
+      }
+    }
+    // Generate Barcode
+    try {
+      const barEl = document.getElementById(`bar_${suffix}`);
+      if(barEl) {
+        JsBarcode(barEl, barEl.getAttribute('data-val'), { format: "CODE128", height: 25, fontSize: 10, displayValue: false, margin:0 });
+      }
+    } catch(e){}
+  }
+
+  function printSingle() {
     const data = getFormData();
-    const isExc = document.getElementById('e_type').value === 'exchange';
-    
     const area = document.getElementById('printArea');
-    area.innerHTML = getLabelHTML(data, 'print', isExc);
+    area.innerHTML = getLabelHTML(data, 'print');
     
-    // توليد الأكواد
+    // 1. Render HTML
+    // 2. Wait small time -> Generate Codes
+    // 3. Wait small time -> Print
+    
     setTimeout(() => {
-      JsBarcode("#bar_print", data.phone, { format: "CODE128", height: 25, fontSize: 10, displayValue: false, margin:0 });
-      new QRCode(document.getElementById("qr_print"), { text: "https://wa.me/972549634449", width: 45, height: 45 });
+      generateCodes('print');
       
-      window.print();
-      
-      // تحديث الحالة
-      const row = allOrders[currentIndex].rowIndex;
-      closeModal();
-      setStatus(row, "READY ✅");
-    }, 300);
-  }
-
-  async function cancelOrder() {
-    if(!confirm("هل أنت متأكد من إلغاء هذا الطلب؟")) return;
-    const row = allOrders[currentIndex].rowIndex;
-    closeModal();
-    setStatus(row, "CANCELLED ❌");
-  }
-
-  function printAllPending() {
-    // نأخذ فقط الطلبات في التبويب الحالي (Pending)
-    const list = allOrders.filter(o => {
-       const st = (o.status || "").toLowerCase();
-       return (st.includes("prep") || st.includes("approved")) && !st.includes("ready") && !st.includes("cancel");
-    });
-
-    if(!list.length) return alert("لا يوجد طلبات جديدة للطباعة!");
-    if(!confirm(`طباعة ${list.length} ملصق دفعة واحدة؟`)) return;
-
-    const area = document.getElementById('printArea');
-    area.innerHTML = list.map((o, i) => getLabelHTML(o, `bulk_${i}`, false)).join("");
-
-    setTimeout(() => {
-      list.forEach((o, i) => {
-        try {
-          JsBarcode(`#bar_bulk_${i}`, o.phone, { format: "CODE128", height: 25, fontSize: 10, displayValue: false, margin:0 });
-          new QRCode(document.getElementById(`qr_bulk_${i}`), { text: "https://wa.me/972549634449", width: 45, height: 45 });
-        } catch(e){}
-      });
-
-      setTimeout(() => {
+      setTimeout(async () => {
         window.print();
-        if(confirm("تمت الطباعة! نقل الكل إلى جاهز؟")) {
-          list.forEach(o => fetch(`${SCRIPT_URL}?action=updateStatus&key=${PASS}&row=${o.rowIndex}&status=READY ✅`));
-          setTimeout(loadData, 2000);
-        }
-      }, 1500);
+        
+        // Update Server
+        const row = orders[currentIndex].rowIndex;
+        closeModal();
+        await fetch(`${SCRIPT_URL}?action=updateStatus&key=${PASSWORD}&row=${row}&status=READY ✅`);
+        
+        // Remove from list visually
+        orders.splice(currentIndex, 1);
+        render();
+        
+      }, 500); // 500ms delay for codes to render
     }, 100);
   }
 
-  async function setStatus(row, status) {
-    // تحديث محلي سريع
-    const o = allOrders.find(x => x.rowIndex === row);
-    if(o) o.status = status;
-    render();
-    // تحديث السيرفر
-    await fetch(`${SCRIPT_URL}?action=updateStatus&key=${PASS}&row=${row}&status=${encodeURIComponent(status)}`);
+  function printAll() {
+    if(!orders.length) return alert("لا يوجد طلبات");
+    if(!confirm(`طباعة ${orders.length} طلب دفعة واحدة؟`)) return;
+
+    const area = document.getElementById('printArea');
+    area.innerHTML = orders.map((o, i) => getLabelHTML(o, `bulk_${i}`)).join("");
+
+    setTimeout(() => {
+      // Generate all codes
+      orders.forEach((o, i) => generateCodes(`bulk_${i}`));
+
+      setTimeout(() => {
+        window.print();
+        
+        if(confirm("تمت الطباعة. هل أنقل الكل إلى (جاهز)؟")) {
+          orders.forEach(o => fetch(`${SCRIPT_URL}?action=updateStatus&key=${PASSWORD}&row=${o.rowIndex}&status=READY ✅`));
+          orders = [];
+          render();
+        }
+      }, 1500); // Longer delay for bulk
+    }, 200);
   }
 
 </script>
