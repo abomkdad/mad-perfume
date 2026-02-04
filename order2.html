@@ -1,289 +1,411 @@
-/**
- * MAD System Backend - V30 ✅ (Prep + Confirm + Edit)
- * Actions:
- *  - GET  ?action=get
- *  - GET  ?action=updateOrder&key=12345678&row=5&...
- *  - GET  ?action=updateStatus&key=12345678&row=5&status=...
- *  - GET  ?action=sendCustomerConfirm&key=12345678&row=5
- */
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>MAD Prep</title>
 
-const SPREADSHEET_ID = "1Ht_W4sPbV_K8UMWa69_ZjtVQQT305JAvlUVBCfoq4Qg";
-const SHEET_TAB_NAME = "Sheet1";
+  <style>
+    :root{
+      --bg:#070b16;
+      --card1:rgba(255,255,255,.10);
+      --card2:rgba(255,255,255,.06);
+      --border:rgba(255,255,255,.12);
+      --muted:rgba(255,255,255,.75);
+      --green:#16a34a;
+      --blue:#2563eb;
+      --orange:#f59e0b;
+      --red:#dc2626;
 
-const DASH_KEY = "12345678";
-const DELIVERY_DAYS = "3";
-
-// ⚠️ مؤقتاً حسب طلبك — غيّره بعد التشغيل
-const WABA_API_KEY = "nSXZrRGBZswsmAn5jOStM2lHAK";
-
-function doGet(e){
-  const p = (e && e.parameter) ? e.parameter : {};
-  const action = String(p.action || "");
-
-  if(action === "get") return handleGet_();
-  if(action === "updateOrder") return handleUpdateOrder_(p);
-  if(action === "updateStatus") return handleUpdateStatus_(p);
-  if(action === "sendCustomerConfirm") return handleSendCustomerConfirm_(p);
-
-  return ContentService.createTextOutput("MAD Backend V30 Online ✅").setMimeType(ContentService.MimeType.TEXT);
-}
-
-/* ================= GET: get ================= */
-function handleGet_(){
-  try{
-    const sh = openSheet_();
-    const data = sh.getDataRange().getValues();
-
-    const out = [];
-    for(let i=1;i<data.length;i++){
-      const name = data[i][3];
-      if(!name) continue;
-
-      const offer = String(data[i][2]||"");
-      const notes = String(data[i][6]||"");
-      const status = String(data[i][7]||"");
-
-      out.push({
-        rowIndex: i+1,
-        date: data[i][0],
-        orderId: data[i][1],
-        offer,
-        name,
-        phone: data[i][4],
-        city: data[i][5],
-        notes,
-        status,
-        source: data[i][8] || "",
-        price: extractPrice_(offer, notes),
-        payment: extractField_(notes, "Pay"),
-        proc: extractField_(notes, "Proc"),
-        addr: extractField_(notes, "Addr"),
-        delivery: extractField_(notes, "Del")
-      });
-    }
-    return json_(out);
-  }catch(err){
-    return json_({error:String(err)});
-  }
-}
-
-/* ================= GET: updateStatus ================= */
-function handleUpdateStatus_(p){
-  if(String(p.key||"") !== DASH_KEY) return json_({result:"ERROR", message:"Bad key"});
-  const row = parseInt(String(p.row||""),10);
-  const status = String(p.status||"").trim();
-  if(!row || row<2 || !status) return json_({result:"ERROR", message:"Missing row/status"});
-
-  const lock = LockService.getScriptLock();
-  if(!lock.tryLock(10000)) return json_({result:"ERROR", message:"Lock busy"});
-  try{
-    const sh = openSheet_();
-    sh.getRange(row,8).setValue(status); // H
-
-    // لو الحالة تدل "ارسال للتجهيز" نضيف FLAG:PREP_SENT بالنوتس
-    if(/sent to prep|approved|تم ارسال للتجهيز|prep/i.test(status)){
-      addFlagToNotes_(sh, row, "FLAG:PREP_SENT");
+      /* Default label size (mm) */
+      --label-w:60mm;
+      --label-h:40mm;
     }
 
-    SpreadsheetApp.flush();
-    return json_({result:"SUCCESS", message:"Updated"});
-  }catch(err){
-    return json_({result:"ERROR", message:String(err)});
-  }finally{
-    try{ lock.releaseLock(); }catch(e){}
+    body{margin:0;font-family:system-ui,Segoe UI,Tahoma,Arial;background:var(--bg);color:#fff}
+    .top{
+      position:sticky;top:0;z-index:10;
+      background:rgba(7,11,22,.92);backdrop-filter:blur(10px);
+      border-bottom:1px solid var(--border);
+      padding:14px;
+    }
+    .wrap{max-width:980px;margin:0 auto;padding:16px}
+    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+    .title{font-weight:1000;font-size:18px}
+    .tag{
+      padding:6px 10px;border-radius:999px;
+      background:rgba(255,255,255,.10);
+      border:1px solid rgba(255,255,255,.10);
+      font-weight:900;
+    }
+    input,select,button{
+      font:inherit;border-radius:14px;border:1px solid var(--border);
+      background:rgba(255,255,255,.06);color:#fff;padding:12px 12px;outline:none
+    }
+    button{cursor:pointer;border:none}
+    .btn{padding:12px 14px;border-radius:14px;font-weight:1000}
+    .bgray{background:rgba(255,255,255,.12)}
+    .bgreen{background:var(--green)}
+    .bblue{background:var(--blue)}
+    .borange{background:var(--orange);color:#111}
+    .bred{background:var(--red)}
+
+    .card{
+      background:linear-gradient(180deg,var(--card1),var(--card2));
+      border:1px solid var(--border);
+      border-radius:20px;
+      padding:16px;
+      margin:14px 0;
+      box-shadow:0 14px 50px rgba(0,0,0,.35);
+    }
+    .head{
+      display:flex;justify-content:space-between;gap:10px;
+      flex-wrap:wrap;align-items:center;margin-bottom:12px
+    }
+    .oid{font-size:20px;font-weight:1000}
+    .status{font-weight:1000;background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.10);padding:8px 12px;border-radius:999px}
+    .bigbox{
+      background:rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.12);
+      border-radius:18px;
+      padding:14px;
+    }
+    .grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+    }
+    @media(max-width:760px){.grid{grid-template-columns:1fr}}
+    .field{
+      background:rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.12);
+      border-radius:16px;
+      padding:12px;
+    }
+    .label{opacity:.8;font-weight:900;margin-bottom:6px}
+    .value{font-size:18px;font-weight:1000;word-break:break-word}
+    .muted{opacity:.75}
+    .actions{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+      margin-top:14px;
+    }
+    @media(max-width:760px){.actions{grid-template-columns:1fr}}
+
+    .hugeBtn{
+      padding:18px 16px;
+      border-radius:18px;
+      font-size:18px;
+      font-weight:1100;
+    }
+
+    .empty{
+      padding:24px;border:1px dashed rgba(255,255,255,.18);
+      border-radius:18px;text-align:center;opacity:.85;margin-top:16px
+    }
+
+    /* ---------- PRINT LABEL ---------- */
+    #printArea{
+      display:none;
+    }
+    @media print{
+      body *{visibility:hidden !important;}
+      #printArea, #printArea *{visibility:visible !important;}
+      #printArea{
+        display:block;
+        position:fixed;
+        inset:0;
+        padding:0;
+        margin:0;
+      }
+      .labelSheet{
+        width:var(--label-w);
+        height:var(--label-h);
+        box-sizing:border-box;
+        border:1px solid #000;
+        padding:3mm;
+        background:#fff;
+        color:#000;
+        overflow:hidden;
+      }
+      .lp1{font-size:12pt;font-weight:900;line-height:1.1}
+      .lp2{font-size:10pt;font-weight:800;line-height:1.2;margin-top:1.5mm}
+      .lp3{font-size:9pt;font-weight:700;line-height:1.2;margin-top:1.5mm}
+      .lp4{font-size:8.5pt;font-weight:700;line-height:1.2;margin-top:1.5mm}
+      .mono{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace}
+      .sep{height:1px;background:#000;margin:2mm 0}
+    }
+  </style>
+</head>
+<body>
+
+  <div class="top">
+    <div class="wrap">
+      <div class="row">
+        <div class="title">نسخة التجهيز (سهل جدًا) ✅</div>
+        <span class="tag" id="stat">...</span>
+        <button class="btn bgray" onclick="load()">تحديث ↻</button>
+
+        <select id="labelSize" onchange="applyLabelSize()">
+          <option value="60x40" selected>ملصق 60×40</option>
+          <option value="50x30">ملصق 50×30</option>
+          <option value="100x50">ملصق 100×50</option>
+        </select>
+
+        <input id="q" placeholder="بحث: اسم / رقم / كود / OrderId" style="flex:1;min-width:240px" oninput="render()"/>
+      </div>
+
+      <div class="row" style="margin-top:10px">
+        <span class="muted">يعرض فقط الطلبات المرسلة للتجهيز — الموظف يضغط: (طباعة) ثم (تم تجهيز)</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap" id="list"></div>
+
+  <!-- Hidden print container -->
+  <div id="printArea"></div>
+
+<script>
+  // ==== EDIT THESE ONLY ====
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyLjLFa8AaH82Ip7m747WC-KSUUEaU_M70S0I9Mda14XbnmcuEfZ7pBnF_zzJYZuXmZ/exec";
+  const DASH_KEY   = "12345678";
+  // ========================
+
+  let orders = [];
+  let authed = false;
+
+  (function(){
+    const pass = prompt("كلمة السر:");
+    if(pass !== DASH_KEY){
+      document.body.innerHTML = "<div style='padding:30px;font-size:20px'>❌ كلمة السر غلط</div>";
+      return;
+    }
+    authed = true;
+    applyLabelSize();
+    load();
+  })();
+
+  function applyLabelSize(){
+    const v = document.getElementById("labelSize").value;
+    const root = document.documentElement;
+    if(v==="60x40"){ root.style.setProperty("--label-w","60mm"); root.style.setProperty("--label-h","40mm"); }
+    if(v==="50x30"){ root.style.setProperty("--label-w","50mm"); root.style.setProperty("--label-h","30mm"); }
+    if(v==="100x50"){ root.style.setProperty("--label-w","100mm"); root.style.setProperty("--label-h","50mm"); }
   }
-}
 
-/* ================= GET: updateOrder ================= */
-function handleUpdateOrder_(p){
-  if(String(p.key||"") !== DASH_KEY) return json_({result:"ERROR", message:"Bad key"});
-  const row = parseInt(String(p.row||""),10);
-  if(!row || row<2) return json_({result:"ERROR", message:"Invalid row"});
-
-  const lock = LockService.getScriptLock();
-  if(!lock.tryLock(10000)) return json_({result:"ERROR", message:"Lock busy"});
-  try{
-    const sh = openSheet_();
-
-    const name = safe_(p.name);
-    const phone = normalizePhone_(p.phone);
-    const city  = safe_(p.city);
-    const addr  = safe_(p.addr);
-    const offer = safe_(p.offer);
-
-    const price = safe_(p.price);
-    const pay   = safe_(p.payment);
-    const proc  = safe_(p.proc);
-    const del   = safe_(p.delivery);
-
-    const extraNotes = safe_(p.extraNotes);
-
-    const offerWithPrice = appendPriceToOffer_(offer, price);
-    const notes = buildNotes_(price, pay, proc, addr, del, extraNotes);
-
-    if(name) sh.getRange(row,4).setValue(name);
-    if(offerWithPrice) sh.getRange(row,3).setValue(offerWithPrice);
-    if(phone) sh.getRange(row,5).setValue(phone);
-    sh.getRange(row,6).setValue(city || "-");
-    sh.getRange(row,7).setValue(notes);
-
-    SpreadsheetApp.flush();
-    return json_({result:"SUCCESS", message:"Order updated"});
-  }catch(err){
-    return json_({result:"ERROR", message:String(err)});
-  }finally{
-    try{ lock.releaseLock(); }catch(e){}
+  async function load(){
+    if(!authed) return;
+    document.getElementById("stat").textContent = "تحميل...";
+    const res = await fetch(`${SCRIPT_URL}?action=get`);
+    orders = await res.json();
+    render();
   }
-}
 
-/* ================= GET: sendCustomerConfirm ================= */
-function handleSendCustomerConfirm_(p){
-  if(String(p.key||"") !== DASH_KEY) return json_({result:"ERROR", message:"Bad key"});
-  const row = parseInt(String(p.row||""),10);
-  if(!row || row<2) return json_({result:"ERROR", message:"Invalid row"});
-
-  const lock = LockService.getScriptLock();
-  if(!lock.tryLock(10000)) return json_({result:"ERROR", message:"Lock busy"});
-  try{
-    const sh = openSheet_();
-    const r = sh.getRange(row,1,1,8).getValues()[0];
-
-    const orderId = String(r[1]||"");
-    const offer   = String(r[2]||"");
-    const name    = String(r[3]||"Customer");
-    const phone   = normalizePhone_(r[4]||"");
-    const city    = String(r[5]||"-");
-    const notes   = String(r[6]||"");
-    const status  = String(r[7]||"");
-
-    if(!phone) return json_({result:"ERROR", message:"No customer phone"});
-
-    const price = extractPrice_(offer, notes) || "150";
-    const pay   = extractField_(notes, "Pay") || "Cash";
-    const proc  = extractField_(notes, "Proc") || "Direct";
-    const addr  = extractField_(notes, "Addr") || city;
-
-    const lang = detectLang_(name, offer, notes); // he/ar
-    const tpl = (lang === "he") ? "order_confirmation_he" : "arabic_v3";
-
-    const paymentWithPrice = `${pay} (${price} ₪)`;
-    const params = [name, offer, paymentWithPrice, addr, proc, DELIVERY_DAYS];
-
-    const res = sendTemplate_(phone, lang, tpl, params);
-    if(!res.success) return json_({result:"ERROR", message:res.error});
-
-    addFlagToNotes_(sh, row, "FLAG:CUST_SENT");
-
-    // (اختياري) نضيف كمان عبارة لطيفة بالنوتس
-    addFlagToNotes_(sh, row, "تم ارسال للعميل");
-
-    SpreadsheetApp.flush();
-    return json_({result:"SUCCESS", message:"Customer confirmed"});
-  }catch(err){
-    return json_({result:"ERROR", message:String(err)});
-  }finally{
-    try{ lock.releaseLock(); }catch(e){}
+  function isPrepOrder(o){
+    const st = String(o.status||"");
+    // Show only orders that are "Approved / Sent to Prep" and NOT ready/cancelled
+    const approved = st.includes("Approved") || st.includes("Sent to Prep") || st.includes("التجهيز") || st.includes("Prep");
+    const ready = st.includes("READY") || st.includes("مجهز") || st.includes("מוכן");
+    const cancelled = st.includes("CANCEL") || st.includes("ملغي") || st.includes("إلغاء");
+    return approved && !ready && !cancelled;
   }
-}
 
-/* ================= Helpers ================= */
-function openSheet_(){
-  const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
-  const sh = ss.getSheetByName(SHEET_TAB_NAME);
-  if(!sh) throw new Error("Sheet not found: "+SHEET_TAB_NAME);
-  return sh;
-}
-function json_(o){
-  return ContentService.createTextOutput(JSON.stringify(o)).setMimeType(ContentService.MimeType.JSON);
-}
-function safe_(v){
-  try{ return decodeURIComponent(String(v||"").replace(/\+/g," ")).trim(); }
-  catch(e){ return String(v||"").trim(); }
-}
-function normalizePhone_(p){
-  if(!p) return "";
-  let d = String(p).replace(/[^\d]/g,"");
-  if(d.startsWith("00")) d = d.slice(2);
-  if(d.startsWith("9720")) d = "972" + d.slice(4);
+  function render(){
+    const q = document.getElementById("q").value.trim().toLowerCase();
+    const list = document.getElementById("list");
 
-  if(d.startsWith("0")){
-    if(d.startsWith("059") && d.length>=10) d = "970" + d.slice(1);
-    else if(d.startsWith("05") && d.length>=10) d = "972" + d.slice(1);
-    else if(d.length>=9) d = "972" + d.slice(1);
+    const items = orders
+      .filter(isPrepOrder)
+      .filter(o=>{
+        if(!q) return true;
+        return `${o.orderId} ${o.name} ${o.phone} ${o.offer} ${o.city} ${o.notes}`.toLowerCase().includes(q);
+      })
+      .sort((a,b)=> (b.rowIndex||0)-(a.rowIndex||0));
+
+    document.getElementById("stat").textContent = `طلبات للتجهيز: ${items.length}`;
+
+    if(!items.length){
+      list.innerHTML = `<div class="empty">لا يوجد طلبات للتجهيز الآن ✅</div>`;
+      return;
+    }
+
+    list.innerHTML = items.map(o => cardHtml(o)).join("");
   }
-  if(d.length===9 && d.startsWith("5")) d = "972"+d;
-  if(d.length===9 && d.startsWith("59")) d = "970"+d;
-  return d;
-}
-function extractField_(notes, key){
-  const s = String(notes||"");
-  const m = s.match(new RegExp(key + "\\s*:\\s*([^|]+)", "i"));
-  return m ? String(m[1]).trim() : "";
-}
-function extractPrice_(offer, notes){
-  const s = (String(offer||"") + " " + String(notes||"")).replace(/[,]/g," ");
-  const m1 = s.match(/₪\s*(\d{2,5})/);
-  if(m1) return m1[1];
-  const m2 = s.match(/Price\s*:\s*(\d{2,5})/i);
-  if(m2) return m2[1];
-  const m3 = s.match(/\b(\d{2,5})\b/);
-  return m3 ? m3[1] : "";
-}
-function appendPriceToOffer_(offer, price){
-  const o = String(offer||"").trim();
-  const p = String(price||"").trim();
-  if(!o) return "";
-  if(!p) return o;
-  if(o.includes("₪")) return o;
-  return `${o} — ₪${p}`;
-}
-function buildNotes_(price, pay, proc, addr, del, extra){
-  const parts = [];
-  if(price) parts.push(`Price: ${price} ₪`);
-  if(pay) parts.push(`Pay: ${pay}`);
-  if(proc) parts.push(`Proc: ${proc}`);
-  if(addr) parts.push(`Addr: ${addr}`);
-  if(del)  parts.push(`Del: ${del}`);
-  let base = parts.join(" | ");
-  if(extra) base = base ? (base + " | " + extra) : extra;
-  return base;
-}
-function addFlagToNotes_(sh, row, flagText){
-  const cell = sh.getRange(row,7); // G
-  const prev = String(cell.getValue()||"");
-  const f = String(flagText||"").trim();
-  if(!f) return;
-  if(prev.includes(f)) return;
-  cell.setValue(prev ? (prev + " | " + f) : f);
-}
-function detectLang_(name, offer, notes){
-  const s = String(name||"") + " " + String(offer||"") + " " + String(notes||"");
-  if(/[\u0590-\u05FF]/.test(s)) return "he";
-  return "ar";
-}
 
-/* ========== WhatsApp send template ========== */
-function sendTemplate_(to, lang, tpl, params){
-  try{
-    if(!WABA_API_KEY) return {success:false, error:"No API key"};
-    const res = UrlFetchApp.fetch("https://waba-v2.360dialog.io/messages", {
-      method:"post",
-      headers:{ "D360-API-KEY": WABA_API_KEY, "Content-Type":"application/json" },
-      payload: JSON.stringify({
-        messaging_product:"whatsapp",
-        to:String(to),
-        type:"template",
-        template:{
-          name: tpl,
-          language:{ code: lang },
-          components:[{ type:"body", parameters: params.map(x=>({type:"text", text:String(x)})) }]
-        }
-      }),
-      muteHttpExceptions:true
+  function esc(s){
+    return String(s||"").replace(/[&<>"']/g,m=>({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[m]));
+  }
+
+  function cardHtml(o){
+    const price = o.price || "";
+    const pay   = o.payment || "";
+    const proc  = o.proc || "";
+    const addr  = o.addr || "";
+    const del   = o.delivery || "";
+    const offer = o.offer || "";
+
+    return `
+      <div class="card" id="c${o.rowIndex}">
+        <div class="head">
+          <div class="oid">🧾 ${esc(o.orderId)} <span class="muted">#${o.rowIndex}</span></div>
+          <div class="status">${esc(o.status||"")}</div>
+        </div>
+
+        <div class="bigbox">
+          <div class="grid">
+            ${f("اسم الزبون", o.name)}
+            ${f("الهاتف", `<span class="mono">${esc(o.phone||"")}</span>`)}
+            ${f("المدينة/العنوان", o.city)}
+            ${f("العنوان التفصيلي", addr || "—")}
+            ${f("الطلب", `<span class="mono">${esc(offer)}</span>`)}
+            ${f("السعر", price ? (`₪ ${esc(price)}`) : "—")}
+            ${f("الدفع", pay || "—")}
+            ${f("الإجراء", proc || "—")}
+            ${f("شركة التوصيل", del || "—")}
+          </div>
+        </div>
+
+        <div class="actions">
+          <button class="btn bblue hugeBtn" onclick="printLabel(${o.rowIndex})">🖨️ طباعة ملصق</button>
+          <button class="btn bgreen hugeBtn" onclick="markReady(${o.rowIndex})">✅ تم تجهيز الطلب</button>
+        </div>
+
+        <div class="row" style="margin-top:10px">
+          <button class="btn borange" onclick="copySummary(${o.rowIndex})">📋 نسخ معلومات الطلب</button>
+          <button class="btn bred" onclick="openCard(${o.rowIndex})">⬇️ نزّل على الطلب</button>
+        </div>
+
+        <div class="muted" style="margin-top:10px">ملاحظة: إذا بدك تعديل — المدير يعدّل من صفحة المدير.</div>
+      </div>
+    `;
+  }
+
+  function f(label, value){
+    return `
+      <div class="field">
+        <div class="label">${label}</div>
+        <div class="value">${value}</div>
+      </div>
+    `;
+  }
+
+  function openCard(row){
+    const el = document.getElementById("c"+row);
+    if(el) el.scrollIntoView({behavior:"smooth",block:"start"});
+  }
+
+  function findByRow(row){
+    return orders.find(x => Number(x.rowIndex) === Number(row));
+  }
+
+  async function markReady(row){
+    const ok = confirm("تأكيد: تم تجهيز الطلب؟");
+    if(!ok) return;
+
+    const status = "READY ✅ (مجهز)";
+    const url = `${SCRIPT_URL}?action=updateStatus&key=${encodeURIComponent(DASH_KEY)}&row=${row}&status=${encodeURIComponent(status)}`;
+    await fetch(url);
+
+    // Refresh
+    await load();
+    alert("✅ تم وضع الحالة: جاهز");
+  }
+
+  function isArabicText(s){
+    return /[\u0600-\u06FF]/.test(String(s||""));
+  }
+  function isHebrewText(s){
+    return /[\u0590-\u05FF]/.test(String(s||""));
+  }
+
+  // Rule: label in Hebrew if name is Hebrew; if name is Arabic -> Arabic
+  function getLabelLang(name){
+    const n = String(name||"");
+    if(isHebrewText(n)) return "he";
+    if(isArabicText(n)) return "ar";
+    // fallback: if offer/notes contains he => he else ar
+    return "ar";
+  }
+
+  function buildLabelHtml(o){
+    const lang = getLabelLang(o.name);
+    const price = o.price || "";
+    const pay   = o.payment || "";
+    const addr  = o.addr || o.city || "";
+    const offer = o.offer || "";
+    const phone = o.phone || "";
+    const orderId = o.orderId || "";
+    const del = o.delivery || "";
+
+    if(lang === "he"){
+      return `
+        <div class="labelSheet" dir="rtl" lang="he">
+          <div class="lp1">MAD Parfumeur</div>
+          <div class="lp2">הזמנה: <span class="mono">${esc(orderId)}</span></div>
+          <div class="sep"></div>
+          <div class="lp2">שם: ${esc(o.name||"")}</div>
+          <div class="lp2">טל: <span class="mono">${esc(phone)}</span></div>
+          <div class="lp3">כתובת: ${esc(addr)}</div>
+          <div class="lp3">מוצר: <span class="mono">${esc(offer)}</span></div>
+          <div class="lp4">תשלום: ${esc(pay||"—")}  |  סכום: ₪${esc(price||"—")}</div>
+          <div class="lp4">שליח: ${esc(del||"—")}</div>
+        </div>
+      `;
+    }
+
+    // Arabic
+    return `
+      <div class="labelSheet" dir="rtl" lang="ar">
+        <div class="lp1">MAD Parfumeur</div>
+        <div class="lp2">رقم الطلب: <span class="mono">${esc(orderId)}</span></div>
+        <div class="sep"></div>
+        <div class="lp2">الاسم: ${esc(o.name||"")}</div>
+        <div class="lp2">الهاتف: <span class="mono">${esc(phone)}</span></div>
+        <div class="lp3">العنوان: ${esc(addr)}</div>
+        <div class="lp3">الطلب: <span class="mono">${esc(offer)}</span></div>
+        <div class="lp4">الدفع: ${esc(pay||"—")}  |  المبلغ: ₪${esc(price||"—")}</div>
+        <div class="lp4">شركة التوصيل: ${esc(del||"—")}</div>
+      </div>
+    `;
+  }
+
+  function printLabel(row){
+    const o = findByRow(row);
+    if(!o){ alert("❌ لم يتم العثور على الطلب"); return; }
+
+    // Put label into print area
+    const pa = document.getElementById("printArea");
+    pa.innerHTML = buildLabelHtml(o);
+
+    // Print
+    window.print();
+  }
+
+  function copySummary(row){
+    const o = findByRow(row);
+    if(!o){ alert("❌ لم يتم العثور على الطلب"); return; }
+
+    const txt =
+      `OrderId: ${o.orderId}\n`+
+      `Name: ${o.name}\n`+
+      `Phone: ${o.phone}\n`+
+      `City/Addr: ${o.city}\n`+
+      `Addr: ${o.addr||""}\n`+
+      `Offer: ${o.offer}\n`+
+      `Price: ${o.price||""}\n`+
+      `Pay: ${o.payment||""}\n`+
+      `Proc: ${o.proc||""}\n`+
+      `Delivery: ${o.delivery||""}\n`+
+      `Status: ${o.status||""}`;
+
+    navigator.clipboard.writeText(txt).then(()=>{
+      alert("✅ تم نسخ معلومات الطلب");
+    }).catch(()=>{
+      prompt("انسخ:", txt);
     });
-    const code = res.getResponseCode();
-    return {success: code>=200 && code<300, error: res.getContentText()};
-  }catch(e){
-    return {success:false, error:String(e)};
   }
-}
+</script>
+</body>
+</html>
