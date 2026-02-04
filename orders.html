@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=0"/>
-  <title>MAD Manager v3.7 - الرابط الجديد</title>
+  <title>MAD Manager v4.0 - English Companies & Local Numbers</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
   <style>
@@ -147,16 +147,24 @@
     <label>الأصناف</label><textarea id="f_offer" rows="2"></textarea>
     <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
       <div><label>السعر (₪)</label><input type="number" id="f_price"></div>
-      <div><label>الدفع</label><select id="f_payment"><option value="نقداً">نقداً</option><option value="مدفوع">مدفوع</option></select></div>
+      <div>
+        <label>الدفع</label>
+        <select id="f_payment">
+          <option value="دفع عند الاستلام">دفع عند الاستلام</option>
+          <option value="شراء من الموقع - مدفوع">شراء من الموقع - مدفوع</option>
+          <option value="شراء عبر الرابط">شراء عبر الرابط</option>
+        </select>
+      </div>
     </div>
     <label>المدينة</label><input type="text" id="f_city">
-    <label>ملاحظات إضافية (العمود G)</label><textarea id="f_notes" rows="2"></textarea>
+    <label>ملاحظات إضافية (العمود G)</label><textarea id="f_notes" rows="2" placeholder="أضف ملاحظة اختيارية هنا..."></textarea>
     <label>شركة التوصيل</label>
     <select id="f_delivery">
       <option value="">-- اختر شركة الشحن --</option>
-      <option value="High Express">High Express</option>
-      <option value="Marwah Delivery">Marwah Delivery</option>
-      <option value="Lama Delivery">Lama Delivery</option>
+      <option value="High Express (050-9566919)">High Express (050-9566919)</option>
+      <option value="Lama (050-5102019)">Lama (050-5102019)</option>
+      <option value="Marwah (052-7035370)">Marwah (052-7035370)</option>
+      <option value="Areen (052-5118966)">Areen (052-5118966)</option>
       <option value="Pickup">Pickup</option>
     </select>
     <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:10px;">
@@ -175,14 +183,13 @@
     </div>
   </div>
   <div style="margin-top:10px;">
-    <input type="text" id="searchInput" placeholder="بحث بالاسم أو رقم الهاتف..." oninput="filterOrders()" style="margin-bottom:0; background:rgba(255,255,255,0.05);">
+    <input type="text" id="searchInput" placeholder="بحث باسم العميل أو رقم الهاتف..." oninput="filterOrders()" style="margin-bottom:0; background:rgba(255,255,255,0.05);">
   </div>
 </div>
 
 <div class="container" id="ordersList"></div>
 
 <script>
-// ✅ تم تحديث الرابط الجديد هنا
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwWi55Q1H1HNdJb61Ht99ZiZodp4B4aaElWSqSuxo37zhKUwRgy8T-NHNPffH4i_Y89Eg/exec";
 const DASH_KEY = "12345678";
 let allOrders = [];
@@ -192,6 +199,22 @@ function showLoading(s) { document.getElementById('loadingOverlay').style.displa
 function showToast(m) { const t = document.getElementById('toast'); t.textContent = m; t.style.display = 'block'; setTimeout(() => t.style.display = 'none', 2500); }
 
 const safe = (v) => (v === undefined || v === null || String(v).toLowerCase()==="undefined" || String(v).toLowerCase()==="null") ? "" : String(v).trim();
+
+// دالة لتحويل أرقام الهواتف للصيغة المحلية (05...)
+function formatLocalPhone(p) {
+  if(!p) return "";
+  let d = String(p).replace(/\D/g, "");
+  if (d.startsWith("972")) d = "0" + d.substring(3);
+  if (!d.startsWith("0") && d.length === 9) d = "0" + d;
+  return d;
+}
+
+// دالة مخصصة لروابط واتساب (تحتاج لـ 972)
+function normalizePhoneForLink(p) { 
+  let d = String(p||"").replace(/\D/g, ""); 
+  if (d.startsWith("0")) d = "972" + d.substring(1); 
+  return d; 
+}
 
 async function load() {
   showLoading(true);
@@ -221,11 +244,11 @@ function renderOrders(list) {
     <div class="order-card">
       <div class="card-header">
         <small class="order-id">#${safe(o.orderId) || '---'}</small>
-        <span class="status-pill ${isPrep ? 'status-prep' : 'status-new'}">${safe(o.status) || 'NEW'}</span>
+        <span class="status-pill ${isPrep ? 'status-prep' : 'status-new'}">${safe(o.status) || 'جديد'}</span>
       </div>
       <div onclick="openEditModal(${o.rowIndex})">
         <span class="customer-name">${safe(o.name)}</span>
-        <div class="customer-phone"><i class="fa fa-phone"></i> ${safe(o.phone)}</div>
+        <div class="customer-phone"><i class="fa fa-phone"></i> ${formatLocalPhone(o.phone)}</div>
         <div class="offer-details">${safe(o.offer)}</div>
         <div class="meta-line">
            <span class="meta-tag">📍 ${safe(o.city)}</span>
@@ -251,16 +274,22 @@ function renderOrders(list) {
 async function sendMsg(row, lang) {
   const o = allOrders.find(x => x.rowIndex == row);
   if(!o) return;
+
+  const paymentMethod = safe(o.payment) || "دفع عند الاستلام";
+  const note = safe(o.notes) ? `%0A📝 ملاحظة: ${safe(o.notes)}` : "";
+  const deliveryComp = safe(o.delivery) ? `%0A🚚 شركة التوصيل: ${safe(o.delivery)}` : "";
+  const customerPhone = formatLocalPhone(o.phone);
+
   const msg = lang === 'ar' ? 
-    `أهلاً بك ${safe(o.name)} في MAD Parfumeur 🖤%0Aيسعدنا تأكيد طلبك المميز!%0A💎 العرض: ${safe(o.offer)}%0A📍 العنوان: ${safe(o.city)}%0A💰 السعر: ${safe(o.price)} ₪` :
-    `שלום ${safe(o.name)} 👋, תודה שהזמנת מ-MAD Parfumeur%0A📦 המוצר: ${safe(o.offer)}%0A📍 כתובת: ${safe(o.city)}%0A💰 מחיר: ${safe(o.price)} ₪`;
-  window.open(`https://wa.me/${normalizePhone(o.phone)}?text=${msg}`, '_blank');
+    `أهلاً بك ${safe(o.name)} في MAD Parfumeur 🖤%0Aيسعدنا تأكيد طلبك المميز!%0A💎 العرض: ${safe(o.offer)}%0A📍 العنوان: ${safe(o.city)}%0A💰 السعر: ${safe(o.price)} ₪%0A💳 الدفع: ${paymentMethod}${deliveryComp}${note}%0A📞 هاتف التواصل: ${customerPhone}` :
+    `שלום ${safe(o.name)} 👋, תודה שהזמנת מ-MAD Parfumeur%0A📦 המוצר: ${safe(o.offer)}%0A📍 כתובת: ${safe(o.city)}%0A💰 מחיר: ${safe(o.price)} ₪%0A💳 תשלום: ${paymentMethod}${deliveryComp}%0A📞 טלפון: ${customerPhone}`;
+  
+  window.open(`https://wa.me/${normalizePhoneForLink(o.phone)}?text=${msg}`, '_blank');
 }
 
 async function approve(row) {
   showLoading(true);
   const o = allOrders.find(x => x.rowIndex == row);
-  // نرسل كافة البيانات لضمان تنظيف السطر تماماً في الخلفية
   const p = new URLSearchParams({
     action: "updateOrder", key: DASH_KEY, row: row,
     offer: safe(o.offer), name: safe(o.name), phone: safe(o.phone), 
@@ -280,10 +309,10 @@ function openEditModal(row) {
   if(!o) return;
   editingRow = row;
   document.getElementById('f_name').value = safe(o.name);
-  document.getElementById('f_phone').value = safe(o.phone);
+  document.getElementById('f_phone').value = formatLocalPhone(o.phone);
   document.getElementById('f_offer').value = safe(o.offer);
   document.getElementById('f_price').value = safe(o.price);
-  document.getElementById('f_payment').value = safe(o.payment) || "نقداً";
+  document.getElementById('f_payment').value = safe(o.payment) || "دفع عند الاستلام";
   document.getElementById('f_city').value = safe(o.city);
   document.getElementById('f_notes').value = safe(o.notes);
   document.getElementById('f_delivery').value = safe(o.delivery);
@@ -303,7 +332,7 @@ async function saveOrder() {
     notes: safe(document.getElementById('f_notes').value),
     payment: safe(document.getElementById('f_payment').value),
     delivery: safe(document.getElementById('f_delivery').value),
-    status: "NEW" // عند الحفظ يعود للحالة NEW لضمان المراجعة
+    status: "NEW"
   };
   try {
     const res = await fetch(`${SCRIPT_URL}?` + new URLSearchParams(payload).toString());
@@ -323,19 +352,19 @@ function openPrintModal(row, lang) {
     document.getElementById('p_date').textContent = `DATE: ${now.getDate()}.${now.getMonth()+1}.${now.getFullYear()}`;
     document.getElementById('p_ord').textContent = "ORD: MAD-" + (safe(o.orderId) || "00000");
     document.getElementById('p_total').textContent = safe(o.price) || "0";
-    document.getElementById('p_qr').src = `https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=https://wa.me/${normalizePhone(o.phone)}`;
-    document.getElementById('p_footer_phone').textContent = safe(o.phone);
+    document.getElementById('p_qr').src = `https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=https://wa.me/${normalizePhoneForLink(o.phone)}`;
+    document.getElementById('p_footer_phone').textContent = formatLocalPhone(o.phone);
     const c = document.getElementById('p_content_lang');
     c.style.direction = "rtl";
     c.innerHTML = lang === 'ar' ? 
-      `<strong>الاسم:</strong> ${safe(o.name)}<br><strong>الهاتف:</strong> ${safe(o.phone)}<br><strong>العنوان:</strong> ${safe(o.city)}<br><strong>التوصيل:</strong> ${safe(o.delivery)}<br><strong>الدفع:</strong> ${safe(o.payment)}<br><strong>الأصناف:</strong> ${safe(o.offer)}` :
-      `<strong>לכבוד:</strong> ${safe(o.name)}<br><strong>טלפון:</strong> ${safe(o.phone)}<br><strong>כתובת:</strong> ${safe(o.city)}<br><strong>משלוח:</strong> ${safe(o.delivery)}<br><strong>תשלום:</strong> ${safe(o.payment)}<br><strong>פריטים:</strong> ${safe(o.offer)}`;
+      `<strong>الاسم:</strong> ${safe(o.name)}<br><strong>الهاتف:</strong> ${formatLocalPhone(o.phone)}<br><strong>العنوان:</strong> ${safe(o.city)}<br><strong>التوصيل:</strong> ${safe(o.delivery)}<br><strong>الدفع:</strong> ${safe(o.payment)}<br><strong>الأصناف:</strong> ${safe(o.offer)}<br><strong>ملاحظة:</strong> ${safe(o.notes)}` :
+      `<strong>לכבוד:</strong> ${safe(o.name)}<br><strong>טלפון:</strong> ${formatLocalPhone(o.phone)}<br><strong>כתובת:</strong> ${safe(o.city)}<br><strong>משלוח:</strong> ${safe(o.delivery)}<br><strong>תשלום:</strong> ${safe(o.payment)}<br><strong>פריטים:</strong> ${safe(o.offer)}`;
     document.getElementById('printModal').classList.add('show');
 }
 
 function closeModal(id) { document.getElementById(id).classList.remove('show'); }
 function openAddModal() { showToast("يرجى استخدام نموذج الإضافة من الموقع الرئيسي"); }
-function normalizePhone(p) { let d = String(p||"").replace(/\D/g, ""); if (d.startsWith("0")) d = "972" + d.substring(1); return d; }
+
 window.onload = load;
 </script>
 </body>
