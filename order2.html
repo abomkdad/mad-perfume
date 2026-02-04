@@ -1,361 +1,501 @@
 <!doctype html>
-<html lang="he" dir="rtl">
+<html lang="ar" dir="rtl">
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=0"/>
-  <title>MAD Mobile v3.0</title>
-  
-  <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+  <title>MAD Manager v5.3 - Audio Alerts</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
   <style>
-    :root { 
-      --bg-dark: #0f172a; --bg-card: #1e293b; --primary: #3b82f6; 
-      --accent: #f59e0b; --success: #10b981; --text: #f8fafc; --muted: #94a3b8;
-      --font: 'Rubik', sans-serif;
+    :root {
+      --bg: #0a0f1e;
+      --card: #161b2c;
+      --primary: #3b82f6;
+      --success: #10b981;
+      --ready: #f59e0b;
+      --hebrew: #8b5cf6;
+      --danger: #ef4444;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --border: rgba(255,255,255,0.08);
+      --grad: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
     }
 
-    body { 
-      margin: 0; font-family: var(--font); background: var(--bg-dark); 
-      color: var(--text); height: 100vh; display: flex; flex-direction: column; 
-      overflow: hidden; -webkit-tap-highlight-color: transparent;
+    body {
+      margin: 0; font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+      background: var(--bg); color: var(--text); padding-bottom: 90px;
+      line-height: 1.5;
     }
-    * { box-sizing: border-box; outline: none; }
 
-    /* --- Header Mobile --- */
-    .header { 
-      background: #1e293b; padding: 12px 15px; border-bottom: 1px solid #334155; 
-      display: flex; flex-direction: column; gap: 10px; z-index: 100;
+    .header {
+      background: rgba(16, 21, 36, 0.85); backdrop-filter: blur(12px);
+      padding: 12px 16px; position: sticky; top: 0; z-index: 100;
+      border-bottom: 1px solid var(--border);
     }
-    .header-top { display: flex; justify-content: space-between; align-items: center; }
-    .brand { font-size: 1.3rem; font-weight: 900; }
+
+    .tab-container {
+      display: flex; background: rgba(255,255,255,0.05); border-radius: 12px;
+      padding: 4px; margin-top: 10px; gap: 4px;
+    }
+    .tab-btn {
+      flex: 1; padding: 10px; border-radius: 8px; border: none;
+      background: transparent; color: var(--muted); font-weight: bold;
+      cursor: pointer; transition: 0.3s; font-size: 14px;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .tab-btn.active {
+      background: var(--primary); color: white; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    }
+
+    .container { padding: 16px; max-width: 600px; margin: 0 auto; }
+
+    .order-card {
+      background: var(--card); border-radius: 24px; padding: 20px;
+      margin-bottom: 20px; border: 1px solid var(--border);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+      transition: transform 0.2s;
+    }
+
+    .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+    .order-id { font-family: monospace; color: var(--muted); background: rgba(255,255,255,0.05); padding: 2px 8px; border-radius: 6px; font-size: 13px; }
+
+    .status-pill { font-size: 11px; padding: 4px 12px; border-radius: 20px; font-weight: 700; text-transform: uppercase; }
+    .status-new { background: rgba(59, 130, 246, 0.1); color: #60a5fa; }
+    .status-prep { background: rgba(245, 158, 11, 0.1); color: var(--ready); }
+    .status-ready { background: rgba(16, 185, 129, 0.1); color: var(--success); }
+
+    .customer-name { font-size: 19px; font-weight: 800; display: block; margin-bottom: 4px; }
     
-    .search-box { position: relative; width: 100%; }
-    .search-inp { 
-      width: 100%; padding: 12px 40px 12px 15px; border-radius: 10px; border: 1px solid #334155; 
-      background: #0f172a; color: white; font-size: 16px; /* منع الزووم في الآيفون */
+    .offer-details {
+      margin: 12px 0; padding: 12px; background: rgba(59, 130, 246, 0.05);
+      border-radius: 12px; color: #93c5fd; font-weight: 600; border-right: 3px solid var(--primary);
+      font-size: 14px;
     }
-    .search-icon { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: var(--muted); }
 
-    /* --- Workspace --- */
-    .workspace { flex: 1; overflow-y: auto; padding: 10px; }
-    .grid { display: flex; flex-direction: column; gap: 12px; padding-bottom: 100px; }
+    .meta-line { display: flex; flex-wrap: wrap; gap: 10px; font-size: 12px; color: var(--muted); margin-top: 8px; }
+    .meta-tag { background: rgba(255,255,255,0.05); padding: 2px 8px; border-radius: 6px; }
 
-    /* --- Card Design Mobile --- */
-    .card { 
-      background: var(--bg-card); border: 1px solid #334155; border-radius: 12px; padding: 15px; 
-      position: relative; display: flex; flex-direction: column; gap: 6px;
-    }
-    .card-select {
-      position: absolute; top: 12px; left: 12px; width: 28px; height: 28px; cursor: pointer; accent-color: var(--primary);
-    }
-    .card-top { display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--muted); padding-left: 35px; }
-    .card-name { font-size: 1.1rem; font-weight: 700; color: #fff; }
-    .card-detail { display: flex; align-items: center; gap: 8px; font-size: 0.9rem; color: #cbd5e1; }
-    .card-detail i { color: var(--accent); }
-    
-    .card-body { 
-      background: rgba(0,0,0,0.2); padding: 10px; border-radius: 8px; font-size: 0.85rem; 
-      color: var(--muted); margin: 5px 0;
-    }
-    .card-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 5px; border-top: 1px solid #334155; padding-top: 10px; }
-    .price { color: var(--success); font-size: 1.2rem; font-weight: 800; }
+    .actions-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 20px; }
+    .actions-secondary { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
 
-    /* --- Floating Bulk Bar --- */
-    .bulk-bar {
-      position: fixed; bottom: 15px; left: 15px; right: 15px;
-      background: #3b82f6; color: #fff; padding: 12px 20px; border-radius: 15px;
-      display: flex; align-items: center; justify-content: space-between;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.4); transform: translateY(150%); transition: 0.4s; z-index: 500;
+    .btn {
+      padding: 10px 4px; border-radius: 14px; border: none; font-weight: 700;
+      cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center;
+      font-size: 10px; transition: 0.2s; gap: 6px; text-decoration: none;
     }
-    .bulk-bar.active { transform: translateY(0); }
-    .btn-bulk { background: #fff; color: #3b82f6; border: none; padding: 8px 15px; border-radius: 8px; font-weight: bold; }
+    .btn i { font-size: 18px; }
+    .btn-primary { background: var(--grad); color: white; }
+    .btn-success { background: #059669; color: white; }
+    .btn-ready { background: var(--ready); color: white; }
+    .btn-wa-ar { background: #d97706; color: white; }
+    .btn-wa-he { background: #7c3aed; color: white; }
+    .btn-outline { background: rgba(255,255,255,0.03); color: white; border: 1px solid var(--border); }
 
-    /* --- Modal Mobile --- */
-    .modal-overlay { display: none; position: fixed; inset: 0; background: #000; z-index: 1000; }
-    .modal-box { width: 100%; height: 100%; display: flex; flex-direction: column; overflow-y: auto; background: #f8fafc; }
-    
-    .modal-fields { padding: 20px; display: flex; flex-direction: column; gap: 12px; color: #000; }
-    .modal-fields input, .modal-fields textarea { 
-        width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; font-size: 16px; 
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px);
+      display: none; align-items: center; justify-content: center; z-index: 2000; padding: 20px;
     }
-    .modal-preview-area { background: #e2e8f0; padding: 20px; display: flex; justify-content: center; }
+    .modal-overlay.show { display: flex; }
+    .modal-content { background: var(--card); width: 100%; max-width: 450px; padding: 24px; border-radius: 32px; border: 1px solid var(--border); overflow-y: auto; max-height: 90vh; }
 
-    /* --- Labels (Unchanged for Print Quality) --- */
-    #printArea { display: none; }
-    .label-page { 
-      width: 100mm; height: 100mm; background: #fff; padding: 4mm; direction: rtl; position: relative;
-    }
+    .smart-box { background: rgba(59, 130, 246, 0.1); border: 1px dashed var(--primary); padding: 15px; border-radius: 16px; margin-bottom: 20px; }
+
+    input, select, textarea { width: 100%; padding: 12px; margin-bottom: 12px; border-radius: 12px; border: 1px solid var(--border); background: rgba(0,0,0,0.2); color: white; outline: none; font-size: 15px; box-sizing: border-box; }
+
+    .invoice-box { background: white; color: black; width: 98mm; height: 98mm; padding: 6mm; box-sizing: border-box; display: flex; flex-direction: column; position: relative; border-radius: 2px; }
+    .inv-header { text-align: center; border-bottom: 2px solid #000; padding-bottom: 5px; margin-bottom: 8px; }
+    .inv-body { font-size: 11px; flex-grow: 1; line-height: 1.4; overflow: hidden; }
+    .inv-row { display: flex; margin-bottom: 2px; gap: 5px; }
+    .inv-label { font-weight: 800; min-width: 75px; }
+    .inv-footer { border-top: 2px solid #000; padding-top: 5px; display: flex; justify-content: space-between; align-items: flex-end; }
+
+    #toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: #10b981; color: white; padding: 14px 28px; border-radius: 50px; font-weight: 700; z-index: 3000; display: none; box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
+    #loadingOverlay { position: fixed; inset: 0; background: rgba(6, 9, 20, 0.7); z-index: 4000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
+    .spinner { width: 44px; height: 44px; border: 4px solid rgba(59, 130, 246, 0.1); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
     @media print {
       body * { visibility: hidden; }
-      #printArea, #printArea * { visibility: visible; display: block; }
-      #printArea { position: absolute; left: 0; top: 0; width: 100%; }
-      @page { size: 100mm 100mm; margin: 0; }
+      #invoicePreview, #invoicePreview * { visibility: visible; }
+      #invoicePreview { position: fixed; left: 0; top: 0; width: 98mm; height: 98mm; border: none; padding: 6mm; margin: 0; }
+      .no-print { display: none !important; }
+      @page { size: 98mm 98mm; margin: 0; }
     }
   </style>
 </head>
 <body>
 
-<audio id="bell" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3"></audio>
+<div id="loadingOverlay"><div class="spinner"></div></div>
+<div id="toast">✅ تمت العملية</div>
+
+<!-- نافذة معاينة الفاتورة -->
+<div class="modal-overlay" id="printModal">
+  <div class="invoice-box" id="invoicePreview">
+    <div class="inv-header">
+      <h1 style="margin:0; font-size: 28px; letter-spacing: 3px; font-weight: 900;">MAD</h1>
+      <div style="font-size: 10px; font-weight: 800; color: #333;">PARFUMEUR</div>
+      <div style="display: flex; justify-content: space-between; font-size: 9px; font-weight: 900; margin-top:5px; border-top: 1px solid #eee; padding-top: 3px;">
+        <span id="p_date_label">تاريخ: 00.00.0000</span>
+        <span id="p_ord_label">طلب: MAD-00000</span>
+      </div>
+    </div>
+    
+    <div class="inv-body" id="p_content_lang"></div>
+
+    <div class="inv-footer">
+      <div style="text-align:center;">
+        <img id="p_qr" src="" style="width:40px; height:40px; border:1px solid #000;">
+        <div id="p_footer_phone" style="font-size:8px; font-weight:900; margin-top:4px;"></div>
+      </div>
+      <div id="p_promo" style="font-size: 8px; text-align: center; flex: 1; padding: 0 8px; font-weight: 800; line-height: 1.2;"></div>
+      <div style="text-align: left;">
+        <div id="p_label_total" style="font-size: 10px; font-weight: 700;">المجموع:</div>
+        <div style="font-size: 22px; font-weight: 900; color: #000;">₪<span id="p_total">0</span></div>
+      </div>
+    </div>
+
+    <div style="position: absolute; bottom: -75px; left: 0; right: 0; display: flex; gap: 12px; justify-content: center;" class="no-print">
+      <button class="btn btn-outline" onclick="closeModal('printModal')" style="flex-direction:row; padding:10px 20px; font-size: 14px;">إلغاء</button>
+      <button class="btn btn-primary" onclick="window.print()" style="flex-direction:row; padding:10px 20px; font-size: 14px;"><i class="fa fa-print"></i> طباعة</button>
+    </div>
+  </div>
+</div>
+
+<!-- نافذة إضافة/تعديل طلب -->
+<div class="modal-overlay" id="orderModal">
+  <div class="modal-content">
+    <h3 id="modalTitle">إضافة طلب جديد</h3>
+    
+    <div class="smart-box" id="smartSection">
+        <textarea id="smartInput" placeholder="الصق نص الطلب للتحليل السريع..." style="height: 60px; margin-bottom: 8px; font-size: 13px;"></textarea>
+        <button class="btn btn-primary" onclick="analyzeText()" style="width: 100%; flex-direction: row; height: 35px; font-size: 13px;">تحليل ذكي ⚡</button>
+    </div>
+
+    <label>الاسم</label><input type="text" id="f_name">
+    <label>الهاتف</label><input type="tel" id="f_phone">
+    <label>الأصناف</label><textarea id="f_offer" rows="2"></textarea>
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+      <input type="number" id="f_price" placeholder="السعر">
+      <select id="f_payment">
+          <option value="دفع عند الاستلام">دفع عند الاستلام</option>
+          <option value="شراء من الموقع - مدفوع">شراء من الموقع - مدفوع</option>
+          <option value="شراء عبر الرابط">شراء عبر الرابط</option>
+      </select>
+    </div>
+    <input type="text" id="f_city" placeholder="المدينة">
+    <textarea id="f_notes" rows="2" placeholder="ملاحظات..."></textarea>
+    <select id="f_delivery">
+      <option value="">شركة الشحن</option>
+      <option value="High Express (050-9566919)">High Express</option>
+      <option value="Lama (050-5102019)">Lama</option>
+      <option value="Marwah (052-7035370)">Marwah</option>
+      <option value="Areen (052-5118966)">Areen</option>
+      <option value="Pickup">Pickup</option>
+    </select>
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:10px;">
+      <button class="btn btn-outline" onclick="closeModal('orderModal')">إلغاء</button>
+      <button class="btn btn-primary" onclick="saveOrder()">حفظ الطلب ✨</button>
+    </div>
+  </div>
+</div>
 
 <div class="header">
-  <div class="header-top">
-    <div class="brand">MAD <span style="color:var(--primary)">V3 Mobile</span></div>
-    <button onclick="app.loadData()" style="background:var(--bg-card); border:1px solid #334155; color:#fff; padding:6px 12px; border-radius:6px;">
-        <i class="fas fa-sync"></i>
-    </button>
-  </div>
-  <div class="search-box">
-    <i class="fas fa-search search-icon"></i>
-    <input class="search-inp" id="search" placeholder="חיפוש שם، طلفون..." oninput="app.render()">
-  </div>
-</div>
-
-<div class="workspace">
-  <div class="grid" id="grid"></div>
-</div>
-
-<div class="bulk-bar" id="bulkBar">
-  <span id="selectedCount">0 נבחרו</span>
-  <div style="display:flex; gap:10px; align-items:center;">
-      <button onclick="app.clearSelection()" style="background:none; border:none; color:#fff; text-decoration:underline; font-size:14px;">ביטול</button>
-      <button class="btn-bulk" onclick="app.printSelected()">הדפס <i class="fas fa-print"></i></button>
-  </div>
-</div>
-
-<div class="modal-overlay" id="editorModal">
-  <div class="modal-box">
-    <div style="padding:15px; background:#fff; border-bottom:1px solid #ddd; display:flex; justify-content:space-between; align-items:center; position:sticky; top:0; z-index:10;">
-        <h3 style="margin:0; color:#000;">עריכת הזמנה</h3>
-        <button onclick="app.closeModal()" style="background:none; border:none; font-size:24px;">&times;</button>
-    </div>
-
-    <div class="modal-fields">
-      <label>שם לקוח:</label><input id="e_name" oninput="app.updatePreview()">
-      <label>טלפון:</label><input id="e_phone" type="tel" oninput="app.updatePreview()">
-      <label>עיר وכתובת:</label><input id="e_city" oninput="app.updatePreview()">
-      
-      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px">
-        <div><label>משלוח:</label><input id="e_del" oninput="app.updatePreview()"></div>
-        <div><label>תשלום:</label><input id="e_pay" oninput="app.updatePreview()"></div>
-      </div>
-
-      <label>פריטים:</label><textarea id="e_offer" rows="3" oninput="app.updatePreview()"></textarea>
-      <label>מחير סופי:</label><input type="number" id="e_price" style="color:green; font-weight:bold;" oninput="app.updatePreview()">
-      
-      <button onclick="app.printFromModal()" style="padding:18px; background:#000; color:#fff; border:none; border-radius:12px; font-weight:bold; font-size:1.1rem; margin-top:10px;">
-          הדפס ושמור הזמנה 🖨️
-      </button>
-    </div>
-
-    <div style="padding:10px; text-align:center; color:#666; font-weight:bold;">תצוגה מקדימה של המדבקה:</div>
-    <div class="modal-preview-area">
-      <div id="livePreview" style="transform:scale(0.75); transform-origin: top center;"></div>
+  <div class="header-top" style="display:flex; justify-content:space-between; align-items:center;">
+    <div class="logo" style="font-weight:900; font-size:20px;">MAD <span>MANAGER</span></div>
+    <div style="display:flex; gap:10px;">
+      <button class="btn btn-outline" onclick="load()" style="width:40px; height:40px;"><i class="fa fa-sync"></i></button>
+      <button class="btn btn-primary" onclick="openAddModal()" style="width:40px; height:40px;"><i class="fa fa-plus"></i></button>
     </div>
   </div>
+  
+  <div class="tab-container">
+    <button class="tab-btn active" id="tabPrep" onclick="switchView('prep')"><i class="fa fa-box-open"></i> قسم التجهيز</button>
+    <button class="tab-btn" id="tabManager" onclick="switchView('manager')"><i class="fa fa-tasks"></i> الإدارة</button>
+  </div>
+
+  <div style="margin-top:10px;">
+    <input type="text" id="searchInput" placeholder="بحث بالاسم أو رقم الهاتف..." oninput="filterOrders()" style="margin-bottom:0; background:rgba(255,255,255,0.05);">
+  </div>
 </div>
 
-<div id="printArea"></div>
+<div class="container" id="ordersList"></div>
 
 <script>
-// نفس المنطق البرمجي الخاص بك مع تعديلات بسيطة لتوافق الموبايل
-class MadSystem {
-  constructor() {
-    this.scriptUrl = "https://script.google.com/macros/s/AKfycbyLjLFa8AaH82Ip7m747WC-KSUUEaU_M70S0I9Mda14XbnmcuEfZ7pBnF_zzJYZuXmZ/exec";
-    this.orders = [];
-    this.selectedIds = new Set();
-    this.editingIndex = null;
-    this.init();
-  }
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwWi55Q1H1HNdJb61Ht99ZiZodp4B4aaElWSqSuxo37zhKUwRgy8T-NHNPffH4i_Y89Eg/exec";
+const DASH_KEY = "12345678";
+let allOrders = [];
+let lastKnownOrderId = null; // تتبع آخر طلب لمنع تكرار الصوت
+let currentView = 'prep'; 
 
-  init() {
-    if(localStorage.getItem('mad_auth') !== "12345678") {
-      let p = prompt("Password:");
-      if(p === "12345678") localStorage.setItem('mad_auth', "12345678");
-      else return;
-    }
-    this.loadData();
-    setInterval(() => this.loadData(true), 30000);
-  }
+function showLoading(s) { document.getElementById('loadingOverlay').style.display = s ? 'flex' : 'none'; }
+function showToast(m) { const t = document.getElementById('toast'); t.textContent = m; t.style.display = 'block'; setTimeout(() => t.style.display = 'none', 2500); }
 
-  async loadData(silent = false) {
-    if(!silent) document.getElementById('grid').innerHTML = '<div style="color:white;text-align:center;padding:50px">טוען נתונים...</div>';
-    try {
-      const res = await fetch(`${this.scriptUrl}?action=get`);
-      this.orders = await res.json();
-      this.render();
-      if(!silent && this.orders.length > 0) document.getElementById('bell').play().catch(()=>{});
-    } catch(e) { console.error(e); }
-  }
+const safe = (v) => (v === undefined || v === null || String(v).toLowerCase()==="undefined") ? "" : String(v).trim();
 
-  formatPhone(p) {
-    p = String(p || "").replace(/[^0-9]/g, "");
-    if(p.startsWith("972")) p = "0" + p.slice(3);
-    if(p.startsWith("5") && p.length === 9) p = "0" + p;
-    return p.length === 10 ? p.slice(0,3) + "-" + p.slice(3) : p;
-  }
-
-  render() {
-    const q = document.getElementById('search').value.toLowerCase();
-    const grid = document.getElementById('grid');
-    const list = this.orders.filter(o => (o.name + o.phone + o.city + o.orderId).toLowerCase().includes(q));
-
-    if(list.length === 0) {
-      grid.innerHTML = '<div style="text-align:center;color:#555;padding:20px;">לא נמצאו תוצאות</div>';
-      return;
-    }
-
-    grid.innerHTML = list.map(o => {
-      const i = this.orders.indexOf(o);
-      const isSelected = this.selectedIds.has(i);
-      const isReady = (o.status||"").includes("READY");
-
-      return `
-        <div class="card" style="border-right:5px solid ${isReady ? 'var(--success)' : 'var(--accent)'}">
-          <input type="checkbox" class="card-select" ${isSelected ? 'checked' : ''} 
-                 onclick="event.stopPropagation(); app.toggleSelect(${i})">
-          
-          <div onclick="app.openEditor(${i})">
-              <div class="card-top">
-                <span>#${o.orderId} | ${o.delivery || 'High Express'}</span>
-              </div>
-              <div class="card-name">${o.name}</div>
-              <div class="card-detail"><i class="fas fa-phone"></i> ${this.formatPhone(o.phone)}</div>
-              <div class="card-detail"><i class="fas fa-city"></i> ${o.city || '---'}</div>
-              <div class="card-body">${(o.offer || 'אין פירוט').substring(0,60)}...</div>
-              <div class="card-footer">
-                <span style="font-size:0.8rem; color:${isReady?'#10b981':'#f59e0b'}">${o.status || 'ממתין'}</span>
-                <div class="price">₪${o.price}</div>
-              </div>
-          </div>
-        </div>
-      `;
-    }).join("");
-  }
-
-  toggleSelect(index) {
-    if(this.selectedIds.has(index)) this.selectedIds.delete(index);
-    else this.selectedIds.add(index);
-    this.updateBulkBar();
-  }
-
-  updateBulkBar() {
-    const bar = document.getElementById('bulkBar');
-    const count = this.selectedIds.size;
-    document.getElementById('selectedCount').innerText = `${count} נבחרו`;
-    if(count > 0) bar.classList.add('active');
-    else bar.classList.remove('active');
-  }
-
-  clearSelection() {
-    this.selectedIds.clear();
-    this.updateBulkBar();
-    this.render();
-  }
-
-  openEditor(index) {
-    this.editingIndex = index;
-    const o = this.orders[index];
-    ['name','phone','city','offer','price'].forEach(k => document.getElementById('e_'+k).value = o[k]||"");
-    document.getElementById('e_del').value = o.delivery || "High Express";
-    document.getElementById('e_pay').value = o.payment || "מזומן";
-    document.getElementById('editorModal').style.display = 'block';
-    this.updatePreview();
-  }
-
-  closeModal() { document.getElementById('editorModal').style.display = 'none'; }
-
-  updatePreview() {
-    const data = this.getModalData();
-    document.getElementById('livePreview').innerHTML = this.generateLabelHtml(data, 'prev');
-    this.genCodes('prev', data.phone);
-  }
-
-  getModalData() {
-    const o = this.orders[this.editingIndex];
-    return {
-      orderId: o.orderId,
-      name: document.getElementById('e_name').value,
-      phone: document.getElementById('e_phone').value,
-      city: document.getElementById('e_city').value,
-      delivery: document.getElementById('e_del').value,
-      payment: document.getElementById('e_pay').value,
-      offer: document.getElementById('e_offer').value,
-      price: document.getElementById('e_price').value
-    };
-  }
-
-  generateLabelHtml(o, idSuffix) {
-    return `
-      <div class="label-page">
-        <div style="display:flex; justify-content:space-between;">
-           <img src="https://www.madparfum.com/logo.svg" style="width:35mm">
-           <div style="font-size:9pt; font-weight:bold; text-align:left;">ORD: ${o.orderId}</div>
-        </div>
-        <div style="background:#000; color:#fbbf24; text-align:center; padding:4px; font-weight:900; margin:5px 0; border-radius:4px;">צלם את הרגע וקבל מתנה 🎁</div>
-        <div style="font-size:11pt; line-height:1.5;">
-           <b>לכבוד:</b> ${o.name}<br>
-           <b>טלפון:</b> ${this.formatPhone(o.phone)}<br>
-           <b>עיר:</b> ${o.city}<br>
-           <b>חברה:</b> ${o.delivery} | <b>תשלום:</b> ${o.payment}
-        </div>
-        <div style="border-bottom:1px dashed #000; height:15mm; overflow:hidden; margin:5px 0; font-size:9pt;">${o.offer}</div>
-        <div style="border:2px solid #000; text-align:center; font-size:22pt; font-weight:900; border-radius:8px;">₪${o.price}</div>
-        <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-top:10px;">
-           <div style="background:#000; color:#fff; font-size:7pt; padding:5px; border-radius:4px; width:60%;">סרוק ושלח סרטון ל-WhatsApp לקבלת מתנה!</div>
-           <div id="qr_${idSuffix}"></div>
-        </div>
-        <div style="text-align:center; margin-top:5px"><svg id="bar_${idSuffix}"></svg></div>
-      </div>
-    `;
-  }
-
-  genCodes(suffix, phone) {
-    setTimeout(() => {
-      try {
-        const clean = String(phone).replace(/[^0-9]/g, "");
-        JsBarcode(`#bar_${suffix}`, clean, {format:"CODE128", height:20, displayValue:false});
-        document.getElementById(`qr_${suffix}`).innerHTML = "";
-        new QRCode(document.getElementById(`qr_${suffix}`), {text:"https://wa.me/972549634449", width:45, height:45});
-      } catch(e){}
-    }, 150);
-  }
-
-  printFromModal() {
-    const data = this.getModalData();
-    this.printList([data]);
-    setTimeout(() => {
-        const o = this.orders[this.editingIndex];
-        o.status = "READY ✅";
-        fetch(`${this.scriptUrl}?action=updateStatus&key=12345678&row=${o.rowIndex}&status=READY ✅`);
-        this.closeModal();
-        this.render();
-    }, 500);
-  }
-
-  printSelected() {
-    const list = Array.from(this.selectedIds).map(idx => this.orders[idx]);
-    if(confirm(`להדפיס ${list.length} הזמנות?`)) {
-      this.printList(list);
-      list.forEach(o => {
-          o.status = "READY ✅";
-          fetch(`${this.scriptUrl}?action=updateStatus&key=12345678&row=${o.rowIndex}&status=READY ✅`);
-      });
-      this.clearSelection();
-    }
-  }
-
-  printList(list) {
-    const area = document.getElementById('printArea');
-    area.innerHTML = list.map((o, i) => this.generateLabelHtml(o, `p_${i}`)).join("");
-    list.forEach((o, i) => this.genCodes(`p_${i}`, o.phone));
-    setTimeout(() => { window.print(); }, 1000);
+// تنبيه صوتي: لديك طلبية جديدة بالعربي
+function announceNewOrder() {
+  if ('speechSynthesis' in window) {
+    const msg = new SpeechSynthesisUtterance();
+    msg.text = "لديك طلبية جديدة";
+    msg.lang = 'ar-SA'; // اللغة العربية
+    msg.rate = 0.9; // سرعة الكلام
+    window.speechSynthesis.speak(msg);
   }
 }
 
-const app = new MadSystem();
+function formatLocalPhone(p) {
+  if(!p) return "";
+  let d = String(p).replace(/\D/g, "");
+  if (d.startsWith("972")) d = "0" + d.substring(3);
+  return d.startsWith("0") ? d : "0" + d;
+}
+
+function normalizePhoneForLink(p) { 
+  let d = String(p||"").replace(/\D/g, ""); 
+  if (d.startsWith("0")) d = "972" + d.substring(1); 
+  return d; 
+}
+
+function switchView(view) {
+  currentView = view;
+  document.getElementById('tabManager').classList.toggle('active', view === 'manager');
+  document.getElementById('tabPrep').classList.toggle('active', view === 'prep');
+  renderOrders(allOrders);
+}
+
+async function load() {
+  showLoading(true);
+  try {
+    const res = await fetch(`${SCRIPT_URL}?action=get&_=${Date.now()}`);
+    const data = await res.json();
+    
+    // التحقق من وجود طلبات جديدة لإصدار التنبيه الصوتي
+    if (data && data.length > 0) {
+        const latestOnServer = data[data.length - 1].orderId;
+        // إذا كان هناك طلب جديد (id أكبر أو مختلف عن السابق)
+        if (lastKnownOrderId !== null && latestOnServer !== lastKnownOrderId) {
+            announceNewOrder();
+        }
+        lastKnownOrderId = latestOnServer;
+    }
+
+    allOrders = data;
+    renderOrders(allOrders);
+  } catch(e) { showToast("خطأ في الاتصال"); }
+  showLoading(false);
+}
+
+function filterOrders() {
+    const term = document.getElementById('searchInput').value.toLowerCase();
+    const filtered = allOrders.filter(o => safe(o.name).toLowerCase().includes(term) || safe(o.phone).includes(term));
+    renderOrders(filtered);
+}
+
+function renderOrders(list) {
+  const container = document.getElementById('ordersList');
+  let displayList = [...list].filter(o => o.rowIndex).reverse();
+
+  if (displayList.length === 0) {
+      container.innerHTML = `<div style="text-align:center; padding:50px; color:var(--muted);">لا توجد بيانات متاحة</div>`;
+      return;
+  }
+
+  if (currentView === 'prep') {
+    displayList = displayList.filter(o => safe(o.status).includes("بانتظار الإرسال للتجهيز"));
+    if (displayList.length === 0) {
+      container.innerHTML = `<div style="text-align:center; padding:50px; color:var(--muted);">🎉 لا توجد طلبات بانتظار التجهيز حالياً</div>`;
+      return;
+    }
+  }
+
+  container.innerHTML = displayList.map(o => {
+    const s = safe(o.status);
+    const isWaitingPrep = s.includes("بانتظار الإرسال للتجهيز");
+    
+    return `
+    <div class="order-card">
+      <div class="card-header">
+        <small class="order-id">#${safe(o.orderId) || '---'}</small>
+        <span class="status-pill ${isWaitingPrep ? 'status-prep' : 'status-new'}">${s || 'جديد'}</span>
+      </div>
+      <div onclick="openEditModal(${o.rowIndex})">
+        <span class="customer-name">${safe(o.name)}</span>
+        <div style="font-size:14px; color:var(--muted);"><i class="fa fa-phone"></i> ${formatLocalPhone(o.phone)}</div>
+        <div class="offer-details">${safe(o.offer)}</div>
+        <div class="meta-line">
+           <span class="meta-tag">📍 ${safe(o.city)}</span>
+           <span class="meta-tag">₪${safe(o.price)}</span>
+           <span class="meta-tag">🚚 ${safe(o.delivery).split(' (')[0]}</span>
+        </div>
+      </div>
+      <div class="actions-grid">
+        ${currentView === 'manager' ? `
+          <button class="btn btn-wa-ar" onclick="sendMsg(${o.rowIndex}, 'ar')"><i class="fa-brands fa-whatsapp"></i><span>عربي</span></button>
+          <button class="btn btn-wa-he" onclick="sendMsg(${o.rowIndex}, 'he')"><i class="fa-brands fa-whatsapp"></i><span>عبري</span></button>
+          <button class="btn btn-success" onclick="updateStatus(${o.rowIndex}, 'بانتظار الإرسال للتجهيز')"><i class="fa fa-check"></i><span>اعتماد</span></button>
+          <button class="btn btn-outline" onclick="openEditModal(${o.rowIndex})"><i class="fa fa-edit"></i><span>تعديل</span></button>
+        ` : `
+          <button class="btn btn-success" style="grid-column: span 2;" onclick="updateStatus(${o.rowIndex}, 'جاهز للتسليم')"><i class="fa fa-box-check"></i><span>تم التجهيز ✅</span></button>
+          <button class="btn btn-outline" onclick="openPrintModal(${o.rowIndex}, 'ar')"><i class="fa fa-print"></i><span>وصل ع</span></button>
+          <button class="btn btn-outline" onclick="openPrintModal(${o.rowIndex}, 'he')"><i class="fa fa-print"></i><span>وصل هـ</span></button>
+        `}
+      </div>
+      ${currentView === 'manager' ? `
+      <div class="actions-secondary">
+        <button class="btn btn-outline" onclick="openPrintModal(${o.rowIndex}, 'ar')"><i class="fa fa-print"></i><span>وصل عربي</span></button>
+        <button class="btn btn-outline" onclick="openPrintModal(${o.rowIndex}, 'he')"><i class="fa fa-print"></i><span>وصل عبري</span></button>
+      </div>` : ''}
+    </div>`;
+  }).join('');
+}
+
+async function updateStatus(row, newStatus) {
+  showLoading(true);
+  const o = allOrders.find(x => x.rowIndex == row);
+  const p = new URLSearchParams({
+    action: "updateOrder", key: DASH_KEY, row: row,
+    offer: safe(o.offer), name: safe(o.name), phone: safe(o.phone), 
+    city: safe(o.city), notes: safe(o.notes), 
+    delivery: safe(o.delivery), payment: safe(o.payment), price: safe(o.price),
+    status: newStatus
+  });
+  try {
+    await fetch(`${SCRIPT_URL}?${p.toString()}`);
+    showToast("تم تحديث الحالة ✨");
+    load();
+  } catch(e) { showToast("خطأ في التحديث"); showLoading(false); }
+}
+
+async function sendMsg(row, lang) {
+  const o = allOrders.find(x => x.rowIndex == row);
+  if(!o) return;
+  const paymentMethod = safe(o.payment) || "دفع عند الاستلام";
+  const note = safe(o.notes) ? `%0A📝 ملاحظة: ${safe(o.notes)}` : "";
+  const deliveryComp = safe(o.delivery) ? `%0A🚚 شركة التوصيل: ${safe(o.delivery)}` : "";
+  const customerPhone = formatLocalPhone(o.phone);
+  const msg = lang === 'ar' ? 
+    `أهلاً بك ${safe(o.name)} في MAD Parfumeur 🖤%0Aيسعدنا تأكيد طلبك المميز!%0A💎 العرض: ${safe(o.offer)}%0A📍 العنوان: ${safe(o.city)}%0A💰 السعر: ${safe(o.price)} ₪%0A💳 الدفع: ${paymentMethod}${deliveryComp}${note}%0A📞 هاتف التواصل: ${customerPhone}` :
+    `שלום ${safe(o.name)} 👋, תודה שהזמנת מ-MAD Parfumeur%0A📦 המוצר: ${safe(o.offer)}%0A📍 כתובת: ${safe(o.city)}%0A💰 מחיר: ${safe(o.price)} ₪%0A💳 תשלום: ${paymentMethod}${deliveryComp}%0A📞 טלפון: ${customerPhone}`;
+  window.open(`https://wa.me/${normalizePhoneForLink(o.phone)}?text=${msg}`, '_blank');
+}
+
+function openAddModal() {
+  editingRow = null;
+  document.getElementById('modalTitle').textContent = "إضافة طلب جديد";
+  document.getElementById('smartSection').style.display = 'block';
+  ['smartInput','f_name','f_phone','f_offer','f_price','f_city','f_notes'].forEach(id => document.getElementById(id).value = "");
+  document.getElementById('orderModal').classList.add('show');
+}
+
+function openEditModal(row) {
+  const o = allOrders.find(x => x.rowIndex == row);
+  if(!o) return;
+  editingRow = row;
+  document.getElementById('modalTitle').textContent = "تعديل الطلب";
+  document.getElementById('smartSection').style.display = 'none';
+  document.getElementById('f_name').value = safe(o.name);
+  document.getElementById('f_phone').value = formatLocalPhone(o.phone);
+  document.getElementById('f_offer').value = safe(o.offer);
+  document.getElementById('f_price').value = safe(o.price);
+  document.getElementById('f_payment').value = safe(o.payment) || "دفع عند الاستلام";
+  document.getElementById('f_city').value = safe(o.city);
+  document.getElementById('f_notes').value = safe(o.notes);
+  document.getElementById('f_delivery').value = safe(o.delivery);
+  document.getElementById('orderModal').classList.add('show');
+}
+
+async function saveOrder() {
+  const isAdd = !editingRow;
+  showLoading(true);
+  const payload = {
+    action: isAdd ? "addOrder" : "updateOrder", 
+    key: DASH_KEY, row: editingRow || "",
+    name: safe(document.getElementById('f_name').value),
+    phone: safe(document.getElementById('f_phone').value),
+    offer: safe(document.getElementById('f_offer').value),
+    price: safe(document.getElementById('f_price').value),
+    city: safe(document.getElementById('f_city').value),
+    notes: safe(document.getElementById('f_notes').value),
+    payment: safe(document.getElementById('f_payment').value),
+    delivery: safe(document.getElementById('f_delivery').value),
+    status: isAdd ? "NEW" : (allOrders.find(x=>x.rowIndex==editingRow).status || "NEW")
+  };
+  try {
+    const res = await fetch(`${SCRIPT_URL}?` + new URLSearchParams(payload).toString());
+    const data = await res.json();
+    if(data.result === "SUCCESS") {
+      showToast(isAdd ? "تمت إضافة الطلب ✨" : "تم الحفظ ✨");
+      closeModal('orderModal');
+      load();
+    }
+  } catch(e) { showToast("فشل الحفظ"); showLoading(false); }
+}
+
+function openPrintModal(row, lang) {
+    const o = allOrders.find(x => x.rowIndex == row);
+    if (!o) return;
+    const now = new Date();
+    const formattedDate = `${now.getDate()}.${now.getMonth()+1}.${now.getFullYear()}`;
+    const cleanP = formatLocalPhone(o.phone);
+    
+    document.getElementById('p_date_label').textContent = lang === 'ar' ? `تاريخ: ${formattedDate}` : `תאריך: ${formattedDate}`;
+    document.getElementById('p_ord_label').textContent = lang === 'ar' ? `طلب: MAD-${safe(o.orderId) || "0000"}` : `מס' הזמנה: MAD-${safe(o.orderId) || "0000"}`;
+    document.getElementById('p_label_total').textContent = lang === 'ar' ? `المجموع:` : `לתשלום:`;
+    document.getElementById('p_total').textContent = safe(o.price) || "0";
+    document.getElementById('p_footer_phone').textContent = cleanP;
+    document.getElementById('p_qr').src = `https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=https://wa.me/${normalizePhoneForLink(o.phone)}`;
+    
+    const body = document.getElementById('p_content_lang');
+    body.style.direction = "rtl";
+    
+    if (lang === 'ar') {
+        document.getElementById('p_promo').innerHTML = "🎁 صور اللحظة وارسلها فيديو<br>واحصل على هدية فورية!";
+        body.innerHTML = `
+            <div class="inv-row"><span class="inv-label">الاسم:</span> <span>${safe(o.name)}</span></div>
+            <div class="inv-row"><span class="inv-label">الهاتف:</span> <span>${cleanP}</span></div>
+            <div class="inv-row"><span class="inv-label">المدينة:</span> <span>${safe(o.city)}</span></div>
+            <div class="inv-row"><span class="inv-label">التوصيل:</span> <span>${safe(o.delivery).split(' (')[0]}</span></div>
+            <div class="inv-row"><span class="inv-label">الدفع:</span> <span>${safe(o.payment)}</span></div>
+            <div style="margin-top:5px; border-top:1px dashed #ccc; padding-top:5px;">
+                <div class="inv-label">الطلبية:</div>
+                <div style="font-weight:700;">${safe(o.offer)}</div>
+            </div>
+            ${safe(o.notes) ? `<div style="margin-top:3px; font-size:9px;">📝 ${safe(o.notes)}</div>` : ''}
+        `;
+    } else {
+        document.getElementById('p_promo').innerHTML = "🎁 צלמו את הרגע ושלחו וידאו<br>לקבלת מתנה מיידית!";
+        body.innerHTML = `
+            <div class="inv-row"><span class="inv-label">שם:</span> <span>${safe(o.name)}</span></div>
+            <div class="inv-row"><span class="inv-label">טלפון:</span> <span>${cleanP}</span></div>
+            <div class="inv-row"><span class="inv-label">עיר:</span> <span>${safe(o.city)}</span></div>
+            <div class="inv-row"><span class="inv-label">משלוח:</span> <span>${safe(o.delivery).split(' (')[0]}</span></div>
+            <div class="inv-row"><span class="inv-label">תשלום:</span> <span>${safe(o.payment)}</span></div>
+            <div style="margin-top:5px; border-top:1px dashed #ccc; padding-top:5px;">
+                <div class="inv-label">פריטים:</div>
+                <div style="font-weight:700;">${safe(o.offer)}</div>
+            </div>
+            ${safe(o.notes) ? `<div style="margin-top:3px; font-size:9px;">📝 ${safe(o.notes)}</div>` : ''}
+        `;
+    }
+    
+    document.getElementById('printModal').classList.add('show');
+}
+
+function analyzeText() {
+    const raw = document.getElementById('smartInput').value;
+    if(!raw.trim()) return showToast("الصق نصاً أولاً");
+    const phoneMatch = raw.match(/(?:05|972|5)\d{8,11}/);
+    if(phoneMatch) document.getElementById('f_phone').value = formatLocalPhone(phoneMatch[0]);
+    const priceMatch = raw.match(/(\d{2,4})\s*(?:₪|shekel|ILS|السعر)/i);
+    if(priceMatch) document.getElementById('f_price').value = priceMatch[1];
+    const nameLine = raw.split('\n')[0].trim();
+    if(nameLine.length < 30) document.getElementById('f_name').value = nameLine;
+    document.getElementById('f_offer').value = raw.substring(0, 100).trim();
+    showToast("تم التحليل ✨");
+}
+
+function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+window.onload = load;
 </script>
 </body>
 </html>
