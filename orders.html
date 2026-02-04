@@ -1,4 +1,3 @@
-```html
 <!doctype html>
 <html lang="ar" dir="rtl">
 <head>
@@ -52,7 +51,7 @@
 
     .customer-name { font-size: 19px; font-weight: 800; display: block; margin-bottom: 4px; }
     .customer-phone { color: var(--muted); font-size: 14px; display: flex; align-items: center; gap: 6px; }
-    
+
     .offer-details {
       margin: 12px 0; padding: 12px; background: rgba(59, 130, 246, 0.05);
       border-radius: 12px; color: #93c5fd; font-weight: 600; border-right: 3px solid var(--primary);
@@ -147,7 +146,7 @@
 <div class="modal-overlay" id="orderModal">
   <div class="modal-content">
     <h3 id="modalTitle" style="margin-top:0;">إضافة طلب جديد</h3>
-    
+
     <!-- Smart Analysis Section -->
     <div class="smart-box" id="smartSection">
         <h4><i class="fa fa-magic"></i> المحلل الذكي للبيانات</h4>
@@ -178,7 +177,7 @@
       <option value="Lama (050-5102019)">Lama (050-5102019)</option>
       <option value="Marwah (052-7035370)">Marwah (052-7035370)</option>
       <option value="Areen (052-5118966)">Areen (052-5118966)</option>
-      <option value="Pickup">Pickup</option>
+      <option value="Aiat (052-5118966)">Aiat (052-5118966)</option>
     </select>
     <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:10px;">
       <button class="btn btn-outline" onclick="closeModal('orderModal')">إلغاء</button>
@@ -206,6 +205,7 @@
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwWi55Q1H1HNdJb61Ht99ZiZodp4B4aaElWSqSuxo37zhKUwRgy8T-NHNPffH4i_Y89Eg/exec";
 const DASH_KEY = "12345678";
 const CUSTOMER_SERVICE_PHONE = "972509787730";
+
 let allOrders = [];
 let editingRow = null;
 
@@ -222,36 +222,36 @@ function formatLocalPhone(p) {
   return d;
 }
 
-function normalizePhoneForLink(p) { 
-  let d = String(p||"").replace(/\D/g, ""); 
-  if (d.startsWith("0")) d = "972" + d.substring(1); 
-  return d; 
+function normalizePhoneForLink(p) {
+  let d = String(p||"").replace(/\D/g, "");
+  if (d.startsWith("0")) d = "972" + d.substring(1);
+  if (!d.startsWith("972") && d.length === 9) d = "972" + d; // احتياط لو دخل 5xxxxxxxx
+  return d;
 }
 
 function analyzeText() {
-    const raw = document.getElementById('smartInput').value;
-    if(!raw.trim()) return showToast("الصق نصاً أولاً");
+  const raw = document.getElementById('smartInput').value;
+  if(!raw.trim()) return showToast("الصق نصاً أولاً");
 
-    const phoneMatch = raw.match(/(?:05|972|5)\d{8,11}/);
-    if(phoneMatch) document.getElementById('f_phone').value = formatLocalPhone(phoneMatch[0]);
+  const phoneMatch = raw.match(/(?:05|972|5)\d{8,11}/);
+  if(phoneMatch) document.getElementById('f_phone').value = formatLocalPhone(phoneMatch[0]);
 
-    const priceMatch = raw.match(/(\d{2,4})\s*(?:₪|shekel|ILS|السعر)/i) || raw.match(/(?:₪|السعر|Price)\s*:?\s*(\d{2,4})/i);
-    if(priceMatch) document.getElementById('f_price').value = priceMatch[1];
+  const priceMatch = raw.match(/(\d{2,4})\s*(?:₪|shekel|ILS|السعر)/i) || raw.match(/(?:₪|السعر|Price)\s*:?\s*(\d{2,4})/i);
+  if(priceMatch) document.getElementById('f_price').value = priceMatch[1];
 
-    const nameMatch = raw.match(/(?:الاسم|Name)\s*:?\s*([^\n|]+)/i);
-    if(nameMatch) {
-        document.getElementById('f_name').value = nameMatch[1].trim();
-    } else {
-        const firstLine = raw.split('\n')[0].trim();
-        if(firstLine.length < 30) document.getElementById('f_name').value = firstLine;
-    }
+  const nameMatch = raw.match(/(?:الاسم|Name)\s*:?\s*([^\n|]+)/i);
+  if(nameMatch) {
+    document.getElementById('f_name').value = nameMatch[1].trim();
+  } else {
+    const firstLine = raw.split('\n')[0].trim();
+    if(firstLine.length < 30) document.getElementById('f_name').value = firstLine;
+  }
 
-    const cityMatch = raw.match(/(?:المدينة|city|عنوان|من)\s*:?\s*([^\n|]+)/i);
-    if(cityMatch) document.getElementById('f_city').value = cityMatch[1].trim();
+  const cityMatch = raw.match(/(?:المدينة|city|عنوان|من)\s*:?\s*([^\n|]+)/i);
+  if(cityMatch) document.getElementById('f_city').value = cityMatch[1].trim();
 
-    document.getElementById('f_offer').value = raw.substring(0, 100).trim();
-
-    showToast("تم تحليل البيانات بنجاح ⚡");
+  document.getElementById('f_offer').value = raw.substring(0, 100).trim();
+  showToast("تم تحليل البيانات بنجاح ⚡");
 }
 
 async function load() {
@@ -265,82 +265,90 @@ async function load() {
 }
 
 function filterOrders() {
-    const term = document.getElementById('searchInput').value.toLowerCase();
-    const filtered = allOrders.filter(o => safe(o.name).toLowerCase().includes(term) || safe(o.phone).includes(term));
-    renderOrders(filtered);
+  const term = document.getElementById('searchInput').value.toLowerCase();
+  const filtered = allOrders.filter(o => safe(o.name).toLowerCase().includes(term) || safe(o.phone).includes(term));
+  renderOrders(filtered);
 }
 
 /**
- * دالة العرض - تم تعديلها لعرض آخر طلب في البداية
+ * دالة العرض - أحدث طلب أولاً
  */
 function renderOrders(list) {
   const container = document.getElementById('ordersList');
-  if (list.length === 0) {
+  if (!list || list.length === 0) {
     container.innerHTML = `<div style="text-align:center; padding:50px; color:var(--muted);">لا توجد طلبات لعرضها</div>`;
     return;
   }
-  
-  // نقوم بنسخ القائمة وعكسها لعرض الأحدث أولاً
+
   const reversedList = [...list].filter(o => o.rowIndex).reverse();
 
   container.innerHTML = reversedList.map(o => {
     const isPrep = (o.status || "").includes("تجهيز");
     return `
-    <div class="order-card">
-      <div class="card-header">
-        <small class="order-id">#${safe(o.orderId) || '---'}</small>
-        <span class="status-pill ${isPrep ? 'status-prep' : 'status-new'}">${safe(o.status) || 'جديد'}</span>
-      </div>
-      <div onclick="openEditModal(${o.rowIndex})">
-        <span class="customer-name">${safe(o.name)}</span>
-        <div class="customer-phone"><i class="fa fa-phone"></i> ${formatLocalPhone(o.phone)}</div>
-        <div class="offer-details">${safe(o.offer)}</div>
-        <div class="meta-line">
-           <span class="meta-tag">📍 ${safe(o.city)}</span>
-           <span class="meta-tag">₪${safe(o.price)}</span>
-           <span class="meta-tag">💳 ${safe(o.payment)}</span>
-           <span class="meta-tag">🚚 ${safe(o.delivery)}</span>
+      <div class="order-card">
+        <div class="card-header">
+          <small class="order-id">#${safe(o.orderId) || '---'}</small>
+          <span class="status-pill ${isPrep ? 'status-prep' : 'status-new'}">${safe(o.status) || 'جديد'}</span>
         </div>
-      </div>
-      <div class="actions-grid">
-        <button class="btn btn-wa-ar" onclick="sendMsg(${o.rowIndex}, 'ar')"><i class="fa-brands fa-whatsapp"></i><span>عربي</span></button>
-        <button class="btn btn-wa-he" onclick="sendMsg(${o.rowIndex}, 'he')"><i class="fa-brands fa-whatsapp"></i><span>עברית</span></button>
-        <button class="btn btn-success" onclick="approve(${o.rowIndex})"><i class="fa fa-check"></i><span>اعتماد</span></button>
-        <button class="btn btn-outline" onclick="openEditModal(${o.rowIndex})"><i class="fa fa-edit"></i><span>تعديل</span></button>
-      </div>
-      <div class="actions-secondary">
-        <button class="btn btn-outline" onclick="openPrintModal(${o.rowIndex}, 'ar')"><i class="fa fa-print"></i><span>وصل ع</span></button>
-        <button class="btn btn-outline" onclick="openPrintModal(${o.rowIndex}, 'he')"><i class="fa fa-print"></i><span>وصل هـ</span></button>
-      </div>
-    </div>`;
+        <div onclick="openEditModal(${o.rowIndex})">
+          <span class="customer-name">${safe(o.name)}</span>
+          <div class="customer-phone"><i class="fa fa-phone"></i> ${formatLocalPhone(o.phone)}</div>
+          <div class="offer-details">${safe(o.offer)}</div>
+          <div class="meta-line">
+            <span class="meta-tag">📍 ${safe(o.city)}</span>
+            <span class="meta-tag">₪${safe(o.price)}</span>
+            <span class="meta-tag">💳 ${safe(o.payment)}</span>
+            <span class="meta-tag">🚚 ${safe(o.delivery)}</span>
+          </div>
+        </div>
+        <div class="actions-grid">
+          <button class="btn btn-wa-ar" onclick="sendMsg(${o.rowIndex}, 'ar')"><i class="fa-brands fa-whatsapp"></i><span>عربي</span></button>
+          <button class="btn btn-wa-he" onclick="sendMsg(${o.rowIndex}, 'he')"><i class="fa-brands fa-whatsapp"></i><span>עברית</span></button>
+          <button class="btn btn-success" onclick="approve(${o.rowIndex})"><i class="fa fa-check"></i><span>اعتماد</span></button>
+          <button class="btn btn-outline" onclick="openEditModal(${o.rowIndex})"><i class="fa fa-edit"></i><span>تعديل</span></button>
+        </div>
+        <div class="actions-secondary">
+          <button class="btn btn-outline" onclick="openPrintModal(${o.rowIndex}, 'ar')"><i class="fa fa-print"></i><span>وصل ع</span></button>
+          <button class="btn btn-outline" onclick="openPrintModal(${o.rowIndex}, 'he')"><i class="fa fa-print"></i><span>وصل هـ</span></button>
+        </div>
+      </div>`;
   }).join('');
 }
 
+/**
+ * ✅ WhatsApp - نسخة مصححة نهائياً (بدون أخطاء const msg / بدون %0A داخل النص)
+ */
 async function sendMsg(row, lang) {
   const o = allOrders.find(x => x.rowIndex == row);
   if(!o) return;
 
   const paymentMethod = safe(o.payment) || (lang === "he" ? "תשלום במעמד המסירה" : "دفع عند الاستلام");
-  const note = safe(o.notes) ? (lang === "he" ? `%0A📝 הערה: ${safe(o.notes)}` : `%0A📝 ملاحظة: ${safe(o.notes)}`) : "";
-  const deliveryComp = safe(o.delivery) ? (lang === "he" ? `%0A🚚 חברת משלוח: ${safe(o.delivery)}` : `%0A🚚 شركة التوصيل: ${safe(o.delivery)}`) : "";
 
-  const msgRaw = (lang === 'ar')
-    ? ("أهلاً بك " + safe(o.name) + " في MAD Parfumeur 🖤%0A" +
-       "يسعدنا تأكيد طلبك المميز!%0A" +
-       "💎 العرض: " + safe(o.offer) + "%0A" +
-       "📍 العنوان: " + safe(o.city) + "%0A" +
-       "💰 السعر: " + safe(o.price) + " ₪%0A" +
-       "💳 الدفع: " + paymentMethod + (deliveryComp||"") + (note||"") + "%0A" +
-       "📞 هاتف التواصل: " + CUSTOMER_SERVICE_PHONE)
-    : ("שלום " + safe(o.name) + " 👋, תודה שהזמנת מ-MAD Parfumeur%0A" +
-       "📦 המוצר: " + safe(o.offer) + "%0A" +
-       "📍 כתובת: " + safe(o.city) + "%0A" +
-       "💰 מחיר: " + safe(o.price) + " ₪%0A" +
-       "💳 תשלום: " + paymentMethod + (deliveryComp||"") + "%0A" +
-       "📞 טלפון: " + CUSTOMER_SERVICE_PHONE);
+  const noteTxt = safe(o.notes)
+    ? (lang === "he" ? `\n📝 הערה: ${safe(o.notes)}` : `\n📝 ملاحظة: ${safe(o.notes)}`)
+    : "";
 
-  const url = `https://wa.me/${normalizePhoneForLink(o.phone)}?text=${encodeURIComponent(msgRaw)}`;
-  window.open(url, '_blank');
+  const deliveryTxt = safe(o.delivery)
+    ? (lang === "he" ? `\n🚚 חברת משלוח: ${safe(o.delivery)}` : `\n🚚 شركة التوصيل: ${safe(o.delivery)}`)
+    : "";
+
+  const msg = (lang === "ar")
+    ? `أهلاً بك ${safe(o.name)} في MAD Parfumeur 🖤
+يسعدنا تأكيد طلبك المميز!
+💎 العرض: ${safe(o.offer)}
+📍 العنوان: ${safe(o.city)}
+💰 السعر: ${safe(o.price)} ₪
+💳 الدفع: ${paymentMethod}${deliveryTxt}${noteTxt}
+📞 هاتف التواصل: ${CUSTOMER_SERVICE_PHONE}`
+    : `שלום ${safe(o.name)} 👋, תודה שהזמנת מ-MAD Parfumeur
+📦 המוצר: ${safe(o.offer)}
+📍 כתובת: ${safe(o.city)}
+💰 מחיר: ${safe(o.price)} ₪
+💳 תשלום: ${paymentMethod}${deliveryTxt}${noteTxt}
+📞 טלפון: ${CUSTOMER_SERVICE_PHONE}`;
+
+  const wa = `https://wa.me/${normalizePhoneForLink(o.phone)}?text=${encodeURIComponent(msg)}`;
+  window.open(wa, "_blank");
 }
 
 async function approve(row) {
@@ -348,8 +356,8 @@ async function approve(row) {
   const o = allOrders.find(x => x.rowIndex == row);
   const p = new URLSearchParams({
     action: "updateOrder", key: DASH_KEY, row: row,
-    offer: safe(o.offer), name: safe(o.name), phone: safe(o.phone), 
-    city: safe(o.city), notes: safe(o.notes), 
+    offer: safe(o.offer), name: safe(o.name), phone: safe(o.phone),
+    city: safe(o.city), notes: safe(o.notes),
     delivery: safe(o.delivery), payment: safe(o.payment), price: safe(o.price),
     status: "بانتظار الإرسال للتجهيز"
   });
@@ -357,7 +365,10 @@ async function approve(row) {
     await fetch(`${SCRIPT_URL}?${p.toString()}`);
     showToast("تم الاعتماد بنجاح ✨");
     load();
-  } catch(e) { showToast("فشل التحديث"); showLoading(false); }
+  } catch(e) {
+    showToast("فشل التحديث");
+    showLoading(false);
+  }
 }
 
 function openAddModal() {
@@ -371,6 +382,8 @@ function openAddModal() {
   document.getElementById('f_price').value = "";
   document.getElementById('f_city').value = "";
   document.getElementById('f_notes').value = "";
+  document.getElementById('f_payment').value = "دفع عند الاستلام";
+  document.getElementById('f_delivery').value = "";
   document.getElementById('orderModal').classList.add('show');
 }
 
@@ -394,9 +407,10 @@ function openEditModal(row) {
 async function saveOrder() {
   const isAdd = (editingRow === null);
   showLoading(true);
+
   const payload = {
-    action: isAdd ? "addOrder" : "updateOrder", 
-    key: DASH_KEY, 
+    action: isAdd ? "addOrder" : "updateOrder",
+    key: DASH_KEY,
     row: isAdd ? "" : editingRow,
     name: safe(document.getElementById('f_name').value),
     phone: safe(document.getElementById('f_phone').value),
@@ -408,6 +422,7 @@ async function saveOrder() {
     delivery: safe(document.getElementById('f_delivery').value),
     status: "NEW"
   };
+
   try {
     const res = await fetch(`${SCRIPT_URL}?` + new URLSearchParams(payload).toString());
     const data = await res.json();
@@ -415,25 +430,34 @@ async function saveOrder() {
       showToast(isAdd ? "تمت إضافة الطلب بنجاح ✨" : "تم الحفظ بنجاح ✨");
       closeModal('orderModal');
       load();
+    } else {
+      showToast("فشل الحفظ");
+      showLoading(false);
     }
-  } catch(e) { showToast("فشل الحفظ"); showLoading(false); }
+  } catch(e) {
+    showToast("فشل الحفظ");
+    showLoading(false);
+  }
 }
 
 function openPrintModal(row, lang) {
-    const o = allOrders.find(x => x.rowIndex == row);
-    if (!o) return;
-    const now = new Date();
-    document.getElementById('p_date').textContent = `DATE: ${now.getDate()}.${now.getMonth()+1}.${now.getFullYear()}`;
-    document.getElementById('p_ord').textContent = "ORD: MAD-" + (safe(o.orderId) || "00000");
-    document.getElementById('p_total').textContent = safe(o.price) || "0";
-    document.getElementById('p_qr').src = `https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=https://wa.me/${normalizePhoneForLink(o.phone)}`;
-    document.getElementById('p_footer_phone').textContent = formatLocalPhone(o.phone);
-    const c = document.getElementById('p_content_lang');
-    c.style.direction = "rtl";
-    c.innerHTML = lang === 'ar' ? 
-      `<strong>الاسم:</strong> ${safe(o.name)}<br><strong>الهاتف:</strong> ${formatLocalPhone(o.phone)}<br><strong>العنوان:</strong> ${safe(o.city)}<br><strong>التوصيل:</strong> ${safe(o.delivery)}<br><strong>الدفع:</strong> ${safe(o.payment)}<br><strong>الأصناف:</strong> ${safe(o.offer)}` :
-      `<strong>לכבוד:</strong> ${safe(o.name)}<br><strong>טלפון:</strong> ${formatLocalPhone(o.phone)}<br><strong>כתובת:</strong> ${safe(o.city)}<br><strong>משלוח:</strong> ${safe(o.delivery)}<br><strong>תשלום:</strong> ${safe(o.payment)}<br><strong>פריטים:</strong> ${safe(o.offer)}`;
-    document.getElementById('printModal').classList.add('show');
+  const o = allOrders.find(x => x.rowIndex == row);
+  if (!o) return;
+
+  const now = new Date();
+  document.getElementById('p_date').textContent = `DATE: ${now.getDate()}.${now.getMonth()+1}.${now.getFullYear()}`;
+  document.getElementById('p_ord').textContent = "ORD: MAD-" + (safe(o.orderId) || "00000");
+  document.getElementById('p_total').textContent = safe(o.price) || "0";
+  document.getElementById('p_qr').src = `https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=https://wa.me/${normalizePhoneForLink(o.phone)}`;
+  document.getElementById('p_footer_phone').textContent = formatLocalPhone(o.phone);
+
+  const c = document.getElementById('p_content_lang');
+  c.style.direction = "rtl";
+  c.innerHTML = (lang === 'ar')
+    ? `<strong>الاسم:</strong> ${safe(o.name)}<br><strong>الهاتف:</strong> ${formatLocalPhone(o.phone)}<br><strong>العنوان:</strong> ${safe(o.city)}<br><strong>التوصيل:</strong> ${safe(o.delivery)}<br><strong>الدفع:</strong> ${safe(o.payment)}<br><strong>الأصناف:</strong> ${safe(o.offer)}`
+    : `<strong>לכבוד:</strong> ${safe(o.name)}<br><strong>טלפון:</strong> ${formatLocalPhone(o.phone)}<br><strong>כתובת:</strong> ${safe(o.city)}<br><strong>משלוח:</strong> ${safe(o.delivery)}<br><strong>תשלום:</strong> ${safe(o.payment)}<br><strong>פריטים:</strong> ${safe(o.offer)}`;
+
+  document.getElementById('printModal').classList.add('show');
 }
 
 function closeModal(id) { document.getElementById(id).classList.remove('show'); }
@@ -442,4 +466,3 @@ window.onload = load;
 </script>
 </body>
 </html>
-```
