@@ -3,107 +3,136 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=0"/>
-  <title>MAD Prep | מדבקות 10x10</title>
+  <title>MAD Prep Station | תחנת הכנה</title>
   
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
   <style>
-    /* الإعدادات العامة للواجهة */
-    :root { --bg: #f1f5f9; --card: #ffffff; --primary: #000; }
-    body { margin: 0; font-family: 'Segoe UI', Arial; background: var(--bg); }
-    .header { background: #000; color: #fff; padding: 15px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 10;}
-    .container { padding: 12px; max-width: 500px; margin: auto; }
-    .prep-card { background: #fff; border-radius: 12px; padding: 15px; margin-bottom: 12px; border: 1px solid #ddd; }
-    .item-list { background: #000; color: #fff; padding: 10px; border-radius: 8px; font-weight: 900; font-size: 20px; margin: 10px 0; text-align: center; }
-    .btn { width: 100%; padding: 15px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; margin-bottom: 8px; font-size: 16px; display: flex; align-items: center; justify-content: center; gap: 10px; }
-    .btn-print { background: #2563eb; color: #fff; }
-    .btn-ready { background: #16a34a; color: #fff; }
+    :root {
+      --bg: #f8fafc;
+      --card: #ffffff;
+      --primary: #000000;
+      --success: #16a34a;
+      --text: #1e293b;
+      --border: #e2e8f0;
+      /* צבעי כפתורים חדשים */
+      --btn-print-bg: linear-gradient(135deg, #3b82f6, #2563eb);
+      --btn-ready-bg: linear-gradient(135deg, #22c55e, #15803d);
+    }
 
-    /* =========================================
-       إعدادات الطباعة الإجبارية (10سم * 10سم)
-       ========================================= */
+    body {
+      margin: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: var(--bg); color: var(--text); padding-bottom: 70px;
+    }
+
+    .header {
+      background: var(--primary); color: white; padding: 15px;
+      position: sticky; top: 0; z-index: 100; display: flex;
+      justify-content: space-between; align-items: center;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    .container { padding: 12px; max-width: 600px; margin: auto; }
+
+    .prep-card {
+      background: var(--card); border-radius: 12px; padding: 15px;
+      margin-bottom: 15px; border: 1px solid var(--border);
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+    }
+    .prep-header { display: flex; justify-content: space-between; border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 10px; }
+    .order-num { font-weight: 900; font-size: 22px; color: #000; }
+    
+    .item-list { background: #fff1f2; padding: 12px; border-radius: 8px; font-weight: 800; font-size: 19px; margin: 10px 0; color: #e11d48; border-right: 4px solid #e11d48; }
+    
+    .btn {
+      padding: 14px; border-radius: 10px; border: none; font-weight: bold;
+      display: flex; align-items: center; justify-content: center; gap: 8px; 
+      cursor: pointer; transition: transform 0.1s, opacity 0.2s;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+    }
+    .btn:active { transform: scale(0.98); }
+
+    .btn-print { 
+        background: var(--btn-print-bg); 
+        color: white; width: 100%; margin-bottom: 10px; font-size: 16px;
+        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+    }
+    .btn-ready { 
+        background: var(--btn-ready-bg); 
+        color: white; width: 100%; font-size: 16px;
+        box-shadow: 0 4px 12px rgba(21, 128, 61, 0.3);
+    }
+
+    /* הגדרות הדפסה בגודל 98x98 מ"מ */
     @media print {
-      /* إخفاء كل شيء في الصفحة ما عدا منطقة الملصق */
       body * { visibility: hidden; }
       #printSection, #printSection * { visibility: visible; }
-      
-      @page {
-        size: 100mm 100mm; /* حجم الورقة إجباري */
-        margin: 0;        /* إلغاء الهوامش */
-      }
-
       #printSection {
-        position: fixed;
-        left: 0; top: 0;
-        width: 100mm;
-        height: 100mm;
-        padding: 5mm;
-        box-sizing: border-box;
-        background: #fff;
-        color: #000;
-        visibility: visible;
-        display: flex !important;
-        flex-direction: column;
-        justify-content: space-between;
-        border: none;
-        page-break-after: avoid;
-        page-break-before: avoid;
+        position: absolute; left: 0; top: 0;
+        width: 98mm; height: 98mm;
+        padding: 5mm; box-sizing: border-box;
+        border: 1px solid #000; direction: rtl;
+        display: flex; flex-direction: column; justify-content: space-between;
       }
-      
-      .no-print { display: none !important; }
+      @page { size: 98mm 98mm; margin: 0; }
+      .no-print { display: none; }
     }
 
-    /* شكل الملصق المجهز للطباعة (مخفي في الواجهة) */
-    #printSection {
-      display: none;
-      direction: rtl;
-      font-family: Arial, sans-serif;
+    .label-box {
+      width: 98mm; height: 98mm; border: 1px solid #000; padding: 10px;
+      display: none; 
+      font-family: Arial, sans-serif; background: white; color: black;
     }
-    .label-header { border-bottom: 3px solid #000; padding-bottom: 5px; text-align: center; }
-    .label-body { flex-grow: 1; padding: 5mm 0; }
-    .label-footer { border-top: 2px solid #000; padding-top: 3px; text-align: center; font-size: 12px; font-weight: bold; }
-    .big-id { font-size: 32px; font-weight: 900; display: block; margin-bottom: 5px; }
-    .delivery-badge { border: 2px solid #000; padding: 2px 8px; font-size: 18px; font-weight: 900; display: inline-block; }
+    .label-header { text-align: center; border-bottom: 2px solid #000; padding-bottom: 5px; }
+    .label-body { margin-top: 10px; font-size: 16px; flex-grow: 1; }
+    .label-footer { text-align: center; font-size: 12px; border-top: 1px solid #000; padding-top: 5px; }
+    
+    .bottom-nav {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      background: white; display: flex; border-top: 1px solid var(--border);
+      box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+    }
+    .nav-item { flex: 1; text-align: center; padding: 12px; color: #64748b; text-decoration: none; font-size: 14px; }
+    .nav-item.active { color: #2563eb; font-weight: bold; }
   </style>
 </head>
 <body>
 
 <div class="header">
-  <div style="font-weight:900;">MAD <span style="color:#22c55e">PREP</span></div>
-  <button onclick="load()" style="background:none; border:none; color:#fff;"><i class="fa fa-sync"></i></button>
+  <div style="font-weight: 900; letter-spacing: 1px;">MAD <span style="color:#22c55e">PREP STATION</span></div>
+  <div id="status" style="font-size: 12px; background: rgba(255,255,255,0.2); padding: 4px 8px; border-radius: 4px;">טוען...</div>
 </div>
 
-<div class="container" id="ordersList">
-  <div style="text-align:center; padding:50px;">טוען הזמנות...</div>
+<div class="container" id="ordersList"></div>
+
+<div class="bottom-nav">
+  <a href="#" class="nav-item active" onclick="load('Approved')"><i class="fa fa-box-open"></i><br>להכנה</a>
+  <a href="#" class="nav-item" onclick="load('READY')"><i class="fa fa-check-double"></i><br>מוכן</a>
+  <a href="#" class="nav-item" onclick="window.location.reload()"><i class="fa fa-sync"></i><br>רענן</a>
 </div>
 
-<div id="printSection">
+<div id="printSection" class="label-box">
   <div class="label-header">
-    <div style="font-size: 26px; font-weight: 900;">MAD Parfumeur</div>
-    <div id="p_delivery" class="delivery-badge"></div>
+    <h1 style="margin:0; font-size: 24px;">MAD Parfumeur</h1>
+    <div id="p_delivery" style="font-weight: bold; font-size: 18px; border: 1px solid #000; display: inline-block; padding: 2px 10px;"></div>
   </div>
-  
   <div class="label-body">
-    <span class="big-id">#<span id="p_id"></span></span>
-    
-    <div style="font-size: 18px; line-height: 1.4;">
-      <strong>לקוח:</strong> <span id="p_name"></span><br>
-      <strong>טלפון:</strong> <span id="p_phone"></span><br>
-      <strong>כתובת:</strong> <span id="p_addr"></span>
+    <div style="font-size: 22px; font-weight: 900;">הזמנה: <span id="p_id"></span></div>
+    <div style="margin-top: 8px;">
+        <strong>לקוח:</strong> <span id="p_name"></span><br>
+        <strong>טלפון:</strong> <span id="p_phone"></span><br>
+        <strong>כתובת:</strong> <span id="p_addr"></span>
     </div>
-
-    <div style="margin-top: 10px; border: 2px solid #000; padding: 5px; background: #eee;">
-      <strong>מוצרים:</strong><br>
-      <div id="p_offer" style="font-size: 22px; font-weight: 900; word-wrap: break-word;"></div>
+    <div style="margin-top: 10px; padding: 5px; border: 2px dashed #000; min-height: 80px;">
+        <strong>מוצרים:</strong><br>
+        <div id="p_offer" style="font-size: 19px; font-weight: bold;"></div>
+    </div>
+    <div style="margin-top: 8px; font-size: 20px; font-weight: bold; text-align: center; background: #eee;">
+        לתשלום: <span id="p_price"></span> ₪ | <span id="p_payment"></span>
     </div>
   </div>
-
-  <div style="text-align: center; font-size: 20px; font-weight: 900; margin-bottom: 5px;">
-    לתשלום: <span id="p_price"></span> ₪ | <span id="p_payment"></span>
-  </div>
-
   <div class="label-footer">
-    MAD Parfumeur | www.mad-parfumeur.com | *9935
+    תודה שבחרת MAD Parfumeur | שירות לקוחות: *9935
   </div>
 </div>
 
@@ -111,72 +140,85 @@
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyLjLFa8AaH82Ip7m747WC-KSUUEaU_M70S0I9Mda14XbnmcuEfZ7pBnF_zzJYZuXmZ/exec";
 const DASH_KEY = "12345678";
 
-async function load() {
+let allOrders = [];
+
+async function load(filterStatus = 'Approved') {
+  document.getElementById('status').textContent = "מעדכן...";
+  
+  // עדכון ויזואלי של התפריט התחתון
+  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+  if(filterStatus === 'Approved') document.querySelectorAll('.nav-item')[0].classList.add('active');
+  if(filterStatus === 'READY') document.querySelectorAll('.nav-item')[1].classList.add('active');
+
   try {
     const res = await fetch(`${SCRIPT_URL}?action=get&_=${Date.now()}`);
     const data = await res.json();
-    // إظهار فقط الطلبات المعتمدة (Approved)
-    const filtered = data.filter(o => (o.status || "").includes('Approved'));
-    render(filtered);
-  } catch (e) { alert("שגיאת חיבור"); }
+    allOrders = data.filter(o => {
+        const s = (o.status || "").toLowerCase();
+        if(filterStatus === 'Approved') return s.includes('approved');
+        if(filterStatus === 'READY') return s.includes('ready');
+        return false;
+    });
+    render();
+    document.getElementById('status').textContent = "עודכן";
+  } catch (e) {
+    document.getElementById('status').textContent = "שגיאה";
+  }
 }
 
-function render(orders) {
+function render() {
   const container = document.getElementById('ordersList');
-  if(orders.length === 0) {
-    container.innerHTML = `<div style="text-align:center; padding:40px; color:#64748b;">אין הזמנות חדשות להכנה ✅</div>`;
-    return;
+  if(allOrders.length === 0) {
+      container.innerHTML = '<div style="text-align:center; margin-top:50px; color:#94a3b8;">אין הזמנות חדשות</div>';
+      return;
   }
-  
-  container.innerHTML = orders.map(o => `
+  container.innerHTML = allOrders.map(o => `
     <div class="prep-card">
-      <div style="display:flex; justify-content:space-between; align-items:center;">
-        <span style="font-size:22px; font-weight:900;">#${o.orderId}</span>
-        <span style="font-weight:bold; color:#2563eb;">${o.delivery || 'משלוח'}</span>
+      <div class="prep-header">
+        <span class="order-num">#${o.orderId}</span>
+        <span style="font-weight:bold; background:#e2e8f0; padding:2px 8px; border-radius:4px; font-size:14px;">${o.delivery || 'משלוח רגיל'}</span>
       </div>
-      <div style="margin:10px 0;">
-        <strong>${o.name}</strong> | ${o.phone}
+      <div>
+        <strong style="font-size:18px;">${o.name}</strong> | ${o.phone}
+        <div class="item-list">${o.offer}</div>
+        <div style="font-size:14px; color:#64748b; margin-top:5px;"><i class="fa fa-map-marker-alt"></i> ${o.addr || o.city || 'לא צוין'}</div>
       </div>
-      <div class="item-list">${o.offer}</div>
-      <button class="btn btn-print" onclick="printLabel(${o.rowIndex})"><i class="fa fa-print"></i> הדפס מדבקה 10x10</button>
-      <button class="btn btn-ready" onclick="markReady(${o.rowIndex})"><i class="fa fa-check"></i> סיים הכנה</button>
+      <div style="margin-top:20px;">
+        <button class="btn btn-print" onclick="printLabel(${o.rowIndex})"><i class="fa fa-print"></i> הדפס מדבקה (98x98)</button>
+        <button class="btn btn-ready" onclick="markReady(${o.rowIndex})"><i class="fa fa-check"></i> סמן כהושלם (מוכן)</button>
+      </div>
     </div>
   `).join('');
 }
 
 function printLabel(rowIndex) {
-  // جلب البيانات من مصفوفة الطلبات الأصلية المخزنة (أو طلبها من السيرفر)
-  // للتبسيط سنقوم بالبحث في العناصر الظاهرة أو إعادة جلب البيانات
-  fetch(`${SCRIPT_URL}?action=get`).then(r => r.json()).then(data => {
-    const o = data.find(x => x.rowIndex == rowIndex);
-    if(!o) return;
+  const o = allOrders.find(x => x.rowIndex == rowIndex);
+  if(!o) return;
 
-    document.getElementById('p_id').textContent = o.orderId;
-    document.getElementById('p_name').textContent = o.name;
-    document.getElementById('p_phone').textContent = o.phone;
-    document.getElementById('p_addr').textContent = o.addr || o.city || "";
-    document.getElementById('p_offer').textContent = o.offer;
-    document.getElementById('p_price').textContent = o.price;
-    document.getElementById('p_delivery').textContent = o.delivery || "משלוח";
-    
-    // تحويل الدفع للعبرية
-    let pay = o.payment;
-    if(pay === "نقداً" || pay === "Cash") pay = "מזומן";
-    else if(pay === "مدفوع" || pay === "Paid") pay = "שולם";
-    document.getElementById('p_payment').textContent = pay;
+  document.getElementById('p_id').textContent = o.orderId;
+  document.getElementById('p_name').textContent = o.name;
+  document.getElementById('p_phone').textContent = o.phone;
+  document.getElementById('p_addr').textContent = o.addr || o.city || "";
+  document.getElementById('p_offer').textContent = o.offer;
+  document.getElementById('p_price').textContent = o.price;
+  document.getElementById('p_delivery').textContent = o.delivery || "משלוח";
+  
+  let payHe = o.payment;
+  if(payHe === "نقداً" || payHe === "Cash") payHe = "מזומן";
+  if(payHe === "مدفوع" || payHe === "Paid") payHe = "שולם";
+  document.getElementById('p_payment').textContent = payHe;
 
-    window.print();
-  });
+  window.print();
 }
 
 async function markReady(row) {
-  if(!confirm("האם סיימת לארוז? ההזמנה תעבור לסטטוס מוכן")) return;
+  if(!confirm("האם ההזמנה מוכנה למשלוח?")) return;
   const url = `${SCRIPT_URL}?action=updateStatus&key=${DASH_KEY}&row=${row}&status=${encodeURIComponent("READY ✅ (מוכן / مجهز)")}`;
   await fetch(url);
-  load();
+  load('Approved');
 }
 
-window.onload = load;
+window.onload = () => load('Approved');
 </script>
 
 </body>
