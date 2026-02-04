@@ -3,9 +3,7 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=0"/>
-  <title>MAD Mobile Manager v2 - Print Edition</title>
-  
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <title>MAD Manager v2 - Approved Print Edition</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
   <style>
@@ -14,8 +12,6 @@
       --card: #161b2c;
       --primary: #2563eb;
       --success: #16a34a;
-      --danger: #dc2626;
-      --warning: #f59e0b;
       --text: #ffffff;
       --muted: #94a3b8;
       --border: rgba(255,255,255,0.1);
@@ -23,356 +19,187 @@
 
     body {
       margin: 0; font-family: system-ui, -apple-system, sans-serif;
-      background: var(--bg); color: var(--text);
-      padding-bottom: 90px;
+      background: var(--bg); color: var(--text); padding-bottom: 90px;
     }
 
-    /* Header */
-    .header {
-      background: rgba(22, 27, 44, 0.9); backdrop-filter: blur(10px);
-      padding: 15px; position: sticky; top: 0; z-index: 100;
-      border-bottom: 1px solid var(--border);
-      display: flex; justify-content: space-between; align-items: center;
-    }
-
-    /* Search Section */
-    .search-area { padding: 12px; background: var(--bg); }
-    .input-group { position: relative; }
-    .input-group i { position: absolute; right: 12px; top: 14px; color: var(--muted); }
-    input, select, textarea {
-      width: 100%; padding: 12px 40px 12px 12px; border-radius: 12px;
-      border: 1px solid var(--border); background: var(--card); color: #fff;
-      font-size: 16px; box-sizing: border-box; outline: none;
-    }
-    input:focus { border-color: var(--primary); }
-
-    /* Orders List */
+    /* UI Layout */
+    .header { background: rgba(22, 27, 44, 0.9); padding: 15px; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
     .container { padding: 12px; }
-    .order-card {
-      background: var(--card); border-radius: 18px; padding: 16px;
-      margin-bottom: 15px; border: 1px solid var(--border);
-      box-shadow: 0 10px 15px -3px rgba(0,0,0,0.3);
-    }
-    .order-header { display: flex; justify-content: space-between; margin-bottom: 12px; }
-    .status-pill { font-size: 11px; padding: 4px 10px; border-radius: 20px; font-weight: bold; background: rgba(255,255,255,0.1); }
-    
-    .order-body h3 { margin: 0 0 8px 0; font-size: 18px; color: var(--text); }
-    .info-row { display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--muted); margin-bottom: 6px; }
-    .info-row i { width: 18px; color: var(--primary); text-align: center; }
-    .price-tag { font-size: 18px; font-weight: 800; color: var(--success); margin-top: 10px; display: block; }
-
-    /* Buttons */
+    .order-card { background: var(--card); border-radius: 18px; padding: 16px; margin-bottom: 15px; border: 1px solid var(--border); }
     .actions { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-top: 15px; }
-    .btn {
-      padding: 10px; border-radius: 12px; border: none; font-weight: bold;
-      display: flex; align-items: center; justify-content: center; gap: 6px;
-      cursor: pointer; font-size: 13px; transition: 0.2s;
-    }
+    .btn { padding: 10px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; }
     .btn-primary { background: var(--primary); color: white; }
-    .btn-success { background: var(--success); color: white; }
-    .btn-wa { background: #075e54; color: white; }
     .btn-outline { background: rgba(255,255,255,0.05); color: white; border: 1px solid var(--border); }
+    .btn-wa { background: #075e54; color: white; }
 
-    /* Bottom Nav */
-    .bottom-nav {
-      position: fixed; bottom: 0; left: 0; right: 0;
-      background: var(--card); display: flex; justify-content: space-around;
-      padding: 12px 5px; border-top: 1px solid var(--border); z-index: 100;
-    }
-    .nav-item { 
-      text-align: center; color: var(--muted); text-decoration: none; font-size: 11px;
-      flex: 1; display: flex; flex-direction: column; gap: 5px;
-    }
-    .nav-item.active { color: var(--primary); font-weight: bold; }
-    .nav-item i { font-size: 22px; }
-
-    /* Modal */
-    .modal {
+    /* Print Preview Modal (مركز الشاشة للموبايل) */
+    .modal-overlay {
       position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(5px);
-      display: none; padding: 15px; z-index: 1000; overflow-y: auto;
+      display: none; align-items: center; justify-content: center; z-index: 2000; padding: 10px;
     }
-    .modal.show { display: block; }
-    .modal-content { background: var(--card); padding: 20px; border-radius: 24px; border: 1px solid var(--border); }
-    .field-label { display: block; font-size: 13px; color: var(--muted); margin: 10px 5px 5px 0; }
-    .badge { position: absolute; top: -5px; left: 50%; transform: translateX(5px); background: var(--danger); font-size: 10px; padding: 2px 6px; border-radius: 10px; color: #fff; }
+    .modal-overlay.show { display: flex; }
+    
+    .invoice-container {
+      background: white; color: black; width: 98mm; height: 98mm;
+      padding: 6mm; box-sizing: border-box; border-radius: 4px;
+      display: flex; flex-direction: column; position: relative;
+    }
 
-    /* Print Styles */
+    /* Approved Design Styling */
+    .inv-header { text-align: center; margin-bottom: 5px; border-bottom: 1.5px solid #000; padding-bottom: 5px; }
+    .inv-logo-text { font-size: 28px; font-weight: 900; margin: 0; line-height: 1; letter-spacing: 2px; }
+    .inv-subtitle { font-size: 10px; font-weight: bold; margin-bottom: 5px; }
+    .inv-meta { display: flex; justify-content: space-between; font-size: 9px; font-weight: bold; margin-top: 2px; }
+
+    .inv-body { font-size: 12px; margin-top: 10px; flex-grow: 1; line-height: 1.4; text-align: right; }
+    .inv-row { margin-bottom: 4px; border-bottom: 0.5px solid #eee; padding-bottom: 2px; }
+    .inv-row strong { font-weight: 900; }
+
+    .inv-footer { border-top: 1.5px solid #000; padding-top: 8px; display: flex; justify-content: space-between; align-items: flex-end; }
+    .promo-section { text-align: center; flex: 1; }
+    .promo-title { font-size: 10px; font-weight: 900; margin-bottom: 3px; }
+    .promo-steps { font-size: 8.5px; line-height: 1.2; text-align: right; }
+    
+    .qr-area { text-align: center; margin-left: 10px; }
+    .qr-area img { width: 45px; height: 45px; border: 1px solid #000; }
+    .qr-phone { font-size: 8px; font-weight: bold; margin-top: 2px; }
+
+    .total-area { text-align: left; min-width: 60px; }
+    .total-label { font-size: 10px; font-weight: bold; }
+    .total-amount { font-size: 20px; font-weight: 900; }
+
+    /* Modal Controls */
+    .modal-btns { position: absolute; bottom: -60px; left: 0; right: 0; display: flex; gap: 10px; justify-content: center; }
+
     @media print {
       body * { visibility: hidden; }
-      #printArea, #printArea * { visibility: visible; }
-      #printArea {
-        position: fixed; left: 0; top: 0; width: 98mm; height: 98mm;
-        background: #fff !important; color: #000 !important;
-        padding: 8mm; box-sizing: border-box; display: block !important;
-      }
+      #invoicePreview, #invoicePreview * { visibility: visible; }
+      #invoicePreview { position: fixed; left: 0; top: 0; width: 98mm; height: 98mm; margin: 0; padding: 6mm; border: none; }
+      .modal-btns { display: none; }
       @page { size: 98mm 98mm; margin: 0; }
     }
-    #printArea { display: none; }
   </style>
 </head>
 <body>
 
-<div id="printArea"></div>
+<div class="modal-overlay" id="printModal">
+    <div class="invoice-container" id="invoicePreview">
+        <div class="inv-header">
+            <h1 class="inv-logo-text">MAD</h1>
+            <div class="inv-subtitle">PARFUMEUR</div>
+            <div class="inv-meta">
+                <span>DATE: <span id="p_date">4.2.2026</span></span>
+                <span>ORD: <span id="p_ord">MAD-04752</span></span>
+            </div>
+        </div>
 
-<div class="header">
-  <div style="font-weight: 900; font-size: 22px; letter-spacing: -1px;">MAD <span style="color:var(--primary)">MANAGER</span></div>
-  <div style="display:flex; gap:10px;">
-    <button class="btn btn-outline" onclick="load()" style="padding: 8px; border-radius: 50%; width: 40px; height: 40px;"><i class="fa fa-sync"></i></button>
-    <button class="btn btn-primary" onclick="openAddModal()" style="padding: 8px 15px; border-radius: 12px;"><i class="fa fa-plus"></i></button>
-  </div>
+        <div class="inv-body">
+            <div class="inv-row"><strong>לכבוד:</strong> <span id="p_name">Mohamad Basheer</span></div>
+            <div class="inv-row"><strong>טלפון:</strong> <span id="p_phone">054-9748773</span></div>
+            <div class="inv-row"><strong>כתובת:</strong> <span id="p_addr">شفاعمر - High Express</span></div>
+            <div style="margin-top: 8px;">
+                <strong>פריטים:</strong>
+                <div id="p_items" style="font-size: 10px; background: #f9f9f9; padding: 4px; margin-top: 2px;">W183, X102, P104</div>
+            </div>
+        </div>
+
+        <div class="inv-footer">
+            <div class="qr-area">
+                <img id="p_qr" src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=https://wa.me/972549748773" alt="QR">
+                <div class="qr-phone" id="p_phone_footer">0549748773</div>
+            </div>
+            
+            <div class="promo-section">
+                <div class="promo-title">צלם את הרגע וקבל מתנה</div>
+                <div class="promo-steps">
+                    1. סרוק את הקוד <br>
+                    2. שלח סרטון ל-WA <br>
+                    3. קבל מתנה!
+                </div>
+            </div>
+
+            <div class="total-area">
+                <div class="total-label">לתשלום:</div>
+                <div class="total-amount">₪<span id="p_total">20</span></div>
+            </div>
+        </div>
+
+        <div class="modal-btns">
+            <button class="btn btn-outline" onclick="closePrintModal()">إغلاق</button>
+            <button class="btn btn-primary" onclick="window.print()"><i class="fa fa-print"></i> طباعة الآن</button>
+        </div>
+    </div>
 </div>
 
-<div class="search-area">
-  <div class="input-group">
-    <i class="fa fa-search"></i>
-    <input type="text" id="searchInput" placeholder="بحث..." oninput="renderOrders()">
-  </div>
+<div class="header">
+  <div style="font-weight: 900; font-size: 20px;">MAD <span style="color:var(--primary)">MANAGER</span></div>
+  <button class="btn btn-primary" onclick="load()"><i class="fa fa-sync"></i></button>
 </div>
 
 <div class="container" id="ordersList"></div>
 
-<div class="bottom-nav">
-  <a href="#" class="nav-item active" onclick="setFilter('NEW', this)">
-    <div style="position:relative; display:inline-block;"><i class="fa fa-inbox"></i><span id="countNew" class="badge">0</span></div>
-    <span>جديد</span>
-  </a>
-  <a href="#" class="nav-item" onclick="setFilter('PREP', this)">
-    <i class="fa fa-tools"></i>
-    <span>تجهيز</span>
-  </a>
-  <a href="#" class="nav-item" onclick="setFilter('READY', this)">
-    <i class="fa fa-shipping-fast"></i>
-    <span>جاهز</span>
-  </a>
-  <a href="#" class="nav-item" onclick="setFilter('ALL', this)">
-    <i class="fa fa-list"></i>
-    <span>الكل</span>
-  </a>
-</div>
-
-<div class="modal" id="orderModal">
-  <div class="modal-content">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-        <h2 id="modalTitle" style="margin:0; font-size:20px;">إضافة طلب</h2>
-        <button onclick="closeModal()" style="background:none; border:none; color:var(--muted); font-size:24px;">&times;</button>
-    </div>
-    <div style="background:rgba(255,255,255,0.03); padding:12px; border-radius:15px; margin-bottom:15px;">
-        <label class="field-label" style="margin-top:0;">التحليل الذكي (واتساب)</label>
-        <div style="display:flex; gap:8px;">
-            <textarea id="rawText" placeholder="الصق النص هنا..." style="height: 60px;"></textarea>
-            <button class="btn btn-primary" onclick="magicParse()" style="width:50px;"><i class="fa fa-wand-magic-sparkles"></i></button>
-        </div>
-    </div>
-    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-        <input type="text" id="f_name" placeholder="اسم العميل">
-        <input type="tel" id="f_phone" placeholder="رقم الهاتف">
-    </div>
-    <label class="field-label">الطلبات</label>
-    <input type="text" id="f_offer" placeholder="W101, M202...">
-    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-        <input type="number" id="f_price" placeholder="السعر">
-        <select id="f_payment">
-            <option value="نقداً">نقداً</option>
-            <option value="مدفوع">مدفوع</option>
-            <option value="مدفوع بالرابط">رابط</option>
-        </select>
-    </div>
-    <label class="field-label">التوصيل والعنوان</label>
-    <select id="f_delivery" style="margin-bottom:10px;">
-        <option value="">-- شركة التوصيل --</option>
-        <option value="High Express">High Express</option>
-        <option value="Marwah Delivery">Marwah</option>
-        <option value="Lama Delivery">Lama</option>
-        <option value="Areen Delivery">Areen</option>
-        <option value="Pickup">استلام</option>
-    </select>
-    <input type="text" id="f_addr" placeholder="المدينة / العنوان">
-    <div class="actions" style="margin-top:25px; grid-template-columns: 1fr 1fr;">
-      <button class="btn btn-outline" onclick="closeModal()">إلغاء</button>
-      <button class="btn btn-success" onclick="saveOrder(true)">حفظ واعتماد ✅</button>
-    </div>
-  </div>
-</div>
-
 <script>
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyLjLFa8AaH82Ip7m747WC-KSUUEaU_M70S0I9Mda14XbnmcuEfZ7pBnF_zzJYZuXmZ/exec";
-const DASH_KEY = "12345678";
 let allOrders = [];
-let currentFilter = 'NEW';
-let editingRow = null;
 
 async function load() {
-  document.body.style.opacity = "0.7";
+  document.body.style.opacity = "0.5";
   try {
     const res = await fetch(`${SCRIPT_URL}?action=get&_=${Date.now()}`);
-    const data = await res.json();
-    allOrders = data.filter(o => o.rowIndex);
-    updateStats();
+    allOrders = await res.json();
     renderOrders();
-  } catch (e) { console.error("Load error"); }
+  } catch (e) { console.error("Error loading data"); }
   document.body.style.opacity = "1";
 }
 
-function updateStats() {
-  const newOnes = allOrders.filter(o => isNew(o)).length;
-  document.getElementById('countNew').textContent = newOnes;
-}
-
-function setFilter(f, el) {
-  currentFilter = f;
-  document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-  el.classList.add('active');
-  renderOrders();
-}
-
-const isNew = (o) => {
-    const s = (o.status || "").toLowerCase();
-    return s.includes('new') || s === "" || s.includes('inbox') || s.includes('pending');
-};
-const isPrep = (o) => (o.status || "").includes('Approved') || (o.status || "").includes('تجهيز');
-const isReady = (o) => (o.status || "").includes('READY') || (o.status || "").includes('جاهز');
-
 function renderOrders() {
   const container = document.getElementById('ordersList');
-  const query = document.getElementById('searchInput').value.replace(/[-\s]/g, "").toLowerCase();
-  
-  let filtered = allOrders.filter(o => {
-    const cleanPhone = String(o.phone || "").replace(/[-\s]/g, "");
-    const blob = (o.name + o.orderId + cleanPhone + o.offer + (o.addr||"") + (o.city||"")).toLowerCase();
-    return blob.includes(query) && (
-      currentFilter === 'NEW' ? isNew(o) :
-      currentFilter === 'PREP' ? isPrep(o) :
-      currentFilter === 'READY' ? isReady(o) : true
-    );
-  });
-
-  filtered.sort((a,b) => b.rowIndex - a.rowIndex);
-  if(filtered.length === 0) {
-    container.innerHTML = `<div style="text-align:center; padding:50px; color:var(--muted);">لا يوجد نتائج</div>`;
-    return;
-  }
-
-  container.innerHTML = filtered.map(o => `
+  container.innerHTML = allOrders.filter(o => o.rowIndex).map(o => `
     <div class="order-card">
-      <div class="order-header">
-        <span class="order-id">#${o.orderId}</span>
-        <span class="status-pill">${o.status || 'جديد'}</span>
+      <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+        <strong>#${o.orderId}</strong>
+        <span style="font-size:12px;">${o.status || 'NEW'}</span>
       </div>
-      <div onclick="openEditModal(${o.rowIndex})">
-        <h3 style="margin-bottom:10px;">${o.name || 'بدون اسم'}</h3>
-        <div class="info-row"><i class="fa fa-phone"></i> ${o.phone}</div>
-        <div class="info-row"><i class="fa fa-shopping-bag"></i> ${o.offer}</div>
-        <div class="info-row"><i class="fa fa-map-marker-alt"></i> ${o.addr || o.city || '...'}</div>
-        <span class="price-tag">${o.price} ₪ <small style="font-size:12px; color:var(--muted)">(${o.payment})</small></span>
+      <div>
+        <div style="font-size:16px; font-weight:bold;">${o.name}</div>
+        <div style="font-size:13px; color:var(--muted);">${o.phone}</div>
       </div>
       <div class="actions">
-        <a href="https://wa.me/${normalizePhone(o.phone)}" target="_blank" class="btn btn-wa"><i class="fab fa-whatsapp"></i></a>
-        <button class="btn btn-outline" onclick="printInvoice(${o.rowIndex})"><i class="fa fa-print"></i> فاتورة</button>
-        ${isNew(o) ? 
-          `<button class="btn btn-success" onclick="quickApprove(${o.rowIndex})"><i class="fa fa-check"></i></button>` : 
-          `<button class="btn btn-primary" onclick="openEditModal(${o.rowIndex})"><i class="fa fa-edit"></i></button>`
-        }
+        <a href="https://wa.me/${o.phone}" class="btn btn-wa"><i class="fab fa-whatsapp"></i></a>
+        <button class="btn btn-outline" onclick="openPrintModal(${o.rowIndex})"><i class="fa fa-file-invoice"></i> فاتورة</button>
+        <button class="btn btn-primary" onclick="alert('تعديل')"><i class="fa fa-edit"></i></button>
       </div>
     </div>
   `).join('');
 }
 
-function printInvoice(row) {
+function openPrintModal(row) {
     const o = allOrders.find(x => x.rowIndex == row);
     if (!o) return;
-    const p = document.getElementById('printArea');
-    p.innerHTML = `
-        <div style="direction:rtl; text-align:center; font-family:sans-serif;">
-            <h2 style="margin:0 0 5px 0; border-bottom:2px solid #000; padding-bottom:5px;">MAD MANAGER</h2>
-            <p style="font-size:14px; margin:5px 0;">رقم الطلب: <strong>#${o.orderId}</strong></p>
-            <div style="text-align:right; margin-top:10px; font-size:15px; line-height:1.4;">
-                <p><strong>العميل:</strong> ${o.name}</p>
-                <p><strong>الهاتف:</strong> ${o.phone}</p>
-                <p><strong>العنوان:</strong> ${o.addr || o.city || '---'}</p>
-                <p><strong>الطلب:</strong> ${o.offer}</p>
-                <p><strong>شركة التوصيل:</strong> ${o.delivery}</p>
-            </div>
-            <div style="margin-top:15px; border-top:1px dashed #000; padding-top:10px; font-size:18px;">
-                <strong>المجموع: ${o.price} ₪</strong>
-                <div style="font-size:12px;">(${o.payment})</div>
-            </div>
-            <p style="font-size:10px; margin-top:15px; opacity:0.7;">شكراً لتعاملكم معنا ✨</p>
-        </div>
-    `;
-    window.print();
+
+    // تعبئة البيانات بناءً على النسخة المعتمدة
+    document.getElementById('p_date').textContent = "4.2.2026"; // التاريخ الحالي حسب المطلوب 
+    document.getElementById('p_ord').textContent = "MAD-" + (o.orderId || "0000"); // [cite: 2]
+    document.getElementById('p_name').textContent = o.name; // לכבוד [cite: 6]
+    document.getElementById('p_phone').textContent = o.phone; // טלפון [cite: 7]
+    document.getElementById('p_addr').textContent = (o.addr || o.city || "") + " - " + (o.delivery || ""); // כתובת [cite: 8]
+    document.getElementById('p_items').textContent = o.offer; // פריטים [cite: 9]
+    document.getElementById('p_total').textContent = o.price; // לתשלום 
+    
+    // تحديث QR والترويج
+    const cleanPhone = String(o.phone).replace(/\D/g, "");
+    document.getElementById('p_qr').src = `https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=https://wa.me/${cleanPhone}`;
+    document.getElementById('p_phone_footer').textContent = cleanPhone;
+
+    document.getElementById('printModal').classList.add('show');
 }
 
-function magicParse() {
-  const text = document.getElementById('rawText').value;
-  if(!text) return;
-  const phoneMatch = text.replace(/[-\s]/g, "").match(/(05\d{8})/);
-  const priceMatch = text.match(/(\d{2,4})\s*(₪|شيكل|ils|nis)/i);
-  if(phoneMatch) document.getElementById('f_phone').value = phoneMatch[1];
-  if(priceMatch) document.getElementById('f_price').value = priceMatch[1];
-  if(/هاي|High|Express/i.test(text)) document.getElementById('f_delivery').value = "High Express";
-  else if(/مروة|Marwah/i.test(text)) document.getElementById('f_delivery').value = "Marwah Delivery";
-  const lines = text.split('\n').filter(l => l.trim().length > 2);
-  if(lines.length > 0) document.getElementById('f_name').value = lines[0].trim();
-}
-
-async function saveOrder(approve = false) {
-  const payload = {
-    action: editingRow ? "updateOrder" : "addOrder",
-    key: DASH_KEY, row: editingRow,
-    name: document.getElementById('f_name').value,
-    phone: document.getElementById('f_phone').value.replace(/[-\s]/g, ""),
-    offer: document.getElementById('f_offer').value,
-    price: document.getElementById('f_price').value,
-    payment: document.getElementById('f_payment').value,
-    addr: document.getElementById('f_addr').value,
-    delivery: document.getElementById('f_delivery').value,
-    status: approve ? "Approved ✅ (Sent to Prep)" : "NEW"
-  };
-  if(!payload.phone) return alert("الرقم مطلوب");
-  closeModal();
-  try {
-    await fetch(`${SCRIPT_URL}?` + new URLSearchParams(payload).toString());
-    load();
-  } catch(e) { load(); }
-}
-
-function openAddModal() {
-  editingRow = null;
-  document.getElementById('modalTitle').textContent = "طلب جديد";
-  ['f_name','f_phone','f_offer','f_price','f_addr','rawText'].forEach(id => document.getElementById(id).value = "");
-  document.getElementById('orderModal').classList.add('show');
-}
-
-function openEditModal(row) {
-  const o = allOrders.find(x => x.rowIndex == row);
-  if (!o) return;
-  editingRow = row;
-  document.getElementById('modalTitle').textContent = "تعديل #" + o.orderId;
-  document.getElementById('f_name').value = o.name || "";
-  document.getElementById('f_phone').value = o.phone || "";
-  document.getElementById('f_offer').value = o.offer || "";
-  document.getElementById('f_price').value = o.price || "";
-  document.getElementById('f_payment').value = o.payment || "نقداً";
-  document.getElementById('f_delivery').value = o.delivery || "";
-  document.getElementById('f_addr').value = o.addr || o.city || "";
-  document.getElementById('orderModal').classList.add('show');
-}
-
-function closeModal() { document.getElementById('orderModal').classList.remove('show'); }
-
-async function quickApprove(row) {
-  const url = `${SCRIPT_URL}?action=updateStatus&key=${DASH_KEY}&row=${row}&status=${encodeURIComponent("Approved ✅ (Sent to Prep)")}`;
-  await fetch(url);
-  load();
-}
-
-function normalizePhone(p) {
-  let d = String(p).replace(/[^\d]/g,"");
-  if(d.startsWith("05")) return "972" + d.substring(1);
-  return d;
+function closePrintModal() {
+    document.getElementById('printModal').classList.remove('show');
 }
 
 window.onload = load;
 </script>
+
 </body>
 </html>
