@@ -3,108 +3,64 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>MAD FINAL SYSTEM</title>
+  <title>MAD FINAL FIX</title>
   
   <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
   <style>
-    :root { 
-      --bg: #111116;       /* خلفية سوداء */
-      --card: #1c1c24;     /* لون الكروت */
-      --primary: #3b82f6;  /* أزرق */
-      --accent: #f59e0b;   /* ذهبي للطباعة */
-      --text: #ffffff;     
-      --green: #10b981;    /* للسعر */
-      --danger: #ef4444;   /* للتنبيهات */
-    }
-
+    :root { --bg: #000000; --card: #18181b; --primary: #3b82f6; --text: #fff; --accent: #f59e0b; }
+    
     body { margin: 0; font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); color: var(--text); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
 
-    /* --- شريط التنبيه الأحمر --- */
-    #alert-bar { 
-      display: none; background: var(--danger); color: white; text-align: center; 
-      padding: 12px; font-weight: 900; font-size: 1.1rem; cursor: pointer;
-      animation: flash 1s infinite; position: sticky; top: 0; z-index: 9999;
-    }
-    @keyframes flash { 50% { opacity: 0.5; } }
-
-    /* --- الهيدر (القائمة العلوية) --- */
-    .header { 
-      background: #18181b; padding: 15px 25px; border-bottom: 1px solid #333;
-      display: flex; align-items: center; justify-content: space-between;
-    }
-    .brand { font-size: 1.5rem; font-weight: 900; letter-spacing: 1px; color: #fff; }
+    /* --- الهيدر --- */
+    .header { background: #111; padding: 15px 20px; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
+    .brand { font-size: 1.5rem; font-weight: 900; color: #fff; letter-spacing: 1px; }
     
-    .tabs { display: flex; background: #27272a; padding: 5px; border-radius: 8px; gap: 5px; }
-    .tab { 
-      padding: 8px 20px; cursor: pointer; border-radius: 6px; font-weight: bold; color: #a1a1aa; 
-      transition: 0.3s; display: flex; align-items: center; gap: 8px;
-    }
+    .tabs { display: flex; gap: 10px; background: #222; padding: 5px; border-radius: 8px; }
+    .tab { padding: 8px 15px; cursor: pointer; border-radius: 5px; color: #888; font-weight: bold; }
     .tab.active { background: var(--primary); color: #fff; }
-    .badge { background: #000; padding: 2px 8px; border-radius: 10px; font-size: 0.8rem; }
+    
+    .search-box { flex: 1; max-width: 400px; margin: 0 20px; padding: 10px; border-radius: 5px; border: 1px solid #444; background: #000; color: #fff; font-weight: bold; }
 
-    .search-wrap { flex: 1; max-width: 400px; margin: 0 20px; }
-    .search-inp { 
-      width: 100%; padding: 10px 15px; border-radius: 8px; border: 1px solid #3f3f46; 
-      background: #000; color: #fff; font-weight: bold; outline: none;
-    }
-    .search-inp:focus { border-color: var(--primary); }
-
-    .btn { cursor: pointer; border: none; padding: 10px 20px; border-radius: 6px; font-weight: bold; color: white; transition: 0.2s; display: flex; align-items: center; gap: 8px; }
+    .btn { padding: 10px 20px; border-radius: 5px; font-weight: bold; cursor: pointer; border: none; color: #fff; display: flex; align-items: center; gap: 5px; }
     .btn-all { background: var(--accent); color: #000; }
-    .btn-refresh { background: #27272a; border: 1px solid #3f3f46; }
+    .btn-refresh { background: #333; }
 
-    /* --- منطقة العمل (الشبكة) --- */
+    /* --- منطقة العمل --- */
     .workspace { flex: 1; overflow-y: auto; padding: 20px; }
     .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 15px; }
 
-    /* --- تصميم الكرت (حسب الصورة المرفقة) --- */
-    .card { 
-      background: var(--card); border: 1px solid #27272a; border-radius: 10px; padding: 15px; 
-      position: relative; cursor: pointer; transition: transform 0.2s; 
-      display: flex; flex-direction: column; gap: 8px;
-    }
-    .card:hover { transform: translateY(-4px); border-color: var(--primary); background: #202029; }
+    .card { background: var(--card); border: 1px solid #333; border-radius: 10px; padding: 15px; cursor: pointer; position: relative; border-right: 4px solid transparent; }
+    .card:hover { border-color: var(--primary); background: #222; }
     
-    .card-top { display: flex; justify-content: space-between; font-size: 0.85rem; color: #71717a; font-weight: bold; border-bottom: 1px solid #27272a; padding-bottom: 8px; }
-    .card-name { font-size: 1.2rem; font-weight: 800; color: #fff; }
-    .card-phone { font-family: monospace; font-size: 1rem; color: #a1a1aa; direction: ltr; text-align: right; }
-    
-    .card-products { 
-      background: #101014; padding: 8px; border-radius: 6px; font-size: 0.9rem; 
-      color: #e4e4e7; line-height: 1.4; max-height: 60px; overflow: hidden; 
-    }
-    
-    .card-footer { display: flex; justify-content: space-between; align-items: center; margin-top: auto; }
-    .price-tag { color: var(--green); font-size: 1.3rem; font-weight: 900; }
-    .status-tag { font-size: 0.8rem; padding: 3px 8px; border-radius: 4px; background: #27272a; color: #aaa; }
-    .status-ready { background: var(--green); color: #fff; }
+    .card-top { display: flex; justify-content: space-between; color: #777; font-size: 0.9rem; margin-bottom: 5px; }
+    .card-name { font-size: 1.2rem; font-weight: 800; color: #fff; margin-bottom: 5px; }
+    .card-phone { font-family: monospace; color: #aaa; direction: ltr; text-align: right; }
+    .card-offer { background: #000; padding: 8px; border-radius: 5px; font-size: 0.9rem; margin-top: 10px; color: #ddd; max-height: 50px; overflow: hidden; }
+    .card-price { position: absolute; bottom: 15px; left: 15px; font-size: 1.2rem; font-weight: bold; color: #10b981; }
 
-    /* --- نافذة التعديل (Modal) --- */
+    /* --- المودال --- */
     .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 1000; justify-content: center; align-items: center; }
-    .modal-box { width: 95%; max-width: 1100px; height: 90vh; background: #fff; color: #000; display: flex; border-radius: 12px; overflow: hidden; }
-    .editor-pane { width: 35%; background: #f4f4f5; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
-    .preview-pane { width: 65%; background: #e4e4e7; display: flex; align-items: center; justify-content: center; padding: 20px; flex-direction: column; }
+    .modal-box { width: 95%; max-width: 1100px; height: 90vh; background: #fff; color: #000; border-radius: 10px; display: flex; overflow: hidden; }
+    .editor { width: 35%; background: #f4f4f5; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+    .preview { width: 65%; background: #e4e4e7; display: flex; align-items: center; justify-content: center; }
     
-    .inp-group label { display: block; font-weight: 700; font-size: 0.85rem; margin-bottom: 4px; }
-    .inp-group input, .inp-group textarea { width: 100%; padding: 10px; border: 1px solid #d4d4d8; border-radius: 6px; font-weight: 600; box-sizing: border-box; }
-    
-    .btn-print-modal { width: 100%; padding: 15px; background: #000; color: #fff; font-size: 1.2rem; margin-top: auto; border: none; cursor: pointer; font-weight: bold; border-radius: 8px; }
+    .inp-group label { display: block; font-weight: bold; font-size: 0.85rem; }
+    .inp-group input, .inp-group textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; font-weight: bold; }
+    .btn-print-big { width: 100%; padding: 15px; background: #000; color: #fff; font-size: 1.2rem; margin-top: auto; border: none; cursor: pointer; font-weight: bold; }
 
-    /* --- تصميم الملصق (10x10) - مطابق للصورة تماماً --- */
+    /* --- الملصق --- */
     .label-page { 
       width: 100mm; height: 100mm; background: #fff; color: #000; padding: 3mm; 
       box-sizing: border-box; border: 1px solid #ddd; display: flex; flex-direction: column; 
       position: relative; overflow: hidden; page-break-after: always; direction: rtl;
     }
-    
     .l-head { display: flex; justify-content: space-between; height: 20mm; align-items: flex-start; }
     .l-logo img { width: 35mm; }
     .l-meta { text-align: left; font-size: 9pt; font-weight: 800; line-height: 1.2; }
     
-    /* البانر الأسود والذهبي */
     .l-banner { 
       background: #18181b; color: #fbbf24; text-align: center; font-weight: 900; 
       font-size: 11pt; padding: 4px; margin: 1mm 0 3mm 0; border-radius: 4px;
@@ -113,59 +69,34 @@
     
     .l-info { font-size: 11pt; line-height: 1.35; margin-bottom: 2mm; }
     .l-info b { font-weight: 800; min-width: 50px; display: inline-block; }
-    
-    /* قائمة المنتجات */
-    .l-products { 
-      font-size: 9.5pt; font-weight: bold; line-height: 1.2; 
-      margin-bottom: 2mm; max-height: 15mm; overflow: hidden;
-    }
-    
-    /* مربع السعر الكبير */
-    .l-price-box { 
-      border: 3px solid #000; font-size: 22pt; font-weight: 900; 
-      text-align: center; padding: 2px; margin-bottom: 2mm; 
-    }
+    .l-products { font-size: 9.5pt; font-weight: bold; line-height: 1.2; margin-bottom: 2mm; max-height: 15mm; overflow: hidden; }
+    .l-price-box { border: 3px solid #000; font-size: 22pt; font-weight: 900; text-align: center; padding: 2px; margin-bottom: 2mm; }
     
     .l-footer { display: flex; justify-content: space-between; align-items: flex-end; margin-top: auto; border-top: 1px solid #000; padding-top: 2mm; }
-    .l-wa-text { 
-      font-size: 7.5pt; font-weight: 800; width: 68%; line-height: 1.2; 
-      background: #18181b; color: #fbbf24; padding: 5px; border-radius: 4px;
-    }
+    .l-wa-text { font-size: 7.5pt; font-weight: 800; width: 68%; line-height: 1.2; background: #18181b; color: #fbbf24; padding: 5px; border-radius: 4px; }
 
+    /* --- إعدادات الطباعة المصححة --- */
     #printArea { display: none; }
+    
     @media print {
-      body * { visibility: hidden !important; }
-      #printArea, #printArea * { visibility: visible !important; }
-      #printArea { position: absolute; left: 0; top: 0; width: 100%; }
+      /* إخفاء كل شيء ما عدا منطقة الطباعة */
+      body > *:not(#printArea) { display: none !important; }
+      #printArea { display: block !important; position: absolute; top: 0; left: 0; width: 100%; }
+      body { background: #fff; height: auto; overflow: visible; }
       @page { size: 100mm 100mm; margin: 0; }
-      .label-page { border: none; } 
+      .label-page { border: none; }
     }
   </style>
 </head>
 <body>
 
-<audio id="bell" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3"></audio>
-
-<div id="alert-bar" onclick="this.style.display='none'">🔔 يوجد طلبات جديدة! (اضغط للإخفاء)</div>
-
 <div class="header">
-  <div class="brand">MAD <span style="color:var(--primary)">SYSTEM</span></div>
-  
+  <div class="brand">MAD SYSTEM</div>
   <div class="tabs">
-    <div class="tab active" id="tab-pending" onclick="setTab('pending')">
-      <span>قيد التجهيز</span>
-      <span class="badge" id="count-pending">0</span>
-    </div>
-    <div class="tab" id="tab-all" onclick="setTab('all')">
-      <span>الأرشيف (الكل)</span>
-      <span class="badge" id="count-all">0</span>
-    </div>
+    <div class="tab active" id="tab-pending" onclick="setTab('pending')">قيد التجهيز <span id="c-pending">0</span></div>
+    <div class="tab" id="tab-all" onclick="setTab('all')">الأرشيف <span id="c-all">0</span></div>
   </div>
-
-  <div class="search-wrap">
-    <input class="search-inp" id="search" placeholder="بحث ذكي: 050 / اسم..." oninput="render()">
-  </div>
-
+  <input class="search-box" id="search" placeholder="بحث..." oninput="render()">
   <div style="display:flex; gap:10px">
     <button class="btn btn-refresh" onclick="loadData()">تحديث ↻</button>
     <button class="btn btn-all" onclick="printAll()">طباعة القائمة 🖨️</button>
@@ -178,29 +109,21 @@
 
 <div class="modal-overlay" id="editor">
   <div class="modal-box">
-    <div class="editor-pane" dir="rtl">
+    <div class="editor" dir="rtl">
       <div style="display:flex; justify-content:space-between">
-        <h2 style="margin:0">تعديل الطلب</h2>
-        <button onclick="closeModal()" style="border:none;background:none;font-size:1.5rem;cursor:pointer">✕</button>
+        <h2>تعديل الطلب</h2>
+        <button onclick="closeModal()" style="border:none;background:none;font-size:2rem;cursor:pointer">&times;</button>
       </div>
-      
-      <div class="inp-group"><label>الاسم:</label><input id="e_name" oninput="updatePreview()"></div>
-      <div class="inp-group"><label>الهاتف (سيتم تحويله تلقائياً):</label><input id="e_phone" oninput="updatePreview()"></div>
-      <div class="inp-group"><label>العنوان:</label><input id="e_city" oninput="updatePreview()"></div>
-      <div class="inp-group"><label>شركة الشحن:</label><input id="e_del" oninput="updatePreview()"></div>
-      
-      <div class="inp-group">
-        <label>المنتجات (Items):</label>
-        <textarea id="e_offer" oninput="updatePreview()" style="height:80px"></textarea>
-      </div>
-      
-      <div class="inp-group"><label>السعر (₪):</label><input id="e_price" type="number" style="font-size:1.2rem;color:green" oninput="updatePreview()"></div>
-      
-      <button class="btn-print-modal" onclick="printSingle()">طباعة (Enter) 🖨️</button>
+      <div class="inp-group"><label>الاسم</label><input id="e_name" oninput="updatePreview()"></div>
+      <div class="inp-group"><label>الهاتف (تلقائي)</label><input id="e_phone" oninput="updatePreview()"></div>
+      <div class="inp-group"><label>العنوان</label><input id="e_city" oninput="updatePreview()"></div>
+      <div class="inp-group"><label>الشحن</label><input id="e_del" oninput="updatePreview()"></div>
+      <div class="inp-group"><label>المنتجات</label><textarea id="e_offer" oninput="updatePreview()" style="height:80px"></textarea></div>
+      <div class="inp-group"><label>السعر ₪</label><input id="e_price" type="number" oninput="updatePreview()" style="font-size:1.2rem; color:green"></div>
+      <button class="btn-print-big" onclick="printSingle()">طباعة (Enter) 🖨️</button>
     </div>
-    
-    <div class="preview-pane">
-      <div id="livePreview" style="box-shadow: 0 10px 40px rgba(0,0,0,0.5);"></div>
+    <div class="preview">
+      <div id="livePreview"></div>
     </div>
   </div>
 </div>
@@ -208,97 +131,73 @@
 <div id="printArea"></div>
 
 <script>
-  // رابط السكربت وكلمة المرور
   const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyLjLFa8AaH82Ip7m747WC-KSUUEaU_M70S0I9Mda14XbnmcuEfZ7pBnF_zzJYZuXmZ/exec";
   const PASS = "12345678";
   
   let orders = [];
   let currentTab = 'pending';
   let currentIndex = null;
-  let lastCount = 0;
 
-  // 1. الدالة السحرية لإصلاح الأرقام (بدون 972)
-  // تحول أي رقم لصيغة محلية 05X-XXXXXXX
+  // 1. تحويل الرقم لـ 05X-XXXXXXX
   function formatPhone(input) {
-    let p = String(input || "").replace(/[^0-9]/g, ""); // حذف أي رموز
-    if (!p) return "";
-
-    // حالات دولية
-    if (p.startsWith("972")) p = "0" + p.slice(3);
-    if (p.startsWith("970")) p = "0" + p.slice(3);
+    let p = String(input || "").replace(/[^0-9]/g, "");
+    if(!p) return "";
     
-    // إذا بدأ بـ 5 وكان 9 أرقام (نسي الصفر)
-    if (p.startsWith("5") && p.length === 9) p = "0" + p;
-
-    // تنسيق مع شَرطة للجمال (اختياري)
-    if (p.length === 10) {
-      return p.slice(0,3) + "-" + p.slice(3);
-    }
+    // إزالة المقدمات الدولية
+    if(p.startsWith("972")) p = "0" + p.slice(3);
+    if(p.startsWith("970")) p = "0" + p.slice(3);
+    
+    // إصلاح أخطاء الكتابة (نسيان الصفر)
+    if(p.startsWith("5") && p.length === 9) p = "0" + p;
+    
+    // التنسيق الجمالي
+    if(p.length === 10) return p.slice(0,3) + "-" + p.slice(3);
     return p;
   }
 
-  // 2. التحقق والتحميل
+  // 2. التحميل
   (function(){
     if(localStorage.getItem('mad_auth') !== PASS) {
-      if(prompt("كلمة السر:") === PASS) localStorage.setItem('mad_auth', PASS);
-      else { document.body.innerHTML = "<h3 style='color:white;text-align:center;margin-top:50px'>دخول مرفوض</h3>"; return; }
+      if(prompt("Password:") === PASS) localStorage.setItem('mad_auth', PASS);
+      else { document.body.innerHTML="Access Denied"; return; }
     }
     loadData();
-    setInterval(loadData, 20000); // تحديث كل 20 ثانية
+    setInterval(loadData, 20000);
   })();
 
   async function loadData() {
     try {
       const res = await fetch(`${SCRIPT_URL}?action=get`);
       orders = await res.json();
-      
-      // التنبيه عند زيادة الطلبات الجديدة
-      const newPending = orders.filter(o => isPending(o)).length;
-      if(newPending > lastCount && lastCount !== 0) triggerAlert();
-      lastCount = newPending;
-
       render();
     } catch(e) {}
   }
 
-  function isPending(o) {
-    const st = (o.status || "").toLowerCase();
-    return (st.includes("prep") || st.includes("approved")) && !st.includes("ready");
-  }
-
-  function triggerAlert() {
-    const b = document.getElementById('alert-bar');
-    b.style.display = 'block';
-    document.getElementById('bell').play().catch(()=>{});
-    setTimeout(() => b.style.display='none', 8000);
-  }
-
   function setTab(t) {
     currentTab = t;
-    document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(e => e.classList.remove('active'));
     document.getElementById('tab-'+t).classList.add('active');
     render();
   }
 
-  // 3. عرض البيانات
   function render() {
-    const pendingList = orders.filter(isPending);
-    const allList = orders;
-
-    document.getElementById('count-pending').innerText = pendingList.length;
-    document.getElementById('count-all').innerText = allList.length;
-
-    let list = currentTab === 'pending' ? pendingList : allList;
+    const pendingList = orders.filter(o => {
+      const st = (o.status || "").toLowerCase();
+      return (st.includes("prep") || st.includes("approved")) && !st.includes("ready");
+    });
+    
+    document.getElementById('c-pending').innerText = pendingList.length;
+    document.getElementById('c-all').innerText = orders.length;
+    
+    let list = currentTab === 'pending' ? pendingList : orders;
     const q = document.getElementById('search').value.toLowerCase().trim();
-
-    // البحث الذكي
+    
     if(q) {
       list = list.filter(o => {
-        const p = formatPhone(o.phone).replace(/-/g, ""); // رقم نظيف
-        const qClean = q.replace(/-/g, "");
-        return (o.name||"").toLowerCase().includes(q) ||
+        const pClean = formatPhone(o.phone).replace(/-/g, "");
+        return (o.name||"").toLowerCase().includes(q) || 
                (o.orderId||"").toString().includes(q) ||
-               p.includes(qClean);
+               pClean.includes(q);
       });
     }
 
@@ -311,36 +210,27 @@
     grid.innerHTML = list.map(o => {
       const idx = orders.indexOf(o);
       const isReady = (o.status||"").includes("READY");
-      
-      // هنا نعرض شركة التوصيل والمنتجات كما طلبت
       return `
-        <div class="card" onclick="openEditor(${idx})" style="${isReady ? 'opacity:0.6' : ''}">
+        <div class="card" onclick="openEditor(${idx})" style="opacity:${isReady?0.6:1}">
           <div class="card-top">
             <span>#${o.orderId}</span>
-            <span style="color:var(--accent)">${o.delivery || 'High Express'}</span>
+            <span>${o.delivery || 'Standard'}</span>
           </div>
           <div class="card-name">${o.name}</div>
           <div class="card-phone">${formatPhone(o.phone)}</div>
-          <div class="card-products">📦 ${o.offer || 'لا يوجد وصف'}</div>
-          
-          <div class="card-footer">
-            <span class="status-tag ${isReady ? 'status-ready' : ''}">
-              ${isReady ? 'تم التجهيز (جاهز)' : 'قيد الانتظار'}
-            </span>
-            <span class="price-tag">₪${o.price}</span>
-          </div>
+          <div class="card-offer">📦 ${o.offer || '...'}</div>
+          <div class="card-price">₪${o.price}</div>
         </div>
       `;
     }).join("");
   }
 
-  // 4. تصميم الملصق (مطابق للصورة LOGO 10)
+  // 3. تصميم الملصق
   function getLabelHTML(o, idSuffix) {
     const date = new Date().toLocaleDateString('he-IL');
     const localPhone = formatPhone(o.phone);
     const cleanPhone = localPhone.replace(/-/g, ""); // للباركود
-    const waLink = `https://wa.me/972${cleanPhone.substring(1)}`; // واتساب دولي
-
+    
     return `
       <div class="label-page" dir="rtl">
         <div class="l-head">
@@ -350,26 +240,21 @@
             ORD: ${o.orderId}
           </div>
         </div>
-
         <div class="l-banner">
           <i class="fas fa-gift"></i> צלם את הרגע וקבל מתנה
         </div>
-
         <div class="l-info">
           <div><b>לכבוד:</b> ${o.name}</div>
-          <div><b>טלפון:</b> <span dir="ltr" style="font-family:monospace">${localPhone}</span></div>
+          <div><b>טלפון:</b> <span dir="ltr" style="font-family:monospace; font-weight:900">${localPhone}</span></div>
           <div><b>כתובת:</b> ${o.city}</div>
           <div><b>משלוח:</b> ${o.delivery}</div>
         </div>
-
         <div class="l-products">
           <b>פריטים:</b> ${o.offer || ""}
         </div>
-
         <div class="l-price-box">
           לתשלום: ₪${o.price}
         </div>
-
         <div class="l-footer">
           <div class="l-wa-text">
              1. סרוק את הקוד <br>
@@ -378,7 +263,6 @@
           </div>
           <div id="qr_${idSuffix}"></div>
         </div>
-        
         <div style="position:absolute; bottom:2mm; width:94%; text-align:center">
            <svg id="bar_${idSuffix}" data-val="${cleanPhone}"></svg>
         </div>
@@ -386,12 +270,12 @@
     `;
   }
 
-  // 5. المحرر والطباعة
+  // 4. المحرر والطباعة
   function openEditor(idx) {
     currentIndex = idx;
     const o = orders[idx];
     document.getElementById('e_name').value = o.name;
-    document.getElementById('e_phone').value = o.phone; // سيتم التنسيق في المعاينة
+    document.getElementById('e_phone').value = o.phone;
     document.getElementById('e_city').value = o.city + " " + (o.addr||"");
     document.getElementById('e_del').value = o.delivery || "High Express";
     document.getElementById('e_offer').value = o.offer || "";
@@ -412,7 +296,13 @@
   }
 
   function updatePreview() {
-    const data = {
+    const d = getFormData();
+    document.getElementById('livePreview').innerHTML = getLabelHTML(d, 'prev');
+    genCodes('prev', d.phone);
+  }
+
+  function getFormData() {
+    return {
       orderId: orders[currentIndex].orderId,
       name: document.getElementById('e_name').value,
       phone: document.getElementById('e_phone').value,
@@ -421,54 +311,40 @@
       offer: document.getElementById('e_offer').value,
       price: document.getElementById('e_price').value
     };
-    document.getElementById('livePreview').innerHTML = getLabelHTML(data, 'prev');
-    genCodes('prev', data.phone);
   }
 
-  function genCodes(suffix, phoneInput) {
-    // توليد الأكواد
+  function genCodes(s, phone) {
+    // التأخير ضروري لضمان وجود العنصر في DOM
     setTimeout(() => {
       try {
-        // باركود بالرقم المحلي النظيف
-        const cleanP = formatPhone(phoneInput).replace(/-/g, "");
-        const barEl = document.getElementById(`bar_${suffix}`);
+        const cleanP = formatPhone(phone).replace(/-/g, "");
+        const barEl = document.getElementById(`bar_${s}`);
         if(barEl) JsBarcode(barEl, cleanP, { format: "CODE128", height: 25, fontSize: 10, displayValue: true, margin:0 });
         
-        // QR يفتح واتساب الشركة
-        const qrEl = document.getElementById(`qr_${suffix}`);
+        const qrEl = document.getElementById(`qr_${s}`);
         if(qrEl) {
           qrEl.innerHTML = "";
+          // رقم الواتساب ثابت +972
           new QRCode(qrEl, { text: "https://wa.me/972549634449", width: 45, height: 45 });
         }
-      } catch(e){}
+      } catch(e) { console.log(e); }
     }, 50);
   }
 
   function printSingle() {
-    const data = {
-      orderId: orders[currentIndex].orderId,
-      name: document.getElementById('e_name').value,
-      phone: document.getElementById('e_phone').value,
-      city: document.getElementById('e_city').value,
-      delivery: document.getElementById('e_del').value,
-      offer: document.getElementById('e_offer').value,
-      price: document.getElementById('e_price').value
-    };
-    
+    const d = getFormData();
     const area = document.getElementById('printArea');
-    area.innerHTML = getLabelHTML(data, 'print');
+    area.innerHTML = getLabelHTML(d, 'print');
     
     setTimeout(() => {
-      genCodes('print', data.phone);
+      genCodes('print', d.phone);
       setTimeout(async () => {
         window.print();
         
-        // تحديث الحالة
-        const row = orders[currentIndex].rowIndex;
+        // التحديث
+        const r = orders[currentIndex].rowIndex;
         closeModal();
-        await fetch(`${SCRIPT_URL}?action=updateStatus&key=${PASS}&row=${row}&status=READY ✅`);
-        
-        // تحديث محلي
+        await fetch(`${SCRIPT_URL}?action=updateStatus&key=${PASS}&row=${r}&status=READY ✅`);
         orders[currentIndex].status = "READY ✅";
         render();
       }, 500);
@@ -476,11 +352,13 @@
   }
 
   function printAll() {
-    // طباعة القائمة الحالية فقط (قيد التجهيز أو الكل)
-    const list = currentTab === 'pending' ? orders.filter(isPending) : orders;
+    const list = currentTab === 'pending' ? orders.filter(o => {
+      const st = (o.status || "").toLowerCase();
+      return (st.includes("prep") || st.includes("approved")) && !st.includes("ready");
+    }) : orders;
     
     if(!list.length) return alert("القائمة فارغة!");
-    if(!confirm(`طباعة ${list.length} ملصق دفعة واحدة؟`)) return;
+    if(!confirm(`طباعة ${list.length} ملصق؟`)) return;
 
     const area = document.getElementById('printArea');
     area.innerHTML = list.map((o, i) => getLabelHTML(o, `bulk_${i}`)).join("");
@@ -489,14 +367,14 @@
       list.forEach((o, i) => genCodes(`bulk_${i}`, o.phone));
       setTimeout(() => {
         window.print();
-        if(currentTab === 'pending' && confirm("نقل كل المطبوع إلى (جاهز)؟")) {
+        if(currentTab === 'pending' && confirm("نقل إلى جاهز؟")) {
           list.forEach(o => {
              o.status = "READY ✅";
              fetch(`${SCRIPT_URL}?action=updateStatus&key=${PASS}&row=${o.rowIndex}&status=READY ✅`);
           });
           render();
         }
-      }, 2000); // وقت أطول للكميات الكبيرة
+      }, 1500);
     }, 200);
   }
 </script>
