@@ -2,503 +2,264 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="utf-8"/>
-  <title>MAD SYSTEM v5.5 | Auto-Sync</title>
-  
-  <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>MAD Manager | الإصدار المطور</title>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 
   <style>
-    :root { --bg: #0f172a; --card: #1e293b; --blue: #3b82f6; --text: #f8fafc; --green: #10b981; --red: #ef4444; --orange: #f59e0b; }
-    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg); color: var(--text); margin: 0; direction: rtl; }
-    
-    /* Header & Search */
-    header { background: var(--card); padding: 15px 25px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #334155; position: sticky; top: 0; z-index: 90; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
-    .search-box { flex: 1; max-width: 500px; margin: 0 20px; position: relative; }
-    .search-box input { width: 100%; padding: 12px 20px; border-radius: 50px; border: 1px solid #334155; background: #0f172a; color: white; font-size: 16px; outline: none; transition: 0.3s; }
-    .search-box input:focus { border-color: var(--blue); box-shadow: 0 0 10px rgba(59, 130, 246, 0.3); }
-
-    /* Grid Layout */
-    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 25px; padding: 25px; }
-    
-    /* Card Design */
-    .card { background: var(--card); border-radius: 16px; overflow: hidden; border: 1px solid #334155; transition: all 0.3s ease; display: flex; flex-direction: column; position: relative; }
-    .card:hover { transform: translateY(-5px); box-shadow: 0 15px 30px rgba(0,0,0,0.4); border-color: var(--blue); }
-    .card.selected { border: 2px solid var(--blue); background: #232f42; }
-    
-    /* Status Badge */
-    .status-badge { position: absolute; top: 15px; left: 15px; padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; color: white; box-shadow: 0 2px 5px rgba(0,0,0,0.2); cursor: pointer; z-index: 10; }
-    .status-pending { background: var(--orange); animation: pulse 2s infinite; }
-    .status-ready { background: var(--green); }
-    
-    @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
-
-    .card-content { padding: 20px; flex-grow: 1; }
-    .card-id { font-size: 13px; color: #94a3b8; font-weight: bold; margin-bottom: 5px; }
-    .card-name { font-size: 20px; font-weight: 800; margin-bottom: 10px; color: #fff; }
-    
-    .info-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; color: #cbd5e1; font-size: 14px; }
-    .info-row i { width: 20px; text-align: center; color: var(--blue); }
-
-    /* Products Section */
-    .products-box { background: #0f172a; border-radius: 8px; padding: 10px; margin-top: 15px; border: 1px dashed #334155; }
-    .products-title { font-size: 11px; color: #64748b; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; }
-    .product-item { font-size: 13px; color: #e2e8f0; display: flex; justify-content: space-between; padding: 3px 0; border-bottom: 1px solid #1e293b; }
-    .product-item:last-child { border-bottom: none; }
-
-    .card-price { font-size: 28px; font-weight: 900; color: var(--green); margin-top: 15px; text-align: left; direction: ltr; }
-
-    /* Actions Bar */
-    .card-actions { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; background: #161e2e; border-top: 1px solid #334155; }
-    .btn-action { border: none; background: transparent; color: #94a3b8; padding: 12px 0; cursor: pointer; font-size: 13px; display: flex; flex-direction: column; align-items: center; gap: 5px; transition: 0.2s; border-left: 1px solid #334155; }
-    .btn-action:last-child { border-left: none; }
-    .btn-action:hover { background: #1e293b; color: white; }
-    .btn-status:hover { color: var(--orange); }
-
-    /* Bulk Bar */
-    .bulk-bar { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px); background: white; color: black; padding: 12px 30px; border-radius: 50px; display: flex; align-items: center; gap: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.6); z-index: 1000; transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); opacity: 0; }
-    .bulk-bar.active { transform: translateX(-50%) translateY(0); opacity: 1; }
-    
-    /* Edit Modal */
-    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 2000; display: none; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
-    .modal { background: var(--card); padding: 30px; border-radius: 20px; width: 90%; max-width: 500px; border: 1px solid #334155; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); }
-    .modal h2 { margin-top: 0; color: white; border-bottom: 1px solid #334155; padding-bottom: 15px; }
-    .form-group { margin-bottom: 15px; }
-    .form-group label { display: block; color: #94a3b8; font-size: 13px; margin-bottom: 5px; }
-    .form-group input, .form-group textarea { width: 100%; padding: 10px; background: #0f172a; border: 1px solid #334155; border-radius: 8px; color: white; box-sizing: border-box; }
-    .modal-btns { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
-    .btn-save { background: var(--blue); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; }
-    .btn-close { background: #334155; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; }
-
-    /* Notification Toast */
-    #toast { position: fixed; top: 20px; right: 20px; background: var(--green); color: white; padding: 15px 25px; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); transform: translateX(150%); transition: 0.3s; z-index: 3000; display: flex; align-items: center; gap: 10px; font-weight: bold; }
-    #toast.show { transform: translateX(0); }
-
-    /* Print Styles */
-    @media print {
-      body * { visibility: hidden; }
-      #printArea, #printArea * { visibility: visible; }
-      #printArea { position: absolute; left: 0; top: 0; width: 100%; }
-      @page { size: 100mm 100mm; margin: 0; }
-      .label { 
-          width: 100mm; height: 100mm; padding: 5mm; 
-          background: white !important; color: black !important; 
-          display: flex; flex-direction: column; page-break-after: always; 
-          box-sizing: border-box; font-family: sans-serif; position: relative; 
-          border: 2px dashed #333;
-          -webkit-print-color-adjust: exact; 
-      }
-      .label-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid #000; padding-bottom: 10px; margin-bottom: 15px; }
-      .label-row { font-size: 13pt; margin-bottom: 6px; line-height: 1.3; display: flex; }
-      .label-key { width: 75px; font-weight: bold; }
-      .label-val { flex: 1; font-weight: bold; }
-      .label-products { border-top: 2px solid #000; margin-top: 5px; padding-top: 5px; font-size: 11pt; height: 110px; overflow: hidden; }
-      .label-footer { margin-top: auto; text-align: center; border: 3px solid #000; border-radius: 15px; padding: 5px; display: flex; align-items: center; justify-content: space-between; }
-      .label-price { font-size: 24pt; font-weight: 900; }
-      .barcode-container { text-align: center; margin-top: 5px; }
-      .barcode-container svg { height: 40px; width: 100%; }
+    :root{
+      --bg:#060914;
+      --card1:rgba(255,255,255,.10);
+      --card2:rgba(255,255,255,.06);
+      --border:rgba(255,255,255,.12);
+      --muted:rgba(255,255,255,.72);
+      --green:#16a34a;
+      --blue:#2563eb;
+      --orange:#f59e0b;
+      --red:#dc2626;
+      --gray:rgba(255,255,255,.12);
+      --pink:#db2777;
+      --cyan:#06b6d4;
+      --violet:#7c3aed;
     }
-    #printArea { display: none; }
+    body{margin:0;font-family:system-ui,Segoe UI,Tahoma,Arial;background:var(--bg);color:#fff}
+    
+    /* تحسينات الطباعة */
+    @media print {
+      .top, .actions, .subactions, button, select, #q, .tabs, .modal-ignore { display: none !important; }
+      body { background: white; color: black; }
+      .card { border: 2px solid #000; page-break-inside: avoid; margin: 10px; box-shadow: none; background: #fff; color: #000; }
+      .field { border: 1px solid #ccc; background: #f9f9f9 !important; color: #000; }
+      .label { color: #333; }
+      input { color: #000 !important; background: transparent !important; border: none !important; }
+    }
+
+    .top{ position:sticky;top:0;z-index:50; background:rgba(6,9,20,.92);backdrop-filter:blur(10px); border-bottom:1px solid var(--border); padding:14px; }
+    .wrap{max-width:1200px;margin:0 auto;padding:16px}
+    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+    .title{font-weight:1000;font-size:18px}
+    .tag{ padding:7px 11px;border-radius:999px; background:rgba(255,255,255,.10); border:1px solid rgba(255,255,255,.10); font-weight:1000; }
+    input,select,textarea{ font:inherit;border-radius:14px;border:1px solid var(--border); background:rgba(255,255,255,.06);color:#fff;padding:12px 12px;outline:none; width: 100%; box-sizing: border-box; }
+    .btn{padding:12px 14px;border-radius:14px;font-weight:1100; border:none; cursor:pointer; color:#fff; display:inline-block; text-align:center;}
+    .bgray{background:var(--gray)} .bgreen{background:var(--green)} .bblue{background:var(--blue)}
+    .borange{background:var(--orange);color:#111} .bred{background:var(--red)} .bviolet{background:var(--violet)}
+    .tabs{display:flex;gap:10px;margin-top:10px}
+    .tab{ padding:10px 12px;border-radius:999px; border:1px solid rgba(255,255,255,.14); background:rgba(255,255,255,.08); font-weight:1000; cursor:pointer; }
+    .tab.active{background:rgba(37,99,235,.30);border-color:rgba(37,99,235,.65)}
+    .card{ background:linear-gradient(180deg,var(--card1),var(--card2)); border:1px solid var(--border); border-radius:20px; padding:16px; margin:14px 0; box-shadow:0 14px 50px rgba(0,0,0,.35); }
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+    @media(max-width:820px){.grid{grid-template-columns:1fr}}
+    .field{ background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12); border-radius:16px; padding:10px; }
+    .label{opacity:.85;font-weight:1000;margin-bottom:6px; font-size:13px}
+    .actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+    .hugeBtn{padding:18px 16px;border-radius:18px;font-size:18px;font-weight:1200}
+    .modal{position:fixed;inset:0;background:rgba(0,0,0,.8);display:none;align-items:center;justify-content:center;z-index:999}
+    .modal.show{display:flex}
+    .modal .box{width:min(900px,95vw);max-height:90vh;overflow:auto;background:#0f172a;border-radius:24px;padding:20px;border:1px solid var(--border)}
   </style>
 </head>
 <body>
 
-<header>
-  <div style="font-size: 24px; font-weight: 900; display:flex; align-items:center; gap:10px;">
-    <span>MAD</span> <span style="color:var(--blue)">SYS v5.5</span>
-    <span id="loader" style="font-size:12px; font-weight:normal; color:#64748b; margin-right:15px; opacity:0; transition:0.3s"><i class="fas fa-circle-notch fa-spin"></i> مزامنة...</span>
-  </div>
-  
-  <div class="search-box">
-    <input type="text" id="searchInput" placeholder="ابحث عن اسم، هاتف، أو رقم طلب..." oninput="app.render()">
-  </div>
+<script>
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyLjLFa8AaH82Ip7m747WC-KSUUEaU_M70S0I9Mda14XbnmcuEfZ7pBnF_zzJYZuXmZ/exec";
+const DASH_KEY   = "12345678"; 
 
-  <button onclick="app.manualRefresh()" style="background: #1e293b; color: white; border: 1px solid #334155; padding: 10px 20px; border-radius: 10px; cursor: pointer; font-weight: bold; transition:0.2s">
-    <i class="fas fa-sync-alt"></i> تحديث
-  </button>
-</header>
+pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+</script>
 
-<div class="grid" id="grid"></div>
-
-<div class="bulk-bar" id="bulkBar">
-  <span id="selectedCount" style="font-weight: bold; min-width: 100px;">0 مختار</span>
-  <button onclick="app.printSelected()" style="background: black; color: white; border: none; padding: 10px 25px; border-radius: 30px; cursor: pointer; font-weight: bold;">
-    <i class="fas fa-print"></i> طباعة المحدد
-  </button>
-  <button onclick="app.clearSelection()" style="background: none; border: none; color: #ef4444; cursor: pointer; font-weight:bold;">إلغاء</button>
-</div>
-
-<div class="modal-overlay" id="editModal">
-  <div class="modal">
-    <h2>تعديل الطلب <span id="editIdStr"></span></h2>
-    <input type="hidden" id="editRealId">
-    <div class="form-group">
-      <label>اسم العميل</label>
-      <input type="text" id="editName">
-    </div>
-    <div class="form-group">
-      <label>الهاتف</label>
-      <input type="text" id="editPhone">
-    </div>
-    <div class="form-group">
-      <label>المدينة / العنوان</label>
-      <input type="text" id="editCity">
-    </div>
-    <div class="form-group">
-      <label>المنتجات (افصل بفاصلة)</label>
-      <textarea id="editProducts" rows="3"></textarea>
-    </div>
-    <div class="form-group">
-      <label>السعر</label>
-      <input type="number" id="editPrice">
-    </div>
-    <div class="modal-btns">
-      <button class="btn-close" onclick="app.closeModal()">إغلاق</button>
-      <button class="btn-save" onclick="app.saveEdit()">حفظ التعديلات</button>
+<div class="top">
+  <div class="wrap">
+    <div class="row">
+      <div class="title">MAD Manager ✅</div>
+      <span class="tag" id="stat">تحميل...</span>
+      <button class="btn bgray" onclick="load()">تحديث ↻</button>
+      <button class="btn bviolet" onclick="openSmartNew()">➕ إضافة طلب ذكي</button>
+      <input id="q" placeholder="بحث باسم، رقم، مدينة..." style="flex:1" oninput="render()"/>
+      <select id="filter" style="width:auto" onchange="render()">
+        <option value="NEW">طلبات جديدة</option>
+        <option value="PREP">قيد التجهيز</option>
+        <option value="READY">جاهزة</option>
+        <option value="ALL">الكل</option>
+      </select>
     </div>
   </div>
 </div>
 
-<div id="toast"><i class="fas fa-bell"></i> <span>طلب جديد وصل!</span></div>
-<div id="printArea"></div>
+<div class="wrap">
+  <div id="quickView"></div>
+</div>
+
+<div class="modal" id="modal">
+  <div class="box">
+    <div class="row" style="justify-content:space-between; margin-bottom:15px">
+      <div class="title" id="modalTitle"></div>
+      <button class="btn bgray" onclick="closeModal()">إغلاق ✖</button>
+    </div>
+    <div id="modalBody"></div>
+  </div>
+</div>
 
 <script>
-class MadSystem {
-  constructor() {
-    // IMPORTANT: Replace this URL with your actual Google Apps Script Web App URL
-    this.scriptUrl = "https://script.google.com/macros/s/AKfycbyLjLFa8AaH82Ip7m747WC-KSUUEaU_M70S0I9Mda14XbnmcuEfZ7pBnF_zzJYZuXmZ/exec";
-    this.orders = [];
-    this.selected = new Set();
-    this.localStatus = JSON.parse(localStorage.getItem('mad_status_v5') || '{}');
-    this.lastOrderCount = 0;
-    this.editingId = null;
+let orders = [];
 
-    this.init();
-  }
-
-  async init() {
-    await this.loadData();
-    setInterval(() => this.loadData(true), 5000);
-  }
-
-  async loadData(isAuto = false) {
-    if(isAuto) document.getElementById('loader').style.opacity = '1';
-    
-    try {
-      // Added error handling for network requests
-      const res = await fetch(`${this.scriptUrl}?action=get`);
-      if (!res.ok) throw new Error('Network response was not ok');
-      const data = await res.json();
-      
-      if (this.lastOrderCount > 0 && data.length > this.lastOrderCount) {
-        this.showToast();
-        this.playNotificationSound();
-      }
-      this.lastOrderCount = data.length;
-      
-      this.orders = data.map(o => {
-          const id = String(o.orderId || o.id || '0'); // Force ID to string
-          return {
-              id: id,
-              name: o.name || o.customer || 'بدون اسم',
-              phone: o.phone || o.tel || '',
-              city: o.city || o.address || '',
-              payment: o.payment || '',
-              price: o.price || '0',
-              products: o.products || o.items || '',
-              status: this.localStatus[id] || (o.status || 'pending')
-          };
-      });
-
-      this.render();
-      
-    } catch (e) {
-      console.error("Connection Error", e);
-      // Optional: Show error in UI
-    } finally {
-      if(isAuto) setTimeout(() => document.getElementById('loader').style.opacity = '0', 1000);
-    }
-  }
-
-  manualRefresh() {
-    this.loadData();
-  }
-
-  translate(type, val) {
-    if(!val) return "---";
-    const v = val.toString().toLowerCase().trim();
-    
-    if(type === 'payment') {
-      if(v.includes('cash') || v.includes('מזומן')) return 'نقدي';
-      if(v.includes('bit') || v.includes('ביט')) return 'Bit';
-      if(v.includes('credit') || v.includes('אשראי')) return 'بطاقة ائتمان';
-      if(v.includes('pending')) return 'عند الاستلام';
-      return val;
-    }
-    
-    if(type === 'city') {
-      const map = {
-        'haifa': 'حيفا', 'חיפה': 'حيفا',
-        'acre': 'عكا', 'akko': 'عكا', 'עכו': 'عكا',
-        'nazareth': 'الناصرة', 'נצרת': 'الناصرة',
-        'tel aviv': 'تل أبيب', 'תל אביב': 'تل أبيب',
-        'jerusalem': 'القدس', 'ירושלים': 'القدس'
-      };
-      return map[v] || val; 
-    }
-    return val;
-  }
-
-  render() {
-    const query = document.getElementById('searchInput').value.toLowerCase().trim();
-    const grid = document.getElementById('grid');
-    
-    // Sort: Pending first
-    let displayList = [...this.orders].sort((a, b) => {
-        const sA = a.status === 'ready' ? 1 : 0;
-        const sB = b.status === 'ready' ? 1 : 0;
-        return sA - sB;
-    });
-
-    if(query) {
-      displayList = displayList.filter(o => 
-        o.name.toLowerCase().includes(query) || 
-        o.phone.includes(query) || 
-        String(o.id).includes(query)
-      );
-    }
-
-    grid.innerHTML = displayList.map(o => {
-      // Use ID for selection check instead of Index
-      const isSel = this.selected.has(o.id);
-      const isReady = o.status === 'ready';
-      
-      let prodHTML = '';
-      if(o.products) {
-          // Safe split fix
-          const pList = String(o.products).split(/,|،|\n/).filter(p => p.trim() !== '');
-          if(pList.length > 0) {
-              prodHTML = `<div class="products-box"><div class="products-title">المنتجات</div>` + 
-                         pList.map(p => `<div class="product-item"><span>- ${p}</span></div>`).join('') + 
-                         `</div>`;
-          }
-      }
-
-      // Pass ID string specifically using quotes
-      return `
-        <div class="card ${isSel ? 'selected' : ''}">
-          <div class="status-badge ${isReady ? 'status-ready' : 'status-pending'}" onclick="app.toggleStatus('${o.id}', event)">
-            ${isReady ? 'جاهز للتسليم <i class="fas fa-check"></i>' : 'انتظار التجهيز <i class="fas fa-clock"></i>'}
-          </div>
-
-          <div class="card-content">
-            <div class="card-id">ORDER #${o.id}</div>
-            <div class="card-name">${o.name}</div>
-            
-            <div class="info-row"><i class="fas fa-phone"></i> ${o.phone}</div>
-            <div class="info-row"><i class="fas fa-map-marker-alt"></i> ${this.translate('city', o.city)}</div>
-            <div class="info-row"><i class="fas fa-wallet"></i> ${this.translate('payment', o.payment)}</div>
-            
-            ${prodHTML}
-            
-            <div class="card-price">₪${o.price}</div>
-          </div>
-          
-          <div class="card-actions">
-            <button class="btn-action" onclick="app.printSingle('${o.id}')">
-              <i class="fas fa-print"></i> طباعة
-            </button>
-            <button class="btn-action" onclick="app.openEdit('${o.id}')">
-              <i class="fas fa-edit"></i> تعديل
-            </button>
-             <button class="btn-action btn-status" onclick="app.toggleStatus('${o.id}', event)">
-              <i class="fas fa-exchange-alt"></i> الحالة
-            </button>
-            <button class="btn-action" onclick="app.toggleSelect('${o.id}')" style="color:${isSel?'var(--blue)':'inherit'}">
-              <i class="fas ${isSel ? 'fa-check-square' : 'fa-square'}"></i> تحديد
-            </button>
-          </div>
-        </div>
-      `;
-    }).join("");
-  }
-
-  // --- Logic Helper ---
-  findOrder(id) {
-    return this.orders.find(o => o.id === id);
-  }
-
-  toggleStatus(id, e) {
-    if(e) e.stopPropagation();
-    const o = this.findOrder(id);
-    if(!o) return;
-
-    o.status = o.status === 'ready' ? 'pending' : 'ready';
-    this.localStatus[o.id] = o.status;
-    localStorage.setItem('mad_status_v5', JSON.stringify(this.localStatus));
-    this.render();
-  }
-
-  toggleSelect(id) {
-    this.selected.has(id) ? this.selected.delete(id) : this.selected.add(id);
-    this.updateBulkUI();
-    this.render();
-  }
-
-  updateBulkUI() {
-    const bar = document.getElementById('bulkBar');
-    document.getElementById('selectedCount').innerText = `${this.selected.size} طلبات`;
-    this.selected.size > 0 ? bar.classList.add('active') : bar.classList.remove('active');
-  }
-
-  clearSelection() {
-    this.selected.clear();
-    this.updateBulkUI();
-    this.render();
-  }
-
-  // --- Edit System ---
-  openEdit(id) {
-    this.editingId = id;
-    const o = this.findOrder(id);
-    if(!o) return;
-
-    document.getElementById('editIdStr').innerText = `#${o.id}`;
-    document.getElementById('editRealId').value = o.id;
-    document.getElementById('editName').value = o.name;
-    document.getElementById('editPhone').value = o.phone;
-    document.getElementById('editCity').value = o.city;
-    document.getElementById('editPrice').value = o.price;
-    document.getElementById('editProducts').value = o.products;
-    
-    document.getElementById('editModal').style.display = 'flex';
-  }
-
-  closeModal() {
-    document.getElementById('editModal').style.display = 'none';
-    this.editingId = null;
-  }
-
-  saveEdit() {
-    if (this.editingId === null) return;
-    const o = this.findOrder(this.editingId);
-    if(!o) return;
-    
-    o.name = document.getElementById('editName').value;
-    o.phone = document.getElementById('editPhone').value;
-    o.city = document.getElementById('editCity').value;
-    o.price = document.getElementById('editPrice').value;
-    o.products = document.getElementById('editProducts').value;
-    
-    this.closeModal();
-    this.render();
-    // Warning persists because backend sync is not implemented in this snippet
-    alert("تم التحديث محلياً فقط.");
-  }
-
-  // --- Printing System ---
-  printSingle(id) {
-    const o = this.findOrder(id);
-    if(!o) return;
-    this.executePrint([o]);
-  }
-
-  printSelected() {
-    // Convert Set of IDs back to Order Objects
-    const list = Array.from(this.selected).map(id => this.findOrder(id)).filter(x => x);
-    if(list.length === 0) return alert("اختر طلبات أولاً");
-    this.executePrint(list);
-  }
-
-  executePrint(list) {
-    const area = document.getElementById('printArea');
-    area.innerHTML = list.map(o => this.generateLabel(o)).join("");
-    
-    // Generate Barcodes
-    list.forEach(o => {
-      try {
-        JsBarcode(`#barcode-${o.id}`, o.id, {
-          format: "CODE128",
-          lineColor: "#000",
-          width: 2,
-          height: 30,
-          displayValue: false
-        });
-      } catch(e) { console.log('Barcode Err', e); }
-    });
-
-    setTimeout(() => {
-        window.print();
-        // Optional: clear selection after print
-        // this.clearSelection(); 
-    }, 500);
-  }
-
-  generateLabel(o) {
-    const date = new Date().toLocaleDateString('ar-EG');
-    const cityAr = this.translate('city', o.city);
-    const payAr = this.translate('payment', o.payment);
-    const safeProd = o.products ? String(o.products).replace(/,|،/g, '<br>') : '---';
-    
-    return `
-      <div class="label" dir="rtl">
-        <div class="label-header">
-          <div style="font-size:18pt; font-weight:900;">MAD PARFUM</div>
-          <div style="font-size:14pt;">#${o.id}</div>
-        </div>
-
-        <div class="label-row">
-          <div class="label-key">العميل:</div>
-          <div class="label-val">${o.name}</div>
-        </div>
-        <div class="label-row">
-          <div class="label-key">الهاتف:</div>
-          <div class="label-val" dir="ltr" style="text-align:right">${o.phone}</div>
-        </div>
-        <div class="label-row">
-          <div class="label-key">المدينة:</div>
-          <div class="label-val">${cityAr}</div>
-        </div>
-         <div class="label-row">
-          <div class="label-key">الدفع:</div>
-          <div class="label-val">${payAr}</div>
-        </div>
-
-        <div class="label-products">
-          <b>المنتجات:</b><br>
-          ${safeProd}
-        </div>
-
-        <div class="label-footer">
-          <div>
-            <div style="font-size:10pt;">المطلوب للدفع</div>
-            <div class="label-price">₪${o.price}</div>
-          </div>
-          <div style="text-align:left">
-             <div class="barcode-container">
-                <svg id="barcode-${o.id}"></svg>
-             </div>
-          </div>
-        </div>
-      </div>
-    `;
-  }
-
-  // --- Notifications ---
-  showToast() {
-    const t = document.getElementById('toast');
-    t.classList.add('show');
-    setTimeout(() => t.classList.remove('show'), 4000);
-  }
-
-  playNotificationSound() {
-    // Improved sound handling
-    const audio = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
-    audio.volume = 0.5;
-    audio.play().catch(e => console.log("Audio requires interaction first"));
-  }
+async function load(){
+  try {
+    const res = await fetch(`${SCRIPT_URL}?action=get&_=${Date.now()}`);
+    orders = await res.json();
+    document.getElementById("stat").textContent = `طلبات: ${orders.length}`;
+    render();
+  } catch(e) { document.getElementById("stat").textContent = "خطأ اتصال"; }
 }
 
-const app = new MadSystem();
+function smartParse(txt){
+  // تنظيف النص وتجاوز الرموز في أرقام الهواتف
+  const cleanTxt = txt.replace(/\u200f|\u200e/g,"").replace(/[-()]/g,"");
+  
+  // 1. استخراج الهاتف (تجاوز الخطوط والرموز)
+  const phoneMatch = cleanTxt.match(/(\+?972\d{9}|05\d{8}|0?59\d{7,8})/);
+  let phone = phoneMatch ? phoneMatch[1].replace(/\D/g,'') : "";
+
+  // 2. استخراج السعر
+  let price = "";
+  const priceMatch = cleanTxt.match(/(\d{2,4})\s*(₪|شيكل|NIS|ILS)/i) || cleanTxt.match(/(₪|شيكل)\s*(\d{2,4})/);
+  price = priceMatch ? (priceMatch[1].match(/\d/) ? priceMatch[1] : priceMatch[2]) : "";
+
+  // 3. طريقة الدفع (دائماً عربي)
+  let payment = "Cash"; 
+  if(/مدفوع|رابط|paid|קישור|אשראי/i.test(cleanTxt)) payment = "Paid";
+  
+  // 4. استخراج اسم البلد (أول كلمة بعد "العنوان" أو "مدينة")
+  let country = "إسرائيل"; // افتراضي
+  if(/ضفة|palestine|westbank|رام الله|نابلس/i.test(cleanTxt)) country = "فلسطين";
+
+  // 5. استخراج الأكواد (C-Codes)
+  const codes = cleanTxt.match(/[A-Za-z]{1,2}\d{2,3}/g);
+  let offer = codes ? codes.join(" ") : "";
+
+  return { 
+    name: cleanTxt.split("\n")[0].substring(0,20), 
+    phone, 
+    offer, 
+    price, 
+    payment: payment === "Paid" ? "مدفوع" : "نقداً", 
+    country,
+    addr: cleanTxt.match(/(?:العنوان|address|כתובת)[:\s]+([^\n|]+)/i)?.[1]?.trim() || ""
+  };
+}
+
+function render(){
+  const q = document.getElementById("q").value.toLowerCase();
+  const f = document.getElementById("filter").value;
+  const container = document.getElementById("quickView");
+  
+  let filtered = orders.filter(o => {
+    const matchQ = JSON.stringify(o).toLowerCase().includes(q);
+    const st = (o.status || "").toUpperCase();
+    if(f === "NEW") return matchQ && (st.includes("NEW") || st === "");
+    if(f === "PREP") return matchQ && st.includes("PREP");
+    if(f === "READY") return matchQ && st.includes("READY");
+    return matchQ;
+  });
+
+  container.innerHTML = filtered.reverse().map(o => `
+    <div class="card">
+      <div class="row" style="justify-content:space-between">
+        <div class="title">📦 طلب #${o.orderId || o.rowIndex}</div>
+        <div class="tag">${o.status || "جديد"}</div>
+      </div>
+      <div class="grid">
+        <div class="field"><div class="label">الاسم</div><input id="n_${o.rowIndex}" value="${o.name||''}"></div>
+        <div class="field"><div class="label">الهاتف</div><input id="p_${o.rowIndex}" value="${o.phone||''}"></div>
+        <div class="field"><div class="label">الطلب</div><input id="o_${o.rowIndex}" value="${o.offer||''}"></div>
+        <div class="field"><div class="label">السعر</div><input id="pr_${o.rowIndex}" value="${o.price||''}"></div>
+        <div class="field">
+            <div class="label">الدفع</div>
+            <select id="pay_${o.rowIndex}">
+                <option value="نقداً" ${o.payment === 'نقداً'?'selected':''}>نقداً / מזומן</option>
+                <option value="مدفوع" ${o.payment === 'مدفوع'?'selected':''}>مدفوع / שולם</option>
+            </select>
+        </div>
+        <div class="field"><div class="label">العنوان</div><input id="ad_${o.rowIndex}" value="${o.addr||o.city||''}"></div>
+      </div>
+      <div class="actions">
+        <button class="btn bgreen" onclick="saveOrder(${o.rowIndex})">💾 حفظ التعديلات</button>
+        <button class="btn bblue" onclick="window.print()">🖨️ طباعة الفاتورة</button>
+      </div>
+    </div>
+  `).join("");
+}
+
+async function saveOrder(row){
+  const data = {
+    action: "updateOrder",
+    key: DASH_KEY,
+    row: row,
+    name: document.getElementById(`n_${row}`).value,
+    phone: document.getElementById(`p_${row}`).value,
+    offer: document.getElementById(`o_${row}`).value,
+    price: document.getElementById(`pr_${row}`).value,
+    payment: document.getElementById(`pay_${row}`).value,
+    addr: document.getElementById(`ad_${row}`).value
+  };
+  
+  const url = `${SCRIPT_URL}?` + new URLSearchParams(data).toString();
+  await fetch(url);
+  alert("تم الحفظ بنجاح ✅");
+  load();
+}
+
+function openSmartNew(){
+  document.getElementById("modalTitle").textContent = "إضافة طلب جديد (تحليل ذكي)";
+  document.getElementById("modalBody").innerHTML = `
+    <textarea id="rawInput" style="height:150px" placeholder="الصق نص واتساب هنا..."></textarea>
+    <button class="btn bviolet" style="width:100%;margin-top:10px" onclick="analyzeNew()">🧠 تحليل النص الآن</button>
+    <div id="parsedResult"></div>
+  `;
+  document.getElementById("modal").classList.add("show");
+}
+
+function analyzeNew(){
+  const raw = document.getElementById("rawInput").value;
+  const p = smartParse(raw);
+  document.getElementById("parsedResult").innerHTML = `
+    <div class="grid" style="margin-top:15px">
+        <div class="field"><div class="label">الاسم</div><input id="new_name" value="${p.name}"></div>
+        <div class="field"><div class="label">الهاتف</div><input id="new_phone" value="${p.phone}"></div>
+        <div class="field"><div class="label">الطلب</div><input id="new_offer" value="${p.offer}"></div>
+        <div class="field"><div class="label">السعر</div><input id="new_price" value="${p.price}"></div>
+        <div class="field"><div class="label">الدفع</div><input id="new_pay" value="${p.payment}"></div>
+        <div class="field"><div class="label">البلد</div><input id="new_country" value="${p.country}"></div>
+    </div>
+    <button class="btn bgreen" style="width:100%;margin-top:15px;padding:20px" onclick="submitNew()">✅ تأكيد وحفظ الطلب في الشيت</button>
+  `;
+}
+
+async function submitNew(){
+    // كود الإرسال للسيرفر (POST)
+    const body = {
+        name: document.getElementById("new_name").value,
+        phone: document.getElementById("new_phone").value,
+        offer: document.getElementById("new_offer").value,
+        price: document.getElementById("new_price").value,
+        payment: document.getElementById("new_pay").value,
+        address: document.getElementById("new_country").value,
+        status: "Approved ✅"
+    };
+    
+    await fetch(SCRIPT_URL, {
+        method: "POST",
+        body: JSON.stringify(body)
+    });
+    alert("تمت الإضافة بنجاح!");
+    closeModal();
+    load();
+}
+
+function closeModal(){ document.getElementById("modal").classList.remove("show"); }
+
+load(); // تحميل البيانات عند الفتح
 </script>
+
 </body>
 </html>
