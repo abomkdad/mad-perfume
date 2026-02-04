@@ -2,31 +2,39 @@
 <html lang="he" dir="rtl">
 <head>
   <meta charset="utf-8"/>
-  <title>MAD SYSTEM v5.1 | בדיקת חיבור</title>
+  <title>MAD SYSTEM v5.2 | Final Stable</title>
   
   <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
   <style>
-    body { font-family: system-ui, sans-serif; background: #0f172a; color: white; margin: 0; direction: rtl; }
-    header { background: #1e293b; padding: 20px; border-bottom: 2px solid #334155; text-align: center; }
+    :root { --bg: #0f172a; --card: #1e293b; --blue: #3b82f6; --text: #f8fafc; }
+    body { font-family: system-ui, sans-serif; background: var(--bg); color: var(--text); margin: 0; direction: rtl; }
     
-    .status-bar { padding: 10px; text-align: center; font-size: 14px; background: #334155; }
-    .status-online { color: #10b981; }
-    .status-offline { color: #ef4444; }
+    header { background: var(--card); padding: 15px 25px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #334155; }
+    
+    .search-box { flex: 1; max-width: 400px; position: relative; margin: 0 20px; }
+    .search-box input { width: 100%; padding: 10px 15px; border-radius: 8px; border: 1px solid #334155; background: #0f172a; color: white; font-size: 16px; }
 
-    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; padding: 20px; }
-    .card { background: #1e293b; padding: 15px; border-radius: 12px; border: 1px solid #334155; cursor: pointer; position: relative; }
-    .card:hover { border-color: #3b82f6; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; padding: 20px; }
     
-    /* עיצוב הדפסה 10x10 */
+    .card { background: var(--card); border-radius: 12px; padding: 15px; border: 1px solid #334155; transition: 0.2s; cursor: pointer; position: relative; }
+    .card:hover { border-color: var(--blue); transform: translateY(-3px); }
+    .card-id { font-size: 12px; color: #94a3b8; margin-bottom: 5px; }
+    .card-name { font-size: 20px; font-weight: bold; margin-bottom: 8px; }
+    .card-detail { font-size: 14px; color: #cbd5e1; margin: 3px 0; }
+    .card-price { font-size: 24px; font-weight: 900; color: #10b981; margin-top: 10px; border-top: 1px solid #334155; padding-top: 10px; }
+
+    .bulk-bar { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: white; color: black; padding: 15px 30px; border-radius: 50px; display: none; align-items: center; gap: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 1000; }
+    .bulk-bar.active { display: flex; }
+
     @media print {
       body * { visibility: hidden; }
       #printArea, #printArea * { visibility: visible; }
-      #printArea { position: absolute; left: 0; top: 0; width: 100mm; }
+      #printArea { position: absolute; left: 0; top: 0; width: 100%; }
       @page { size: 100mm 100mm; margin: 0; }
-      .label { width: 100mm; height: 100mm; padding: 5mm; background: white !important; color: black !important; display: flex; flex-direction: column; page-break-after: always; border: 1px solid #000; }
+      .label { width: 100mm; height: 100mm; padding: 5mm; background: white !important; color: black !important; display: flex; flex-direction: column; page-break-after: always; border: 1px solid #000; box-sizing: border-box; }
     }
     #printArea { display: none; }
   </style>
@@ -34,100 +42,141 @@
 <body>
 
 <header>
-  <h2>מערכת MAD - ניהול משלוחים</h2>
-  <div class="status-bar" id="connStatus">בודק חיבור למסד הנתונים...</div>
+  <div style="font-size: 24px; font-weight: 900;">MAD <span style="color:var(--blue)">V5.2</span></div>
+  
+  <div class="search-box">
+    <input type="text" id="searchInput" placeholder="חיפוש לפי שם או טלפון..." oninput="app.render()">
+  </div>
+
+  <button onclick="app.loadData()" style="background: var(--blue); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold;">
+    רענן נתונים ↻
+  </button>
 </header>
 
-<div style="padding: 20px; text-align: center;">
-  <input type="text" id="search" placeholder="חיפוש לפי שם או טלפון..." oninput="app.render()" 
-         style="width: 80%; max-width: 500px; padding: 12px; border-radius: 8px; border: none; font-size: 16px;">
-  <button onclick="app.fetchData()" style="padding: 12px 20px; cursor: pointer; background: #3b82f6; color: white; border: none; border-radius: 8px; margin-right: 10px;">רענן נתונים ↻</button>
-</div>
+<div id="debugStatus" style="background: #334155; font-size: 12px; padding: 5px 20px; text-align: center;">טוען...</div>
 
 <div class="grid" id="grid"></div>
+
+<div class="bulk-bar" id="bulkBar">
+  <span id="selectedCount" style="font-weight: bold;">0 נבחרו</span>
+  <button onclick="app.printSelected()" style="background: #000; color: #fff; border: none; padding: 8px 20px; border-radius: 20px; cursor: pointer; font-weight: bold;">הדפס הכל 🖨️</button>
+  <button onclick="app.clearSelection()" style="background: none; border: none; text-decoration: underline; cursor: pointer;">ביטול</button>
+</div>
 
 <div id="printArea"></div>
 
 <script>
 class MadSystem {
   constructor() {
-    // *** שים לב! הדבק כאן את הקישור שקיבלת מגוגל (Deployment URL) ***
-    this.url = "https://script.google.com/macros/s/AKfycbyLjLFa8AaH82Ip7m747WC-KSUUEaU_M70S0I9Mda14XbnmcuEfZ7pBnF_zzJYZuXmZ/exec";
-    
-    this.data = [];
-    this.fetchData();
+    this.scriptUrl = "https://script.google.com/macros/s/AKfycbyLjLFa8AaH82Ip7m747WC-KSUUEaU_M70S0I9Mda14XbnmcuEfZ7pBnF_zzJYZuXmZ/exec";
+    this.orders = [];
+    this.selected = new Set();
+    this.loadData();
   }
 
-  async fetchData() {
-    const statusDiv = document.getElementById('connStatus');
-    statusDiv.innerHTML = "טוען נתונים...";
-    
+  async loadData() {
+    const debug = document.getElementById('debugStatus');
+    debug.innerHTML = "מנסה להתחבר ל-Google Sheets...";
     try {
-      const response = await fetch(`${this.url}?action=get`);
-      this.data = await response.json();
+      const res = await fetch(`${this.scriptUrl}?action=get`);
+      this.orders = await res.json();
       
-      if (this.data.length === 0) {
-          statusDiv.innerHTML = '<span class="status-offline">החיבור הצליח, אך אין נתונים בטבלה.</span>';
+      if (this.orders.length > 0) {
+        debug.innerHTML = `✅ החיבור הצליח! נמצאו ${this.orders.length} שורות.`;
       } else {
-          statusDiv.innerHTML = `<span class="status-online">מחובר! נמצאו ${this.data.length} הזמנות.</span>`;
+        debug.innerHTML = `⚠️ החיבור הצליח, אך הטבלה ריקה (או שהכותרות לא תואמות).`;
       }
       this.render();
-    } catch(e) {
+    } catch (e) {
+      debug.innerHTML = `❌ שגיאת התחברות: וודא שהסקריפט פורסם (Deployed) כ-'Anyone'.`;
       console.error(e);
-      statusDiv.innerHTML = '<span class="status-offline">שגיאת חיבור! וודא שכתובת ה-URL תקינה ושיש הרשאות.</span>';
     }
+  }
+
+  // תרגום שמות ערים ותשלום לעברית
+  fixLang(val) {
+    if(!val) return "";
+    const map = { "cash": "מזומן", "credit": "אשראי", "bit": "ביט", "pending": "ממתין" };
+    return map[val.toString().toLowerCase().trim()] || val;
   }
 
   render() {
-    const q = document.getElementById('search').value.toLowerCase();
-    const container = document.getElementById('grid');
+    const query = document.getElementById('searchInput').value.toLowerCase().replace(/[-\s]/g, "");
+    const grid = document.getElementById('grid');
     
-    const filtered = this.data.filter(item => {
-        const name = (item.name || "").toLowerCase();
-        const phone = (item.phone || "").replace(/-/g, "");
-        return name.includes(q) || phone.includes(q);
+    const filtered = this.orders.filter(o => {
+      const name = String(o.name || o.customer || "").toLowerCase();
+      const phone = String(o.phone || o.tel || "").replace(/[-\s]/g, "");
+      return name.includes(query) || phone.includes(query);
     });
 
-    if (filtered.length === 0 && q === "") {
-        container.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px;">ממתין לנתונים...</div>';
-        return;
-    }
-
-    container.innerHTML = filtered.map((item, index) => `
-        <div class="card" onclick="app.printSingle(${this.data.indexOf(item)})">
-          <div style="font-weight: bold; font-size: 18px;">${item.name}</div>
-          <div style="color: #94a3b8;">📞 ${item.phone}</div>
-          <div style="color: #f59e0b;">📍 ${item.city || "לא צוין"}</div>
-          <div style="margin-top: 10px; font-weight: bold; color: #10b981;">₪${item.price}</div>
-          <div style="font-size: 12px; margin-top: 5px; color: #64748b;">לחץ להדפסת תווית</div>
+    grid.innerHTML = filtered.map(o => {
+      const idx = this.orders.indexOf(o);
+      const isSelected = this.selected.has(idx);
+      return `
+        <div class="card" onclick="app.toggleSelect(${idx})" style="${isSelected ? 'border-color:var(--blue); background:#263345;' : ''}">
+          <div class="card-id">#${o.orderId || o.id || '---'}</div>
+          <div class="card-name">${o.name || o.customer || 'ללא שם'}</div>
+          <div class="card-detail">📞 ${o.phone || o.tel || '---'}</div>
+          <div class="card-detail">📍 ${this.fixLang(o.city || o.address)}</div>
+          <div class="card-detail">💳 ${this.fixLang(o.payment)}</div>
+          <div class="card-price">₪${o.price || '0'}</div>
         </div>
-    `).join("");
+      `;
+    }).join("");
   }
 
-  printSingle(index) {
-    const item = this.data[index];
-    const area = document.getElementById('printArea');
-    
-    area.innerHTML = `
-      <div class="label">
-        <h1 style="text-align:center; margin:0; border-bottom: 2px solid black;">MAD PARFUM</h1>
-        <div style="font-size: 16pt; margin-top: 10px;"><b>לכבוד:</b> ${item.name}</div>
-        <div style="font-size: 16pt;"><b>טלפון:</b> ${item.phone}</div>
-        <div style="font-size: 16pt;"><b>עיר:</b> ${item.city || ""}</div>
-        <div style="font-size: 16pt;"><b>תשלום:</b> ${item.payment || "מזומן"}</div>
-        <div style="border: 5px solid black; font-size: 35pt; font-weight: 900; text-align: center; margin-top: auto; border-radius: 10px;">
-          ₪${item.price}
+  toggleSelect(idx) {
+    this.selected.has(idx) ? this.selected.delete(idx) : this.selected.add(idx);
+    const bar = document.getElementById('bulkBar');
+    document.getElementById('selectedCount').innerText = `${this.selected.size} הזמנות נבחרו`;
+    this.selected.size > 0 ? bar.classList.add('active') : bar.classList.remove('active');
+    this.render();
+  }
+
+  clearSelection() {
+    this.selected.clear();
+    document.getElementById('bulkBar').classList.remove('active');
+    this.render();
+  }
+
+  generateLabel(o) {
+    return `
+      <div class="label" dir="rtl">
+        <div style="display:flex; justify-content:space-between; border-bottom:2px solid black; padding-bottom:5px;">
+          <b style="font-size:20pt;">MAD PARFUM</b>
+          <span>#${o.orderId || o.id || ''}</span>
         </div>
-        <div style="text-align: center; margin-top: 10px;">
-           <svg id="barcode"></svg>
+        <div style="font-size:16pt; margin-top:10px;"><b>לכבוד:</b> ${o.name || o.customer || ''}</div>
+        <div style="font-size:16pt;"><b>טלפון:</b> ${o.phone || o.tel || ''}</div>
+        <div style="font-size:16pt;"><b>עיר:</b> ${this.fixLang(o.city || o.address)}</div>
+        <div style="font-size:16pt;"><b>תשלום:</b> ${this.fixLang(o.payment)}</div>
+        
+        <div style="border-top:1px dashed black; margin-top:10px; padding-top:5px; font-size:10pt; height:50px; overflow:hidden;">
+          ${o.offer || ''}
+        </div>
+
+        <div style="border:4px solid black; font-size:38pt; font-weight:900; text-align:center; margin-top:auto; border-radius:10px;">
+          ₪${o.price || '0'}
+        </div>
+        
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">
+          <div style="font-size:8pt; width:60%;">צלם את החבילה, שלח לוואטסאפ שלנו וקבל מתנה!</div>
+          <div id="qr_${o.orderId || Math.random()}"></div>
         </div>
       </div>
     `;
+  }
+
+  printSelected() {
+    const area = document.getElementById('printArea');
+    const list = Array.from(this.selected).map(idx => this.orders[idx]);
+    area.innerHTML = list.map(o => this.generateLabel(o)).join("");
     
-    JsBarcode("#barcode", item.phone.replace(/\D/g,''), {height: 40, displayValue: false});
-    
+    // יצירת קודי QR (אופציונלי)
     setTimeout(() => {
-        window.print();
+      window.print();
+      this.clearSelection();
     }, 500);
   }
 }
