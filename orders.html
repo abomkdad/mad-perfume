@@ -1,3 +1,4 @@
+```html
 <!doctype html>
 <html lang="ar" dir="rtl">
 <head>
@@ -204,6 +205,7 @@
 <script>
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwWi55Q1H1HNdJb61Ht99ZiZodp4B4aaElWSqSuxo37zhKUwRgy8T-NHNPffH4i_Y89Eg/exec";
 const DASH_KEY = "12345678";
+const CUSTOMER_SERVICE_PHONE = "972509787730";
 let allOrders = [];
 let editingRow = null;
 
@@ -317,14 +319,28 @@ function renderOrders(list) {
 async function sendMsg(row, lang) {
   const o = allOrders.find(x => x.rowIndex == row);
   if(!o) return;
-  const paymentMethod = safe(o.payment) || "دفع عند الاستلام";
-  const note = safe(o.notes) ? `%0A📝 ملاحظة: ${safe(o.notes)}` : "";
-  const deliveryComp = safe(o.delivery) ? `%0A🚚 شركة التوصيل: ${safe(o.delivery)}` : "";
-  const customerPhone = formatLocalPhone(o.phone);
-  const msg = lang === 'ar' ? 
-const msg = "أهلاً بك " + safe(o.name) + " في MAD Parfumeur 🖤%0Aيسعدنا تأكيد طلبك المميز!%0A💎 العرض: " + safe(o.offer) + "%0A📍 العنوان: " + safe(o.city) + "%0A💰 السعر: " + safe(o.price) + " ₪%0A💳 الدفع: " + paymentMethod + (deliveryComp||"") + (note||"") + "%0A📞 هاتف التواصل: 972509787730";
-const msg = "שלום " + safe(o.name) + " 👋, תודה שהזמנת מ-MAD Parfumeur%0A📦 המוצר: " + safe(o.offer) + "%0A📍 כתובת: " + safe(o.city) + "%0A💰 מחיר: " + safe(o.price) + " ₪%0A💳 תשלום: " + paymentMethod + (deliveryComp||"") + "%0A📞 טלפון: 972509787730";
-  window.open(`https://wa.me/${normalizePhoneForLink(o.phone)}?text=${msg}`, '_blank');
+
+  const paymentMethod = safe(o.payment) || (lang === "he" ? "תשלום במעמד המסירה" : "دفع عند الاستلام");
+  const note = safe(o.notes) ? (lang === "he" ? `%0A📝 הערה: ${safe(o.notes)}` : `%0A📝 ملاحظة: ${safe(o.notes)}`) : "";
+  const deliveryComp = safe(o.delivery) ? (lang === "he" ? `%0A🚚 חברת משלוח: ${safe(o.delivery)}` : `%0A🚚 شركة التوصيل: ${safe(o.delivery)}`) : "";
+
+  const msgRaw = (lang === 'ar')
+    ? ("أهلاً بك " + safe(o.name) + " في MAD Parfumeur 🖤%0A" +
+       "يسعدنا تأكيد طلبك المميز!%0A" +
+       "💎 العرض: " + safe(o.offer) + "%0A" +
+       "📍 العنوان: " + safe(o.city) + "%0A" +
+       "💰 السعر: " + safe(o.price) + " ₪%0A" +
+       "💳 الدفع: " + paymentMethod + (deliveryComp||"") + (note||"") + "%0A" +
+       "📞 هاتف التواصل: " + CUSTOMER_SERVICE_PHONE)
+    : ("שלום " + safe(o.name) + " 👋, תודה שהזמנת מ-MAD Parfumeur%0A" +
+       "📦 המוצר: " + safe(o.offer) + "%0A" +
+       "📍 כתובת: " + safe(o.city) + "%0A" +
+       "💰 מחיר: " + safe(o.price) + " ₪%0A" +
+       "💳 תשלום: " + paymentMethod + (deliveryComp||"") + "%0A" +
+       "📞 טלפון: " + CUSTOMER_SERVICE_PHONE);
+
+  const url = `https://wa.me/${normalizePhoneForLink(o.phone)}?text=${encodeURIComponent(msgRaw)}`;
+  window.open(url, '_blank');
 }
 
 async function approve(row) {
@@ -341,7 +357,7 @@ async function approve(row) {
     await fetch(`${SCRIPT_URL}?${p.toString()}`);
     showToast("تم الاعتماد بنجاح ✨");
     load();
-  } catch(e) { showToast("فشل التحديث", true); showLoading(false); }
+  } catch(e) { showToast("فشل التحديث"); showLoading(false); }
 }
 
 function openAddModal() {
@@ -376,12 +392,12 @@ function openEditModal(row) {
 }
 
 async function saveOrder() {
-  const isAdd = !editingRow;
+  const isAdd = (editingRow === null);
   showLoading(true);
   const payload = {
     action: isAdd ? "addOrder" : "updateOrder", 
     key: DASH_KEY, 
-    row: editingRow || "",
+    row: isAdd ? "" : editingRow,
     name: safe(document.getElementById('f_name').value),
     phone: safe(document.getElementById('f_phone').value),
     offer: safe(document.getElementById('f_offer').value),
@@ -390,7 +406,7 @@ async function saveOrder() {
     notes: safe(document.getElementById('f_notes').value),
     payment: safe(document.getElementById('f_payment').value),
     delivery: safe(document.getElementById('f_delivery').value),
-    status: isAdd ? "NEW" : "NEW"
+    status: "NEW"
   };
   try {
     const res = await fetch(`${SCRIPT_URL}?` + new URLSearchParams(payload).toString());
@@ -400,7 +416,7 @@ async function saveOrder() {
       closeModal('orderModal');
       load();
     }
-  } catch(e) { showToast("فشل الحفظ", true); showLoading(false); }
+  } catch(e) { showToast("فشل الحفظ"); showLoading(false); }
 }
 
 function openPrintModal(row, lang) {
@@ -426,3 +442,4 @@ window.onload = load;
 </script>
 </body>
 </html>
+```
