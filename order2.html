@@ -2,192 +2,132 @@
 <html lang="he" dir="rtl">
 <head>
   <meta charset="utf-8"/>
-  <title>MAD SYSTEM v5.0 | النسخة المبسطة</title>
+  <title>MAD SYSTEM v5.1 | בדיקת חיבור</title>
   
   <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
   <style>
-    /* تصميم الواجهة - ألوان مريحة للعين */
-    body { font-family: system-ui, -apple-system, sans-serif; background: #0f172a; color: white; margin: 0; padding: 0; direction: rtl; }
-    header { background: #1e293b; padding: 20px; display: flex; align-items: center; gap: 20px; border-bottom: 2px solid #334155; }
+    body { font-family: system-ui, sans-serif; background: #0f172a; color: white; margin: 0; direction: rtl; }
+    header { background: #1e293b; padding: 20px; border-bottom: 2px solid #334155; text-align: center; }
     
-    /* صندوق البحث */
-    .search-bar { flex: 1; position: relative; }
-    .search-bar input { width: 100%; padding: 12px; border-radius: 10px; border: none; font-size: 18px; }
+    .status-bar { padding: 10px; text-align: center; font-size: 14px; background: #334155; }
+    .status-online { color: #10b981; }
+    .status-offline { color: #ef4444; }
 
-    /* شبكة الطلبات */
     .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; padding: 20px; }
-    .card { background: #1e293b; padding: 15px; border-radius: 12px; border: 1px solid #334155; cursor: pointer; transition: 0.3s; position: relative; }
-    .card:hover { border-color: #3b82f6; background: #263345; }
-    .card input[type="checkbox"] { position: absolute; top: 15px; left: 15px; width: 20px; height: 20px; }
+    .card { background: #1e293b; padding: 15px; border-radius: 12px; border: 1px solid #334155; cursor: pointer; position: relative; }
+    .card:hover { border-color: #3b82f6; }
     
-    .price { color: #10b981; font-size: 24px; font-weight: bold; }
-
-    /* شريط الإجراءات الأسفل */
-    .action-bar { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: white; color: black; padding: 15px 30px; border-radius: 50px; display: none; gap: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 100; }
-    .action-bar.show { display: flex; align-items: center; }
-    .btn-print { background: #3b82f6; color: white; border: none; padding: 10px 20px; border-radius: 20px; font-weight: bold; cursor: pointer; }
-
-    /* إعدادات الطباعة - قياس 10x10 سم */
+    /* עיצוב הדפסה 10x10 */
     @media print {
       body * { visibility: hidden; }
       #printArea, #printArea * { visibility: visible; }
       #printArea { position: absolute; left: 0; top: 0; width: 100mm; }
       @page { size: 100mm 100mm; margin: 0; }
-      .label { 
-        width: 100mm; height: 100mm; padding: 5mm; box-sizing: border-box;
-        background: white !important; color: black !important;
-        display: flex; flex-direction: column; page-break-after: always;
-        border: 1px solid #eee;
-      }
+      .label { width: 100mm; height: 100mm; padding: 5mm; background: white !important; color: black !important; display: flex; flex-direction: column; page-break-after: always; border: 1px solid #000; }
     }
-
-    /* شكل التيكت (الملصق) */
-    .label { font-family: Arial, sans-serif; color: black; direction: rtl; }
-    .label-header { display: flex; justify-content: space-between; margin-bottom: 5px; }
-    .label-row { font-size: 14pt; margin-bottom: 4px; border-bottom: 1px solid #eee; padding-bottom: 2px; }
-    .label-price { font-size: 32pt; font-weight: 900; text-align: center; border: 4px solid black; margin: 5px 0; border-radius: 10px; }
-    .label-footer { display: flex; justify-content: space-between; align-items: center; margin-top: auto; }
     #printArea { display: none; }
   </style>
 </head>
 <body>
 
 <header>
-  <h2 style="margin:0">MAD <span style="color:#3b82f6">V5</span></h2>
-  <div class="search-bar">
-    <input type="text" id="search" placeholder="ابحث بالاسم أو الهاتف (يتجاهل الشرطات)..." oninput="app.render()">
-  </div>
-  <button onclick="app.fetchData()" style="padding:10px; cursor:pointer">تحديث ↻</button>
+  <h2>מערכת MAD - ניהול משלוחים</h2>
+  <div class="status-bar" id="connStatus">בודק חיבור למסד הנתונים...</div>
 </header>
 
-<div class="grid" id="grid"></div>
-
-<div class="action-bar" id="actionBar">
-  <span id="count">0 طلبات مختارة</span>
-  <button class="btn-print" onclick="app.printAll()">طباعة الملصقات 🖨️</button>
-  <button onclick="app.clear()" style="background:none; border:none; color:gray; text-decoration:underline; cursor:pointer">إلغاء</button>
+<div style="padding: 20px; text-align: center;">
+  <input type="text" id="search" placeholder="חיפוש לפי שם או טלפון..." oninput="app.render()" 
+         style="width: 80%; max-width: 500px; padding: 12px; border-radius: 8px; border: none; font-size: 16px;">
+  <button onclick="app.fetchData()" style="padding: 12px 20px; cursor: pointer; background: #3b82f6; color: white; border: none; border-radius: 8px; margin-right: 10px;">רענן נתונים ↻</button>
 </div>
+
+<div class="grid" id="grid"></div>
 
 <div id="printArea"></div>
 
 <script>
 class MadSystem {
   constructor() {
+    // *** שים לב! הדבק כאן את הקישור שקיבלת מגוגל (Deployment URL) ***
     this.url = "https://script.google.com/macros/s/AKfycbyLjLFa8AaH82Ip7m747WC-KSUUEaU_M70S0I9Mda14XbnmcuEfZ7pBnF_zzJYZuXmZ/exec";
-    this.data = [];
-    this.selected = new Set();
     
-    // قاموس الترجمة التلقائية
-    this.dict = {
-      "cash": "مزومين (نقد)", "credit": "ائتمان", "bit": "بيت", "cod": "دفع عند الاستلام",
-      "jerusalem": "القدس", "haifa": "حيفا", "tel aviv": "تل أبيب", "nazareth": "الناصرة"
-    };
-
+    this.data = [];
     this.fetchData();
   }
 
   async fetchData() {
+    const statusDiv = document.getElementById('connStatus');
+    statusDiv.innerHTML = "טוען נתונים...";
+    
     try {
-      const r = await fetch(`${this.url}?action=get`);
-      this.data = await r.json();
+      const response = await fetch(`${this.url}?action=get`);
+      this.data = await response.json();
+      
+      if (this.data.length === 0) {
+          statusDiv.innerHTML = '<span class="status-offline">החיבור הצליח, אך אין נתונים בטבלה.</span>';
+      } else {
+          statusDiv.innerHTML = `<span class="status-online">מחובר! נמצאו ${this.data.length} הזמנות.</span>`;
+      }
       this.render();
-    } catch(e) { alert("خطأ في جلب البيانات"); }
+    } catch(e) {
+      console.error(e);
+      statusDiv.innerHTML = '<span class="status-offline">שגיאת חיבור! וודא שכתובת ה-URL תקינה ושיש הרשאות.</span>';
+    }
   }
-
-  // ترجمة أي كلمة للعربية
-  translate(txt) {
-    if(!txt) return "غير محدد";
-    let k = txt.toString().toLowerCase().trim();
-    return this.dict[k] || txt;
-  }
-
-  // تنظيف النص من الرموز للبحث الذكي
-  clean(s) { return String(s || "").replace(/[^a-zA-Z0-9أ-ת]/g, ""); }
 
   render() {
-    const q = this.clean(document.getElementById('search').value).toLowerCase();
+    const q = document.getElementById('search').value.toLowerCase();
     const container = document.getElementById('grid');
     
-    const list = this.data.filter(item => {
-      const searchKey = this.clean(item.name + item.phone + item.city).toLowerCase();
-      return searchKey.includes(q);
+    const filtered = this.data.filter(item => {
+        const name = (item.name || "").toLowerCase();
+        const phone = (item.phone || "").replace(/-/g, "");
+        return name.includes(q) || phone.includes(q);
     });
 
-    container.innerHTML = list.map(item => {
-      const id = this.data.indexOf(item);
-      const isSel = this.selected.has(id);
-      return `
-        <div class="card" onclick="app.toggle(${id})">
-          <input type="checkbox" ${isSel ? 'checked' : ''}>
-          <div style="font-size:12px; color:#94a3b8">#${item.orderId}</div>
-          <div style="font-size:20px; font-weight:bold; margin:5px 0">${item.name}</div>
-          <div style="color:#cbd5e1">📞 ${item.phone}</div>
-          <div style="color:#f59e0b">📍 ${this.translate(item.city)}</div>
-          <div style="margin-top:10px; display:flex; justify-content:space-between; align-items:center">
-            <span style="font-weight:bold">${this.translate(item.payment)}</span>
-            <span class="price">₪${item.price}</span>
-          </div>
+    if (filtered.length === 0 && q === "") {
+        container.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px;">ממתין לנתונים...</div>';
+        return;
+    }
+
+    container.innerHTML = filtered.map((item, index) => `
+        <div class="card" onclick="app.printSingle(${this.data.indexOf(item)})">
+          <div style="font-weight: bold; font-size: 18px;">${item.name}</div>
+          <div style="color: #94a3b8;">📞 ${item.phone}</div>
+          <div style="color: #f59e0b;">📍 ${item.city || "לא צוין"}</div>
+          <div style="margin-top: 10px; font-weight: bold; color: #10b981;">₪${item.price}</div>
+          <div style="font-size: 12px; margin-top: 5px; color: #64748b;">לחץ להדפסת תווית</div>
         </div>
-      `;
-    }).join("");
+    `).join("");
   }
 
-  toggle(id) {
-    this.selected.has(id) ? this.selected.delete(id) : this.selected.add(id);
-    const bar = document.getElementById('actionBar');
-    document.getElementById('count').innerText = `${this.selected.size} طلبات مختارة`;
-    this.selected.size > 0 ? bar.classList.add('show') : bar.classList.remove('show');
-    this.render();
-  }
-
-  clear() {
-    this.selected.clear();
-    document.getElementById('actionBar').classList.remove('show');
-    this.render();
-  }
-
-  // قالب الملصق للطباعة
-  createLabel(item, i) {
-    return `
+  printSingle(index) {
+    const item = this.data[index];
+    const area = document.getElementById('printArea');
+    
+    area.innerHTML = `
       <div class="label">
-        <div class="label-header">
-          <b style="font-size:18pt">MAD PARFUM</b>
-          <span>#${item.orderId}</span>
+        <h1 style="text-align:center; margin:0; border-bottom: 2px solid black;">MAD PARFUM</h1>
+        <div style="font-size: 16pt; margin-top: 10px;"><b>לכבוד:</b> ${item.name}</div>
+        <div style="font-size: 16pt;"><b>טלפון:</b> ${item.phone}</div>
+        <div style="font-size: 16pt;"><b>עיר:</b> ${item.city || ""}</div>
+        <div style="font-size: 16pt;"><b>תשלום:</b> ${item.payment || "מזומן"}</div>
+        <div style="border: 5px solid black; font-size: 35pt; font-weight: 900; text-align: center; margin-top: auto; border-radius: 10px;">
+          ₪${item.price}
         </div>
-        <div style="background:black; color:yellow; text-align:center; padding:3px; font-weight:bold; margin-bottom:10px">صور اللحظة واحصل على هدية 🎁</div>
-        <div class="label-row"><b>الاسم:</b> ${item.name}</div>
-        <div class="label-row"><b>الهاتف:</b> <span dir="ltr">${item.phone}</span></div>
-        <div class="label-row"><b>البلد:</b> ${this.translate(item.city)}</div>
-        <div class="label-row"><b>الدفع:</b> ${this.translate(item.payment)}</div>
-        <div style="height:50px; overflow:hidden; font-size:11pt; margin-top:5px; border-top:1px dashed #ccc">${item.offer || ''}</div>
-        <div class="label-price">₪${item.price}</div>
-        <div class="label-footer">
-          <div style="font-size:9pt; width:60%">سجل فيديو للمنتج وأرسله للواتساب الخاص بنا واربح!</div>
-          <div id="qr_${i}"></div>
+        <div style="text-align: center; margin-top: 10px;">
+           <svg id="barcode"></svg>
         </div>
-        <div style="text-align:center; margin-top:5px"><svg id="barcode_${i}"></svg></div>
       </div>
     `;
-  }
-
-  printAll() {
-    const list = Array.from(this.selected).map(id => this.data[id]);
-    const area = document.getElementById('printArea');
-    area.innerHTML = list.map((item, i) => this.createLabel(item, i)).join("");
-
-    list.forEach((item, i) => {
-      // توليد الباركود
-      JsBarcode(`#barcode_${i}`, item.phone.replace(/\D/g,''), {height: 30, displayValue: false});
-      // توليد الـ QR
-      new QRCode(document.getElementById(`qr_${i}`), {text: "https://wa.me/972549634449", width: 50, height: 50});
-    });
-
+    
+    JsBarcode("#barcode", item.phone.replace(/\D/g,''), {height: 40, displayValue: false});
+    
     setTimeout(() => {
-      window.print();
-      this.clear();
+        window.print();
     }, 500);
   }
 }
