@@ -4,6 +4,10 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>MAD Manager</title>
+
+  <!-- PDF.js (لاستخراج النص من PDF داخل المتصفح) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+
   <style>
     :root{
       --bg:#060914;
@@ -40,6 +44,7 @@
       font:inherit;border-radius:14px;border:1px solid var(--border);
       background:rgba(255,255,255,.06);color:#fff;padding:12px 12px;outline:none
     }
+    select{appearance:none}
     textarea{min-height:110px;resize:vertical}
     button{font:inherit;border:none;cursor:pointer}
     .btn{padding:12px 14px;border-radius:14px;font-weight:1100}
@@ -123,6 +128,7 @@
     .hr{height:1px;background:rgba(255,255,255,.10);margin:12px 0}
     .two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
     @media(max-width:820px){.two{grid-template-columns:1fr}}
+    .hint{padding:10px 12px;border-radius:14px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.06)}
   </style>
 </head>
 <body>
@@ -133,16 +139,20 @@
 <script>
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyLjLFa8AaH82Ip7m747WC-KSUUEaU_M70S0I9Mda14XbnmcuEfZ7pBnF_zzJYZuXmZ/exec";
 const DASH_KEY   = "12345678"; // للعمليات (بدون باسورد للمستخدم)
+
+// PDF.js Worker
+pdfjsLib.GlobalWorkerOptions.workerSrc =
+  "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
 </script>
 
 <div class="top">
   <div class="wrap">
     <div class="row">
-      <div class="title">نسخة المدير ✅ (Smart Parse)</div>
+      <div class="title">نسخة المدير ✅ (PDF + Smart Parse)</div>
       <span class="tag" id="stat">...</span>
 
       <button class="btn bgray" onclick="manualRefresh()">تحديث ↻</button>
-      <button class="btn bviolet" onclick="openSmartNew()">➕ إضافة طلب من نص واتساب</button>
+      <button class="btn bviolet" onclick="openSmartNew()">➕ إضافة طلب (نص/ PDF)</button>
 
       <button class="btn bblue" id="modeBtn" onclick="toggleMode()">الواجهة: سريعة ⚡</button>
 
@@ -163,7 +173,7 @@ const DASH_KEY   = "12345678"; // للعمليات (بدون باسورد للم
     <div class="tabs">
       <button class="tab active" id="tabQuick" onclick="setTab('quick')">⚡ عمل سريع</button>
       <button class="tab" id="tabPro" onclick="setTab('pro')">🧠 متطوّر جدًا</button>
-      <span class="small muted">Smart Parse: حلّل رسالة واتساب تلقائيًا وعبّي الحقول.</span>
+      <span class="small muted">ارفع PDF أو الصق نص واتساب → تحليل تلقائي → تعديل → تأكيد.</span>
     </div>
   </div>
 </div>
@@ -190,6 +200,24 @@ let mode = localStorage.getItem("mad_manager_mode") || "quick";
 let tab  = localStorage.getItem("mad_manager_tab")  || "quick";
 let firstLoad = true;
 let lastNewKey = "";
+
+const PAYMENT_OPTIONS = [
+  {value:"Cash",     label:"نقداً / מזומן"},
+  {value:"Paid",     label:"مدفوع / שולם"},
+  {value:"PaidLink", label:"مدفوع بالرابط / שולם בקישור"}
+];
+
+const SOURCE_OPTIONS = [
+  {value:"WhatsApp",            label:"واتساب"},
+  {value:"WhatsApp-Sheet",      label:"واتساب (شيت)"},
+  {value:"Site-HE-Paid",        label:"موقع عبري (مدفوع)"},
+  {value:"Site-HE-COD",         label:"موقع عبري (نقداً)"},
+  {value:"Site-AR-Paid",        label:"موقع عربي (مدفوع)"},
+  {value:"Site-AR-COD",         label:"موقع عربي (نقداً)"},
+  {value:"TikTok",              label:"تيك توك"},
+  {value:"Facebook",            label:"فيس"},
+  {value:"Manual",              label:"يدوي"}
+];
 
 start();
 
@@ -239,7 +267,20 @@ async function load(){
 /* ================= Helpers ================= */
 function esc(s){ return String(s||"").replace(/[&<>"']/g,m=>({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[m])); }
 function toLower(s){ return String(s||"").toLowerCase(); }
-function cleanPhone(s){ return String(s||"").replace(/[^\d+]/g,"").trim(); }
+function waLink(phone){
+  const p = String(phone||"").replace(/[^\d]/g,"");
+  if(!p) return "#";
+  return `https://wa.me/${p}`;
+}
+function getVal(id){ return (document.getElementById(id)?.value || "").trim(); }
+function findByRow(row){ return orders.find(x => Number(x.rowIndex) === Number(row)); }
+function badge(text, kind="info"){ return `<span class="badge ${kind}">${esc(text)}</span>`; }
+function extractCityLocal(addr){
+  const s = String(addr||"").trim();
+  if(!s) return "-";
+  return s.split(/[\s,]+/)[0] || "-";
+}
+function isHebrewText(s){ return /[\u0590-\u05FF]/.test(String(s||"")); }
 
 function isInbox(o){
   const offer = toLower(o.offer);
@@ -272,99 +313,18 @@ function flagPrepSent(o){
   const s = (toLower(o.notes) + " " + toLower(o.status));
   return s.includes("flag:prep_sent") || s.includes("sent to prep") || s.includes("approved") || s.includes("تم ارسال للتجهيز");
 }
-function waLink(phone){
-  const p = String(phone||"").replace(/[^\d]/g,"");
-  if(!p) return "#";
-  return `https://wa.me/${p}`;
-}
-function getVal(id){ return (document.getElementById(id)?.value || "").trim(); }
-function findByRow(row){ return orders.find(x => Number(x.rowIndex) === Number(row)); }
-function badge(text, kind="info"){ return `<span class="badge ${kind}">${esc(text)}</span>`; }
-function extractCityLocal(addr){
-  const s = String(addr||"").trim();
-  if(!s) return "-";
-  return s.split(/[\s,]+/)[0] || "-";
+
+function selectHtml(id, options, current){
+  const cur = String(current||"").trim();
+  return `
+    <select id="${id}">
+      <option value="" ${cur===""?"selected":""}>— اختياري —</option>
+      ${options.map(o => `<option value="${esc(o.value)}" ${o.value===cur?"selected":""}>${esc(o.label)}</option>`).join("")}
+    </select>
+  `;
 }
 
-/* ================= Smart Parse (Client) ================= */
-/**
- * يقبل نصوص مرنة مثل:
- * "محمد القدس 0525105889 W183 X102 P104 L102 A115 he 500 مدفوع High Express"
- * أو:
- * "🌟 שלום ... המוצר: W183 X102 ... 500 ₪ ... כתובת: ..."
- */
-function smartParse(txt){
-  const t0 = String(txt||"").replace(/\u200f|\u200e/g,"").replace(/\n+/g," ").trim();
-  const t = t0.replace(/[|]+/g," | "); // يساعد بالـ Notes
-
-  // phone
-  const phoneMatch = t.match(/(\+?972\d{9}|\b05\d{8}\b|\b0?59\d{7,8}\b)/);
-  let phone = phoneMatch ? phoneMatch[1] : "";
-  phone = normalizePhoneLocal(phone);
-
-  // price
-  let price = "";
-  const m1 = t.match(/₪\s*(\d{2,5})/);
-  if(m1) price = m1[1];
-  const m2 = t.match(/\b(\d{2,5})\s*(?:₪|شيكل|shekel|nis|ils)\b/i);
-  if(!price && m2) price = m2[1];
-  if(!price){
-    const tailNum = t.match(/\b(\d{2,5})\b(?!.*\b(\d{2,5})\b)/);
-    if(tailNum) price = tailNum[1];
-  }
-
-  // payment
-  let payment = "";
-  if(/مدفوع|paid|אשראי|כרטיס|בכרטיס|credit/i.test(t)) payment = "Paid";
-  else if(/نقد|cash|מזומן/i.test(t)) payment = "Cash";
-
-  // delivery
-  let delivery = "";
-  if(/High\s*Express/i.test(t)) delivery = "High Express";
-  else if(/Marwah/i.test(t)) delivery = "Marwah Delivery";
-  else if(/Lama/i.test(t)) delivery = "Lama Delivery";
-  else if(/Areen/i.test(t)) delivery = "Areen Delivery";
-
-  // offer codes
-  const tokens = t.replace(/[:,]/g," ").split(/\s+/).filter(Boolean);
-  const codes = tokens.filter(x => /^[A-Za-z]{1,3}\d{2,4}$/i.test(x) || x.toLowerCase()==="he" || x.toLowerCase()==="ar");
-  let offer = codes.length ? codes.join(" ") : "";
-
-  // address
-  let addr = "";
-  const addrHe = t.match(/(?:כתובת|‏כתובת|address)\s*[:：]\s*([^|]+?)(?=(\s{2,}|$|🚀|סטטוס|status))/i);
-  if(addrHe) addr = addrHe[1].trim();
-  const addrAr = t.match(/(?:العنوان|عنوان)\s*[:：]\s*([^|]+?)(?=(\s{2,}|$|🚚|شركة|الدفع|الإجراء))/i);
-  if(!addr && addrAr) addr = addrAr[1].trim();
-
-  // if no addr from keywords, use "city" detected before phone
-  let name = "";
-  let city = "";
-  if(phoneMatch){
-    const before = t.slice(0, phoneMatch.index).trim();
-    const parts = before.split(/\s+/).filter(Boolean);
-    name = parts[0] || "";
-    city = parts.slice(1).join(" ") || "";
-  }
-
-  if(!addr) addr = city || "";
-
-  // proc
-  let proc = "";
-  if(/direct|دون تواصل|بدون تواصل|ללא קשר/i.test(t)) proc = "Direct";
-  if(/call|اتصال|تواصل|טלפון/i.test(t)) proc = proc || "Call";
-
-  // if offer still empty, try "المبلغ" style or "المוצר"
-  if(!offer){
-    const prodHe = t.match(/(?:המוצר|מוצר)\s*[:：]\s*([^|]+?)(?=(\s{2,}|$|💳|שיטת|סטטוס|🚀))/i);
-    if(prodHe) offer = prodHe[1].trim();
-    const prodAr = t.match(/(?:المنتج|العطر)\s*[:：]\s*([^|]+?)(?=(\s{2,}|$|💰|الدفع|📍|العنوان))/i);
-    if(!offer && prodAr) offer = prodAr[1].trim();
-  }
-
-  return { name, phone, offer, price, payment, proc, addr, delivery, raw:t0 };
-}
-
+/* ======== Smart Parse ======== */
 function normalizePhoneLocal(p){
   if(!p) return "";
   let d = String(p).replace(/[^\d]/g,"");
@@ -379,17 +339,92 @@ function normalizePhoneLocal(p){
   return d;
 }
 
+function smartParse(txt){
+  const t0 = String(txt||"").replace(/\u200f|\u200e/g,"").replace(/\n+/g," ").trim();
+  const t = t0.replace(/[|]+/g," | ");
+
+  const phoneMatch = t.match(/(\+?972\d{9}|\b05\d{8}\b|\b0?59\d{7,8}\b)/);
+  let phone = phoneMatch ? phoneMatch[1] : "";
+  phone = normalizePhoneLocal(phone);
+
+  let price = "";
+  const m1 = t.match(/₪\s*(\d{2,5})/);
+  if(m1) price = m1[1];
+  const m2 = t.match(/\b(\d{2,5})\s*(?:₪|شيكل|shekel|nis|ils)\b/i);
+  if(!price && m2) price = m2[1];
+  if(!price){
+    const tailNum = t.match(/\b(\d{2,5})\b(?!.*\b(\d{2,5})\b)/);
+    if(tailNum) price = tailNum[1];
+  }
+
+  let payment = "";
+  if(/مدفوع بالرابط|paid link|בקישור/i.test(t)) payment = "PaidLink";
+  else if(/مدفوع|paid|אשראי|כרטיס|בכרטיס|credit/i.test(t)) payment = "Paid";
+  else if(/نقد|cash|מזומן/i.test(t)) payment = "Cash";
+
+  let delivery = "";
+  if(/High\s*Express/i.test(t)) delivery = "High Express";
+  else if(/Marwah/i.test(t)) delivery = "Marwah Delivery";
+  else if(/Lama/i.test(t)) delivery = "Lama Delivery";
+  else if(/Areen/i.test(t)) delivery = "Areen Delivery";
+
+  const tokens = t.replace(/[:,]/g," ").split(/\s+/).filter(Boolean);
+  const codes = tokens.filter(x => /^[A-Za-z]{1,3}\d{2,4}$/i.test(x) || x.toLowerCase()==="he" || x.toLowerCase()==="ar");
+  let offer = codes.length ? codes.join(" ") : "";
+
+  let addr = "";
+  const addrHe = t.match(/(?:כתובת|‏כתובת|address)\s*[:：]\s*([^|]+?)(?=(\s{2,}|$|🚀|סטטוס|status))/i);
+  if(addrHe) addr = addrHe[1].trim();
+  const addrAr = t.match(/(?:العنوان|عنوان)\s*[:：]\s*([^|]+?)(?=(\s{2,}|$|🚚|شركة|الدفع|الإجراء))/i);
+  if(!addr && addrAr) addr = addrAr[1].trim();
+
+  let name = "";
+  let city = "";
+  if(phoneMatch){
+    const before = t.slice(0, phoneMatch.index).trim();
+    const parts = before.split(/\s+/).filter(Boolean);
+    name = parts[0] || "";
+    city = parts.slice(1).join(" ") || "";
+  }
+  if(!addr) addr = city || "";
+
+  let proc = "";
+  if(/direct|دون تواصل|بدون تواصل|ללא קשר/i.test(t)) proc = "Direct";
+  if(/call|اتصال|تواصل|טלפון/i.test(t)) proc = proc || "Call";
+
+  if(!offer){
+    const prodHe = t.match(/(?:המוצר|מוצר)\s*[:：]\s*([^|]+?)(?=(\s{2,}|$|💳|שיטת|סטטוס|🚀))/i);
+    if(prodHe) offer = prodHe[1].trim();
+    const prodAr = t.match(/(?:المنتج|العطر)\s*[:：]\s*([^|]+?)(?=(\s{2,}|$|💰|الدفع|📍|العنوان))/i);
+    if(!offer && prodAr) offer = prodAr[1].trim();
+  }
+
+  return { name, phone, offer, price, payment, proc, addr, delivery, raw:t0 };
+}
+
 function getRawFromNotes(o){
   const notes = String(o.notes||"");
-  // يحاول يطلع RAW من Notes (إن وجد)
   const m = notes.match(/RAW\s*:\s*(.+)$/i);
   if(m) return m[1].trim();
-  // إذا Notes فيها WA_INBOX | ... | النص بعد آخر |
   if(/WA_INBOX/i.test(notes)){
     const parts = notes.split("|").map(x=>x.trim()).filter(Boolean);
     if(parts.length) return parts[parts.length-1];
   }
   return notes;
+}
+
+/* ================= PDF Extract ================= */
+async function extractTextFromPdfFile(file){
+  const buf = await file.arrayBuffer();
+  const pdf = await pdfjsLib.getDocument({data: buf}).promise;
+  let full = "";
+  for(let p=1; p<=pdf.numPages; p++){
+    const page = await pdf.getPage(p);
+    const tc = await page.getTextContent();
+    const line = tc.items.map(it => it.str).join(" ");
+    full += line + "\n";
+  }
+  return full.trim();
 }
 
 /* ================= Render ================= */
@@ -444,10 +479,10 @@ function quickCard(o){
 
   const addr = o.addr || o.city || "";
   const price = o.price || "";
-  const pay = o.payment || "";
+  const pay = o.payment || "";     // يجي من notes parsing
   const proc = o.proc || "";
   const del = o.delivery || "";
-
+  const src = o.source || "";
   const inbox = isInbox(o);
 
   return `
@@ -461,7 +496,7 @@ function quickCard(o){
         ${badge(prepOk ? "✅ تم إرسال للتجهيز" : "❌ غير مُرسل للتجهيز", prepOk?"ok":"no")}
         ${badge(custOk ? "✅ تم إرسال للعميل" : "❌ لم يتم إرسال للعميل", custOk?"ok":"no")}
         ${inbox ? badge("📩 WA_INBOX", "warn") : ""}
-        ${o.source ? badge("🌐 " + o.source, "info") : ""}
+        ${src ? badge("🌐 " + src, "info") : ""}
       </div>
 
       <div class="grid">
@@ -469,10 +504,22 @@ function quickCard(o){
         ${fieldInput("الهاتف", `phone_${o.rowIndex}`, o.phone||"", true)}
         ${fieldInput("الطلب (C)", `offer_${o.rowIndex}`, o.offer||"", true)}
         ${fieldInput("السعر", `price_${o.rowIndex}`, price, true)}
-        ${fieldInput("الدفع", `payment_${o.rowIndex}`, pay)}
-        ${fieldInput("الإجراء", `proc_${o.rowIndex}`, proc)}
+
+        <div class="field">
+          <div class="label">طريقة الدفع</div>
+          ${selectHtml(`payment_${o.rowIndex}`, PAYMENT_OPTIONS, pay)}
+        </div>
+
+        ${fieldInput("الإجراء", `proc_${o.rowIndex}`, proc || "Direct")}
         ${fieldInput("العنوان", `addr_${o.rowIndex}`, addr)}
+
+        <div class="field">
+          <div class="label">مصدر الطلب (اختياري)</div>
+          ${selectHtml(`source_${o.rowIndex}`, SOURCE_OPTIONS, src)}
+        </div>
+
         ${fieldInput("شركة التوصيل", `delivery_${o.rowIndex}`, del)}
+
         <div class="field" style="grid-column:1/-1">
           <div class="label">ملاحظات (تظهر كاملة)</div>
           <div class="muted" style="white-space:pre-wrap;word-break:break-word">${esc(o.notes||"")}</div>
@@ -485,7 +532,8 @@ function quickCard(o){
       </div>
 
       <div class="subactions">
-        <button class="btn bviolet" onclick="smartFillFromNotes(${o.rowIndex})">🧠 تحليل تلقائي (من Notes)</button>
+        <button class="btn bviolet" onclick="smartFillFromNotes(${o.rowIndex})">🧠 تحليل (من Notes)</button>
+        <button class="btn bviolet" onclick="openPdfForRow(${o.rowIndex})">📄 إضافة PDF</button>
         <button class="btn borange" onclick="saveQuick(${o.rowIndex})">💾 حفظ التعديل</button>
         <a class="btn bcyan" href="${waLink(o.phone)}" target="_blank" style="text-decoration:none;display:inline-block">💬 فتح واتساب</a>
         <button class="btn bgray" onclick="markReady(${o.rowIndex})">✅ جاهز</button>
@@ -494,7 +542,7 @@ function quickCard(o){
       </div>
 
       <div class="small muted" style="margin-top:10px">
-        إذا هذا سجل واتساب Inbox: اضغط “🧠 تحليل تلقائي” ثم “💾 حفظ” ثم “✅ اعتماد + إرسال للتجهيز”.
+        لو هذا سجل واتساب Inbox: اضغط “🧠 تحليل” أو “📄 PDF” ثم “💾 حفظ” ثم “✅ اعتماد”.
       </div>
     </div>
   `;
@@ -524,8 +572,8 @@ function renderPro(){
         <button class="btn bgray" onclick="selectAll(true)">تحديد الكل</button>
         <button class="btn bgray" onclick="selectAll(false)">إلغاء التحديد</button>
 
-        <select id="bulkStatus" style="min-width:240px">
-          <option value="Approved ✅ (Sent to Prep)">اعتماد + إرسال للتجهيز</option>
+        <select id="bulkStatus" style="min-width:260px">
+          <option value="Approved ✅ (Sent to Prep) | FLAG:PREP_SENT">اعتماد + إرسال للتجهيز</option>
           <option value="READY ✅ (מוכן / مجهز)">جاهز</option>
           <option value="CANCELLED ❌">إلغاء</option>
         </select>
@@ -534,7 +582,7 @@ function renderPro(){
         <button class="btn bblue" onclick="bulkSendConfirm()">تأكيد للعميل (للمحدد)</button>
       </div>
       <div class="small muted" style="margin-top:10px">
-        Smart Parse: افتح أي طلب واضغط “تحليل تلقائي” لملء الحقول من الرسالة.
+        افتح أي طلب واضغط “تحليل” أو “PDF” لملء الحقول.
       </div>
     </div>
   `;
@@ -548,7 +596,7 @@ function renderPro(){
     <div class="card">
       <div class="head">
         <div class="title">جدول الطلبات</div>
-        <div class="small muted">اضغط "فتح" لفتح لوحة التعديل الكاملة</div>
+        <div class="small muted">اضغط "فتح" للتعديل الكامل</div>
       </div>
 
       <table>
@@ -590,6 +638,7 @@ function proRow(o){
       <td>
         <button class="rowBtn" onclick="openEditor(${o.rowIndex})">فتح</button>
         <button class="vioBtn" onclick="smartFillFromNotes(${o.rowIndex});openEditor(${o.rowIndex})">تحليل</button>
+        <button class="vioBtn" onclick="openPdfForRow(${o.rowIndex})">PDF</button>
         <button class="okBtn" onclick="approveToPrep(${o.rowIndex})">إرسال للتجهيز</button>
         <button class="rowBtn" onclick="sendConfirm(${o.rowIndex})">تأكيد</button>
         <button class="dangerBtn" onclick="cancelOrder(${o.rowIndex})">إلغاء</button>
@@ -601,6 +650,16 @@ function proRow(o){
 /* ================= Actions (shared) ================= */
 async function saveQuick(row){
   const addr = getVal(`addr_${row}`);
+  const source = getVal(`source_${row}`);
+  const payment = getVal(`payment_${row}`);
+  const delivery = getVal(`delivery_${row}`);
+
+  // إذا سكربتك لا يدعم source كعمود، رح ينضاف كـ Note تلقائيًا
+  const extra = [
+    source ? `SOURCE_UI:${source}` : "",
+    delivery ? `DELIVERY_UI:${delivery}` : ""
+  ].filter(Boolean).join(" | ");
+
   const payload = {
     action:"updateOrder",
     key:DASH_KEY,
@@ -609,12 +668,13 @@ async function saveQuick(row){
     phone: getVal(`phone_${row}`),
     offer: getVal(`offer_${row}`),
     price: getVal(`price_${row}`),
-    payment: getVal(`payment_${row}`),
+    payment: payment,
     proc: getVal(`proc_${row}`),
     addr: addr,
-    delivery: getVal(`delivery_${row}`),
     city: extractCityLocal(addr),
-    extraNotes: "" // اتركها فاضية هنا
+    source: source,            // ✅ لو السكربت يدعم
+    delivery: delivery,        // ✅ لو السكربت يدعم
+    extraNotes: extra
   };
 
   const url = `${SCRIPT_URL}?` + new URLSearchParams(payload).toString();
@@ -650,26 +710,78 @@ async function setStatus(row, status){
   else { alert("✅ تم تحديث الحالة"); await load(); }
 }
 
-async function sendConfirm(row){
-  if(!confirm("إرسال رسالة تأكيد محترمة للعميل؟")) return;
-  const url = `${SCRIPT_URL}?action=sendCustomerConfirm&key=${encodeURIComponent(DASH_KEY)}&row=${row}`;
-  const res = await fetch(url);
-  const j = await res.json().catch(()=>({}));
+/* ======== Confirm customer (API if exists / fallback to wa.me) ======== */
+function buildCustomerConfirmMessage(o){
+  const name = o.name || "عميلنا";
+  const offer = o.offer || "";
+  const price = o.price ? `₪${o.price}` : "";
+  const payment = o.payment || "";
+  const addr = o.addr || o.city || "";
+  const orderId = o.orderId || "";
+  const days = "3";
 
-  if(j.result !== "SUCCESS"){
-    alert("❌ فشل الإرسال: " + (j.message||""));
-    return;
+  const he = isHebrewText(name) || isHebrewText(addr) || / he\b/i.test(String(o.offer||""));
+  if(he){
+    const payTxt = payment==="PaidLink" ? "שולם בקישור" : (payment==="Paid" ? "שולם" : (payment==="Cash" ? "מזומן" : payment));
+    return (
+      `שלום ${name} 👋\n`+
+      `תודה שהזמנת מ-MAD Parfumeur 🖤\n\n`+
+      `📦 מוצר: ${offer}\n`+
+      `💰 סכום: ${price}\n`+
+      `💳 תשלום: ${payTxt}\n`+
+      `📍 כתובת: ${addr}\n`+
+      `🧾 הזמנה: ${orderId}\n\n`+
+      `ההזמנה תטופל ותישלח תוך ${days} ימי עסקים.\n`+
+      `לשירות לקוחות: 9935`
+    );
   }
 
-  // ✅ نضيف علامة أنه تم ارسال للعميل (لو الباك-إند ما يكتبها)
+  const payTxt = payment==="PaidLink" ? "مدفوع بالرابط" : (payment==="Paid" ? "مدفوع" : (payment==="Cash" ? "نقداً" : payment));
+  return (
+    `أهلاً بك ${name} في عالم MAD Parfumeur 🖤\n`+
+    `تم تأكيد طلبك بنجاح ✅\n\n`+
+    `📦 الطلب: ${offer}\n`+
+    `💰 السعر: ${price}\n`+
+    `💳 الدفع: ${payTxt}\n`+
+    `📍 العنوان: ${addr}\n`+
+    `🧾 رقم الطلب: ${orderId}\n\n`+
+    `سنقوم بتجهيز شحنتك وإرسالها خلال ${days} أيام عمل.\n`+
+    `📞 خدمة العملاء: 9935`
+  );
+}
+
+async function sendConfirm(row){
+  const o = findByRow(row);
+  if(!o){ alert("❌ لم يتم العثور على الطلب"); return; }
+
+  if(!confirm("إرسال رسالة تأكيد محترمة للعميل؟")) return;
+
+  // أولاً: جرّب endpoint من السكربت (إذا موجود)
+  try{
+    const url = `${SCRIPT_URL}?action=sendCustomerConfirm&key=${encodeURIComponent(DASH_KEY)}&row=${row}`;
+    const res = await fetch(url);
+    const j = await res.json().catch(()=>null);
+
+    if(j && j.result === "SUCCESS"){
+      await appendFlagToNotes(row, "FLAG:CUST_SENT | تم ارسال للعميل ✅");
+      alert("✅ تم إرسال التأكيد (API)");
+      await load();
+      return;
+    }
+  }catch(e){}
+
+  // fallback: افتح واتساب مع رسالة جاهزة
+  const msg = buildCustomerConfirmMessage(o);
+  const link = waLink(o.phone) + "?text=" + encodeURIComponent(msg);
+  window.open(link, "_blank");
+
   await appendFlagToNotes(row, "FLAG:CUST_SENT | تم ارسال للعميل ✅");
-  alert("✅ تم إرسال التأكيد");
+  alert("✅ تم فتح واتساب برسالة جاهزة");
   await load();
 }
 
 async function appendFlagToNotes(row, flagText){
   try{
-    // حل سريع: نستخدم updateOrder مع extraNotes (ما يغيّر البيانات)
     const o = findByRow(row);
     if(!o) return;
 
@@ -685,8 +797,9 @@ async function appendFlagToNotes(row, flagText){
       payment: o.payment || "",
       proc: o.proc || "",
       addr: addr,
-      delivery: o.delivery || "",
       city: o.city || extractCityLocal(addr),
+      source: o.source || "",
+      delivery: o.delivery || "",
       extraNotes: flagText
     };
     const url = `${SCRIPT_URL}?` + new URLSearchParams(payload).toString();
@@ -708,8 +821,8 @@ function copySummary(row){
     `Proc: ${o.proc||""}\n`+
     `Addr: ${o.addr||o.city||""}\n`+
     `Delivery: ${o.delivery||""}\n`+
-    `Status: ${o.status||""}\n`+
-    `Source: ${o.source||""}`;
+    `Source: ${o.source||""}\n`+
+    `Status: ${o.status||""}`;
 
   navigator.clipboard.writeText(txt).then(()=> alert("✅ تم النسخ")).catch(()=> prompt("انسخ:", txt));
 }
@@ -727,7 +840,6 @@ function smartFillFromNotes(row){
     return;
   }
 
-  // Quick inputs
   const set = (id, v)=>{
     const el = document.getElementById(id);
     if(el && v) el.value = v;
@@ -737,14 +849,70 @@ function smartFillFromNotes(row){
   set(`phone_${row}`, parsed.phone || o.phone || "");
   set(`offer_${row}`, parsed.offer || o.offer || "");
   set(`price_${row}`, parsed.price || o.price || "");
-  set(`payment_${row}`, parsed.payment || o.payment || "");
+  if(parsed.payment) set(`payment_${row}`, parsed.payment);
   set(`proc_${row}`, parsed.proc || o.proc || "Direct");
   set(`addr_${row}`, parsed.addr || (o.addr||o.city||""));
   set(`delivery_${row}`, parsed.delivery || o.delivery || "");
 
-  // لو ما في name، خلي الاسم الحالي
-  // لو ما في offer وتوجد Codes داخل النص، هو بيعبّي
   alert("✅ تم التحليل وتعبئة الحقول");
+}
+
+/* ================= PDF for existing row ================= */
+function openPdfForRow(row){
+  const o = findByRow(row);
+  if(!o){ alert("❌ لم يتم العثور"); return; }
+
+  document.getElementById("modalTitle").textContent = `📄 إضافة PDF — ${o.orderId} (#${row})`;
+  document.getElementById("modalBody").innerHTML = `
+    <div class="card" style="margin:0">
+      <div class="hint">
+        ارفع PDF (طلب موقع) → سيتم استخراج النص وتحليله وتعبئة الحقول في الكرت مباشرة.
+      </div>
+      <div class="row" style="margin-top:10px">
+        <input id="pdf_file" type="file" accept="application/pdf"/>
+        <button class="btn bviolet" onclick="pdfParseToRow(${row})">🧠 تحليل PDF</button>
+        <button class="btn bgray" onclick="closeModal()">إغلاق</button>
+      </div>
+      <div class="hr"></div>
+      <div class="field">
+        <div class="label">النص المستخرج من PDF</div>
+        <textarea id="pdf_text" placeholder="سيظهر هنا النص بعد التحليل..."></textarea>
+      </div>
+      <div class="small muted">بعد التحليل: اضغط “💾 حفظ التعديل” من الكرت.</div>
+    </div>
+  `;
+  document.getElementById("modal").classList.add("show");
+}
+
+async function pdfParseToRow(row){
+  const f = document.getElementById("pdf_file").files[0];
+  if(!f){ alert("اختر ملف PDF"); return; }
+
+  try{
+    const text = await extractTextFromPdfFile(f);
+    document.getElementById("pdf_text").value = text;
+
+    const parsed = smartParse(text);
+
+    // اكتب في Inputs في الكرت
+    const set = (id, v)=>{
+      const el = document.getElementById(id);
+      if(el && v) el.value = v;
+    };
+
+    set(`name_${row}`, parsed.name || getVal(`name_${row}`));
+    set(`phone_${row}`, parsed.phone || getVal(`phone_${row}`));
+    set(`offer_${row}`, parsed.offer || getVal(`offer_${row}`));
+    set(`price_${row}`, parsed.price || getVal(`price_${row}`));
+    if(parsed.payment) set(`payment_${row}`, parsed.payment);
+    set(`proc_${row}`, parsed.proc || getVal(`proc_${row}`) || "Direct");
+    set(`addr_${row}`, parsed.addr || getVal(`addr_${row}`));
+    set(`delivery_${row}`, parsed.delivery || getVal(`delivery_${row}`));
+
+    alert("✅ تم تحليل PDF وتعبئة الحقول — الآن احفظ التعديل");
+  }catch(e){
+    alert("❌ فشل تحليل PDF");
+  }
 }
 
 /* ================= Pro editor modal ================= */
@@ -752,11 +920,10 @@ function openEditor(row){
   const o = findByRow(row);
   if(!o){ alert("❌ لم يتم العثور"); return; }
 
-  document.getElementById("modalTitle").textContent = `تعديل متقدّم — ${o.orderId} (#${row})`;
-
   const raw = getRawFromNotes(o);
 
-  const html = `
+  document.getElementById("modalTitle").textContent = `تعديل متقدّم — ${o.orderId} (#${row})`;
+  document.getElementById("modalBody").innerHTML = `
     <div class="split">
       <div class="card" style="margin:0">
         <div class="head">
@@ -765,8 +932,13 @@ function openEditor(row){
         </div>
 
         <div class="two">
-          <button class="btn bviolet" onclick="modalSmartParse(${row})">🧠 تحليل تلقائي (من النص)</button>
+          <button class="btn bviolet" onclick="modalSmartParse(${row})">🧠 تحليل (من النص)</button>
+          <button class="btn bviolet" onclick="modalPdfParse(${row})">📄 تحليل PDF</button>
+        </div>
+
+        <div class="two" style="margin-top:10px">
           <button class="btn borange" onclick="modalSave(${row})">💾 حفظ التعديل</button>
+          <button class="btn bblue" onclick="sendConfirm(${row})">📩 تأكيد للعميل</button>
         </div>
 
         <div class="hr"></div>
@@ -778,14 +950,28 @@ function openEditor(row){
           ${fieldInput("العنوان", `m_addr`, (o.addr||o.city||""))}
           ${fieldInput("الطلب (C)", `m_offer`, o.offer||"", true)}
           ${fieldInput("السعر", `m_price`, (o.price||""), true)}
-          ${fieldInput("الدفع", `m_payment`, (o.payment||""))}
-          ${fieldInput("الإجراء", `m_proc`, (o.proc||""))}
+
+          <div class="field">
+            <div class="label">طريقة الدفع</div>
+            ${selectHtml(`m_payment`, PAYMENT_OPTIONS, (o.payment||""))}
+          </div>
+
+          ${fieldInput("الإجراء", `m_proc`, (o.proc||"Direct"))}
+
+          <div class="field">
+            <div class="label">مصدر الطلب (اختياري)</div>
+            ${selectHtml(`m_source`, SOURCE_OPTIONS, (o.source||""))}
+          </div>
+
           ${fieldInput("شركة التوصيل", `m_delivery`, (o.delivery||""))}
 
           <div class="field" style="grid-column:1/-1">
-            <div class="label">نص واتساب (لتحليل تلقائي)</div>
+            <div class="label">نص واتساب / نص PDF (للتحليل)</div>
             <textarea id="m_raw">${esc(raw)}</textarea>
-            <div class="small muted" style="margin-top:8px">الصق هنا أي رسالة واتساب وسيتم تعبئة الحقول بزر واحد.</div>
+            <div class="row" style="margin-top:10px">
+              <input id="m_pdf_file" type="file" accept="application/pdf"/>
+              <span class="small muted">ارفع PDF ثم اضغط “📄 تحليل PDF”.</span>
+            </div>
           </div>
 
           <div class="field" style="grid-column:1/-1">
@@ -801,13 +987,12 @@ function openEditor(row){
 
         <div class="actions">
           <button class="btn bgreen hugeBtn" onclick="approveToPrep(${row})">✅ إرسال للتجهيز</button>
-          <button class="btn bblue hugeBtn" onclick="sendConfirm(${row})">📩 تأكيد للعميل</button>
+          <button class="btn bgray hugeBtn" onclick="markReady(${row})">✅ جاهز</button>
         </div>
 
         <div class="subactions">
-          <button class="btn bgray" onclick="markReady(${row})">✅ جاهز</button>
-          <button class="btn bred" onclick="cancelOrder(${row})">🛑 إلغاء</button>
           <a class="btn bcyan" href="${waLink(o.phone)}" target="_blank" style="text-decoration:none;display:inline-block">💬 فتح واتساب</a>
+          <button class="btn bred" onclick="cancelOrder(${row})">🛑 إلغاء</button>
           <button class="btn bgray" onclick="copySummary(${row})">📋 نسخ</button>
         </div>
       </div>
@@ -827,19 +1012,15 @@ function openEditor(row){
         </div>
 
         <div class="small muted" style="margin-top:12px">
-          إذا سجل واتساب Inbox: الصق النص ثم “تحليل تلقائي” ثم “حفظ” ثم “Approved ✅”.
+          لو سجل واتساب Inbox: الصق النص أو ارفع PDF ثم “تحليل” → “حفظ” → “Approved ✅”.
         </div>
       </div>
     </div>
   `;
-
-  document.getElementById("modalBody").innerHTML = html;
   document.getElementById("modal").classList.add("show");
 }
 
-function closeModal(){
-  document.getElementById("modal").classList.remove("show");
-}
+function closeModal(){ document.getElementById("modal").classList.remove("show"); }
 
 function modalSmartParse(row){
   const raw = getVal("m_raw");
@@ -854,7 +1035,7 @@ function modalSmartParse(row){
   set("m_phone", parsed.phone);
   set("m_offer", parsed.offer);
   set("m_price", parsed.price);
-  set("m_payment", parsed.payment);
+  if(parsed.payment) set("m_payment", parsed.payment);
   set("m_proc", parsed.proc || "Direct");
   set("m_addr", parsed.addr);
   set("m_delivery", parsed.delivery);
@@ -866,8 +1047,29 @@ function modalSmartParse(row){
   alert("✅ تم التحليل وتعبئة الحقول");
 }
 
+async function modalPdfParse(row){
+  const f = document.getElementById("m_pdf_file").files[0];
+  if(!f){ alert("اختر ملف PDF"); return; }
+  try{
+    const text = await extractTextFromPdfFile(f);
+    document.getElementById("m_raw").value = text;
+    modalSmartParse(row);
+  }catch(e){
+    alert("❌ فشل تحليل PDF");
+  }
+}
+
 async function modalSave(row){
   const addr = getVal("m_addr");
+  const source = getVal("m_source");
+  const delivery = getVal("m_delivery");
+
+  const extra = [
+    getVal("m_extraNotes"),
+    source ? `SOURCE_UI:${source}` : "",
+    delivery ? `DELIVERY_UI:${delivery}` : ""
+  ].filter(Boolean).join(" | ");
+
   const payload = {
     action:"updateOrder",
     key:DASH_KEY,
@@ -880,8 +1082,9 @@ async function modalSave(row){
     price: getVal("m_price"),
     payment: getVal("m_payment"),
     proc: getVal("m_proc"),
-    delivery: getVal("m_delivery"),
-    extraNotes: getVal("m_extraNotes")
+    source: source,
+    delivery: delivery,
+    extraNotes: extra
   };
 
   const url = `${SCRIPT_URL}?` + new URLSearchParams(payload).toString();
@@ -891,18 +1094,30 @@ async function modalSave(row){
   else { alert("✅ تم الحفظ"); await load(); }
 }
 
-/* ================= Smart New Order (Paste WhatsApp text -> Save as order) ================= */
+/* ================= Smart New Order (Text/PDF) ================= */
 function openSmartNew(){
-  document.getElementById("modalTitle").textContent = "➕ إضافة طلب من نص واتساب (Smart Parse)";
+  document.getElementById("modalTitle").textContent = "➕ إضافة طلب (نص/ PDF) — Smart Parse";
   document.getElementById("modalBody").innerHTML = `
     <div class="card" style="margin:0">
-      <div class="label">الصق نص واتساب هنا</div>
-      <textarea id="sn_raw" placeholder="مثال: محمد القدس 0525105889 W183 X102 P104 L102 A115 he 500 مدفوع High Express"></textarea>
+      <div class="hint">الصق نص واتساب أو ارفع PDF من موقعك — ثم تحليل — ثم حفظ.</div>
 
       <div class="row" style="margin-top:10px">
-        <button class="btn bviolet" onclick="sn_parse()">🧠 تحليل</button>
+        <button class="btn bviolet" onclick="sn_parse()">🧠 تحليل النص</button>
+        <button class="btn bviolet" onclick="sn_pdf()">📄 تحليل PDF</button>
         <button class="btn bgreen" onclick="sn_save()">✅ حفظ كطلب (جاهز للتجهيز)</button>
         <button class="btn bgray" onclick="sn_fillExample()">🎯 مثال</button>
+      </div>
+
+      <div class="row" style="margin-top:10px">
+        <input id="sn_pdf_file" type="file" accept="application/pdf"/>
+        <span class="small muted">ارفع PDF ثم اضغط “📄 تحليل PDF”.</span>
+      </div>
+
+      <div class="hr"></div>
+
+      <div class="field">
+        <div class="label">النص</div>
+        <textarea id="sn_raw" placeholder="مثال: محمد القدس 0525105889 W183 X102 P104 L102 A115 he 500 مدفوع High Express"></textarea>
       </div>
 
       <div class="hr"></div>
@@ -912,14 +1127,25 @@ function openSmartNew(){
         ${fieldInput("الهاتف", "sn_phone", "", true)}
         ${fieldInput("الطلب (C)", "sn_offer", "", true)}
         ${fieldInput("السعر", "sn_price", "", true)}
-        ${fieldInput("الدفع", "sn_payment", "")}
+
+        <div class="field">
+          <div class="label">طريقة الدفع</div>
+          ${selectHtml("sn_payment", PAYMENT_OPTIONS, "")}
+        </div>
+
         ${fieldInput("الإجراء", "sn_proc", "Direct")}
         ${fieldInput("العنوان", "sn_addr", "")}
+
+        <div class="field">
+          <div class="label">مصدر الطلب (اختياري)</div>
+          ${selectHtml("sn_source", SOURCE_OPTIONS, "Manual")}
+        </div>
+
         ${fieldInput("شركة التوصيل", "sn_delivery", "")}
       </div>
 
       <div class="small muted" style="margin-top:10px">
-        الحفظ هنا يتم عبر POST إلى السكربت (لا يعتمد WA Webhook).
+        الحفظ يتم عبر POST إلى السكربت.
       </div>
     </div>
   `;
@@ -938,22 +1164,35 @@ function sn_parse(){
   set("sn_phone", p.phone);
   set("sn_offer", p.offer);
   set("sn_price", p.price);
-  set("sn_payment", p.payment);
+  if(p.payment) set("sn_payment", p.payment);
   set("sn_proc", p.proc || "Direct");
   set("sn_addr", p.addr);
   set("sn_delivery", p.delivery);
   alert("✅ تم التحليل");
 }
 
+async function sn_pdf(){
+  const f = document.getElementById("sn_pdf_file").files[0];
+  if(!f){ alert("اختر ملف PDF"); return; }
+  try{
+    const text = await extractTextFromPdfFile(f);
+    document.getElementById("sn_raw").value = text;
+    sn_parse();
+  }catch(e){
+    alert("❌ فشل تحليل PDF");
+  }
+}
+
 async function sn_save(){
   const name = getVal("sn_name") || "Customer";
   const phone = getVal("sn_phone");
-  const offer = getVal("sn_offer") || "Manual-WhatsApp";
+  const offer = getVal("sn_offer") || "Manual-Order";
   const price = getVal("sn_price") || "";
   const payment = getVal("sn_payment") || "";
   const proc = getVal("sn_proc") || "Direct";
   const addr = getVal("sn_addr") || "-";
   const delivery = getVal("sn_delivery") || "";
+  const source = getVal("sn_source") || "Manual";
 
   if(!phone){
     alert("❌ لازم رقم هاتف");
@@ -968,7 +1207,7 @@ async function sn_save(){
     payment,
     process: proc,
     address: addr,
-    source: "Manager-WhatsApp",
+    source: source,
     status: "Approved ✅ (Sent to Prep) | FLAG:PREP_SENT",
     extraNotes: delivery ? ("Delivery: " + delivery) : ""
   };
