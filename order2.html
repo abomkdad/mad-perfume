@@ -1,227 +1,504 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<!doctype html>
+<html lang="he" dir="rtl">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Prep - MAD System</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;700;900&family=Assistant:wght@400;700;800&display=swap" rel="stylesheet">
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>MAD FINAL SYSTEM</title>
+  
+  <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
   <style>
-    body { font-family: "Noto Sans Arabic", "Assistant", system-ui, sans-serif; }
-    .card { border:1px solid rgba(255,255,255,.08); background:rgba(17,24,39,.65); }
-    .muted { opacity:.8; }
+    :root { 
+      --bg: #111116;       /* خلفية سوداء */
+      --card: #1c1c24;     /* لون الكروت */
+      --primary: #3b82f6;  /* أزرق */
+      --accent: #f59e0b;   /* ذهبي للطباعة */
+      --text: #ffffff;     
+      --green: #10b981;    /* للسعر */
+      --danger: #ef4444;   /* للتنبيهات */
+    }
+
+    body { margin: 0; font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); color: var(--text); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+
+    /* --- شريط التنبيه الأحمر --- */
+    #alert-bar { 
+      display: none; background: var(--danger); color: white; text-align: center; 
+      padding: 12px; font-weight: 900; font-size: 1.1rem; cursor: pointer;
+      animation: flash 1s infinite; position: sticky; top: 0; z-index: 9999;
+    }
+    @keyframes flash { 50% { opacity: 0.5; } }
+
+    /* --- الهيدر (القائمة العلوية) --- */
+    .header { 
+      background: #18181b; padding: 15px 25px; border-bottom: 1px solid #333;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .brand { font-size: 1.5rem; font-weight: 900; letter-spacing: 1px; color: #fff; }
+    
+    .tabs { display: flex; background: #27272a; padding: 5px; border-radius: 8px; gap: 5px; }
+    .tab { 
+      padding: 8px 20px; cursor: pointer; border-radius: 6px; font-weight: bold; color: #a1a1aa; 
+      transition: 0.3s; display: flex; align-items: center; gap: 8px;
+    }
+    .tab.active { background: var(--primary); color: #fff; }
+    .badge { background: #000; padding: 2px 8px; border-radius: 10px; font-size: 0.8rem; }
+
+    .search-wrap { flex: 1; max-width: 400px; margin: 0 20px; }
+    .search-inp { 
+      width: 100%; padding: 10px 15px; border-radius: 8px; border: 1px solid #3f3f46; 
+      background: #000; color: #fff; font-weight: bold; outline: none;
+    }
+    .search-inp:focus { border-color: var(--primary); }
+
+    .btn { cursor: pointer; border: none; padding: 10px 20px; border-radius: 6px; font-weight: bold; color: white; transition: 0.2s; display: flex; align-items: center; gap: 8px; }
+    .btn-all { background: var(--accent); color: #000; }
+    .btn-refresh { background: #27272a; border: 1px solid #3f3f46; }
+
+    /* --- منطقة العمل (الشبكة) --- */
+    .workspace { flex: 1; overflow-y: auto; padding: 20px; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 15px; }
+
+    /* --- تصميم الكرت (حسب الصورة المرفقة) --- */
+    .card { 
+      background: var(--card); border: 1px solid #27272a; border-radius: 10px; padding: 15px; 
+      position: relative; cursor: pointer; transition: transform 0.2s; 
+      display: flex; flex-direction: column; gap: 8px;
+    }
+    .card:hover { transform: translateY(-4px); border-color: var(--primary); background: #202029; }
+    
+    .card-top { display: flex; justify-content: space-between; font-size: 0.85rem; color: #71717a; font-weight: bold; border-bottom: 1px solid #27272a; padding-bottom: 8px; }
+    .card-name { font-size: 1.2rem; font-weight: 800; color: #fff; }
+    .card-phone { font-family: monospace; font-size: 1rem; color: #a1a1aa; direction: ltr; text-align: right; }
+    
+    .card-products { 
+      background: #101014; padding: 8px; border-radius: 6px; font-size: 0.9rem; 
+      color: #e4e4e7; line-height: 1.4; max-height: 60px; overflow: hidden; 
+    }
+    
+    .card-footer { display: flex; justify-content: space-between; align-items: center; margin-top: auto; }
+    .price-tag { color: var(--green); font-size: 1.3rem; font-weight: 900; }
+    .status-tag { font-size: 0.8rem; padding: 3px 8px; border-radius: 4px; background: #27272a; color: #aaa; }
+    .status-ready { background: var(--green); color: #fff; }
+
+    /* --- نافذة التعديل (Modal) --- */
+    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 1000; justify-content: center; align-items: center; }
+    .modal-box { width: 95%; max-width: 1100px; height: 90vh; background: #fff; color: #000; display: flex; border-radius: 12px; overflow: hidden; }
+    .editor-pane { width: 35%; background: #f4f4f5; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+    .preview-pane { width: 65%; background: #e4e4e7; display: flex; align-items: center; justify-content: center; padding: 20px; flex-direction: column; }
+    
+    .inp-group label { display: block; font-weight: 700; font-size: 0.85rem; margin-bottom: 4px; }
+    .inp-group input, .inp-group textarea { width: 100%; padding: 10px; border: 1px solid #d4d4d8; border-radius: 6px; font-weight: 600; box-sizing: border-box; }
+    
+    .btn-print-modal { width: 100%; padding: 15px; background: #000; color: #fff; font-size: 1.2rem; margin-top: auto; border: none; cursor: pointer; font-weight: bold; border-radius: 8px; }
+
+    /* --- تصميم الملصق (10x10) - مطابق للصورة تماماً --- */
+    .label-page { 
+      width: 100mm; height: 100mm; background: #fff; color: #000; padding: 3mm; 
+      box-sizing: border-box; border: 1px solid #ddd; display: flex; flex-direction: column; 
+      position: relative; overflow: hidden; page-break-after: always; direction: rtl;
+    }
+    
+    .l-head { display: flex; justify-content: space-between; height: 20mm; align-items: flex-start; }
+    .l-logo img { width: 35mm; }
+    .l-meta { text-align: left; font-size: 9pt; font-weight: 800; line-height: 1.2; }
+    
+    /* البانر الأسود والذهبي */
+    .l-banner { 
+      background: #18181b; color: #fbbf24; text-align: center; font-weight: 900; 
+      font-size: 11pt; padding: 4px; margin: 1mm 0 3mm 0; border-radius: 4px;
+      display: flex; align-items: center; justify-content: center; gap: 5px;
+    }
+    
+    .l-info { font-size: 11pt; line-height: 1.35; margin-bottom: 2mm; }
+    .l-info b { font-weight: 800; min-width: 50px; display: inline-block; }
+    
+    /* قائمة المنتجات */
+    .l-products { 
+      font-size: 9.5pt; font-weight: bold; line-height: 1.2; 
+      margin-bottom: 2mm; max-height: 15mm; overflow: hidden;
+    }
+    
+    /* مربع السعر الكبير */
+    .l-price-box { 
+      border: 3px solid #000; font-size: 22pt; font-weight: 900; 
+      text-align: center; padding: 2px; margin-bottom: 2mm; 
+    }
+    
+    .l-footer { display: flex; justify-content: space-between; align-items: flex-end; margin-top: auto; border-top: 1px solid #000; padding-top: 2mm; }
+    .l-wa-text { 
+      font-size: 7.5pt; font-weight: 800; width: 68%; line-height: 1.2; 
+      background: #18181b; color: #fbbf24; padding: 5px; border-radius: 4px;
+    }
+
+    #printArea { display: none; }
+    @media print {
+      body * { visibility: hidden !important; }
+      #printArea, #printArea * { visibility: visible !important; }
+      #printArea { position: absolute; left: 0; top: 0; width: 100%; }
+      @page { size: 100mm 100mm; margin: 0; }
+      .label-page { border: none; } 
+    }
   </style>
 </head>
-<body class="min-h-screen bg-slate-950 text-white">
-  <div class="max-w-5xl mx-auto p-4">
-    <div class="flex items-center justify-between gap-3 mb-4">
-      <div>
-        <h1 class="text-xl font-black">نسخة التجهيز (سهل جدًا)</h1>
-        <p class="text-sm muted">يعرض فقط الطلبات المعتمدة للتجهيز. زر واحد: <b>تم تجهيز الطلب</b>.</p>
-      </div>
-      <div class="flex gap-2">
-        <button id="btnNotif" class="px-3 py-2 rounded-xl bg-white/10 hover:bg-white/15">تفعيل إشعارات</button>
-        <button id="btnRefresh" class="px-3 py-2 rounded-xl bg-white/10 hover:bg-white/15">تحديث</button>
-      </div>
-    </div>
+<body>
 
-    <div class="bg-white/5 rounded-2xl p-3 mb-4">
-      <label class="text-sm muted">رابط الـ API (سكريبت جوجل)</label>
-      <input id="api" class="mt-2 w-full px-3 py-3 rounded-xl bg-slate-900 border border-white/10 outline-none"
-        value="https://script.google.com/macros/s/AKfycbyLjLFa8AaH82Ip7m747WC-KSUUEaU_M70S0I9Mda14XbnmcuEfZ7pBnF_zzJYZuXmZ/exec" />
-      <p class="text-xs muted mt-2">إذا غيرت السكربت/نشرت من جديد: بدّل الرابط هنا.</p>
-    </div>
+<audio id="bell" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3"></audio>
 
-    <div id="list" class="space-y-4"></div>
+<div id="alert-bar" onclick="this.style.display='none'">🔔 يوجد طلبات جديدة! (اضغط للإخفاء)</div>
+
+<div class="header">
+  <div class="brand">MAD <span style="color:var(--primary)">SYSTEM</span></div>
+  
+  <div class="tabs">
+    <div class="tab active" id="tab-pending" onclick="setTab('pending')">
+      <span>قيد التجهيز</span>
+      <span class="badge" id="count-pending">0</span>
+    </div>
+    <div class="tab" id="tab-all" onclick="setTab('all')">
+      <span>الأرشيف (الكل)</span>
+      <span class="badge" id="count-all">0</span>
+    </div>
   </div>
 
-  <audio id="beep" preload="auto">
-    <source src="data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAIA+AAACABAAZGF0YQAAAAA=" type="audio/wav">
-  </audio>
+  <div class="search-wrap">
+    <input class="search-inp" id="search" placeholder="بحث ذكي: 050 / اسم..." oninput="render()">
+  </div>
+
+  <div style="display:flex; gap:10px">
+    <button class="btn btn-refresh" onclick="loadData()">تحديث ↻</button>
+    <button class="btn btn-all" onclick="printAll()">طباعة القائمة 🖨️</button>
+  </div>
+</div>
+
+<div class="workspace">
+  <div class="grid" id="grid"></div>
+</div>
+
+<div class="modal-overlay" id="editor">
+  <div class="modal-box">
+    <div class="editor-pane" dir="rtl">
+      <div style="display:flex; justify-content:space-between">
+        <h2 style="margin:0">تعديل الطلب</h2>
+        <button onclick="closeModal()" style="border:none;background:none;font-size:1.5rem;cursor:pointer">✕</button>
+      </div>
+      
+      <div class="inp-group"><label>الاسم:</label><input id="e_name" oninput="updatePreview()"></div>
+      <div class="inp-group"><label>الهاتف (سيتم تحويله تلقائياً):</label><input id="e_phone" oninput="updatePreview()"></div>
+      <div class="inp-group"><label>العنوان:</label><input id="e_city" oninput="updatePreview()"></div>
+      <div class="inp-group"><label>شركة الشحن:</label><input id="e_del" oninput="updatePreview()"></div>
+      
+      <div class="inp-group">
+        <label>المنتجات (Items):</label>
+        <textarea id="e_offer" oninput="updatePreview()" style="height:80px"></textarea>
+      </div>
+      
+      <div class="inp-group"><label>السعر (₪):</label><input id="e_price" type="number" style="font-size:1.2rem;color:green" oninput="updatePreview()"></div>
+      
+      <button class="btn-print-modal" onclick="printSingle()">طباعة (Enter) 🖨️</button>
+    </div>
+    
+    <div class="preview-pane">
+      <div id="livePreview" style="box-shadow: 0 10px 40px rgba(0,0,0,0.5);"></div>
+    </div>
+  </div>
+</div>
+
+<div id="printArea"></div>
 
 <script>
-  const $ = (id)=>document.getElementById(id);
+  // رابط السكربت وكلمة المرور
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyLjLFa8AaH82Ip7m747WC-KSUUEaU_M70S0I9Mda14XbnmcuEfZ7pBnF_zzJYZuXmZ/exec";
+  const PASS = "12345678";
+  
+  let orders = [];
+  let currentTab = 'pending';
+  let currentIndex = null;
   let lastCount = 0;
 
-  function isApprovedForPrep(status=""){
-    status = (status||"").toLowerCase();
-    return status.includes("approved") || status.includes("sent to prep") || status.includes("للتجهيز") || status.includes("اعتماد");
-  }
-  function isReady(status=""){
-    status = (status||"").toLowerCase();
-    return status.includes("تم تجهيز") || status.includes("ready") || status.includes("מוכן");
-  }
+  // 1. الدالة السحرية لإصلاح الأرقام (بدون 972)
+  // تحول أي رقم لصيغة محلية 05X-XXXXXXX
+  function formatPhone(input) {
+    let p = String(input || "").replace(/[^0-9]/g, ""); // حذف أي رموز
+    if (!p) return "";
 
-  async function fetchOrders(){
-    const url = `${$("api").value}?action=get&t=${Date.now()}`;
-    const res = await fetch(url);
-    return await res.json();
-  }
+    // حالات دولية
+    if (p.startsWith("972")) p = "0" + p.slice(3);
+    if (p.startsWith("970")) p = "0" + p.slice(3);
+    
+    // إذا بدأ بـ 5 وكان 9 أرقام (نسي الصفر)
+    if (p.startsWith("5") && p.length === 9) p = "0" + p;
 
-  function detectLang(name=""){
-    if (/[ء-ي]/.test(name)) return "ar";
-    if (/[א-ת]/.test(name)) return "he";
-    return "he";
-  }
-
-  function openPrint(order){
-    const lang = detectLang(order.name||"");
-    const dir = "rtl"; // both ar/he RTL
-    const font = lang==="ar" ? "Noto Sans Arabic" : "Assistant";
-
-    const html = `
-<!doctype html><html dir="${dir}"><head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@700;900&family=Assistant:wght@700;800&display=swap" rel="stylesheet">
-<style>
-  @page { size: 100mm 100mm; margin: 0; } /* default label 100x100 */
-  body { margin:0; font-family:${font}, system-ui; }
-  .box { width:100mm; height:100mm; padding:6mm; box-sizing:border-box; }
-  .t1{ font-size:18pt; font-weight:900; }
-  .t2{ font-size:12pt; font-weight:800; margin-top:2mm; }
-  .t3{ font-size:10pt; margin-top:2mm; line-height:1.2; }
-  .hr{ margin:3mm 0; border-top:2px solid #000; }
-</style></head>
-<body onload="window.print(); setTimeout(()=>window.close(),300);">
-  <div class="box">
-    <div class="t1">MAD</div>
-    <div class="t2">${order.orderId || ""}</div>
-    <div class="hr"></div>
-    <div class="t2">${order.name || ""}</div>
-    <div class="t2">${order.phone || ""}</div>
-    <div class="t3">${order.addr || order.city || ""}</div>
-    <div class="hr"></div>
-    <div class="t2">${order.offer || ""}</div>
-    <div class="t2">${order.price ? ("₪" + order.price) : ""}</div>
-  </div>
-</body></html>`;
-    const w = window.open("", "_blank", "width=420,height=420");
-    w.document.open(); w.document.write(html); w.document.close();
-  }
-
-  async function updateStatus(rowIndex, status){
-    const url = `${$("api").value}?action=updateStatus&row=${encodeURIComponent(rowIndex)}&status=${encodeURIComponent(status)}&t=${Date.now()}`;
-    const res = await fetch(url);
-    return await res.json();
-  }
-
-  async function updateOrder(rowIndex, payload){
-    const qs = new URLSearchParams({ action:"updateOrder", row:rowIndex, ...payload, t:Date.now() });
-    const url = `${$("api").value}?${qs.toString()}`;
-    const res = await fetch(url);
-    return await res.json();
-  }
-
-  function card(order){
-    const wrapper = document.createElement("div");
-    wrapper.className = "card rounded-2xl p-4";
-    wrapper.innerHTML = `
-      <div class="flex items-center justify-between gap-2">
-        <div class="text-sm muted">#${order.rowIndex} • ${order.orderId || ""}</div>
-        <div class="text-xs px-2 py-1 rounded-lg bg-white/10">${order.source || ""}</div>
-      </div>
-
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3">
-        <div class="bg-white/5 rounded-xl p-3">
-          <div class="text-xs muted mb-1">اسم العميل</div>
-          <input class="w-full px-3 py-3 rounded-xl bg-slate-900 border border-white/10" value="${order.name||""}" data-k="name">
-        </div>
-
-        <div class="bg-white/5 rounded-xl p-3">
-          <div class="text-xs muted mb-1">الهاتف</div>
-          <input class="w-full px-3 py-3 rounded-xl bg-slate-900 border border-white/10 text-lg font-black" value="${order.phone||""}" data-k="phone">
-        </div>
-
-        <div class="bg-white/5 rounded-xl p-3 md:col-span-2">
-          <div class="text-xs muted mb-1">العنوان</div>
-          <input class="w-full px-3 py-3 rounded-xl bg-slate-900 border border-white/10" value="${order.addr||order.city||""}" data-k="addr">
-        </div>
-
-        <div class="bg-white/5 rounded-xl p-3 md:col-span-2">
-          <div class="text-xs muted mb-1">(C) الطلب</div>
-          <input class="w-full px-3 py-3 rounded-xl bg-slate-900 border border-white/10 text-base font-bold" value="${order.offer||""}" data-k="offer">
-        </div>
-
-        <div class="bg-white/5 rounded-xl p-3">
-          <div class="text-xs muted mb-1">السعر</div>
-          <input class="w-full px-3 py-3 rounded-xl bg-slate-900 border border-white/10 text-xl font-black" value="${order.price||""}" data-k="price">
-        </div>
-
-        <div class="bg-white/5 rounded-xl p-3">
-          <div class="text-xs muted mb-1">ملاحظات</div>
-          <input class="w-full px-3 py-3 rounded-xl bg-slate-900 border border-white/10" value="${order.notes||""}" data-k="extraNotes">
-        </div>
-      </div>
-
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mt-4">
-        <button class="btnSave px-4 py-4 rounded-2xl bg-indigo-600 hover:bg-indigo-500 font-black">💾 حفظ التعديل</button>
-        <button class="btnPrint px-4 py-4 rounded-2xl bg-slate-800 hover:bg-slate-700 font-black">🖨️ طباعة ملصق</button>
-        <button class="btnReady px-4 py-4 rounded-2xl bg-emerald-600 hover:bg-emerald-500 font-black">✅ تم تجهيز الطلب</button>
-      </div>
-
-      <div class="mt-3 text-sm muted">الحالة: <b>${order.status||""}</b></div>
-    `;
-
-    wrapper.querySelector(".btnPrint").onclick = ()=>openPrint(order);
-
-    wrapper.querySelector(".btnSave").onclick = async ()=>{
-      const inputs = [...wrapper.querySelectorAll("input[data-k]")];
-      const payload = {};
-      inputs.forEach(i=>payload[i.dataset.k]=i.value);
-      payload.city = payload.addr || order.city || "-";
-      payload.payment = order.payment || "";
-      payload.proc = order.proc || "Direct";
-      payload.deliveryCompany = order.deliveryCompany || "";
-      payload.source = order.source || "";
-      await updateOrder(order.rowIndex, payload);
-      await load();
-      alert("تم الحفظ ✅");
-    };
-
-    wrapper.querySelector(".btnReady").onclick = async ()=>{
-      await updateStatus(order.rowIndex, "READY ✅ (تم تجهيز الطلب)");
-      await load();
-      alert("تم ✅");
-    };
-
-    return wrapper;
-  }
-
-  async function load(){
-    const list = $("list");
-    list.innerHTML = `<div class="text-center muted py-10">جاري التحميل...</div>`;
-    let data = await fetchOrders();
-    if (!Array.isArray(data)) data = [];
-    const filtered = data.filter(o => isApprovedForPrep(o.status) && !isReady(o.status));
-
-    // notifications
-    if (filtered.length > lastCount) {
-      try { $("beep").play(); } catch(e){}
-      if (Notification.permission === "granted") {
-        new Notification("MAD System", { body: "وصلت طلبية جديدة للتجهيز ✅" });
-      }
+    // تنسيق مع شَرطة للجمال (اختياري)
+    if (p.length === 10) {
+      return p.slice(0,3) + "-" + p.slice(3);
     }
-    lastCount = filtered.length;
+    return p;
+  }
 
-    list.innerHTML = "";
-    if (!filtered.length) {
-      list.innerHTML = `<div class="text-center muted py-10">لا توجد طلبات للتجهيز الآن.</div>`;
+  // 2. التحقق والتحميل
+  (function(){
+    if(localStorage.getItem('mad_auth') !== PASS) {
+      if(prompt("كلمة السر:") === PASS) localStorage.setItem('mad_auth', PASS);
+      else { document.body.innerHTML = "<h3 style='color:white;text-align:center;margin-top:50px'>دخول مرفوض</h3>"; return; }
+    }
+    loadData();
+    setInterval(loadData, 20000); // تحديث كل 20 ثانية
+  })();
+
+  async function loadData() {
+    try {
+      const res = await fetch(`${SCRIPT_URL}?action=get`);
+      orders = await res.json();
+      
+      // التنبيه عند زيادة الطلبات الجديدة
+      const newPending = orders.filter(o => isPending(o)).length;
+      if(newPending > lastCount && lastCount !== 0) triggerAlert();
+      lastCount = newPending;
+
+      render();
+    } catch(e) {}
+  }
+
+  function isPending(o) {
+    const st = (o.status || "").toLowerCase();
+    return (st.includes("prep") || st.includes("approved")) && !st.includes("ready");
+  }
+
+  function triggerAlert() {
+    const b = document.getElementById('alert-bar');
+    b.style.display = 'block';
+    document.getElementById('bell').play().catch(()=>{});
+    setTimeout(() => b.style.display='none', 8000);
+  }
+
+  function setTab(t) {
+    currentTab = t;
+    document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+    document.getElementById('tab-'+t).classList.add('active');
+    render();
+  }
+
+  // 3. عرض البيانات
+  function render() {
+    const pendingList = orders.filter(isPending);
+    const allList = orders;
+
+    document.getElementById('count-pending').innerText = pendingList.length;
+    document.getElementById('count-all').innerText = allList.length;
+
+    let list = currentTab === 'pending' ? pendingList : allList;
+    const q = document.getElementById('search').value.toLowerCase().trim();
+
+    // البحث الذكي
+    if(q) {
+      list = list.filter(o => {
+        const p = formatPhone(o.phone).replace(/-/g, ""); // رقم نظيف
+        const qClean = q.replace(/-/g, "");
+        return (o.name||"").toLowerCase().includes(q) ||
+               (o.orderId||"").toString().includes(q) ||
+               p.includes(qClean);
+      });
+    }
+
+    const grid = document.getElementById('grid');
+    if(!list.length) {
+      grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:50px;color:#555">لا توجد طلبات</div>';
       return;
     }
-    filtered.forEach(o=>list.appendChild(card(o)));
+
+    grid.innerHTML = list.map(o => {
+      const idx = orders.indexOf(o);
+      const isReady = (o.status||"").includes("READY");
+      
+      // هنا نعرض شركة التوصيل والمنتجات كما طلبت
+      return `
+        <div class="card" onclick="openEditor(${idx})" style="${isReady ? 'opacity:0.6' : ''}">
+          <div class="card-top">
+            <span>#${o.orderId}</span>
+            <span style="color:var(--accent)">${o.delivery || 'High Express'}</span>
+          </div>
+          <div class="card-name">${o.name}</div>
+          <div class="card-phone">${formatPhone(o.phone)}</div>
+          <div class="card-products">📦 ${o.offer || 'لا يوجد وصف'}</div>
+          
+          <div class="card-footer">
+            <span class="status-tag ${isReady ? 'status-ready' : ''}">
+              ${isReady ? 'تم التجهيز (جاهز)' : 'قيد الانتظار'}
+            </span>
+            <span class="price-tag">₪${o.price}</span>
+          </div>
+        </div>
+      `;
+    }).join("");
   }
 
-  $("btnRefresh").onclick = load;
-  $("btnNotif").onclick = async ()=>{
-    if (!("Notification" in window)) return alert("المتصفح لا يدعم إشعارات");
-    const p = await Notification.requestPermission();
-    alert(p === "granted" ? "تم تفعيل الإشعارات ✅" : "تم الرفض");
-  };
+  // 4. تصميم الملصق (مطابق للصورة LOGO 10)
+  function getLabelHTML(o, idSuffix) {
+    const date = new Date().toLocaleDateString('he-IL');
+    const localPhone = formatPhone(o.phone);
+    const cleanPhone = localPhone.replace(/-/g, ""); // للباركود
+    const waLink = `https://wa.me/972${cleanPhone.substring(1)}`; // واتساب دولي
 
-  // auto refresh every 8s
-  setInterval(load, 8000);
-  load();
+    return `
+      <div class="label-page" dir="rtl">
+        <div class="l-head">
+          <div class="l-logo"><img src="https://www.madparfum.com/logo.svg"></div>
+          <div class="l-meta">
+            DATE: ${date}<br>
+            ORD: ${o.orderId}
+          </div>
+        </div>
+
+        <div class="l-banner">
+          <i class="fas fa-gift"></i> צלם את הרגע וקבל מתנה
+        </div>
+
+        <div class="l-info">
+          <div><b>לכבוד:</b> ${o.name}</div>
+          <div><b>טלפון:</b> <span dir="ltr" style="font-family:monospace">${localPhone}</span></div>
+          <div><b>כתובת:</b> ${o.city}</div>
+          <div><b>משלוח:</b> ${o.delivery}</div>
+        </div>
+
+        <div class="l-products">
+          <b>פריטים:</b> ${o.offer || ""}
+        </div>
+
+        <div class="l-price-box">
+          לתשלום: ₪${o.price}
+        </div>
+
+        <div class="l-footer">
+          <div class="l-wa-text">
+             1. סרוק את הקוד <br>
+             2. שלח סרטון ל-WhatsApp <br>
+             3. קבל מתנה!
+          </div>
+          <div id="qr_${idSuffix}"></div>
+        </div>
+        
+        <div style="position:absolute; bottom:2mm; width:94%; text-align:center">
+           <svg id="bar_${idSuffix}" data-val="${cleanPhone}"></svg>
+        </div>
+      </div>
+    `;
+  }
+
+  // 5. المحرر والطباعة
+  function openEditor(idx) {
+    currentIndex = idx;
+    const o = orders[idx];
+    document.getElementById('e_name').value = o.name;
+    document.getElementById('e_phone').value = o.phone; // سيتم التنسيق في المعاينة
+    document.getElementById('e_city').value = o.city + " " + (o.addr||"");
+    document.getElementById('e_del').value = o.delivery || "High Express";
+    document.getElementById('e_offer').value = o.offer || "";
+    document.getElementById('e_price').value = o.price;
+    
+    document.getElementById('editor').style.display = 'flex';
+    updatePreview();
+    
+    document.onkeydown = (e) => {
+      if(e.key === "Enter" && !e.shiftKey) { e.preventDefault(); printSingle(); }
+      if(e.key === "Escape") closeModal();
+    }
+  }
+
+  function closeModal() {
+    document.getElementById('editor').style.display = 'none';
+    document.onkeydown = null;
+  }
+
+  function updatePreview() {
+    const data = {
+      orderId: orders[currentIndex].orderId,
+      name: document.getElementById('e_name').value,
+      phone: document.getElementById('e_phone').value,
+      city: document.getElementById('e_city').value,
+      delivery: document.getElementById('e_del').value,
+      offer: document.getElementById('e_offer').value,
+      price: document.getElementById('e_price').value
+    };
+    document.getElementById('livePreview').innerHTML = getLabelHTML(data, 'prev');
+    genCodes('prev', data.phone);
+  }
+
+  function genCodes(suffix, phoneInput) {
+    // توليد الأكواد
+    setTimeout(() => {
+      try {
+        // باركود بالرقم المحلي النظيف
+        const cleanP = formatPhone(phoneInput).replace(/-/g, "");
+        const barEl = document.getElementById(`bar_${suffix}`);
+        if(barEl) JsBarcode(barEl, cleanP, { format: "CODE128", height: 25, fontSize: 10, displayValue: true, margin:0 });
+        
+        // QR يفتح واتساب الشركة
+        const qrEl = document.getElementById(`qr_${suffix}`);
+        if(qrEl) {
+          qrEl.innerHTML = "";
+          new QRCode(qrEl, { text: "https://wa.me/972549634449", width: 45, height: 45 });
+        }
+      } catch(e){}
+    }, 50);
+  }
+
+  function printSingle() {
+    const data = {
+      orderId: orders[currentIndex].orderId,
+      name: document.getElementById('e_name').value,
+      phone: document.getElementById('e_phone').value,
+      city: document.getElementById('e_city').value,
+      delivery: document.getElementById('e_del').value,
+      offer: document.getElementById('e_offer').value,
+      price: document.getElementById('e_price').value
+    };
+    
+    const area = document.getElementById('printArea');
+    area.innerHTML = getLabelHTML(data, 'print');
+    
+    setTimeout(() => {
+      genCodes('print', data.phone);
+      setTimeout(async () => {
+        window.print();
+        
+        // تحديث الحالة
+        const row = orders[currentIndex].rowIndex;
+        closeModal();
+        await fetch(`${SCRIPT_URL}?action=updateStatus&key=${PASS}&row=${row}&status=READY ✅`);
+        
+        // تحديث محلي
+        orders[currentIndex].status = "READY ✅";
+        render();
+      }, 500);
+    }, 100);
+  }
+
+  function printAll() {
+    // طباعة القائمة الحالية فقط (قيد التجهيز أو الكل)
+    const list = currentTab === 'pending' ? orders.filter(isPending) : orders;
+    
+    if(!list.length) return alert("القائمة فارغة!");
+    if(!confirm(`طباعة ${list.length} ملصق دفعة واحدة؟`)) return;
+
+    const area = document.getElementById('printArea');
+    area.innerHTML = list.map((o, i) => getLabelHTML(o, `bulk_${i}`)).join("");
+
+    setTimeout(() => {
+      list.forEach((o, i) => genCodes(`bulk_${i}`, o.phone));
+      setTimeout(() => {
+        window.print();
+        if(currentTab === 'pending' && confirm("نقل كل المطبوع إلى (جاهز)؟")) {
+          list.forEach(o => {
+             o.status = "READY ✅";
+             fetch(`${SCRIPT_URL}?action=updateStatus&key=${PASS}&row=${o.rowIndex}&status=READY ✅`);
+          });
+          render();
+        }
+      }, 2000); // وقت أطول للكميات الكبيرة
+    }, 200);
+  }
 </script>
 </body>
 </html>
