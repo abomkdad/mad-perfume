@@ -5,271 +5,1067 @@
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>MAD Manager</title>
   <style>
-    body{margin:0;font-family:system-ui,Segoe UI,Tahoma,Arial;background:#070b16;color:#fff}
-    .top{position:sticky;top:0;background:rgba(7,11,22,.92);backdrop-filter:blur(10px);padding:14px;border-bottom:1px solid rgba(255,255,255,.08);z-index:10}
-    .wrap{max-width:980px;margin:0 auto;padding:16px}
+    :root{
+      --bg:#060914;
+      --card1:rgba(255,255,255,.10);
+      --card2:rgba(255,255,255,.06);
+      --border:rgba(255,255,255,.12);
+      --muted:rgba(255,255,255,.72);
+      --green:#16a34a;
+      --blue:#2563eb;
+      --orange:#f59e0b;
+      --red:#dc2626;
+      --gray:rgba(255,255,255,.12);
+      --pink:#db2777;
+      --cyan:#06b6d4;
+      --violet:#7c3aed;
+    }
+    body{margin:0;font-family:system-ui,Segoe UI,Tahoma,Arial;background:var(--bg);color:#fff}
+    .top{
+      position:sticky;top:0;z-index:50;
+      background:rgba(6,9,20,.92);backdrop-filter:blur(10px);
+      border-bottom:1px solid var(--border);
+      padding:14px;
+    }
+    .wrap{max-width:1200px;margin:0 auto;padding:16px}
     .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-    input,select,textarea,button{
-      font:inherit;border-radius:14px;border:1px solid rgba(255,255,255,.14);
+    .title{font-weight:1000;font-size:18px}
+    .tag{
+      padding:7px 11px;border-radius:999px;
+      background:rgba(255,255,255,.10);
+      border:1px solid rgba(255,255,255,.10);
+      font-weight:1000;
+    }
+    input,select,textarea{
+      font:inherit;border-radius:14px;border:1px solid var(--border);
       background:rgba(255,255,255,.06);color:#fff;padding:12px 12px;outline:none
     }
-    textarea{min-height:70px;resize:vertical}
-    button{cursor:pointer;border:none}
-    .btn{padding:12px 14px;border-radius:14px;font-weight:800}
-    .bblue{background:#2563eb}
-    .bgreen{background:#16a34a}
-    .bred{background:#dc2626}
-    .borange{background:#f59e0b;color:#111}
-    .bgray{background:rgba(255,255,255,.12)}
-    .card{
-      background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.04));
-      border:1px solid rgba(255,255,255,.10);
-      border-radius:18px;padding:14px;margin:14px 0;
-      box-shadow:0 12px 40px rgba(0,0,0,.35)
+    textarea{min-height:110px;resize:vertical}
+    button{font:inherit;border:none;cursor:pointer}
+    .btn{padding:12px 14px;border-radius:14px;font-weight:1100}
+    .bgray{background:var(--gray)}
+    .bgreen{background:var(--green)}
+    .bblue{background:var(--blue)}
+    .borange{background:var(--orange);color:#111}
+    .bred{background:var(--red)}
+    .bpink{background:var(--pink)}
+    .bcyan{background:var(--cyan);color:#001018}
+    .bviolet{background:var(--violet)}
+    .tabs{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+    .tab{
+      padding:10px 12px;border-radius:999px;
+      border:1px solid rgba(255,255,255,.14);
+      background:rgba(255,255,255,.08);
+      font-weight:1000;opacity:.95
     }
-    .h{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
-    .tag{padding:6px 10px;border-radius:999px;background:rgba(255,255,255,.10);font-weight:800}
-    .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-    @media(max-width:760px){.grid{grid-template-columns:1fr}}
-    .muted{opacity:.75}
-    .big{font-size:18px;font-weight:900}
-    .sep{height:1px;background:rgba(255,255,255,.10);margin:12px 0}
+    .tab.active{background:rgba(37,99,235,.30);border-color:rgba(37,99,235,.65)}
+    .split{display:grid;grid-template-columns: 1.2fr .8fr;gap:14px}
+    @media(max-width:980px){.split{grid-template-columns:1fr}}
+    .card{
+      background:linear-gradient(180deg,var(--card1),var(--card2));
+      border:1px solid var(--border);
+      border-radius:20px;
+      padding:16px;
+      margin:14px 0;
+      box-shadow:0 14px 50px rgba(0,0,0,.35);
+    }
+    .head{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
+    .oid{font-size:18px;font-weight:1000}
+    .status{font-weight:1000;background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.10);padding:8px 12px;border-radius:999px}
+    .badges{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+    .badge{
+      padding:6px 10px;border-radius:999px;font-weight:1000;
+      border:1px solid rgba(255,255,255,.14);
+      background:rgba(255,255,255,.08);
+    }
+    .badge.ok{background:rgba(22,163,74,.18);border-color:rgba(22,163,74,.35)}
+    .badge.no{background:rgba(220,38,38,.16);border-color:rgba(220,38,38,.35)}
+    .badge.info{background:rgba(6,182,212,.18);border-color:rgba(6,182,212,.35)}
+    .badge.warn{background:rgba(245,158,11,.16);border-color:rgba(245,158,11,.35)}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+    @media(max-width:820px){.grid{grid-template-columns:1fr}}
+    .field{
+      background:rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.12);
+      border-radius:16px;
+      padding:10px;
+    }
+    .label{opacity:.85;font-weight:1000;margin-bottom:6px}
+    .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace}
+    .actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+    @media(max-width:820px){.actions{grid-template-columns:1fr}}
+    .hugeBtn{padding:18px 16px;border-radius:18px;font-size:18px;font-weight:1200}
+    .subactions{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+    .small{font-size:12px;opacity:.8}
+    .muted{opacity:.82;color:var(--muted)}
+    .empty{
+      padding:24px;border:1px dashed rgba(255,255,255,.18);
+      border-radius:18px;text-align:center;opacity:.88;margin-top:16px
+    }
+    table{width:100%;border-collapse:separate;border-spacing:0 10px}
+    th{font-size:12px;opacity:.8;text-align:right;padding:0 10px}
+    td{
+      background:rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.12);
+      padding:10px;border-left:none;border-right:none
+    }
+    tr td:first-child{border-top-right-radius:14px;border-bottom-right-radius:14px;border-right:1px solid rgba(255,255,255,.12)}
+    tr td:last-child{border-top-left-radius:14px;border-bottom-left-radius:14px;border-left:1px solid rgba(255,255,255,.12)}
+    .rowBtn{padding:8px 10px;border-radius:12px;font-weight:1100;background:rgba(37,99,235,.22);border:1px solid rgba(37,99,235,.45); color:#fff}
+    .dangerBtn{padding:8px 10px;border-radius:12px;font-weight:1100;background:rgba(220,38,38,.22);border:1px solid rgba(220,38,38,.45); color:#fff}
+    .okBtn{padding:8px 10px;border-radius:12px;font-weight:1100;background:rgba(22,163,74,.18);border:1px solid rgba(22,163,74,.45); color:#fff}
+    .vioBtn{padding:8px 10px;border-radius:12px;font-weight:1100;background:rgba(124,58,237,.18);border:1px solid rgba(124,58,237,.55); color:#fff}
+
+    .modal{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;z-index:999}
+    .modal .box{width:min(980px,92vw);max-height:90vh;overflow:auto;background:rgba(8,12,26,.96);border:1px solid rgba(255,255,255,.12);border-radius:18px;padding:16px}
+    .modal.show{display:flex}
+
+    .hr{height:1px;background:rgba(255,255,255,.10);margin:12px 0}
+    .two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    @media(max-width:820px){.two{grid-template-columns:1fr}}
   </style>
 </head>
 <body>
-  <div class="top">
-    <div class="wrap">
-      <div class="row">
-        <div style="font-weight:900;font-size:18px">نسخة المدير (تعديل كامل)</div>
-        <span class="tag" id="stat">...</span>
-        <button class="btn bgray" onclick="load()">تحديث ↻</button>
-        <select id="filter" onchange="render()">
-          <option value="NEW">طلبات جديدة (NEW)</option>
-          <option value="APPROVED">تم إرسال للتجهيز</option>
-          <option value="READY">تم تجهيز</option>
-          <option value="ALL">كل الطلبات</option>
-        </select>
-      </div>
-      <div class="row" style="margin-top:10px">
-        <input id="q" placeholder="بحث: اسم / رقم / OrderId" style="flex:1;min-width:240px" oninput="render()"/>
-      </div>
+
+<!-- =========================
+   عدّل فقط هذه القيم
+========================= -->
+<script>
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyLjLFa8AaH82Ip7m747WC-KSUUEaU_M70S0I9Mda14XbnmcuEfZ7pBnF_zzJYZuXmZ/exec";
+const DASH_KEY   = "12345678"; // للعمليات (بدون باسورد للمستخدم)
+</script>
+
+<div class="top">
+  <div class="wrap">
+    <div class="row">
+      <div class="title">نسخة المدير ✅ (Smart Parse)</div>
+      <span class="tag" id="stat">...</span>
+
+      <button class="btn bgray" onclick="manualRefresh()">تحديث ↻</button>
+      <button class="btn bviolet" onclick="openSmartNew()">➕ إضافة طلب من نص واتساب</button>
+
+      <button class="btn bblue" id="modeBtn" onclick="toggleMode()">الواجهة: سريعة ⚡</button>
+
+      <input id="q" placeholder="بحث: اسم / رقم / كود / OrderId / مدينة" style="flex:1;min-width:280px" oninput="render()"/>
+
+      <select id="filter" onchange="render()">
+        <option value="NEW" selected>طلبات جديدة (غير معتمدة)</option>
+        <option value="INBOX">واتساب Inbox (رسائل/PDF)</option>
+        <option value="PREP">تم إرسال للتجهيز</option>
+        <option value="READY">جاهزة</option>
+        <option value="ALL">الكل</option>
+      </select>
+
+      <button class="btn bblue" onclick="enableNotify()">تفعيل إشعار المتصفح</button>
+      <span class="small" id="notifyState"></span>
+    </div>
+
+    <div class="tabs">
+      <button class="tab active" id="tabQuick" onclick="setTab('quick')">⚡ عمل سريع</button>
+      <button class="tab" id="tabPro" onclick="setTab('pro')">🧠 متطوّر جدًا</button>
+      <span class="small muted">Smart Parse: حلّل رسالة واتساب تلقائيًا وعبّي الحقول.</span>
     </div>
   </div>
+</div>
 
-  <div class="wrap" id="list"></div>
+<div class="wrap">
+  <div id="quickView"></div>
+  <div id="proView" style="display:none"></div>
+</div>
+
+<!-- Modal (Pro editor) -->
+<div class="modal" id="modal">
+  <div class="box">
+    <div class="row" style="justify-content:space-between">
+      <div class="title" id="modalTitle">...</div>
+      <button class="btn bgray" onclick="closeModal()">إغلاق ✖</button>
+    </div>
+    <div id="modalBody" style="margin-top:12px"></div>
+  </div>
+</div>
 
 <script>
-  // ==== EDIT THESE ONLY ====
-  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyLjLFa8AaH82Ip7m747WC-KSUUEaU_M70S0I9Mda14XbnmcuEfZ7pBnF_zzJYZuXmZ/exec";
-  const DASH_KEY   = "12345678";
-  // ========================
+let orders = [];
+let mode = localStorage.getItem("mad_manager_mode") || "quick";
+let tab  = localStorage.getItem("mad_manager_tab")  || "quick";
+let firstLoad = true;
+let lastNewKey = "";
 
-  let orders = [];
-  let authed = false;
+start();
 
-  (function(){
-    const pass = prompt("كلمة السر:");
-    if(pass !== DASH_KEY){ document.body.innerHTML = "<div style='padding:30px;font-size:20px'>❌ كلمة السر غلط</div>"; return; }
-    authed = true;
-    load();
-  })();
+async function start(){
+  applyTab();
+  setModeButton();
+  await load();
+  setInterval(load, 10000);
+}
 
-  async function load(){
-    if(!authed) return;
-    document.getElementById("stat").textContent = "تحميل...";
-    const res = await fetch(`${SCRIPT_URL}?action=get`);
-    orders = await res.json();
-    document.getElementById("stat").textContent = `عدد: ${orders.length}`;
+function setTab(t){
+  tab = t;
+  localStorage.setItem("mad_manager_tab", tab);
+  applyTab();
+  render();
+}
+function applyTab(){
+  document.getElementById("tabQuick").classList.toggle("active", tab==="quick");
+  document.getElementById("tabPro").classList.toggle("active", tab==="pro");
+  document.getElementById("quickView").style.display = (tab==="quick") ? "block" : "none";
+  document.getElementById("proView").style.display   = (tab==="pro") ? "block" : "none";
+}
+function toggleMode(){
+  mode = (mode === "quick") ? "pro" : "quick";
+  localStorage.setItem("mad_manager_mode", mode);
+  setModeButton();
+  setTab(mode === "quick" ? "quick" : "pro");
+}
+function setModeButton(){
+  document.getElementById("modeBtn").textContent = (mode==="quick") ? "الواجهة: سريعة ⚡" : "الواجهة: متطوّرة 🧠";
+}
+function manualRefresh(){ load(); }
+
+async function load(){
+  try{
+    const res = await fetch(`${SCRIPT_URL}?action=get&_=${Date.now()}`);
+    const data = await res.json();
+    orders = Array.isArray(data) ? data : [];
+    document.getElementById("stat").textContent = `كل السجلات: ${orders.length}`;
     render();
+    pingNewOrders();
+  }catch(e){
+    document.getElementById("stat").textContent = "خطأ اتصال";
+  }
+}
+
+/* ================= Helpers ================= */
+function esc(s){ return String(s||"").replace(/[&<>"']/g,m=>({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[m])); }
+function toLower(s){ return String(s||"").toLowerCase(); }
+function cleanPhone(s){ return String(s||"").replace(/[^\d+]/g,"").trim(); }
+
+function isInbox(o){
+  const offer = toLower(o.offer);
+  const notes = toLower(o.notes);
+  const src = toLower(o.source);
+  return src.includes("whatsapp") && (notes.includes("wa_inbox") || offer.includes("whatsapp"));
+}
+function isNewUnapproved(o){
+  const st = toLower(o.status);
+  if(isInbox(o) && st.includes("new")) return true;
+  return st === "" || st.includes("new") || st.includes("processing") || st.includes("pending");
+}
+function isPrep(o){
+  const st = toLower(o.status);
+  return st.includes("approved") || st.includes("sent to prep") || st.includes("prep") || st.includes("تم ارسال للتجهيز");
+}
+function isReady(o){
+  const st = toLower(o.status);
+  return st.includes("ready") || st.includes("مجهز") || st.includes("מוכן");
+}
+function isCancelled(o){
+  const st = toLower(o.status);
+  return st.includes("cancel") || st.includes("ملغي") || st.includes("إلغاء");
+}
+function flagCustSent(o){
+  const s = (toLower(o.notes) + " " + toLower(o.status));
+  return s.includes("flag:cust_sent") || s.includes("تم ارسال للعميل") || s.includes("cust:✅");
+}
+function flagPrepSent(o){
+  const s = (toLower(o.notes) + " " + toLower(o.status));
+  return s.includes("flag:prep_sent") || s.includes("sent to prep") || s.includes("approved") || s.includes("تم ارسال للتجهيز");
+}
+function waLink(phone){
+  const p = String(phone||"").replace(/[^\d]/g,"");
+  if(!p) return "#";
+  return `https://wa.me/${p}`;
+}
+function getVal(id){ return (document.getElementById(id)?.value || "").trim(); }
+function findByRow(row){ return orders.find(x => Number(x.rowIndex) === Number(row)); }
+function badge(text, kind="info"){ return `<span class="badge ${kind}">${esc(text)}</span>`; }
+function extractCityLocal(addr){
+  const s = String(addr||"").trim();
+  if(!s) return "-";
+  return s.split(/[\s,]+/)[0] || "-";
+}
+
+/* ================= Smart Parse (Client) ================= */
+/**
+ * يقبل نصوص مرنة مثل:
+ * "محمد القدس 0525105889 W183 X102 P104 L102 A115 he 500 مدفوع High Express"
+ * أو:
+ * "🌟 שלום ... המוצר: W183 X102 ... 500 ₪ ... כתובת: ..."
+ */
+function smartParse(txt){
+  const t0 = String(txt||"").replace(/\u200f|\u200e/g,"").replace(/\n+/g," ").trim();
+  const t = t0.replace(/[|]+/g," | "); // يساعد بالـ Notes
+
+  // phone
+  const phoneMatch = t.match(/(\+?972\d{9}|\b05\d{8}\b|\b0?59\d{7,8}\b)/);
+  let phone = phoneMatch ? phoneMatch[1] : "";
+  phone = normalizePhoneLocal(phone);
+
+  // price
+  let price = "";
+  const m1 = t.match(/₪\s*(\d{2,5})/);
+  if(m1) price = m1[1];
+  const m2 = t.match(/\b(\d{2,5})\s*(?:₪|شيكل|shekel|nis|ils)\b/i);
+  if(!price && m2) price = m2[1];
+  if(!price){
+    const tailNum = t.match(/\b(\d{2,5})\b(?!.*\b(\d{2,5})\b)/);
+    if(tailNum) price = tailNum[1];
   }
 
-  function matchFilter(o){
-    const f = document.getElementById("filter").value;
-    const st = String(o.status||"");
-    if(f==="ALL") return true;
-    if(f==="NEW") return st.trim().toUpperCase().startsWith("NEW");
-    if(f==="APPROVED") return st.includes("Approved") || st.includes("التجهيز") || st.includes("Prep");
-    if(f==="READY") return st.includes("READY") || st.includes("مجهز") || st.includes("מוכן");
+  // payment
+  let payment = "";
+  if(/مدفوع|paid|אשראי|כרטיס|בכרטיס|credit/i.test(t)) payment = "Paid";
+  else if(/نقد|cash|מזומן/i.test(t)) payment = "Cash";
+
+  // delivery
+  let delivery = "";
+  if(/High\s*Express/i.test(t)) delivery = "High Express";
+  else if(/Marwah/i.test(t)) delivery = "Marwah Delivery";
+  else if(/Lama/i.test(t)) delivery = "Lama Delivery";
+  else if(/Areen/i.test(t)) delivery = "Areen Delivery";
+
+  // offer codes
+  const tokens = t.replace(/[:,]/g," ").split(/\s+/).filter(Boolean);
+  const codes = tokens.filter(x => /^[A-Za-z]{1,3}\d{2,4}$/i.test(x) || x.toLowerCase()==="he" || x.toLowerCase()==="ar");
+  let offer = codes.length ? codes.join(" ") : "";
+
+  // address
+  let addr = "";
+  const addrHe = t.match(/(?:כתובת|‏כתובת|address)\s*[:：]\s*([^|]+?)(?=(\s{2,}|$|🚀|סטטוס|status))/i);
+  if(addrHe) addr = addrHe[1].trim();
+  const addrAr = t.match(/(?:العنوان|عنوان)\s*[:：]\s*([^|]+?)(?=(\s{2,}|$|🚚|شركة|الدفع|الإجراء))/i);
+  if(!addr && addrAr) addr = addrAr[1].trim();
+
+  // if no addr from keywords, use "city" detected before phone
+  let name = "";
+  let city = "";
+  if(phoneMatch){
+    const before = t.slice(0, phoneMatch.index).trim();
+    const parts = before.split(/\s+/).filter(Boolean);
+    name = parts[0] || "";
+    city = parts.slice(1).join(" ") || "";
+  }
+
+  if(!addr) addr = city || "";
+
+  // proc
+  let proc = "";
+  if(/direct|دون تواصل|بدون تواصل|ללא קשר/i.test(t)) proc = "Direct";
+  if(/call|اتصال|تواصل|טלפון/i.test(t)) proc = proc || "Call";
+
+  // if offer still empty, try "المبلغ" style or "المוצר"
+  if(!offer){
+    const prodHe = t.match(/(?:המוצר|מוצר)\s*[:：]\s*([^|]+?)(?=(\s{2,}|$|💳|שיטת|סטטוס|🚀))/i);
+    if(prodHe) offer = prodHe[1].trim();
+    const prodAr = t.match(/(?:المنتج|العطر)\s*[:：]\s*([^|]+?)(?=(\s{2,}|$|💰|الدفع|📍|العنوان))/i);
+    if(!offer && prodAr) offer = prodAr[1].trim();
+  }
+
+  return { name, phone, offer, price, payment, proc, addr, delivery, raw:t0 };
+}
+
+function normalizePhoneLocal(p){
+  if(!p) return "";
+  let d = String(p).replace(/[^\d]/g,"");
+  if(d.startsWith("00")) d = d.slice(2);
+  if(d.startsWith("9720")) d = "972" + d.slice(4);
+  if(d.startsWith("059") && d.length >= 10) return "970" + d.slice(1);
+  if(d.startsWith("05") && d.length >= 10) return "972" + d.slice(1);
+  if(d.startsWith("972") || d.startsWith("970")) return d;
+  if(d.length === 10 && d.startsWith("0")) return "972" + d.slice(1);
+  if(d.length === 9 && d.startsWith("5")) return "972" + d;
+  if(d.length === 9 && d.startsWith("59")) return "970" + d;
+  return d;
+}
+
+function getRawFromNotes(o){
+  const notes = String(o.notes||"");
+  // يحاول يطلع RAW من Notes (إن وجد)
+  const m = notes.match(/RAW\s*:\s*(.+)$/i);
+  if(m) return m[1].trim();
+  // إذا Notes فيها WA_INBOX | ... | النص بعد آخر |
+  if(/WA_INBOX/i.test(notes)){
+    const parts = notes.split("|").map(x=>x.trim()).filter(Boolean);
+    if(parts.length) return parts[parts.length-1];
+  }
+  return notes;
+}
+
+/* ================= Render ================= */
+function render(){
+  if(tab === "quick") renderQuick();
+  else renderPro();
+}
+
+function filtered(){
+  const q = toLower(document.getElementById("q").value.trim());
+  const f = document.getElementById("filter").value;
+
+  let arr = orders.slice();
+
+  arr = arr.filter(o=>{
+    if(!o.name) return false;
+    if(isCancelled(o)) return false;
+    if(f==="NEW") return isNewUnapproved(o) && !isPrep(o) && !isReady(o);
+    if(f==="INBOX") return isInbox(o);
+    if(f==="PREP") return isPrep(o) && !isReady(o);
+    if(f==="READY") return isReady(o);
     return true;
+  });
+
+  if(q){
+    arr = arr.filter(o=>{
+      const blob = toLower(`${o.orderId} ${o.name} ${o.phone} ${o.offer} ${o.city} ${o.notes} ${o.status} ${o.source}`);
+      return blob.includes(q);
+    });
   }
 
-  function render(){
-    const q = document.getElementById("q").value.trim().toLowerCase();
-    const list = document.getElementById("list");
-    const items = orders
-      .filter(matchFilter)
-      .filter(o=>{
-        if(!q) return true;
-        return `${o.orderId} ${o.name} ${o.phone} ${o.offer} ${o.notes}`.toLowerCase().includes(q);
-      })
-      .sort((a,b)=> (b.rowIndex||0)-(a.rowIndex||0));
+  arr.sort((a,b)=>(b.rowIndex||0)-(a.rowIndex||0));
+  return arr;
+}
 
-    list.innerHTML = items.map(o => cardHtml(o)).join("");
+/* ================= Quick View ================= */
+function renderQuick(){
+  const list = document.getElementById("quickView");
+  const arr = filtered();
+
+  if(!arr.length){
+    list.innerHTML = `<div class="empty">لا يوجد نتائج حسب الفلتر الحالي ✅</div>`;
+    return;
   }
 
-  function esc(s){ return String(s||"").replace(/[&<>"']/g,m=>({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[m])); }
+  list.innerHTML = arr.map(o => quickCard(o)).join("");
+}
 
-  function cardHtml(o){
-    const price = o.price || "";
-    const pay = o.payment || "";
-    const proc = o.proc || "";
-    const addr = o.addr || "";
-    const delivery = o.delivery || "";
-    const isInbox = (String(o.offer||"").toLowerCase().includes("whatsapp"));
+function quickCard(o){
+  const custOk = flagCustSent(o);
+  const prepOk = flagPrepSent(o);
 
-    return `
+  const addr = o.addr || o.city || "";
+  const price = o.price || "";
+  const pay = o.payment || "";
+  const proc = o.proc || "";
+  const del = o.delivery || "";
+
+  const inbox = isInbox(o);
+
+  return `
     <div class="card" id="c${o.rowIndex}">
-      <div class="h">
-        <div class="big">🧾 ${esc(o.orderId)} <span class="muted">#${o.rowIndex}</span></div>
-        <div class="tag">${esc(o.status||"")}</div>
+      <div class="head">
+        <div class="oid">🧾 ${esc(o.orderId)} <span class="small">#${o.rowIndex}</span></div>
+        <div class="status">${esc(o.status||"")}</div>
+      </div>
+
+      <div class="badges">
+        ${badge(prepOk ? "✅ تم إرسال للتجهيز" : "❌ غير مُرسل للتجهيز", prepOk?"ok":"no")}
+        ${badge(custOk ? "✅ تم إرسال للعميل" : "❌ لم يتم إرسال للعميل", custOk?"ok":"no")}
+        ${inbox ? badge("📩 WA_INBOX", "warn") : ""}
+        ${o.source ? badge("🌐 " + o.source, "info") : ""}
       </div>
 
       <div class="grid">
-        <div>
-          <div class="muted">اسم الزبون</div>
-          <input id="name${o.rowIndex}" value="${esc(o.name)}" style="width:100%"/>
-        </div>
-        <div>
-          <div class="muted">الهاتف</div>
-          <input id="phone${o.rowIndex}" value="${esc(o.phone)}" style="width:100%"/>
-        </div>
-
-        <div>
-          <div class="muted">المدينة / العنوان</div>
-          <input id="city${o.rowIndex}" value="${esc(o.city)}" style="width:100%"/>
-        </div>
-        <div>
-          <div class="muted">العنوان التفصيلي (داخل الملاحظات)</div>
-          <input id="addr${o.rowIndex}" value="${esc(addr)}" style="width:100%"/>
-        </div>
-
-        <div>
-          <div class="muted">الطلب (C)</div>
-          <input id="offer${o.rowIndex}" value="${esc(o.offer)}" style="width:100%"/>
-        </div>
-        <div>
-          <div class="muted">السعر ₪</div>
-          <input id="price${o.rowIndex}" value="${esc(price)}" style="width:100%"/>
-        </div>
-
-        <div>
-          <div class="muted">طريقة الدفع</div>
-          <select id="pay${o.rowIndex}" style="width:100%">
-            ${opt(pay,"Cash","Cash")}
-            ${opt(pay,"Paid","Paid")}
-            ${opt(pay,"Card","Card")}
-          </select>
-        </div>
-        <div>
-          <div class="muted">الإجراء</div>
-          <select id="proc${o.rowIndex}" style="width:100%">
-            ${opt(proc,"Direct","Direct")}
-            ${opt(proc,"Call","Call")}
-            ${opt(proc,"No-Call","No-Call")}
-          </select>
-        </div>
-
-        <div>
-          <div class="muted">شركة التوصيل</div>
-          <select id="del${o.rowIndex}" style="width:100%">
-            ${opt(delivery,"High Express","High Express")}
-            ${opt(delivery,"Marwah Delivery","Marwah Delivery")}
-            ${opt(delivery,"Lama Delivery","Lama Delivery")}
-            ${opt(delivery,"Areen Delivery","Areen Delivery")}
-            ${opt(delivery,"","—")}
-          </select>
-        </div>
-
-        <div>
-          <div class="muted">الحالة</div>
-          <select id="status${o.rowIndex}" style="width:100%">
-            ${opt(o.status,"NEW","NEW")}
-            ${opt(o.status,"Approved ✅ (Sent to Prep)","Approved ✅ (Sent to Prep)")}
-            ${opt(o.status,"READY ✅ (مجهز)","READY ✅ (مجهز)")}
-            ${opt(o.status,"CANCELLED ❌","CANCELLED ❌")}
-          </select>
+        ${fieldInput("الاسم", `name_${o.rowIndex}`, o.name||"")}
+        ${fieldInput("الهاتف", `phone_${o.rowIndex}`, o.phone||"", true)}
+        ${fieldInput("الطلب (C)", `offer_${o.rowIndex}`, o.offer||"", true)}
+        ${fieldInput("السعر", `price_${o.rowIndex}`, price, true)}
+        ${fieldInput("الدفع", `payment_${o.rowIndex}`, pay)}
+        ${fieldInput("الإجراء", `proc_${o.rowIndex}`, proc)}
+        ${fieldInput("العنوان", `addr_${o.rowIndex}`, addr)}
+        ${fieldInput("شركة التوصيل", `delivery_${o.rowIndex}`, del)}
+        <div class="field" style="grid-column:1/-1">
+          <div class="label">ملاحظات (تظهر كاملة)</div>
+          <div class="muted" style="white-space:pre-wrap;word-break:break-word">${esc(o.notes||"")}</div>
         </div>
       </div>
 
-      <div class="sep"></div>
-
-      <div class="muted">ملاحظات (G)</div>
-      <textarea id="notes${o.rowIndex}" style="width:100%">${esc(o.notes||"")}</textarea>
-
-      <div class="row" style="margin-top:12px">
-        <button class="btn bblue" onclick="saveOrder(${o.rowIndex})">💾 حفظ التعديل</button>
-        <button class="btn bgreen" onclick="sendToPrep(${o.rowIndex})">✅ إرسال للتجهيز</button>
-        <button class="btn bgray" onclick="confirmCustomer(${o.rowIndex})">📩 تأكيد للعميل</button>
-        <button class="btn bred" onclick="setStatus(${o.rowIndex}, 'CANCELLED ❌')">✖ إلغاء</button>
-        ${isInbox ? `<button class="btn borange" onclick="alert('هذا Inbox (واتساب/PDF). عدل البيانات ثم اضغط إرسال للتجهيز ✅')">⚠ Inbox</button>` : ``}
+      <div class="actions">
+        <button class="btn bgreen hugeBtn" onclick="approveToPrep(${o.rowIndex})">✅ اعتماد + إرسال للتجهيز</button>
+        <button class="btn bblue hugeBtn" onclick="sendConfirm(${o.rowIndex})">📩 تأكيد للعميل</button>
       </div>
 
-      <div class="muted" style="margin-top:10px">
-        *ملاحظة:* السعر يظهر في (C) بعد الطلب + أيضاً داخل الملاحظات (G).
+      <div class="subactions">
+        <button class="btn bviolet" onclick="smartFillFromNotes(${o.rowIndex})">🧠 تحليل تلقائي (من Notes)</button>
+        <button class="btn borange" onclick="saveQuick(${o.rowIndex})">💾 حفظ التعديل</button>
+        <a class="btn bcyan" href="${waLink(o.phone)}" target="_blank" style="text-decoration:none;display:inline-block">💬 فتح واتساب</a>
+        <button class="btn bgray" onclick="markReady(${o.rowIndex})">✅ جاهز</button>
+        <button class="btn bred" onclick="cancelOrder(${o.rowIndex})">🛑 إلغاء</button>
+        <button class="btn bgray" onclick="copySummary(${o.rowIndex})">📋 نسخ</button>
       </div>
-    </div>`;
+
+      <div class="small muted" style="margin-top:10px">
+        إذا هذا سجل واتساب Inbox: اضغط “🧠 تحليل تلقائي” ثم “💾 حفظ” ثم “✅ اعتماد + إرسال للتجهيز”.
+      </div>
+    </div>
+  `;
+}
+
+function fieldInput(label, id, value, mono=false){
+  return `
+    <div class="field">
+      <div class="label">${esc(label)}</div>
+      <input id="${id}" value="${esc(value)}" class="${mono?'mono':''}" />
+    </div>
+  `;
+}
+
+/* ================= Pro View ================= */
+function renderPro(){
+  const host = document.getElementById("proView");
+  const arr = filtered();
+
+  const bulkHtml = `
+    <div class="card">
+      <div class="head">
+        <div class="title">🧠 أدوات متطورة (Bulk)</div>
+        <div class="small muted">حدد عدة طلبات ثم نفّذ إجراء واحد عليهم</div>
+      </div>
+      <div class="row">
+        <button class="btn bgray" onclick="selectAll(true)">تحديد الكل</button>
+        <button class="btn bgray" onclick="selectAll(false)">إلغاء التحديد</button>
+
+        <select id="bulkStatus" style="min-width:240px">
+          <option value="Approved ✅ (Sent to Prep)">اعتماد + إرسال للتجهيز</option>
+          <option value="READY ✅ (מוכן / مجهز)">جاهز</option>
+          <option value="CANCELLED ❌">إلغاء</option>
+        </select>
+        <button class="btn bblue" onclick="bulkUpdateStatus()">تحديث الحالة للطلبات المحددة</button>
+
+        <button class="btn bblue" onclick="bulkSendConfirm()">تأكيد للعميل (للمحدد)</button>
+      </div>
+      <div class="small muted" style="margin-top:10px">
+        Smart Parse: افتح أي طلب واضغط “تحليل تلقائي” لملء الحقول من الرسالة.
+      </div>
+    </div>
+  `;
+
+  if(!arr.length){
+    host.innerHTML = bulkHtml + `<div class="empty">لا يوجد نتائج حسب الفلتر الحالي ✅</div>`;
+    return;
   }
 
-  function opt(current, value, label){
-    const c = String(current||"");
-    const sel = (c===value) ? "selected" : "";
-    return `<option value="${value}" ${sel}>${label}</option>`;
+  const table = `
+    <div class="card">
+      <div class="head">
+        <div class="title">جدول الطلبات</div>
+        <div class="small muted">اضغط "فتح" لفتح لوحة التعديل الكاملة</div>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>✓</th>
+            <th>OrderId</th>
+            <th>الاسم</th>
+            <th>الهاتف</th>
+            <th>الطلب</th>
+            <th>₪</th>
+            <th>الحالة</th>
+            <th>المصدر</th>
+            <th>أوامر</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${arr.map(o=>proRow(o)).join("")}
+        </tbody>
+      </table>
+    </div>
+  `;
+
+  host.innerHTML = bulkHtml + table;
+}
+
+function proRow(o){
+  const price = o.price || "";
+  return `
+    <tr>
+      <td><input type="checkbox" class="sel" data-row="${o.rowIndex}"></td>
+      <td class="mono">${esc(o.orderId)}</td>
+      <td>${esc(o.name||"")}</td>
+      <td class="mono">${esc(o.phone||"")}</td>
+      <td class="mono">${esc(o.offer||"")}</td>
+      <td class="mono">${esc(price)}</td>
+      <td>${esc(o.status||"")}</td>
+      <td>${esc(o.source||"")}</td>
+      <td>
+        <button class="rowBtn" onclick="openEditor(${o.rowIndex})">فتح</button>
+        <button class="vioBtn" onclick="smartFillFromNotes(${o.rowIndex});openEditor(${o.rowIndex})">تحليل</button>
+        <button class="okBtn" onclick="approveToPrep(${o.rowIndex})">إرسال للتجهيز</button>
+        <button class="rowBtn" onclick="sendConfirm(${o.rowIndex})">تأكيد</button>
+        <button class="dangerBtn" onclick="cancelOrder(${o.rowIndex})">إلغاء</button>
+      </td>
+    </tr>
+  `;
+}
+
+/* ================= Actions (shared) ================= */
+async function saveQuick(row){
+  const addr = getVal(`addr_${row}`);
+  const payload = {
+    action:"updateOrder",
+    key:DASH_KEY,
+    row,
+    name: getVal(`name_${row}`),
+    phone: getVal(`phone_${row}`),
+    offer: getVal(`offer_${row}`),
+    price: getVal(`price_${row}`),
+    payment: getVal(`payment_${row}`),
+    proc: getVal(`proc_${row}`),
+    addr: addr,
+    delivery: getVal(`delivery_${row}`),
+    city: extractCityLocal(addr),
+    extraNotes: "" // اتركها فاضية هنا
+  };
+
+  const url = `${SCRIPT_URL}?` + new URLSearchParams(payload).toString();
+  const res = await fetch(url);
+  const j = await res.json().catch(()=>({}));
+  if(j.result !== "SUCCESS") alert("❌ فشل الحفظ: " + (j.message||""));
+  else { alert("✅ تم الحفظ"); await load(); }
+}
+
+async function approveToPrep(row){
+  if(!confirm("تأكيد: اعتماد الطلب وإرساله للتجهيز؟")) return;
+  const status = "Approved ✅ (Sent to Prep) | FLAG:PREP_SENT";
+  await setStatus(row, status);
+}
+
+async function markReady(row){
+  if(!confirm("تأكيد: وضع الحالة جاهز؟")) return;
+  const status = "READY ✅ (מוכן / مجهز)";
+  await setStatus(row, status);
+}
+
+async function cancelOrder(row){
+  if(!confirm("تأكيد: إلغاء الطلب؟")) return;
+  const status = "CANCELLED ❌";
+  await setStatus(row, status);
+}
+
+async function setStatus(row, status){
+  const url = `${SCRIPT_URL}?action=updateStatus&key=${encodeURIComponent(DASH_KEY)}&row=${row}&status=${encodeURIComponent(status)}`;
+  const res = await fetch(url);
+  const j = await res.json().catch(()=>({}));
+  if(j.result !== "SUCCESS") alert("❌ فشل: " + (j.message||""));
+  else { alert("✅ تم تحديث الحالة"); await load(); }
+}
+
+async function sendConfirm(row){
+  if(!confirm("إرسال رسالة تأكيد محترمة للعميل؟")) return;
+  const url = `${SCRIPT_URL}?action=sendCustomerConfirm&key=${encodeURIComponent(DASH_KEY)}&row=${row}`;
+  const res = await fetch(url);
+  const j = await res.json().catch(()=>({}));
+
+  if(j.result !== "SUCCESS"){
+    alert("❌ فشل الإرسال: " + (j.message||""));
+    return;
   }
 
-  async function saveOrder(row){
-    const payload = getForm(row);
-    const url = `${SCRIPT_URL}?action=updateOrder&key=${encodeURIComponent(DASH_KEY)}&row=${row}` +
-      `&name=${enc(payload.name)}&phone=${enc(payload.phone)}&city=${enc(payload.city)}` +
-      `&offer=${enc(payload.offer)}&price=${enc(payload.price)}&payment=${enc(payload.payment)}` +
-      `&proc=${enc(payload.proc)}&addr=${enc(payload.addr)}&extraNotes=${enc(payload.notes)}`;
+  // ✅ نضيف علامة أنه تم ارسال للعميل (لو الباك-إند ما يكتبها)
+  await appendFlagToNotes(row, "FLAG:CUST_SENT | تم ارسال للعميل ✅");
+  alert("✅ تم إرسال التأكيد");
+  await load();
+}
 
-    await fetch(url);
-    await setStatus(row, payload.status, false);
-    await load();
-    jump(row);
-  }
+async function appendFlagToNotes(row, flagText){
+  try{
+    // حل سريع: نستخدم updateOrder مع extraNotes (ما يغيّر البيانات)
+    const o = findByRow(row);
+    if(!o) return;
 
-  async function sendToPrep(row){
-    // اولاً حفظ كل شيء
-    await saveOrder(row);
-    await setStatus(row, "Approved ✅ (Sent to Prep)");
-    await load();
-    jump(row);
-  }
-
-  async function confirmCustomer(row){
-    const url = `${SCRIPT_URL}?action=sendConfirm&key=${encodeURIComponent(DASH_KEY)}&row=${row}`;
-    const r = await (await fetch(url)).json();
-    alert(r.result==="SUCCESS" ? "✅ تم إرسال التأكيد للعميل" : ("❌ فشل: " + r.message));
-    await load();
-    jump(row);
-  }
-
-  async function setStatus(row, status, reload=true){
-    const url = `${SCRIPT_URL}?action=updateStatus&key=${encodeURIComponent(DASH_KEY)}&row=${row}&status=${enc(status)}`;
-    await fetch(url);
-    if(reload) await load();
-    jump(row);
-  }
-
-  function getForm(row){
-    return {
-      name:  val(`name${row}`),
-      phone: val(`phone${row}`),
-      city:  val(`city${row}`),
-      addr:  val(`addr${row}`),
-      offer: val(`offer${row}`),
-      price: val(`price${row}`),
-      payment: val(`pay${row}`),
-      proc: val(`proc${row}`),
-      status: val(`status${row}`),
-      notes: val(`notes${row}`),
-      delivery: val(`del${row}`)
+    const addr = o.addr || o.city || "";
+    const payload = {
+      action:"updateOrder",
+      key:DASH_KEY,
+      row,
+      name: o.name || "",
+      phone: o.phone || "",
+      offer: o.offer || "",
+      price: o.price || "",
+      payment: o.payment || "",
+      proc: o.proc || "",
+      addr: addr,
+      delivery: o.delivery || "",
+      city: o.city || extractCityLocal(addr),
+      extraNotes: flagText
     };
+    const url = `${SCRIPT_URL}?` + new URLSearchParams(payload).toString();
+    await fetch(url);
+  }catch(e){}
+}
+
+function copySummary(row){
+  const o = findByRow(row);
+  if(!o){ alert("❌ لم يتم العثور على الطلب"); return; }
+
+  const txt =
+    `OrderId: ${o.orderId}\n`+
+    `Name: ${o.name}\n`+
+    `Phone: ${o.phone}\n`+
+    `Offer: ${o.offer}\n`+
+    `Price: ${o.price||""}\n`+
+    `Payment: ${o.payment||""}\n`+
+    `Proc: ${o.proc||""}\n`+
+    `Addr: ${o.addr||o.city||""}\n`+
+    `Delivery: ${o.delivery||""}\n`+
+    `Status: ${o.status||""}\n`+
+    `Source: ${o.source||""}`;
+
+  navigator.clipboard.writeText(txt).then(()=> alert("✅ تم النسخ")).catch(()=> prompt("انسخ:", txt));
+}
+
+/* ================= Smart Fill (From Notes) ================= */
+function smartFillFromNotes(row){
+  const o = findByRow(row);
+  if(!o){ alert("❌ لم يتم العثور"); return; }
+
+  const raw = getRawFromNotes(o);
+  const parsed = smartParse(raw);
+
+  if(!parsed || (!parsed.phone && !parsed.offer && !parsed.price && !parsed.name)){
+    alert("❌ لم يتم التعرف على البيانات من Notes");
+    return;
   }
-  function val(id){ const el=document.getElementById(id); return el? el.value : ""; }
-  function enc(s){ return encodeURIComponent(String(s||"")); }
-  function jump(row){ const el=document.getElementById("c"+row); if(el) el.scrollIntoView({behavior:"smooth",block:"start"}); }
+
+  // Quick inputs
+  const set = (id, v)=>{
+    const el = document.getElementById(id);
+    if(el && v) el.value = v;
+  };
+
+  set(`name_${row}`, parsed.name || o.name || "");
+  set(`phone_${row}`, parsed.phone || o.phone || "");
+  set(`offer_${row}`, parsed.offer || o.offer || "");
+  set(`price_${row}`, parsed.price || o.price || "");
+  set(`payment_${row}`, parsed.payment || o.payment || "");
+  set(`proc_${row}`, parsed.proc || o.proc || "Direct");
+  set(`addr_${row}`, parsed.addr || (o.addr||o.city||""));
+  set(`delivery_${row}`, parsed.delivery || o.delivery || "");
+
+  // لو ما في name، خلي الاسم الحالي
+  // لو ما في offer وتوجد Codes داخل النص، هو بيعبّي
+  alert("✅ تم التحليل وتعبئة الحقول");
+}
+
+/* ================= Pro editor modal ================= */
+function openEditor(row){
+  const o = findByRow(row);
+  if(!o){ alert("❌ لم يتم العثور"); return; }
+
+  document.getElementById("modalTitle").textContent = `تعديل متقدّم — ${o.orderId} (#${row})`;
+
+  const raw = getRawFromNotes(o);
+
+  const html = `
+    <div class="split">
+      <div class="card" style="margin:0">
+        <div class="head">
+          <div class="oid">🧾 ${esc(o.orderId)} <span class="small">#${row}</span></div>
+          <div class="status">${esc(o.status||"")}</div>
+        </div>
+
+        <div class="two">
+          <button class="btn bviolet" onclick="modalSmartParse(${row})">🧠 تحليل تلقائي (من النص)</button>
+          <button class="btn borange" onclick="modalSave(${row})">💾 حفظ التعديل</button>
+        </div>
+
+        <div class="hr"></div>
+
+        <div class="grid">
+          ${fieldInput("الاسم", `m_name`, o.name||"")}
+          ${fieldInput("الهاتف", `m_phone`, o.phone||"", true)}
+          ${fieldInput("المدينة", `m_city`, o.city||"")}
+          ${fieldInput("العنوان", `m_addr`, (o.addr||o.city||""))}
+          ${fieldInput("الطلب (C)", `m_offer`, o.offer||"", true)}
+          ${fieldInput("السعر", `m_price`, (o.price||""), true)}
+          ${fieldInput("الدفع", `m_payment`, (o.payment||""))}
+          ${fieldInput("الإجراء", `m_proc`, (o.proc||""))}
+          ${fieldInput("شركة التوصيل", `m_delivery`, (o.delivery||""))}
+
+          <div class="field" style="grid-column:1/-1">
+            <div class="label">نص واتساب (لتحليل تلقائي)</div>
+            <textarea id="m_raw">${esc(raw)}</textarea>
+            <div class="small muted" style="margin-top:8px">الصق هنا أي رسالة واتساب وسيتم تعبئة الحقول بزر واحد.</div>
+          </div>
+
+          <div class="field" style="grid-column:1/-1">
+            <div class="label">ملاحظات إضافية (تنضاف على Notes)</div>
+            <textarea id="m_extraNotes" placeholder="مثال: ملاحظة للموظف / ملاحظة للمدير"></textarea>
+          </div>
+
+          <div class="field" style="grid-column:1/-1">
+            <div class="label">Notes الحالية</div>
+            <div class="muted" style="white-space:pre-wrap;word-break:break-word">${esc(o.notes||"")}</div>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button class="btn bgreen hugeBtn" onclick="approveToPrep(${row})">✅ إرسال للتجهيز</button>
+          <button class="btn bblue hugeBtn" onclick="sendConfirm(${row})">📩 تأكيد للعميل</button>
+        </div>
+
+        <div class="subactions">
+          <button class="btn bgray" onclick="markReady(${row})">✅ جاهز</button>
+          <button class="btn bred" onclick="cancelOrder(${row})">🛑 إلغاء</button>
+          <a class="btn bcyan" href="${waLink(o.phone)}" target="_blank" style="text-decoration:none;display:inline-block">💬 فتح واتساب</a>
+          <button class="btn bgray" onclick="copySummary(${row})">📋 نسخ</button>
+        </div>
+      </div>
+
+      <div class="card" style="margin:0">
+        <div class="head">
+          <div class="title">حالات جاهزة (Preset)</div>
+        </div>
+
+        <div class="row" style="flex-direction:column;align-items:stretch">
+          <button class="btn bblue" onclick="setStatus(${row}, 'NEW')">NEW</button>
+          <button class="btn bgreen" onclick="setStatus(${row}, 'Approved ✅ (Sent to Prep) | FLAG:PREP_SENT')">Approved ✅</button>
+          <button class="btn bgray" onclick="setStatus(${row}, 'In Prep ⏳')">In Prep ⏳</button>
+          <button class="btn bgreen" onclick="setStatus(${row}, 'READY ✅ (מוכן / مجهز)')">READY ✅</button>
+          <button class="btn borange" onclick="setStatus(${row}, 'Delivery Requested 🚚')">Delivery Requested 🚚</button>
+          <button class="btn bred" onclick="setStatus(${row}, 'CANCELLED ❌')">CANCELLED ❌</button>
+        </div>
+
+        <div class="small muted" style="margin-top:12px">
+          إذا سجل واتساب Inbox: الصق النص ثم “تحليل تلقائي” ثم “حفظ” ثم “Approved ✅”.
+        </div>
+      </div>
+    </div>
+  `;
+
+  document.getElementById("modalBody").innerHTML = html;
+  document.getElementById("modal").classList.add("show");
+}
+
+function closeModal(){
+  document.getElementById("modal").classList.remove("show");
+}
+
+function modalSmartParse(row){
+  const raw = getVal("m_raw");
+  const parsed = smartParse(raw);
+
+  const set = (id, v)=>{
+    const el = document.getElementById(id);
+    if(el && v) el.value = v;
+  };
+
+  set("m_name", parsed.name);
+  set("m_phone", parsed.phone);
+  set("m_offer", parsed.offer);
+  set("m_price", parsed.price);
+  set("m_payment", parsed.payment);
+  set("m_proc", parsed.proc || "Direct");
+  set("m_addr", parsed.addr);
+  set("m_delivery", parsed.delivery);
+
+  if(!getVal("m_city") && parsed.addr){
+    document.getElementById("m_city").value = extractCityLocal(parsed.addr);
+  }
+
+  alert("✅ تم التحليل وتعبئة الحقول");
+}
+
+async function modalSave(row){
+  const addr = getVal("m_addr");
+  const payload = {
+    action:"updateOrder",
+    key:DASH_KEY,
+    row,
+    name: getVal("m_name"),
+    phone: getVal("m_phone"),
+    city:  getVal("m_city") || extractCityLocal(addr),
+    addr:  addr,
+    offer: getVal("m_offer"),
+    price: getVal("m_price"),
+    payment: getVal("m_payment"),
+    proc: getVal("m_proc"),
+    delivery: getVal("m_delivery"),
+    extraNotes: getVal("m_extraNotes")
+  };
+
+  const url = `${SCRIPT_URL}?` + new URLSearchParams(payload).toString();
+  const res = await fetch(url);
+  const j = await res.json().catch(()=>({}));
+  if(j.result !== "SUCCESS") alert("❌ فشل الحفظ: " + (j.message||""));
+  else { alert("✅ تم الحفظ"); await load(); }
+}
+
+/* ================= Smart New Order (Paste WhatsApp text -> Save as order) ================= */
+function openSmartNew(){
+  document.getElementById("modalTitle").textContent = "➕ إضافة طلب من نص واتساب (Smart Parse)";
+  document.getElementById("modalBody").innerHTML = `
+    <div class="card" style="margin:0">
+      <div class="label">الصق نص واتساب هنا</div>
+      <textarea id="sn_raw" placeholder="مثال: محمد القدس 0525105889 W183 X102 P104 L102 A115 he 500 مدفوع High Express"></textarea>
+
+      <div class="row" style="margin-top:10px">
+        <button class="btn bviolet" onclick="sn_parse()">🧠 تحليل</button>
+        <button class="btn bgreen" onclick="sn_save()">✅ حفظ كطلب (جاهز للتجهيز)</button>
+        <button class="btn bgray" onclick="sn_fillExample()">🎯 مثال</button>
+      </div>
+
+      <div class="hr"></div>
+
+      <div class="grid">
+        ${fieldInput("الاسم", "sn_name", "")}
+        ${fieldInput("الهاتف", "sn_phone", "", true)}
+        ${fieldInput("الطلب (C)", "sn_offer", "", true)}
+        ${fieldInput("السعر", "sn_price", "", true)}
+        ${fieldInput("الدفع", "sn_payment", "")}
+        ${fieldInput("الإجراء", "sn_proc", "Direct")}
+        ${fieldInput("العنوان", "sn_addr", "")}
+        ${fieldInput("شركة التوصيل", "sn_delivery", "")}
+      </div>
+
+      <div class="small muted" style="margin-top:10px">
+        الحفظ هنا يتم عبر POST إلى السكربت (لا يعتمد WA Webhook).
+      </div>
+    </div>
+  `;
+  document.getElementById("modal").classList.add("show");
+}
+
+function sn_fillExample(){
+  document.getElementById("sn_raw").value = "محمد القدس 0525105889 W183 X102 P104 L102 A115 he 500 مدفوع High Express";
+}
+
+function sn_parse(){
+  const raw = getVal("sn_raw");
+  const p = smartParse(raw);
+  const set = (id,v)=>{ const el=document.getElementById(id); if(el) el.value = v||""; };
+  set("sn_name", p.name);
+  set("sn_phone", p.phone);
+  set("sn_offer", p.offer);
+  set("sn_price", p.price);
+  set("sn_payment", p.payment);
+  set("sn_proc", p.proc || "Direct");
+  set("sn_addr", p.addr);
+  set("sn_delivery", p.delivery);
+  alert("✅ تم التحليل");
+}
+
+async function sn_save(){
+  const name = getVal("sn_name") || "Customer";
+  const phone = getVal("sn_phone");
+  const offer = getVal("sn_offer") || "Manual-WhatsApp";
+  const price = getVal("sn_price") || "";
+  const payment = getVal("sn_payment") || "";
+  const proc = getVal("sn_proc") || "Direct";
+  const addr = getVal("sn_addr") || "-";
+  const delivery = getVal("sn_delivery") || "";
+
+  if(!phone){
+    alert("❌ لازم رقم هاتف");
+    return;
+  }
+
+  const body = {
+    name,
+    phone,
+    offer,
+    price,
+    payment,
+    process: proc,
+    address: addr,
+    source: "Manager-WhatsApp",
+    status: "Approved ✅ (Sent to Prep) | FLAG:PREP_SENT",
+    extraNotes: delivery ? ("Delivery: " + delivery) : ""
+  };
+
+  try{
+    const res = await fetch(SCRIPT_URL, {
+      method:"POST",
+      headers:{ "Content-Type":"application/json" },
+      body: JSON.stringify(body)
+    });
+    const j = await res.json().catch(()=>({}));
+    if(j.result !== "SUCCESS"){
+      alert("❌ فشل الحفظ: " + (j.message||""));
+      return;
+    }
+    alert("✅ تم حفظ الطلب: " + (j.message||""));
+    closeModal();
+    await load();
+  }catch(e){
+    alert("❌ خطأ اتصال");
+  }
+}
+
+/* ================= Bulk ================= */
+function selectedRows(){
+  return Array.from(document.querySelectorAll(".sel"))
+    .filter(x=>x.checked)
+    .map(x=>Number(x.getAttribute("data-row")));
+}
+function selectAll(on){ document.querySelectorAll(".sel").forEach(x=>x.checked = !!on); }
+
+async function bulkUpdateStatus(){
+  const rows = selectedRows();
+  if(!rows.length){ alert("حدد طلبات أولاً"); return; }
+  const status = document.getElementById("bulkStatus").value;
+  if(!confirm(`تطبيق الحالة "${status}" على ${rows.length} طلب؟`)) return;
+
+  for(const r of rows){
+    await setStatus(r, status);
+  }
+  await load();
+}
+
+async function bulkSendConfirm(){
+  const rows = selectedRows();
+  if(!rows.length){ alert("حدد طلبات أولاً"); return; }
+  if(!confirm(`إرسال تأكيد للعميل لـ ${rows.length} طلب؟`)) return;
+
+  for(const r of rows){
+    await sendConfirm(r);
+  }
+  await load();
+}
+
+/* ================= Notifications ================= */
+function enableNotify(){
+  if(!("Notification" in window)){
+    document.getElementById("notifyState").textContent = "متصفحك لا يدعم إشعارات";
+    return;
+  }
+  Notification.requestPermission().then(p=>{
+    document.getElementById("notifyState").textContent = (p === "granted") ? "✅ الإشعارات مفعّلة" : "❌ تم رفض الإشعارات";
+  });
+}
+
+function pingNewOrders(){
+  const newOnes = orders.filter(o => isNewUnapproved(o) && !isPrep(o) && !isReady(o) && !isCancelled(o));
+  newOnes.sort((a,b)=>(b.rowIndex||0)-(a.rowIndex||0));
+  const newest = newOnes[0] ? `${newOnes[0].orderId}_${newOnes[0].rowIndex}` : "";
+
+  if(firstLoad){
+    lastNewKey = newest;
+    firstLoad = false;
+    return;
+  }
+
+  if(newest && newest !== lastNewKey){
+    lastNewKey = newest;
+
+    try{
+      const ctx = new (window.AudioContext||window.webkitAudioContext)();
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.type="sine"; o.frequency.value=880; g.gain.value=0.08;
+      o.connect(g); g.connect(ctx.destination);
+      o.start(); setTimeout(()=>{o.stop();ctx.close();},180);
+    }catch(e){}
+
+    if("Notification" in window && Notification.permission === "granted"){
+      new Notification("MAD Manager", { body: "طلب جديد غير معتمد دخل النظام ✅" });
+    }
+
+    document.title = "🟢 طلب جديد - MAD Manager";
+    setTimeout(()=> document.title = "MAD Manager", 5000);
+  }
+}
 </script>
+
 </body>
 </html>
