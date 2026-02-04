@@ -3,95 +3,99 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>MAD SMART SYSTEM</title>
+  <title>MAD FINAL PRO</title>
   
   <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
   <style>
     :root { 
-      --bg: #1a1a2e; --card: #16213e; --primary: #0f3460; 
-      --accent: #e94560; --text: #f1f1f1; --success: #22c55e;
+      --bg: #101014; --card: #1c1c24; --primary: #5c7cfa; 
+      --accent: #fab005; --danger: #fa5252; --text: #e9ecef;
     }
 
     body { margin: 0; font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); color: var(--text); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
     
-    /* Header */
+    /* --- التنبيهات --- */
+    #alert-bar { 
+      display: none; background: var(--danger); color: white; text-align: center; 
+      padding: 10px; font-weight: bold; font-size: 1.2rem; animation: blink 1s infinite;
+      cursor: pointer;
+    }
+    @keyframes blink { 50% { opacity: 0.5; } }
+
+    /* --- الهيدر والتبويبات --- */
     .header { 
-      background: rgba(0,0,0,0.8); padding: 10px 20px; border-bottom: 3px solid var(--accent);
+      background: rgba(28, 28, 36, 0.95); padding: 15px 25px; border-bottom: 2px solid var(--primary);
       display: flex; gap: 20px; align-items: center; justify-content: space-between;
     }
-    .search-container { flex: 1; display: flex; gap: 10px; max-width: 600px; }
-    .search-box { 
-      width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #444; 
-      background: #0f3460; color: white; font-size: 1.1rem; outline: none; transition: 0.3s;
+    
+    .tabs { display: flex; background: #2c2c35; padding: 4px; border-radius: 8px; }
+    .tab { 
+      padding: 8px 20px; cursor: pointer; border-radius: 6px; font-weight: bold; 
+      color: #888; transition: 0.3s; display: flex; align-items: center; gap: 8px;
     }
-    .search-box:focus { border-color: var(--accent); background: #1a1a2e; }
+    .tab.active { background: var(--primary); color: #fff; }
+    .count-badge { background: rgba(0,0,0,0.3); padding: 2px 8px; border-radius: 10px; font-size: 0.8rem; }
 
-    .btn { cursor: pointer; border: none; padding: 10px 20px; border-radius: 6px; font-weight: bold; color: white; transition: 0.2s; font-size: 1rem; }
+    .search-box { 
+      flex: 1; max-width: 400px; padding: 10px; border-radius: 8px; border: 1px solid #444; 
+      background: #101014; color: white; font-weight: bold; 
+    }
+
+    .btn { cursor: pointer; border: none; padding: 10px 20px; border-radius: 6px; font-weight: bold; color: white; transition: 0.2s; display: flex; align-items: center; gap: 8px; }
+    .btn-all { background: var(--accent); color: #000; }
     .btn-refresh { background: #333; }
-    .btn-all { background: var(--accent); }
-    .btn-all:hover { opacity: 0.8; }
 
-    /* Workspace Grid */
+    /* --- الشبكة --- */
     .workspace { flex: 1; overflow-y: auto; padding: 20px; }
     .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 15px; }
 
     .card { 
-      background: var(--card); border: 1px solid #2a2a40; border-radius: 12px; padding: 15px; 
+      background: var(--card); border: 1px solid #2a2a35; border-radius: 12px; padding: 15px; 
       cursor: pointer; position: relative; transition: transform 0.2s; border-right: 5px solid transparent;
     }
-    .card:hover { transform: translateY(-5px); background: #1f2b4d; border-color: var(--accent); }
-    .card.rush { border-right-color: var(--accent); } 
+    .card:hover { transform: translateY(-5px); background: #252530; border-color: var(--primary); }
+    .card.rush { border-right-color: var(--danger); }
+    .card.status-ready { opacity: 0.6; border-right-color: var(--accent); } /* للأرشيف */
 
-    .card-head { display: flex; justify-content: space-between; color: #888; font-size: 0.9rem; margin-bottom: 5px; }
+    .card-head { display: flex; justify-content: space-between; color: #777; font-size: 0.9rem; margin-bottom: 5px; }
     .card-name { font-size: 1.3rem; font-weight: bold; color: #fff; margin-bottom: 5px; }
-    .card-sub { font-size: 0.95rem; color: #ccc; line-height: 1.4; }
-    .card-price { position: absolute; bottom: 15px; left: 15px; font-size: 1.2rem; font-weight: bold; color: var(--success); }
+    .card-info { font-size: 0.9rem; color: #aaa; line-height: 1.4; }
+    .card-price { position: absolute; bottom: 15px; left: 15px; font-size: 1.2rem; font-weight: bold; color: #20c997; }
 
-    /* Modal */
+    /* --- المودال --- */
     .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 1000; justify-content: center; align-items: center; }
-    .modal-box { width: 90%; max-width: 1000px; height: 80vh; background: #fff; color: #000; display: flex; border-radius: 10px; overflow: hidden; }
+    .modal-box { width: 95%; max-width: 1100px; height: 85vh; background: #fff; color: #000; display: flex; border-radius: 10px; overflow: hidden; }
+    .editor { width: 35%; background: #f8f9fa; padding: 25px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
+    .preview { width: 65%; background: #e9ecef; display: flex; align-items: center; justify-content: center; }
     
-    .editor { width: 40%; background: #f4f4f4; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
-    .preview { width: 60%; background: #ddd; display: flex; align-items: center; justify-content: center; padding: 20px; flex-direction: column; }
-
-    .inp-group label { display: block; font-weight: bold; font-size: 0.9rem; }
-    .inp-group input, .inp-group textarea { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; font-weight: bold; }
-    
+    .inp-group label { display: block; font-weight: bold; font-size: 0.85rem; margin-bottom: 3px; }
+    .inp-group input, .inp-group textarea { width: 100%; padding: 10px; border: 1px solid #ced4da; border-radius: 6px; font-weight: bold; box-sizing: border-box; }
     .btn-print-big { width: 100%; padding: 15px; background: #000; color: #fff; font-size: 1.2rem; margin-top: auto; border: none; cursor: pointer; font-weight: bold; }
 
-    /* ---------------------------------------------------- */
-    /* LABEL DESIGN (10x10cm) - FIXED FOR PRINTING */
-    /* ---------------------------------------------------- */
+    /* --- الملصق --- */
     .label-canvas { 
       width: 100mm; height: 100mm; background: #fff; color: #000; padding: 3mm; 
       box-sizing: border-box; border: 1px solid #ccc; display: flex; flex-direction: column; 
       overflow: hidden; position: relative; page-break-after: always; direction: rtl;
     }
-    
     .lbl-head { display: flex; justify-content: space-between; height: 20mm; border-bottom: 1px solid #000; }
     .lbl-logo img { width: 35mm; }
     .lbl-meta { text-align: left; font-size: 9pt; font-weight: bold; }
-    
     .lbl-promo { background: #000; color: #fff; text-align: center; font-weight: 900; font-size: 10pt; padding: 3px; margin: 2mm 0; }
-    
     .lbl-info { font-size: 11pt; line-height: 1.3; font-weight: 600; }
-    .lbl-content { border: 2px dashed #000; background: #eee; padding: 5px; margin: 2mm 0; font-size: 9pt; height: 16mm; overflow: hidden; font-weight: bold; }
+    .lbl-content { border: 2px dashed #000; background: #f1f3f5; padding: 5px; margin: 2mm 0; font-size: 9pt; height: 16mm; overflow: hidden; font-weight: bold; }
     .lbl-price { border: 3px solid #000; font-size: 20pt; font-weight: 900; text-align: center; padding: 0; margin-bottom: 2mm; }
-    
     .lbl-footer { display: flex; justify-content: space-between; align-items: flex-end; margin-top: auto; border-top: 1px solid #000; padding-top: 1mm; }
     .lbl-wa { font-size: 8pt; font-weight: 800; width: 65%; }
 
-    /* Print Logic */
     #printArea { display: none; }
     @media print {
       body * { visibility: hidden !important; }
       #printArea, #printArea * { visibility: visible !important; }
-      #printArea { 
-        display: block !important; position: absolute; left: 0; top: 0; width: 100%; height: 100%; 
-        background: white; z-index: 9999;
-      }
+      #printArea { display: block !important; position: absolute; left: 0; top: 0; width: 100%; }
       @page { size: 100mm 100mm; margin: 0; }
       .label-canvas { border: none; }
     }
@@ -99,14 +103,29 @@
 </head>
 <body>
 
+<audio id="bell" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3"></audio>
+
+<div id="alert-bar" onclick="this.style.display='none'">🔔 يوجد طلبات جديدة! (اضغط للإخفاء)</div>
+
 <div class="header">
-  <div style="font-weight:900; font-size:1.5rem">MAD <span style="color:var(--accent)">SMART</span></div>
-  <div class="search-container">
-    <input class="search-box" id="search" placeholder="بحث ذكي: رقم هاتف / اسم / كود..." oninput="render()">
+  <div style="font-weight:900; font-size:1.4rem">MAD <span style="color:var(--primary)">PRO</span></div>
+  
+  <div class="tabs">
+    <div class="tab active" id="tab-pending" onclick="setTab('pending')">
+      <span>قيد التجهيز</span>
+      <span class="count-badge" id="count-pending">0</span>
+    </div>
+    <div class="tab" id="tab-all" onclick="setTab('all')">
+      <span>الأرشيف (الكل)</span>
+      <span class="count-badge" id="count-all">0</span>
+    </div>
   </div>
+
+  <input class="search-box" id="search" placeholder="بحث ذكي: 050 / 972 / اسم..." oninput="render()">
+  
   <div style="display:flex; gap:10px">
     <button class="btn btn-refresh" onclick="loadData()">تحديث ↻</button>
-    <button class="btn btn-all" onclick="printAll()">طباعة الكل 🖨️</button>
+    <button class="btn btn-all" onclick="printAll()">طباعة القائمة 🖨️</button>
   </div>
 </div>
 
@@ -139,108 +158,123 @@
 
 <script>
   const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyLjLFa8AaH82Ip7m747WC-KSUUEaU_M70S0I9Mda14XbnmcuEfZ7pBnF_zzJYZuXmZ/exec";
-  const PASSWORD = "12345678";
+  const PASS = "12345678";
+  
   let orders = [];
+  let currentTab = 'pending'; // 'pending' or 'all'
   let currentIndex = null;
+  let lastPendingCount = 0;
 
-  /* =========================================
-     1. Phone Normalization Logic (The Core)
-     ========================================= */
+  // 1. منطق معالجة الأرقام
   function normalizeILPSPhone(input) {
     let d = String(input || "").replace(/[^0-9]/g, "");
     if (!d) return { ok: false, reason: "EMPTY", e164: "", display: "" };
-
     if (d.startsWith("00")) d = d.slice(2);
     if (d.startsWith("9720")) d = "972" + d.slice(4);
     if (d.startsWith("9700")) d = "970" + d.slice(4);
-
-    // If starts with 972/970
-    if (d.startsWith("972") || d.startsWith("970")) {
-      return { ok: true, e164: "+" + d, display: d };
-    }
-
-    // If starts with 0
+    if (d.startsWith("972") || d.startsWith("970")) return { ok: true, e164: "+" + d, display: d };
     if (d.startsWith("0")) {
-      // 059 -> 970
       if (d.startsWith("059")) return { ok: true, e164: "+970" + d.slice(1), display: d };
-      // 05x -> 972
-      if (d.startsWith("05")) return { ok: true, e164: "+972" + d.slice(1), display: d };
-      // Fallback
       return { ok: true, e164: "+972" + d.slice(1), display: d };
     }
-
-    // If starts with 5 (missing 0)
     if (d.startsWith("5")) {
        if (d.startsWith("59")) return { ok: true, e164: "+970" + d, display: "0" + d };
        return { ok: true, e164: "+972" + d, display: "0" + d };
     }
-
     return { ok: false, e164: "+" + d, display: d };
   }
 
   // Init
   (function(){
-    if(prompt("كلمة السر:") !== PASSWORD) document.body.innerHTML = "Access Denied";
-    else loadData();
+    if(localStorage.getItem('mad_auth') !== PASS) {
+      if(prompt("Password:") === PASS) localStorage.setItem('mad_auth', PASS);
+      else { document.body.innerHTML = "<h3>Access Denied</h3>"; return; }
+    }
+    loadData();
+    setInterval(loadData, 20000); // تحديث تلقائي كل 20 ثانية
   })();
 
   async function loadData() {
     try {
       const res = await fetch(`${SCRIPT_URL}?action=get`);
-      const all = await res.json();
-      orders = all.filter(o => {
-        const s = (o.status || "").toLowerCase();
-        return (s.includes("prep") || s.includes("approved")) && !s.includes("ready");
-      });
+      orders = await res.json();
+      
+      // منطق التنبيه
+      const pendingList = orders.filter(isPendingOrder);
+      if (pendingList.length > lastPendingCount && lastPendingCount !== 0) {
+         triggerAlert();
+      }
+      lastPendingCount = pendingList.length;
+
       render();
-    } catch(e) { console.error(e); }
+    } catch(e) {}
   }
 
-  /* =========================================
-     2. Smart Search Logic
-     ========================================= */
+  function triggerAlert() {
+    const bar = document.getElementById('alert-bar');
+    bar.style.display = 'block';
+    document.getElementById('bell').play().catch(()=>{});
+    // إخفاء تلقائي بعد 10 ثواني
+    setTimeout(() => { bar.style.display = 'none'; }, 10000);
+  }
+
+  function isPendingOrder(o) {
+    const st = (o.status || "").toLowerCase();
+    return (st.includes("prep") || st.includes("approved")) && !st.includes("ready");
+  }
+
+  function setTab(tab) {
+    currentTab = tab;
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.getElementById(`tab-${tab}`).classList.add('active');
+    render();
+  }
+
   function render() {
+    const pendingList = orders.filter(isPendingOrder);
+    const allList = orders; // أو قم بتصفية معينة للأرشيف
+    
+    document.getElementById('count-pending').innerText = pendingList.length;
+    document.getElementById('count-all').innerText = allList.length;
+
+    let displayList = (currentTab === 'pending') ? pendingList : allList;
+
+    // البحث الذكي
     const q = document.getElementById('search').value.toLowerCase().trim();
-    // Normalize the search query itself if it looks like a phone
-    const qNorm = normalizeILPSPhone(q).e164 || q; 
-    const qClean = qNorm.replace('+', ''); // Search both +972 and 972
+    if(q) {
+      const qNorm = normalizeILPSPhone(q).e164 || q; 
+      const qClean = qNorm.replace('+', '');
+      displayList = displayList.filter(o => {
+        const oPhoneInfo = normalizeILPSPhone(o.phone);
+        const oPhoneE164 = oPhoneInfo.e164.toLowerCase();
+        return (o.name || "").toLowerCase().includes(q) ||
+               (o.orderId || "").toString().includes(q) ||
+               oPhoneE164.includes(qClean) ||
+               (o.phone || "").includes(q);
+      });
+    }
 
     const grid = document.getElementById('grid');
-    
-    // Filter
-    const filtered = orders.filter(o => {
-      if(!q) return true;
-      
-      // Normalize Order Phone
-      const oPhoneInfo = normalizeILPSPhone(o.phone);
-      const oPhoneE164 = oPhoneInfo.e164.toLowerCase();
-      
-      // Check: Name OR OrderID OR Normalized Phone
-      return (o.name || "").toLowerCase().includes(q) ||
-             (o.orderId || "").toString().includes(q) ||
-             oPhoneE164.includes(qClean) || // Match +972...
-             (o.phone || "").includes(q);   // Match raw input
-    });
-
-    document.querySelector('.header div').innerHTML = `MAD <span style="color:var(--accent)">SMART</span> (${filtered.length})`;
-
-    if(filtered.length === 0) {
-      grid.innerHTML = '<div style="color:white;text-align:center;grid-column:1/-1;padding:50px">لا توجد نتائج / لا يوجد طلبات</div>';
+    if(!displayList.length) {
+      grid.innerHTML = '<div style="color:#555;text-align:center;grid-column:1/-1;padding:50px">لا توجد طلبات للعرض</div>';
       return;
     }
 
-    grid.innerHTML = filtered.map((o, i) => {
-      // Find real index in main array
+    grid.innerHTML = displayList.map(o => {
       const realIndex = orders.indexOf(o);
       const isRush = (o.delivery||"").includes("High");
+      const isReady = (o.status||"").includes("READY");
+      
       return `
-        <div class="card ${isRush ? 'rush' : ''}" onclick="openEditor(${realIndex})">
+        <div class="card ${isRush ? 'rush' : ''} ${isReady ? 'status-ready' : ''}" onclick="openEditor(${realIndex})">
           <div class="card-head">
             <span>#${o.orderId}</span>
             <span>${o.delivery || 'Standard'}</span>
           </div>
-          <div class="card-name">${o.name}</div>
-          <div class="card-sub">
+          <div class="card-name">
+            ${isReady ? '✅ ' : ''}${o.name}
+          </div>
+          <div class="card-info">
             📞 ${o.phone}<br>
             📍 ${o.city}
           </div>
@@ -250,16 +284,11 @@
     }).join("");
   }
 
-  /* =========================================
-     3. Label Template (10x10)
-     ========================================= */
+  // --- Label HTML ---
   function getLabelHTML(data, idSuffix) {
     const date = new Date().toLocaleDateString('he-IL');
-    
-    // Use the Logic function!
     const phoneInfo = normalizeILPSPhone(data.phone);
-    const waLink = `https://wa.me/${phoneInfo.e164.replace('+','')}`; 
-    // Barcode: use clean digits (remove +)
+    // للباركود نزيل +
     const barcodeVal = phoneInfo.e164.replace('+','');
 
     return `
@@ -302,21 +331,19 @@
     `;
   }
 
-  // --- Editor & Print Single ---
+  // --- Editor & Printing ---
   function openEditor(idx) {
     currentIndex = idx;
     const o = orders[idx];
-    
     document.getElementById('e_name').value = o.name;
     document.getElementById('e_phone').value = o.phone;
     document.getElementById('e_city').value = o.city + " " + (o.addr||"");
     document.getElementById('e_del').value = o.delivery || "High Express";
     document.getElementById('e_content').value = o.offer || "";
     document.getElementById('e_price').value = o.price;
-
     document.getElementById('editor').style.display = 'flex';
     updatePreview();
-
+    
     document.onkeydown = (e) => {
       if(e.key === "Enter" && !e.shiftKey) { e.preventDefault(); printSingle(); }
       if(e.key === "Escape") closeModal();
@@ -326,12 +353,6 @@
   function closeModal() {
     document.getElementById('editor').style.display = 'none';
     document.onkeydown = null;
-  }
-
-  function updatePreview() {
-    const data = getFormData();
-    document.getElementById('livePreview').innerHTML = getLabelHTML(data, 'prev');
-    generateCodes('prev');
   }
 
   function getFormData() {
@@ -346,25 +367,23 @@
     };
   }
 
-  /* =========================================
-     4. Robust Print Logic (With Delays)
-     ========================================= */
+  function updatePreview() {
+    const data = getFormData();
+    document.getElementById('livePreview').innerHTML = getLabelHTML(data, 'prev');
+    generateCodes('prev');
+  }
+
   function generateCodes(suffix) {
-    // Generate QR
-    const qrEl = document.getElementById(`qr_${suffix}`);
-    if(qrEl) {
-      qrEl.innerHTML = "";
-      // Extract link from HTML logic or rebuild
-      const phoneVal = document.getElementById(`bar_${suffix}`)?.getAttribute('data-val');
-      if(phoneVal) {
-        new QRCode(qrEl, { text: `https://wa.me/${phoneVal}`, width: 45, height: 45 });
-      }
-    }
-    // Generate Barcode
     try {
       const barEl = document.getElementById(`bar_${suffix}`);
       if(barEl) {
         JsBarcode(barEl, barEl.getAttribute('data-val'), { format: "CODE128", height: 25, fontSize: 10, displayValue: false, margin:0 });
+      }
+      const qrEl = document.getElementById(`qr_${suffix}`);
+      if(qrEl) {
+        qrEl.innerHTML = "";
+        const val = barEl ? barEl.getAttribute('data-val') : "972549634449";
+        new QRCode(qrEl, { text: `https://wa.me/${val}`, width: 45, height: 45 });
       }
     } catch(e){}
   }
@@ -374,52 +393,49 @@
     const area = document.getElementById('printArea');
     area.innerHTML = getLabelHTML(data, 'print');
     
-    // 1. Render HTML
-    // 2. Wait small time -> Generate Codes
-    // 3. Wait small time -> Print
-    
     setTimeout(() => {
       generateCodes('print');
-      
       setTimeout(async () => {
         window.print();
-        
-        // Update Server
         const row = orders[currentIndex].rowIndex;
         closeModal();
-        await fetch(`${SCRIPT_URL}?action=updateStatus&key=${PASSWORD}&row=${row}&status=READY ✅`);
-        
-        // Remove from list visually
-        orders.splice(currentIndex, 1);
+        await fetch(`${SCRIPT_URL}?action=updateStatus&key=${PASS}&row=${row}&status=READY ✅`);
+        // تحديث الواجهة (إزالة الطلب من القائمة إذا كنا في تبويب قيد التجهيز)
+        orders[currentIndex].status = "READY ✅"; // تحديث محلي
         render();
-        
-      }, 500); // 500ms delay for codes to render
+      }, 500);
     }, 100);
   }
 
   function printAll() {
-    if(!orders.length) return alert("لا يوجد طلبات");
-    if(!confirm(`طباعة ${orders.length} طلب دفعة واحدة؟`)) return;
+    // طباعة فقط المعروض حالياً في الشبكة
+    let listToPrint = [];
+    if (currentTab === 'pending') {
+      listToPrint = orders.filter(isPendingOrder);
+    } else {
+      if(!confirm("أنت في تبويب الأرشيف، هل تريد طباعة الكل؟")) return;
+      listToPrint = orders;
+    }
+
+    if(!listToPrint.length) return alert("لا يوجد طلبات للطباعة");
 
     const area = document.getElementById('printArea');
-    area.innerHTML = orders.map((o, i) => getLabelHTML(o, `bulk_${i}`)).join("");
+    area.innerHTML = listToPrint.map((o, i) => getLabelHTML(o, `bulk_${i}`)).join("");
 
     setTimeout(() => {
-      // Generate all codes
-      orders.forEach((o, i) => generateCodes(`bulk_${i}`));
-
+      listToPrint.forEach((o, i) => generateCodes(`bulk_${i}`));
       setTimeout(() => {
         window.print();
-        
-        if(confirm("تمت الطباعة. هل أنقل الكل إلى (جاهز)؟")) {
-          orders.forEach(o => fetch(`${SCRIPT_URL}?action=updateStatus&key=${PASSWORD}&row=${o.rowIndex}&status=READY ✅`));
-          orders = [];
+        if(currentTab === 'pending' && confirm("نقل كل هذه الطلبات إلى الأرشيف (جاهز)؟")) {
+          listToPrint.forEach(o => {
+             o.status = "READY ✅";
+             fetch(`${SCRIPT_URL}?action=updateStatus&key=${PASS}&row=${o.rowIndex}&status=READY ✅`);
+          });
           render();
         }
-      }, 1500); // Longer delay for bulk
+      }, 1500);
     }, 200);
   }
-
 </script>
 </body>
 </html>
