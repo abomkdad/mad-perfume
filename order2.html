@@ -1,58 +1,92 @@
 <!doctype html>
-<html lang="he" dir="rtl">
+<html lang="ar" dir="rtl">
 <head>
   <meta charset="utf-8"/>
-  <title>MAD SYSTEM v5.2 | Final Stable</title>
+  <title>MAD SYSTEM v5.3 | Auto-Sync</title>
   
   <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
   <style>
     :root { --bg: #0f172a; --card: #1e293b; --blue: #3b82f6; --text: #f8fafc; --green: #10b981; --red: #ef4444; --orange: #f59e0b; }
-    body { font-family: system-ui, sans-serif; background: var(--bg); color: var(--text); margin: 0; direction: rtl; }
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg); color: var(--text); margin: 0; direction: rtl; }
     
-    header { background: var(--card); padding: 15px 25px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #334155; position: sticky; top: 0; z-index: 100; }
+    /* Header & Search */
+    header { background: var(--card); padding: 15px 25px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #334155; position: sticky; top: 0; z-index: 90; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+    .search-box { flex: 1; max-width: 500px; margin: 0 20px; position: relative; }
+    .search-box input { width: 100%; padding: 12px 20px; border-radius: 50px; border: 1px solid #334155; background: #0f172a; color: white; font-size: 16px; outline: none; transition: 0.3s; }
+    .search-box input:focus { border-color: var(--blue); box-shadow: 0 0 10px rgba(59, 130, 246, 0.3); }
+
+    /* Grid Layout */
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 25px; padding: 25px; }
     
-    .search-box { flex: 1; max-width: 400px; position: relative; margin: 0 20px; }
-    .search-box input { width: 100%; padding: 10px 15px; border-radius: 8px; border: 1px solid #334155; background: #0f172a; color: white; font-size: 16px; }
-
-    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; padding: 20px; }
+    /* Card Design */
+    .card { background: var(--card); border-radius: 16px; overflow: hidden; border: 1px solid #334155; transition: all 0.3s ease; display: flex; flex-direction: column; position: relative; }
+    .card:hover { transform: translateY(-5px); box-shadow: 0 15px 30px rgba(0,0,0,0.4); border-color: var(--blue); }
+    .card.selected { border: 2px solid var(--blue); background: #232f42; }
     
-    .card { background: var(--card); border-radius: 15px; overflow: hidden; border: 1px solid #334155; transition: 0.3s; position: relative; display: flex; flex-direction: column; }
-    .card:hover { border-color: var(--blue); transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
-    .card.selected { border: 2px solid var(--blue); background: #263345; }
-
-    .status-badge { position: absolute; top: 10px; left: 10px; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: bold; }
-    .status-waiting { background: var(--orange); color: #000; }
-    .status-ready { background: var(--green); color: #fff; }
-
-    .card-content { padding: 15px; flex-grow: 1; }
-    .card-id { font-size: 12px; color: #94a3b8; font-weight: bold; }
-    .card-name { font-size: 22px; font-weight: bold; margin: 5px 0; color: #fff; }
-    .card-detail { font-size: 14px; color: #cbd5e1; margin: 5px 0; display: flex; align-items: center; gap: 8px; }
-    .card-items { background: rgba(0,0,0,0.2); padding: 8px; border-radius: 6px; margin-top: 10px; font-size: 13px; color: #94a3b8; border: 1px solid #334155; }
+    /* Status Badge */
+    .status-badge { position: absolute; top: 15px; left: 15px; padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; color: white; box-shadow: 0 2px 5px rgba(0,0,0,0.2); cursor: pointer; }
+    .status-pending { background: var(--orange); animation: pulse 2s infinite; }
+    .status-ready { background: var(--green); }
     
-    .card-price { font-size: 26px; font-weight: 900; color: var(--green); margin-top: 10px; padding-top: 10px; border-top: 1px dashed #334155; }
+    @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
 
-    .card-actions { display: grid; grid-template-columns: 1fr 1fr 1fr; border-top: 1px solid #334155; background: #161e2e; }
-    .btn-action { border: none; background: transparent; color: #cbd5e1; padding: 12px 5px; cursor: pointer; font-size: 13px; transition: 0.2s; display: flex; flex-direction: column; align-items: center; gap: 5px; border-left: 1px solid #334155; }
+    .card-content { padding: 20px; flex-grow: 1; }
+    .card-id { font-size: 13px; color: #94a3b8; font-weight: bold; margin-bottom: 5px; }
+    .card-name { font-size: 20px; font-weight: 800; margin-bottom: 10px; color: #fff; }
+    
+    .info-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; color: #cbd5e1; font-size: 14px; }
+    .info-row i { width: 20px; text-align: center; color: var(--blue); }
+
+    /* Products Section */
+    .products-box { background: #0f172a; border-radius: 8px; padding: 10px; margin-top: 15px; border: 1px dashed #334155; }
+    .products-title { font-size: 11px; color: #64748b; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; }
+    .product-item { font-size: 13px; color: #e2e8f0; display: flex; justify-content: space-between; padding: 3px 0; border-bottom: 1px solid #1e293b; }
+    .product-item:last-child { border-bottom: none; }
+
+    .card-price { font-size: 28px; font-weight: 900; color: var(--green); margin-top: 15px; text-align: left; }
+
+    /* Actions Bar */
+    .card-actions { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; background: #161e2e; border-top: 1px solid #334155; }
+    .btn-action { border: none; background: transparent; color: #94a3b8; padding: 12px 0; cursor: pointer; font-size: 13px; display: flex; flex-direction: column; align-items: center; gap: 5px; transition: 0.2s; border-left: 1px solid #334155; }
     .btn-action:last-child { border-left: none; }
-    .btn-action:hover { background: #1e293b; color: #fff; }
+    .btn-action:hover { background: #1e293b; color: white; }
+    .btn-status:hover { color: var(--orange); }
+
+    /* Bulk Bar */
+    .bulk-bar { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px); background: white; color: black; padding: 12px 30px; border-radius: 50px; display: flex; align-items: center; gap: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.6); z-index: 1000; transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); opacity: 0; }
+    .bulk-bar.active { transform: translateX(-50%) translateY(0); opacity: 1; }
     
-    .btn-print:hover { color: var(--blue); }
-    .btn-edit:hover { color: #fbbf24; }
-    .btn-select:hover { color: var(--green); }
+    /* Edit Modal */
+    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 2000; display: none; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
+    .modal { background: var(--card); padding: 30px; border-radius: 20px; width: 90%; max-width: 500px; border: 1px solid #334155; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); }
+    .modal h2 { margin-top: 0; color: white; border-bottom: 1px solid #334155; padding-bottom: 15px; }
+    .form-group { margin-bottom: 15px; }
+    .form-group label { display: block; color: #94a3b8; font-size: 13px; margin-bottom: 5px; }
+    .form-group input, .form-group textarea { width: 100%; padding: 10px; background: #0f172a; border: 1px solid #334155; border-radius: 8px; color: white; box-sizing: border-box; }
+    .modal-btns { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
+    .btn-save { background: var(--blue); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; }
+    .btn-close { background: #334155; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; }
 
-    .bulk-bar { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: white; color: black; padding: 15px 30px; border-radius: 50px; display: none; align-items: center; gap: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 1000; }
-    .bulk-bar.active { display: flex; }
+    /* Notification Toast */
+    #toast { position: fixed; top: 20px; right: 20px; background: var(--green); color: white; padding: 15px 25px; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); transform: translateX(150%); transition: 0.3s; z-index: 3000; display: flex; align-items: center; gap: 10px; font-weight: bold; }
+    #toast.show { transform: translateX(0); }
 
+    /* Print Styles */
     @media print {
       body * { visibility: hidden; }
       #printArea, #printArea * { visibility: visible; }
-      #printArea { position: absolute; left: 0; top: 0; width: 100%; display: block !important; }
+      #printArea { position: absolute; left: 0; top: 0; width: 100%; }
       @page { size: 100mm 100mm; margin: 0; }
-      .label { width: 100mm; height: 100mm; padding: 5mm; background: white !important; color: black !important; display: flex; flex-direction: column; page-break-after: always; border: 1px solid #000; box-sizing: border-box; }
+      .label { width: 100mm; height: 100mm; padding: 5mm; background: white !important; color: black !important; display: flex; flex-direction: column; page-break-after: always; box-sizing: border-box; font-family: sans-serif; position: relative; border: 1px dashed #ccc; }
+      .label-header { display: flex; justify-content: space-between; border-bottom: 3px solid #000; padding-bottom: 10px; margin-bottom: 15px; }
+      .label-row { font-size: 14pt; margin-bottom: 8px; line-height: 1.4; display: flex; }
+      .label-key { width: 80px; font-weight: bold; }
+      .label-val { flex: 1; font-weight: bold; }
+      .label-products { border-top: 2px solid #000; margin-top: 10px; padding-top: 5px; font-size: 12pt; height: 120px; overflow: hidden; }
+      .label-footer { margin-top: auto; text-align: center; border: 3px solid #000; border-radius: 15px; padding: 10px; }
+      .label-price { font-size: 32pt; font-weight: 900; }
     }
     #printArea { display: none; }
   </style>
@@ -60,26 +94,62 @@
 <body>
 
 <header>
-  <div style="font-size: 24px; font-weight: 900;">MAD <span style="color:var(--blue)">V5.2</span></div>
-  <div class="search-box">
-    <input type="text" id="searchInput" placeholder="חיפוש לפי שם או טלפון..." oninput="app.render()">
+  <div style="font-size: 24px; font-weight: 900; display:flex; align-items:center; gap:10px;">
+    <span>MAD</span> <span style="color:var(--blue)">SYS v5.3</span>
+    <span id="loader" style="font-size:12px; font-weight:normal; color:#64748b; margin-right:15px; opacity:0; transition:0.3s"><i class="fas fa-circle-notch fa-spin"></i> مزامنة...</span>
   </div>
-  <div id="syncIndicator" style="font-size: 12px; color: var(--green);">סנכרון פעיל ●</div>
-</header>
+  
+  <div class="search-box">
+    <input type="text" id="searchInput" placeholder="ابحث عن اسم، هاتف، أو رقم طلب..." oninput="app.render()">
+  </div>
 
-<div id="debugStatus" style="background: #334155; font-size: 12px; padding: 5px 20px; text-align: center;">מתחבר...</div>
+  <button onclick="app.manualRefresh()" style="background: #1e293b; color: white; border: 1px solid #334155; padding: 10px 20px; border-radius: 10px; cursor: pointer; font-weight: bold; transition:0.2s">
+    <i class="fas fa-sync-alt"></i> تحديث
+  </button>
+</header>
 
 <div class="grid" id="grid"></div>
 
 <div class="bulk-bar" id="bulkBar">
-  <span id="selectedCount" style="font-weight: bold;">0 נבחרו</span>
-  <button onclick="app.printSelected()" style="background: #000; color: #fff; border: none; padding: 8px 20px; border-radius: 20px; cursor: pointer; font-weight: bold;">הדפס נבחרים 🖨️</button>
-  <button onclick="app.clearSelection()" style="background: none; border: none; text-decoration: underline; cursor: pointer;">ביטול</button>
+  <span id="selectedCount" style="font-weight: bold; min-width: 100px;">0 مختار</span>
+  <button onclick="app.printSelected()" style="background: black; color: white; border: none; padding: 10px 25px; border-radius: 30px; cursor: pointer; font-weight: bold;">
+    <i class="fas fa-print"></i> طباعة المحدد
+  </button>
+  <button onclick="app.clearSelection()" style="background: none; border: none; color: #ef4444; cursor: pointer; font-weight:bold;">إلغاء</button>
 </div>
 
-<div id="printArea"></div>
+<div class="modal-overlay" id="editModal">
+  <div class="modal">
+    <h2>تعديل الطلب <span id="editIdStr"></span></h2>
+    <div class="form-group">
+      <label>اسم العميل</label>
+      <input type="text" id="editName">
+    </div>
+    <div class="form-group">
+      <label>الهاتف</label>
+      <input type="text" id="editPhone">
+    </div>
+    <div class="form-group">
+      <label>المدينة / العنوان</label>
+      <input type="text" id="editCity">
+    </div>
+    <div class="form-group">
+      <label>المنتجات (افصل بفاصلة)</label>
+      <textarea id="editProducts" rows="3"></textarea>
+    </div>
+    <div class="form-group">
+      <label>السعر</label>
+      <input type="number" id="editPrice">
+    </div>
+    <div class="modal-btns">
+      <button class="btn-close" onclick="app.closeModal()">إغلاق</button>
+      <button class="btn-save" onclick="app.saveEdit()">حفظ التعديلات</button>
+    </div>
+  </div>
+</div>
 
-<audio id="notifSound" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3"></audio>
+<div id="toast"><i class="fas fa-bell"></i> <span>طلب جديد وصل!</span></div>
+<div id="printArea"></div>
 
 <script>
 class MadSystem {
@@ -87,106 +157,156 @@ class MadSystem {
     this.scriptUrl = "https://script.google.com/macros/s/AKfycbyLjLFa8AaH82Ip7m747WC-KSUUEaU_M70S0I9Mda14XbnmcuEfZ7pBnF_zzJYZuXmZ/exec";
     this.orders = [];
     this.selected = new Set();
-    this.loadData();
-    
-    // רענון אוטומטי כל 5 שניות
+    this.localStatus = JSON.parse(localStorage.getItem('mad_status_v5') || '{}');
+    this.lastOrderCount = 0;
+    this.editingIdx = null;
+
+    this.init();
+  }
+
+  async init() {
+    await this.loadData();
+    // Auto refresh every 5 seconds
     setInterval(() => this.loadData(true), 5000);
   }
 
-  async loadData(isSilent = false) {
-    const debug = document.getElementById('debugStatus');
-    if(!isSilent) debug.innerHTML = "טוען נתונים...";
+  async loadData(isAuto = false) {
+    if(isAuto) document.getElementById('loader').style.opacity = '1';
     
     try {
       const res = await fetch(`${this.scriptUrl}?action=get`);
-      const newData = await res.json();
+      const data = await res.json();
       
-      if (this.orders.length > 0 && newData.length > this.orders.length) {
-        this.notifyNewOrder();
+      // Check for new orders
+      if (this.lastOrderCount > 0 && data.length > this.lastOrderCount) {
+        this.showToast();
+        this.playNotificationSound();
       }
-
-      // מיון: ממתין לטיפול (ממתין) יופיע ראשון
-      this.orders = newData.sort((a, b) => {
-        const statusA = (a.status || "ממתין").trim();
-        const statusB = (b.status || "ממתין").trim();
-        if (statusA === "ממתין" && statusB !== "ממתין") return -1;
-        if (statusA !== "ממתין" && statusB === "ממתין") return 1;
-        return 0;
+      this.lastOrderCount = data.length;
+      
+      // Merge with local updates (since we don't have a real backend save yet)
+      this.orders = data.map(o => {
+          // Normalize keys
+          const id = o.orderId || o.id || '0';
+          return {
+              id: id,
+              name: o.name || o.customer || '',
+              phone: o.phone || o.tel || '',
+              city: o.city || o.address || '',
+              payment: o.payment || '',
+              price: o.price || '0',
+              products: o.products || o.items || '',
+              // Local status override
+              status: this.localStatus[id] || (o.status || 'pending')
+          };
       });
 
-      debug.innerHTML = `✅ מעודכן: ${new Date().toLocaleTimeString()} | ${this.orders.length} הזמנות`;
       this.render();
+      
     } catch (e) {
-      debug.innerHTML = `❌ שגיאת סנכרון`;
+      console.error("Connection Error", e);
+    } finally {
+      if(isAuto) setTimeout(() => document.getElementById('loader').style.opacity = '0', 1000);
     }
   }
 
-  notifyNewOrder() {
-    document.getElementById('notifSound').play().catch(e => {});
-    const indicator = document.getElementById('syncIndicator');
-    indicator.style.color = "var(--red)";
-    indicator.innerHTML = "הזמנה חדשה הגיעה! 🔔";
-    setTimeout(() => {
-        indicator.style.color = "var(--green)";
-        indicator.innerHTML = "סנכרון פעיל ●";
-    }, 4000);
+  manualRefresh() {
+    this.loadData();
   }
 
-  fixLang(val) {
+  // --- Translation Helper (Strict Arabic) ---
+  translate(type, val) {
     if(!val) return "---";
-    const map = { 
-        "cash": "מזומן", "credit": "אשראי", "bit": "ביט", 
-        "pending": "ממתין", "waiting": "ממתין", "ready": "מוכן" 
-    };
-    const cleaned = val.toString().toLowerCase().trim();
-    return map[cleaned] || val;
+    const v = val.toString().toLowerCase().trim();
+    
+    if(type === 'payment') {
+      if(v.includes('cash') || v.includes('מזומן')) return 'نقدي';
+      if(v.includes('bit') || v.includes('ביט')) return 'Bit';
+      if(v.includes('credit') || v.includes('אשראי')) return 'بطاقة ائتمان';
+      if(v.includes('pending')) return 'عند الاستلام';
+      return v; // Return original if unknown, or map more
+    }
+    
+    if(type === 'city') {
+      // Basic Hebrew/English to Arabic mapping
+      const map = {
+        'haifa': 'حيفا', 'חיפה': 'حيفا',
+        'acre': 'عكا', 'akko': 'عكا', 'עכו': 'عكا',
+        'nazareth': 'الناصرة', 'נצרת': 'الناصرة',
+        'tel aviv': 'تل أبيب', 'תל אביב': 'تل أبيب',
+        'jerusalem': 'القدس', 'ירושלים': 'القدس'
+      };
+      // If found in map return it, else return original (assuming it might be already Arabic or unknown)
+      return map[v] || val; 
+    }
+    return val;
   }
 
+  // --- Rendering & Logic ---
   render() {
-    const query = document.getElementById('searchInput').value.toLowerCase().replace(/[-\s]/g, "");
+    const query = document.getElementById('searchInput').value.toLowerCase().trim();
     const grid = document.getElementById('grid');
     
-    const filtered = this.orders.filter(o => {
-      const name = String(o.name || o.customer || "").toLowerCase();
-      const phone = String(o.phone || o.tel || "").replace(/[-\s]/g, "");
-      return name.includes(query) || phone.includes(query);
+    // Sort: Pending first, then Ready
+    let displayList = [...this.orders].sort((a, b) => {
+        const sA = a.status === 'ready' ? 1 : 0;
+        const sB = b.status === 'ready' ? 1 : 0;
+        return sA - sB; // 0 (pending) comes before 1 (ready)
     });
 
-    grid.innerHTML = filtered.map(o => {
-      const uniqueId = o.orderId || o.id;
-      const isSelected = this.selected.has(uniqueId);
-      const isReady = (o.status || "").includes("מוכן") || (o.status === "ready");
-      
-      return `
-        <div class="card ${isSelected ? 'selected' : ''}">
-          <span class="status-badge ${isReady ? 'status-ready' : 'status-waiting'}">
-            ${isReady ? 'מוכן' : 'ממתין לתהליך'}
-          </span>
-          <div class="card-content">
-            <div class="card-id">#${uniqueId}</div>
-            <div class="card-name">${o.name || o.customer || 'ללא שם'}</div>
-            <div class="card-detail"><i class="fas fa-phone"></i> ${o.phone || o.tel || '---'}</div>
-            <div class="card-detail"><i class="fas fa-map-marker-alt"></i> ${this.fixLang(o.city || o.address)}</div>
-            <div class="card-detail"><i class="fas fa-credit-card"></i> ${this.fixLang(o.payment)}</div>
-            
-            <div class="card-items">
-                <strong>מוצרים:</strong><br>
-                ${o.items || o.products || 'לא צוינו מוצרים'}
-            </div>
+    if(query) {
+      displayList = displayList.filter(o => 
+        o.name.toLowerCase().includes(query) || 
+        o.phone.includes(query) || 
+        String(o.id).includes(query)
+      );
+    }
 
-            <div class="card-price">₪${o.price || '0'}</div>
+    grid.innerHTML = displayList.map(o => {
+      const idx = this.orders.findIndex(x => x.id === o.id); // Find original index
+      const isSel = this.selected.has(idx);
+      const isReady = o.status === 'ready';
+      
+      // Format Products List
+      let prodHTML = '';
+      if(o.products) {
+          const pList = o.products.toString().split(/,|،|\n/);
+          prodHTML = `<div class="products-box"><div class="products-title">المنتجات</div>` + 
+                     pList.map(p => `<div class="product-item"><span>- ${p}</span></div>`).join('') + 
+                     `</div>`;
+      }
+
+      return `
+        <div class="card ${isSel ? 'selected' : ''}">
+          <div class="status-badge ${isReady ? 'status-ready' : 'status-pending'}" onclick="app.toggleStatus(${idx}, event)">
+            ${isReady ? 'جاهز للتسليم <i class="fas fa-check"></i>' : 'انتظار التجهيز <i class="fas fa-clock"></i>'}
+          </div>
+
+          <div class="card-content">
+            <div class="card-id">ORDER #${o.id}</div>
+            <div class="card-name">${o.name}</div>
+            
+            <div class="info-row"><i class="fas fa-phone"></i> ${o.phone}</div>
+            <div class="info-row"><i class="fas fa-map-marker-alt"></i> ${this.translate('city', o.city)}</div>
+            <div class="info-row"><i class="fas fa-wallet"></i> ${this.translate('payment', o.payment)}</div>
+            
+            ${prodHTML}
+            
+            <div class="card-price">₪${o.price}</div>
           </div>
           
           <div class="card-actions">
-            <button class="btn-action btn-print" onclick="app.printSingle('${uniqueId}')">
-              <i class="fas fa-print"></i> הדפסה
+            <button class="btn-action" onclick="app.printSingle(${idx})">
+              <i class="fas fa-print"></i> طباعة
             </button>
-            <button class="btn-action btn-edit" onclick="app.toggleStatus('${uniqueId}')">
-              <i class="fas fa-sync"></i> ${isReady ? 'שנה לממתין' : 'סמן כמעודכן'}
+            <button class="btn-action" onclick="app.openEdit(${idx})">
+              <i class="fas fa-edit"></i> تعديل
             </button>
-            <button class="btn-action btn-select" onclick="app.toggleSelect('${uniqueId}')">
-              <i class="fas ${isSelected ? 'fa-check-circle' : 'fa-plus-circle'}"></i> 
-              ${isSelected ? 'נבחר' : 'בחר'}
+             <button class="btn-action btn-status" onclick="app.toggleStatus(${idx}, event)">
+              <i class="fas fa-exchange-alt"></i> الحالة
+            </button>
+            <button class="btn-action" onclick="app.toggleSelect(${idx})" style="color:${isSel?'var(--blue)':'inherit'}">
+              <i class="fas ${isSel ? 'fa-check-square' : 'fa-square'}"></i> تحديد
             </button>
           </div>
         </div>
@@ -194,78 +314,149 @@ class MadSystem {
     }).join("");
   }
 
-  toggleSelect(id) {
-    this.selected.has(id) ? this.selected.delete(id) : this.selected.add(id);
-    this.updateBulkBar();
+  // --- Status System ---
+  toggleStatus(idx, e) {
+    if(e) e.stopPropagation();
+    const o = this.orders[idx];
+    o.status = o.status === 'ready' ? 'pending' : 'ready';
+    
+    // Save locally
+    this.localStatus[o.id] = o.status;
+    localStorage.setItem('mad_status_v5', JSON.stringify(this.localStatus));
+    
     this.render();
   }
 
-  updateBulkBar() {
+  // --- Selection System ---
+  toggleSelect(idx) {
+    this.selected.has(idx) ? this.selected.delete(idx) : this.selected.add(idx);
+    this.updateBulkUI();
+    this.render();
+  }
+
+  updateBulkUI() {
     const bar = document.getElementById('bulkBar');
-    document.getElementById('selectedCount').innerText = `${this.selected.size} הזמנות נבחרו להדפסה`;
+    document.getElementById('selectedCount').innerText = `${this.selected.size} طلبات`;
     this.selected.size > 0 ? bar.classList.add('active') : bar.classList.remove('active');
   }
 
   clearSelection() {
     this.selected.clear();
-    this.updateBulkBar();
+    this.updateBulkUI();
     this.render();
   }
 
-  async toggleStatus(id) {
-    // כאן נשלחת בקשה לעדכון הסטטוס ב-Google Sheets
-    const debug = document.getElementById('debugStatus');
-    debug.innerHTML = "מעדכן סטטוס בשרת...";
-    try {
-        await fetch(`${this.scriptUrl}?action=update&id=${id}`);
-        this.loadData(true);
-    } catch(e) {
-        alert("שגיאה בעדכון הסטטוס");
-    }
+  // --- Edit System ---
+  openEdit(idx) {
+    this.editingIdx = idx;
+    const o = this.orders[idx];
+    document.getElementById('editIdStr').innerText = `#${o.id}`;
+    document.getElementById('editName').value = o.name;
+    document.getElementById('editPhone').value = o.phone;
+    document.getElementById('editCity').value = o.city;
+    document.getElementById('editPrice').value = o.price;
+    document.getElementById('editProducts').value = o.products;
+    
+    document.getElementById('editModal').style.display = 'flex';
   }
 
-  printSingle(id) {
-    const o = this.orders.find(ord => (ord.orderId || ord.id) == id);
+  closeModal() {
+    document.getElementById('editModal').style.display = 'none';
+    this.editingIdx = null;
+  }
+
+  saveEdit() {
+    if (this.editingIdx === null) return;
+    const o = this.orders[this.editingIdx];
+    
+    // Update local object
+    o.name = document.getElementById('editName').value;
+    o.phone = document.getElementById('editPhone').value;
+    o.city = document.getElementById('editCity').value;
+    o.price = document.getElementById('editPrice').value;
+    o.products = document.getElementById('editProducts').value;
+    
+    this.closeModal();
+    this.render();
+    alert("تم تحديث البيانات مؤقتاً في الشاشة. (ملاحظة: لا يتم الحفظ في Google Sheet في هذه النسخة)");
+  }
+
+  // --- Printing System ---
+  printSingle(idx) {
     const area = document.getElementById('printArea');
-    area.innerHTML = this.generateLabel(o);
-    setTimeout(() => { window.print(); }, 300);
+    area.innerHTML = this.generateLabel(this.orders[idx]);
+    setTimeout(() => window.print(), 300);
   }
 
   printSelected() {
     const area = document.getElementById('printArea');
-    const list = this.orders.filter(o => this.selected.has(o.orderId || o.id));
+    const list = Array.from(this.selected).map(idx => this.orders[idx]);
+    if(list.length === 0) return alert("اختر طلبات أولاً");
     
-    if(list.length === 0) return;
-
     area.innerHTML = list.map(o => this.generateLabel(o)).join("");
     setTimeout(() => {
       window.print();
-      this.clearSelection();
+      this.clearSelection(); // Optional: clear selection after print
     }, 500);
   }
 
   generateLabel(o) {
+    const date = new Date().toLocaleDateString('ar-EG');
+    const cityAr = this.translate('city', o.city);
+    const payAr = this.translate('payment', o.payment);
+    
     return `
       <div class="label" dir="rtl">
-        <div style="display:flex; justify-content:space-between; border-bottom:4px solid black; padding-bottom:10px; margin-bottom:10px;">
-          <b style="font-size:28pt;">MAD PARFUM</b>
-          <span style="font-size:18pt;">#${o.orderId || o.id || ''}</span>
-        </div>
-        <div style="font-size:20pt; margin-top:5px;"><b>לכבוד:</b> ${o.name || o.customer || ''}</div>
-        <div style="font-size:20pt;"><b>טלפון:</b> ${o.phone || o.tel || ''}</div>
-        <div style="font-size:20pt;"><b>עיר:</b> ${this.fixLang(o.city || o.address)}</div>
-        <div style="font-size:20pt; border-bottom:1px solid #ccc; padding-bottom:10px;"><b>תשלום:</b> ${this.fixLang(o.payment)}</div>
-        
-        <div style="font-size:14pt; margin-top:10px; flex-grow:1;">
-            <b>פירוט הזמנה:</b><br>
-            ${o.items || o.products || ''}
+        <div class="label-header">
+          <div style="font-size:18pt; font-weight:900;">MAD PARFUM</div>
+          <div style="font-size:14pt;">#${o.id}</div>
         </div>
 
-        <div style="border:5px solid black; font-size:45pt; font-weight:900; text-align:center; margin-top:auto; border-radius:15px; background:#000; color:#fff !important;">
-          ₪${o.price || '0'}
+        <div class="label-row">
+          <div class="label-key">العميل:</div>
+          <div class="label-val">${o.name}</div>
+        </div>
+        <div class="label-row">
+          <div class="label-key">الهاتف:</div>
+          <div class="label-val" dir="ltr" style="text-align:right">${o.phone}</div>
+        </div>
+        <div class="label-row">
+          <div class="label-key">المدينة:</div>
+          <div class="label-val">${cityAr}</div>
+        </div>
+         <div class="label-row">
+          <div class="label-key">الدفع:</div>
+          <div class="label-val">${payAr}</div>
+        </div>
+
+        <div class="label-products">
+          <b>الطلبات:</b><br>
+          ${o.products ? o.products.replace(/,/g, '<br>') : '---'}
+        </div>
+
+        <div class="label-footer">
+          <div>المبلغ المطلوب للدفع</div>
+          <div class="label-price">₪${o.price}</div>
+          <div style="font-size:10pt; margin-top:5px;">شكراً لطلبكم!</div>
         </div>
       </div>
     `;
+  }
+
+  // --- Notifications ---
+  showToast() {
+    const t = document.getElementById('toast');
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 4000);
+  }
+
+  playNotificationSound() {
+    // Simple beep using AudioContext (browser allowed) or file
+    // For simplicity, we assume user interaction happened before
+    try {
+        const audio = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
+        audio.play();
+    } catch(e) {}
   }
 }
 
