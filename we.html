@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>MAD Chat</title>
   <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700&display=swap" rel="stylesheet">
   <style>
@@ -17,7 +17,8 @@
     body { margin: 0; background-color: #d1d7db; height: 100vh; overflow: hidden; display: flex; justify-content: center; }
     .app-container { display:flex; width:100%; height:100%; background:white; position:relative; max-width:1600px; box-shadow:0 0 20px rgba(0,0,0,0.05); }
 
-    .sidebar { width:100%; height:100%; display:flex; flex-direction:column; background:white; position:absolute; z-index:10; transition:.3s; border-left:1px solid #ddd; }
+    /* Sidebar */
+    .sidebar { width:100%; height:100%; display:flex; flex-direction:column; background:white; position:absolute; z-index:10; transition:0.3s; border-left:1px solid #ddd; }
     .main-header { padding:10px 16px; background:var(--primary-color); color:white; display:flex; justify-content:space-between; align-items:center; height:60px; }
     .logo-area { display:flex; align-items:center; gap:10px; font-weight:bold; font-size:18px; }
     .contact-list { flex:1; overflow-y:auto; }
@@ -25,14 +26,16 @@
     .contact-item:active { background:#f5f6f6; }
     .avatar { width:45px; height:45px; border-radius:50%; display:flex; align-items:center; justify-content:center; background:#dfe5e7; color:white; font-weight:bold; margin-left:10px; }
 
+    /* Chat Area */
     .chat-area {
       width:100%; height:100%; display:flex; flex-direction:column; background:var(--chat-bg);
       background-image:url("https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png");
-      position:absolute; z-index:20; transform:translateX(100%); transition:.3s;
+      position:absolute; z-index:20; transform:translateX(100%); transition:0.3s;
     }
     body.in-chat .sidebar { display:none; }
     body.in-chat .chat-area { transform:translateX(0); }
-    @media (min-width:769px){
+
+    @media (min-width: 769px) {
       .sidebar { width:350px; position:relative; display:flex !important; }
       .chat-area { position:relative; transform:translateX(0); width:calc(100% - 350px); }
     }
@@ -45,7 +48,7 @@
     .msg-in { align-self:flex-end; background:var(--incoming-bg); border-radius:0 8px 8px 8px; }
 
     .media-preview img { max-width:100%; border-radius:6px; display:block; margin-bottom:4px; cursor:pointer; }
-    .media-preview iframe { width:320px; max-width:100%; height:220px; border:0; border-radius:8px; background:#fff; }
+    .media-preview iframe { width:340px; max-width:100%; height:240px; border:0; border-radius:8px; background:#fff; }
     .media-link { display:block; font-size:12px; color:#007bff; text-decoration:none; margin-top:4px; }
 
     .footer { background:#f0f2f5; padding:8px; display:flex; align-items:center; gap:8px; }
@@ -85,13 +88,24 @@
 </div>
 
 <script>
-  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyjSduTc7mtIhJ1TayOog3yT1OodKeQxXf3GJPiKmp3MfCS67BgUVqA2fh44fOqx8vc/exec";
+  // ✅ ضع رابط Web App تبع Apps Script
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzNXivtr6UHUY4Bt8wZZdLQ-86NpNPII2fIJprH2tQDD1yWNKHddReLGTG-92mTSn46/exec";
 
   let contacts = JSON.parse(localStorage.getItem('mad_drive_db')) || {};
   let activePhone = null;
 
+  function isHttpUrl(v){
+    return typeof v === "string" && (v.startsWith("http://") || v.startsWith("https://"));
+  }
+
   function isDrivePreview(url){
     return typeof url === "string" && url.includes("drive.google.com/file/d/") && url.includes("/preview");
+  }
+
+  function timeLabel(t){
+    const d = new Date(t);
+    if (isNaN(d.getTime())) return "";
+    return d.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
   }
 
   function renderMessages() {
@@ -99,19 +113,24 @@
     container.innerHTML = '';
     if(!activePhone) return;
 
-    (contacts[activePhone].msgs || []).forEach(msg => {
+    const arr = (contacts[activePhone].msgs || []);
+    arr.forEach(msg => {
       const div = document.createElement('div');
       div.className = `message ${msg.from === 'me' ? 'msg-out' : 'msg-in'}`;
 
       let html = '';
 
-      if (msg.type === 'image') {
+      // ✅ لو المحتوى ليس رابط http -> اعرضه كنص (حتى لو type=image/video)
+      if (!isHttpUrl(msg.content)) {
+        html = `<div>${String(msg.content || "")}</div>`;
+      }
+      else if (msg.type === 'image') {
         html = `<div class="media-preview">
                   <img src="${msg.content}" onerror="this.style.display='none'">
                   <a href="${msg.content}" target="_blank" class="media-link">🔍 فتح الصورة</a>
                 </div>`;
-      } else if (msg.type === 'video') {
-        // ✅ فيديو من Drive: الأفضل preview داخل iframe
+      }
+      else if (msg.type === 'video') {
         if (isDrivePreview(msg.content)) {
           html = `<div class="media-preview">
                     <iframe src="${msg.content}" allow="autoplay" allowfullscreen></iframe>
@@ -122,8 +141,8 @@
                     <a href="${msg.content}" target="_blank" class="media-link">🎬 فتح الفيديو</a>
                   </div>`;
         }
-      } else if (msg.type === 'audio' || msg.type === 'voice') {
-        // ✅ صوت: preview داخل iframe (أضمن من audio direct)
+      }
+      else if (msg.type === 'audio' || msg.type === 'voice') {
         if (isDrivePreview(msg.content)) {
           html = `<div class="media-preview">
                     <iframe src="${msg.content}" allow="autoplay"></iframe>
@@ -134,18 +153,20 @@
                     <a href="${msg.content}" target="_blank" class="media-link">🔊 فتح الصوت</a>
                   </div>`;
         }
-      } else if (msg.type === 'document') {
+      }
+      else if (msg.type === 'document') {
         html = `<div class="media-preview">
                   📄 <a href="${msg.content}" target="_blank">فتح الملف</a>
                 </div>`;
-      } else {
-        html = `<div>${(msg.content || '')}</div>`;
+      }
+      else {
+        html = `<div>${String(msg.content || "")}</div>`;
       }
 
       div.innerHTML = `
         ${html}
         <div style="font-size:10px; color:#777; margin-top:4px; text-align:left;">
-          ${new Date(msg.time).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}
+          ${timeLabel(msg.time)}
           ${msg.from === 'me' ? (msg.status === 'sent' ? '✓' : '🕒') : ''}
         </div>
       `;
@@ -172,41 +193,59 @@
     const txt = document.getElementById('msgInput').value.trim();
     if(!txt || !activePhone) return;
 
-    contacts[activePhone].msgs.push({ content: txt, from: 'me', time: new Date(), status: 'pending', type: 'text' });
-    save(); renderMessages(); document.getElementById('msgInput').value='';
+    contacts[activePhone].msgs.push({
+      content: txt, from: 'me', time: Date.now(), status: 'pending', type: 'text'
+    });
+    save(); renderMessages();
+    document.getElementById('msgInput').value='';
 
     fetch(SCRIPT_URL, {
       method: 'POST',
       body: JSON.stringify({ to: activePhone, text: { body: txt } })
-    }).then(()=> setTimeout(syncMessages, 2000));
+    }).then(()=> setTimeout(syncMessages, 1500));
   }
 
   function addNewContact() {
     const p = prompt("الرقم:");
-    if(p) { if(!contacts[p]) contacts[p] = {name:p, msgs:[]}; openChat(p); }
+    if(p) {
+      if(!contacts[p]) contacts[p] = {name:p, msgs:[]};
+      openChat(p);
+    }
   }
+
   function openChat(p) {
     activePhone = p;
     document.body.classList.add('in-chat');
     document.getElementById('activeName').innerText = p;
-    renderMessages(); syncMessages();
+    renderMessages();
+    syncMessages();
   }
+
   function closeChat() {
     document.body.classList.remove('in-chat');
     activePhone = null;
     renderContacts();
   }
+
   function renderContacts() {
-    const list = document.getElementById('contactList'); list.innerHTML='';
+    const list = document.getElementById('contactList');
+    list.innerHTML = '';
     Object.keys(contacts).forEach(p => {
-      const d = document.createElement('div'); d.className='contact-item';
+      const d = document.createElement('div');
+      d.className = 'contact-item';
       d.innerHTML = `<div class="avatar">${p.slice(-2)}</div><div><b>${p}</b></div>`;
-      d.onclick=()=>openChat(p);
+      d.onclick = () => openChat(p);
       list.appendChild(d);
     });
   }
-  function save() { localStorage.setItem('mad_drive_db', JSON.stringify(contacts)); }
-  function handleEnter(e){ if(e.key==='Enter') sendMessage(); }
+
+  function save() {
+    localStorage.setItem('mad_drive_db', JSON.stringify(contacts));
+  }
+
+  function handleEnter(e){
+    if(e.key==='Enter') sendMessage();
+  }
 
   renderContacts();
 </script>
