@@ -177,7 +177,7 @@
       <option value="Lama (050-5102019)">Lama (050-5102019)</option>
       <option value="Marwah (052-7035370)">Marwah (052-7035370)</option>
       <option value="Areen (052-5118966)">Areen (052-5118966)</option>
-      <option value="Aiat (052-5118966)">Aiat (052-5118966)</option>
+      <option value="Pickup">Pickup</option>
     </select>
     <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:10px;">
       <button class="btn btn-outline" onclick="closeModal('orderModal')">إلغاء</button>
@@ -225,7 +225,7 @@ function formatLocalPhone(p) {
 function normalizePhoneForLink(p) {
   let d = String(p||"").replace(/\D/g, "");
   if (d.startsWith("0")) d = "972" + d.substring(1);
-  if (!d.startsWith("972") && d.length === 9) d = "972" + d; // احتياط لو دخل 5xxxxxxxx
+  if (!d.startsWith("972") && d.length === 9) d = "972" + d;
   return d;
 }
 
@@ -316,36 +316,54 @@ function renderOrders(list) {
 }
 
 /**
- * ✅ WhatsApp - نسخة مصححة نهائياً (بدون أخطاء const msg / بدون %0A داخل النص)
+ * ✅ WhatsApp - نسخة مصححة + ✅ Emoji Unicode Escape + ✅ إضافة سطر "للتعديل أو إضافة ملاحظات..."
  */
 async function sendMsg(row, lang) {
   const o = allOrders.find(x => x.rowIndex == row);
   if(!o) return;
 
+  const E = {
+    blackHeart: "\u{1F5A4}",
+    diamond: "\u{1F48E}",
+    pin: "\u{1F4CD}",
+    money: "\u{1F4B0}",
+    card: "\u{1F4B3}",
+    truck: "\u{1F69A}",
+    memo: "\u{1F4DD}",
+    phone: "\u{1F4DE}",
+    wave: "\u{1F44B}",
+    box: "\u{1F4E6}",
+    info: "\u{2139}\u{FE0F}"
+  };
+
   const paymentMethod = safe(o.payment) || (lang === "he" ? "תשלום במעמד המסירה" : "دفع عند الاستلام");
 
   const noteTxt = safe(o.notes)
-    ? (lang === "he" ? `\n📝 הערה: ${safe(o.notes)}` : `\n📝 ملاحظة: ${safe(o.notes)}`)
+    ? (lang === "he" ? `\n${E.memo} הערה: ${safe(o.notes)}` : `\n${E.memo} ملاحظة: ${safe(o.notes)}`)
     : "";
 
   const deliveryTxt = safe(o.delivery)
-    ? (lang === "he" ? `\n🚚 חברת משלוח: ${safe(o.delivery)}` : `\n🚚 شركة التوصيل: ${safe(o.delivery)}`)
+    ? (lang === "he" ? `\n${E.truck} חברת משלוח: ${safe(o.delivery)}` : `\n${E.truck} شركة التوصيل: ${safe(o.delivery)}`)
     : "";
 
+  const supportLine = (lang === "he")
+    ? `\n${E.info} לשינוי ההזמנה או להוספת הערות לחברת המשלוחים – אפשר לפנות אלינו.`
+    : `\n${E.info} لتعديل الطلب أو إضافة ملاحظات لشركة التوصيل يمكن التواصل معنا.`;
+
   const msg = (lang === "ar")
-    ? `أهلاً بك ${safe(o.name)} في MAD Parfumeur 🖤
+    ? `أهلاً بك ${safe(o.name)} في MAD Parfumeur ${E.blackHeart}
 يسعدنا تأكيد طلبك المميز!
-💎 العرض: ${safe(o.offer)}
-📍 العنوان: ${safe(o.city)}
-💰 السعر: ${safe(o.price)} ₪
-💳 الدفع: ${paymentMethod}${deliveryTxt}${noteTxt}
-📞 هاتف التواصل: ${CUSTOMER_SERVICE_PHONE}`
-    : `שלום ${safe(o.name)} 👋, תודה שהזמנת מ-MAD Parfumeur
-📦 המוצר: ${safe(o.offer)}
-📍 כתובת: ${safe(o.city)}
-💰 מחיר: ${safe(o.price)} ₪
-💳 תשלום: ${paymentMethod}${deliveryTxt}${noteTxt}
-📞 טלפון: ${CUSTOMER_SERVICE_PHONE}`;
+${E.diamond} العرض: ${safe(o.offer)}
+${E.pin} العنوان: ${safe(o.city)}
+${E.money} السعر: ${safe(o.price)} ₪
+${E.card} الدفع: ${paymentMethod}${deliveryTxt}${noteTxt}
+${E.phone} هاتف التواصل: ${CUSTOMER_SERVICE_PHONE}${supportLine}`
+    : `שלום ${safe(o.name)} ${E.wave}, תודה שהזמנת מ-MAD Parfumeur
+${E.box} המוצר: ${safe(o.offer)}
+${E.pin} כתובת: ${safe(o.city)}
+${E.money} מחיר: ${safe(o.price)} ₪
+${E.card} תשלום: ${paymentMethod}${deliveryTxt}${noteTxt}
+${E.phone} טלפון: ${CUSTOMER_SERVICE_PHONE}${supportLine}`;
 
   const wa = `https://wa.me/${normalizePhoneForLink(o.phone)}?text=${encodeURIComponent(msg)}`;
   window.open(wa, "_blank");
