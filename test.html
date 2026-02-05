@@ -43,9 +43,16 @@
       ttq.page();
     }(window, document, 'ttq');
 
+    // ✅ Track Lead: WhatsApp, Phone, Waze
     function trackLead(actionName) {
       try { if(window.fbq) fbq('track', 'Lead', { content_name: actionName }); } catch(e){}
       try { if(window.ttq) ttq.track('Lead', { content_name: actionName }); } catch(e){}
+    }
+
+    // ✅ Track View: Other Socials (Instagram, TikTok, etc.)
+    function trackView(actionName) {
+      try { if(window.fbq) fbq('track', 'ViewContent', { content_name: actionName }); } catch(e){}
+      try { if(window.ttq) ttq.track('ViewContent', { content_name: actionName }); } catch(e){}
     }
   </script>
 
@@ -341,7 +348,7 @@
   </section>
 
   <!-- FLOATING WHATSAPP BUTTON -->
-  <a id="float-wa-btn" href="#" target="_blank" class="floating-wa">
+  <a id="float-wa-btn" href="#" target="_blank" class="floating-wa" onclick="trackLead('Floating WhatsApp')">
     <i class="fab fa-whatsapp"></i>
   </a>
 
@@ -891,9 +898,13 @@
         { key:"waze", url: s.waze || "", icon:"fab fa-waze", title:"Waze" }
       ].filter(x => x.url);
 
-      document.getElementById("social-container").innerHTML = items.map(it =>
-        `<a href="${it.url}" target="_blank" rel="noopener" class="social-btn" title="${it.title}" onclick="trackLead('Social: ${it.key}')"><i class="${it.icon}"></i></a>`
-      ).join("");
+      document.getElementById("social-container").innerHTML = items.map(it => {
+        // Determine tracking function based on key
+        const isLead = ["whatsapp", "phone", "waze"].includes(it.key);
+        const trackFn = isLead ? "trackLead" : "trackView";
+        
+        return `<a href="${it.url}" target="_blank" rel="noopener" class="social-btn" title="${it.title}" onclick="${trackFn}('Social: ${it.key}')"><i class="${it.icon}"></i></a>`
+      }).join("");
     }
 
     function updateBranchStatus(){
@@ -995,7 +1006,7 @@
     function orderOffer(id) {
       const b = STATE.branch || {};
       const waPhone = normalizePhoneForWhatsApp(b.phone);
-      trackLead(`Order Offer ${id}`);
+      trackLead(`Order Offer ${id}`); // WhatsApp order is a Lead
 
       if (!waPhone) {
         alert(lang === "ar" ? "رقم واتساب غير متوفر لهذا الفرع." : "מספר וואטסאפ לא זמין לסניף הזה.");
@@ -1034,7 +1045,7 @@
           const popupContent = `
             <div>
               <h3 style="font-weight:900; margin-bottom:5px;">${name}</h3>
-              <a href="${wazeUrl}" target="_blank" class="map-btn">
+              <a href="${wazeUrl}" target="_blank" class="map-btn" onclick="trackLead('Waze Map')">
                 <i class="fab fa-waze"></i> ${t.navWaze}
               </a>
             </div>
