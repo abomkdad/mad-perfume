@@ -3,250 +3,143 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MAD WhatsApp Manager</title>
+    <title>MAD Chat</title>
     <style>
-        :root {
-            --primary-color: #008069;
-            --header-text: #fff;
-            --bg-color: #e9edef;
-            --chat-bg: #efeae2;
-            --incoming-bg: #ffffff;
-            --outgoing-bg: #d9fdd3;
-        }
-
-        * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; -webkit-tap-highlight-color: transparent; }
+        /* نفس التصميم السابق */
+        :root { --primary-color: #008069; --chat-bg: #efeae2; --incoming-bg: #ffffff; --outgoing-bg: #d9fdd3; }
+        * { box-sizing: border-box; font-family: sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { margin: 0; background-color: #d1d7db; height: 100vh; overflow: hidden; }
+        .app-container { display: flex; width: 100%; height: 100%; background: white; position: relative; }
         
-        body { margin: 0; padding: 0; background-color: #d1d7db; height: 100vh; overflow: hidden; }
-
-        .app-container {
-            display: flex;
-            width: 100%;
-            height: 100%;
-            background: white;
-            position: relative;
-        }
-
-        /* Sidebar (Contact List) */
-        .sidebar {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            background: white;
-            position: absolute;
-            z-index: 10;
-            transition: transform 0.3s ease;
-        }
-
-        .sidebar-header {
-            padding: 15px;
-            background: var(--primary-color);
-            color: var(--header-text);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            height: 60px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
-        }
-
-        .search-box { padding: 10px; background: white; border-bottom: 1px solid #f0f2f5; }
-        .search-box input { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ddd; background: #f0f2f5; outline: none; }
-
-        .contact-list { flex: 1; overflow-y: auto; }
-        .contact-item { padding: 15px; border-bottom: 1px solid #f5f5f5; cursor: pointer; display: flex; align-items: center; }
-        .contact-item:active { background-color: #f0f2f5; }
-        
-        .avatar {
-            width: 50px; height: 50px; background: #dfe5e7; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center; margin-left: 15px;
-            color: #fff; font-size: 20px; font-weight: bold; flex-shrink: 0;
-        }
-
-        /* Chat Area */
-        .chat-area {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            background-color: var(--chat-bg);
-            background-image: url("https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png");
-            position: absolute;
-            z-index: 20;
-            transform: translateX(100%); /* Hidden by default (RTL: moved right) */
-            transition: transform 0.3s ease;
-        }
-
-        /* Toggle Classes for Mobile */
+        .sidebar { width: 100%; height: 100%; display: flex; flex-direction: column; background: white; position: absolute; z-index: 10; transition: transform 0.3s; }
+        .chat-area { width: 100%; height: 100%; display: flex; flex-direction: column; background: var(--chat-bg); position: absolute; z-index: 20; transform: translateX(100%); transition: transform 0.3s; background-image: url("https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png"); }
         body.in-chat .sidebar { display: none; }
         body.in-chat .chat-area { transform: translateX(0); }
-
-        .chat-header {
-            height: 60px;
-            background: var(--primary-color);
-            color: var(--header-text);
-            padding: 5px 10px;
-            display: flex;
-            align-items: center;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
-        }
-
-        .back-btn {
-            background: none; border: none; color: white; font-size: 24px; padding: 0 10px; cursor: pointer; margin-left: 5px;
-        }
-
-        .messages-container {
-            flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px;
-        }
-
-        .message {
-            max-width: 80%; padding: 8px 10px; border-radius: 8px; font-size: 15px; position: relative; word-wrap: break-word; box-shadow: 0 1px 0.5px rgba(0,0,0,0.13);
-        }
-
-        .msg-out { align-self: flex-start; background-color: var(--outgoing-bg); border-radius: 8px 0 8px 8px; }
-        .msg-in { align-self: flex-end; background-color: var(--incoming-bg); border-radius: 0 8px 8px 8px; }
-        .msg-meta { font-size: 10px; color: #667781; text-align: left; margin-top: 4px; display: flex; align-items: center; gap: 3px; justify-content: flex-end; }
-
-        .input-area { background: #f0f2f5; padding: 8px; display: flex; flex-direction: column; gap: 8px; }
-        
-        .quick-replies { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 5px; scrollbar-width: none; }
-        .quick-replies::-webkit-scrollbar { display: none; }
-        .chip { background: white; border: 1px solid #ddd; padding: 6px 14px; border-radius: 20px; font-size: 13px; white-space: nowrap; }
-
-        .input-row { display: flex; gap: 8px; align-items: center; }
-        .message-input { flex: 1; padding: 12px; border-radius: 25px; border: none; outline: none; font-size: 16px; }
-        
-        .btn-send {
-            background: var(--primary-color); color: white; border: none; width: 45px; height: 45px; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center; font-size: 20px; cursor: pointer;
-        }
-
-        /* Desktop override */
         @media (min-width: 769px) {
-            .app-container { max-width: 1400px; margin: 0 auto; box-shadow: 0 0 20px rgba(0,0,0,0.1); }
-            .sidebar { width: 350px; position: relative; z-index: 1; display: flex !important; border-left: 1px solid #ddd; }
+            .app-container { max-width: 1400px; margin: 0 auto; }
+            .sidebar { width: 350px; position: relative; display: flex !important; border-left: 1px solid #ddd; }
             .chat-area { position: relative; transform: translateX(0); width: calc(100% - 350px); display: flex; }
-            .back-btn { display: none; }
         }
 
-        /* Modal */
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; }
-        .modal-content { background: white; padding: 20px; border-radius: 12px; width: 90%; max-width: 400px; }
-        .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; margin-bottom: 5px; font-weight: bold; }
-        .form-group input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; background: #f9f9f9; }
-        .btn-modal { padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
-
+        .header { padding: 10px 15px; background: var(--primary-color); color: white; display: flex; align-items: center; height: 60px; justify-content: space-between; }
+        .contact-list { flex: 1; overflow-y: auto; }
+        .contact-item { padding: 15px; border-bottom: 1px solid #f5f5f5; cursor: pointer; display: flex; align-items: center; }
+        .avatar { width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: #ddd; color: white; margin-left: 10px; }
+        
+        .messages-container { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
+        .message { max-width: 80%; padding: 8px 10px; border-radius: 8px; font-size: 15px; position: relative; word-wrap: break-word; box-shadow: 0 1px 0.5px rgba(0,0,0,0.13); }
+        .msg-out { align-self: flex-start; background: var(--outgoing-bg); border-radius: 8px 0 8px 8px; }
+        .msg-in { align-self: flex-end; background: var(--incoming-bg); border-radius: 0 8px 8px 8px; }
+        
+        .input-area { background: #f0f2f5; padding: 10px; display: flex; gap: 10px; }
+        .message-input { flex: 1; padding: 12px; border-radius: 25px; border: none; outline: none; }
+        .btn-icon { background: none; border: none; color: white; font-size: 20px; cursor: pointer; }
     </style>
 </head>
 <body>
 
 <div class="app-container">
     <div class="sidebar">
-        <div class="sidebar-header">
-            <div style="font-size: 18px; font-weight: bold;">MAD Parfumeur 💬</div>
-            <div>
-                <button onclick="openSettings()" style="background:none; border:none; color:white; font-size:20px;">⚙️</button>
-                <button onclick="addNewContact()" style="background:none; border:none; color:white; font-size:20px; margin-right:10px;">➕</button>
-            </div>
+        <div class="header">
+            <b>MAD Parfumeur</b>
+            <button onclick="addNewContact()" class="btn-icon">➕</button>
         </div>
-        
-        <div class="search-box">
-            <input type="text" id="searchContact" placeholder="بحث..." onkeyup="filterContacts()">
-        </div>
-
         <div class="contact-list" id="contactList"></div>
     </div>
 
     <div class="chat-area">
-        <div class="chat-header">
-            <button class="back-btn" onclick="backToContacts()">➜</button>
-            <div class="avatar" id="headerAvatar" style="width: 35px; height: 35px; margin-left: 10px; font-size: 16px;">👤</div>
-            <div style="flex: 1;">
-                <div id="activeContactName" style="font-weight: bold; font-size: 16px;"></div>
-                <div id="activeContactPhone" style="font-size: 12px; opacity: 0.9;"></div>
+        <div class="header">
+            <button onclick="backToContacts()" class="btn-icon" style="margin-left:10px;">➜</button>
+            <div style="flex:1;">
+                <div id="activeContactName" style="font-weight:bold;"></div>
+                <div id="activeContactPhone" style="font-size:12px; opacity:0.8;"></div>
             </div>
-            <button onclick="clearChat()" style="background:none; border:none; color:white; font-size:18px;">🗑️</button>
+            <button onclick="syncMessages()" class="btn-icon" title="تحديث المحادثة">🔄</button>
         </div>
 
         <div class="messages-container" id="messagesContainer"></div>
 
         <div class="input-area">
-            <div class="quick-replies">
-                <span class="chip" onclick="quickReply('مرحباً، كيف أساعدك؟')">مرحباً</span>
-                <span class="chip" onclick="quickReply('الطلب قيد التجهيز 📦')">تجهيز</span>
-                <span class="chip" onclick="quickReply('تم الشحن، شكراً لك 🚚')">شحن</span>
-                <span class="chip" onclick="quickReply('📍 موقع الفرع: ...')">موقع</span>
-            </div>
-            <div class="input-row">
-                <input type="text" id="messageInput" class="message-input" placeholder="رسالة..." onkeypress="handleEnter(event)">
-                <button class="btn-send" onclick="sendMessage()">➤</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div id="settingsModal" class="modal">
-    <div class="modal-content">
-        <h3>⚙️ إعدادات الربط</h3>
-        <p style="font-size:12px; color:#666; margin-bottom:15px;">تم الربط مع Google Apps Script بنجاح.</p>
-        <div class="form-group">
-            <label>Backend URL (Google Script)</label>
-            <input type="text" id="webhookUrl" readonly style="background:#eee; color:#555;">
-        </div>
-        <div class="form-group" style="opacity: 0.5;">
-            <label>Token (غير مطلوب - آمن في السيرفر)</label>
-            <input type="password" id="webhookToken" disabled placeholder="محفوظ في Google Script">
-        </div>
-        <div style="text-align: left;">
-            <button class="btn-modal" style="background:#ddd" onclick="closeSettings()">إغلاق</button>
-            <button class="btn-modal" style="background:var(--primary-color); color:white;" onclick="saveSettings()">تحديث</button>
+            <input type="text" id="messageInput" class="message-input" placeholder="رسالة..." onkeypress="handleEnter(event)">
+            <button onclick="sendMessage()" style="background:var(--primary-color); color:white; border:none; width:45px; height:45px; border-radius:50%;">➤</button>
         </div>
     </div>
 </div>
 
 <script>
-    // --- Configuration ---
-    // هذا هو الرابط الخاص بك الذي زودتني به
-    const MY_GOOGLE_SCRIPT = "https://script.google.com/macros/s/AKfycbw3u04D-GJmdQrx27Va-GAd6NdCvqCjDwQPL-89pyk3KAWK74f5BwxCXNyTkByd2rsa/exec";
+    // ⚙️ الرابط الخاص بك
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwhyqYJRiCs84eZi_C0Gg22n049aNvM9Pt4EjLSJUGMbwdBtjudZE_hQi0asDknEfqh/exec";
 
-    // --- Data & State ---
-    let contacts = JSON.parse(localStorage.getItem('wa_mobile_contacts')) || {};
+    let contacts = JSON.parse(localStorage.getItem('mad_contacts')) || {};
     let activePhone = null;
+
+    // --- Core Functions ---
     
-    // إجبار الإعدادات على استخدام رابط جوجل الجديد
-    let settings = JSON.parse(localStorage.getItem('wa_mobile_settings')) || {};
-    if (settings.url !== MY_GOOGLE_SCRIPT) {
-        settings.url = MY_GOOGLE_SCRIPT;
-        settings.token = ""; // تفريغ التوكن لأنه لم يعد مطلوباً هنا
-        localStorage.setItem('wa_mobile_settings', JSON.stringify(settings));
+    // 1. جلب الرسائل من الشيت
+    async function syncMessages() {
+        if (!activePhone) return;
+        const btn = document.querySelector('button[title="تحديث المحادثة"]');
+        btn.style.transform = "rotate(180deg)"; btn.style.transition = "0.5s"; // تأثير بصري
+
+        try {
+            // نطلب من جوجل: أعطني رسائل هذا الرقم
+            const res = await fetch(`${SCRIPT_URL}?phone=${activePhone}`);
+            const serverMsgs = await res.json();
+            
+            if (Array.isArray(serverMsgs) && serverMsgs.length > 0) {
+                // تحديث الرسائل المحلية
+                contacts[activePhone].messages = serverMsgs;
+                saveAndRender();
+            }
+        } catch (e) {
+            console.error("Sync Error", e);
+        }
+        setTimeout(() => btn.style.transform = "rotate(0deg)", 500);
     }
 
-    // --- Colors for Avatars ---
-    const colors = ['#00a884', '#128c7e', '#075e54', '#34b7f1', '#f25c6e', '#ffad1f'];
-    function getColor(str) {
-        let hash = 0;
-        for (let i = 0; i < str.length; i++) hash = str.charCodeAt(i) + ((hash << 5) - hash);
-        return colors[Math.abs(hash) % colors.length];
+    // 2. إرسال رسالة
+    async function sendMessage() {
+        const input = document.getElementById('messageInput');
+        const text = input.value.trim();
+        if (!text || !activePhone) return;
+
+        // إضافة وهمية فورية
+        contacts[activePhone].messages.push({ text: text, from: 'me', time: new Date(), status: 'pending' });
+        saveAndRender();
+        input.value = '';
+
+        // إرسال للسيرفر
+        fetch(SCRIPT_URL, {
+            method: 'POST',
+            body: JSON.stringify({ "to": activePhone, "text": { "body": text } })
+        }).then(() => {
+            // بعد ثانية نقوم بعمل تحديث للتأكد أن كل شيء تمام
+            setTimeout(syncMessages, 1000); 
+        });
     }
 
-    // --- Init ---
-    document.addEventListener('DOMContentLoaded', () => {
-        renderContacts();
-    });
+    // --- UI Helpers ---
 
-    // --- Navigation ---
+    function addNewContact() {
+        const phone = prompt("أدخل الرقم (مثال: 97250...):");
+        if (phone) {
+            const cleanPhone = phone.replace(/\+/g,'').trim();
+            if (!contacts[cleanPhone]) {
+                contacts[cleanPhone] = { name: cleanPhone, messages: [] };
+                openChat(cleanPhone);
+            } else {
+                openChat(cleanPhone);
+            }
+        }
+    }
+
     function openChat(phone) {
         activePhone = phone;
         document.body.classList.add('in-chat');
-        
         document.getElementById('activeContactName').innerText = contacts[phone].name;
         document.getElementById('activeContactPhone').innerText = phone;
-        const color = getColor(phone);
-        const avatar = document.getElementById('headerAvatar');
-        avatar.style.backgroundColor = color;
-        avatar.innerText = contacts[phone].name.charAt(0).toUpperCase();
-
         renderMessages();
+        syncMessages(); // تحديث تلقائي عند الفتح
     }
 
     function backToContacts() {
@@ -255,164 +148,41 @@
         renderContacts();
     }
 
-    // --- Logic ---
-    function saveToLocal() {
-        localStorage.setItem('wa_mobile_contacts', JSON.stringify(contacts));
-    }
-
-    function addNewContact() {
-        const phone = prompt("أدخل الرقم الدولي (مثال: 97250...) \nبدون علامة +");
-        if (phone) {
-            const cleanPhone = phone.replace(/\+/g, '').replace(/\s/g, '');
-            if (!contacts[cleanPhone]) {
-                const name = prompt("الاسم:") || cleanPhone;
-                contacts[cleanPhone] = { name: name, messages: [] };
-                saveToLocal();
-                renderContacts();
-                openChat(cleanPhone);
-            } else {
-                openChat(cleanPhone);
-            }
-        }
+    function renderMessages() {
+        const div = document.getElementById('messagesContainer');
+        div.innerHTML = '';
+        if (!activePhone) return;
+        
+        (contacts[activePhone].messages || []).forEach(msg => {
+            const el = document.createElement('div');
+            el.className = `message ${msg.from === 'me' ? 'msg-out' : 'msg-in'}`;
+            el.innerHTML = `${msg.text} <div style="font-size:10px; color:#777; margin-top:4px; text-align:left;">${new Date(msg.time).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</div>`;
+            div.appendChild(el);
+        });
+        div.scrollTop = div.scrollHeight;
     }
 
     function renderContacts() {
         const list = document.getElementById('contactList');
-        const search = document.getElementById('searchContact').value.toLowerCase();
         list.innerHTML = '';
-
-        const sortedPhones = Object.keys(contacts).sort((a,b) => {
-            const timeA = contacts[a].messages.length ? new Date(contacts[a].messages[contacts[a].messages.length-1].time) : 0;
-            const timeB = contacts[b].messages.length ? new Date(contacts[b].messages[contacts[b].messages.length-1].time) : 0;
-            return timeB - timeA;
-        });
-
-        sortedPhones.forEach(phone => {
-            const contact = contacts[phone];
-            if (contact.name.toLowerCase().includes(search) || phone.includes(search)) {
-                const div = document.createElement('div');
-                div.className = 'contact-item';
-                div.onclick = () => openChat(phone);
-                
-                const lastMsg = contact.messages.length > 0 ? contact.messages[contact.messages.length - 1] : null;
-                const lastText = lastMsg ? (lastMsg.text.length > 25 ? lastMsg.text.substring(0, 25) + '...' : lastMsg.text) : 'انقر للبدء';
-                const time = lastMsg ? new Date(lastMsg.time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '';
-                const color = getColor(phone);
-
-                div.innerHTML = `
-                    <div class="avatar" style="background:${color}">${contact.name.charAt(0)}</div>
-                    <div style="flex:1; margin-right:15px;">
-                        <div style="font-weight:bold; display:flex; justify-content:space-between;">
-                            ${contact.name}
-                            <span style="font-size:11px; font-weight:normal; color:#888;">${time}</span>
-                        </div>
-                        <div style="font-size:13px; color:#667781; display:flex; align-items:center; gap:5px;">
-                            ${lastMsg && lastMsg.from === 'me' ? (lastMsg.status === 'sent' ? '✓✓' : (lastMsg.status === 'failed' ? '❌' : '🕒')) : ''} 
-                            ${lastText}
-                        </div>
-                    </div>
-                `;
-                list.appendChild(div);
-            }
+        Object.keys(contacts).forEach(phone => {
+            const item = document.createElement('div');
+            item.className = 'contact-item';
+            item.innerHTML = `<div class="avatar">👤</div><div style="margin-right:10px;"><b>${contacts[phone].name}</b><br><small>${phone}</small></div>`;
+            item.onclick = () => openChat(phone);
+            list.appendChild(item);
         });
     }
 
-    function renderMessages() {
-        const container = document.getElementById('messagesContainer');
-        container.innerHTML = '';
-        if (!activePhone) return;
-        
-        const msgs = contacts[activePhone].messages;
-        
-        msgs.forEach(msg => {
-            const div = document.createElement('div');
-            div.className = `message ${msg.from === 'me' ? 'msg-out' : 'msg-in'}`;
-            div.innerHTML = `
-                ${msg.text}
-                <div class="msg-meta">
-                    ${new Date(msg.time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
-                    ${msg.from === 'me' ? (msg.status === 'sent' ? '<span style="color:#53bdeb">✓✓</span>' : (msg.status === 'failed' ? '<span style="color:red">!</span>' : '🕒')) : ''}
-                </div>
-            `;
-            container.appendChild(div);
-        });
-
-        setTimeout(() => container.scrollTop = container.scrollHeight, 100);
-    }
-
-    async function sendMessage() {
-        const input = document.getElementById('messageInput');
-        const text = input.value.trim();
-        if (!text || !activePhone) return;
-
-        // UI Update (Optimistic)
-        const msgObj = { text: text, from: 'me', time: new Date().toISOString(), status: 'pending' };
-        contacts[activePhone].messages.push(msgObj);
-        saveToLocal();
+    function saveAndRender() {
+        localStorage.setItem('mad_contacts', JSON.stringify(contacts));
         renderMessages();
-        input.value = '';
-        document.getElementById('messageInput').focus();
-
-        try {
-            // Send to Google Script
-            const payload = {
-                "to": activePhone,
-                "text": { "body": text }
-            };
-
-            const response = await fetch(settings.url, {
-                method: 'POST',
-                // نستخدم text/plain لتجنب مشاكل CORS المعقدة، جوجل يفهمها
-                headers: { 'Content-Type': 'text/plain' },
-                body: JSON.stringify(payload)
-            });
-
-            const result = await response.json();
-
-            if (result.status === "success") {
-                msgObj.status = 'sent';
-            } else {
-                console.error("Google Script Error:", result);
-                msgObj.status = 'failed';
-                msgObj.text += ' (خطأ)';
-            }
-            
-            saveToLocal();
-            renderMessages();
-            
-        } catch (error) {
-            console.error("Fetch Error:", error);
-            msgObj.status = 'failed';
-            saveToLocal();
-            renderMessages();
-        }
     }
 
-    // --- Utilities ---
-    function handleEnter(e) { if (e.key === 'Enter') sendMessage(); }
-    function quickReply(txt) { 
-        document.getElementById('messageInput').value = txt; 
-        sendMessage();
-    }
-    function clearChat() {
-        if(confirm('مسح الرسائل؟')) {
-            contacts[activePhone].messages = [];
-            saveToLocal();
-            renderMessages();
-        }
-    }
-
-    // --- Settings ---
-    function openSettings() {
-        document.getElementById('webhookUrl').value = settings.url;
-        document.getElementById('settingsModal').style.display = 'flex';
-    }
-    function closeSettings() { document.getElementById('settingsModal').style.display = 'none'; }
-    function saveSettings() {
-        // لا نحفظ شيئاً لأن الرابط ثابت، لكن نعيد تحميل الصفحة للتأكيد
-        location.reload();
-    }
-    window.onclick = (e) => { if(e.target == document.getElementById('settingsModal')) closeSettings(); }
+    function handleEnter(e) { if(e.key==='Enter') sendMessage(); }
+    
+    // Start
+    renderContacts();
 </script>
 
 </body>
