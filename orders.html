@@ -147,16 +147,16 @@
   <div class="modal-content">
     <h3 id="modalTitle" style="margin-top:0;">إضافة طلب جديد</h3>
 
-    <!-- Smart Analysis Section -->
     <div class="smart-box" id="smartSection">
-        <h4><i class="fa fa-magic"></i> المحلل الذكي للبيانات</h4>
-        <textarea id="smartInput" placeholder="الصق نص الطلب هنا (الاسم، الهاتف، العنوان...) ثم اضغط تحليل..." style="height: 80px; margin-bottom: 8px; font-size: 13px;"></textarea>
-        <button class="btn btn-primary" onclick="analyzeText()" style="width: 100%; flex-direction: row; height: 35px; font-size: 13px;">تحليل وتعبئة تلقائية</button>
+      <h4><i class="fa fa-magic"></i> المحلل الذكي للبيانات</h4>
+      <textarea id="smartInput" placeholder="الصق نص الطلب هنا (الاسم، الهاتف، العنوان...) ثم اضغط تحليل..." style="height: 80px; margin-bottom: 8px; font-size: 13px;"></textarea>
+      <button class="btn btn-primary" onclick="analyzeText()" style="width: 100%; flex-direction: row; height: 35px; font-size: 13px;">تحليل وتعبئة تلقائية</button>
     </div>
 
     <label>الاسم الكامل</label><input type="text" id="f_name">
     <label>رقم الهاتف</label><input type="tel" id="f_phone">
     <label>الأصناف المطلوبة</label><textarea id="f_offer" rows="2"></textarea>
+
     <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
       <div><label>السعر (₪)</label><input type="number" id="f_price"></div>
       <div>
@@ -168,8 +168,10 @@
         </select>
       </div>
     </div>
+
     <label>المدينة</label><input type="text" id="f_city">
     <label>ملاحظات إضافية</label><textarea id="f_notes" rows="2"></textarea>
+
     <label>شركة التوصيل</label>
     <select id="f_delivery">
       <option value="">-- اختر شركة الشحن --</option>
@@ -179,6 +181,7 @@
       <option value="Areen (052-5118966)">Areen (052-5118966)</option>
       <option value="Pickup">Pickup</option>
     </select>
+
     <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:10px;">
       <button class="btn btn-outline" onclick="closeModal('orderModal')">إلغاء</button>
       <button class="btn btn-primary" onclick="saveOrder()" id="saveBtn">حفظ الطلب ✨</button>
@@ -204,7 +207,9 @@
 <script>
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwWi55Q1H1HNdJb61Ht99ZiZodp4B4aaElWSqSuxo37zhKUwRgy8T-NHNPffH4i_Y89Eg/exec";
 const DASH_KEY = "12345678";
-const CUSTOMER_SERVICE_PHONE = "972509787730";
+
+const CUSTOMER_SERVICE_PHONE = "972509787730";   // خدمة العملاء
+const CUSTOMER_SERVICE_STAR = "*9935";          // الرقم الثاني (نجمة)
 
 let allOrders = [];
 let editingRow = null;
@@ -240,9 +245,8 @@ function analyzeText() {
   if(priceMatch) document.getElementById('f_price').value = priceMatch[1];
 
   const nameMatch = raw.match(/(?:الاسم|Name)\s*:?\s*([^\n|]+)/i);
-  if(nameMatch) {
-    document.getElementById('f_name').value = nameMatch[1].trim();
-  } else {
+  if(nameMatch) document.getElementById('f_name').value = nameMatch[1].trim();
+  else {
     const firstLine = raw.split('\n')[0].trim();
     if(firstLine.length < 30) document.getElementById('f_name').value = firstLine;
   }
@@ -270,9 +274,6 @@ function filterOrders() {
   renderOrders(filtered);
 }
 
-/**
- * دالة العرض - أحدث طلب أولاً
- */
 function renderOrders(list) {
   const container = document.getElementById('ordersList');
   if (!list || list.length === 0) {
@@ -316,7 +317,7 @@ function renderOrders(list) {
 }
 
 /**
- * ✅ WhatsApp - نسخة مصححة + ✅ Emoji Unicode Escape + ✅ إضافة سطر "للتعديل أو إضافة ملاحظات..."
+ * ✅ WhatsApp: رابط خدمة العملاء قابل للضغط + رقم ثاني *9935 + سطر تعديل الطلب
  */
 async function sendMsg(row, lang) {
   const o = allOrders.find(x => x.rowIndex == row);
@@ -333,7 +334,8 @@ async function sendMsg(row, lang) {
     phone: "\u{1F4DE}",
     wave: "\u{1F44B}",
     box: "\u{1F4E6}",
-    info: "\u{2139}\u{FE0F}"
+    info: "\u{2139}\u{FE0F}",
+    link: "\u{1F517}"
   };
 
   const paymentMethod = safe(o.payment) || (lang === "he" ? "תשלום במעמד המסירה" : "دفع عند الاستلام");
@@ -346,6 +348,14 @@ async function sendMsg(row, lang) {
     ? (lang === "he" ? `\n${E.truck} חברת משלוח: ${safe(o.delivery)}` : `\n${E.truck} شركة التوصيل: ${safe(o.delivery)}`)
     : "";
 
+  // ✅ روابط قابلة للضغط داخل واتساب
+  const serviceWaLink = `https://wa.me/${CUSTOMER_SERVICE_PHONE}`;
+  const telStarLink = `tel:${CUSTOMER_SERVICE_STAR}`;
+
+  const contactBlock = (lang === "he")
+    ? `\n${E.phone} שירות לקוחות: ${CUSTOMER_SERVICE_PHONE}\n${E.link} WhatsApp: ${serviceWaLink}\n${E.phone} קו נוסף: ${CUSTOMER_SERVICE_STAR}\n${E.link} חיוג: ${telStarLink}`
+    : `\n${E.phone} خدمة العملاء: ${CUSTOMER_SERVICE_PHONE}\n${E.link} واتساب مباشر: ${serviceWaLink}\n${E.phone} رقم إضافي: ${CUSTOMER_SERVICE_STAR}\n${E.link} اتصال: ${telStarLink}`;
+
   const supportLine = (lang === "he")
     ? `\n${E.info} לשינוי ההזמנה או להוספת הערות לחברת המשלוחים – אפשר לפנות אלינו.`
     : `\n${E.info} لتعديل الطلب أو إضافة ملاحظات لشركة التوصيل يمكن التواصل معنا.`;
@@ -356,14 +366,12 @@ async function sendMsg(row, lang) {
 ${E.diamond} العرض: ${safe(o.offer)}
 ${E.pin} العنوان: ${safe(o.city)}
 ${E.money} السعر: ${safe(o.price)} ₪
-${E.card} الدفع: ${paymentMethod}${deliveryTxt}${noteTxt}
-${E.phone} هاتف التواصل: ${CUSTOMER_SERVICE_PHONE}${supportLine}`
+${E.card} الدفع: ${paymentMethod}${deliveryTxt}${noteTxt}${contactBlock}${supportLine}`
     : `שלום ${safe(o.name)} ${E.wave}, תודה שהזמנת מ-MAD Parfumeur
 ${E.box} המוצר: ${safe(o.offer)}
 ${E.pin} כתובת: ${safe(o.city)}
 ${E.money} מחיר: ${safe(o.price)} ₪
-${E.card} תשלום: ${paymentMethod}${deliveryTxt}${noteTxt}
-${E.phone} טלפון: ${CUSTOMER_SERVICE_PHONE}${supportLine}`;
+${E.card} תשלום: ${paymentMethod}${deliveryTxt}${noteTxt}${contactBlock}${supportLine}`;
 
   const wa = `https://wa.me/${normalizePhoneForLink(o.phone)}?text=${encodeURIComponent(msg)}`;
   window.open(wa, "_blank");
