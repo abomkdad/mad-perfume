@@ -1,207 +1,214 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MAD Chat</title>
-    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --primary-color: #008069;
-            --bg-color: #e9edef;
-            --chat-bg: #efeae2;
-            --incoming-bg: #ffffff;
-            --outgoing-bg: #d9fdd3;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>MAD Chat</title>
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary-color: #008069;
+      --bg-color: #e9edef;
+      --chat-bg: #efeae2;
+      --incoming-bg: #ffffff;
+      --outgoing-bg: #d9fdd3;
+    }
+    * { box-sizing: border-box; font-family: 'Heebo', sans-serif; -webkit-tap-highlight-color: transparent; }
+    body { margin: 0; background-color: #d1d7db; height: 100vh; overflow: hidden; display: flex; justify-content: center; }
+    .app-container { display:flex; width:100%; height:100%; background:white; position:relative; max-width:1600px; box-shadow:0 0 20px rgba(0,0,0,0.05); }
 
-        * { box-sizing: border-box; font-family: 'Heebo', sans-serif; -webkit-tap-highlight-color: transparent; }
-        body { margin: 0; background-color: #d1d7db; height: 100vh; overflow: hidden; display: flex; justify-content: center; }
+    .sidebar { width:100%; height:100%; display:flex; flex-direction:column; background:white; position:absolute; z-index:10; transition:.3s; border-left:1px solid #ddd; }
+    .main-header { padding:10px 16px; background:var(--primary-color); color:white; display:flex; justify-content:space-between; align-items:center; height:60px; }
+    .logo-area { display:flex; align-items:center; gap:10px; font-weight:bold; font-size:18px; }
+    .contact-list { flex:1; overflow-y:auto; }
+    .contact-item { padding:12px 16px; border-bottom:1px solid #f0f2f5; cursor:pointer; display:flex; align-items:center; }
+    .contact-item:active { background:#f5f6f6; }
+    .avatar { width:45px; height:45px; border-radius:50%; display:flex; align-items:center; justify-content:center; background:#dfe5e7; color:white; font-weight:bold; margin-left:10px; }
 
-        .app-container {
-            display: flex; width: 100%; height: 100%; background: white; position: relative; max-width: 1600px;
-            box-shadow: 0 0 20px rgba(0,0,0,0.05);
-        }
+    .chat-area {
+      width:100%; height:100%; display:flex; flex-direction:column; background:var(--chat-bg);
+      background-image:url("https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png");
+      position:absolute; z-index:20; transform:translateX(100%); transition:.3s;
+    }
+    body.in-chat .sidebar { display:none; }
+    body.in-chat .chat-area { transform:translateX(0); }
+    @media (min-width:769px){
+      .sidebar { width:350px; position:relative; display:flex !important; }
+      .chat-area { position:relative; transform:translateX(0); width:calc(100% - 350px); }
+    }
 
-        /* Sidebar */
-        .sidebar {
-            width: 100%; height: 100%; display: flex; flex-direction: column; background: white; position: absolute; z-index: 10; transition: 0.3s; border-left: 1px solid #ddd;
-        }
-        
-        .main-header {
-            padding: 10px 16px; background: var(--primary-color); color: white; display: flex; justify-content: space-between; align-items: center; height: 60px;
-        }
+    .chat-header { height:60px; background:#f0f2f5; padding:0 10px; display:flex; align-items:center; border-bottom:1px solid #d1d7db; }
+    .messages-container { flex:1; padding:15px; overflow-y:auto; display:flex; flex-direction:column; gap:6px; }
 
-        .logo-area { display: flex; align-items: center; gap: 10px; font-weight: bold; font-size: 18px; }
-        
-        .contact-list { flex: 1; overflow-y: auto; }
-        .contact-item { padding: 12px 16px; border-bottom: 1px solid #f0f2f5; cursor: pointer; display: flex; align-items: center; }
-        .contact-item:active { background: #f5f6f6; }
-        .avatar { width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: #dfe5e7; color: white; font-weight: bold; margin-left: 10px; }
+    .message { max-width:75%; padding:6px 8px; border-radius:8px; font-size:14px; position:relative; box-shadow:0 1px 1px rgba(0,0,0,0.1); }
+    .msg-out { align-self:flex-start; background:var(--outgoing-bg); border-radius:8px 0 8px 8px; }
+    .msg-in { align-self:flex-end; background:var(--incoming-bg); border-radius:0 8px 8px 8px; }
 
-        /* Chat Area */
-        .chat-area {
-            width: 100%; height: 100%; display: flex; flex-direction: column; background: var(--chat-bg);
-            background-image: url("https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png");
-            position: absolute; z-index: 20; transform: translateX(100%); transition: 0.3s;
-        }
+    .media-preview img { max-width:100%; border-radius:6px; display:block; margin-bottom:4px; cursor:pointer; }
+    .media-preview iframe { width:320px; max-width:100%; height:220px; border:0; border-radius:8px; background:#fff; }
+    .media-link { display:block; font-size:12px; color:#007bff; text-decoration:none; margin-top:4px; }
 
-        body.in-chat .sidebar { display: none; }
-        body.in-chat .chat-area { transform: translateX(0); }
-
-        @media (min-width: 769px) {
-            .sidebar { width: 350px; position: relative; display: flex !important; }
-            .chat-area { position: relative; transform: translateX(0); width: calc(100% - 350px); }
-        }
-
-        .chat-header { height: 60px; background: #f0f2f5; padding: 0 10px; display: flex; align-items: center; border-bottom: 1px solid #d1d7db; }
-
-        .messages-container { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; }
-        
-        .message {
-            max-width: 75%; padding: 6px 8px; border-radius: 8px; font-size: 14px; position: relative; box-shadow: 0 1px 1px rgba(0,0,0,0.1);
-        }
-        .msg-out { align-self: flex-start; background: var(--outgoing-bg); border-radius: 8px 0 8px 8px; }
-        .msg-in { align-self: flex-end; background: var(--incoming-bg); border-radius: 0 8px 8px 8px; }
-        
-        /* Media Styles */
-        .media-preview img { max-width: 100%; border-radius: 6px; display: block; margin-bottom: 4px; cursor: pointer; }
-        .media-preview video { max-width: 100%; border-radius: 6px; }
-        .media-preview audio { width: 220px; }
-        .media-link { display: block; font-size: 12px; color: #007bff; text-decoration: none; margin-top: 4px; }
-
-        .footer { background: #f0f2f5; padding: 8px; display: flex; align-items: center; gap: 8px; }
-        .input-box { flex: 1; background: white; border-radius: 20px; padding: 10px 15px; border: none; outline: none; }
-        .btn-icon { background: none; border: none; font-size: 22px; cursor: pointer; color: #54656f; }
-
-    </style>
+    .footer { background:#f0f2f5; padding:8px; display:flex; align-items:center; gap:8px; }
+    .input-box { flex:1; background:white; border-radius:20px; padding:10px 15px; border:none; outline:none; }
+    .btn-icon { background:none; border:none; font-size:22px; cursor:pointer; color:#54656f; }
+  </style>
 </head>
 <body>
 
 <div class="app-container">
-    <div class="sidebar">
-        <div class="main-header">
-            <div class="logo-area">📂 MAD Files</div>
-            <button onclick="addNewContact()" class="btn-icon" style="color:white;">➕</button>
-        </div>
-        <div id="contactList" class="contact-list"></div>
+  <div class="sidebar">
+    <div class="main-header">
+      <div class="logo-area">📂 MAD Files</div>
+      <button onclick="addNewContact()" class="btn-icon" style="color:white;">➕</button>
+    </div>
+    <div id="contactList" class="contact-list"></div>
+  </div>
+
+  <div class="chat-area">
+    <div class="chat-header">
+      <button class="btn-icon" onclick="closeChat()">➜</button>
+      <div style="flex:1; margin-right:10px;">
+        <b id="activeName"></b>
+        <div id="activePhone" style="font-size:11px; color:gray;"></div>
+      </div>
+      <button class="btn-icon" onclick="syncMessages()">🔄</button>
     </div>
 
-    <div class="chat-area">
-        <div class="chat-header">
-            <button class="btn-icon" onclick="closeChat()">➜</button>
-            <div style="flex:1; margin-right:10px;">
-                <b id="activeName"></b>
-                <div id="activePhone" style="font-size:11px; color:gray;"></div>
-            </div>
-            <button class="btn-icon" onclick="syncMessages()">🔄</button>
-        </div>
+    <div class="messages-container" id="messagesContainer"></div>
 
-        <div class="messages-container" id="messagesContainer"></div>
-
-        <div class="footer">
-            <button class="btn-icon" onclick="alert('للإرسال: استخدم نصاً فقط حالياً.')">📎</button>
-            <input type="text" id="msgInput" class="input-box" placeholder="رسالة..." onkeypress="handleEnter(event)">
-            <button class="btn-icon" onclick="sendMessage()" style="color:var(--primary-color);">➤</button>
-        </div>
+    <div class="footer">
+      <button class="btn-icon" onclick="alert('للإرسال: نص فقط حالياً.')">📎</button>
+      <input type="text" id="msgInput" class="input-box" placeholder="رسالة..." onkeypress="handleEnter(event)">
+      <button class="btn-icon" onclick="sendMessage()" style="color:var(--primary-color);">➤</button>
     </div>
+  </div>
 </div>
 
 <script>
-    // ⚙️ رابط السكربت الخاص بك (نفس الرابط السابق إذا لم تغير المشروع)
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzE5SRPCexvMpt14OXeOwSDVVye3vumvhuXDgXaWBf2xWCBaP3avUN0qeQ1EPUr7DVO/exec";
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyjSduTc7mtIhJ1TayOog3yT1OodKeQxXf3GJPiKmp3MfCS67BgUVqA2fh44fOqx8vc/exec";
 
-    let contacts = JSON.parse(localStorage.getItem('mad_drive_db')) || {};
-    let activePhone = null;
+  let contacts = JSON.parse(localStorage.getItem('mad_drive_db')) || {};
+  let activePhone = null;
 
-    // --- العرض الذكي للملفات ---
-    function renderMessages() {
-        const container = document.getElementById('messagesContainer');
-        container.innerHTML = '';
-        if(!activePhone) return;
+  function isDrivePreview(url){
+    return typeof url === "string" && url.includes("drive.google.com/file/d/") && url.includes("/preview");
+  }
 
-        (contacts[activePhone].msgs || []).forEach(msg => {
-            const div = document.createElement('div');
-            div.className = `message ${msg.from === 'me' ? 'msg-out' : 'msg-in'}`;
-            
-            let html = '';
-            
-            // التعامل مع الصور والروابط
-            if (msg.type === 'image') {
-                // نستخدم رابط العرض المباشر
-                html = `<div class="media-preview">
-                            <img src="${msg.content}" onerror="this.style.display='none'">
-                            <a href="${msg.content}" target="_blank" class="media-link">🔍 فتح الصورة</a>
-                        </div>`;
-            } else if (msg.type === 'video') {
-                html = `<div class="media-preview">
-                            <video src="${msg.content}" controls></video>
-                            <a href="${msg.content}" target="_blank" class="media-link">🎬 تحميل الفيديو</a>
-                        </div>`;
-            } else if (msg.type === 'audio' || msg.type === 'voice') {
-                html = `<div class="media-preview">
-                            <audio src="${msg.content}" controls></audio>
-                        </div>`;
-            } else if (msg.type === 'document') {
-                html = `<div class="media-preview">
-                             📄 <a href="${msg.content}" target="_blank">فتح الملف</a>
-                        </div>`;
-            } else {
-                html = `<div>${msg.content}</div>`;
-            }
+  function renderMessages() {
+    const container = document.getElementById('messagesContainer');
+    container.innerHTML = '';
+    if(!activePhone) return;
 
-            div.innerHTML = `
-                ${html}
-                <div style="font-size:10px; color:#777; margin-top:4px; text-align:left;">
-                    ${new Date(msg.time).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}
-                    ${msg.from === 'me' ? (msg.status === 'sent' ? '✓' : '🕒') : ''}
-                </div>
-            `;
-            container.appendChild(div);
-        });
-        container.scrollTop = container.scrollHeight;
-    }
+    (contacts[activePhone].msgs || []).forEach(msg => {
+      const div = document.createElement('div');
+      div.className = `message ${msg.from === 'me' ? 'msg-out' : 'msg-in'}`;
 
-    // --- وظائف النظام الأساسية ---
-    async function syncMessages() {
-        if(!activePhone) return;
-        try {
-            const res = await fetch(`${SCRIPT_URL}?phone=${activePhone}`);
-            const data = await res.json();
-            if(Array.isArray(data)) {
-                contacts[activePhone].msgs = data;
-                save(); renderMessages();
-            }
-        } catch(e) { console.log(e); }
-    }
+      let html = '';
 
-    function sendMessage() {
-        const txt = document.getElementById('msgInput').value.trim();
-        if(!txt) return;
-        contacts[activePhone].msgs.push({ content: txt, from: 'me', time: new Date(), status: 'pending', type: 'text' });
-        save(); renderMessages(); document.getElementById('msgInput').value='';
-        
-        fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ to: activePhone, text: { body: txt } }) })
-        .then(()=> setTimeout(syncMessages, 2000));
-    }
+      if (msg.type === 'image') {
+        html = `<div class="media-preview">
+                  <img src="${msg.content}" onerror="this.style.display='none'">
+                  <a href="${msg.content}" target="_blank" class="media-link">🔍 فتح الصورة</a>
+                </div>`;
+      } else if (msg.type === 'video') {
+        // ✅ فيديو من Drive: الأفضل preview داخل iframe
+        if (isDrivePreview(msg.content)) {
+          html = `<div class="media-preview">
+                    <iframe src="${msg.content}" allow="autoplay" allowfullscreen></iframe>
+                    <a href="${msg.content.replace('/preview','/view')}" target="_blank" class="media-link">🎬 فتح الفيديو</a>
+                  </div>`;
+        } else {
+          html = `<div class="media-preview">
+                    <a href="${msg.content}" target="_blank" class="media-link">🎬 فتح الفيديو</a>
+                  </div>`;
+        }
+      } else if (msg.type === 'audio' || msg.type === 'voice') {
+        // ✅ صوت: preview داخل iframe (أضمن من audio direct)
+        if (isDrivePreview(msg.content)) {
+          html = `<div class="media-preview">
+                    <iframe src="${msg.content}" allow="autoplay"></iframe>
+                    <a href="${msg.content.replace('/preview','/view')}" target="_blank" class="media-link">🔊 فتح الصوت</a>
+                  </div>`;
+        } else {
+          html = `<div class="media-preview">
+                    <a href="${msg.content}" target="_blank" class="media-link">🔊 فتح الصوت</a>
+                  </div>`;
+        }
+      } else if (msg.type === 'document') {
+        html = `<div class="media-preview">
+                  📄 <a href="${msg.content}" target="_blank">فتح الملف</a>
+                </div>`;
+      } else {
+        html = `<div>${(msg.content || '')}</div>`;
+      }
 
-    function addNewContact() {
-        const p = prompt("الرقم:");
-        if(p) { if(!contacts[p]) contacts[p] = {name:p, msgs:[]}; openChat(p); }
-    }
-    function openChat(p) { activePhone = p; document.body.classList.add('in-chat'); document.getElementById('activeName').innerText=p; renderMessages(); syncMessages(); }
-    function closeChat() { document.body.classList.remove('in-chat'); activePhone=null; renderContacts(); }
-    function renderContacts() {
-        const list = document.getElementById('contactList'); list.innerHTML='';
-        Object.keys(contacts).forEach(p => {
-            const d = document.createElement('div'); d.className='contact-item';
-            d.innerHTML = `<div class="avatar">${p.slice(-2)}</div><div><b>${p}</b></div>`;
-            d.onclick=()=>openChat(p); list.appendChild(d);
-        });
-    }
-    function save() { localStorage.setItem('mad_drive_db', JSON.stringify(contacts)); }
-    function handleEnter(e){ if(e.key==='Enter') sendMessage(); }
-    
+      div.innerHTML = `
+        ${html}
+        <div style="font-size:10px; color:#777; margin-top:4px; text-align:left;">
+          ${new Date(msg.time).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}
+          ${msg.from === 'me' ? (msg.status === 'sent' ? '✓' : '🕒') : ''}
+        </div>
+      `;
+
+      container.appendChild(div);
+    });
+
+    container.scrollTop = container.scrollHeight;
+  }
+
+  async function syncMessages() {
+    if(!activePhone) return;
+    try {
+      const res = await fetch(`${SCRIPT_URL}?phone=${encodeURIComponent(activePhone)}`);
+      const data = await res.json();
+      if(Array.isArray(data)) {
+        contacts[activePhone].msgs = data;
+        save(); renderMessages();
+      }
+    } catch(e) { console.log(e); }
+  }
+
+  function sendMessage() {
+    const txt = document.getElementById('msgInput').value.trim();
+    if(!txt || !activePhone) return;
+
+    contacts[activePhone].msgs.push({ content: txt, from: 'me', time: new Date(), status: 'pending', type: 'text' });
+    save(); renderMessages(); document.getElementById('msgInput').value='';
+
+    fetch(SCRIPT_URL, {
+      method: 'POST',
+      body: JSON.stringify({ to: activePhone, text: { body: txt } })
+    }).then(()=> setTimeout(syncMessages, 2000));
+  }
+
+  function addNewContact() {
+    const p = prompt("الرقم:");
+    if(p) { if(!contacts[p]) contacts[p] = {name:p, msgs:[]}; openChat(p); }
+  }
+  function openChat(p) {
+    activePhone = p;
+    document.body.classList.add('in-chat');
+    document.getElementById('activeName').innerText = p;
+    renderMessages(); syncMessages();
+  }
+  function closeChat() {
+    document.body.classList.remove('in-chat');
+    activePhone = null;
     renderContacts();
+  }
+  function renderContacts() {
+    const list = document.getElementById('contactList'); list.innerHTML='';
+    Object.keys(contacts).forEach(p => {
+      const d = document.createElement('div'); d.className='contact-item';
+      d.innerHTML = `<div class="avatar">${p.slice(-2)}</div><div><b>${p}</b></div>`;
+      d.onclick=()=>openChat(p);
+      list.appendChild(d);
+    });
+  }
+  function save() { localStorage.setItem('mad_drive_db', JSON.stringify(contacts)); }
+  function handleEnter(e){ if(e.key==='Enter') sendMessage(); }
+
+  renderContacts();
 </script>
 
 </body>
