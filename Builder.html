@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MAD Builder V66 - Professional Bilingual Edition 🛡️</title>
+  <title>MAD Builder V66 - User Friendly 🟢</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest" defer></script>
   <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
@@ -14,15 +14,22 @@
     .app-layout { display:flex; height:100vh; flex-direction:row-reverse; }
     .editor-sidebar { width:450px; background:#fff; border-left:1px solid #cbd5e1; overflow-y:auto; padding:20px; flex-shrink:0; box-shadow:-5px 0 15px rgba(0,0,0,0.05); }
     .preview-area { flex:1; background:#cbd5e1; display:flex; flex-direction:column; align-items:center; justify-content:center; position:relative; overflow: hidden; }
+    
+    /* iPhone Frame Styling */
     .iphone { width:375px; height:750px; background:#000; border-radius:45px; border:12px solid #1e293b; overflow:hidden; position:relative; box-shadow:0 25px 50px -12px rgba(0,0,0,0.5); background-color:#fff; transition:transform 0.3s; transform-origin: center; }
     .iphone iframe { width:100%; height:100%; border:none; background:#fff; }
+    .iphone-notch { position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 150px; height: 30px; background: #1e293b; border-bottom-left-radius: 12px; border-bottom-right-radius: 12px; z-index: 20; }
+    
     .section-box { background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:15px; margin-bottom:15px; }
     .section-title { font-weight:900; font-size:0.85rem; color:#1e293b; margin-bottom:10px; display:flex; align-items:center; gap:5px; text-transform: uppercase; }
+    
     input, textarea, select { width:100%; padding:8px 12px; border:1px solid #cbd5e1; border-radius:8px; font-size:12px; outline:none; transition:0.2s; background: white; color: black; }
     input:focus, textarea:focus { border-color:#3b82f6; box-shadow: 0 0 0 2px rgba(59,130,246,0.1); }
+    
     .btn-grid { display:grid; grid-template-columns:repeat(2, 1fr); gap:8px; }
     .btn-add { background:#fff; border:1px solid #e2e8f0; padding:10px; border-radius:8px; font-size:11px; font-weight:bold; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:5px; transition:0.2s; }
     .btn-add:hover { background:#f1f5f9; border-color:#3b82f6; color:#3b82f6; }
+    
     .btn-action { width:100%; padding:14px; border-radius:12px; font-weight:900; margin-top:10px; cursor:pointer; text-align:center; transition: 0.2s; }
     .zoom-controls { position:fixed; bottom:20px; right:20px; background:rgba(30,41,59,0.9); padding:8px 16px; border-radius:99px; display:flex; gap:15px; color:white; z-index:50; align-items:center; font-size:14px; backdrop-blur: sm; }
   </style>
@@ -32,7 +39,7 @@
 <div class="app-layout" x-data="builderApp()" x-init="init()" x-cloak>
   <aside class="editor-sidebar">
     <div class="flex items-center justify-between mb-6 text-black">
-      <h1 class="text-xl font-black text-slate-800 tracking-tighter">MAD <span class="text-rose-500">AE BILINGUAL</span></h1>
+      <h1 class="text-xl font-black text-slate-800 tracking-tighter">MAD <span class="text-rose-500">LEAD PRO</span></h1>
       <div class="flex bg-slate-100 p-1 rounded-lg">
         <button @click="editLang='ar'; update()" :class="editLang==='ar'?'bg-white shadow text-black':'text-gray-500'" class="px-3 py-1 rounded text-[10px] font-bold transition">AR</button>
         <button @click="editLang='he'; update()" :class="editLang==='he'?'bg-white shadow text-black':'text-gray-500'" class="px-3 py-1 rounded text-[10px] font-bold transition">HE</button>
@@ -43,7 +50,7 @@
     <div class="section-box border-rose-100 bg-rose-50/30 text-black">
       <span class="section-title text-rose-700">💰 بيانات المنتج والسعر</span>
       <div class="flex gap-2">
-        <input type="text" x-model="config.productName" @input="update()" placeholder="اسم المنتج">
+        <input type="text" x-model="config.productName" @input="update()" placeholder="اسم المنتج (الافتراضي)">
         <input type="number" x-model="config.price" @input="update()" placeholder="السعر" class="w-1/3">
       </div>
     </div>
@@ -51,6 +58,7 @@
     <div class="section-box border-blue-100 bg-blue-50/30 text-black">
       <span class="section-title text-blue-700">🔗 الروابط والإعدادات</span>
       <input type="text" x-model="config.sheetUrl" class="mb-2 font-mono text-[10px]" placeholder="رابط Google Sheet" @input="update()">
+      <input type="text" x-model="config.zapierUrl" class="mb-2 font-mono text-[10px] border-orange-200 bg-orange-50" placeholder="رابط Zapier Webhook" @input="update()">
       <div class="flex gap-2">
         <input type="text" x-model="config.adminPhone" placeholder="رقم المدير 972" class="font-bold" @input="update()">
         <input type="color" x-model="config.bgColor" @input="update()" class="w-12 h-10 p-1 border-0 bg-transparent cursor-pointer">
@@ -58,7 +66,7 @@
     </div>
 
     <div class="section-box border-emerald-100 bg-emerald-50/30 text-black">
-      <span class="section-title text-emerald-700">📊 بكسلات التتبع (Advanced Match)</span>
+      <span class="section-title text-emerald-700">📊 بكسلات التتبع (Pixel & Leads)</span>
       <div class="space-y-2">
         <input type="text" x-model="config.ttPixel" placeholder="TikTok Pixel" @input="update()">
         <input type="text" x-model="config.fbPixel" placeholder="Facebook Pixel" @input="update()">
@@ -68,31 +76,25 @@
 
     <!-- Content Blocks List -->
     <div class="section-box text-black">
-      <span class="section-title">🧱 المحتوى والتحكم (تلوين النصوص)</span>
+      <span class="section-title">🧱 المحتوى والتحويل (Sales Funnel)</span>
       <div class="space-y-4 mb-6">
         <template x-for="(block, index) in blocks" :key="block.id">
           <div class="border-2 p-3 rounded-xl relative transition shadow-sm"
                :class="{
                  'bg-blue-50 border-blue-200': block.type === 'text',
-                 'bg-slate-50 border-slate-200': ['image','video','iframe','carousel'].includes(block.type),
+                 'bg-slate-50 border-slate-200': ['image','video','carousel'].includes(block.type),
                  'bg-rose-50 border-rose-200': block.type === 'form',
-                 'bg-amber-50 border-amber-200': block.type === 'comparison',
-                 'bg-purple-50 border-purple-200': block.type === 'faq',
-                 'bg-green-50 border-green-200': block.type === 'fragrantica',
-                 'bg-yellow-50 border-yellow-200': block.type === 'interactive_rating'
+                 'bg-green-100 border-green-300': block.type === 'whatsapp'
                }">
             <div class="flex justify-between items-center mb-3">
                <span class="text-[10px] font-black px-2 py-1 rounded uppercase" 
                      :class="{
                        'bg-blue-200 text-blue-800': block.type === 'text',
-                       'bg-slate-200 text-slate-800': ['image','video','iframe','carousel'].includes(block.type),
+                       'bg-slate-200 text-slate-800': ['image','video','carousel'].includes(block.type),
                        'bg-rose-200 text-rose-800': block.type === 'form',
-                       'bg-amber-200 text-amber-800': block.type === 'comparison',
-                       'bg-purple-200 text-purple-800': block.type === 'faq',
-                       'bg-green-200 text-green-800': block.type === 'fragrantica',
-                       'bg-yellow-200 text-yellow-800': block.type === 'interactive_rating'
+                       'bg-green-600 text-white': block.type === 'whatsapp'
                      }"
-                     x-text="block.type"></span>
+                     x-text="block.type === 'whatsapp' ? 'WHATSAPP' : (block.type === 'carousel' ? 'SMART CAROUSEL' : block.type)"></span>
                <div class="flex gap-2">
                  <button @click="moveBlock(index, -1)" class="text-slate-400 hover:text-blue-500 font-bold">↑</button>
                  <button @click="moveBlock(index, 1)" class="text-slate-400 hover:text-blue-500 font-bold">↓</button>
@@ -110,44 +112,69 @@
                </div>
             </template>
 
-            <template x-if="['image','video','iframe'].includes(block.type)">
+            <template x-if="['image','video'].includes(block.type)">
                <input type="text" x-model="block.url" @input="update()" placeholder="URL" class="text-[11px] text-black">
             </template>
 
+            <!-- ✅ كريسول ذكي: إدخال الرابط + اسم العرض -->
             <template x-if="block.type === 'carousel'">
-              <div class="space-y-2">
-                <template x-for="(img, iIdx) in (block.images || [])" :key="'carousel-img-'+iIdx">
-                   <div class="flex gap-1"><input x-model="block.images[iIdx]" @input="update()" class="text-[10px] flex-1 text-black"><button @click="block.images.splice(iIdx,1); update()" class="text-red-500 font-bold">x</button></div>
+              <div class="space-y-3">
+                <template x-for="(item, iIdx) in (block.items || [])" :key="'carousel-item-'+iIdx">
+                   <div class="bg-white p-2 rounded border border-gray-200">
+                     <div class="flex justify-between items-center mb-1">
+                        <span class="text-[9px] font-bold text-slate-500" x-text="'شريحة ' + (iIdx+1)"></span>
+                        <button @click="block.items.splice(iIdx,1); update()" class="text-red-500 font-bold text-[10px]">حذف</button>
+                     </div>
+                     <input x-model="item.url" @input="update()" class="text-[10px] w-full mb-1 text-black font-mono" placeholder="رابط الصورة">
+                     <input x-model="item.name" @input="update()" class="text-[10px] w-full text-black font-bold border-indigo-200 focus:border-indigo-500" placeholder="اسم العرض (مثال: بكج العيد)">
+                   </div>
                 </template>
-                <button @click="if(!block.images) block.images=[]; block.images.push(''); update()" class="w-full py-1 text-[9px] bg-slate-600 text-white rounded">+ إضافة صورة</button>
+                <button @click="if(!block.items) block.items=[]; block.items.push({url:'', name:''}); update()" class="w-full py-2 text-[10px] bg-slate-700 text-white rounded font-bold hover:bg-slate-800 transition">+ إضافة عرض للكريسول</button>
+                <p class="text-[9px] text-slate-500 text-center">💡 سيظهر شريط مصغرات أسفل الصور للتسهيل على الزبون.</p>
               </div>
             </template>
 
             <template x-if="block.type === 'form'">
-               <p class="text-[10px] text-rose-700 font-bold bg-rose-100 p-2 rounded-lg text-center">النموذج مبرمج بالكامل ثنائي اللغة ✅</p>
+               <p class="text-[10px] text-rose-700 font-bold bg-rose-100 p-2 rounded-lg text-center">نموذج الشراء (Lead Form) ✅</p>
             </template>
 
-            <template x-if="block.type === 'faq' || block.type === 'comparison'">
-              <p class="text-[10px] font-bold p-2 rounded-lg text-center"
-                 :class="block.type === 'faq' ? 'text-purple-700 bg-purple-100' : 'text-amber-700 bg-amber-100'">
-                 يتم إنشاء 6 بنود مترجمة باحترافية ✅
-              </p>
+            <template x-if="block.type === 'whatsapp'">
+               <div class="space-y-2">
+                  <div class="flex items-center gap-2">
+                     <span class="text-[10px] font-bold">رقم الهاتف:</span>
+                     <input type="text" x-model="block.url" @input="update()" placeholder="مثال: 050xxxxxxx أو 972xxxxxx" class="text-[11px] font-mono text-black font-bold">
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <span class="text-[10px] font-bold">نص الزر:</span>
+                    <input type="text" x-model="block.content[editLang]" @input="update()" placeholder="نص الزر" class="text-[11px] text-black">
+                  </div>
+                  <div class="block">
+                    <span class="text-[10px] font-bold block mb-1">الرسالة الافتتاحية:</span>
+                    <textarea x-model="block.openingMessage[editLang]" @input="update()" placeholder="مثال: مرحبا، أريد الاستفسار عن..." class="text-[11px] text-black h-12"></textarea>
+                  </div>
+                  <div class="block bg-green-200/50 p-2 rounded">
+                    <span class="text-[10px] font-bold block mb-1">صورة المعاينة (Preview Image):</span>
+                    <input type="text" x-model="block.productImg" @input="update()" placeholder="https://... (رابط الصورة)" class="text-[10px] font-mono text-black">
+                    <template x-if="block.productImg">
+                      <div class="mt-2 text-center">
+                        <img :src="block.productImg" class="w-20 h-20 object-cover rounded-lg border-2 border-white shadow-sm mx-auto bg-white">
+                      </div>
+                    </template>
+                  </div>
+               </div>
             </template>
           </div>
         </template>
       </div>
 
-      <!-- Toolbar -->
+      <!-- Toolbar - Simplified -->
       <div class="btn-grid">
-        <button class="btn-add border-blue-500 text-blue-600" @click="addBlock('text')">📝 MADPERFUME</button>
+        <button class="btn-add border-blue-500 text-blue-600" @click="addBlock('text')">📝 عنوان/نص</button>
         <button class="btn-add border-slate-500 text-slate-600" @click="addBlock('image')">🖼️ صورة</button>
-        <button class="btn-add border-slate-900 text-slate-900 font-black" @click="addBlock('carousel')">📸 كريسولة 4ث</button>
+        <button class="btn-add border-slate-900 text-slate-900 font-black" @click="addBlock('carousel')">📸 كريسولة ذكية</button>
         <button class="btn-add border-slate-800 text-slate-900" @click="addBlock('video')">🎥 فيديو</button>
-        <button class="btn-add border-rose-500 text-rose-600 font-bold" @click="addBlock('form')">📋 نموذج AE</button>
-        <button class="btn-add border-amber-500 text-amber-600 font-bold" @click="addBlock('comparison')">⚖️ مقارنات MAD</button>
-        <button class="btn-add border-purple-500 text-purple-600 font-bold" @click="addBlock('faq')">❓ 6 أسئلة</button>
-        <button class="btn-add border-green-600 text-green-600" @click="addBlock('fragrantica')">🌿 فراغرانتيكا</button>
-        <button class="btn-add border-yellow-500 text-yellow-600" @click="addBlock('interactive_rating')">⭐ تقييم تفاعلي</button>
+        <button class="btn-add border-green-500 text-white bg-green-500 hover:bg-green-600 font-bold" @click="addBlock('whatsapp')">💬 واتساب (Link)</button>
+        <button class="btn-add border-rose-500 text-white bg-rose-500 hover:bg-rose-600 font-bold col-span-2" @click="addBlock('form')">🚀 نموذج شراء (Pixel)</button>
       </div>
     </div>
 
@@ -162,7 +189,10 @@
       <button @click="zoom = Math.min(1.2, zoom + 0.1)">+</button>
       <button @click="update()" class="border-r border-white/20 pr-3 mr-1">🔄 تحديث</button>
     </div>
-    <div class="iphone" :style="`transform: scale(${zoom})`"><iframe id="preview-frame"></iframe></div>
+    <div class="iphone" :style="`transform: scale(${zoom})`">
+        <div class="iphone-notch"></div>
+        <iframe id="preview-frame"></iframe>
+    </div>
   </main>
 </div>
 
@@ -171,18 +201,19 @@ function builderApp() {
   return {
     editLang: 'ar', zoom: 0.85, timeout: null,
     config: {
-      // ✅ افتراضي مثل الصورة (غامق فخم)
       bgColor: '#0e0302',
       logoUrl: 'https://www.mad-parfumeur.com/assets/hero/logo.png',
       heroTitle: { ar: 'أقوى العروض الحصرية', he: 'המבצעים הבלעדיים ביותר' },
-      productName: 'big-sale', price: '500', adminPhone: '972524033442',
+      productName: 'عرض خاص', price: '500', adminPhone: '972524033442',
       sheetUrl: 'https://script.google.com/macros/s/AKfycbxzFuJvnf5QWAam798ZfTrAbINGLCeY52WVz56NtyC7lY-VrlbzC0gsp8ZBY2cT3rLU-g/exec',
+      zapierUrl: 'https://hooks.zapier.com/hooks/catch/14790106/ue4uy7j/',
       fbPixel: '1072283127290819', ttPixel: 'D2D02JBC77U4ENLN9SBG', snapPixel: 'b143822e-1c3c-40ff-93f7-edadee74e626'
     },
     blocks: [],
     init() { 
-      this.addBlock('text'); 
+      // ✅ الافتراضي: كريسول + واتساب + نموذج شراء فقط
       this.addBlock('carousel');
+      this.addBlock('whatsapp');
       this.addBlock('form'); 
       setTimeout(() => this.update(), 500); 
     },
@@ -190,7 +221,6 @@ function builderApp() {
       clearTimeout(this.timeout);
       this.timeout = setTimeout(() => {
         const frame = document.getElementById('preview-frame');
-        // ✅ المعاينة تتبع لغة التحرير (AR/HE)
         if (frame) frame.srcdoc = this.generateFinalHTML(this.editLang, false);
       }, 300);
     },
@@ -200,32 +230,26 @@ function builderApp() {
         type,
         content:{ ar: 'MAD PERFUME', he: 'MAD PERFUME' }, 
         url: '', align: 'center', btnText: { ar: 'تأكيد الطلب', he: 'אישור הזמנה' }, 
-        items: [], images: [], score: '4.9 / 5', 
-        style: { color: '#ffffff', size: 'text-lg', font: 'Cairo', weight: 'font-bold' } 
+        style: { color: '#ffffff', size: 'text-lg', font: 'Cairo', weight: 'font-bold' },
+        openingMessage: { ar: '', he: '' },
+        productImg: '',
+        items: []
       };
+      
       if (type === 'carousel') {
-        b.images = ['https://www.mad-parfumeur.com/assets/hero/8.webp', 'https://www.mad-parfumeur.com/assets/hero/2.webp'];
-      }
-      if (type === 'comparison') {
         b.items = [
-          { mad: {ar:'أصلي ومضمون 100% ماركة MAD ✅',he:'מוצר מקורי ומובטח 100% מבית MAD ✅'}, other: {ar:'مقلد ومجهول المصدر وضار ❌',he:'מוצרים מזויפים ממקור לא ידוע ❌'} },
-          { mad: {ar:'ثبات جبار يتجاوز 48 ساعة ✅',he:'עמידות עוצמתית מעל 48 שעות ✅'}, other: {ar:'رائحة تختفي خلال دقائق ❌',he:'ריח שנעלם תוך דקות ספורות ❌'} },
-          { mad: {ar:'زيوت نيش فرنسية فاخرة جداً ✅',he:'שמנים צרפתיים יוקרתיים ✅'}, other: {ar:'رائحة كحول رخيصة ومزعجة ❌',he:'ריח אלכוהול זול ומציק ❌'} },
-          { mad: {ar:'آمن تماماً ولا يسبب حساسية ✅',he:'בטוח לחלוטין ולא גורם לאלרגיות ✅'}, other: {ar:'يسبب صداع وضيق تنفس ❌',he:'גורם לכאבי ראש וקוצר נשימה ❌'} },
-          { mad: {ar:'تغليف فخم يليق بك وبمقامك ✅',he:'אריזת VIP יוקרתית שמתאימה לך ✅'}, other: {ar:'تغليف عشوائي وشغل شوارع ❌',he:'אריזה פשוטה וזולה ❌'} },
-          { mad: {ar:'ضمان استبدال حقيقي وخدمة زبائن ✅',he:'אחריות החלפה אמיתית ושירות לקוחות ✅'}, other: {ar:'بتشتري وبتتوه وما حد برد عليك ❌',he:'קונים ונתקעים, אין מענה ❌'} }
+          { url: 'https://www.mad-parfumeur.com/assets/hero/8.webp', name: 'بكج العيد - 3 عطور' },
+          { url: 'https://www.mad-parfumeur.com/assets/hero/2.webp', name: 'عرض التوفير - عطرين' }
         ];
       }
-      if (type === 'faq') {
-        b.items = [
-          { q: {ar:'هل العطور أصلية؟',he:'האם הבשמים מקוריים?'}, a: {ar:'نعم، جميع عطورنا أصلية 100% ومصادق عليها.',he:'כן, כל הבשמים שלנו מקוריים 100% ומאושרים على ידי משרד הבריאות.'} },
-          { q: {ar:'كم تستغرق مدة التوصيل؟',he:'כמה זמן לוקח המשלוח?'}, a: {ar:'خلال 2-3 أيام عمل لجميع المناطق.',he:'אספקה מהירה תוך 2-3 ימי עסקים לכל הארץ.'} },
-          { q: {ar:'هل الرائحة ثابتة؟',he:'האם הריח נשאר לאורך זמן?'}, a: {ar:'نعم، تركيز نيش يضمن ثباتاً يتجاوز 24 ساعة.',he:'בהחלט, ריכוז הבשמים גבוה מאוד (נישה) להבטחת עמידות מעל 24 שעות.'} },
-          { q: {ar:'هل يتوفر دفع عند الاستلام؟',he:'יש אפשרות לתשלום במזומן?'}, a: {ar:'نعم، نوفر خدمة الدفع نقداً عند استلام الطلب.',he:'כן, אנו מציעים תשלום במזומן בעת מסירת ההזמנה.'} },
-          { q: {ar:'أين تقع فروعكم؟',he:'איפה נמצאים הסניפים שלכם?'}, a: {ar:'لدينا أكثر من 40 فرع في كافة المناطق.',he:'יש לנו מעל 40 סניפים הפרוסים בכל רחבי הארץ לשירותכם.'} },
-          { q: {ar:'ماذا لو لم يعجبني العطر؟',he:'מה אם לא אהבתי את הבושם?'}, a: {ar:'نحن نضمن رضاك بسياسة استبدال مرنة.',he:'אנחנו מבטיחים שביעות רצון מלאה, ניתן להחליף את הבושם בקלות.'} }
-        ];
+
+      if (type === 'whatsapp') {
+        b.url = this.config.adminPhone;
+        b.content = { ar: 'تواصل معنا عبر واتساب', he: 'דברו איתנו בוואטסאפ' };
+        b.openingMessage = { ar: 'مرحبا، أريد الاستفسار عن العرض...', he: 'היי, אשמח לפרטים נוספים...' };
+        b.productImg = 'https://www.mad-parfumeur.com/assets/hero/8.webp'; 
       }
+      
       this.blocks.push(b); this.update();
     },
     removeBlock(i) { this.blocks.splice(i, 1); this.update(); },
@@ -234,13 +258,11 @@ function builderApp() {
       if (ni >= 0 && ni < this.blocks.length) { [this.blocks[i], this.blocks[ni]] = [this.blocks[ni], this.blocks[i]]; this.update(); }
     },
     async copyCode() {
-      // ✅ النسخ: ملف نهائي تلقائي حسب لغة المستخدم
       const html = this.generateFinalHTML(null, true);
       try { await navigator.clipboard.writeText(html); alert('✅ تم نسخ الكود!'); } 
       catch (err) { const t = document.createElement("textarea"); t.value = html; document.body.appendChild(t); t.select(); document.execCommand('copy'); document.body.removeChild(t); alert('✅ تم نسخ الكود!'); }
     },
     downloadHTML() {
-      // ✅ التحميل: ملف نهائي تلقائي حسب لغة المستخدم
       const html = this.generateFinalHTML(null, true);
       const blob = new Blob([html], { type: 'text/html' });
       const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'MAD_Landing_Final.html'; a.click();
@@ -250,10 +272,21 @@ function builderApp() {
       const cStr = JSON.stringify(this.config).replace(/</g, '\\u003c');
       const initArg = forcedLang ? `'${forcedLang}'` : 'null';
 
+      // ✅ استخراج صورة المعاينة (OG Image)
+      const waBlock = this.blocks.find(b => b.type === 'whatsapp' && b.productImg);
+      const ogImage = waBlock ? waBlock.productImg : (this.blocks.find(b => b.type === 'image')?.url || this.config.logoUrl);
+
       return `<!DOCTYPE html>
 <html x-data="app()" x-init="init(${initArg})" :lang="lang" :dir="lang==='he'?'ltr':'rtl'">
 <head>
   <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <!-- ✅ إعدادات المعاينة (Preview) -->
+  <meta property="og:title" content="${this.config.heroTitle.ar}" />
+  <meta property="og:description" content="${this.config.productName}">
+  <meta property="og:image" content="${ogImage}" />
+  <meta property="og:type" content="website" />
+
   <script src="https://cdn.tailwindcss.com"><\/script>
   <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer><\/script>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;900&display=swap" rel="stylesheet">
@@ -276,6 +309,10 @@ function builderApp() {
     .btn-main { background: #10b981; color: #fff; width: 100%; padding: 18px; border-radius: 14px; font-weight: 900; font-size: 1.2rem; animation: pulse 2s infinite; cursor: pointer; border:none; box-shadow: 0 6px 18px rgba(16,185,129,0.35); }
     .btn-main:hover { filter: brightness(1.05); }
     .btn-main:active { transform: scale(0.99); }
+
+    /* Whatsapp Animation */
+    @keyframes wiggle { 0%, 100% { transform: rotate(-1deg); } 50% { transform: rotate(1deg) scale(1.02); } }
+    .animate-wiggle { animation: wiggle 1s ease-in-out infinite; }
 
     @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.02); } 100% { transform: scale(1); } }
     .progress-container { margin-bottom: 15px; }
@@ -307,82 +344,78 @@ function builderApp() {
         <template x-if="b.type==='image'"><img :src="b.url" class="rounded-2xl mx-auto shadow-lg w-full"></template>
         <template x-if="b.type==='video'"><video :src="b.url" controls class="w-full rounded-2xl shadow-lg"></video></template>
         
+        <!-- ✅ كريسول ذكي: مع مصغرات (Thumbnails) واضحة -->
         <template x-if="b.type==='carousel'">
-          <div class="relative w-full overflow-hidden" x-data="{ curr: 0, total: b.images.length }" x-init="if(total>1) setInterval(()=>{curr=(curr+1)%total}, 4000)">
-            <div class="flex transition-transform duration-700 ease-in-out" :style="'transform: translateX(' + (lang === 'he' ? (curr * -100) : (curr * 100)) + '%)'">
-               <template x-for="(img, i) in b.images" :key="'ci-'+i"><div class="min-w-full w-full"><img :src="img" class="w-full object-cover shadow-xl"></div></template>
+          <div class="w-full" 
+               x-data="{ curr: 0, total: (b.items || []).length }" 
+               x-init="$watch('curr', val => { if(b.items[val] && b.items[val].name) selectedOffer = b.items[val].name }); 
+                       if(b.items[0]) selectedOffer = b.items[0].name;">
+            
+            <h3 class="text-center text-white font-black text-lg mb-2" x-text="lang==='he'?'בחר הצעה':'اختر العرض المناسب لك:'"></h3>
+
+            <div class="relative overflow-hidden rounded-2xl shadow-2xl mb-4">
+               <template x-for="(item, i) in (b.items || [])" :key="'ci-'+i">
+                 <div class="w-full relative transition-opacity duration-300" x-show="curr===i" x-transition:enter="opacity-0" x-transition:enter-end="opacity-100">
+                   <img :src="item.url" class="w-full object-cover">
+                   <div class="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent p-4 pt-12 text-center">
+                      <p class="text-white font-black text-xl" x-text="item.name"></p>
+                   </div>
+                 </div>
+               </template>
+               
+               <!-- أسهم كبيرة وواضحة -->
+               <button @click="curr = (curr - 1 + total) % total" class="absolute left-2 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/40 text-white p-3 rounded-full backdrop-blur-md transition shadow-lg">❮</button>
+               <button @click="curr = (curr + 1) % total" class="absolute right-2 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/40 text-white p-3 rounded-full backdrop-blur-md transition shadow-lg">❯</button>
             </div>
-            <div class="absolute bottom-4 left-0 right-0 flex justify-center gap-2" x-show="total > 1">
-               <template x-for="(img, i) in b.images" :key="'ind-'+i"><div class="w-2 h-2 rounded-full transition-all duration-300" :class="curr === i ? 'bg-white w-6' : 'bg-white/40'"></div></template>
+
+            <!-- شريط المصغرات (Thumbnails) للاختيار السريع -->
+            <div class="flex gap-2 justify-center overflow-x-auto pb-2 px-1">
+               <template x-for="(item, i) in b.items" :key="'thumb-'+i">
+                 <div class="w-16 h-16 rounded-lg overflow-hidden cursor-pointer border-2 transition-all transform hover:scale-105 shrink-0"
+                      :class="curr === i ? 'border-green-400 shadow-[0_0_10px_rgba(74,222,128,0.7)] scale-105' : 'border-transparent opacity-60'"
+                      @click="curr = i">
+                    <img :src="item.url" class="w-full h-full object-cover">
+                 </div>
+               </template>
+            </div>
+
+            <!-- تأكيد الاختيار -->
+            <div class="text-center mt-1">
+               <span class="inline-block bg-green-600 text-white px-4 py-1 rounded-full text-[10px] font-bold animate-pulse" x-show="selectedOffer">
+                 ✅ تم تحديد العرض
+               </span>
             </div>
           </div>
         </template>
 
-<!-- ✅ قسم فراغرانتيكا (كامل) -->
-<template x-if="b.type==='fragrantica'">
-  <a :href="b.url" target="_blank"
-     class="block w-full max-w-[320px] bg-[#3f5a31] text-white p-5 rounded-[24px] shadow-xl relative overflow-hidden mx-auto no-underline text-right mt-4">
+        <!-- ✅ واتساب هزاز -->
+        <template x-if="b.type==='whatsapp'">
+          <div class="my-6">
+            <template x-if="b.productImg">
+              <div class="mb-3 rounded-2xl overflow-hidden shadow-lg border-2 border-white/20">
+                <img :src="b.productImg" class="w-full h-auto object-cover block">
+              </div>
+            </template>
 
-    <div class="flex justify-between items-center mb-3">
-      <span class="text-[10px] font-black uppercase tracking-widest text-white/60"
-            x-text="lang==='he' ? 'ביקורות' : 'REVIEWS'"></span>
-
-      <div class="flex text-amber-400 gap-0.5">
-        <template x-for="i in 5">
-          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
-          </svg>
-        </template>
-      </div>
-    </div>
-
-    <div class="flex items-end gap-2">
-      <span class="text-4xl font-black" x-text="b.score || '4.9 / 5'"></span>
-      <span class="text-xs opacity-60 mb-1" x-text="lang==='he' ? 'דירוג' : 'Rating'"></span>
-    </div>
-
-    <p class="text-[11px] font-black text-white/90 mt-1"
-       x-text="lang==='he' ? 'דירוג לקוחות שניסו לפניך' : 'تقييم عملاء جرّبوا العطر قبلَك'"></p>
-
-    <p class="text-[10px] font-bold mt-2 text-white/80"
-       x-text="b.content && b.content[lang] ? b.content[lang] : (lang==='he' ? 'מבוסס על ביקורות לקוחות אמיתיות' : 'مبني على تقييمات عملاء حقيقيين')"></p>
-  </a>
-</template>
-
-<!-- ✅ تقييم تفاعلي + عنوان فوق النجوم (مثل الصورة) -->
-<template x-if="b.type==='interactive_rating'">
-  <div class="bg-white border-2 border-amber-100 rounded-2xl p-5 shadow-sm text-center mt-4" x-data="{ r: 0 }">
-    <div class="flex items-center justify-center gap-2 mb-3">
-      <span class="text-amber-500 text-xl">★</span>
-      <h3 class="text-[18px] font-black text-slate-900" x-text="b.content && b.content[lang] ? b.content[lang] : (lang==='he' ? 'ניסית את הבושם? דרג אותנו' : 'جرّبت العطر؟ قيّمنا')"></h3>
-    </div>
-
-    <div class="flex justify-center gap-2 mb-2" x-show="r===0">
-      <template x-for="i in 5">
-        <button @click="r=i" class="text-3xl text-gray-200 hover:text-amber-400 transition">★</button>
-      </template>
-    </div>
-
-    <div x-show="r>0" class="text-emerald-600 font-bold mt-2">
-      <p class="text-sm" x-text="lang==='he' ? 'תודה רבה על הדירוג!' : 'شكراً لتقييمك! ⭐'"></p>
-    </div>
-  </div>
-</template>
-
-        <template x-if="b.type==='comparison'">
-          <div class="mt-4">
-            <div class="grid grid-cols-2 gap-1 mb-2 px-1 text-right">
-              <div class="text-center font-black text-white text-[10px] uppercase bg-black/20 py-1 rounded-t-lg">MAD</div>
-              <div class="text-center font-black text-white/70 text-[10px] uppercase bg-black/10 py-1 rounded-t-lg" x-text="lang==='he'?'אחרים':'الآخرين'"></div>
-            </div>
-            <div class="space-y-2 text-right"><template x-for="(row, rIdx) in b.items" :key="'c-'+rIdx"><div class="grid grid-cols-2 gap-1 rounded-xl overflow-hidden shadow-sm"><div class="bg-amber-50 p-4 border-r border-amber-100 text-center font-bold text-[11px] text-black" x-text="row.mad[lang]"></div><div class="bg-white p-4 text-center text-gray-400 text-[11px]" x-text="row.other[lang]"></div></div></template></div>
+            <a :href="'https://wa.me/' + (b.url ? b.url.replace(/[^0-9]/g,'').replace(/^05/, '9725') : '') + '?text=' + encodeURIComponent((b.openingMessage[lang] || '') + '\\n' + window.location.href)" 
+               target="_blank"
+               class="block w-full bg-[#25D366] text-white p-4 rounded-xl shadow-lg text-center font-black text-xl transform transition hover:scale-105 flex items-center justify-center gap-2 animate-wiggle no-underline relative overflow-hidden">
+               <svg class="w-7 h-7 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                 <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.008-.57-.008-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.355-5.032c0-5.437 4.411-9.865 9.869-9.865 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.438-4.415 9.868-9.865 9.868"/>
+               </svg>
+               <span x-text="b.content[lang]"></span>
+            </a>
           </div>
         </template>
-
-        <template x-if="b.type==='faq'"><div class="bg-white rounded-2xl p-4 shadow-sm space-y-2 text-right mt-4"><template x-for="(qa, qIdx) in b.items" :key="'f-'+qIdx"><div class="border-b last:border-0 pb-2" x-data="{open:false}"><button @click="open=!open" class="w-full flex justify-between font-bold text-sm text-gray-800"><span x-text="qa.q[lang]"></span><span x-text="open?'-':'+'"></span></button><p x-show="open" class="text-xs text-gray-500 mt-1 leading-relaxed" x-text="qa.a[lang]"></p></div></template></div></template>
 
         <template x-if="b.type==='form'">
 <div class="bg-white p-6 rounded-[24px] shadow-sm text-right border-2 border-gray-100 mt-4" id="order">
+
+  <!-- عرض اسم المنتج المختار من الكريسول -->
+  <div x-show="selectedOffer" class="bg-indigo-50 border border-indigo-200 text-indigo-800 p-3 rounded-xl mb-4 text-center font-black text-sm transition-all duration-300 transform scale-100">
+    <span x-text="lang==='he'?'ההצעה שנבחרה: ':'العرض المختار: '"></span>
+    <span x-text="selectedOffer" class="text-lg block mt-1 text-green-700"></span>
+  </div>
 
   <div class="flex gap-2 mb-4">
     <div class="flex-1 rounded-full py-2 text-center text-[12px] font-black bg-slate-100 text-slate-600 border border-slate-200"
@@ -441,7 +474,7 @@ function builderApp() {
 <script>
 function app() {
   return {
-    lang: 'ar', loading: false, submitted: false,
+    lang: 'ar', loading: false, submitted: false, selectedOffer: '',
     blocks: ${bStr}, c: ${cStr}, f: {name:'', phone:'', address:'', payment:'Cash', process:'Direct'},
     time: 900, hasStartedTyping: false,
     get timer() { const m=Math.floor(this.time/60); const s=this.time%60; return \`\${m}:\${s<10?'0':''}\${s}\`; },
@@ -469,10 +502,27 @@ function app() {
       this.track('Purchase');
 
       const cfg = this.c;
+      const zapUrl = '${this.config.zapierUrl || "https://hooks.zapier.com/hooks/catch/14790106/ue4uy7j/"}';
+      // ✅ استخدام الاسم من الكريسول إذا وجد
+      const finalProduct = this.selectedOffer ? this.selectedOffer : cfg.productName;
+
+      // ✅ بناء رسالة Zapier (Message Body)
+      const msg = \`أهلاً بك \${this.f.name} في عالم MAD Parfumeur 🖤 يسعدنا تأكيد طلبك المميز! إليك التفاصيل:
+💎 العطر: \${finalProduct} 💰 الدفع: \${this.f.payment} (\${cfg.price}) 📍 العنوان: \${this.f.address} 📦 الإجراء: \${this.f.process}
+سنقوم بتجهيز شحنتك وإرسالها خلال 3-5 أيام عمل. تواصل معنا بكل لاضافة منتجات اوتعديل الطلب 📞 لخدمة الزبائن: *9935 شكراً لاختيارك التميز ✨\`;
+
+      // 1. إرسال البيانات إلى Zapier (WebHook)
+      let zapFd = new FormData();
+      Object.keys(this.f).forEach(k => zapFd.append(k, this.f[k]));
+      zapFd.append('product', finalProduct);
+      zapFd.append('price', cfg.price);
+      zapFd.append('generated_message', msg);
+      fetch(zapUrl, { method: 'POST', body: zapFd, mode: 'no-cors' }).catch(e => console.error('Zapier Error:', e));
+
+      // 2. إرسال البيانات إلى Google Sheet (Backup)
       let fd = new FormData();
       Object.keys(this.f).forEach(k => fd.append(k, this.f[k]));
-
-      fd.append('offer', cfg.productName);
+      fd.append('offer', finalProduct);
       fd.append('price', cfg.price);
       fd.append('lang', this.lang);
 
