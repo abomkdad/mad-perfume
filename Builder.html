@@ -3,12 +3,14 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MAD Builder V66 - User Friendly 🟢</title>
+  <title>MAD Builder V66 - Linked & Fixed 🔗</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest" defer></script>
   <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@200..1000&family=Tajawal:wght@200..900&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Heebo:wght@100..900&display=swap'); /* خط للعبري */
+    
     [x-cloak] { display:none !important; }
     body { font-family:'Cairo', sans-serif; background:#f1f5f9; height:100vh; overflow:hidden; }
     .app-layout { display:flex; height:100vh; flex-direction:row-reverse; }
@@ -65,6 +67,19 @@
       </div>
     </div>
 
+    <!-- Floating WhatsApp Config -->
+    <div class="section-box border-green-100 bg-green-50/30 text-black">
+      <span class="section-title text-green-700 flex justify-between">
+        <span>💬 واتساب عائم (اختياري)</span>
+        <input type="checkbox" x-model="config.floatingWhatsapp.enabled" @change="update()" class="w-4 h-4">
+      </span>
+      <div x-show="config.floatingWhatsapp.enabled" class="space-y-2 mt-2">
+        <input type="text" x-model="config.floatingWhatsapp.phone" placeholder="رقم الهاتف (972...)" @input="update()" class="font-mono text-xs">
+        <div class="text-[9px] text-gray-500">رسالة الزر العائم:</div>
+        <input type="text" x-model="config.floatingWhatsapp.message[editLang]" placeholder="الرسالة" @input="update()">
+      </div>
+    </div>
+
     <div class="section-box border-emerald-100 bg-emerald-50/30 text-black">
       <span class="section-title text-emerald-700">📊 بكسلات التتبع (Pixel & Leads)</span>
       <div class="space-y-2">
@@ -76,7 +91,7 @@
 
     <!-- Content Blocks List -->
     <div class="section-box text-black">
-      <span class="section-title">🧱 المحتوى والتحويل (Sales Funnel)</span>
+      <span class="section-title">🧱 المحتوى والتحويل (Linked Funnel)</span>
       <div class="space-y-4 mb-6">
         <template x-for="(block, index) in blocks" :key="block.id">
           <div class="border-2 p-3 rounded-xl relative transition shadow-sm"
@@ -130,12 +145,12 @@
                    </div>
                 </template>
                 <button @click="if(!block.items) block.items=[]; block.items.push({url:'', name:''}); update()" class="w-full py-2 text-[10px] bg-slate-700 text-white rounded font-bold hover:bg-slate-800 transition">+ إضافة عرض للكريسول</button>
-                <p class="text-[9px] text-slate-500 text-center">💡 سيظهر شريط مصغرات أسفل الصور للتسهيل على الزبون.</p>
+                <p class="text-[9px] text-slate-500 text-center">💡 العرض المختار هنا سيتم إرساله في الواتساب والفورم.</p>
               </div>
             </template>
 
             <template x-if="block.type === 'form'">
-               <p class="text-[10px] text-rose-700 font-bold bg-rose-100 p-2 rounded-lg text-center">نموذج الشراء (Lead Form) ✅</p>
+               <p class="text-[10px] text-rose-700 font-bold bg-rose-100 p-2 rounded-lg text-center">نموذج الشراء (مرتبط بالكريسول) ✅</p>
             </template>
 
             <template x-if="block.type === 'whatsapp'">
@@ -207,7 +222,8 @@ function builderApp() {
       productName: 'عرض خاص', price: '500', adminPhone: '972524033442',
       sheetUrl: 'https://script.google.com/macros/s/AKfycbxzFuJvnf5QWAam798ZfTrAbINGLCeY52WVz56NtyC7lY-VrlbzC0gsp8ZBY2cT3rLU-g/exec',
       zapierUrl: 'https://hooks.zapier.com/hooks/catch/14790106/ue4uy7j/',
-      fbPixel: '1072283127290819', ttPixel: 'D2D02JBC77U4ENLN9SBG', snapPixel: 'b143822e-1c3c-40ff-93f7-edadee74e626'
+      fbPixel: '1072283127290819', ttPixel: 'D2D02JBC77U4ENLN9SBG', snapPixel: 'b143822e-1c3c-40ff-93f7-edadee74e626',
+      floatingWhatsapp: { enabled: false, phone: '', message: { ar: 'مرحبا، لدي استفسار', he: 'היי, יש לי שאלה' } }
     },
     blocks: [],
     init() { 
@@ -277,7 +293,7 @@ function builderApp() {
       const ogImage = waBlock ? waBlock.productImg : (this.blocks.find(b => b.type === 'image')?.url || this.config.logoUrl);
 
       return `<!DOCTYPE html>
-<html x-data="app()" x-init="init(${initArg})" :lang="lang" :dir="lang==='he'?'ltr':'rtl'">
+<html x-data="app()" x-init="init(${initArg})" :lang="lang" dir="rtl">
 <head>
   <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
   
@@ -289,7 +305,7 @@ function builderApp() {
 
   <script src="https://cdn.tailwindcss.com"><\/script>
   <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer><\/script>
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;900&family=Heebo:wght@400;900&display=swap" rel="stylesheet">
   <style>
     body {
       background:
@@ -297,7 +313,7 @@ function builderApp() {
         radial-gradient(700px circle at 10% 40%, rgba(255,255,255,.06), transparent 60%),
         linear-gradient(180deg, rgba(0,0,0,.65), rgba(0,0,0,.15) 45%, rgba(0,0,0,.85)),
         ${this.config.bgColor};
-      font-family: 'Cairo', sans-serif;
+      font-family: 'Cairo', 'Heebo', sans-serif; /* دعم العبري والعربي */
       overflow-x: hidden;
       min-height: 100vh;
       color: #fff;
@@ -321,6 +337,15 @@ function builderApp() {
     .mad-radio-box { border: 2px solid #e5e7eb; border-radius: 12px; padding: 12px; text-align: center; background: white; font-weight: 700; cursor: pointer; transition: 0.2s; color: black; }
     input:checked + .mad-radio-box { border-color: #10b981; background: #f0fdf4; color: #047857; transform: scale(1.02); }
     .recommended::after { content: '★'; position: absolute; top: -8px; right: -8px; background: #10b981; color: white; border-radius: 50%; width: 20px; height: 20px; font-size: 10px; display: flex; align-items: center; justify-content: center; }
+    
+    /* زر واتساب العائم والمصغرة */
+    .float-container { position: fixed; bottom: 20px; left: 20px; z-index: 100; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+    [dir="ltr"] .float-container { left: auto; right: 20px; }
+    
+    .float-wa { background: #25d366; color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 30px; box-shadow: 2px 2px 10px rgba(0,0,0,0.2); animation: pulse 2s infinite; text-decoration: none; }
+    
+    .float-thumb { width: 50px; height: 50px; border-radius: 12px; overflow: hidden; border: 2px solid white; box-shadow: 0 4px 6px rgba(0,0,0,0.3); animation: wiggle 3s infinite; background: white; }
+    .float-thumb img { width: 100%; height: 100%; object-cover: cover; }
   </style>
   <script>
     function formatE164(p) { if(!p) return ''; let d = String(p).replace(/[^0-9]/g, ''); if(d.startsWith('05') && d.length === 10) d = '972' + d.slice(1); if(d.startsWith('00')) d = d.slice(2); return '+' + d; }
@@ -348,8 +373,8 @@ function builderApp() {
         <template x-if="b.type==='carousel'">
           <div class="w-full" 
                x-data="{ curr: 0, total: (b.items || []).length }" 
-               x-init="$watch('curr', val => { if(b.items[val] && b.items[val].name) selectedOffer = b.items[val].name }); 
-                       if(b.items[0]) selectedOffer = b.items[0].name;">
+               x-init="$watch('curr', val => { if(b.items[val]) { selectedOffer = b.items[val].name; selectedImage = b.items[val].url; } }); 
+                       if(b.items[0]) { selectedOffer = b.items[0].name; selectedImage = b.items[0].url; }">
             
             <h3 class="text-center text-white font-black text-lg mb-2" x-text="lang==='he'?'בחר הצעה':'اختر العرض المناسب لك:'"></h3>
 
@@ -382,13 +407,13 @@ function builderApp() {
             <!-- تأكيد الاختيار -->
             <div class="text-center mt-1">
                <span class="inline-block bg-green-600 text-white px-4 py-1 rounded-full text-[10px] font-bold animate-pulse" x-show="selectedOffer">
-                 ✅ تم تحديد العرض
+                 ✅ <span x-text="lang==='he'?'ההצעה נבחרה':'تم تحديد العرض'"></span>
                </span>
             </div>
           </div>
         </template>
 
-        <!-- ✅ واتساب هزاز -->
+        <!-- ✅ واتساب هزاز: مرتبط بالكريسول -->
         <template x-if="b.type==='whatsapp'">
           <div class="my-6">
             <template x-if="b.productImg">
@@ -397,7 +422,7 @@ function builderApp() {
               </div>
             </template>
 
-            <a :href="'https://wa.me/' + (b.url ? b.url.replace(/[^0-9]/g,'').replace(/^05/, '9725') : '') + '?text=' + encodeURIComponent((b.openingMessage[lang] || '') + '\\n' + window.location.href)" 
+            <a :href="'https://wa.me/' + (b.url ? b.url.replace(/[^0-9]/g,'').replace(/^05/, '9725') : '') + '?text=' + encodeURIComponent((b.openingMessage[lang] || '') + (selectedOffer ? ('\\n ' + (lang==='he'?'הצעה: ':'عرض: ') + selectedOffer) : '') + '\\n' + window.location.href)" 
                target="_blank"
                class="block w-full bg-[#25D366] text-white p-4 rounded-xl shadow-lg text-center font-black text-xl transform transition hover:scale-105 flex items-center justify-center gap-2 animate-wiggle no-underline relative overflow-hidden">
                <svg class="w-7 h-7 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -447,7 +472,7 @@ function builderApp() {
     </div>
     <div class="grid grid-cols-2 gap-3 mb-6">
       <label class="cursor-pointer"><input type="radio" x-model="f.process" value="Direct" class="hidden"><div class="mad-radio-box recommended"><span class="text-xs" x-text="lang==='he'?'שלח הזמנה':'ارسل الطلب'"></span><div class="text-[9px] text-blue-600 font-normal" x-text="lang==='he'?'הכי מהיר':'🚀 أسرع'"></div></div></label>
-      <label class="cursor-pointer"><input type="radio" x-model="f.process" value="Contact" class="hidden"><div class="mad-radio-box"><span class="text-xs" x-text="lang==='he'?'צור איתי קשר':'تواصل معي'"></span></div></label>
+      <label class="cursor-pointer"><input type="radio" x-model="f.process" value="Contact" class="hidden"><div class="mad-radio-box"><span class="text-xs" x-text="lang==='he'?'צור קשר':'تواصل معي'"></span></div></label>
     </div>
     <button type="submit" class="btn-main mt-2 w-full" x-text="loading?'...':(lang==='he'?'אישור הזמנה':'تأكيد الطلب')" :disabled="loading"></button>
   </form>
@@ -456,6 +481,19 @@ function builderApp() {
       </div>
     </template>
   </main>
+
+  <!-- زر واتساب عائم (اختياري) + صورة المنتج المصغرة -->
+  <template x-if="c.floatingWhatsapp && c.floatingWhatsapp.enabled">
+    <div class="float-container">
+      <div class="float-thumb" x-show="selectedImage">
+        <img :src="selectedImage">
+      </div>
+      <a :href="'https://wa.me/' + (c.floatingWhatsapp.phone ? c.floatingWhatsapp.phone.replace(/[^0-9]/g,'').replace(/^05/, '9725') : '') + '?text=' + encodeURIComponent((c.floatingWhatsapp.message[lang] || '') + (selectedOffer ? ('\\n ' + (lang==='he'?'הצעה: ':'عرض: ') + selectedOffer) : '') + '\\n' + window.location.href)" 
+         target="_blank" class="float-wa">
+         <svg class="w-8 h-8 fill-current" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.008-.57-.008-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.355-5.032c0-5.437 4.411-9.865 9.869-9.865 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.438-4.415 9.868-9.865 9.868"/></svg>
+      </a>
+    </div>
+  </template>
 
   <div x-show="loading" class="fixed inset-0 z-50 bg-black/90 flex flex-col items-center justify-center text-white" style="display:none">
     <div class="text-5xl mb-4 animate-bounce">🚀</div>
@@ -474,7 +512,7 @@ function builderApp() {
 <script>
 function app() {
   return {
-    lang: 'ar', loading: false, submitted: false, selectedOffer: '',
+    lang: 'ar', loading: false, submitted: false, selectedOffer: '', selectedImage: '',
     blocks: ${bStr}, c: ${cStr}, f: {name:'', phone:'', address:'', payment:'Cash', process:'Direct'},
     time: 900, hasStartedTyping: false,
     get timer() { const m=Math.floor(this.time/60); const s=this.time%60; return \`\${m}:\${s<10?'0':''}\${s}\`; },
