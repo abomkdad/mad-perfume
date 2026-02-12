@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MAD Builder V66 - Linked & Fixed 🔗</title>
+  <title>MAD Builder V66 - Final Fix 🛠️</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest" defer></script>
   <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@200..1000&family=Tajawal:wght@200..900&display=swap');
-    @import url('https://fonts.googleapis.com/css2?family=Heebo:wght@100..900&display=swap'); /* خط للعبري */
+    @import url('https://fonts.googleapis.com/css2?family=Heebo:wght@100..900&display=swap');
     
     [x-cloak] { display:none !important; }
     body { font-family:'Cairo', sans-serif; background:#f1f5f9; height:100vh; overflow:hidden; }
@@ -17,7 +17,6 @@
     .editor-sidebar { width:450px; background:#fff; border-left:1px solid #cbd5e1; overflow-y:auto; padding:20px; flex-shrink:0; box-shadow:-5px 0 15px rgba(0,0,0,0.05); }
     .preview-area { flex:1; background:#cbd5e1; display:flex; flex-direction:column; align-items:center; justify-content:center; position:relative; overflow: hidden; }
     
-    /* iPhone Frame Styling */
     .iphone { width:375px; height:750px; background:#000; border-radius:45px; border:12px solid #1e293b; overflow:hidden; position:relative; box-shadow:0 25px 50px -12px rgba(0,0,0,0.5); background-color:#fff; transition:transform 0.3s; transform-origin: center; }
     .iphone iframe { width:100%; height:100%; border:none; background:#fff; }
     .iphone-notch { position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 150px; height: 30px; background: #1e293b; border-bottom-left-radius: 12px; border-bottom-right-radius: 12px; z-index: 20; }
@@ -41,7 +40,7 @@
 <div class="app-layout" x-data="builderApp()" x-init="init()" x-cloak>
   <aside class="editor-sidebar">
     <div class="flex items-center justify-between mb-6 text-black">
-      <h1 class="text-xl font-black text-slate-800 tracking-tighter">MAD <span class="text-rose-500">LEAD PRO</span></h1>
+      <h1 class="text-xl font-black text-slate-800 tracking-tighter">MAD <span class="text-rose-500">FULL SUITE</span></h1>
       <div class="flex bg-slate-100 p-1 rounded-lg">
         <button @click="editLang='ar'; update()" :class="editLang==='ar'?'bg-white shadow text-black':'text-gray-500'" class="px-3 py-1 rounded text-[10px] font-bold transition">AR</button>
         <button @click="editLang='he'; update()" :class="editLang==='he'?'bg-white shadow text-black':'text-gray-500'" class="px-3 py-1 rounded text-[10px] font-bold transition">HE</button>
@@ -52,7 +51,7 @@
     <div class="section-box border-rose-100 bg-rose-50/30 text-black">
       <span class="section-title text-rose-700">💰 بيانات المنتج والسعر</span>
       <div class="flex gap-2">
-        <input type="text" x-model="config.productName" @input="update()" placeholder="اسم المنتج (الافتراضي)">
+        <input type="text" x-model="config.productName" @input="update()" placeholder="اسم المنتج">
         <input type="number" x-model="config.price" @input="update()" placeholder="السعر" class="w-1/3">
       </div>
     </div>
@@ -75,41 +74,36 @@
       </span>
       <div x-show="config.floatingWhatsapp.enabled" class="space-y-2 mt-2">
         <input type="text" x-model="config.floatingWhatsapp.phone" placeholder="رقم الهاتف (972...)" @input="update()" class="font-mono text-xs">
-        <div class="text-[9px] text-gray-500">رسالة الزر العائم:</div>
-        <input type="text" x-model="config.floatingWhatsapp.message[editLang]" placeholder="الرسالة" @input="update()">
-      </div>
-    </div>
-
-    <div class="section-box border-emerald-100 bg-emerald-50/30 text-black">
-      <span class="section-title text-emerald-700">📊 بكسلات التتبع (Pixel & Leads)</span>
-      <div class="space-y-2">
-        <input type="text" x-model="config.ttPixel" placeholder="TikTok Pixel" @input="update()">
-        <input type="text" x-model="config.fbPixel" placeholder="Facebook Pixel" @input="update()">
-        <input type="text" x-model="config.snapPixel" placeholder="Snapchat Pixel" @input="update()">
+        <input type="text" x-model="config.floatingWhatsapp.message[editLang]" placeholder="الرسالة الافتتاحية" @input="update()">
       </div>
     </div>
 
     <!-- Content Blocks List -->
     <div class="section-box text-black">
-      <span class="section-title">🧱 المحتوى والتحويل (Linked Funnel)</span>
+      <span class="section-title">🧱 المحتوى</span>
       <div class="space-y-4 mb-6">
         <template x-for="(block, index) in blocks" :key="block.id">
           <div class="border-2 p-3 rounded-xl relative transition shadow-sm"
                :class="{
                  'bg-blue-50 border-blue-200': block.type === 'text',
-                 'bg-slate-50 border-slate-200': ['image','video','carousel'].includes(block.type),
+                 'bg-slate-50 border-slate-200': ['image','video','video_carousel'].includes(block.type),
                  'bg-rose-50 border-rose-200': block.type === 'form',
-                 'bg-green-100 border-green-300': block.type === 'whatsapp'
+                 'bg-green-100 border-green-300': block.type === 'whatsapp',
+                 'bg-indigo-50 border-indigo-200': block.type === 'carousel' || block.type === 'catalog',
+                 'bg-yellow-50 border-yellow-200': block.type === 'testimonials'
                }">
             <div class="flex justify-between items-center mb-3">
                <span class="text-[10px] font-black px-2 py-1 rounded uppercase" 
                      :class="{
                        'bg-blue-200 text-blue-800': block.type === 'text',
-                       'bg-slate-200 text-slate-800': ['image','video','carousel'].includes(block.type),
+                       'bg-slate-200 text-slate-800': ['image','video','video_carousel'].includes(block.type),
                        'bg-rose-200 text-rose-800': block.type === 'form',
-                       'bg-green-600 text-white': block.type === 'whatsapp'
+                       'bg-green-600 text-white': block.type === 'whatsapp',
+                       'bg-indigo-200 text-indigo-800': block.type === 'carousel',
+                       'bg-indigo-600 text-white': block.type === 'catalog',
+                       'bg-yellow-200 text-yellow-800': block.type === 'testimonials'
                      }"
-                     x-text="block.type === 'whatsapp' ? 'WHATSAPP' : (block.type === 'carousel' ? 'SMART CAROUSEL' : block.type)"></span>
+                     x-text="block.type === 'video_carousel' ? 'REELS' : (block.type === 'catalog' ? 'CATALOG LINK' : block.type.toUpperCase())"></span>
                <div class="flex gap-2">
                  <button @click="moveBlock(index, -1)" class="text-slate-400 hover:text-blue-500 font-bold">↑</button>
                  <button @click="moveBlock(index, 1)" class="text-slate-400 hover:text-blue-500 font-bold">↓</button>
@@ -131,50 +125,76 @@
                <input type="text" x-model="block.url" @input="update()" placeholder="URL" class="text-[11px] text-black">
             </template>
 
-            <!-- ✅ كريسول ذكي: إدخال الرابط + اسم العرض -->
+            <!-- كريسول العروض الذكي -->
             <template x-if="block.type === 'carousel'">
               <div class="space-y-3">
                 <template x-for="(item, iIdx) in (block.items || [])" :key="'carousel-item-'+iIdx">
                    <div class="bg-white p-2 rounded border border-gray-200">
                      <div class="flex justify-between items-center mb-1">
-                        <span class="text-[9px] font-bold text-slate-500" x-text="'شريحة ' + (iIdx+1)"></span>
-                        <button @click="block.items.splice(iIdx,1); update()" class="text-red-500 font-bold text-[10px]">حذف</button>
+                        <span class="text-[9px] font-bold text-slate-500">شريحة</span>
+                        <button @click="block.items.splice(iIdx,1); update()" class="text-red-500 font-bold text-[10px]">x</button>
                      </div>
                      <input x-model="item.url" @input="update()" class="text-[10px] w-full mb-1 text-black font-mono" placeholder="رابط الصورة">
-                     <input x-model="item.name" @input="update()" class="text-[10px] w-full text-black font-bold border-indigo-200 focus:border-indigo-500" placeholder="اسم العرض (مثال: بكج العيد)">
+                     <input x-model="item.name" @input="update()" class="text-[10px] w-full text-black font-bold" placeholder="اسم العرض">
                    </div>
                 </template>
-                <button @click="if(!block.items) block.items=[]; block.items.push({url:'', name:''}); update()" class="w-full py-2 text-[10px] bg-slate-700 text-white rounded font-bold hover:bg-slate-800 transition">+ إضافة عرض للكريسول</button>
-                <p class="text-[9px] text-slate-500 text-center">💡 العرض المختار هنا سيتم إرساله في الواتساب والفورم.</p>
+                <button @click="if(!block.items) block.items=[]; block.items.push({url:'', name:''}); update()" class="w-full py-2 text-[10px] bg-indigo-600 text-white rounded font-bold">+ عرض جديد</button>
+              </div>
+            </template>
+
+            <!-- كريسول الفيديوهات العامودية -->
+            <template x-if="block.type === 'video_carousel'">
+              <div class="space-y-2">
+                <p class="text-[10px] text-gray-500 mb-1">ضع روابط فيديوهات (يفضل عامودية 9:16)</p>
+                <template x-for="(vid, iIdx) in (block.items || [])" :key="'vid-'+iIdx">
+                   <div class="flex gap-1">
+                     <input x-model="block.items[iIdx]" @input="update()" class="text-[10px] flex-1 text-black" placeholder="رابط الفيديو (mp4)">
+                     <button @click="block.items.splice(iIdx,1); update()" class="text-red-500 font-bold">x</button>
+                   </div>
+                </template>
+                <button @click="if(!block.items) block.items=[]; block.items.push(''); update()" class="w-full py-2 text-[10px] bg-slate-600 text-white rounded font-bold">+ فيديو (Reel)</button>
+              </div>
+            </template>
+
+            <!-- كريسول آراء العملاء (صور) -->
+            <template x-if="block.type === 'testimonials'">
+              <div class="space-y-2">
+                <p class="text-[10px] text-gray-500 mb-1">صور آراء العملاء (سكرين شوت)</p>
+                <template x-for="(img, iIdx) in (block.items || [])" :key="'testi-img-'+iIdx">
+                   <div class="flex gap-1">
+                     <input x-model="block.items[iIdx]" @input="update()" class="text-[10px] flex-1 text-black" placeholder="رابط صورة الرأي">
+                     <button @click="block.items.splice(iIdx,1); update()" class="text-red-500 font-bold">x</button>
+                   </div>
+                </template>
+                <button @click="if(!block.items) block.items=[]; block.items.push(''); update()" class="w-full py-2 text-[10px] bg-yellow-500 text-white rounded font-bold">+ صورة رأي جديدة</button>
               </div>
             </template>
 
             <template x-if="block.type === 'form'">
-               <p class="text-[10px] text-rose-700 font-bold bg-rose-100 p-2 rounded-lg text-center">نموذج الشراء (مرتبط بالكريسول) ✅</p>
+               <p class="text-[10px] text-rose-700 font-bold bg-rose-100 p-2 rounded-lg text-center">نموذج الشراء ✅</p>
+            </template>
+
+            <!-- زر الكتالوج الجديد -->
+            <template x-if="block.type === 'catalog'">
+               <div class="space-y-2">
+                  <div class="flex items-center gap-2">
+                     <span class="text-[10px] font-bold">رابط الكتالوج:</span>
+                     <input type="text" x-model="block.url" @input="update()" placeholder="https://wa.me/c/..." class="text-[11px] font-mono text-black font-bold w-full">
+                  </div>
+                  <input type="text" x-model="block.content[editLang]" @input="update()" placeholder="نص الزر (مثل: تصفح الكتالوج)" class="text-[11px] text-black">
+               </div>
             </template>
 
             <template x-if="block.type === 'whatsapp'">
                <div class="space-y-2">
                   <div class="flex items-center gap-2">
-                     <span class="text-[10px] font-bold">رقم الهاتف:</span>
-                     <input type="text" x-model="block.url" @input="update()" placeholder="مثال: 050xxxxxxx أو 972xxxxxx" class="text-[11px] font-mono text-black font-bold">
+                     <span class="text-[10px] font-bold">الرقم:</span>
+                     <input type="text" x-model="block.url" @input="update()" placeholder="972..." class="text-[11px] font-mono text-black font-bold w-full">
                   </div>
-                  <div class="flex items-center gap-2">
-                    <span class="text-[10px] font-bold">نص الزر:</span>
-                    <input type="text" x-model="block.content[editLang]" @input="update()" placeholder="نص الزر" class="text-[11px] text-black">
-                  </div>
-                  <div class="block">
-                    <span class="text-[10px] font-bold block mb-1">الرسالة الافتتاحية:</span>
-                    <textarea x-model="block.openingMessage[editLang]" @input="update()" placeholder="مثال: مرحبا، أريد الاستفسار عن..." class="text-[11px] text-black h-12"></textarea>
-                  </div>
+                  <input type="text" x-model="block.content[editLang]" @input="update()" placeholder="نص الزر" class="text-[11px] text-black">
                   <div class="block bg-green-200/50 p-2 rounded">
-                    <span class="text-[10px] font-bold block mb-1">صورة المعاينة (Preview Image):</span>
-                    <input type="text" x-model="block.productImg" @input="update()" placeholder="https://... (رابط الصورة)" class="text-[10px] font-mono text-black">
-                    <template x-if="block.productImg">
-                      <div class="mt-2 text-center">
-                        <img :src="block.productImg" class="w-20 h-20 object-cover rounded-lg border-2 border-white shadow-sm mx-auto bg-white">
-                      </div>
-                    </template>
+                    <span class="text-[10px] font-bold block mb-1">صورة المعاينة:</span>
+                    <input type="text" x-model="block.productImg" @input="update()" placeholder="رابط الصورة" class="text-[10px] font-mono text-black">
                   </div>
                </div>
             </template>
@@ -182,19 +202,20 @@
         </template>
       </div>
 
-      <!-- Toolbar - Simplified -->
+      <!-- Toolbar -->
       <div class="btn-grid">
-        <button class="btn-add border-blue-500 text-blue-600" @click="addBlock('text')">📝 عنوان/نص</button>
-        <button class="btn-add border-slate-500 text-slate-600" @click="addBlock('image')">🖼️ صورة</button>
-        <button class="btn-add border-slate-900 text-slate-900 font-black" @click="addBlock('carousel')">📸 كريسولة ذكية</button>
-        <button class="btn-add border-slate-800 text-slate-900" @click="addBlock('video')">🎥 فيديو</button>
-        <button class="btn-add border-green-500 text-white bg-green-500 hover:bg-green-600 font-bold" @click="addBlock('whatsapp')">💬 واتساب (Link)</button>
-        <button class="btn-add border-rose-500 text-white bg-rose-500 hover:bg-rose-600 font-bold col-span-2" @click="addBlock('form')">🚀 نموذج شراء (Pixel)</button>
+        <button class="btn-add border-blue-500 text-blue-600" @click="addBlock('text')">📝 نص</button>
+        <button class="btn-add border-indigo-500 text-indigo-600 font-bold" @click="addBlock('carousel')">📸 عروض ذكية</button>
+        <button class="btn-add border-slate-600 text-slate-700 font-bold" @click="addBlock('video_carousel')">🎥 فيديوهات (Reels)</button>
+        <button class="btn-add border-yellow-500 text-yellow-600 font-bold" @click="addBlock('testimonials')">⭐ آراء (صور)</button>
+        <button class="btn-add border-green-500 text-white bg-green-500 hover:bg-green-600" @click="addBlock('whatsapp')">💬 واتساب</button>
+        <button class="btn-add border-indigo-700 text-white bg-indigo-700 hover:bg-indigo-800 font-bold" @click="addBlock('catalog')">🛍️ كتالوج واتساب</button>
+        <button class="btn-add border-rose-500 text-white bg-rose-500 hover:bg-rose-600 col-span-2" @click="addBlock('form')">🚀 نموذج شراء</button>
       </div>
     </div>
 
-    <button class="btn-action bg-black text-white hover:bg-slate-900 shadow-xl" @click="downloadHTML()">💾 تحميل الصفحة النهائية</button>
-    <button class="btn-action bg-slate-100 text-slate-700" @click="copyCode()">📋 نسخ كود الصفحة</button>
+    <button class="btn-action bg-black text-white hover:bg-slate-900 shadow-xl" @click="downloadHTML()">💾 تحميل الصفحة</button>
+    <button class="btn-action bg-slate-100 text-slate-700" @click="copyCode()">📋 نسخ الكود</button>
   </aside>
 
   <main class="preview-area">
@@ -227,8 +248,10 @@ function builderApp() {
     },
     blocks: [],
     init() { 
-      // ✅ الافتراضي: كريسول + واتساب + نموذج شراء فقط
       this.addBlock('carousel');
+      this.addBlock('catalog');
+      this.addBlock('video_carousel');
+      this.addBlock('testimonials');
       this.addBlock('whatsapp');
       this.addBlock('form'); 
       setTimeout(() => this.update(), 500); 
@@ -254,16 +277,28 @@ function builderApp() {
       
       if (type === 'carousel') {
         b.items = [
-          { url: 'https://www.mad-parfumeur.com/assets/hero/8.webp', name: 'بكج العيد - 3 عطور' },
-          { url: 'https://www.mad-parfumeur.com/assets/hero/2.webp', name: 'عرض التوفير - عطرين' }
+          { url: 'https://www.mad-parfumeur.com/assets/hero/8.webp', name: 'بكج العيد' },
+          { url: 'https://www.mad-parfumeur.com/assets/hero/2.webp', name: 'عرض التوفير' }
         ];
       }
-
+      if (type === 'video_carousel') {
+        b.items = ['https://www.w3schools.com/html/mov_bbb.mp4', 'https://www.w3schools.com/html/movie.mp4'];
+      }
+      if (type === 'testimonials') {
+        b.items = [
+          'https://placehold.co/300x400/png?text=Review+1',
+          'https://placehold.co/300x400/png?text=Review+2'
+        ];
+      }
       if (type === 'whatsapp') {
         b.url = this.config.adminPhone;
         b.content = { ar: 'تواصل معنا عبر واتساب', he: 'דברו איתנו בוואטסאפ' };
         b.openingMessage = { ar: 'مرحبا، أريد الاستفسار عن العرض...', he: 'היי, אשמח לפרטים נוספים...' };
         b.productImg = 'https://www.mad-parfumeur.com/assets/hero/8.webp'; 
+      }
+      if (type === 'catalog') {
+        b.url = 'https://wa.me/c/15558106988';
+        b.content = { ar: 'تصفح الكتالوج الكامل 🛍️', he: 'צפה בקטלוג המלא 🛍️' };
       }
       
       this.blocks.push(b); this.update();
@@ -288,7 +323,6 @@ function builderApp() {
       const cStr = JSON.stringify(this.config).replace(/</g, '\\u003c');
       const initArg = forcedLang ? `'${forcedLang}'` : 'null';
 
-      // ✅ استخراج صورة المعاينة (OG Image)
       const waBlock = this.blocks.find(b => b.type === 'whatsapp' && b.productImg);
       const ogImage = waBlock ? waBlock.productImg : (this.blocks.find(b => b.type === 'image')?.url || this.config.logoUrl);
 
@@ -296,8 +330,6 @@ function builderApp() {
 <html x-data="app()" x-init="init(${initArg})" :lang="lang" dir="rtl">
 <head>
   <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <!-- ✅ إعدادات المعاينة (Preview) -->
   <meta property="og:title" content="${this.config.heroTitle.ar}" />
   <meta property="og:description" content="${this.config.productName}">
   <meta property="og:image" content="${ogImage}" />
@@ -308,28 +340,15 @@ function builderApp() {
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;900&family=Heebo:wght@400;900&display=swap" rel="stylesheet">
   <style>
     body {
-      background:
-        radial-gradient(900px circle at 50% -200px, rgba(255,255,255,.10), transparent 55%),
-        radial-gradient(700px circle at 10% 40%, rgba(255,255,255,.06), transparent 60%),
-        linear-gradient(180deg, rgba(0,0,0,.65), rgba(0,0,0,.15) 45%, rgba(0,0,0,.85)),
-        ${this.config.bgColor};
-      font-family: 'Cairo', 'Heebo', sans-serif; /* دعم العبري والعربي */
-      overflow-x: hidden;
-      min-height: 100vh;
-      color: #fff;
+      background: radial-gradient(900px circle at 50% -200px, rgba(255,255,255,.10), transparent 55%), radial-gradient(700px circle at 10% 40%, rgba(255,255,255,.06), transparent 60%), linear-gradient(180deg, rgba(0,0,0,.65), rgba(0,0,0,.15) 45%, rgba(0,0,0,.85)), ${this.config.bgColor};
+      font-family: 'Cairo', 'Heebo', sans-serif;
+      overflow-x: hidden; min-height: 100vh; color: #fff;
     }
-
     .inp { width: 100%; padding: 15px; background: #f8fafc; border: 1px solid #ddd; border-radius: 12px; margin-bottom: 10px; font-weight: bold; text-align: center; color: black; }
-
-    /* ✅ زر الطلب أخضر */
     .btn-main { background: #10b981; color: #fff; width: 100%; padding: 18px; border-radius: 14px; font-weight: 900; font-size: 1.2rem; animation: pulse 2s infinite; cursor: pointer; border:none; box-shadow: 0 6px 18px rgba(16,185,129,0.35); }
-    .btn-main:hover { filter: brightness(1.05); }
-    .btn-main:active { transform: scale(0.99); }
-
-    /* Whatsapp Animation */
+    .btn-main:hover { filter: brightness(1.05); } .btn-main:active { transform: scale(0.99); }
     @keyframes wiggle { 0%, 100% { transform: rotate(-1deg); } 50% { transform: rotate(1deg) scale(1.02); } }
     .animate-wiggle { animation: wiggle 1s ease-in-out infinite; }
-
     @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.02); } 100% { transform: scale(1); } }
     .progress-container { margin-bottom: 15px; }
     .progress-track { height: 6px; background: rgba(0,0,0,0.1); border-radius: 99px; overflow: hidden; }
@@ -337,25 +356,15 @@ function builderApp() {
     .mad-radio-box { border: 2px solid #e5e7eb; border-radius: 12px; padding: 12px; text-align: center; background: white; font-weight: 700; cursor: pointer; transition: 0.2s; color: black; }
     input:checked + .mad-radio-box { border-color: #10b981; background: #f0fdf4; color: #047857; transform: scale(1.02); }
     .recommended::after { content: '★'; position: absolute; top: -8px; right: -8px; background: #10b981; color: white; border-radius: 50%; width: 20px; height: 20px; font-size: 10px; display: flex; align-items: center; justify-content: center; }
-    
-    /* زر واتساب العائم والمصغرة */
     .float-container { position: fixed; bottom: 20px; left: 20px; z-index: 100; display: flex; flex-direction: column; align-items: center; gap: 8px; }
     [dir="ltr"] .float-container { left: auto; right: 20px; }
-    
     .float-wa { background: #25d366; color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 30px; box-shadow: 2px 2px 10px rgba(0,0,0,0.2); animation: pulse 2s infinite; text-decoration: none; }
-    
     .float-thumb { width: 50px; height: 50px; border-radius: 12px; overflow: hidden; border: 2px solid white; box-shadow: 0 4px 6px rgba(0,0,0,0.3); animation: wiggle 3s infinite; background: white; }
     .float-thumb img { width: 100%; height: 100%; object-cover: cover; }
   </style>
   <script>
     function formatE164(p) { if(!p) return ''; let d = String(p).replace(/[^0-9]/g, ''); if(d.startsWith('05') && d.length === 10) d = '972' + d.slice(1); if(d.startsWith('00')) d = d.slice(2); return '+' + d; }
-
-    function loadPixels(cfg) {
-      if(window._px_f) return; window._px_f = true;
-      if(cfg.fbPixel) { !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)n=f.fbq;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js'); fbq('init', cfg.fbPixel); fbq('track', 'PageView'); }
-      if(cfg.ttPixel) { !function(w,d,t){w.TiktokAnalyticsObject=t;var ttq=w[t]=w[t]||[];ttq.methods=["page","track","identify","instances","debug","on","off","once","ready","alias","group","enableCookie","disableCookie","holdConsent","revokeConsent","grantConsent"];ttq.setAndDefer=function(t,e){t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}};for(var i=0;i<ttq.methods.length;i++)ttq.setAndDefer(ttq,ttq.methods[i]);ttq.load=function(e,n){var r="https://analytics.tiktok.com/i18n/pixel/events.js";ttq._i=ttq._i||{};ttq._i[e]=[];ttq._i[e]._u=r;ttq._t=ttq._t||{};ttq._t[e]=+new Date;ttq._o=ttq._o||{};ttq._o[e]=n||{};var o=document.createElement("script");o.type="text/javascript";o.async=!0;o.src=r+"?sdkid="+e+"&lib="+t;var a=document.getElementsByTagName("script")[0];a.parentNode.insertBefore(o,a)};ttq.load(cfg.ttPixel);ttq.page();}(window,document,'ttq'); }
-      if(cfg.snapPixel) { (function(e,t,n){if(e.snaptr)return;var a=e.snaptr=function(){a.handleRequest?a.handleRequest.apply(a,arguments):a.queue.push(arguments)};a.queue=[];var s='script';var r=t.createElement(s);r.async=!0;r.src=n;var u=t.getElementsByTagName(s)[0];u.parentNode.insertBefore(r,u)})(window,document,'https://sc-static.net/scevent.min.js'); snaptr('init', cfg.snapPixel); snaptr('track', 'PAGE_VIEW'); }
-    }
+    function loadPixels(cfg) { if(window._px_f) return; window._px_f = true; if(cfg.fbPixel) { !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)n=f.fbq;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js'); fbq('init', cfg.fbPixel); fbq('track', 'PageView'); } if(cfg.ttPixel) { !function(w,d,t){w.TiktokAnalyticsObject=t;var ttq=w[t]=w[t]||[];ttq.methods=["page","track","identify","instances","debug","on","off","once","ready","alias","group","enableCookie","disableCookie","holdConsent","revokeConsent","grantConsent"];ttq.setAndDefer=function(t,e){t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}};for(var i=0;i<ttq.methods.length;i++)ttq.setAndDefer(ttq,ttq.methods[i]);ttq.load=function(e,n){var r="https://analytics.tiktok.com/i18n/pixel/events.js";ttq._i=ttq._i||{};ttq._i[e]=[];ttq._i[e]._u=r;ttq._t=ttq._t||{};ttq._t[e]=+new Date;ttq._o=ttq._o||{};ttq._o[e]=n||{};var o=document.createElement("script");o.type="text/javascript";o.async=!0;o.src=r+"?sdkid="+e+"&lib="+t;var a=document.getElementsByTagName("script")[0];a.parentNode.insertBefore(o,a)};ttq.load(cfg.ttPixel);ttq.page();}(window,document,'ttq'); } if(cfg.snapPixel) { (function(e,t,n){if(e.snaptr)return;var a=e.snaptr=function(){a.handleRequest?a.handleRequest.apply(a,arguments):a.queue.push(arguments)};a.queue=[];var s='script';var r=t.createElement(s);r.async=!0;r.src=n;var u=t.getElementsByTagName(s)[0];u.parentNode.insertBefore(r,u)})(window,document,'https://sc-static.net/scevent.min.js'); snaptr('init', cfg.snapPixel); snaptr('track', 'PAGE_VIEW'); } }
   <\/script>
 </head>
 <body class="pb-20">
@@ -369,7 +378,35 @@ function builderApp() {
         <template x-if="b.type==='image'"><img :src="b.url" class="rounded-2xl mx-auto shadow-lg w-full"></template>
         <template x-if="b.type==='video'"><video :src="b.url" controls class="w-full rounded-2xl shadow-lg"></video></template>
         
-        <!-- ✅ كريسول ذكي: مع مصغرات (Thumbnails) واضحة -->
+        <!-- ✅ كريسول فيديوهات عامودية (Reels) -->
+        <template x-if="b.type==='video_carousel'">
+          <div class="w-full" x-data="{ curr: 0, total: (b.items || []).length }">
+            <h3 class="text-center text-white font-bold mb-3 text-lg" x-text="lang==='he'?'לקוחות ממליצים':'آراء العملاء (فيديو)'"></h3>
+            <div class="flex overflow-x-auto gap-3 p-2 snap-x hide-scrollbar pb-6">
+               <template x-for="(vid, i) in b.items" :key="'vid-c-'+i">
+                 <div class="min-w-[260px] w-[260px] snap-center rounded-2xl overflow-hidden shadow-2xl border-2 border-white/20 relative aspect-[9/16] bg-black">
+                   <video :src="vid" controls class="w-full h-full object-cover"></video>
+                 </div>
+               </template>
+            </div>
+          </div>
+        </template>
+
+        <!-- ✅ كريسول آراء العملاء (صور) -->
+        <template x-if="b.type==='testimonials'">
+          <div class="w-full">
+            <h3 class="text-center text-white font-black text-lg mb-4" x-text="lang==='he'?'מה הלקוחות אומרים?':'ماذا يقول عملاؤنا؟'"></h3>
+            <div class="flex overflow-x-auto gap-3 p-2 snap-x hide-scrollbar pb-6">
+               <template x-for="(img, i) in b.items" :key="'testi-img-'+i">
+                 <div class="min-w-[200px] w-[200px] snap-center rounded-xl overflow-hidden shadow-lg border border-white/20 relative">
+                   <img :src="img" class="w-full h-auto object-cover">
+                 </div>
+               </template>
+            </div>
+          </div>
+        </template>
+
+        <!-- ✅ كريسول العروض الذكي -->
         <template x-if="b.type==='carousel'">
           <div class="w-full" 
                x-data="{ curr: 0, total: (b.items || []).length }" 
@@ -378,7 +415,7 @@ function builderApp() {
             
             <h3 class="text-center text-white font-black text-lg mb-2" x-text="lang==='he'?'בחר הצעה':'اختر العرض المناسب لك:'"></h3>
 
-            <div class="relative overflow-hidden rounded-2xl shadow-2xl mb-4">
+            <div class="relative overflow-hidden rounded-2xl shadow-2xl mb-4 bg-black">
                <template x-for="(item, i) in (b.items || [])" :key="'ci-'+i">
                  <div class="w-full relative transition-opacity duration-300" x-show="curr===i" x-transition:enter="opacity-0" x-transition:enter-end="opacity-100">
                    <img :src="item.url" class="w-full object-cover">
@@ -387,13 +424,10 @@ function builderApp() {
                    </div>
                  </div>
                </template>
-               
-               <!-- أسهم كبيرة وواضحة -->
                <button @click="curr = (curr - 1 + total) % total" class="absolute left-2 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/40 text-white p-3 rounded-full backdrop-blur-md transition shadow-lg">❮</button>
                <button @click="curr = (curr + 1) % total" class="absolute right-2 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/40 text-white p-3 rounded-full backdrop-blur-md transition shadow-lg">❯</button>
             </div>
 
-            <!-- شريط المصغرات (Thumbnails) للاختيار السريع -->
             <div class="flex gap-2 justify-center overflow-x-auto pb-2 px-1">
                <template x-for="(item, i) in b.items" :key="'thumb-'+i">
                  <div class="w-16 h-16 rounded-lg overflow-hidden cursor-pointer border-2 transition-all transform hover:scale-105 shrink-0"
@@ -404,7 +438,6 @@ function builderApp() {
                </template>
             </div>
 
-            <!-- تأكيد الاختيار -->
             <div class="text-center mt-1">
                <span class="inline-block bg-green-600 text-white px-4 py-1 rounded-full text-[10px] font-bold animate-pulse" x-show="selectedOffer">
                  ✅ <span x-text="lang==='he'?'ההצעה נבחרה':'تم تحديد العرض'"></span>
@@ -413,7 +446,18 @@ function builderApp() {
           </div>
         </template>
 
-        <!-- ✅ واتساب هزاز: مرتبط بالكريسول -->
+        <!-- ✅ زر الكتالوج -->
+        <template x-if="b.type==='catalog'">
+          <div class="my-6">
+            <a :href="b.url" target="_blank"
+               class="block w-full bg-indigo-600 text-white p-4 rounded-xl shadow-lg text-center font-black text-xl transform transition hover:scale-105 flex items-center justify-center gap-2 no-underline">
+               <span class="text-2xl">🛍️</span>
+               <span x-text="b.content[lang]"></span>
+            </a>
+          </div>
+        </template>
+
+        <!-- ✅ واتساب هزاز -->
         <template x-if="b.type==='whatsapp'">
           <div class="my-6">
             <template x-if="b.productImg">
@@ -421,13 +465,10 @@ function builderApp() {
                 <img :src="b.productImg" class="w-full h-auto object-cover block">
               </div>
             </template>
-
             <a :href="'https://wa.me/' + (b.url ? b.url.replace(/[^0-9]/g,'').replace(/^05/, '9725') : '') + '?text=' + encodeURIComponent((b.openingMessage[lang] || '') + (selectedOffer ? ('\\n ' + (lang==='he'?'הצעה: ':'عرض: ') + selectedOffer) : '') + '\\n' + window.location.href)" 
                target="_blank"
                class="block w-full bg-[#25D366] text-white p-4 rounded-xl shadow-lg text-center font-black text-xl transform transition hover:scale-105 flex items-center justify-center gap-2 animate-wiggle no-underline relative overflow-hidden">
-               <svg class="w-7 h-7 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                 <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.008-.57-.008-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.355-5.032c0-5.437 4.411-9.865 9.869-9.865 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.438-4.415 9.868-9.865 9.868"/>
-               </svg>
+               <svg class="w-7 h-7 fill-current" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.008-.57-.008-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.355-5.032c0-5.437 4.411-9.865 9.869-9.865 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.438-4.415 9.868-9.865 9.868"/></svg>
                <span x-text="b.content[lang]"></span>
             </a>
           </div>
@@ -435,24 +476,15 @@ function builderApp() {
 
         <template x-if="b.type==='form'">
 <div class="bg-white p-6 rounded-[24px] shadow-sm text-right border-2 border-gray-100 mt-4" id="order">
-
-  <!-- عرض اسم المنتج المختار من الكريسول -->
   <div x-show="selectedOffer" class="bg-indigo-50 border border-indigo-200 text-indigo-800 p-3 rounded-xl mb-4 text-center font-black text-sm transition-all duration-300 transform scale-100">
     <span x-text="lang==='he'?'ההצעה שנבחרה: ':'العرض المختار: '"></span>
     <span x-text="selectedOffer" class="text-lg block mt-1 text-green-700"></span>
   </div>
-
   <div class="flex gap-2 mb-4">
-    <div class="flex-1 rounded-full py-2 text-center text-[12px] font-black bg-slate-100 text-slate-600 border border-slate-200"
-         x-text="lang==='he' ? 'אחריות החלפה' : 'ضمان استبدال'"></div>
-
-    <div class="flex-1 rounded-full py-2 text-center text-[12px] font-black bg-amber-100 text-amber-700 border border-amber-200"
-         x-text="lang==='he' ? 'משלוח מהיר' : 'توصيل سريع'"></div>
-
-    <div class="flex-1 rounded-full py-2 text-center text-[12px] font-black bg-emerald-100 text-emerald-700 border border-emerald-200"
-         x-text="lang==='he' ? 'תשלום במשלוח' : 'دفع عند الاستلام'"></div>
+    <div class="flex-1 rounded-full py-2 text-center text-[12px] font-black bg-slate-100 text-slate-600 border border-slate-200" x-text="lang==='he' ? 'אחריות החלפה' : 'ضمان استبدال'"></div>
+    <div class="flex-1 rounded-full py-2 text-center text-[12px] font-black bg-amber-100 text-amber-700 border border-amber-200" x-text="lang==='he' ? 'משלוח מהיר' : 'توصيل سريع'"></div>
+    <div class="flex-1 rounded-full py-2 text-center text-[12px] font-black bg-emerald-100 text-emerald-700 border border-emerald-200" x-text="lang==='he' ? 'תשלום במשלוח' : 'دفع عند الاستلام'"></div>
   </div>
-
   <div class="progress-container">
     <div class="progress-text flex justify-between text-[10px] font-bold mb-1 text-gray-400">
       <span x-text="lang==='he'?'פרטי משלוח':'معلومات الشحن'"></span>
@@ -460,7 +492,6 @@ function builderApp() {
     </div>
     <div class="progress-track"><div class="progress-fill"></div></div>
   </div>
-
   <h2 class="text-xl font-black text-center mb-4 text-gray-800" x-text="lang==='he'?'הזמינו עכשיו':'اطلب الآن'"></h2>
   <form @submit.prevent="submitForm">
     <input type="text" x-model="f.name" @input="trackInput()" class="inp" :placeholder="lang==='he'?'שם מלא':'الاسم الكامل'" required>
@@ -482,14 +513,10 @@ function builderApp() {
     </template>
   </main>
 
-  <!-- زر واتساب عائم (اختياري) + صورة المنتج المصغرة -->
   <template x-if="c.floatingWhatsapp && c.floatingWhatsapp.enabled">
     <div class="float-container">
-      <div class="float-thumb" x-show="selectedImage">
-        <img :src="selectedImage">
-      </div>
-      <a :href="'https://wa.me/' + (c.floatingWhatsapp.phone ? c.floatingWhatsapp.phone.replace(/[^0-9]/g,'').replace(/^05/, '9725') : '') + '?text=' + encodeURIComponent((c.floatingWhatsapp.message[lang] || '') + (selectedOffer ? ('\\n ' + (lang==='he'?'הצעה: ':'عرض: ') + selectedOffer) : '') + '\\n' + window.location.href)" 
-         target="_blank" class="float-wa">
+      <div class="float-thumb" x-show="selectedImage"><img :src="selectedImage"></div>
+      <a :href="'https://wa.me/' + (c.floatingWhatsapp.phone ? c.floatingWhatsapp.phone.replace(/[^0-9]/g,'').replace(/^05/, '9725') : '') + '?text=' + encodeURIComponent((c.floatingWhatsapp.message[lang] || '') + (selectedOffer ? ('\\n ' + (lang==='he'?'הצעה: ':'عرض: ') + selectedOffer) : '') + '\\n' + window.location.href)" target="_blank" class="float-wa">
          <svg class="w-8 h-8 fill-current" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.008-.57-.008-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.355-5.032c0-5.437 4.411-9.865 9.869-9.865 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.438-4.415 9.868-9.865 9.868"/></svg>
       </a>
     </div>
@@ -515,17 +542,13 @@ function app() {
     lang: 'ar', loading: false, submitted: false, selectedOffer: '', selectedImage: '',
     blocks: ${bStr}, c: ${cStr}, f: {name:'', phone:'', address:'', payment:'Cash', process:'Direct'},
     time: 900, hasStartedTyping: false,
-    get timer() { const m=Math.floor(this.time/60); const s=this.time%60; return \`\${m}:\${s<10?'0':''}\${s}\`; },
-
-    // ✅ النهائي: تلقائي حسب لغة المستخدم + يدعم ?lang=he أو ?lang=ar
+    
     init(forcedLang) {
       const qs = new URLSearchParams(window.location.search);
       const urlLang = qs.get('lang');
       const autoLang = navigator.language.startsWith('he') ? 'he' : 'ar';
       this.lang = forcedLang || ((urlLang==='he'||urlLang==='ar') ? urlLang : autoLang);
-
       loadPixels(this.c);
-      setInterval(()=>{if(this.time>0) this.time--}, 1000);
     },
 
     trackInput() { if(!this.hasStartedTyping && this.f.name.length>2){ this.hasStartedTyping=true; this.track('AddToCart'); } },
@@ -538,18 +561,13 @@ function app() {
     async submitForm() {
       this.loading = true; 
       this.track('Purchase');
-
       const cfg = this.c;
       const zapUrl = '${this.config.zapierUrl || "https://hooks.zapier.com/hooks/catch/14790106/ue4uy7j/"}';
-      // ✅ استخدام الاسم من الكريسول إذا وجد
       const finalProduct = this.selectedOffer ? this.selectedOffer : cfg.productName;
-
-      // ✅ بناء رسالة Zapier (Message Body)
       const msg = \`أهلاً بك \${this.f.name} في عالم MAD Parfumeur 🖤 يسعدنا تأكيد طلبك المميز! إليك التفاصيل:
 💎 العطر: \${finalProduct} 💰 الدفع: \${this.f.payment} (\${cfg.price}) 📍 العنوان: \${this.f.address} 📦 الإجراء: \${this.f.process}
 سنقوم بتجهيز شحنتك وإرسالها خلال 3-5 أيام عمل. تواصل معنا بكل لاضافة منتجات اوتعديل الطلب 📞 لخدمة الزبائن: *9935 شكراً لاختيارك التميز ✨\`;
 
-      // 1. إرسال البيانات إلى Zapier (WebHook)
       let zapFd = new FormData();
       Object.keys(this.f).forEach(k => zapFd.append(k, this.f[k]));
       zapFd.append('product', finalProduct);
@@ -557,7 +575,6 @@ function app() {
       zapFd.append('generated_message', msg);
       fetch(zapUrl, { method: 'POST', body: zapFd, mode: 'no-cors' }).catch(e => console.error('Zapier Error:', e));
 
-      // 2. إرسال البيانات إلى Google Sheet (Backup)
       let fd = new FormData();
       Object.keys(this.f).forEach(k => fd.append(k, this.f[k]));
       fd.append('offer', finalProduct);
@@ -567,11 +584,7 @@ function app() {
       try {
         await fetch(cfg.sheetUrl, { method: 'POST', body: fd, mode: 'no-cors' });
         this.submitted = true;
-      } catch (e) {
-        alert('Error');
-      } finally {
-        this.loading = false;
-      }
+      } catch (e) { alert('Error'); } finally { this.loading = false; }
     }
   }
 }
