@@ -2,23 +2,21 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>MAD Manager v5.0</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+  <title>MAD Manager - Active Link</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <style>
     :root { --bg: #0a0f1e; --card: #161b2c; --primary: #3b82f6; --text: #f8fafc; --border: rgba(255,255,255,0.08); }
     body { margin: 0; font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); direction: rtl; }
-    .header { background: #111827; padding: 15px; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+    .header { background: #111827; padding: 15px; position: sticky; top:0; z-index:100; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
     .container { padding: 15px; max-width: 600px; margin: 0 auto; }
-    .order-card { background: var(--card); border-radius: 20px; padding: 20px; margin-bottom: 20px; border: 1px solid var(--border); box-shadow: 0 10px 20px rgba(0,0,0,0.2); }
-    .status-badge { font-size: 11px; padding: 4px 10px; border-radius: 10px; background: rgba(59,130,246,0.1); color: var(--primary); font-weight: bold; }
-    .btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
-    .btn { padding: 12px; border-radius: 12px; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; font-weight: bold; font-size: 13px; transition: 0.3s; }
-    .btn-delivery { background: #2563eb; color: white; width: 100%; margin-top: 10px; }
-    .btn-whatsapp { background: #10b981; color: white; }
-    .btn-refresh { background: #374151; color: white; }
+    .order-card { background: var(--card); border-radius: 18px; padding: 18px; margin-bottom: 18px; border: 1px solid var(--border); }
+    .btn { padding: 12px; border-radius: 10px; border: none; cursor: pointer; font-weight: bold; font-size: 13px; display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.2s; }
+    .btn-delivery { background: #2563eb; color: white; width: 100%; margin: 10px 0; }
+    .btn-wa { background: #10b981; color: white; flex: 1; }
+    .btn-refresh { background: #374151; color: white; padding: 8px 15px; }
     #loader { position: fixed; inset: 0; background: rgba(0,0,0,0.8); display: none; align-items: center; justify-content: center; z-index: 1000; }
-    .spinner { width: 40px; height: 40px; border: 4px solid #3b82f6; border-top-color: transparent; border-radius: 50%; animation: spin 1s infinite; }
+    .spinner { width: 35px; height: 35px; border: 3px solid #3b82f6; border-top-color: transparent; border-radius: 50%; animation: spin 1s infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
   </style>
 </head>
@@ -27,70 +25,70 @@
 <div id="loader"><div class="spinner"></div></div>
 
 <div class="header">
-  <strong>لوحة إدارة MAD 5.0</strong>
-  <button class="btn btn-refresh" onclick="fetchOrders()"><i class="fa fa-sync"></i> تحديث</button>
+  <strong>إدارة مـاد PARFUMEUR</strong>
+  <button class="btn btn-refresh" onclick="loadOrders()"><i class="fa fa-sync"></i></button>
 </div>
 
-<div class="container" id="ordersContainer"></div>
+<div class="container" id="ordersList"></div>
 
 <script>
-  const SCRIPT_URL = "ضع_رابط_السكربت_هنا";
+  // الرابط الخاص بك الذي أرفقته
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzNY935U4FCmVDCRvoc7yySWbxfKxClIqU_tjP9uweQuZMmwm5fvbtR46akDsuAZKG9Tw/exec";
 
-  async function fetchOrders() {
+  async function loadOrders() {
     document.getElementById('loader').style.display = 'flex';
     try {
-      const response = await fetch(`${SCRIPT_URL}?action=get&_=${Date.now()}`);
-      const data = await response.json();
-      renderOrders(data);
-    } catch (e) { alert("خطأ في جلب البيانات"); }
+      const res = await fetch(`${SCRIPT_URL}?action=get&_=${Date.now()}`);
+      const data = await res.json();
+      render(data);
+    } catch (e) { console.error(e); }
     document.getElementById('loader').style.display = 'none';
   }
 
-  function renderOrders(orders) {
-    const container = document.getElementById('ordersContainer');
-    container.innerHTML = orders.filter(o => o.rowIndex).reverse().map(o => `
+  function render(data) {
+    const list = document.getElementById('ordersList');
+    list.innerHTML = data.filter(o => o.rowIndex).reverse().map(o => `
       <div class="order-card">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-          <small style="color:var(--muted)">#${o.orderId}</small>
-          <span class="status-badge">${o.status || 'جديد'}</span>
+        <div style="display:flex; justify-content:space-between; font-size:12px; color:#94a3b8;">
+          <span>ID: ${o.orderId}</span>
+          <span style="color:#60a5fa; font-weight:bold;">${o.status || 'جديد'}</span>
         </div>
-        <h2 style="margin:10px 0 5px 0; font-size:18px;">${o.name}</h2>
-        <div style="color:#94a3b8; font-size:14px;">📍 ${o.city} | ₪${o.price}</div>
-        <div style="margin-top:10px; font-size:13px; border-top:1px solid var(--border); padding-top:10px;">
-          <strong>الأصناف:</strong> ${o.offer}
-        </div>
+        <h3 style="margin:12px 0 5px 0;">${o.name}</h3>
+        <p style="font-size:14px; margin:0; color:#cbd5e1;">📍 ${o.city} | ₪${o.price}</p>
         
-        <button class="btn btn-delivery" onclick="sendToDelivery(${o.rowIndex})">
+        <button class="btn btn-delivery" onclick="sendToHighExpress(${o.rowIndex})">
           <i class="fa fa-paper-plane"></i> إرسال لشركة التوصيل
         </button>
         
-        <div class="btn-group">
-          <button class="btn btn-whatsapp" onclick="window.open('https://wa.me/${o.phone}')">
+        <div style="display:flex; gap:10px;">
+          <button class="btn btn-wa" onclick="window.open('https://wa.me/${o.phone}')">
             <i class="fa-brands fa-whatsapp"></i> واتساب العميل
           </button>
-          <button class="btn btn-refresh" onclick="alert('ملاحظات: ${o.notes}')">
-            <i class="fa fa-info-circle"></i> ملاحظات
+          <button class="btn" style="background:#4b5563; flex:1" onclick="alert('الأصناف: ${o.offer}')">
+            <i class="fa fa-list"></i> تفاصيل
           </button>
         </div>
       </div>
     `).join('');
   }
 
-  async function sendToDelivery(row) {
-    if(!confirm("سيتم إرسال تفاصيل الطلب لشركة التوصيل عبر API، هل أنت متأكد؟")) return;
+  async function sendToHighExpress(row) {
+    if(!confirm("هل أنت متأكد من إرسال هذا الطلب لشركة التوصيل؟")) return;
     document.getElementById('loader').style.display = 'flex';
-    const res = await fetch(`${SCRIPT_URL}?action=sendToDelivery&row=${row}`);
-    const result = await res.json();
-    if(result.result === "SUCCESS") {
-      alert("🚀 تم الإرسال لشركة التوصيل بنجاح");
-      fetchOrders();
-    } else {
-      alert("❌ خطأ: " + result.message);
-    }
+    try {
+      const res = await fetch(`${SCRIPT_URL}?action=sendToDelivery&row=${row}`);
+      const result = await res.json();
+      if(result.result === "SUCCESS") {
+        alert("✅ تم الإرسال بنجاح");
+        loadOrders();
+      } else {
+        alert("❌ فشل الإرسال: " + result.message);
+      }
+    } catch(e) { alert("خطأ في الاتصال"); }
     document.getElementById('loader').style.display = 'none';
   }
 
-  window.onload = fetchOrders;
+  window.onload = loadOrders;
 </script>
 </body>
 </html>
