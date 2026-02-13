@@ -1,275 +1,336 @@
-<!DOCTYPE html>
-<html x-data="app()" x-init="init(null)" :lang="lang" :dir="lang==='he'?'ltr':'rtl'">
-<head>
-  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+import React, { useState, useEffect } from 'react';
+import { Globe, ShoppingCart, Sparkles, Instagram, Facebook, MessageCircle, ShoppingBag, Star, CheckCircle, ThumbsUp, ChevronDown, User, Send } from 'lucide-react';
+
+const App = () => {
+  const [lang, setLang] = useState('ar');
+  const [displayedReviews, setDisplayedReviews] = useState([]);
+  const [userReviews, setUserReviews] = useState([]); 
+  const [showForm, setShowForm] = useState(false);
   
-  <!-- ✅ إعدادات المعاينة (Preview) عند مشاركة الرابط -->
-  <meta property="og:title" content="أقوى العروض الحصرية" />
-  <meta property="og:description" content="big-sale">
-  <meta property="og:image" content="https://www.mad-parfumeur.com/assets/hero/8.webp" />
-  <meta property="og:type" content="website" />
+  const [newRating, setNewRating] = useState(5);
+  const [newTitle, setNewTitle] = useState('');
+  const [newComment, setNewComment] = useState('');
 
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;900&display=swap" rel="stylesheet">
-  <style>
-    body {
-      background:
-        radial-gradient(900px circle at 50% -200px, rgba(255,255,255,.10), transparent 55%),
-        radial-gradient(700px circle at 10% 40%, rgba(255,255,255,.06), transparent 60%),
-        linear-gradient(180deg, rgba(0,0,0,.65), rgba(0,0,0,.15) 45%, rgba(0,0,0,.85)),
-        #0e0302;
-      font-family: 'Cairo', sans-serif;
-      overflow-x: hidden;
-      min-height: 100vh;
-      color: #fff;
+  // إعداد أكواد البيكسل (Pixel) المستخرجة من الصورة
+  const PIXELS = {
+    facebook: "1072283127290819",
+    tiktok: "D2D02JBC77U4ENLN9SBG",
+    snapchat: "b143822e-1c3c-40ff-93f7-edadee74e626"
+  };
+
+  useEffect(() => {
+    // --- إعداد Facebook Pixel ---
+    if (!window.fbq) {
+      (function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+      n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
+      n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
+      t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
+      document,'script','https://connect.facebook.net/en_US/fbevents.js'));
     }
+    window.fbq('init', PIXELS.facebook);
+    window.fbq('track', 'PageView');
+    window.fbq('track', 'ViewContent');
 
-    .inp { width: 100%; padding: 15px; background: #f8fafc; border: 1px solid #ddd; border-radius: 12px; margin-bottom: 10px; font-weight: bold; text-align: center; color: black; }
-
-    /* ✅ زر الطلب أخضر */
-    .btn-main { background: #10b981; color: #fff; width: 100%; padding: 18px; border-radius: 14px; font-weight: 900; font-size: 1.2rem; animation: pulse 2s infinite; cursor: pointer; border:none; box-shadow: 0 6px 18px rgba(16,185,129,0.35); }
-    .btn-main:hover { filter: brightness(1.05); }
-    .btn-main:active { transform: scale(0.99); }
-
-    /* Whatsapp Animation */
-    @keyframes wiggle { 0%, 100% { transform: rotate(-1deg); } 50% { transform: rotate(1deg) scale(1.02); } }
-    .animate-wiggle { animation: wiggle 1s ease-in-out infinite; }
-
-    @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.02); } 100% { transform: scale(1); } }
-    .progress-container { margin-bottom: 15px; }
-    .progress-track { height: 6px; background: rgba(0,0,0,0.1); border-radius: 99px; overflow: hidden; }
-    .progress-fill { height: 100%; background: #10b981; width: 85%; }
-    .mad-radio-box { border: 2px solid #e5e7eb; border-radius: 12px; padding: 12px; text-align: center; background: white; font-weight: 700; cursor: pointer; transition: 0.2s; color: black; }
-    input:checked + .mad-radio-box { border-color: #10b981; background: #f0fdf4; color: #047857; transform: scale(1.02); }
-    .recommended::after { content: '★'; position: absolute; top: -8px; right: -8px; background: #10b981; color: white; border-radius: 50%; width: 20px; height: 20px; font-size: 10px; display: flex; align-items: center; justify-content: center; }
-  </style>
-  <script>
-    function formatE164(p) { if(!p) return ''; let d = String(p).replace(/[^0-9]/g, ''); if(d.startsWith('05') && d.length === 10) d = '972' + d.slice(1); if(d.startsWith('00')) d = d.slice(2); return '+' + d; }
-
-    function loadPixels(cfg) {
-      if(window._px_f) return; window._px_f = true;
-      if(cfg.fbPixel) { !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)n=f.fbq;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js'); fbq('init', cfg.fbPixel); fbq('track', 'PageView'); }
-      if(cfg.ttPixel) { !function(w,d,t){w.TiktokAnalyticsObject=t;var ttq=w[t]=w[t]||[];ttq.methods=["page","track","identify","instances","debug","on","off","once","ready","alias","group","enableCookie","disableCookie","holdConsent","revokeConsent","grantConsent"];ttq.setAndDefer=function(t,e){t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}};for(var i=0;i<ttq.methods.length;i++)ttq.setAndDefer(ttq,ttq.methods[i]);ttq.load=function(e,n){var r="https://analytics.tiktok.com/i18n/pixel/events.js";ttq._i=ttq._i||{};ttq._i[e]=[];ttq._i[e]._u=r;ttq._t=ttq._t||{};ttq._t[e]=+new Date;ttq._o=ttq._o||{};ttq._o[e]=n||{};var o=document.createElement("script");o.type="text/javascript";o.async=!0;o.src=r+"?sdkid="+e+"&lib="+t;var a=document.getElementsByTagName("script")[0];a.parentNode.insertBefore(o,a)};ttq.load(cfg.ttPixel);ttq.page();}(window,document,'ttq'); }
-      if(cfg.snapPixel) { (function(e,t,n){if(e.snaptr)return;var a=e.snaptr=function(){a.handleRequest?a.handleRequest.apply(a,arguments):a.queue.push(arguments)};a.queue=[];var s='script';var r=t.createElement(s);r.async=!0;r.src=n;var u=t.getElementsByTagName(s)[0];u.parentNode.insertBefore(r,u)})(window,document,'https://sc-static.net/scevent.min.js'); snaptr('init', cfg.snapPixel); snaptr('track', 'PAGE_VIEW'); }
+    // --- إعداد TikTok Pixel (نسخة مستقرة ومصلحة) ---
+    if (!window.ttq) {
+      var ttq = window.ttq = window.ttq || [];
+      ttq.methods = ["page", "track", "identify", "instances", "debug", "on", "off", "once", "ready", "alias", "group", "aliasWithContext", "setAndLog", "set", "get", "getAndLog", "setContext", "getContext", "getPlugin", "setPlugin", "deletePlugin", "setInstance", "getInstance", "setEventSettings", "getEventSettings", "setGlobalSettings", "getGlobalSettings", "setAndGetGlobalSettings", "getAndSetGlobalSettings", "setAndGetEventSettings", "getAndSetEventSettings", "setAndGetInstances", "getAndSetInstances", "setAndGetInstancesWithContext", "getAndSetInstancesWithContext", "setAndGetEventSettingsWithContext", "getAndSetEventSettingsWithContext", "setAndGetGlobalSettingsWithContext", "getAndSetGlobalSettingsWithContext", "setAndGetGlobalSettingsWithContext", "getAndSetGlobalSettingsWithContext", "setAndGetGlobalSettingsWithContext", "getAndSetGlobalSettingsWithContext", "setAndGetGlobalSettingsWithContext", "getAndSetGlobalSettingsWithContext", "setAndGetGlobalSettingsWithContext", "getAndSetGlobalSettingsWithContext"];
+      ttq.setAndLog = function (t, e) { ttq.set(t, e); ttq.log(t, e) };
+      ttq.set = function (t, e) { ttq[t] = e };
+      ttq.get = function (t) { return ttq[t] };
+      ttq.instances = [];
+      ttq.load = function (e, t) {
+        var r = "https://analytics.tiktok.com/i18n/pixel/events.js";
+        ttq._i = ttq._i || {}, ttq._i[e] = [], ttq._i[e]._u = r, ttq._t = ttq._t || {}, ttq._t[e] = +new Date, ttq._o = ttq._o || {}, ttq._o[e] = t || {};
+        ttq._v = ttq._v || "1.0.11";
+        var i = document.createElement("script"); i.type = "text/javascript", i.async = !0, i.src = r + "?sdkid=" + e + "&lib=ttq";
+        var a = document.getElementsByTagName("script")[0]; a.parentNode.insertBefore(i, a)
+      };
+      // إضافة الوظائف الوهمية (Stubs) لضمان عدم حدوث خطأ "is not a function"
+      ttq.methods.forEach(function(m) {
+        ttq[m] = (function(method) {
+          return function() {
+            ttq.push([method].concat(Array.prototype.slice.call(arguments, 0)));
+          };
+        })(m);
+      });
+      ttq.load(PIXELS.tiktok);
     }
-  </script>
-</head>
-<body class="pb-20">
-  <nav class="p-4 flex justify-center bg-white/15 backdrop-blur sticky top-0 z-50 border-b border-white/10"><img src="https://www.mad-parfumeur.com/assets/hero/logo.png" class="h-10 object-contain"></nav>
-  <header class="text-center py-8 px-4 text-white"><h1 class="text-3xl font-black" x-text="c.heroTitle[lang]"></h1></header>
+    window.ttq.page();
+    window.ttq.track('ViewContent');
 
-  <main class="max-w-md mx-auto">
-    <template x-for="(b, idx) in (blocks || [])" :key="b.id">
-      <div class="my-6 px-4" :class="b.type==='carousel'?'!px-0':'px-4'">
-        <template x-if="b.type==='text'"><p class="whitespace-pre-wrap leading-relaxed font-black text-center" :style="{ color: b.style.color || '#fff', fontSize: '1.25rem' }" x-text="b.content[lang]"></p></template>
-        <template x-if="b.type==='image'"><img :src="b.url" class="rounded-2xl mx-auto shadow-lg w-full"></template>
-        <template x-if="b.type==='video'"><video :src="b.url" controls class="w-full rounded-2xl shadow-lg"></video></template>
-        
-        <template x-if="b.type==='carousel'">
-          <div class="relative w-full overflow-hidden" x-data="{ curr: 0, total: b.images.length }" x-init="if(total>1) setInterval(()=>{curr=(curr+1)%total}, 4000)">
-            <div class="flex transition-transform duration-700 ease-in-out" :style="'transform: translateX(' + (lang === 'he' ? (curr * -100) : (curr * 100)) + '%)'">
-               <template x-for="(img, i) in b.images" :key="'ci-'+i"><div class="min-w-full w-full"><img :src="img" class="w-full object-cover shadow-xl"></div></template>
-            </div>
-            <div class="absolute bottom-4 left-0 right-0 flex justify-center gap-2" x-show="total > 1">
-               <template x-for="(img, i) in b.images" :key="'ind-'+i"><div class="w-2 h-2 rounded-full transition-all duration-300" :class="curr === i ? 'bg-white w-6' : 'bg-white/40'"></div></template>
+    // --- إعداد Snapchat Pixel ---
+    if (!window.snaptr) {
+      (function(e,t,n,a,r,i,s){if(!e[i]){e[i]=e[r]=function(){e[r].handleRequest?e[r].handleRequest.apply(e[r],arguments):e[r].queue.push(arguments)};e[r].queue=[];i=t.createElement(n);i.async=!0;i.src=a;s=t.getElementsByTagName(n)[0];s.parentNode.insertBefore(i,s)}})(window,document,"script","https://sc-static.net/scevent.min.js","snaptr","snaptr");
+    }
+    window.snaptr('init', PIXELS.snapchat);
+    window.snaptr('track', 'PAGE_VIEW');
+    window.snaptr('track', 'VIEW_CONTENT');
+
+  }, []);
+
+  const content = {
+    title: { ar: "ماد بارفيومير", he: "מד פרפומר" },
+    amazonBadge: { ar: "الأكثر مبيعاً", he: "הנמכר ביותר" },
+    limitedDeal: { ar: "عرض لفترة محدودة", he: "דיל לזמן מוגבל" },
+    customerReviews: { ar: "مراجعات العملاء", he: "ביקורות לקוחות" },
+    globalRating: { ar: "تقييم عالمي", he: "דירוג גלובلي" },
+    verified: { ar: "مشتري مؤكد", he: "רכישה מאומתת" },
+    helpful: { ar: "مفيد", he: "מועיל" },
+    report: { ar: "إبلاغ", he: "דווח" },
+    cta: { ar: "مشاهدة العرض وتفاصيل المنتج", he: "צפה במבצע ופרטי המוצר" },
+    writeReview: { ar: "كتابة مراجعة", he: "כתוב ביקורת" },
+    submitReview: { ar: "نشر المراجعة", he: "פרסם ביקורת" },
+    reviewPlaceholder: { ar: "ما هو رأيك في المنتج؟", he: "מה דעתך על המוצר?" },
+    titlePlaceholder: { ar: "عنوان المراجعة", he: "כותרת הביקורת" },
+    footer: { ar: "جميع الحقوق محفوظة © 2024 - MAD Parfumeur", he: "כל הזכויות שמורות © 2024 - מד פרפומר" }
+  };
+
+  const links = [
+    { key: "offer1", img: "https://www.mad-parfumeur.com/assets/hero/1.webp", title: { ar: "العرض الأول: باقة النخبة", he: "מבצע 1: מארז עילית" }, subtitle: { ar: "تتضمن 3 عطور نيش فاخرة مع علبة خشبية", he: "כולל 3 בשמי נישה יוקרתיים עם מארז עץ" }, rating: 4.9, reviewsCount: "1,240", url: "https://www.mad-parfumeur.com/landing/sale1.html" },
+    { key: "offer2", img: "https://www.mad-parfumeur.com/assets/hero/2.webp", title: { ar: "العرض الثاني: الثنائي الساحر", he: "מבצע 2: הצמד הקסום" }, subtitle: { ar: "عطر رجالي وعطر نسائي بتركيز عالٍ", he: "בושם לגבר ובושם לאישה בריכוז גבוה" }, rating: 4.8, reviewsCount: "850", url: "https://www.mad-parfumeur.com/landing/sale2.html" },
+    { key: "offer3", img: "https://www.mad-parfumeur.com/assets/hero/3.webp", title: { ar: "العرض الثالث: مجموعة الصيف", he: "מבצע 3: קולקציית קיץ" }, subtitle: { ar: "روائح منعشة تدوم لأكثر من 24 ساعة", he: "ריחות רעננים שמחזיקים מעל 24 שעות" }, rating: 5.0, reviewsCount: "2,100", url: "https://www.mad-parfumeur.com/landing/sale3.html" },
+    { key: "offer4", img: "https://www.mad-parfumeur.com/assets/hero/4.webp", title: { ar: "العرض الرابع: زيوت ماد النقية", he: "מבצע 4: שמני מד טהורים" }, subtitle: { ar: "مجموعة من 5 زيوت عطرية مركزة", he: "ערכה של 5 שמני בושם מרוכזים" }, rating: 4.7, reviewsCount: "430", url: "https://www.mad-parfumeur.com/landing/sale4.html" },
+    { key: "offer5", img: "https://www.mad-parfumeur.com/assets/hero/5.webp", title: { ar: "العرض الخامس: الإصدار المحدود", he: "מבצע 5: מהדורה מוגבלת" }, subtitle: { ar: "عطر ليلي بلمسات العود والزعفران", he: "בושם לילה עם נגיעות עוד וזעפרן" }, rating: 4.9, reviewsCount: "1,560", url: "https://www.mad-parfumeur.com/landing/sale5.html" },
+    { key: "offer6", img: "https://www.mad-parfumeur.com/assets/hero/6.webp", title: { ar: "العرض السادس: كلاسيكيات ماد", he: "מבצע 6: קלאסיקות מד" }, subtitle: { ar: "أفضل 3 عطور مبيعاً في تاريخنا", he: "3 הבשמים הנמכרים ביותר בהיסטוריה שלנו" }, rating: 4.8, reviewsCount: "920", url: "https://www.mad-parfumeur.com/landing/sale6.html" },
+    { key: "offer7", img: "https://www.mad-parfumeur.com/assets/hero/7.webp", title: { ar: "العرض السابع: مجموعة السبا", he: "מבצע 7: ערכת ספא" }, subtitle: { ar: "عطور زيتية وشموع فواحة للمنزل", he: "שמני בושם ונרות ריחניים לבית" }, rating: 4.6, reviewsCount: "310", url: "https://www.mad-parfumeur.com/landing/sale7.html" },
+    { key: "offer8", img: "https://www.mad-parfumeur.com/assets/hero/8.webp", title: { ar: "العرض الثامن: ثقة الرجال", he: "מבצע 8: ביטחון גברי" }, subtitle: { ar: "عطور خشبية قوية وجذابة", he: "בשמים עציים חזקים ומושכים" }, rating: 4.9, reviewsCount: "740", url: "https://www.mad-parfumeur.com/landing/sale8.html" },
+    { key: "offer9", img: "https://www.mad-parfumeur.com/assets/hero/9.webp", title: { ar: "العرض التاسع: لمسة الأنوثة", he: "מבצע 9: נגיעה נשית" }, subtitle: { ar: "باقة من الزهور والفواكه المنعشة", he: "מארז פרחים ופירות רעננים" }, rating: 5.0, reviewsCount: "1,050", url: "https://www.mad-parfumeur.com/landing/sale9.html" },
+    { key: "offer10", img: "https://www.mad-parfumeur.com/assets/hero/10.webp", title: { ar: "العرض العاشر: بكج المسك", he: "מבצע 10: מארז מושק" }, subtitle: { ar: "أفخر أنواع المسك الأبيض والملكي", he: "מיטב סוגי המושק הלבן והמלכותי" }, rating: 4.9, reviewsCount: "1,800", url: "https://www.mad-parfumeur.com/landing/sale10.html" }
+  ];
+
+  // قائمة 20 تعليقاً واقعياً جداً
+  const poolOfReviews = [
+    { name: {ar: "أحمد منصور", he: "אחמד מנסור"}, title: {ar: "العطر نار اخوي", he: "בושם פצצה אחי"}, text: { ar: "العطر نار اخوي، الثبات ولا غلطة والكل سألني شو حاطط.", he: "הבושם פצצה אחי, העמידות מעולה וכולם שאלו אותי מה שמתי." }, rating: 5, date: "قبل ساعة", likes: 84 },
+    { name: {ar: "إياد وتد", he: "איאד ותד"}, title: {ar: "احسن شركة عطور", he: "חברת הבשמים הכי טובה"}, text: { ar: "احسن شركة عطور اقسم بالله، جربت W183 وفعلاً بجنن وبنصح الكل فيه.", he: "חברת הבשמים הכי טובה נשבע לכם, ניסיתי את W183 וזה באמת מדהים." }, rating: 5, date: "قبل ساعتين", likes: 32 },
+    { name: {ar: "שרה ل.", he: "שרה ל."}, title: {ar: "تسلم عمي محمد", he: "תודה דוד מוחמד"}, text: { ar: "تسلم عمي محمد احلا شركه، دايماً بتعامل معكم والخدمة توب التوب.", he: "תודה דוד מוחמד החברה הכי טובה, תמיד קונה מכם והשירות הכי טוב שיש." }, rating: 5, date: "اليوم", likes: 19 },
+    { name: {ar: "ميخائيل م.", he: "מיכאל מ."}, title: {ar: "فرع يافا", he: "סניף יפו"}, text: { ar: "اليوم اشتريت من فرع يافا العطور نار خاصه W183، بنصحكم تروحوا لهناك.", he: "היום קניתי מסניף יפו הבשמים אש במיוחד W183, ממליץ לכם ללכת לשם." }, rating: 5, date: "قبل 3 ساعات", likes: 47 },
+    { name: {ar: "فادي جبارين", he: "פאדי ג'בארין"}, title: {ar: "ثبات خرافي", he: "עמידות מטורפת"}, text: { ar: "ريحة العطر بتضل يومين عواعيي حتى بعد الغسيل! روعة.", he: "ריח הבושם נשאר יומיים על הבגדים גם אחרי כביסה! מדהים." }, rating: 5, date: "أمس", likes: 12 },
+    { name: {ar: "נועה ברק", he: "נועה ברק"}, title: {ar: "מומלץ בחום", he: "מומלץ בחום"}, text: { ar: "בשמים ברמה הכי גבוהה בארץ. השירות VIP.", he: "בשמים ברמה הכי גבוהה בארץ. השירות VIP." }, rating: 5, date: "أمس", likes: 25 },
+    { name: {ar: "يوسف حاج", he: "יוסף חאג'"}, title: {ar: "بكج النخبة", he: "מארז העילית"}, text: { ar: "البكج وصلني مغلف بطريقة بتبيض الوجه كهدية. المسك عندكم فنان.", he: "המארז הגיע ארוזה בצורה יפה מאוד כמתנה. המושק אצלכם אליפות." }, rating: 5, date: "قبل يومين", likes: 63 },
+    { name: {ar: "دانا ס.", he: "דנה ס."}, title: {ar: "W183 إدمان", he: "W183 ממכר"}, text: { ar: "صارلي شهر بستخدم W183 وما بقدر أغيره، ريحة فخامة.", he: "כבר חודש אני משתמשת ב-W183 ולא יכולה להחליף אותו, ריח יוקרתי." }, rating: 5, date: "قبل يومين", likes: 41 },
+    { name: {ar: "رنا سلامة", he: "רנא סלאמה"}, title: {ar: "أفضل تجربة", he: "החוויה הכי טובה"}, text: { ar: "تعامل محترم وتوصيل سريع للناصرة، شكراً ماد بارفيوم.", he: "יחס מכבד ומשלוח מהיר לנצרת, תודה מד פרפומר." }, rating: 5, date: "قبل 3 أيام", likes: 55 },
+    { name: {ar: "يوحاي ل.", he: "יוחאי ל."}, title: {ar: "ريحة فخمة", he: "ריח יוקרתי"}, text: { ar: "عطور بمستوى عالي جداً والريحة بتجنن.", he: "בשמים ברמה גבוהה מאוד והריח מדהים." }, rating: 5, date: "قبل 4 أيام", likes: 18 },
+    { name: {ar: "منى وتد", he: "מונא ותד"}, title: {ar: "W183 نار", he: "W183 אש"}, text: { ar: "اليوم وصلني W183 وفعلاً نار، يسلموا إيديكم.", he: "היום הגיע לי W183 ובאמת אש, תודה רבה." }, rating: 5, date: "قبل ساعة", likes: 15 },
+    { name: {ar: "إياد بشارة", he: "איאד בשארה"}, title: {ar: "مصداقية وأمانة", he: "אמינות ויושרה"}, text: { ar: "دايماً بطلب منكم، عطور أصلية وبوصل الطلب بسرعة.", he: "תמיד מזמין מכם, בשמים מקוריים וההזמנה מגיעה מהר." }, rating: 5, date: "قبل أسبوع", likes: 37 },
+    { name: {ar: "خالد وتد", he: "ח'אלד ותד"}, title: {ar: "سعر مناسب جداً", he: "מחיר הוגן מאוד"}, text: { ar: "عطور بتنافس الماركات العالمية بسعر رخيص.", he: "בשמים שמתחרים במותגים בינלאומיים במחיר זול." }, rating: 4, date: "8 فبراير 2024", likes: 8 },
+    { name: {ar: "ياسر م.", he: "יאסר מ."}, title: {ar: "توصيل سريع", he: "משלוח מהיר"}, text: { ar: "الطلب وصلني خلال يوم واحد للبيت.", he: "ההזמנה הגיעה תוך יום אחד עד הבית." }, rating: 5, date: "قبل أسبوعين", likes: 10 },
+    { name: {ar: "ليان حبيب", he: "ליאן חביב"}, title: {ar: "ريحة فواحة", he: "ריח דומיננטי"}, text: { ar: "ريحة النظافة بكل العطور، تجربة ممتازة.", he: "ריח של ניקיון בכל הבשמים, חוויה מצוינת." }, rating: 5, date: "أمس", likes: 36 },
+    { name: {ar: "سامر خوري", he: "סאמר ח'ורי"}, title: {ar: "أحلى هدية", he: "המתנה הכי יפה"}, text: { ar: "أخذت بكج المسك لمرتي وكثير انبسطت عليه.", he: "לקחתי מארז מושק לאשתי והיא מאוד שמחה." }, rating: 5, date: "قبل أسبوع", likes: 21 },
+    { name: {ar: "جمانة أسدي", he: "ג'ומאנה אסדי"}, title: {ar: "أفضل شركة بالبلاد", he: "החברה הכי טובה בארץ"}, text: { ar: "كل عطر أحلى من الثاني، المسك الملكي خيال.", he: "כל בושם יותר יפה מהשני, המושק המלכותי דמיוני." }, rating: 5, date: "قبل شهر", likes: 48 },
+    { name: {ar: "איתן סלע", he: "איתן סלע"}, title: {ar: "תמורה למחיר", he: "תמורה למחיר"}, text: { ar: "محירים فجز وبشמים ברמה של מותגים كببر.", he: "מחירים פגז ובשמים ברמה של מותגים גדולים." }, rating: 5, date: "قبل شهرين", likes: 71 },
+    { name: {ar: "فرح س.", he: "פרח ס."}, title: {ar: "عطور فخمة", he: "בשמים יוקרתיים"}, text: { ar: "روائح كلاسيكية راقية جداً.", he: "ריחות קלאסיים ויוקרתיים מאוד." }, rating: 5, date: "قبل يومين", likes: 5 },
+    { name: {ar: "أحمد جبارين", he: "אחמד ג'בארין"}, title: {ar: "تغليف رهيب", he: "אריזה מדהימה"}, text: { ar: "وصلتني الطلبية مغلفة بطريقة كتير مرتبة وفخمة.", he: "ההזמנה הגיעה ארוזה בצורה מאוד מסודרת ויוקרתית." }, rating: 5, date: "أمس", likes: 14 }
+  ];
+
+  useEffect(() => {
+    const updateReviews = () => {
+      const now = new Date();
+      const hourIndex = now.getHours() % (poolOfReviews.length > 5 ? poolOfReviews.length - 5 : 1);
+      setDisplayedReviews(poolOfReviews.slice(hourIndex, hourIndex + 6));
+    };
+    updateReviews();
+    const interval = setInterval(updateReviews, 3600000); 
+    return () => clearInterval(interval);
+  }, []);
+
+  const handleAddReview = (e) => {
+    e.preventDefault();
+    if (!newComment || !newTitle) return;
+
+    const reviewName = lang === 'ar' ? "أنت (مراجعة خاصة)" : "אתה (ביקורת פרטית)";
+    const review = {
+      name: { ar: reviewName, he: reviewName }, // حفظ ككائن لتجنب خطأ Object rendering
+      title: { ar: newTitle, he: newTitle },
+      text: { ar: newComment, he: newComment },
+      rating: newRating,
+      date: lang === 'ar' ? "الآن" : "עכשיו",
+      likes: 0,
+      isUserGenerated: true
+    };
+
+    setUserReviews([review, ...userReviews]);
+    setNewComment('');
+    setNewTitle('');
+    setShowForm(false);
+  };
+
+  const renderStars = (rating, size = 18, interactive = false) => (
+    <div className="flex text-[#FFA41C]">
+      {[...Array(5)].map((_, i) => (
+        <Star 
+          key={i} 
+          size={size} 
+          fill={i < Math.floor(rating) ? "currentColor" : "none"} 
+          strokeWidth={1.5} 
+          className={interactive ? "cursor-pointer" : ""}
+          onClick={() => interactive && setNewRating(i + 1)}
+        />
+      ))}
+    </div>
+  );
+
+  const toggleLanguage = () => setLang(lang === 'ar' ? 'he' : 'ar');
+
+  return (
+    <div className="min-h-screen bg-[#EAEDED] text-[#0F1111] font-sans selection:bg-[#FEBD69]" dir="rtl">
+      {/* Amazon Header */}
+      <header className="bg-[#131921] text-white p-3 sticky top-0 z-50 shadow-md">
+        <div className="max-w-6xl mx-auto flex items-center justify-between gap-4">
+          <div className="flex items-center gap-2">
+            <div className="text-2xl font-bold flex items-center">
+              MAD<span className="text-[#FF9900]">.</span>
             </div>
           </div>
-        </template>
-
-<!-- ✅ قسم فراغرانتيكا (كامل) -->
-<template x-if="b.type==='fragrantica'">
-  <a :href="b.url" target="_blank"
-     class="block w-full max-w-[320px] bg-[#3f5a31] text-white p-5 rounded-[24px] shadow-xl relative overflow-hidden mx-auto no-underline text-right mt-4">
-
-    <div class="flex justify-between items-center mb-3">
-      <span class="text-[10px] font-black uppercase tracking-widest text-white/60"
-            x-text="lang==='he' ? 'ביקורות' : 'REVIEWS'"></span>
-
-      <div class="flex text-amber-400 gap-0.5">
-        <template x-for="i in 5">
-          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
-          </svg>
-        </template>
-      </div>
-    </div>
-
-    <div class="flex items-end gap-2">
-      <span class="text-4xl font-black" x-text="b.score || '4.9 / 5'"></span>
-      <span class="text-xs opacity-60 mb-1" x-text="lang==='he' ? 'דירוג' : 'Rating'"></span>
-    </div>
-
-    <p class="text-[11px] font-black text-white/90 mt-1"
-       x-text="lang==='he' ? 'דירוג לקוחות שניסו לפניך' : 'تقييم عملاء جرّبوا العطر قبلَك'"></p>
-
-    <p class="text-[10px] font-bold mt-2 text-white/80"
-       x-text="b.content && b.content[lang] ? b.content[lang] : (lang==='he' ? 'מבוסס על ביקורות לקוחות אמיתיות' : 'مبني على تقييمات عملاء حقيقيين')"></p>
-  </a>
-</template>
-
-<!-- ✅ تقييم تفاعلي + عنوان فوق النجوم (مثل الصورة) -->
-<template x-if="b.type==='interactive_rating'">
-  <div class="bg-white border-2 border-amber-100 rounded-2xl p-5 shadow-sm text-center mt-4" x-data="{ r: 0 }">
-    <div class="flex items-center justify-center gap-2 mb-3">
-      <span class="text-amber-500 text-xl">★</span>
-      <h3 class="text-[18px] font-black text-slate-900" x-text="b.content && b.content[lang] ? b.content[lang] : (lang==='he' ? 'ניסית את הבושם? דרג אותנו' : 'جرّبت العطر؟ قيّمنا')"></h3>
-    </div>
-
-    <div class="flex justify-center gap-2 mb-2" x-show="r===0">
-      <template x-for="i in 5">
-        <button @click="r=i" class="text-3xl text-gray-200 hover:text-amber-400 transition">★</button>
-      </template>
-    </div>
-
-    <div x-show="r>0" class="text-emerald-600 font-bold mt-2">
-      <p class="text-sm" x-text="lang==='he' ? 'תודה רבה על הדירוג!' : 'شكراً لتقييمك! ⭐'"></p>
-    </div>
-  </div>
-</template>
-
-        <template x-if="b.type==='comparison'">
-          <div class="mt-4">
-            <div class="grid grid-cols-2 gap-1 mb-2 px-1 text-right">
-              <div class="text-center font-black text-white text-[10px] uppercase bg-black/20 py-1 rounded-t-lg">MAD</div>
-              <div class="text-center font-black text-white/70 text-[10px] uppercase bg-black/10 py-1 rounded-t-lg" x-text="lang==='he'?'אחרים':'الآخرين'"></div>
-            </div>
-            <div class="space-y-2 text-right"><template x-for="(row, rIdx) in b.items" :key="'c-'+rIdx"><div class="grid grid-cols-2 gap-1 rounded-xl overflow-hidden shadow-sm"><div class="bg-amber-50 p-4 border-r border-amber-100 text-center font-bold text-[11px] text-black" x-text="row.mad[lang]"></div><div class="bg-white p-4 text-center text-gray-400 text-[11px]" x-text="row.other[lang]"></div></div></template></div>
-          </div>
-        </template>
-
-        <template x-if="b.type==='faq'"><div class="bg-white rounded-2xl p-4 shadow-sm space-y-2 text-right mt-4"><template x-for="(qa, qIdx) in b.items" :key="'f-'+qIdx"><div class="border-b last:border-0 pb-2" x-data="{open:false}"><button @click="open=!open" class="w-full flex justify-between font-bold text-sm text-gray-800"><span x-text="qa.q[lang]"></span><span x-text="open?'-':'+'"></span></button><p x-show="open" class="text-xs text-gray-500 mt-1 leading-relaxed" x-text="qa.a[lang]"></p></div></template></div></template>
-
-        <!-- ✅ واتساب هزاز: صورة منتج جذابة فوق الزر + رابط الصفحة في الرسالة -->
-        <template x-if="b.type==='whatsapp'">
-          <div class="my-6">
-            <!-- 1. عرض صورة المنتج في الصفحة لتعزيز الجاذبية -->
-            <template x-if="b.productImg">
-              <div class="mb-3 rounded-2xl overflow-hidden shadow-lg border-2 border-white/20">
-                <img :src="b.productImg" class="w-full h-auto object-cover block">
+          <div className="flex-1 max-w-xl hidden md:block">
+            <div className="relative">
+              <input type="text" className="w-full py-2 px-4 rounded-lg text-black focus:outline-[#FF9900]" placeholder={lang === 'ar' ? 'البحث في العروض...' : 'חיפוש במבצעים...'} />
+              <div className="absolute left-0 top-0 h-full bg-[#FEBD69] px-4 rounded-l-lg flex items-center cursor-pointer hover:bg-[#F3A847]">
+                <Globe size={18} className="text-black" />
               </div>
-            </template>
-
-            <!-- 2. زر الواتساب يرسل رابط الصفحة الحالية -->
-            <a :href="'https://wa.me/' + (b.url ? b.url.replace(/[^0-9]/g,'') : '') + '?text=' + encodeURIComponent((b.openingMessage[lang] || '') + '\n' + window.location.href)" 
-               target="_blank"
-               class="block w-full bg-[#25D366] text-white p-4 rounded-xl shadow-lg text-center font-black text-xl transform transition hover:scale-105 flex items-center justify-center gap-2 animate-wiggle no-underline relative overflow-hidden">
-               
-               <svg class="w-7 h-7 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                 <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.008-.57-.008-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.355-5.032c0-5.437 4.411-9.865 9.869-9.865 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.438-4.415 9.868-9.865 9.868"/>
-               </svg>
-               
-               <span x-text="b.content[lang]"></span>
-            </a>
+            </div>
           </div>
-        </template>
+          <button onClick={toggleLanguage} className="flex items-center gap-1 border border-transparent hover:border-white p-1 transition-all rounded">
+            <Globe size={18} /> <span className="text-sm font-bold">{lang === 'ar' ? 'עברית' : 'عربي'}</span>
+          </button>
+        </div>
+      </header>
 
-        <template x-if="b.type==='form'">
-<div class="bg-white p-6 rounded-[24px] shadow-sm text-right border-2 border-gray-100 mt-4" id="order">
+      <main className="max-w-6xl mx-auto py-6 px-4">
+        {/* Offers Grid */}
+        <div className="grid grid-cols-1 gap-6 mb-12">
+          {links.map((offer) => (
+            <div key={offer.key} className="bg-white border border-gray-200 p-4 rounded-sm flex flex-col md:flex-row gap-6 hover:shadow-md transition-shadow">
+              <div className="w-full md:w-1/3 aspect-square relative">
+                <img src={offer.img} alt={offer.title[lang]} className="w-full h-full object-contain" />
+                <div className="absolute top-2 right-2 bg-[#CC0C39] text-white text-[10px] font-bold px-2 py-1 rounded-sm">
+                  {content.limitedDeal[lang]}
+                </div>
+              </div>
+              <div className="flex-1 flex flex-col justify-start items-start text-right">
+                <div className="bg-[#E47911] text-white text-[10px] font-bold px-2 py-0.5 rounded-sm mb-2">
+                  {content.amazonBadge[lang]}
+                </div>
+                <h3 className="text-xl font-medium mb-1 hover:text-[#C7511F] cursor-pointer">
+                  {offer.title[lang]}
+                </h3>
+                <div className="flex items-center gap-2 mb-3">
+                  {renderStars(offer.rating, 16)}
+                  <span className="text-[#007185] text-sm hover:text-[#C7511F] cursor-pointer">{offer.reviewsCount}</span>
+                </div>
+                <p className="text-gray-600 text-sm mb-6">{offer.subtitle[lang]}</p>
+                
+                <div className="mt-auto w-full">
+                  <p className="text-xs text-green-700 font-bold mb-3">{lang === 'ar' ? 'متوفر حالياً - عروض حصرية أونلاين' : 'זמין כעת - מבצעים בלעדיים אונליין'}</p>
+                  <a href={offer.url} target="_blank" rel="noopener noreferrer" className="w-full md:w-64 bg-[#FFD814] hover:bg-[#F7CA00] border border-[#FCD200] py-2 rounded-full text-center text-sm font-bold shadow-sm active:scale-95 transition-all flex items-center justify-center gap-2">
+                    <ShoppingBag size={16} />
+                    {content.cta[lang]}
+                  </a>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
 
-  <div class="flex gap-2 mb-4">
-    <div class="flex-1 rounded-full py-2 text-center text-[12px] font-black bg-slate-100 text-slate-600 border border-slate-200"
-         x-text="lang==='he' ? 'אחריות החלפה' : 'ضمان استبدال'"></div>
+        {/* Amazon Review Section */}
+        <div className="bg-white border border-gray-200 p-6 md:p-10 rounded-sm">
+          <div className="flex flex-col lg:flex-row gap-12">
+            <div className="w-full lg:w-1/3 text-right">
+              <h2 className="text-2xl font-bold mb-4">{content.customerReviews[lang]}</h2>
+              <div className="flex items-center gap-2 mb-2">
+                {renderStars(4.9, 22)}
+                <span className="text-lg font-bold">4.9 {lang === 'ar' ? 'من 5' : 'מתוך 5'}</span>
+              </div>
+              <p className="text-sm text-gray-500 mb-6">{content.globalRating[lang]}</p>
 
-    <div class="flex-1 rounded-full py-2 text-center text-[12px] font-black bg-amber-100 text-amber-700 border border-amber-200"
-         x-text="lang==='he' ? 'משלוח מהיר' : 'توصيل سريع'"></div>
+              {[5, 4, 3, 2, 1].map((star) => (
+                <div key={star} className="flex items-center gap-3 mb-2 text-sm text-[#007185] hover:text-[#C7511F] cursor-pointer group">
+                  <span className="w-12">{star} {lang === 'ar' ? 'نجوم' : 'כוכבים'}</span>
+                  <div className="flex-1 h-5 bg-[#F0F2F2] rounded-sm overflow-hidden border border-gray-200">
+                    <div className="h-full bg-[#FFA41C] border-r border-[#DE7921]" style={{ width: star === 5 ? '88%' : star === 4 ? '10%' : '2%' }}></div>
+                  </div>
+                  <span className="w-8 text-left">{star === 5 ? '88%' : star === 4 ? '10%' : '1%'}</span>
+                </div>
+              ))}
+              
+              <div className="mt-10 pt-6 border-t border-gray-200">
+                <h4 className="font-bold mb-2">{lang === 'ar' ? 'مراجعة هذا المنتج' : 'בקר מוצר זה'}</h4>
+                <p className="text-sm mb-4">{lang === 'ar' ? 'شارك أفكارك مع العملاء الآخرين' : 'שתף את המחשבות שלך עם לקוחות אחרים'}</p>
+                {!showForm ? (
+                   <button onClick={() => setShowForm(true)} className="w-full border border-gray-300 rounded-lg py-2 text-sm font-medium hover:bg-gray-50 shadow-sm transition-all">{content.writeReview[lang]}</button>
+                ) : (
+                  <form onSubmit={handleAddReview} className="bg-gray-50 p-4 rounded-lg border border-gray-200 animate-in fade-in slide-in-from-top-2">
+                    <div className="mb-4">
+                      <label className="block text-xs font-bold mb-1 uppercase tracking-wide">{lang === 'ar' ? 'تقييمك' : 'הדירוג שלך'}</label>
+                      {renderStars(newRating, 24, true)}
+                    </div>
+                    <input type="text" value={newTitle} onChange={(e) => setNewTitle(e.target.value)} placeholder={content.titlePlaceholder[lang]} className="w-full p-2 mb-3 text-sm border border-gray-300 rounded focus:outline-[#FF9900]" required />
+                    <textarea value={newComment} onChange={(e) => setNewComment(e.target.value)} placeholder={content.reviewPlaceholder[lang]} className="w-full p-2 mb-4 text-sm border border-gray-300 rounded h-24 focus:outline-[#FF9900]" required></textarea>
+                    <div className="flex gap-2">
+                      <button type="submit" className="flex-1 bg-[#FFD814] py-2 rounded-lg text-xs font-bold shadow-sm hover:bg-[#F7CA00]">{content.submitReview[lang]}</button>
+                      <button type="button" onClick={() => setShowForm(false)} className="px-4 py-2 text-xs font-bold text-gray-500 hover:text-black">{lang === 'ar' ? 'إلغاء' : 'ביטול'}</button>
+                    </div>
+                  </form>
+                )}
+              </div>
+            </div>
 
-    <div class="flex-1 rounded-full py-2 text-center text-[12px] font-black bg-emerald-100 text-emerald-700 border border-emerald-200"
-         x-text="lang==='he' ? 'תשלום במשלוח' : 'دفع عند الاستلام'"></div>
-  </div>
+            <div className="flex-1 text-right">
+              <div className="flex items-center justify-between mb-8 pb-4 border-b border-gray-100">
+                <span className="font-bold text-sm uppercase tracking-wide">{lang === 'ar' ? 'أحدث المراجعات' : 'ביקורות אחרונות'}</span>
+                <div className="flex items-center gap-1 text-xs text-gray-500 cursor-pointer hover:text-black">
+                  {lang === 'ar' ? 'ترتيب حسب' : 'מיין לפי'}: <span className="font-bold">أحدث</span> <ChevronDown size={14} />
+                </div>
+              </div>
 
-  <div class="progress-container">
-    <div class="progress-text flex justify-between text-[10px] font-bold mb-1 text-gray-400">
-      <span x-text="lang==='he'?'פרטי משלוח':'معلومات الشحن'"></span>
-      <span x-text="lang==='he'?'שלב אחרון':'الخطوة الأخيرة'"></span>
-    </div>
-    <div class="progress-track"><div class="progress-fill"></div></div>
-  </div>
+              <div className="space-y-10">
+                {[...userReviews, ...displayedReviews].map((rev, idx) => (
+                  <div key={idx} className={`flex flex-col gap-2 p-4 rounded-lg transition-all ${rev.isUserGenerated ? 'bg-[#fffdf0] border-r-4 border-[#FFA41C]' : ''}`}>
+                    <div className="flex items-center gap-2">
+                      <div className={`w-8 h-8 rounded-full flex items-center justify-center ${rev.isUserGenerated ? 'bg-[#FFA41C] text-white' : 'bg-gray-200 text-gray-400'}`}>
+                        <User size={20} />
+                      </div>
+                      {/* حل مشكلة Objects rendering عبر التأكد من جلب الاسم الصحيح */}
+                      <span className="text-sm font-medium">{rev.name[lang] || rev.name}</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      {renderStars(rev.rating, 14)}
+                      <span className="font-bold text-sm">{rev.title[lang]}</span>
+                    </div>
+                    <div className="text-xs text-gray-500">{lang === 'ar' ? `تمت المراجعة في ${rev.date}` : `נכתב ב-${rev.date}`}</div>
+                    <div className="flex items-center gap-2">
+                       <span className="text-[#C45500] text-xs font-bold underline cursor-default">{content.verified[lang]}</span>
+                       {rev.isUserGenerated && <span className="text-[10px] bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full font-bold">{lang === 'ar' ? 'مراجعتك' : 'הביקורת שלך'}</span>}
+                    </div>
+                    <p className="text-sm leading-relaxed my-2">{rev.text[lang]}</p>
+                    <div className="flex items-center gap-4 mt-2">
+                      <button className="border border-gray-300 shadow-sm px-6 py-1 rounded-lg text-xs hover:bg-gray-50 active:bg-gray-100">{content.helpful[lang]}</button>
+                      <span className="text-gray-300 text-sm">|</span>
+                      <button className="text-gray-500 text-xs hover:text-[#C7511F]">{content.report[lang]}</button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
 
-  <h2 class="text-xl font-black text-center mb-4 text-gray-800" x-text="lang==='he'?'הזמינו עכשיו':'اطلب الآن'"></h2>
-  <form @submit.prevent="submitForm">
-    <input type="text" x-model="f.name" @input="trackInput()" class="inp" :placeholder="lang==='he'?'שם מלא':'الاسم الكامل'" required>
-    <input type="tel" x-model="f.phone" @input="trackInput()" class="inp" :placeholder="lang==='he'?'טלפון':'رقم الهاتف'" dir="ltr" required>
-    <input type="text" x-model="f.address" class="inp" :placeholder="lang==='he'?'כתובת מלאה':'العنوان الكامل'" required>
-    <div class="grid grid-cols-2 gap-3 mb-4">
-      <label class="cursor-pointer"><input type="radio" x-model="f.payment" value="Cash" class="hidden"><div class="mad-radio-box recommended"><span x-text="lang==='he'?'מזומן 💵':'نقد 💵'"></span><div class="text-[9px] text-green-600 font-normal" x-text="lang==='he'?'מומלץ':'موصى به'"></div></div></label>
-      <label class="cursor-pointer"><input type="radio" x-model="f.payment" value="Visa" class="hidden"><div class="mad-radio-box"><span x-text="lang==='he'?'אשראי 💳':'فيزا 💳'"></span></div></label>
-    </div>
-    <div class="grid grid-cols-2 gap-3 mb-6">
-      <label class="cursor-pointer"><input type="radio" x-model="f.process" value="Direct" class="hidden"><div class="mad-radio-box recommended"><span class="text-xs" x-text="lang==='he'?'שלח הזמנה':'ارسل الطلب'"></span><div class="text-[9px] text-blue-600 font-normal" x-text="lang==='he'?'הכי מהיר':'🚀 أسرع'"></div></div></label>
-      <label class="cursor-pointer"><input type="radio" x-model="f.process" value="Contact" class="hidden"><div class="mad-radio-box"><span class="text-xs" x-text="lang==='he'?'צור איתי קשר':'تواصل معي'"></span></div></label>
-    </div>
-    <button type="submit" class="btn-main mt-2 w-full" x-text="loading?'...':(lang==='he'?'אישור הזמנה':'تأكيد الطلب')" :disabled="loading"></button>
-  </form>
-</div>
-        </template>
+        <footer className="mt-20 py-10 border-t border-gray-300 text-center">
+          <div className="text-2xl font-black mb-8 flex items-center justify-center">MAD<span className="text-[#FF9900]">.</span></div>
+          <div className="flex justify-center gap-8 text-gray-500 mb-8">
+            <a href="#" className="hover:text-[#C7511F] transition-all"><Instagram size={24} /></a>
+            <a href="#" className="hover:text-[#C7511F] transition-all"><Facebook size={24} /></a>
+            <a href="#" className="hover:text-[#C7511F] transition-all"><MessageCircle size={24} /></a>
+          </div>
+          <p className="text-[10px] text-gray-500">{content.footer[lang]}</p>
+        </footer>
+      </main>
+
+      <div className="fixed bottom-6 left-6 flex flex-col gap-3 z-50">
+        <a href="https://wa.me/yournumber" className="w-14 h-14 bg-[#25D366] text-white rounded-full flex items-center justify-center shadow-xl hover:scale-110 transition-transform"><MessageCircle size={30} fill="currentColor" /></a>
       </div>
-    </template>
-  </main>
-
-  <div x-show="loading" class="fixed inset-0 z-50 bg-black/90 flex flex-col items-center justify-center text-white" style="display:none">
-    <div class="text-5xl mb-4 animate-bounce">🚀</div>
-    <h2 class="text-xl font-bold" x-text="lang==='he'?'שולח הזמנה...':'يتم ارسال الطلب...'"></h2>
-  </div>
-
-  <div x-show="submitted" class="fixed inset-0 bg-black/95 z-50 flex items-center justify-center text-center text-white" style="display:none">
-    <div class="bg-white text-black p-10 rounded-3xl max-w-xs shadow-2xl mx-4">
-      <div class="text-6xl mb-4">✅</div>
-      <h3 class="text-2xl font-black mb-2" x-text="lang==='he'?'ההזמנה התקבלה!':'تم استلام طلبك!'"></h3>
-      <p class="font-bold text-gray-600 mb-6" x-text="lang==='he'?'ההזמנה בוצעה בהצלה! נשלח לך הודעת וואטסאפ בקרוב. האספקה תוך 5 ימי עסקים.':'تم الطلب بنجاح، سنرسل لك رسالة واتساب، الاستلام خلال 5 أيام عمل'"></p>
-      <button @click="submitted=false" class="w-full bg-black text-white py-4 rounded-xl font-bold mt-4 transition active:scale-95" x-text="lang==='he'?'סגור':'إغلاق'"></button>
     </div>
-  </div>
+  );
+};
 
-<script>
-function app() {
-  return {
-    lang: 'ar', loading: false, submitted: false,
-    blocks: [{"id":1770917582963.5427,"type":"text","content":{"ar":"MAD PERFUME","he":"MAD PERFUME"},"url":"","align":"center","btnText":{"ar":"تأكيد الطلب","he":"אישור הזמנה"},"items":[],"images":[],"score":"4.9 / 5","style":{"color":"#ffffff","size":"text-lg","font":"Cairo","weight":"font-bold"},"openingMessage":{"ar":"","he":""},"productImg":""},{"id":1770917582963.4814,"type":"carousel","content":{"ar":"MAD PERFUME","he":"MAD PERFUME"},"url":"","align":"center","btnText":{"ar":"تأكيد الطلب","he":"אישור הזמנה"},"items":[],"images":["https://www.mad-parfumeur.com/assets/hero/8.webp","https://www.mad-parfumeur.com/assets/hero/2.webp"],"score":"4.9 / 5","style":{"color":"#ffffff","size":"text-lg","font":"Cairo","weight":"font-bold"},"openingMessage":{"ar":"","he":""},"productImg":""},{"id":1770917582963.275,"type":"whatsapp","content":{"ar":"تواصل معنا عبر واتساب","he":"דברו איתנו בוואטסאפ"},"url":"972524033442","align":"center","btnText":{"ar":"تأكيد الطلب","he":"אישור הזמנה"},"items":[],"images":[],"score":"4.9 / 5","style":{"color":"#ffffff","size":"text-lg","font":"Cairo","weight":"font-bold"},"openingMessage":{"ar":"مرحبا، أريد الاستفسار عن العرض...","he":"היי, אשמח לפרטים נוספים..."},"productImg":"https://www.mad-parfumeur.com/assets/hero/8.webp"},{"id":1770917582963.6577,"type":"form","content":{"ar":"MAD PERFUME","he":"MAD PERFUME"},"url":"","align":"center","btnText":{"ar":"تأكيد الطلب","he":"אישור הזמנה"},"items":[],"images":[],"score":"4.9 / 5","style":{"color":"#ffffff","size":"text-lg","font":"Cairo","weight":"font-bold"},"openingMessage":{"ar":"","he":""},"productImg":""},{"id":1770917582964.4026,"type":"text","content":{"ar":"MAD PERFUME","he":"MAD PERFUME"},"url":"","align":"center","btnText":{"ar":"تأكيد الطلب","he":"אישור הזמנה"},"items":[],"images":[],"score":"4.9 / 5","style":{"color":"#ffffff","size":"text-lg","font":"Cairo","weight":"font-bold"},"openingMessage":{"ar":"","he":""},"productImg":""},{"id":1770917582964.6829,"type":"carousel","content":{"ar":"MAD PERFUME","he":"MAD PERFUME"},"url":"","align":"center","btnText":{"ar":"تأكيد الطلب","he":"אישור הזמנה"},"items":[],"images":["https://www.mad-parfumeur.com/assets/hero/8.webp","https://www.mad-parfumeur.com/assets/hero/2.webp"],"score":"4.9 / 5","style":{"color":"#ffffff","size":"text-lg","font":"Cairo","weight":"font-bold"},"openingMessage":{"ar":"","he":""},"productImg":""},{"id":1770917582964.3398,"type":"whatsapp","content":{"ar":"تواصل معنا عبر واتساب","he":"דברו איתנו בוואטסאפ"},"url":"972524033442","align":"center","btnText":{"ar":"تأكيد الطلب","he":"אישור הזמנה"},"items":[],"images":[],"score":"4.9 / 5","style":{"color":"#ffffff","size":"text-lg","font":"Cairo","weight":"font-bold"},"openingMessage":{"ar":"مرحبا، أريد الاستفسار عن العرض...","he":"היי, אשמח לפרטים נוספים..."},"productImg":"https://www.mad-parfumeur.com/assets/hero/8.webp"},{"id":1770917582964.189,"type":"form","content":{"ar":"MAD PERFUME","he":"MAD PERFUME"},"url":"","align":"center","btnText":{"ar":"تأكيد الطلب","he":"אישור הזמנה"},"items":[],"images":[],"score":"4.9 / 5","style":{"color":"#ffffff","size":"text-lg","font":"Cairo","weight":"font-bold"},"openingMessage":{"ar":"","he":""},"productImg":""}], c: {"bgColor":"#0e0302","logoUrl":"https://www.mad-parfumeur.com/assets/hero/logo.png","heroTitle":{"ar":"أقوى العروض الحصرية","he":"המבצעים הבלעדיים ביותר"},"productName":"big-sale","price":"500","adminPhone":"972524033442","sheetUrl":"https://script.google.com/macros/s/AKfycbxzFuJvnf5QWAam798ZfTrAbINGLCeY52WVz56NtyC7lY-VrlbzC0gsp8ZBY2cT3rLU-g/exec","fbPixel":"1072283127290819","ttPixel":"D2D02JBC77U4ENLN9SBG","snapPixel":"b143822e-1c3c-40ff-93f7-edadee74e626"}, f: {name:'', phone:'', address:'', payment:'Cash', process:'Direct'},
-    time: 900, hasStartedTyping: false,
-    get timer() { const m=Math.floor(this.time/60); const s=this.time%60; return `${m}:${s<10?'0':''}${s}`; },
-
-    // ✅ النهائي: تلقائي حسب لغة المستخدم + يدعم ?lang=he أو ?lang=ar
-    init(forcedLang) {
-      const qs = new URLSearchParams(window.location.search);
-      const urlLang = qs.get('lang');
-      const autoLang = navigator.language.startsWith('he') ? 'he' : 'ar';
-      this.lang = forcedLang || ((urlLang==='he'||urlLang==='ar') ? urlLang : autoLang);
-
-      loadPixels(this.c);
-      setInterval(()=>{if(this.time>0) this.time--}, 1000);
-    },
-
-    trackInput() { if(!this.hasStartedTyping && this.f.name.length>2){ this.hasStartedTyping=true; this.track('AddToCart'); } },
-    track(ev) {
-      const cfg = this.c; let ph = formatE164(this.f.phone);
-      if(window.ttq){ if(ph.length>=10) ttq.identify({phone_number:ph, name:this.f.name}); ttq.track(ev==='AddToCart'?'AddToCart':'CompletePayment', {content_id:cfg.productName, value:Number(cfg.price), currency:'ILS', content_type:'product'}); }
-      if(window.fbq) fbq('track', ev, {value:Number(cfg.price), currency:'ILS', content_ids:[cfg.productName], content_type:'product'});
-      if(window.snaptr) { if(ph.length>=10) snaptr('init', cfg.snapPixel, {user_phone_number:ph}); if(ev==='AddToCart') snaptr('track','ADD_CART',{item_ids:[cfg.productName]}); if(ev==='Purchase') snaptr('track','PURCHASE',{currency:'ILS', price:Number(cfg.price)}); }
-    },
-    async submitForm() {
-      this.loading = true; 
-      this.track('Purchase');
-
-      const cfg = this.c;
-      let fd = new FormData();
-      Object.keys(this.f).forEach(k => fd.append(k, this.f[k]));
-
-      fd.append('offer', cfg.productName);
-      fd.append('price', cfg.price);
-      fd.append('lang', this.lang);
-
-      try {
-        await fetch(cfg.sheetUrl, { method: 'POST', body: fd, mode: 'no-cors' });
-        this.submitted = true;
-      } catch (e) {
-        alert('Error');
-      } finally {
-        this.loading = false;
-      }
-    }
-  }
-}
-</script>
-</body>
-</html>
+export default App;
