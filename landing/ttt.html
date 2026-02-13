@@ -1,486 +1,265 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html x-data="app()" x-init="init(null)" :lang="lang" dir="rtl">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>MAD Parfumeur | تجربة الفخامة العطرية</title>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta property="og:title" content="أقوى العروض الحصرية" />
+  <meta property="og:description" content="SALE">
+  <meta property="og:image" content="https://www.mad-parfumeur.com/assets/hero/logo.png" />
+  <meta property="og:type" content="website" />
 
-  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
-
-  <!-- Google Fonts: Cairo -->
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
-
+  <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;900&family=Heebo:wght@400;900&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --primary-gold: #d4af37;
-      --deep-emerald: #064e3b;
-      --soft-beige: #f4f1ea;
+    body {
+      background: radial-gradient(900px circle at 50% -200px, rgba(255,255,255,.10), transparent 55%), radial-gradient(700px circle at 10% 40%, rgba(255,255,255,.06), transparent 60%), linear-gradient(180deg, rgba(0,0,0,.65), rgba(0,0,0,.15) 45%, rgba(0,0,0,.85)), #12151c;
+      font-family: 'Cairo', 'Heebo', sans-serif;
+      overflow-x: hidden; min-height: 100vh; color: #fff;
     }
-
-    body { 
-      font-family: 'Cairo', sans-serif; 
-      background-color: var(--soft-beige);
-      color: #1f2937;
-      overflow-x: hidden;
-    }
-    
-    .phone-shell { 
-      max-width: 480px; 
-      margin: 0 auto;
-      background: white;
-    }
-
-    .luxury-card {
-      background: rgba(255, 255, 255, 0.8);
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(212, 175, 55, 0.2);
-      box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-    }
-
-    .gold-gradient-text {
-      background: linear-gradient(to right, #bf953f, #fcf6ba, #b38728, #fbf5b7, #aa771c);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
-    .carousel-container {
-      position: relative;
-      overflow: hidden;
-      border-radius: 30px;
-      aspect-ratio: 4 / 5; 
-      box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-      background: #f8f8f8;
-    }
-
-    .carousel-track {
-      display: flex;
-      height: 100%;
-      transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
-    }
-
-    .carousel-slide {
-      min-width: 100%;
-      height: 100%;
-      object-fit: cover; 
-    }
-
-    .btn-gold {
-      background: linear-gradient(135deg, #b38728 0%, #d4af37 50%, #b38728 100%);
-      color: white;
-      text-shadow: 0 1px 2px rgba(0,0,0,0.2);
-    }
-
-    .input-premium {
-      border: 1px solid rgba(0,0,0,0.08);
-      background: #fdfdfd;
-    }
-
-    .reveal {
-      opacity: 0;
-      transform: translateY(20px);
-      transition: all 0.8s ease-out;
-    }
-    .reveal.active {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    .selection-badge {
-      animation: pulse-gold 2s infinite;
-    }
-
-    @keyframes pulse-gold {
-      0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.7); }
-      70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(212, 175, 55, 0); }
-      100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(212, 175, 55, 0); }
-    }
-
-    .payment-btn { 
-      background: #fff; border-color: rgba(0,0,0,0.05); color: #64748b;
-      transition: all 0.2s;
-    }
-    .payment-btn.active { 
-      background: #fdfaf3; border-color: #d4af37; color: #b38728; 
-    }
-
-    .dot {
-      width: 8px; height: 8px; border-radius: 50%;
-      background: rgba(0,0,0,0.1); transition: all 0.3s;
-    }
-    .dot.active {
-      width: 24px; border-radius: 10px; background: var(--primary-gold) !important;
-    }
-
-    details > summary {
-      list-style: none;
-    }
-    details > summary::-webkit-details-marker {
-      display: none;
-    }
+    .inp { width: 100%; padding: 15px; background: #f8fafc; border: 1px solid #ddd; border-radius: 12px; margin-bottom: 10px; font-weight: bold; text-align: center; color: black; }
+    .btn-main { background: #10b981; color: #fff; width: 100%; padding: 18px; border-radius: 14px; font-weight: 900; font-size: 1.2rem; animation: pulse 2s infinite; cursor: pointer; border:none; box-shadow: 0 6px 18px rgba(16,185,129,0.35); }
+    .btn-main:hover { filter: brightness(1.05); } .btn-main:active { transform: scale(0.99); }
+    @keyframes wiggle { 0%, 100% { transform: rotate(-1deg); } 50% { transform: rotate(1deg) scale(1.02); } }
+    .animate-wiggle { animation: wiggle 1s ease-in-out infinite; }
+    @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.02); } 100% { transform: scale(1); } }
+    .progress-container { margin-bottom: 15px; }
+    .progress-track { height: 6px; background: rgba(0,0,0,0.1); border-radius: 99px; overflow: hidden; }
+    .progress-fill { height: 100%; background: #10b981; width: 85%; }
+    .mad-radio-box { border: 2px solid #e5e7eb; border-radius: 12px; padding: 12px; text-align: center; background: white; font-weight: 700; cursor: pointer; transition: 0.2s; color: black; }
+    input:checked + .mad-radio-box { border-color: #10b981; background: #f0fdf4; color: #047857; transform: scale(1.02); }
+    .recommended::after { content: '★'; position: absolute; top: -8px; right: -8px; background: #10b981; color: white; border-radius: 50%; width: 20px; height: 20px; font-size: 10px; display: flex; align-items: center; justify-content: center; }
+    .float-container { position: fixed; bottom: 20px; left: 20px; z-index: 100; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+    [dir="ltr"] .float-container { left: auto; right: 20px; }
+    .float-wa { background: #25d366; color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 30px; box-shadow: 2px 2px 10px rgba(0,0,0,0.2); animation: pulse 2s infinite; text-decoration: none; }
+    .float-thumb { width: 50px; height: 50px; border-radius: 12px; overflow: hidden; border: 2px solid white; box-shadow: 0 4px 6px rgba(0,0,0,0.3); animation: wiggle 3s infinite; background: white; }
+    .float-thumb img { width: 100%; height: 100%; object-cover: cover; }
   </style>
+  <script>
+    function formatE164(p) { if(!p) return ''; let d = String(p).replace(/[^0-9]/g, ''); if(d.startsWith('05') && d.length === 10) d = '972' + d.slice(1); if(d.startsWith('00')) d = d.slice(2); return '+' + d; }
+    function loadPixels(cfg) { if(window._px_f) return; window._px_f = true; if(cfg.fbPixel) { !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)n=f.fbq;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js'); fbq('init', cfg.fbPixel); fbq('track', 'PageView'); } if(cfg.ttPixel) { !function(w,d,t){w.TiktokAnalyticsObject=t;var ttq=w[t]=w[t]||[];ttq.methods=["page","track","identify","instances","debug","on","off","once","ready","alias","group","enableCookie","disableCookie","holdConsent","revokeConsent","grantConsent"];ttq.setAndDefer=function(t,e){t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}};for(var i=0;i<ttq.methods.length;i++)ttq.setAndDefer(ttq,ttq.methods[i]);ttq.load=function(e,n){var r="https://analytics.tiktok.com/i18n/pixel/events.js";ttq._i=ttq._i||{};ttq._i[e]=[];ttq._i[e]._u=r;ttq._t=ttq._t||{};ttq._t[e]=+new Date;ttq._o=ttq._o||{};ttq._o[e]=n||{};var o=document.createElement("script");o.type="text/javascript";o.async=!0;o.src=r+"?sdkid="+e+"&lib="+t;var a=document.getElementsByTagName("script")[0];a.parentNode.insertBefore(o,a)};ttq.load(cfg.ttPixel);ttq.page();}(window,document,'ttq'); } if(cfg.snapPixel) { (function(e,t,n){if(e.snaptr)return;var a=e.snaptr=function(){a.handleRequest?a.handleRequest.apply(a,arguments):a.queue.push(arguments)};a.queue=[];var s='script';var r=t.createElement(s);r.async=!0;r.src=n;var u=t.getElementsByTagName(s)[0];u.parentNode.insertBefore(r,u)})(window,document,'https://sc-static.net/scevent.min.js'); snaptr('init', cfg.snapPixel); snaptr('track', 'PAGE_VIEW'); } }
+  </script>
 </head>
+<body class="pb-20">
+  <nav class="p-4 flex justify-center bg-white/15 backdrop-blur sticky top-0 z-50 border-b border-white/10"><img src="https://www.mad-parfumeur.com/assets/hero/logo.png" class="h-10 object-contain"></nav>
+  <header class="text-center py-8 px-4 text-white"><h1 class="text-3xl font-black" x-text="c.heroTitle[lang]"></h1></header>
 
-<body class="p-2 sm:p-4">
-
-  <div class="phone-shell rounded-[40px] overflow-hidden shadow-2xl relative border border-white/50">
-    
-    <!-- Header -->
-    <div class="pt-10 pb-6 px-6 text-center bg-white">
-      <div class="inline-block px-4 py-1 rounded-full border border-[#d4af37] mb-4 bg-amber-50">
-        <span class="text-[10px] font-bold tracking-[0.2em] text-[#b38728] uppercase">The Art of Perfumery</span>
-      </div>
-      <h1 class="text-4xl font-black text-slate-900 leading-tight tracking-tight">MAD <span class="gold-gradient-text">PARFUMEUR</span></h1>
-      <div class="h-1 w-20 bg-[#d4af37] mx-auto mt-2 rounded-full opacity-50"></div>
-      <p class="text-lg mt-4 font-semibold text-slate-500">
-        عروض ملكية بأسعار حصرية<br>
-        <span class="text-sm opacity-60 font-bold">السعر موضح داخل كل صورة - شامل التوصيل</span>
-      </p>
-    </div>
-
-    <!-- Carousel Section -->
-    <div class="px-6 reveal">
-      <div class="carousel-container border-[6px] border-white relative">
-        <div class="selection-badge absolute top-5 right-5 z-30 bg-[#b38728] text-white px-4 py-2 rounded-xl text-[10px] font-black shadow-lg flex items-center gap-2">
-            <div class="w-1.5 h-1.5 bg-white rounded-full animate-ping"></div>
-            <span>اطلب هذا العرض الآن</span>
-        </div>
-
-        <div id="carouselTrack" class="carousel-track"></div>
-
-        <button onclick="movePrev()" class="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/90 text-[#b38728] flex items-center justify-center shadow-lg z-20">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7"/></svg>
-        </button>
-        <button onclick="moveNext()" class="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/90 text-[#b38728] flex items-center justify-center shadow-lg z-20">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7"/></svg>
-        </button>
-
-        <div id="carouselDots" class="absolute bottom-6 left-0 right-0 flex justify-center gap-2 z-20"></div>
-      </div>
-
-      <!-- Trust Badges -->
-      <div class="flex justify-between items-center mt-6 px-2">
-        <div class="text-center">
-            <div class="w-10 h-10 bg-emerald-50 rounded-full flex items-center justify-center mx-auto mb-1"><span>🚚</span></div>
-            <span class="text-[9px] font-black text-slate-400 uppercase">توصيل مجاني</span>
-        </div>
-        <div class="text-center">
-            <div class="w-10 h-10 bg-amber-50 rounded-full flex items-center justify-center mx-auto mb-1"><span>💎</span></div>
-            <span class="text-[9px] font-black text-slate-400 uppercase">جودة ملكية</span>
-        </div>
-        <div class="text-center">
-            <div class="w-10 h-10 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-1"><span>🛡️</span></div>
-            <span class="text-[9px] font-black text-slate-400 uppercase">ضمان استبدال</span>
-        </div>
-        <div class="text-center">
-            <div class="w-10 h-10 bg-purple-50 rounded-full flex items-center justify-center mx-auto mb-1"><span>💵</span></div>
-            <span class="text-[9px] font-black text-slate-400 uppercase">دفع آمن</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- Booking Form -->
-    <div class="px-6 mt-10 reveal">
-      <div class="luxury-card p-6 rounded-[35px] shadow-xl">
-        <h2 class="text-2xl font-black text-slate-800 text-center mb-6">احجز عرضك الآن</h2>
-        <div class="space-y-4">
-          <input type="text" id="custName" class="w-full input-premium rounded-2xl px-5 py-4 font-bold text-slate-700 outline-none focus:ring-1 focus:ring-amber-400" placeholder="الاسم الكامل">
-          <input type="tel" id="custPhone" class="w-full input-premium rounded-2xl px-5 py-4 font-bold text-slate-700 outline-none text-right" placeholder="رقم الهاتف">
-          <input type="text" id="custAddress" class="w-full input-premium rounded-2xl px-5 py-4 font-bold text-slate-700 outline-none" placeholder="المدينة / العنوان بالتفصيل">
-          
-          <div class="grid grid-cols-2 gap-3 pt-2">
-            <button onclick="setPayment('cash')" id="btnCash" class="payment-btn active py-4 rounded-2xl font-black text-sm border-2">كاش 💵</button>
-            <button onclick="setPayment('card')" id="btnCard" class="payment-btn py-4 rounded-2xl font-black text-sm border-2">فيزا 💳</button>
+  <main class="max-w-md mx-auto">
+    <template x-for="(b, idx) in (blocks || [])" :key="b.id">
+      <div class="my-6 px-4" :class="b.type==='carousel'?'!px-0':'px-4'">
+        <template x-if="b.type==='text'"><p class="whitespace-pre-wrap leading-relaxed font-black text-center" :style="{ color: b.style.color || '#fff', fontSize: '1.25rem' }" x-text="b.content[lang]"></p></template>
+        <template x-if="b.type==='image'"><img :src="b.url" class="rounded-2xl mx-auto shadow-lg w-full"></template>
+        <template x-if="b.type==='video'"><video :src="b.url" controls class="w-full rounded-2xl shadow-lg"></video></template>
+        
+        <!-- ✅ كريسول فيديوهات عامودية (Reels) -->
+        <template x-if="b.type==='video_carousel'">
+          <div class="w-full" x-data="{ curr: 0, total: (b.items || []).length }">
+            <h3 class="text-center text-white font-bold mb-3 text-lg" x-text="lang==='he'?'לקוחות ממליצים':'آراء العملاء (فيديو)'"></h3>
+            <div class="flex overflow-x-auto gap-3 p-2 snap-x hide-scrollbar pb-6">
+               <template x-for="(vid, i) in b.items" :key="'vid-c-'+i">
+                 <div class="min-w-[260px] w-[260px] snap-center rounded-2xl overflow-hidden shadow-2xl border-2 border-white/20 relative aspect-[9/16] bg-black">
+                   <video :src="vid" controls class="w-full h-full object-cover"></video>
+                 </div>
+               </template>
+            </div>
           </div>
+        </template>
 
-          <button onclick="submitToWhatsapp()" class="btn-gold w-full py-5 rounded-[25px] font-black text-lg flex items-center justify-center gap-3 shadow-xl transition hover:opacity-90 active:scale-95">
-            <span>تأكيد الحجز عبر الواتساب</span>
-            <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.89 9.884 0 2.225.659 3.891 1.746 5.634l-.999 3.648 3.743-.981zm11.387-5.464c-.301-.15-1.779-.879-2.053-.979-.275-.101-.475-.149-.675.15-.199.299-.775.979-.95 1.174-.175.196-.35.223-.651.074-.3-.15-1.265-.467-2.41-1.485-.89-.794-1.49-1.775-1.665-2.074-.175-.3-.019-.461.13-.611.135-.133.301-.35.451-.524.15-.175.199-.299.3-.499.1-.2.05-.374-.025-.524-.075-.15-.675-1.625-.925-2.224-.244-.583-.493-.503-.675-.512-.175-.01-.375-.011-.575-.011-.2 0-.525.075-.799.374-.275.3-.1.724 0 1.148 0 .424.1.849.15 1.249.05.349.1.624.15.824 0 .05.5 2.1 2.5 3.5 1.15.8 2.3 1.1 3.3 1.1 1.2 0 2.2-.5 3-.7.5-.15.9-.3 1.1-.5.2-.1.4-.3.5-.6.1-.3.1-.6 0-.8z"/></svg>
-          </button>
-        </div>
-      </div>
+        <!-- ✅ كريسول آراء العملاء (صور) -->
+        <template x-if="b.type==='testimonials'">
+          <div class="w-full">
+            <h3 class="text-center text-white font-black text-lg mb-4" x-text="lang==='he'?'מה הלקוחות אומרים?':'ماذا يقول عملاؤنا؟'"></h3>
+            <div class="flex overflow-x-auto gap-3 p-2 snap-x hide-scrollbar pb-6">
+               <template x-for="(img, i) in b.items" :key="'testi-img-'+i">
+                 <div class="min-w-[200px] w-[200px] snap-center rounded-xl overflow-hidden shadow-lg border border-white/20 relative">
+                   <img :src="img" class="w-full h-auto object-cover">
+                 </div>
+               </template>
+            </div>
+          </div>
+        </template>
+
+        <!-- ✅ كريسول العروض الذكي -->
+        <template x-if="b.type==='carousel'">
+          <div class="w-full" 
+               x-data="{ curr: 0, total: (b.items || []).length }" 
+               x-init="$watch('curr', val => { if(b.items[val]) { selectedOffer = b.items[val].name; selectedImage = b.items[val].url; } }); 
+                       if(b.items[0]) { selectedOffer = b.items[0].name; selectedImage = b.items[0].url; }">
+            
+            <h3 class="text-center text-white font-black text-lg mb-2" x-text="lang==='he'?'בחר הצעה':'اختر العرض المناسب لك:'"></h3>
+
+            <div class="relative overflow-hidden rounded-2xl shadow-2xl mb-4 bg-black">
+               <template x-for="(item, i) in (b.items || [])" :key="'ci-'+i">
+                 <div class="w-full relative transition-opacity duration-300" x-show="curr===i" x-transition:enter="opacity-0" x-transition:enter-end="opacity-100">
+                   <img :src="item.url" class="w-full object-cover">
+                   <div class="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent p-4 pt-12 text-center">
+                      <p class="text-white font-black text-xl" x-text="item.name"></p>
+                   </div>
+                 </div>
+               </template>
+               <button @click="curr = (curr - 1 + total) % total" class="absolute left-2 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/40 text-white p-3 rounded-full backdrop-blur-md transition shadow-lg">❮</button>
+               <button @click="curr = (curr + 1) % total" class="absolute right-2 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/40 text-white p-3 rounded-full backdrop-blur-md transition shadow-lg">❯</button>
+            </div>
+
+            <div class="flex gap-2 justify-center overflow-x-auto pb-2 px-1">
+               <template x-for="(item, i) in b.items" :key="'thumb-'+i">
+                 <div class="w-16 h-16 rounded-lg overflow-hidden cursor-pointer border-2 transition-all transform hover:scale-105 shrink-0"
+                      :class="curr === i ? 'border-green-400 shadow-[0_0_10px_rgba(74,222,128,0.7)] scale-105' : 'border-transparent opacity-60'"
+                      @click="curr = i">
+                    <img :src="item.url" class="w-full h-full object-cover">
+                 </div>
+               </template>
+            </div>
+
+            <div class="text-center mt-1">
+               <span class="inline-block bg-green-600 text-white px-4 py-1 rounded-full text-[10px] font-bold animate-pulse" x-show="selectedOffer">
+                 ✅ <span x-text="lang==='he'?'ההצעה נבחרה':'تم تحديد العرض'"></span>
+               </span>
+            </div>
+          </div>
+        </template>
+
+        <!-- ✅ زر الكتالوج -->
+        <template x-if="b.type==='catalog'">
+          <div class="my-6">
+            <a :href="b.url" target="_blank"
+               class="block w-full bg-indigo-600 text-white p-4 rounded-xl shadow-lg text-center font-black text-xl transform transition hover:scale-105 flex items-center justify-center gap-2 no-underline">
+               <span class="text-2xl">🛍️</span>
+               <span x-text="b.content[lang]"></span>
+            </a>
+          </div>
+        </template>
+
+        <!-- ✅ واتساب هزاز -->
+        <template x-if="b.type==='whatsapp'">
+          <div class="my-6">
+            <template x-if="b.productImg">
+              <div class="mb-3 rounded-2xl overflow-hidden shadow-lg border-2 border-white/20">
+                <img :src="b.productImg" class="w-full h-auto object-cover block">
+              </div>
+            </template>
+            <a :href="'https://wa.me/' + (b.url ? b.url.replace(/[^0-9]/g,'').replace(/^05/, '9725') : '') + '?text=' + encodeURIComponent((b.openingMessage[lang] || '') + (selectedOffer ? ('\n ' + (lang==='he'?'הצעה: ':'عرض: ') + selectedOffer) : '') + '\n' + window.location.href)" 
+               target="_blank"
+               class="block w-full bg-[#25D366] text-white p-4 rounded-xl shadow-lg text-center font-black text-xl transform transition hover:scale-105 flex items-center justify-center gap-2 animate-wiggle no-underline relative overflow-hidden">
+               <svg class="w-7 h-7 fill-current" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.008-.57-.008-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.355-5.032c0-5.437 4.411-9.865 9.869-9.865 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.438-4.415 9.868-9.865 9.868"/></svg>
+               <span x-text="b.content[lang]"></span>
+            </a>
+          </div>
+        </template>
+
+        <template x-if="b.type==='form'">
+<div class="bg-white p-6 rounded-[24px] shadow-sm text-right border-2 border-gray-100 mt-4" id="order">
+  <div x-show="selectedOffer" class="bg-indigo-50 border border-indigo-200 text-indigo-800 p-3 rounded-xl mb-4 text-center font-black text-sm transition-all duration-300 transform scale-100">
+    <span x-text="lang==='he'?'ההצעה שנבחרה: ':'العرض المختار: '"></span>
+    <span x-text="selectedOffer" class="text-lg block mt-1 text-green-700"></span>
+  </div>
+  <div class="flex gap-2 mb-4">
+    <div class="flex-1 rounded-full py-2 text-center text-[12px] font-black bg-slate-100 text-slate-600 border border-slate-200" x-text="lang==='he' ? 'אחריות החלפה' : 'ضمان استبدال'"></div>
+    <div class="flex-1 rounded-full py-2 text-center text-[12px] font-black bg-amber-100 text-amber-700 border border-amber-200" x-text="lang==='he' ? 'משלוח מהיר' : 'توصيل سريع'"></div>
+    <div class="flex-1 rounded-full py-2 text-center text-[12px] font-black bg-emerald-100 text-emerald-700 border border-emerald-200" x-text="lang==='he' ? 'תשלום במשלוח' : 'دفع عند الاستلام'"></div>
+  </div>
+  <div class="progress-container">
+    <div class="progress-text flex justify-between text-[10px] font-bold mb-1 text-gray-400">
+      <span x-text="lang==='he'?'פרטי משלוח':'معلومات الشحن'"></span>
+      <span x-text="lang==='he'?'שלב אחרון':'الخطوة الأخيرة'"></span>
     </div>
-
-    <!-- 6 Comparisons -->
-    <div class="px-6 mt-16 reveal">
-      <h3 class="text-2xl font-black text-slate-800 text-center mb-8 uppercase tracking-widest"><span class="gold-gradient-text">MAD</span> مقابل الآخرين</h3>
-      <div class="grid gap-3">
-        <div class="grid grid-cols-2 gap-3">
-            <div class="luxury-card p-4 rounded-2xl text-center bg-emerald-50/30">
-                <span class="block font-black text-emerald-900 text-xs mb-1">عطورنا (MAD)</span>
-                <p class="text-[10px] font-bold text-emerald-700">أصلية وبزيوت فرنسية ✅</p>
-            </div>
-            <div class="luxury-card p-4 rounded-2xl text-center opacity-50 bg-slate-50">
-                <span class="block font-black text-slate-800 text-xs mb-1">المنافسين</span>
-                <p class="text-[10px] font-bold text-slate-500">تقليد غير مضمون ❌</p>
-            </div>
-        </div>
-        <div class="grid grid-cols-2 gap-3">
-            <div class="luxury-card p-4 rounded-2xl text-center bg-emerald-50/30">
-                <p class="text-[10px] font-bold text-emerald-700">ثبات 24 ساعة+ ✅</p>
-            </div>
-            <div class="luxury-card p-4 rounded-2xl text-center opacity-50 bg-slate-50">
-                <p class="text-[10px] font-bold text-slate-500">يختفي بعد ساعة ❌</p>
-            </div>
-        </div>
-        <div class="grid grid-cols-2 gap-3">
-            <div class="luxury-card p-4 rounded-2xl text-center bg-emerald-50/30">
-                <p class="text-[10px] font-bold text-emerald-700">فوحان يملأ المكان ✅</p>
-            </div>
-            <div class="luxury-card p-4 rounded-2xl text-center opacity-50 bg-slate-50">
-                <p class="text-[10px] font-bold text-slate-500">فوحان ضعيف جداً ❌</p>
-            </div>
-        </div>
-        <div class="grid grid-cols-2 gap-3">
-            <div class="luxury-card p-4 rounded-2xl text-center bg-emerald-50/30">
-                <p class="text-[10px] font-bold text-emerald-700">تغليف فخم للهدايا ✅</p>
-            </div>
-            <div class="luxury-card p-4 rounded-2xl text-center opacity-50 bg-slate-50">
-                <p class="text-[10px] font-bold text-slate-500">تغليف بسيط ❌</p>
-            </div>
-        </div>
-        <div class="grid grid-cols-2 gap-3">
-            <div class="luxury-card p-4 rounded-2xl text-center bg-emerald-50/30">
-                <p class="text-[10px] font-bold text-emerald-700">ضمان استبدال حقيقي ✅</p>
-            </div>
-            <div class="luxury-card p-4 rounded-2xl text-center opacity-50 bg-slate-50">
-                <p class="text-[10px] font-bold text-slate-500">لا يوجد أي ضمان ❌</p>
-            </div>
-        </div>
-        <div class="grid grid-cols-2 gap-3">
-            <div class="luxury-card p-4 rounded-2xl text-center bg-emerald-50/30">
-                <p class="text-[10px] font-bold text-emerald-700">زيوت فرنسية نقية ✅</p>
-            </div>
-            <div class="luxury-card p-4 rounded-2xl text-center opacity-50 bg-slate-50">
-                <p class="text-[10px] font-bold text-slate-500">مكونات كيميائية ❌</p>
-            </div>
-        </div>
-      </div>
+    <div class="progress-track"><div class="progress-fill"></div></div>
+  </div>
+  <h2 class="text-xl font-black text-center mb-4 text-gray-800" x-text="lang==='he'?'הזמינו עכשיו':'اطلب الآن'"></h2>
+  <form @submit.prevent="submitForm">
+    <input type="text" x-model="f.name" @input="trackInput()" class="inp" :placeholder="lang==='he'?'שם מלא':'الاسم الكامل'" required>
+    <input type="tel" x-model="f.phone" @input="trackInput()" class="inp" :placeholder="lang==='he'?'טלפון':'رقم الهاتف'" dir="ltr" required>
+    <input type="text" x-model="f.address" class="inp" :placeholder="lang==='he'?'כתובת מלאה':'العنوان الكامل'" required>
+    <div class="grid grid-cols-2 gap-3 mb-4">
+      <label class="cursor-pointer"><input type="radio" x-model="f.payment" value="Cash" class="hidden"><div class="mad-radio-box recommended"><span x-text="lang==='he'?'מזומן 💵':'نقد 💵'"></span><div class="text-[9px] text-green-600 font-normal" x-text="lang==='he'?'מומלץ':'موصى به'"></div></div></label>
+      <label class="cursor-pointer"><input type="radio" x-model="f.payment" value="Visa" class="hidden"><div class="mad-radio-box"><span x-text="lang==='he'?'אשראי 💳':'فيزا 💳'"></span></div></label>
     </div>
-
-    <!-- 6 FAQ Section -->
-    <div class="px-6 mt-16 reveal">
-        <div class="luxury-card p-6 rounded-[35px]">
-            <h3 class="text-xl font-black text-slate-900 mb-6 text-center italic">Luxury Questions</h3>
-            <div class="space-y-4" id="faq-list"></div>
-        </div>
+    <div class="grid grid-cols-2 gap-3 mb-6">
+      <label class="cursor-pointer"><input type="radio" x-model="f.process" value="Direct" class="hidden"><div class="mad-radio-box recommended"><span class="text-xs" x-text="lang==='he'?'שלח הזמנה':'ارسل الطلب'"></span><div class="text-[9px] text-blue-600 font-normal" x-text="lang==='he'?'הכי מהיר':'🚀 أسرع'"></div></div></label>
+      <label class="cursor-pointer"><input type="radio" x-model="f.process" value="Contact" class="hidden"><div class="mad-radio-box"><span class="text-xs" x-text="lang==='he'?'צור קשר':'تواصل معي'"></span></div></label>
     </div>
-
-    <!-- Reviews Section -->
-    <div class="px-6 mt-16 pb-12 reveal">
-      <div class="text-center mb-8">
-        <h3 class="text-3xl font-black text-slate-800">آراء زبائننا الملكية</h3>
-        <p class="text-slate-400 font-bold text-sm mt-1">أكثر من 10,000 عميل يثق بنا</p>
+    <button type="submit" class="btn-main mt-2 w-full" x-text="loading?'...':(lang==='he'?'אישור הזמנה':'تأكيد الطلب')" :disabled="loading"></button>
+  </form>
+</div>
+        </template>
       </div>
+    </template>
+  </main>
 
-      <!-- Add Review Input (11th Review) -->
-      <div class="luxury-card p-6 rounded-[35px] mb-10 text-center border-amber-200 shadow-inner">
-        <span class="text-xs font-bold text-slate-400 mb-3 block">شاركنا تجربتك وتقييمك</span>
-        <div id="starInput" class="flex justify-center gap-2 mb-4 text-3xl transition-all">
-            <span data-value="1" class="cursor-pointer text-amber-400 hover:scale-110 transition">★</span>
-            <span data-value="2" class="cursor-pointer text-amber-400 hover:scale-110 transition">★</span>
-            <span data-value="3" class="cursor-pointer text-amber-400 hover:scale-110 transition">★</span>
-            <span data-value="4" class="cursor-pointer text-amber-400 hover:scale-110 transition">★</span>
-            <span data-value="5" class="cursor-pointer text-amber-400 hover:scale-110 transition">★</span>
-        </div>
-        <input type="text" id="reviewName" class="w-full input-premium rounded-xl px-4 py-3 text-sm font-bold mb-3 outline-none focus:border-amber-400" placeholder="اسمك الكريم">
-        <textarea id="reviewText" class="w-full input-premium rounded-xl px-4 py-3 text-sm font-bold h-24 mb-4 outline-none focus:border-amber-400" placeholder="ما رأيك بجودة عطورنا؟"></textarea>
-        <button onclick="addUserReview()" class="w-full bg-slate-900 text-white font-black py-4 rounded-2xl text-xs hover:bg-slate-800 transition shadow-lg">نشر المراجعة</button>
-      </div>
-
-      <!-- List of 10+ Reviews -->
-      <div id="reviewsList" class="space-y-4"></div>
-
-      <!-- Overall Rating Block -->
-      <div class="mt-12 rounded-[40px] bg-gradient-to-br from-[#064e3b] to-[#1a3a2a] text-white p-8 relative overflow-hidden shadow-2xl">
-        <div class="relative z-10 flex flex-col items-center">
-            <span class="text-[10px] font-black tracking-widest opacity-60 mb-2 uppercase">Average Satisfaction</span>
-            <div class="text-[72px] font-black leading-none mb-2 tracking-tighter">4.9</div>
-            <div class="flex text-amber-400 text-2xl mb-4 tracking-widest">★★★★★</div>
-            <p class="text-[11px] font-bold opacity-70 text-center">بناءً على تقييمات موثقة من زبائننا في الداخل والضفة</p>
-        </div>
-        <div class="absolute -top-10 -left-10 w-40 h-40 bg-white/5 rounded-full blur-3xl"></div>
-        <div class="absolute -bottom-10 -right-10 w-40 h-40 bg-amber-400/10 rounded-full blur-2xl"></div>
-      </div>
+  <template x-if="c.floatingWhatsapp && c.floatingWhatsapp.enabled">
+    <div class="float-container">
+      <div class="float-thumb" x-show="selectedImage"><img :src="selectedImage"></div>
+      <a :href="'https://wa.me/' + (c.floatingWhatsapp.phone ? c.floatingWhatsapp.phone.replace(/[^0-9]/g,'').replace(/^05/, '9725') : '') + '?text=' + encodeURIComponent((c.floatingWhatsapp.message[lang] || '') + (selectedOffer ? ('\n ' + (lang==='he'?'הצעה: ':'عرض: ') + selectedOffer) : '') + '\n' + window.location.href)" target="_blank" class="float-wa">
+         <svg class="w-8 h-8 fill-current" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.008-.57-.008-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.355-5.032c0-5.437 4.411-9.865 9.869-9.865 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.438-4.415 9.868-9.865 9.868"/></svg>
+      </a>
     </div>
+  </template>
 
-    <!-- Footer -->
-    <div class="text-center pb-10 text-slate-400 text-[10px] font-bold bg-white">
-      جميع الحقوق محفوظة MAD Parfumeur Luxury Collection © 2026
+  <div x-show="loading" class="fixed inset-0 z-50 bg-black/90 flex flex-col items-center justify-center text-white" style="display:none">
+    <div class="text-5xl mb-4 animate-bounce">🚀</div>
+    <h2 class="text-xl font-bold" x-text="lang==='he'?'שולח הזמנה...':'يتم ارسال الطلب...'"></h2>
+  </div>
+
+  <div x-show="submitted" class="fixed inset-0 bg-black/95 z-50 flex items-center justify-center text-center text-white" style="display:none">
+    <div class="bg-white text-black p-10 rounded-3xl max-w-xs shadow-2xl mx-4">
+      <div class="text-6xl mb-4">✅</div>
+      <h3 class="text-2xl font-black mb-2" x-text="lang==='he'?'ההזמנה התקבלה!':'تم استلام طلبك!'"></h3>
+      <p class="font-bold text-gray-600 mb-6" x-text="lang==='he'?'ההזמנה בוצעה בהצלה! נשלח לך הודעת וואטסאפ בקרוב. האספקה תוך 5 ימי עסקים.':'تم الطلب بنجاح، سنرسل لك رسالة واتساب، الاستلام خلال 5 أيام عمل'"></p>
+      <button @click="submitted=false" class="w-full bg-black text-white py-4 rounded-xl font-bold mt-4 transition active:scale-95" x-text="lang==='he'?'סגור':'إغلاق'"></button>
     </div>
   </div>
 
-  <script>
-    const PHONE_NUMBER = "15558106988";
-    const IMAGE_BASE = "https://www.mad-parfumeur.com/assets/hero/";
-    const IMAGE_EXT = ".webp";
-    const TOTAL_SLIDES = 10;
+<script>
+function app() {
+  return {
+    lang: 'ar', loading: false, submitted: false, selectedOffer: '', selectedImage: '',
+    blocks: [{"id":1770926276420.7996,"type":"carousel","content":{"ar":"MAD PERFUME","he":"MAD PERFUME"},"url":"","align":"center","btnText":{"ar":"تأكيد الطلب","he":"אישור הזמנה"},"style":{"color":"#ffffff","size":"text-lg","font":"Cairo","weight":"font-bold"},"openingMessage":{"ar":"","he":""},"productImg":"","items":[{"url":"https://www.mad-parfumeur.com/assets/hero/5.webp","name":"W183 X102 P104 L102 A115"},{"url":"https://www.mad-parfumeur.com/assets/hero/1.webp","name":"Y102-A118-P107-G104-B103"},{"url":"https://www.mad-parfumeur.com/assets/hero/3.webp","name":"W179-W183-J110"},{"url":"https://www.mad-parfumeur.com/assets/hero/2.webp","name":"P107-W223-Y104"},{"url":"https://www.mad-parfumeur.com/assets/hero/11.webp","name":"W183- X102- Q105 -L102- L103"},{"url":"https://www.mad-parfumeur.com/assets/hero/12.webp","name":"T102 W183 A115"},{"url":"https://www.mad-parfumeur.com/assets/hero/19.webp","name":"W183 L103"}]},{"id":1770926523541.9778,"type":"form","content":{"ar":"MAD PERFUME","he":"MAD PERFUME"},"url":"","align":"center","btnText":{"ar":"تأكيد الطلب","he":"אישור הזמנה"},"style":{"color":"#ffffff","size":"text-lg","font":"Cairo","weight":"font-bold"},"openingMessage":{"ar":"","he":""},"productImg":"","items":[]},{"id":1770926534955.391,"type":"video_carousel","content":{"ar":"MAD PERFUME","he":"MAD PERFUME"},"url":"","align":"center","btnText":{"ar":"تأكيد الطلب","he":"אישור הזמנה"},"style":{"color":"#ffffff","size":"text-lg","font":"Cairo","weight":"font-bold"},"openingMessage":{"ar":"","he":""},"productImg":"","items":["https://madperfume.ps/upload/02-2026/page/WhatsApp%20Video%202026-02-12%20at%2022.27.01.mp4#t=0.02","https://madperfume.ps/upload/02-2026/page/WhatsApp%20Video%202026-02-12%20at%2022.25.32.mp4#t=0.02","https://madperfume.ps/upload/02-2026/page/WhatsApp%20Video%202026-02-12%20at%2021.32.40.mp4#t=0.02","https://madperfume.ps/upload/02-2026/page/WhatsApp%20Video%202026-02-12%20at%2023.09.25.mp4#t=0.02","https://madperfume.ps/upload/02-2026/page/WhatsApp%20Video%202026-02-12%20at%2022.50.23.mp4#t=0.02","https://madperfume.co.il/upload/09-2024/page/f4b96e75-8790-4763-9664-533d71f66702.MP4#t=0.02","https://madperfume.co.il/upload/09-2024/page/e42a7bd1-77dd-4314-9754-c0673a7a0bd3.MP4#t=0.02","https://madperfume.co.il/upload/09-2024/page/b5d3620a-3c5a-4cfc-9246-f8dfeec92e0e.mp4#t=0.02","https://madperfume.co.il/upload/09-2024/page/9061a8aa-eaa4-4521-b64d-76a9c94baf84.mp4#t=0.02"]},{"id":1770926883668.7065,"type":"catalog","content":{"ar":"تصفح الكتالوج الكامل 🛍️","he":"צפה בקטלוג המלא 🛍️"},"url":"https://wa.me/c/972524033442","align":"center","btnText":{"ar":"تأكيد الطلب","he":"אישור הזמנה"},"style":{"color":"#ffffff","size":"text-lg","font":"Cairo","weight":"font-bold"},"openingMessage":{"ar":"","he":""},"productImg":"","items":[]},{"id":1770926895082.1804,"type":"testimonials","content":{"ar":"MAD PERFUME","he":"MAD PERFUME"},"url":"","align":"center","btnText":{"ar":"تأكيد الطلب","he":"אישור הזמנה"},"style":{"color":"#ffffff","size":"text-lg","font":"Cairo","weight":"font-bold"},"openingMessage":{"ar":"","he":""},"productImg":"","items":["https://madperfume.ps/upload/02-2026/page/WhatsApp%20Image%202026-02-12%20at%2022.28.14.jpeg","https://madperfume.ps/upload/02-2026/page/WhatsApp%20Image%202026-02-12%20at%2022.28.15.jpeg"]},{"id":1770927061815.2495,"type":"catalog","content":{"ar":"تصفح الكتالوج الكامل 🛍️","he":"צפה בקטלוג המלא 🛍️"},"url":"https://wa.me/c/15558106988","align":"center","btnText":{"ar":"تأكيد الطلب","he":"אישור הזמנה"},"style":{"color":"#ffffff","size":"text-lg","font":"Cairo","weight":"font-bold"},"openingMessage":{"ar":"","he":""},"productImg":"","items":[]}], c: {"bgColor":"#12151c","logoUrl":"https://www.mad-parfumeur.com/assets/hero/logo.png","heroTitle":{"ar":"أقوى العروض الحصرية","he":"המבצעים הבלעדיים ביותר"},"productName":"SALE","price":"500","adminPhone":"972524033442","sheetUrl":"https://script.google.com/macros/s/AKfycbzUHX-JGX_Kyekw7u9CFZ8ci1jbDytGN1rd3ZWEjGd7hjiy-Z4dgioujLeRpP-fNOsTKQ/exec","zapierUrl":"https://hooks.zapier.com/hooks/catch/14790106/ue4uy7j/","fbPixel":"1072283127290819","ttPixel":"D2D02JBC77U4ENLN9SBG","snapPixel":"b143822e-1c3c-40ff-93f7-edadee74e626","floatingWhatsapp":{"enabled":true,"phone":"972524033442","message":{"ar":"مرحبا، لدي استفسار","he":"היי, יש לי שאלה"}}}, f: {name:'', phone:'', address:'', payment:'Cash', process:'Direct'},
+    time: 900, hasStartedTyping: false,
     
-    let currentIndex = 0;
-    let paymentMethod = "نقداً عند الاستلام";
-    let currentStarRating = 5;
+    init(forcedLang) {
+      const qs = new URLSearchParams(window.location.search);
+      const urlLang = qs.get('lang');
+      const autoLang = navigator.language.startsWith('he') ? 'he' : 'ar';
+      this.lang = forcedLang || ((urlLang==='he'||urlLang==='ar') ? urlLang : autoLang);
+      loadPixels(this.c);
+    },
 
-    // 10 Static Reviews
-    const staticReviews = [
-      { name: "محمد العلي", text: "أفضل عطور جربتها، الثبات فعلاً بضل أيام على الملابس والريحة بتجنن!", rating: 5 },
-      { name: "سارة خليل", text: "الخدمة سريعة والتغليف فخم جداً، العطر وصلني وكأنه هدية غالية.", rating: 5 },
-      { name: "أحمد ناصر", text: "ريحة بتجنن وفوحان ملحوظ، كل اللي حولي سألوني عن نوع العطر.", rating: 5 },
-      { name: "ليلى حسن", text: "شكراً MAD، فعلاً الجودة بتنافس العطور العالمية وبسعر توفير.", rating: 5 },
-      { name: "يوسف عمر", text: "اشتريت العرض وما ندمت أبداً، العطور متنوعة والروائح راقية جداً.", rating: 4 },
-      { name: "مريم يحيى", text: "الثبات والفوحان 10/10، بنصح الجميع يتعامل معهم بدون تردد.", rating: 5 },
-      { name: "خالد وليد", text: "تعامل راقي وسرعة في التوصيل، المندوب كان محترم والمنتج أصلي.", rating: 5 },
-      { name: "ريم سعيد", text: "تجربة ممتازة، الروائح ناعمة وفخمة بنفس الوقت، رح أطلب كمان مرة.", rating: 5 },
-      { name: "فادي مطر", text: "أروع عطور فرنسية بتركيز عالي، شكراً على المصداقية في العرض.", rating: 5 },
-      { name: "جنى علي", text: "العرض جداً مغري والجودة فوق التوقعات، الريحة بتضل ثابتة.", rating: 5 }
-    ];
+    trackInput() { if(!this.hasStartedTyping && this.f.name.length>2){ this.hasStartedTyping=true; this.track('AddToCart'); } },
+    track(ev) {
+      const cfg = this.c; let ph = formatE164(this.f.phone);
+      if(window.ttq){ if(ph.length>=10) ttq.identify({phone_number:ph, name:this.f.name}); ttq.track(ev==='AddToCart'?'AddToCart':'CompletePayment', {content_id:cfg.productName, value:Number(cfg.price), currency:'ILS', content_type:'product'}); }
+      if(window.fbq) fbq('track', ev, {value:Number(cfg.price), currency:'ILS', content_ids:[cfg.productName], content_type:'product'});
+      if(window.snaptr) { if(ph.length>=10) snaptr('init', cfg.snapPixel, {user_phone_number:ph}); if(ev==='AddToCart') snaptr('track','ADD_CART',{item_ids:[cfg.productName]}); if(ev==='Purchase') snaptr('track','PURCHASE',{currency:'ILS', price:Number(cfg.price)}); }
+    },
+    async submitForm() {
+      this.loading = true; 
+      this.track('Purchase');
+      const cfg = this.c;
+      const zapUrl = 'https://hooks.zapier.com/hooks/catch/14790106/ue4uy7j/';
+      const finalProduct = this.selectedOffer ? this.selectedOffer : cfg.productName;
+      const msg = `أهلاً بك ${this.f.name} في عالم MAD Parfumeur 🖤 يسعدنا تأكيد طلبك المميز! إليك التفاصيل:
+💎 العطر: ${finalProduct} 💰 الدفع: ${this.f.payment} (${cfg.price}) 📍 العنوان: ${this.f.address} 📦 الإجراء: ${this.f.process}
+سنقوم بتجهيز شحنتك وإرسالها خلال 3-5 أيام عمل. تواصل معنا بكل لاضافة منتجات اوتعديل الطلب 📞 لخدمة الزبائن: *9935 شكراً لاختيارك التميز ✨`;
 
-    // 6 FAQ Items
-    const faqs = [
-      { q: "هل جودة العطور مطابقة للأصلي؟", a: "نعم، نستخدم أنقى الزيوت الفرنسية بتركيز Extrait de Parfum لتطابق الروائح العالمية بنسبة 99%." },
-      { q: "كم يستغرق التوصيل لباب البيت؟", a: "يصلك مندوبنا خلال 24 إلى 72 ساعة كحد أقصى لجميع مناطق الضفة والقدس والداخل." },
-      { q: "هل يمكنني فحص المنتج قبل الدفع؟", a: "بالتأكيد، يحق لك معاينة المنتج والتأكد من التغليف قبل دفع المبلغ للمندوب لضمان رضاك." },
-      { q: "كيف يتم اختيار الروائح في العرض؟", a: "بمجرد إتمام الطلب، سيتواصل معك مستشار العطور لمساعدتك في اختيار الروائح التي تناسب ذوقك." },
-      { q: "هل العطور آمنة على الجلد والحساسية؟", a: "نعم، جميع مكوناتنا معتمدة طبياً وآمنة تماماً على البشرة ولا تسبب أي تهيج." },
-      { q: "كيف أعرف سعر العرض المختار؟", a: "السعر مكتوب بوضوح على كل صورة في الكرسولة أعلاه، وهو سعر نهائي يشمل التوصيل." }
-    ];
+      let zapFd = new FormData();
+      Object.keys(this.f).forEach(k => zapFd.append(k, this.f[k]));
+      zapFd.append('product', finalProduct);
+      zapFd.append('price', cfg.price);
+      zapFd.append('generated_message', msg);
+      fetch(zapUrl, { method: 'POST', body: zapFd, mode: 'no-cors' }).catch(e => console.error('Zapier Error:', e));
 
-    function initPage() {
-      // 1. Build Carousel
-      const track = document.getElementById('carouselTrack');
-      const dotsContainer = document.getElementById('carouselDots');
-      for (let i = 1; i <= TOTAL_SLIDES; i++) {
-        const img = document.createElement('img');
-        img.src = `${IMAGE_BASE}${i}${IMAGE_EXT}`;
-        img.className = 'carousel-slide';
-        img.onerror = function() { this.src = 'https://via.placeholder.com/400x500?text=MAD+Parfumeur'; };
-        track.appendChild(img);
+      let fd = new FormData();
+      Object.keys(this.f).forEach(k => fd.append(k, this.f[k]));
+      fd.append('offer', finalProduct);
+      fd.append('price', cfg.price);
+      fd.append('lang', this.lang);
 
-        const dot = document.createElement('div');
-        dot.className = `dot ${i === 1 ? 'active' : ''}`;
-        dot.onclick = () => goToSlide(i - 1);
-        dotsContainer.appendChild(dot);
-      }
-
-      // 2. Build FAQs
-      const faqList = document.getElementById('faq-list');
-      faqs.forEach(item => {
-        const details = document.createElement('details');
-        details.className = 'group luxury-card rounded-2xl p-1 mb-2 border-none shadow-none';
-        details.innerHTML = `
-          <summary class="flex justify-between items-center cursor-pointer font-bold text-slate-800 text-[13px] p-4">
-            <span>${item.q}</span>
-            <span class="text-amber-500 transition group-open:rotate-45">+</span>
-          </summary>
-          <div class="px-4 pb-4 text-[11px] text-slate-500 font-semibold leading-relaxed">${item.a}</div>
-        `;
-        faqList.appendChild(details);
-      });
-
-      // 3. Scroll Reveal Observer
-      const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('active'); });
-      }, { threshold: 0.1 });
-      document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
-
-      // 4. Star Input Logic
-      const stars = document.querySelectorAll('#starInput span');
-      stars.forEach(star => {
-        star.onclick = function() {
-          currentStarRating = parseInt(this.getAttribute('data-value'));
-          stars.forEach(s => {
-            const val = parseInt(s.getAttribute('data-value'));
-            s.style.color = val <= currentStarRating ? '#fbbf24' : '#d1d5db';
-          });
-        };
-      });
-
-      renderReviews();
+      try {
+        await fetch(cfg.sheetUrl, { method: 'POST', body: fd, mode: 'no-cors' });
+        this.submitted = true;
+      } catch (e) { alert('Error'); } finally { this.loading = false; }
     }
-
-    function renderReviews() {
-      const list = document.getElementById('reviewsList');
-      list.innerHTML = '';
-      
-      // User's private review from LocalStorage
-      const saved = localStorage.getItem('userReviewLux');
-      if (saved) {
-        const d = JSON.parse(saved);
-        list.appendChild(createReviewCard(d.name, d.text, d.stars, true));
-      }
-
-      // Static reviews
-      staticReviews.forEach(r => list.appendChild(createReviewCard(r.name, r.text, r.rating, false)));
-    }
-
-    function createReviewCard(name, text, stars, isUser) {
-      const div = document.createElement('div');
-      div.className = `luxury-card p-4 rounded-2xl ${isUser ? 'border-amber-400 border-2' : ''}`;
-      let starHtml = '';
-      for(let i=1; i<=5; i++) starHtml += `<span class="${i<=stars ? 'text-amber-400' : 'text-slate-200'}">★</span>`;
-      div.innerHTML = `
-        <div class="flex justify-between items-center mb-1">
-            <span class="font-black text-slate-800 text-[13px]">${name}</span>
-            <div class="text-[10px]">${starHtml}</div>
-        </div>
-        <p class="text-[11px] font-bold text-slate-500 italic">"${text}"</p>
-        ${isUser ? '<div class="text-[8px] text-amber-600 font-black mt-1">تقييمك الشخصي</div>' : ''}
-      `;
-      return div;
-    }
-
-    function addUserReview() {
-      const name = document.getElementById('reviewName').value.trim();
-      const text = document.getElementById('reviewText').value.trim();
-      if (!name || !text) { alert("لطفاً، أكمل التقييم"); return; }
-      
-      localStorage.setItem('userReviewLux', JSON.stringify({ name, text, stars: currentStarRating }));
-      renderReviews();
-      document.getElementById('reviewName').value = '';
-      document.getElementById('reviewText').value = '';
-    }
-
-    function updateCarousel() {
-      // Adjusted for dir="rtl" - translateX usually positive index * 100
-      document.getElementById('carouselTrack').style.transform = `translateX(${currentIndex * 100}%)`;
-      document.querySelectorAll('.dot').forEach((dot, idx) => dot.classList.toggle('active', idx === currentIndex));
-    }
-
-    function moveNext() { currentIndex = (currentIndex + 1) % TOTAL_SLIDES; updateCarousel(); }
-    function movePrev() { currentIndex = (currentIndex - 1 + TOTAL_SLIDES) % TOTAL_SLIDES; updateCarousel(); }
-    function goToSlide(idx) { currentIndex = idx; updateCarousel(); }
-
-    function setPayment(type) {
-      document.getElementById('btnCash').classList.toggle('active', type==='cash');
-      document.getElementById('btnCard').classList.toggle('active', type==='card');
-      paymentMethod = type === 'cash' ? "نقداً عند الاستلام" : "بطاقة ائتمان (فيزا)";
-    }
-
-    function submitToWhatsapp() {
-      const name = document.getElementById('custName').value.trim();
-      const phone = document.getElementById('custPhone').value.trim();
-      const addr = document.getElementById('custAddress').value.trim();
-      
-      if (!name || !phone || !addr) { alert("لطفاً، أكمل البيانات"); return; }
-      
-      const offerNum = currentIndex + 1;
-      const imageUrl = `${IMAGE_BASE}${offerNum}${IMAGE_EXT}`;
-      
-      const message = `*طلب ملكي جديد من MAD Parfumeur* 💎\n\n` +
-                      `👤 *العميل:* ${name}\n` +
-                      `📞 *الهاتف:* ${phone}\n` +
-                      `📍 *العنوان:* ${addr}\n` +
-                      `💳 *طريقة الدفع:* ${paymentMethod}\n\n` +
-                      `⭐ *العرض المختار:* عرض رقم ${offerNum}\n` +
-                      `💰 *السعر:* موضح على صورة العرض المرفقة\n` +
-                      `🔗 *صورة العرض:* ${imageUrl}\n\n` +
-                      `يرجى التواصل لتأكيد الطلب.`;
-
-      const encodedMsg = encodeURIComponent(message);
-      window.open(`https://api.whatsapp.com/send?phone=${PHONE_NUMBER}&text=${encodedMsg}`, '_blank');
-    }
-
-    setInterval(moveNext, 6000);
-    window.onload = initPage;
-  </script>
+  }
+}
+</script>
 </body>
 </html>
