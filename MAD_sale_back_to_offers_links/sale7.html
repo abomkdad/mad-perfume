@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الإصدار الذهبي المحدود - MAD Parfumeur</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;700;900&display=swap');
+        body { font-family: 'Cairo', sans-serif; background-color: #EAEDED; scroll-behavior: smooth; }
+        .amazon-orange { color: #FF9900; }
+        .amazon-bg-navy { background-color: #131921; }
+        .amazon-bg-yellow { background-color: #FFD814; border: 1px solid #FCD200; }
+        .amazon-bg-yellow:hover { background-color: #F7CA00; }
+        .star-filled { fill: #FFA41C; color: #FFA41C; }
+        .star-empty { fill: transparent; color: #FFA41C; }
+        .form-input { width: 100%; padding: 12px; border: 1px solid #D5D9D9; border-radius: 8px; font-size: 14px; outline-color: #FF9900; background-color: white; }
+        .product-card { background-color: white; border: 1px solid #D5D9D9; border-radius: 8px; overflow: hidden; }
+        .loading-spinner { border: 3px solid rgba(255, 255, 255, 0.3); border-radius: 50%; border-top: 3px solid #fff; width: 20px; height: 20px; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .fade-in { animation: fadeIn 0.5s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .full-size-img { width: 100%; height: auto; display: block; object-fit: cover; }
+    </style>
+    <script>
+        const PIXELS = { facebook: "1072283127290819", tiktok: "D2D02JBC77U4ENLN9SBG", snapchat: "b143822e-1c3c-40ff-93f7-edadee74e626" };
+        !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
+        fbq('init', PIXELS.facebook); fbq('track', 'PageView');
+    </script>
+</head>
+<body class="text-[#0F1111]">
+    <header class="amazon-bg-navy text-white p-3 sticky top-0 z-50 shadow-md">
+        <div class="max-w-6xl mx-auto flex items-center justify-between gap-4">
+            <button onclick=\"window.location.href='links.html'\" class=\"flex items-center gap-2 bg-white/10 hover:bg-white/20 px-4 py-2 rounded-full text-xs font-bold transition shadow-sm\"><span id=\"back-icon\"></span><span id=\"back-text\">رجوع للعروض</span></button>
+            <div class="text-2xl font-bold cursor-default">MAD<span class="amazon-orange">.</span></div>
+            <button onclick="toggleLangManually()" class="flex items-center gap-1 border border-transparent hover:border-white p-2 rounded transition-all">
+                <i data-lucide="globe" class="w-5 h-5"></i>
+                <span id="lang-text" class="text-sm font-bold">עברית</span>
+            </button>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto py-8 px-4">
+        <div class="product-card flex flex-col md:flex-row gap-8 p-6 md:p-10 mb-12 relative">
+            <div class="w-full md:w-1/2 rounded-xl overflow-hidden bg-white flex items-start justify-center shadow-lg">
+                <!--  -->
+                <img id="product-img" src="https://www.mad-parfumeur.com/assets/hero/7.webp" class="full-size-img" alt="الإصدار الذهبي المحدود">
+            </div>
+
+            <div id="order-section" class="flex-1 text-right bg-[#f7f8f8] p-6 md:p-8 rounded-xl border border-gray-100 relative">
+                <div id="success-message" class="hidden absolute inset-0 bg-white/95 z-20 rounded-xl flex flex-col items-center justify-center p-6 text-center fade-in">
+                    <div class="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mb-6"><i data-lucide="check-circle" class="w-12 h-12"></i></div>
+                    <h2 id="success-title" class="text-3xl font-black mb-4"></h2>
+                    <p id="success-desc" class="text-gray-600 text-lg"></p>
+                    <button onclick="location.reload()" class="mt-8 amazon-bg-navy text-white px-8 py-3 rounded-full font-bold">العودة للمتجر</button>
+                </div>
+
+                <div id="form-content">
+                    <div class="mb-6"><span id="badge" class="bg-[#E47911] text-white text-xs font-bold px-2 py-1 rounded-sm uppercase tracking-wider"></span><h1 id="product-title" class="text-3xl md:text-4xl font-black mt-4 mb-2"></h1><p id="product-subtitle" class="text-gray-600 text-lg"></p></div>
+                    <div class="flex items-center gap-2 mb-8 justify-start"><div class="flex" id="stars-top"></div><span id="review-count-text" class="text-[#007185] text-sm font-bold"></span></div>
+                    <h2 id="order-title" class="text-xl font-bold mb-6 amazon-orange border-b pb-2 text-right"></h2>
+                    <form onsubmit="event.preventDefault(); confirmOrder();" class="space-y-5">
+                        <div><label id="label-phone" class="block text-sm font-bold mb-2"></label><input type="tel" id="form-phone" class="form-input text-right" placeholder="05XXXXXXXX" autocomplete="tel" required></div>
+                        <div><label id="label-name" class="block text-sm font-bold mb-2"></label><input type="text" id="form-name" class="form-input text-right" placeholder="أحمد محمد / אחמד מוחמד" autocomplete="name" required></div>
+                        <div><label id="label-address" class="block text-sm font-bold mb-2"></label><input type="text" id="form-address" class="form-input text-right" placeholder="يافا، شارع النزهة / יפו, רחוב הטיול" autocomplete="street-address" required></div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div><label id="label-payment" class="block text-sm font-bold mb-2"></label><select id="form-payment" class="form-input text-right"></select></div>
+                            <div><label id="label-process" class="block text-sm font-bold mb-2"></label><select id="form-process" class="form-input text-right"></select></div>
+                        </div>
+                        <input type="hidden" id="form-product" value="الإصدار الذهبي المحدود">
+                        <button id="submit-btn" type="submit" class="w-full amazon-bg-yellow py-5 mt-6 rounded-full text-xl font-black shadow-lg flex items-center justify-center gap-3 transform transition-transform active:scale-95"><i id="btn-icon" data-lucide="shopping-cart"></i><span id="btn-text"></span></button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white border border-gray-200 p-8 rounded-xl text-right shadow-sm mb-12">
+            <h2 id="reviews-title" class="text-2xl font-black mb-8 border-b pb-4">مراجعات العملاء</h2>
+            <div id="reviews-list" class="space-y-8"></div>
+        </div>
+    </main>
+
+    <script>
+        let currentLang = 'ar';
+        const ZAPIER_HOOK = "https://hooks.zapier.com/hooks/catch/14790106/ue4uy7j/";
+        const trans = {
+            ar: { back: "رجوع للعروض", langBtn: "עברית", productTitle: "الإصدار الذهبي المحدود", productSubtitle: "عطر مركز بتغليف ملكي للهدايا", badge: "الأكثر مبيعاً", orderTitle: "إتمام الطلب المباشر", reviewCount: "1,540 تقييم", phoneLabel: "رقم الهاتف", nameLabel: "الاسم الكامل", addressLabel: "العنوان", paymentLabel: "طريقة الدفع", paymentCash: "كاش عند الاستلام", paymentBank: "تحويل بنكي", paymentCard: "بطاقة ائتمان", processLabel: "حالة الطلب", processNew: "طلب جديد", btn: "تأكيد الطلب الآن", reviewsTitle: "مراجعات العملاء المميزة", verified: "مشتري مؤكد", loading: "جاري المعالجة...", successT: "تم استلام طلبك!", successD: "شكراً لك. فريقنا سيتواصل معك قريباً.", footer: "جميع الحقوق محفوظة © 2024" },
+            he: { back: "חזרה למבצעים", langBtn: "عربي", productTitle: "מהדורה מוזהבת מוגבלת", productSubtitle: "בושם מרוכז באריזה מלכותית למתנות", badge: "הנמכר ביותר", orderTitle: "ביצוע הזמנה ישירה", reviewCount: "1,540 ביקורות", phoneLabel: "מספר טלפון", nameLabel: "שם מלא", addressLabel: "כתובת", paymentLabel: "אמצעי תשלום", paymentCash: "מזומן", paymentBank: "העברה בנקאית", paymentCard: "כרטיס אשראי", processLabel: "סטטוס הזמנה", processNew: "הזמנה חדשה", btn: "אשר הזמנה כעת", reviewsTitle: "ביקורות לקוחות", verified: "רכישה מאומתת", loading: "מעבד...", successT: "ההזמנה התקבלה!", successD: "תודה. ניצור איתך قשר בהקדם.", footer: "כל הזכויות שמורות © 2024" }
+        };
+        let reviewsData = [
+            { name: "أحمد منصور", text: { ar: "العطر نار اخوي، الثبات ولا غلطة والكل سألني شو حاطط.", he: "הבושם פצצה אחי, העמידות מעולה וכולם שאלו אותי מה שמתי." } },
+            { name: "יוסי כהן", text: { ar: "العطر W183 خيالي، أفضل عطر جربته من سنين.", he: "בושם W183 פשוט דמיוני, הבושם הכי טוב שניסיתי מזה שנים." } },
+            { name: "منى وتد", text: { ar: "وصلت الطلبية خلال يوم واحد، تغليف فخم جداً وريحة بتجنن.", he: "ההזמנה הגיע תוך יום אחד, אריזה יוקרתית וריח מדהים." } },
+            { name: "שרה לوي", text: { ar: "أفضل شركة عطور في البلاد، دائماً مبدعين والخدمة سريعة.", he: "חברת הבשמים הכי טובה בארץ, תמיד יצירתיים ושירות מהיר." } },
+            { name: "محمود جبارين", text: { ar: "شكراً عمي محمد على الخدمة السريعة والأمانة.", he: "תודה דוד מוחמד על השירות המהיר והאמינות." } },
+            { name: "דנה אלוני", text: { ar: "المسك الوردية فخمة جداً، مناسبة للسهرات الراقية.", he: "המושק הוורוד יוקרתי מאוד, מתאים לערבים מיוחדים." } },
+            { name: "يوسف حاج", text: { ar: "انصح الجميع بتجربة W183، ريحة ثابتة وقوية.", he: "ממליץ לכולם לנסות את W183, ריח חזק ועמיד." } },
+            { name: "עידן برك", text: { ar: "خدمة VIP وتوصيل سريع للبيت، شكراً لكم.", he: "שירות VIP ומשלוח מהיר עד הבית, תודה לכם." } },
+            { name: "ليان حبيب", text: { ar: "الريحة بتضل يومين على الملابس، جودة عالمية.", he: "הריח נשאר יומיים על הבגדים, איכות עולמית." } },
+            { name: "מיכאל מ.", text: { ar: "تجربة شراء ممتازة ومصداقية عالية جداً في التعامل.", he: "חוויית קנייה מצוינת ואמינות גבוהה מאוד." } }
+        ];
+
+        function autoDetectLanguage() { const browserLang = navigator.language || navigator.userLanguage; currentLang = browserLang.startsWith('he') ? 'he' : 'ar'; document.documentElement.dir = currentLang === 'ar' ? 'rtl' : 'ltr'; }
+        async function confirmOrder() {
+            const phone = document.getElementById('form-phone').value; const name = document.getElementById('form-name').value; const address = document.getElementById('form-address').value;
+            const payment = document.getElementById('form-payment').value; const process = document.getElementById('form-process').value; const product = document.getElementById('form-product').value;
+            if(!phone || !name || !address) return;
+            document.getElementById('submit-btn').disabled = true; document.getElementById('btn-text').innerText = trans[currentLang].loading;
+            const payload = { identifierValue: phone, phone, name, product, payment, address, process, language: currentLang, timestamp: new Date().toISOString() };
+            try { fetch(ZAPIER_HOOK, { method: "POST", body: JSON.stringify(payload), mode: 'no-cors' }); 
+                if(typeof fbq === 'function') fbq('track', 'Purchase', { content_name: product, value: 350, currency: 'ILS' });
+                setTimeout(() => { document.getElementById('form-content').classList.add('hidden'); document.getElementById('success-message').classList.remove('hidden'); lucide.createIcons(); }, 1000);
+            } catch (e) { document.getElementById('submit-btn').disabled = false; }
+        }
+        function toggleLangManually() { currentLang = currentLang === 'ar' ? 'he' : 'ar'; document.documentElement.dir = currentLang === 'ar' ? 'rtl' : 'ltr'; render(); }
+        function render() {
+            const t = trans[currentLang];
+            const bt = document.getElementById('back-text'); if (bt) bt.innerText = t.back || 'رجوع للعروض';
+            const bi = document.getElementById('back-icon');
+            if (bi) bi.innerHTML = `<i data-lucide="${currentLang==='ar'?'arrow-right':'arrow-left'}" class="w-4 h-4"></i>`;
+         document.getElementById('lang-text').innerText = t.langBtn; document.getElementById('product-title').innerText = t.productTitle; document.getElementById('product-subtitle').innerText = t.productSubtitle; document.getElementById('badge').innerText = t.badge; document.getElementById('order-title').innerText = t.orderTitle; document.getElementById('review-count-text').innerText = t.reviewCount; document.getElementById('btn-text').innerText = t.btn; document.getElementById('reviews-title').innerText = t.reviewsTitle; document.getElementById('success-title').innerText = t.successT; document.getElementById('success-desc').innerText = t.successD;
+            document.getElementById('label-phone').innerText = t.phoneLabel; document.getElementById('label-name').innerText = t.nameLabel; document.getElementById('label-address').innerText = t.addressLabel; document.getElementById('label-payment').innerText = t.paymentLabel; document.getElementById('label-process').innerText = t.processLabel;
+            document.getElementById('form-payment').innerHTML = `<option value="Cash">${t.paymentCash}</option><option value="Card">${t.paymentCard}</option><option value="Bank Transfer">${t.paymentBank}</option>`;
+            document.getElementById('form-process').innerHTML = `<option value="New Order">${t.processNew}</option>`;
+            document.getElementById('stars-top').innerHTML = ''; for(let i=0; i<5; i++) document.getElementById('stars-top').innerHTML += '<i data-lucide="star" class="w-4 h-4 star-filled"></i>';
+            document.getElementById('reviews-list').innerHTML = reviewsData.map(r => `<div class="border-b pb-6 last:border-0"><div class="flex items-center gap-3 mb-2 text-right"><div class="w-9 h-9 rounded-full bg-gray-200 flex items-center justify-center"><i data-lucide="user" class="w-5 h-5 text-gray-500"></i></div><span class="font-bold text-sm">${r.name}</span></div><div class="flex items-center gap-2 mb-2 justify-start"><div class="flex">${[1,2,3,4,5].map(() => `<i data-lucide="star" class="w-3 h-3 star-filled"></i>`).join('')}</div><span class="text-[#C45500] text-xs font-bold underline mr-2">${t.verified}</span></div><p class="text-gray-800 text-lg leading-relaxed text-right">${r.text[currentLang]}</p></div>`).join('');
+            lucide.createIcons();
+        }
+        window.onload = () => { autoDetectLanguage(); render(); };
+    </script>
+</body>
+</html>
