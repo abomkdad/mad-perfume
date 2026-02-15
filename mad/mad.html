@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MAD Parfumeur</title>
+
+  <style>
+    body{
+      margin:0;
+      font-family: Arial, sans-serif;
+      background:#ffffff;
+      color:#111;
+    }
+
+    /* محاذاة تلقائية حسب لغة/اتجاه الصفحة */
+    .container{
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 0 16px;
+    }
+
+    .center{ text-align:center; }
+
+    .header-img{
+      width:100%;
+      height:auto;
+      display:block;
+    }
+
+    .btns{
+      padding:26px 0 36px;
+      display:flex;
+      flex-direction:column;
+      gap:14px;
+      align-items:center;
+    }
+
+    .btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      padding:15px 30px;
+      background:#000000;
+      color:#ffffff;
+      text-decoration:none;
+      font-size:18px;
+      border-radius:12px;
+      transition:0.2s ease;
+      border:2px solid #000;
+      min-width:260px;
+      box-shadow: 0 8px 22px rgba(0,0,0,.12);
+      line-height:1;
+      cursor:pointer;
+    }
+    .btn:hover{ background:#222222; transform: translateY(-1px); }
+
+    .btn.alt{
+      background:#ffffff;
+      color:#000000;
+      border:2px solid #000000;
+    }
+    .btn.alt:hover{ background:#f2f2f2; }
+
+    .icon{ width:20px; height:20px; display:inline-block; }
+
+    /* زر العروض مهتز/لافت */
+    .btn.wiggle{
+      animation: wiggle 1.6s ease-in-out infinite;
+      transform-origin: center;
+    }
+    @keyframes wiggle{
+      0%, 100% { transform: translateX(0) rotate(0deg); }
+      10% { transform: translateX(-2px) rotate(-1deg); }
+      20% { transform: translateX(2px) rotate(1deg); }
+      30% { transform: translateX(-2px) rotate(-1deg); }
+      40% { transform: translateX(2px) rotate(1deg); }
+      50% { transform: translateX(0) rotate(0deg); }
+    }
+
+    /* زر واتساب عائم */
+    .wa-float{
+      position:fixed;
+      right:16px;
+      bottom:16px;
+      width:58px;
+      height:58px;
+      border-radius:999px;
+      background:#25D366;
+      box-shadow: 0 12px 28px rgba(0,0,0,.22);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      z-index:9999;
+      transition:0.2s ease;
+    }
+    .wa-float:hover{ transform: translateY(-2px) scale(1.03); }
+    .wa-float svg{ width:30px; height:30px; }
+
+    /* مسافة تحتية للموبايل عشان ما يغطي الزر العائم */
+    .safe-space{ height:80px; }
+
+    /* -like Reviews */
+    .review-summary{
+      display:flex;
+      gap:22px;
+      align-items:flex-start;
+      justify-content:space-between;
+      flex-wrap:wrap;
+      border:1px solid #eee;
+      border-radius:14px;
+      padding:18px;
+      box-shadow:0 6px 18px rgba(0,0,0,.06);
+      background:#fff;
+    }
+    .review-summary-left{ min-width:260px; flex:1; }
+    .review-summary-right{ min-width:280px; flex:1; }
+
+    .review-title{ margin:0 0 10px; font-size:22px; text-align:start; }
+    .rating-row{ display:flex; align-items:center; gap:10px; justify-content:flex-start; }
+    .stars-big{ color:#f5b301; font-size:22px; letter-spacing:1px; }
+    .rating-num{ font-weight:900; font-size:18px; }
+    .rating-count{ color:#565959; font-size:14px; }
+    .rating-note{ margin-top:8px; color:#565959; font-size:13px; text-align:start; }
+
+    .dist{ display:flex; flex-direction:column; gap:10px; }
+    .dist-row{ display:grid; grid-template-columns: 70px 1fr 44px; gap:10px; align-items:center; }
+    .dist-label{ color:#0f1111; font-size:13px; text-align:start; white-space:nowrap; }
+    .dist-pct{ color:#565959; font-size:13px; text-align:end; }
+    .dist-bar{ width:100%; height:12px; border-radius:999px; background:#f0f2f2; overflow:hidden; border:1px solid #e3e6e6; }
+    .dist-bar span{ display:block; height:100%; background:#f5b301; }
+
+    .reviews-list{ display:grid; gap:14px; }
+    .review-card{
+      text-align:start;
+      border:1px solid #eee;
+      border-radius:14px;
+      padding:16px;
+      box-shadow:0 6px 18px rgba(0,0,0,.06);
+      background:#fff;
+    }
+    .review-head{ display:flex; gap:12px; align-items:center; margin-bottom:10px; }
+    .avatar{
+      width:38px; height:38px; border-radius:50%;
+      background:#111; color:#fff; display:flex; align-items:center; justify-content:center;
+      font-weight:900;
+    }
+    .meta .name{ font-weight:900; }
+    .meta .sub{ color:#565959; font-size:13px; }
+
+    .review-body .row{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+    .stars{ color:#f5b301; letter-spacing:1px; font-size:16px; }
+    .headline{ font-weight:900; }
+    .small{ color:#565959; font-size:12px; margin-top:6px; }
+    .badge{
+      display:inline-block;
+      margin-top:10px;
+      padding:5px 10px;
+      border-radius:999px;
+      background:#f0f2f2;
+      border:1px solid #e3e6e6;
+      color:#0f1111;
+      font-size:12px;
+      font-weight:800;
+    }
+    .text{ margin:10px 0 0; color:#0f1111; font-size:14px; line-height:1.55; }
+
+    .helpful-row{ display:flex; align-items:center; gap:10px; margin-top:12px; }
+    .helpful{
+      padding:8px 12px;
+      border-radius:999px;
+      border:1px solid #d5d9d9;
+      background:#fff;
+      cursor:pointer;
+      font-weight:800;
+    }
+    .helpful:hover{ background:#f7fafa; }
+    .helpful-count{ color:#565959; font-size:13px; }
+
+    /* Fix alignment for buttons section */
+    .btns{ text-align:center; }
+
+    /* My private review */
+    .my-review{
+      border:1px solid #eee;
+      border-radius:14px;
+      padding:16px;
+      box-shadow:0 6px 18px rgba(0,0,0,.06);
+      background:#fff;
+      text-align:start;
+    }
+    .my-title{ margin:0 0 12px; font-size:18px; }
+    .my-form{ display:grid; gap:12px; }
+    .my-row{ display:grid; gap:6px; }
+    .my-label{ font-weight:800; font-size:13px; color:#0f1111; }
+    .my-input,.my-textarea{
+      width:100%;
+      border:1px solid #d5d9d9;
+      border-radius:10px;
+      padding:10px 12px;
+      font-size:14px;
+      outline:none;
+    }
+    .my-input:focus,.my-textarea:focus{ border-color:#111; box-shadow:0 0 0 3px rgba(17,17,17,.08); }
+    .my-hint{ color:#565959; font-size:12px; }
+    .my-actions{ display:flex; gap:10px; flex-wrap:wrap; margin-top:2px; }
+    .my-btn{
+      padding:10px 14px;
+      border-radius:999px;
+      border:1px solid #111;
+      background:#111;
+      color:#fff;
+      font-weight:900;
+      cursor:pointer;
+    }
+    .my-btn:hover{ background:#222; }
+    .my-btn.alt{ background:#fff; color:#111; border:1px solid #d5d9d9; }
+    .my-btn.alt:hover{ background:#f7fafa; }
+
+    .my-saved{
+      border:1px dashed #d5d9d9;
+      border-radius:12px;
+      padding:12px;
+      margin-bottom:12px;
+      background:#fafafa;
+    }
+    .my-saved .stars{ font-size:16px; }
+
+    /* Star input (clickable) */
+    .star-input{ display:inline-flex; gap:6px; user-select:none; }
+    .star-input input{ display:none; }
+    .star-input label{
+      font-size:22px;
+      color:#d5d9d9;
+      cursor:pointer;
+      line-height:1;
+    }
+    .star-input input:checked ~ label{ color:#d5d9d9; }
+    .star-input label:hover,
+    .star-input label:hover ~ label{ color:#f5b301; }
+    .star-input input:checked + label,
+    .star-input input:checked + label ~ label{ color:#f5b301; }
+
+    /* Responsive tweaks */
+    @media (max-width:520px){
+      .dist-row{ grid-template-columns: 60px 1fr 40px; }
+      .btn{ min-width: 240px; }
+    }
+  </style>
+
+  <script>
+    // Auto language by device/browser
+    (function(){
+      const lang = (navigator.language || navigator.userLanguage || 'ar').toLowerCase();
+      const isHe = lang.startsWith('he');
+
+      const I18N = {
+        ar: {
+          htmlLang: 'ar',
+          dir: 'rtl',
+          title: 'العروض الحصرية - MAD Parfumeur',
+          offersBtn: 'تصفّح العروض الحصرية',
+          catalogBtn: 'كتالوج واتساب',
+          waLabel: 'واتساب',
+          reviewsTitle: 'آراء العملاء',
+          ratingNote: 'متوسط التقييم بناءً على تقييمات العملاء',
+          verified: 'شراء موثّق',
+          helpful: 'مفيد',
+          d5: '5 نجوم',
+          d4: '4 نجوم',
+          d3: '3 نجوم',
+          d2: '2 نجوم',
+          d1: '1 نجمة',
+          myReviewTitle: 'اكتب تعليق',
+          myRateLabel: 'التقييم',
+          myCommentLabel: 'تعليق',
+          myCommentPh: 'اكتب تعليقك...',
+          myHint: '',
+          mySaveBtn: 'حفظ',
+          myClearBtn: 'مسح',
+          mySavedTitle: 'تم حفظ رأيك',
+          mySavedEdit: 'يمكنك تعديل رأيك ثم حفظه'
+        
+        },
+        he: {
+          htmlLang: 'he',
+          dir: 'ltr',
+          title: 'מבצעים בלעדיים - MAD Parfumeur',
+          offersBtn: 'צפייה במבצעים בלעדיים',
+          catalogBtn: 'קטלוג וואטסאפ',
+          waLabel: 'וואטסאפ',
+          reviewsTitle: 'ביקורות לקוחות',
+          ratingNote: 'דירוג ממוצע על סמך ביקורות לקוחות',
+          verified: 'רכישה מאומתת',
+          helpful: 'מועיל',
+          d5: '5 כוכבים',
+          d4: '4 כוכבים',
+          d3: '3 כוכבים',
+          d2: '2 כוכבים',
+          d1: 'כוכב אחד',
+          myReviewTitle: 'כתוב/כתבי תגובה',
+          myRateLabel: 'דירוג',
+          myCommentLabel: 'תגובה',
+          myCommentPh: 'כתוב/כתבי תגובה...',
+          myHint: '',
+          mySaveBtn: 'שמור',
+          myClearBtn: 'מחק',
+          mySavedTitle: 'חוות הדעת נשמרה',
+          mySavedEdit: 'אפשר לערוך ואז לשמור'
+        
+        }
+      };
+
+      const t = isHe ? I18N.he : I18N.ar;
+
+      document.addEventListener('DOMContentLoaded', function(){
+        document.documentElement.lang = t.htmlLang;
+        document.documentElement.dir = t.dir;
+        document.title = t.title;
+
+        const offers = document.getElementById('btnOffers');
+        const catalog = document.getElementById('btnCatalog');
+        const wa = document.getElementById('waFloat');
+
+        if(offers) offers.querySelector('span').textContent = t.offersBtn;
+        if(catalog) catalog.querySelector('span').textContent = t.catalogBtn;
+        if(wa) wa.setAttribute('aria-label', t.waLabel);
+
+        // Reviews i18n
+        const reviewsTitle = document.getElementById('reviewsTitle');
+        const ratingNote = document.getElementById('ratingNote');
+        const v1 = document.getElementById('verified1');
+        const v2 = document.getElementById('verified2');
+        const v3 = document.getElementById('verified3');
+        const v4 = document.getElementById('verified4');
+        const v5 = document.getElementById('verified5');
+        const d5 = document.getElementById('d5');
+        const d4 = document.getElementById('d4');
+        const d3 = document.getElementById('d3');
+        const d2 = document.getElementById('d2');
+        const d1 = document.getElementById('d1');
+
+        if(reviewsTitle) reviewsTitle.textContent = t.reviewsTitle;
+        if(ratingNote) ratingNote.textContent = t.ratingNote;
+        [v1,v2,v3,v4,v5].forEach(el => { if(el) el.textContent = t.verified; });
+        if(d5) d5.textContent = t.d5;
+        if(d4) d4.textContent = t.d4;
+        if(d3) d3.textContent = t.d3;
+        if(d2) d2.textContent = t.d2;
+        if(d1) d1.textContent = t.d1;
+
+        // Elements with data-ar/data-he
+        document.querySelectorAll('[data-ar][data-he]').forEach(el => {
+          el.textContent = isHe ? el.getAttribute('data-he') : el.getAttribute('data-ar');
+        });
+
+        // Helpful buttons label
+        document.querySelectorAll('button.helpful').forEach(btn => {
+          btn.textContent = t.helpful;
+        });
+
+        // ===== Dynamic Reviews Data =====
+        const REVIEWS = [
+  { name: "أحمد خليل", text: { ar: "الريحة فخمة وثابتة، وكل مرة بطلع معي اختيار مضبوط.", he: "הריח יוקרתי ועמיד, כל פעם בחירה בול." }, date: "2026-02-14" },
+  { name: "سارة حمّاد", text: { ar: "التغليف راقي كتير، بتحسه هدية جاهزة.", he: "האריזה ברמה, מרגיש כמו מתנה מוכנה." }, date: "2026-02-13" },
+  { name: "يوسف شحادة", text: { ar: "فوحان قوي وبعدين بصير ناعم… ممتاز.", he: "פיזור חזק ואז נהיה עדין… מעולה." }, date: "2026-02-12" },
+  { name: "رنا منصور", text: { ar: "أحلى هدية جبتها، الكل انبسط.", he: "המתנה הכי טובה שהבאתי, כולם התלהבו." }, date: "2026-02-11" },
+  { name: "נועה לוי", text: { ar: "خدمة الواتساب سريعة وبساعدوك تختار اللي بناسبك.", he: "השירות בוואטסאפ מהיר ועוזרים לבחור מה שמתאים." }, date: "2026-02-10" },
+  { name: "דניאל כהן", text: { ar: "العطر ثابت طول اليوم، وبتوصلني عليه مديح.", he: "מחזיק כל היום, ואני מקבל מחמאות." }, date: "2026-02-09" },
+  { name: "ليلى ناصر", text: { ar: "ريحة نظافة ونعومة… بتجنن.", he: "ריח נקי ורך… מהמם." }, date: "2026-02-08" },
+  { name: "איתי שטרן", text: { ar: "الأسعار مع العروض بتطلع صفقة جد.", he: "המחיר עם המבצעים יוצא דיל אמיתי." }, date: "2026-02-07" },
+  { name: "محمود حدّاد", text: { ar: "جربت من النيش… مستوى ثاني بصراحة.", he: "ניסיתי מהניש… רמה אחרת לגמרי." }, date: "2026-02-06" },
+  { name: "מאיה פרץ", text: { ar: "العلبة مرتبة والتوصيل سريع، تجربة حلوة.", he: "קופסה מושקעת ומשלוח מהיר, חוויה טובה." }, date: "2026-02-05" },
+
+  { name: "شادي درويش", text: { ar: "ريحة رجّالية قوية ومرتبة… بتعطي حضور.", he: "ריח גברי חזק ומסודר… נותן נוכחות." }, date: "2026-02-04" },
+  { name: "תמר מזרחי", text: { ar: "خفيف ومناسب لليوم يوم… مش خانق.", he: "קליל ומתאים ליומיום… לא חונק." }, date: "2026-02-03" },
+  { name: "هبة عوض", text: { ar: "الريحه رايقة كتير، وبترك أثر حلو.", he: "הריח רגוע ומשאיר שובל יפה." }, date: "2026-02-02" },
+  { name: "יובל דהן", text: { ar: "طلبت أونلاين ووصلني مرتب، بدون وجع راس.", he: "הזמנתי אונליין והגיע מסודר, בלי כאב ראש." }, date: "2026-02-01" },
+  { name: "فراس منصور", text: { ar: "التعامل محترم وبيعطوك اقتراحات سريعة.", he: "יחס מכובד ונותנים המלצות מהר." }, date: "2026-01-31" },
+  { name: "שחר ביטון", text: { ar: "الريحة بتضل على التيشيرت لليوم الثاني.", he: "נשאר על החולצה גם ליום אחרי." }, date: "2026-01-30" },
+  { name: "دانا شحادة", text: { ar: "أخذته هدية وطلع أفخم مما توقعت.", he: "קניתי מתנה ויצא יותר יוקרתי ממה שחשבתי." }, date: "2026-01-29" },
+  { name: "אורי רוזן", text: { ar: "بحب إنه في خيارات كتير، بتلاقي اللي بناسبك.", he: "אהבתי שיש מלא אופציות, מוצאים מה שמתאים." }, date: "2026-01-28" },
+  { name: "نور حمّاد", text: { ar: "ثبات ممتاز، ومع هيك مش ثقيل.", he: "עמידות מצוינת, ועדיין לא כבד." }, date: "2026-01-27" },
+  { name: "רועי דנון", text: { ar: "المستوى ممتاز بالنسبة للسعر، شغل مرتب.", he: "רמה מצוינת ביחס למחיר, עבודה טובה." }, date: "2026-01-26" },
+
+  { name: "كريم حمدان", text: { ar: "فوحان قوي أولها وبعدها بصير هادي… حلو.", he: "פיזור חזק בהתחלה ואז נהיה רגוע… טוב." }, date: "2026-01-25" },
+  { name: "נעמה אלקיים", text: { ar: "ريحة أنثوية ناعمة… كتير حلوة.", he: "ריח נשי ועדין… ממש יפה." }, date: "2026-01-24" },
+  { name: "عمر سليمان", text: { ar: "استفسرت واتساب، ردّوا بسرعة وبذوق.", he: "שאלתי בוואטסאפ, ענו מהר ובאדיבות." }, date: "2026-01-23" },
+  { name: "גיא כץ", text: { ar: "تجربة شراء سهلة وسريعة، وكل شي واضح.", he: "חוויה קלה ומהירה, הכל ברור." }, date: "2026-01-22" },
+  { name: "ريما زيدان", text: { ar: "الريحة نظيفة ومنعشة… بتفتح النفس.", he: "ריח נקי ומרענן… עושה טוב." }, date: "2026-01-21" },
+  { name: "איילת אמסלם", text: { ar: "التغليف ممتاز ومرتب… تفاصيل صغيرة بتفرق.", he: "אריזה מצוינת ומסודרת… הפרטים הקטנים עושים." }, date: "2026-01-20" },
+  { name: "باسل نفاع", text: { ar: "من أول رشة بتحس بالفخامة.", he: "מהספריי הראשון מרגיש יוקרה." }, date: "2026-01-19" },
+  { name: "מיכל שקד", text: { ar: "ريحة شتوية دافية… كتير مناسبة.", he: "ריח חורפי חמים… ממש מתאים." }, date: "2026-01-18" },
+  { name: "ميساء حجازي", text: { ar: "للدوام ممتاز، مش صاخب بس واضح.", he: "לעבודה מעולה, לא צעקני אבל מורגש." }, date: "2026-01-17" },
+  { name: "עמית לוי", text: { ar: "المنتجات مرتبة والخدمة بتخليك ترجع.", he: "המוצרים טובים והשירות גורם לחזור." }, date: "2026-01-16" },
+
+  { name: "نادر أبو ريا", text: { ar: "أخذت باكج 5 عطور… كل واحد أحلى من الثاني.", he: "לקחתי חבילה של 5… כל אחד יותר טוב." }, date: "2026-01-15" },
+  { name: "ליאור כהן", text: { ar: "الريحة ثابتة بس مش خانقة… موزونة.", he: "עמיד אבל לא חונק… מאוזן." }, date: "2026-01-14" },
+  { name: "جنى قواسمي", text: { ar: "حبيت الخيارات النسائية… ريح روعة.", he: "אהבתי את האופציות לנשים… ריחות מהממים." }, date: "2026-01-13" },
+  { name: "בן שמעוני", text: { ar: "الخدمة بالسريع وما في لف ودوران.", he: "שירות מהיר בלי סיבובים." }, date: "2026-01-12" },
+  { name: "رامي كناعنة", text: { ar: "ريحة فخمة للمناسبات، بتطلع هيبة.", he: "ריח יוקרתי לאירועים, נותן וייב רציני." }, date: "2026-01-11" },
+  { name: "אמה סויסה", text: { ar: "كتير حلو إنه بيوجهوك حسب ذوقك.", he: "אהבתי שמכוונים לפי הטעם שלך." }, date: "2026-01-10" },
+  { name: "فرح درويش", text: { ar: "العطر مش بس حلو… كمان مرتب بالشكل.", he: "לא רק ריח טוב… גם נראה מושקע." }, date: "2026-01-09" },
+  { name: "רותם פרידמן", text: { ar: "طلبت واستلمت بسرعة، والتغليف ممتاز.", he: "הזמנתי וקיבלתי מהר, והאריזה מצוינת." }, date: "2026-01-08" },
+  { name: "علاء حمّاد", text: { ar: "ريحة رجّالية رايقة وثابتة.", he: "ריח גברי רגוע ועמיד." }, date: "2026-01-07" },
+  { name: "מתן אוחנה", text: { ar: "فيه ريح خفيفة للصيف… اختيار موفق.", he: "יש ריחות קלילים לקיץ… בחירה טובה." }, date: "2026-01-06" },
+
+  { name: "سلمى ناصر", text: { ar: "حبيت ريحة النظافة… بتناسب كل وقت.", he: "אהבתי את הניקיון בריח… מתאים לכל זמן." }, date: "2026-01-05" },
+  { name: "עומרי בוסקילה", text: { ar: "السعر مقابل الجودة ممتاز.", he: "מחיר מול איכות מעולה." }, date: "2026-01-04" },
+  { name: "يحيى عوض", text: { ar: "كل مرة بشتري وبطلع راضي… شغل ثابت.", he: "כל פעם קונה ויוצא מרוצה… איכות קבועה." }, date: "2026-01-03" },
+  { name: "נוגה מזרחי", text: { ar: "العلبة فخمة… بتليق للهدايا.", he: "הקופסה יוקרתית… בול למתנות." }, date: "2026-01-02" },
+  { name: "هدى سليمان", text: { ar: "ريحة هادية ومرتبة… بحبها.", he: "ריח רגוע ומסודר… אהבתי." }, date: "2026-01-01" },
+  { name: "אדר כהן", text: { ar: "الترتيب ممتاز والتواصل سريع.", he: "הכל מסודר והתקשורת מהירה." }, date: "2026-12-31" },
+  { name: "شيماء قاسم", text: { ar: "جربت كذا نوع… كله طالع مستوى.", he: "ניסיתי כמה סוגים… כולם ברמה." }, date: "2026-12-30" },
+  { name: "הראל ברק", text: { ar: "ريحة بتعطي حضور بدون ما تكون ثقيلة.", he: "נותן נוכחות בלי להיות כבד." }, date: "2026-12-29" },
+  { name: "مروان زيدان", text: { ar: "المنتج ممتاز، وبحس الجودة واضحة.", he: "מוצר מצוין, מרגישים את האיכות." }, date: "2026-12-28" },
+  { name: "ליה לוי", text: { ar: "حبيت إنه في نيش وسلكتف… خيارات كثيرة.", he: "אהבתי שיש גם ניש וגם סלקטיב… הרבה אופציות." }, date: "2026-12-27" },
+
+  { name: "آية حجازي", text: { ar: "ريحة ناعمة ومحببة… بتناسب البنات.", he: "ריח עדין ומקסים… מתאים לבנות." }, date: "2026-12-26" },
+  { name: "יונתן רוזן", text: { ar: "تجربة ممتازة من أولها لآخرها.", he: "חוויה מעולה מהתחלה עד הסוף." }, date: "2026-12-25" },
+  { name: "صفاء منصور", text: { ar: "ريحة فخمة وبتضل… جد مبسوطة.", he: "ריח יוקרתי ונשאר… ממש מרוצה." }, date: "2026-12-24" },
+  { name: "מורן פרץ", text: { ar: "سهل تختار، والأسعار واضحة.", he: "קל לבחור, והמחירים ברורים." }, date: "2026-12-23" },
+  { name: "فادي أبو عيشة", text: { ar: "الموظفين بيفهموا وبيعطوك اللي بدك ياه.", he: "הצוות מבין ומכוון בדיוק למה שצריך." }, date: "2026-12-22" },
+  { name: "שני דהן", text: { ar: "ريحة راقية… بتخليك تحس فخامة.", he: "ריח אלגנטי… מרגיש יוקרתי." }, date: "2026-12-21" },
+  { name: "جود نفاع", text: { ar: "عطور مرتبة وخيارات كتير… أكيد برجع.", he: "בשמים טובים והמון אפשרויות… בטוח חוזר/ת." }, date: "2026-12-20" },
+  { name: "אופיר ביטון", text: { ar: "الريحة بتثبت منيح وبسعر منيح.", he: "עמיד יפה ובמחיר טוב." }, date: "2026-12-19" },
+  { name: "كرم سليمان", text: { ar: "العطر مرتب ومناسب لكل يوم.", he: "בושם טוב שמתאים ליום יום." }, date: "2026-12-18" },
+  { name: "רוני כץ", text: { ar: "كل شي كان سريع ومرتب… شكراً.", he: "הכל היה מהיר ומסודר… תודה." }, date: "2026-12-17" }
+];
+
+        function renderReviews(){
+          const container = document.getElementById('reviewsDynamic');
+          if(!container) return;
+          container.innerHTML = '';
+          REVIEWS.forEach((r) => {
+            // Show original name + both languages for everyone
+            const displayName = r.name;
+            const avatar = displayName.trim().charAt(0);
+            // If the name is written in Hebrew → show Hebrew comment
+            const hasHebrewName = /[֐-׿]/.test(r.name);
+            const text = hasHebrewName
+              ? ((r.text && r.text.he) ? r.text.he : '')
+              : ((r.text && r.text.ar) ? r.text.ar : '');
+            const card = document.createElement('article');
+            card.className = 'review-card';
+            card.innerHTML = `
+              <div class="review-head">
+                <div class="avatar">${avatar}</div>
+                <div class="meta">
+                  <div class="name">${displayName}</div>
+                  <div class="sub">${r.date}</div>
+                </div>
+              </div>
+              <div class="review-body">
+                <div class="row">
+                  <div class="stars">★★★★★</div>
+                </div>
+                ${text ? `<p class="text" dir="${isHe ? 'ltr' : 'rtl'}" style="text-align:start;">${text}</p>` : ''}
+              </div>
+            `;
+            container.appendChild(card);
+          });
+        }
+
+        renderReviews();
+
+        // ===== My private comment (localStorage) =====
+        const LS_KEY = 'MAD_PRIVATE_COMMENT_V1';
+        const myTitle = document.getElementById('myReviewTitle');
+        const mySaved = document.getElementById('myReviewSaved');
+        const myForm = document.getElementById('myReviewForm');
+        const myComment = document.getElementById('myComment');
+        const myRateLabel = document.getElementById('myRateLabel');
+        const myCommentLabel = document.getElementById('myCommentLabel');
+        const mySaveBtn = document.getElementById('mySaveBtn');
+        const myClearBtn = document.getElementById('myClearBtn');
+
+        // i18n labels
+        if(myTitle) myTitle.textContent = t.myReviewTitle;
+        if(myRateLabel) myRateLabel.textContent = t.myRateLabel;
+        if(myCommentLabel) myCommentLabel.textContent = t.myCommentLabel;
+        if(mySaveBtn) mySaveBtn.textContent = t.mySaveBtn;
+        if(myClearBtn) myClearBtn.textContent = t.myClearBtn;
+        if(myComment) myComment.placeholder = t.myCommentPh;
+
+        function getStarsValue(){
+          const checked = document.querySelector('input[name="myStars"]:checked');
+          return checked ? parseInt(checked.value, 10) : 5;
+        }
+        function setStarsValue(v){
+          const el = document.querySelector('input[name="myStars"][value="'+v+'"]');
+          if(el) el.checked = true;
+        }
+        function starsText(v){
+          v = Math.max(1, Math.min(5, parseInt(v||5,10)));
+          return '★★★★★'.slice(0, v) + '☆☆☆☆☆'.slice(0, 5-v);
+        }
+
+        function loadMyComment(){
+          try{
+            const raw = localStorage.getItem(LS_KEY);
+            if(!raw){ if(mySaved) mySaved.style.display='none'; return; }
+            const data = JSON.parse(raw);
+            if(myComment) myComment.value = data.comment || '';
+            setStarsValue(data.stars || 5);
+            if(mySaved){
+              mySaved.style.display='block';
+              mySaved.innerHTML =
+                '<div style="font-weight:900; margin-bottom:6px;">'+ t.mySavedTitle +'</div>'+
+                '<div class="stars" style="margin-bottom:6px;">'+ starsText(data.stars || 5) +'</div>'+
+                '<div style="color:#0f1111; font-size:14px; line-height:1.55;">'+ (data.comment || '') +'</div>'+
+                '<div style="margin-top:8px; color:#565959; font-size:12px;">'+ t.mySavedEdit +'</div>';
+            }
+          }catch(e){ if(mySaved) mySaved.style.display='none'; }
+        }
+        function saveMyComment(){
+          const payload = {
+            stars: getStarsValue(),
+            comment: (myComment?.value || '').trim().slice(0,400),
+            ts: Date.now()
+          };
+          localStorage.setItem(LS_KEY, JSON.stringify(payload));
+          loadMyComment();
+        }
+        function clearMyComment(){
+          localStorage.removeItem(LS_KEY);
+          if(myComment) myComment.value='';
+          setStarsValue(5);
+          if(mySaved) mySaved.style.display='none';
+        }
+
+        loadMyComment();
+        if(myForm){
+          myForm.addEventListener('submit', function(e){
+            e.preventDefault();
+            saveMyComment();
+          });
+        }
+        if(myClearBtn){
+          myClearBtn.addEventListener('click', clearMyComment);
+        }
+      });
+    })();
+  </script>
+</head>
+
+<body>
+
+  <!-- صورة الهيدر -->
+  <img class="header-img" src="https://www.mad-parfumeur.com/assets/hero/hed.webp" alt="MAD Header">
+
+  <!-- الأزرار -->
+  <div class="btns">
+    <!-- زر عروض (مهتز) -->
+    <a id="btnOffers" href="https://www.mad-parfumeur.com/mad/links.html" class="btn wiggle">
+      <span>تصفّح العروض الحصرية</span>
+    </a>
+
+    <!-- زر كتالوج واتساب مع ايقونة كتالوج -->
+    <a id="btnCatalog" href="https://wa.me/c/972524033442" class="btn alt">
+      <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+        <path fill="currentColor" d="M6 2h10a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2Zm0 2v16h10V4H6Zm2 3h6v2H8V7Zm0 4h6v2H8v-2Zm0 4h6v2H8v-2Z"/>
+      </svg>
+      <span>كتالوج واتساب</span>
+    </a>
+  </div>
+
+  <!-- آراء العملاء (ستايل أمازون) -->
+  <section id="reviews" class="container" style="padding:34px 0 10px;">
+
+    <!-- Summary -->
+    <div class="review-summary">
+      <div class="review-summary-left">
+        <h2 id="reviewsTitle" class="review-title">آراء العملاء</h2>
+        <div class="rating-row" aria-label="rating">
+          <div class="stars-big" aria-hidden="true">★★★★★</div>
+          <div class="rating-num" id="ratingNum">4.9</div>
+          <div class="rating-count" id="ratingCount">(2,410)</div>
+        </div>
+        <div class="rating-note" id="ratingNote">متوسط التقييم بناءً على تقييمات العملاء</div>
+      </div>
+
+      <div class="review-summary-right">
+        <div class="dist">
+          <div class="dist-row">
+            <span class="dist-label" id="d5">5 نجوم</span>
+            <div class="dist-bar"><span style="width:88%"></span></div>
+            <span class="dist-pct">88%</span>
+          </div>
+          <div class="dist-row">
+            <span class="dist-label" id="d4">4 نجوم</span>
+            <div class="dist-bar"><span style="width:9%"></span></div>
+            <span class="dist-pct">9%</span>
+          </div>
+          <div class="dist-row">
+            <span class="dist-label" id="d3">3 نجوم</span>
+            <div class="dist-bar"><span style="width:2%"></span></div>
+            <span class="dist-pct">2%</span>
+          </div>
+          <div class="dist-row">
+            <span class="dist-label" id="d2">2 نجوم</span>
+            <div class="dist-bar"><span style="width:1%"></span></div>
+            <span class="dist-pct">1%</span>
+          </div>
+          <div class="dist-row">
+            <span class="dist-label" id="d1">1 نجمة</span>
+            <div class="dist-bar"><span style="width:0%"></span></div>
+            <span class="dist-pct">0%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Reviews list -->
+    <div id="reviewsDynamic" class="reviews-list" style="margin-top:18px;"></div>
+
+    <!-- تعليقك (محفوظ فقط على جهازك) -->
+    <div class="my-review" style="margin-top:22px;">
+      <h3 id="myReviewTitle" class="my-title">أضف رأيك</h3>
+      <div id="myReviewSaved" class="my-saved" style="display:none;"></div>
+
+      <form id="myReviewForm" class="my-form" autocomplete="off">
+        <div class="my-row">
+          <label class="my-label" id="myRateLabel">التقييم</label>
+          <div class="star-input" dir="ltr" aria-label="rating">
+            <input type="radio" name="myStars" id="s5" value="5" checked><label for="s5" title="5">★</label>
+            <input type="radio" name="myStars" id="s4" value="4"><label for="s4" title="4">★</label>
+            <input type="radio" name="myStars" id="s3" value="3"><label for="s3" title="3">★</label>
+            <input type="radio" name="myStars" id="s2" value="2"><label for="s2" title="2">★</label>
+            <input type="radio" name="myStars" id="s1" value="1"><label for="s1" title="1">★</label>
+          </div>
+        </div>
+
+        <div class="my-row">
+          <label class="my-label" id="myCommentLabel" for="myComment">تعليق</label>
+          <textarea id="myComment" class="my-textarea" rows="4" placeholder="اكتب تعليقك..." maxlength="400"></textarea>
+          <div class="my-hint" id="myHint" style="display:none"></div>
+        </div>
+
+        <div class="my-actions">
+          <button type="submit" class="my-btn" id="mySaveBtn">حفظ</button>
+          <button type="button" class="my-btn alt" id="myClearBtn">مسح</button>
+        </div>
+      </form>
+    </div>
+
+  </section>
+
+  <div class="safe-space"></div>
+
+  <!-- واتساب مباشر عائم (ايقونة خضرا) -->
+  <a id="waFloat" class="wa-float" href="https://wa.me/972524033442" target="_blank" rel="noopener" aria-label="WhatsApp">
+    <svg viewBox="0 0 32 32" aria-hidden="true">
+      <path fill="#fff" d="M19.11 17.53c-.27-.14-1.6-.79-1.85-.88-.25-.09-.43-.14-.61.14-.18.27-.7.88-.86 1.06-.16.18-.32.2-.59.07-.27-.14-1.15-.42-2.19-1.34-.81-.72-1.36-1.61-1.52-1.88-.16-.27-.02-.42.12-.56.12-.12.27-.32.41-.48.14-.16.18-.27.27-.45.09-.18.05-.34-.02-.48-.07-.14-.61-1.47-.83-2.01-.22-.53-.44-.46-.61-.47l-.52-.01c-.18 0-.48.07-.73.34-.25.27-.95.93-.95 2.27 0 1.34.97 2.64 1.11 2.82.14.18 1.91 2.92 4.64 4.1.65.28 1.15.45 1.54.58.65.21 1.24.18 1.7.11.52-.08 1.6-.65 1.83-1.27.23-.62.23-1.15.16-1.27-.07-.11-.25-.18-.52-.32Z"/>
+      <path fill="#fff" d="M16.02 5.33c-5.88 0-10.66 4.78-10.66 10.66 0 1.88.49 3.65 1.35 5.19L5.33 26.67l5.64-1.34c1.49.81 3.2 1.27 5.05 1.27 5.88 0 10.66-4.78 10.66-10.66S21.9 5.33 16.02 5.33Zm0 19.43c-1.66 0-3.21-.46-4.54-1.27l-.33-.2-3.35.8.9-3.26-.22-.34a8.74 8.74 0 0 1-1.36-4.55c0-4.82 3.92-8.74 8.74-8.74s8.74 3.92 8.74 8.74-3.92 8.82-8.74 8.82Z"/>
+    </svg>
+  </a>
+
+</body>
+</html>
