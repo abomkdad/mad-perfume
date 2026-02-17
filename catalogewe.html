@@ -1,145 +1,156 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MAD Staff Catalog</title>
-
+<title>MAD Catalog Sender</title>
 <script src="https://cdn.tailwindcss.com"></script>
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
-
 <style>
-body { font-family: 'Cairo', sans-serif; }
-.card:hover { transform: translateY(-2px); }
+body { font-family: Arial; background:#f5f5f5 }
+.card:hover { transform:scale(1.03); transition:.2s }
 </style>
 </head>
+<body class="p-4">
 
-<body class="bg-gray-100">
+<div class="max-w-7xl mx-auto">
 
-<div class="max-w-7xl mx-auto p-6 pb-32">
-
-<h1 class="text-3xl font-black mb-4">اختيار منتجات وإرسال للزبون</h1>
-
-<input id="search" placeholder="بحث..." class="w-full p-3 rounded-xl mb-4">
-
-<div id="filters" class="flex gap-2 flex-wrap mb-4"></div>
-
-<div id="grid" class="grid grid-cols-2 md:grid-cols-4 gap-4"></div>
-
+<!-- Language Toggle -->
+<div class="flex justify-between mb-4">
+    <h1 class="text-2xl font-bold">MAD Product Selector</h1>
+    <button onclick="toggleLang()" class="bg-black text-white px-4 py-2 rounded">
+        عربي / עברית
+    </button>
 </div>
 
-<div class="fixed bottom-4 left-4 right-4 bg-white shadow-xl p-4 rounded-xl flex gap-3 items-center">
-<div>المحدد: <span id="count">0</span></div>
-<button id="clear" class="text-red-600 font-bold">تفريغ</button>
-<button id="send" class="bg-black text-white px-4 py-2 rounded-xl font-bold">فتح واتساب</button>
+<!-- Categories -->
+<div id="categories" class="flex flex-wrap gap-2 mb-6"></div>
+
+<!-- Products -->
+<div id="products" class="grid grid-cols-2 md:grid-cols-4 gap-4"></div>
+
+<!-- Actions -->
+<div class="fixed bottom-4 left-0 right-0 flex justify-center gap-3">
+    <button onclick="sendSelected()" class="bg-green-600 text-white px-6 py-3 rounded-xl shadow-lg">
+        إرسال المنتجات
+    </button>
+    <button onclick="sendCategory()" class="bg-black text-white px-6 py-3 rounded-xl shadow-lg">
+        إرسال الكاتيجوري
+    </button>
+</div>
+
 </div>
 
 <script>
 
 let products = []
-let selected = new Map()
-let activeCategory = "الكل"
-let categories = new Set(["الكل"])
+let selected = []
+let currentCategory = ""
+let lang = "ar"
+const whatsappNumber = "972524033442" // حط رقم الواتساب تبعك
 
-async function loadRSS() {
-  const res = await fetch("products.rss")
-  const text = await res.text()
+async function loadRSS(){
+    const response = await fetch("products.rss")
+    const text = await response.text()
+    const parser = new DOMParser()
+    const xml = parser.parseFromString(text,"text/xml")
+    const items = xml.querySelectorAll("item")
 
-  const parser = new DOMParser()
-  const xml = parser.parseFromString(text, "text/xml")
+    items.forEach(item=>{
+        products.push({
+            id: item.querySelector("g\\:id").textContent,
+            title: item.querySelector("g\\:title").textContent,
+            image: item.querySelector("g\\:image_link").textContent,
+            link: item.querySelector("g\\:link").textContent,
+            category: item.querySelector("g\\:product_type").textContent
+        })
+    })
 
-  const items = [...xml.querySelectorAll("item")]
-
-  products = items.map(item => {
-    return {
-      title: item.querySelector("g\\:title").textContent,
-      link: item.querySelector("g\\:link").textContent,
-      image: item.querySelector("g\\:image_link").textContent,
-      category: item.querySelector("g\\:product_type")?.textContent || "غير مصنف"
-    }
-  })
-
-  products.forEach(p => categories.add(p.category))
-
-  renderFilters()
-  renderGrid()
+    renderCategories()
 }
 
-function renderFilters() {
-  const container = document.getElementById("filters")
-  container.innerHTML = ""
+function renderCategories(){
+    const container = document.getElementById("categories")
+    const cats = [...new Set(products.map(p=>p.category))]
 
-  categories.forEach(cat => {
-    const btn = document.createElement("button")
-    btn.innerText = cat
-    btn.className = "px-4 py-2 bg-white rounded-xl border font-bold"
-    btn.onclick = () => {
-      activeCategory = cat
-      renderGrid()
-    }
-    container.appendChild(btn)
-  })
-}
-
-function renderGrid() {
-  const grid = document.getElementById("grid")
-  grid.innerHTML = ""
-
-  const search = document.getElementById("search").value.toLowerCase()
-
-  products
-    .filter(p =>
-      (activeCategory === "الكل" || p.category === activeCategory) &&
-      p.title.toLowerCase().includes(search)
-    )
-    .forEach(p => {
-      const card = document.createElement("div")
-      card.className = "bg-white p-3 rounded-xl card"
-
-      card.innerHTML = `
-        <img src="${p.image}" class="w-full h-40 object-cover rounded-xl">
-        <div class="font-black mt-2">${p.title}</div>
-        <button class="mt-2 bg-gray-200 w-full py-2 rounded-xl font-bold">
-          ${selected.has(p.link) ? "محدد ✓" : "تحديد"}
-        </button>
-      `
-
-      card.querySelector("button").onclick = () => {
-        if (selected.has(p.link)) {
-          selected.delete(p.link)
-        } else {
-          selected.set(p.link, p)
-        }
-        updateCount()
-        renderGrid()
-      }
-
-      grid.appendChild(card)
+    cats.forEach(cat=>{
+        const btn = document.createElement("button")
+        btn.className = "bg-gray-200 px-4 py-2 rounded"
+        btn.innerText = translateCategory(cat)
+        btn.onclick = ()=>filterCategory(cat)
+        container.appendChild(btn)
     })
 }
 
-function updateCount() {
-  document.getElementById("count").innerText = selected.size
+function filterCategory(cat){
+    currentCategory = cat
+    selected = []
+    const filtered = products.filter(p=>p.category===cat)
+    renderProducts(filtered)
 }
 
-document.getElementById("search").addEventListener("input", renderGrid)
-
-document.getElementById("clear").onclick = () => {
-  selected.clear()
-  updateCount()
-  renderGrid()
+function renderProducts(list){
+    const container = document.getElementById("products")
+    container.innerHTML=""
+    list.forEach(p=>{
+        const div = document.createElement("div")
+        div.className="card bg-white p-2 rounded shadow cursor-pointer"
+        div.innerHTML=`
+            <img src="${p.image}" class="w-full h-40 object-contain">
+            <p class="text-center mt-2 font-semibold">${p.title}</p>
+        `
+        div.onclick=()=>toggleSelect(p.id,div)
+        container.appendChild(div)
+    })
 }
 
-document.getElementById("send").onclick = () => {
-  if (!selected.size) return alert("حدد منتجات أولاً")
+function toggleSelect(id,el){
+    if(selected.includes(id)){
+        selected = selected.filter(x=>x!==id)
+        el.classList.remove("ring","ring-green-500")
+    }else{
+        selected.push(id)
+        el.classList.add("ring","ring-green-500")
+    }
+}
 
-  let message = "هاي المنتجات المقترحة:\n\n"
+function sendSelected(){
+    if(selected.length===0) return alert("اختر منتجات")
+    const chosen = products.filter(p=>selected.includes(p.id))
+    let message = "🛍 المنتجات المختارة:\n\n"
+    chosen.forEach(p=>{
+        message += `${p.title}\n${p.link}\n\n`
+    })
+    openWhatsApp(message)
+}
 
-  Array.from(selected.values()).forEach((p,i)=>{
-    message += `${i+1}) ${p.title}\n${p.link}\n\n`
-  })
+function sendCategory(){
+    if(!currentCategory) return alert("اختر كاتيجوري")
+    const chosen = products.filter(p=>p.category===currentCategory)
+    let message = "🛍 جميع منتجات الفئة:\n\n"
+    chosen.forEach(p=>{
+        message += `${p.title}\n${p.link}\n\n`
+    })
+    openWhatsApp(message)
+}
 
-  window.open(`https://wa.me/?text=${encodeURIComponent(message)}`)
+function openWhatsApp(text){
+    const url = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(text)}`
+    window.open(url,"_blank")
+}
+
+function toggleLang(){
+    lang = lang==="ar" ? "he" : "ar"
+    location.reload()
+}
+
+function translateCategory(cat){
+    if(lang==="ar"){
+        if(cat.includes("גברים")) return "عطور رجال"
+        if(cat.includes("נשים")) return "عطور نساء"
+        if(cat.includes("מבצעים")) return "عروض"
+        return cat
+    }
+    return cat
 }
 
 loadRSS()
