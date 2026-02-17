@@ -5,16 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>MAD - باقة مختارة</title>
 
-  <!-- OG preview (يعرض صورة واحدة فقط - طبيعي بواتساب) -->
+  <!-- OG preview (واتساب يعرض صورة واحدة فقط - طبيعي) -->
   <meta property="og:title" content="MAD - باقة مختارة" />
-  <meta property="og:description" content="اختر المنتجات المفضلة وتواصل عبر واتساب" />
+  <meta property="og:description" content="اختر المنتجات المفضلة وأرسل الطلب عبر واتساب" />
   <meta property="og:type" content="website" />
   <meta property="og:image" content="https://www.mad-parfumeur.com/assets/hero/1.webp" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
 
   <script src="https://cdn.tailwindcss.com"></script>
-
   <style>
     body { font-family: Arial, sans-serif; background:#f6f7f9; }
     .glass { backdrop-filter: blur(10px); background: rgba(255,255,255,.75); }
@@ -23,6 +22,7 @@
     .card:hover { transform: scale(1.02); }
     .danger { background:#dc2626; }
     .danger:hover { background:#b91c1c; }
+    .qtyBadge { min-width: 34px; height: 34px; display:flex; align-items:center; justify-content:center; border-radius: 999px; font-weight: 900; }
   </style>
 </head>
 
@@ -35,7 +35,7 @@
         <img src="https://www.mad-parfumeur.com/assets/hero/logo.png" class="h-10 w-10 rounded-xl object-contain bg-white border" alt="MAD">
         <div>
           <div class="font-black text-lg" id="t_title">MAD - باقة مختارة</div>
-          <div class="text-xs text-gray-600" id="t_sub">اختر المنتجات المفضلة وتواصل عبر واتساب</div>
+          <div class="text-xs text-gray-600" id="t_sub">اختر المنتجات المفضلة وأرسل الطلب عبر واتساب</div>
         </div>
       </div>
       <button id="langBtn" class="px-4 py-2 rounded-xl bg-black text-white text-sm shadow-soft">عربي / עברית</button>
@@ -44,22 +44,17 @@
 
   <div class="max-w-7xl mx-auto px-4 py-6 pb-24">
 
-    <!-- Top Info + Actions -->
+    <!-- Top Info + Actions (بدون Status) -->
     <div class="bg-white rounded-3xl shadow-soft border p-4">
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-        <div class="rounded-2xl border p-3 bg-gray-50">
-          <div class="text-xs text-gray-500" id="t_wa">WhatsApp</div>
-          <div class="font-black text-lg" id="waBox">—</div>
-        </div>
-
-        <div class="rounded-2xl border p-3 bg-gray-50">
-          <div class="text-xs text-gray-500" id="t_status">Status</div>
-          <div class="font-bold" id="statusBox">Loading…</div>
-        </div>
-
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
         <div class="rounded-2xl border p-3 bg-gray-50">
           <div class="text-xs text-gray-500" id="t_products">Products</div>
           <div class="font-black text-lg"><span id="countBox">0</span></div>
+        </div>
+
+        <div class="rounded-2xl border p-3 bg-gray-50">
+          <div class="text-xs text-gray-500" id="t_wa">WhatsApp</div>
+          <div class="font-black text-lg" id="waBox">—</div>
         </div>
       </div>
 
@@ -152,9 +147,10 @@ const DEFAULT_WA = "972524033442";
    STATE
 ========================= */
 let LANG = (navigator.language || "").toLowerCase().includes("he") ? "he" : "ar";
-let IDS = [];            // selected ids from query
-let PRODUCTS = [];       // all products from rss
-let SELECTED = [];       // selected products objects
+let IDS = [];                 // ids list from query (can contain duplicates to represent qty)
+let PRODUCTS = [];            // all products from rss
+let COUNTS = new Map();       // id -> qty
+let SELECTED_UNIQUE = [];     // unique products objects
 let WA = DEFAULT_WA;
 
 /* =========================
@@ -167,10 +163,10 @@ function setTexts(){
   document.documentElement.dir  = (LANG==="he") ? "ltr" : "rtl";
 
   document.getElementById("t_title").textContent = T("MAD - باقة مختارة","MAD - מארז מוצרים");
-  document.getElementById("t_sub").textContent   = T("اختر المنتجات المفضلة وتواصل عبر واتساب","בחר מוצרים ושילחו בוואטסאפ");
-  document.getElementById("t_wa").textContent = "WhatsApp";
-  document.getElementById("t_status").textContent = "Status";
+  document.getElementById("t_sub").textContent   = T("اختر المنتجات المفضلة وأرسل الطلب عبر واتساب","בחר מוצרים ושלח הזמנה בוואטסאפ");
+
   document.getElementById("t_products").textContent = T("Products","מוצרים");
+  document.getElementById("t_wa").textContent = "WhatsApp";
   document.getElementById("notePreview").textContent = T(
     "ملاحظة: واتساب يعرض Preview واحد للصفحة فقط — داخل الصفحة ستظهر كل الصور.",
     "הערה: וואטסאפ מציג Preview אחד בלבד — בתוך הדף תופענה כל התמונות."
@@ -196,7 +192,6 @@ function setTexts(){
   document.getElementById("t_subtotal").textContent = T("المجموع الفرعي","סכום ביניים");
   document.getElementById("t_ship").textContent = T("التوصيل","משלוח");
   document.getElementById("t_total").textContent = T("الإجمالي","סה״כ");
-
   document.getElementById("t_send2").textContent = T("إرسال الطلب عبر واتساب","שלח הזמנה בוואטסאפ");
 }
 
@@ -209,7 +204,16 @@ function qs(name){
 }
 function normalizeWa(v){ return (v||"").toString().replace(/\D/g,"").trim(); }
 
-function updateUrlFromIds(){
+function rebuildIdsFromCounts(){
+  const out = [];
+  for(const [id, qty] of COUNTS.entries()){
+    for(let i=0;i<qty;i++) out.push(id);
+  }
+  IDS = out;
+}
+
+function updateUrlFromCounts(){
+  rebuildIdsFromCounts();
   const u = new URL(location.href);
   u.searchParams.set("ids", IDS.join(","));
   u.searchParams.set("lang", LANG);
@@ -220,10 +224,17 @@ function updateUrlFromIds(){
 function readQuery(){
   const idsRaw = (qs("ids") || "").trim();
   IDS = idsRaw ? idsRaw.split(",").map(s=>s.trim()).filter(Boolean) : [];
+
   const langQ = (qs("lang") || "").toLowerCase();
   if(langQ === "ar" || langQ === "he") LANG = langQ;
+
   WA = normalizeWa(qs("wa")) || DEFAULT_WA;
   document.getElementById("waBox").textContent = WA;
+
+  COUNTS = new Map();
+  for(const id of IDS){
+    COUNTS.set(id, (COUNTS.get(id)||0) + 1);
+  }
 }
 
 /* =========================
@@ -245,8 +256,6 @@ function parsePrice(priceText){
 }
 
 async function loadRSS(){
-  const statusBox = document.getElementById("statusBox");
-  statusBox.textContent = "Loading RSS…";
   try{
     const res = await fetch(RSS_PATH, { cache:"no-store" });
     if(!res.ok) throw new Error("HTTP " + res.status);
@@ -268,21 +277,19 @@ async function loadRSS(){
       };
     }).filter(p=>p.id && p.title);
 
-    rebuildSelected();
-    statusBox.textContent = `OK ✅ Loaded bundle: ${IDS.length}`;
+    rebuildSelectedUnique();
   }catch(e){
     console.error(e);
-    document.getElementById("statusBox").textContent = "Failed ❌";
     alert("فشل تحميل products.rss\n" + e.message);
   }
 }
 
-function rebuildSelected(){
+function rebuildSelectedUnique(){
   const map = new Map(PRODUCTS.map(p=>[p.id,p]));
-  SELECTED = IDS.map(id => map.get(id)).filter(Boolean);
-  document.getElementById("countBox").textContent = String(SELECTED.length);
+  SELECTED_UNIQUE = Array.from(COUNTS.keys()).map(id => map.get(id)).filter(Boolean);
 
-  if(SELECTED.length === 0){
+  document.getElementById("countBox").textContent = String(totalQty());
+  if(SELECTED_UNIQUE.length === 0){
     document.getElementById("productsGrid").innerHTML = "";
     document.getElementById("emptyState").classList.remove("hidden");
   }else{
@@ -291,7 +298,13 @@ function rebuildSelected(){
   }
 
   renderTotals();
-  updateUrlFromIds();
+  updateUrlFromCounts();
+}
+
+function totalQty(){
+  let s = 0;
+  for(const q of COUNTS.values()) s += q;
+  return s;
 }
 
 /* =========================
@@ -301,57 +314,85 @@ function renderProducts(){
   const grid = document.getElementById("productsGrid");
   grid.innerHTML = "";
 
-  SELECTED.forEach(p=>{
+  SELECTED_UNIQUE.forEach(p=>{
+    const qty = COUNTS.get(p.id) || 1;
+
     const card = document.createElement("div");
     card.className = "card bg-white rounded-3xl shadow-soft border overflow-hidden relative";
 
     card.innerHTML = `
-      <div class="bg-gray-50">
+      <div class="relative bg-gray-50">
         <img src="${esc(p.image)}" class="w-full h-44 object-contain" alt="">
+        <!-- Qty badge -->
+        <div class="absolute bottom-2 left-2 qtyBadge bg-white border shadow-soft text-black">
+          ${qty}
+        </div>
       </div>
 
       <div class="p-3">
         <div class="text-center font-black">${esc(p.id)}</div>
 
-        <div class="mt-2 flex gap-2">
-          <a class="w-full px-3 py-3 rounded-2xl bg-black text-white font-bold text-sm text-center"
-             href="${esc(p.link)}" target="_blank">
-            ${esc(T("رابط المنتج","קישור למוצר"))}
-          </a>
+        <!-- Controls (بدون رابط المنتج) -->
+        <div class="mt-3 flex items-center justify-between gap-2">
+          <div class="flex items-center gap-2">
+            <button class="px-3 py-2 rounded-xl bg-gray-100 font-black" data-dec="${esc(p.id)}">-</button>
+            <div class="min-w-[34px] text-center font-black">${qty}</div>
+            <button class="px-3 py-2 rounded-xl bg-gray-100 font-black" data-inc="${esc(p.id)}">+</button>
+          </div>
 
-          <button class="px-3 py-3 rounded-2xl danger text-white font-black text-sm"
-                  data-remove="${esc(p.id)}">
+          <button class="px-3 py-2 rounded-xl danger text-white font-black text-sm" data-remove="${esc(p.id)}">
             ${esc(T("حذف","מחק"))}
           </button>
         </div>
 
-        <div class="mt-2 text-center text-sm font-black">
-          ₪${(p.price||0).toFixed(0)}
+        <div class="mt-3 text-center text-sm font-black">
+          ₪${((p.price||0)*qty).toFixed(0)}
+        </div>
+
+        <div class="mt-1 text-center text-xs text-gray-500">
+          ₪${(p.price||0).toFixed(0)} x ${qty}
         </div>
       </div>
     `;
 
-    card.querySelector(`[data-remove="${CSS.escape(p.id)}"]`).onclick = ()=>{
-      removeProduct(p.id);
-    };
+    card.querySelector(`[data-remove="${CSS.escape(p.id)}"]`).onclick = ()=> removeAll(p.id);
+    card.querySelector(`[data-inc="${CSS.escape(p.id)}"]`).onclick = ()=> changeQty(p.id, +1);
+    card.querySelector(`[data-dec="${CSS.escape(p.id)}"]`).onclick = ()=> changeQty(p.id, -1);
 
     grid.appendChild(card);
   });
 }
 
-function removeProduct(id){
-  IDS = IDS.filter(x => x !== id);
-  rebuildSelected();
+function changeQty(id, delta){
+  const now = COUNTS.get(id) || 0;
+  const next = now + delta;
+  if(next <= 0){
+    COUNTS.delete(id);
+  }else{
+    COUNTS.set(id, next);
+  }
+  rebuildSelectedUnique();
+}
+
+function removeAll(id){
+  COUNTS.delete(id);
+  rebuildSelectedUnique();
 }
 
 /* =========================
    TOTALS
 ========================= */
 function calcSubtotal(){
+  const map = new Map(PRODUCTS.map(p=>[p.id,p]));
   let sum = 0;
-  for(const p of SELECTED) sum += (p.price||0);
+  for(const [id, qty] of COUNTS.entries()){
+    const p = map.get(id);
+    if(!p) continue;
+    sum += (p.price||0) * qty;
+  }
   return sum;
 }
+
 function renderTotals(){
   const sub = calcSubtotal();
   document.getElementById("subtotal").textContent = sub.toFixed(0);
@@ -379,9 +420,8 @@ function buildOrderText(){
   const addr = (document.getElementById("custAddress").value || "").trim();
   const pay = getPay();
 
-  if(!name || !phone || !addr){
-    return { ok:false, text:"" };
-  }
+  if(!name || !phone || !addr) return { ok:false, text:"" };
+  if(totalQty() === 0) return { ok:false, text:"" };
 
   const payTxt = (pay==="COD")
     ? T("الدفع عند الاستلام","תשלום בעת מסירה")
@@ -390,6 +430,8 @@ function buildOrderText(){
   const sub = calcSubtotal();
   const total = sub + DELIVERY_FEE;
 
+  // build items
+  const map = new Map(PRODUCTS.map(p=>[p.id,p]));
   let msg = T("🛒 طلب جديد\n","🛒 הזמנה חדשה\n");
   msg += "----------------------\n";
   msg += T(`👤 الاسم: ${name}\n`,`👤 שם: ${name}\n`);
@@ -399,9 +441,11 @@ function buildOrderText(){
   msg += "----------------------\n";
   msg += T("🧾 المنتجات:\n","🧾 מוצרים:\n");
 
-  SELECTED.forEach(p=>{
-    msg += `• ${p.title} — ₪${(p.price||0).toFixed(0)}\n`;
-  });
+  for(const [id, qty] of COUNTS.entries()){
+    const p = map.get(id);
+    if(!p) continue;
+    msg += `• ${p.title} (x${qty}) — ₪${((p.price||0)*qty).toFixed(0)}\n`;
+  }
 
   msg += "----------------------\n";
   msg += T(`المجموع الفرعي: ₪${sub.toFixed(0)}\n`,`סכום ביניים: ₪${sub.toFixed(0)}\n`);
@@ -415,10 +459,9 @@ function buildOrderText(){
 }
 
 async function copyOrderText(){
-  if(IDS.length===0) return alert(T("الباقة فارغة","המארז ריק"));
   const data = buildOrderText();
   if(!data.ok){
-    alert(T("املأ الاسم والتلفون والعنوان","מלא שם, טלפון וכתובת"));
+    alert(T("املأ الاسم والتلفون والعنوان وتأكد من وجود منتجات","מלא שם/טלפון/כתובת וודא שיש מוצרים"));
     return;
   }
   try{
@@ -430,10 +473,9 @@ async function copyOrderText(){
 }
 
 function sendWhatsApp(){
-  if(IDS.length===0) return alert(T("الباقة فارغة","המארז ריק"));
   const data = buildOrderText();
   if(!data.ok){
-    alert(T("املأ الاسم والتلفون والعنوان","מלא שם, טלפון וכתובת"));
+    alert(T("املأ الاسم والتلفون والعنوان وتأكد من وجود منتجات","מלא שם/טלפון/כתובת וודא שיש מוצרים"));
     return;
   }
   window.open(`https://wa.me/${WA}?text=${encodeURIComponent(data.text)}`, "_blank");
@@ -452,7 +494,7 @@ function esc(s){
 document.getElementById("langBtn").onclick = ()=>{
   LANG = (LANG==="ar") ? "he" : "ar";
   setTexts();
-  rebuildSelected();
+  rebuildSelectedUnique();
 };
 
 document.getElementById("copyTextBtn").onclick = copyOrderText;
