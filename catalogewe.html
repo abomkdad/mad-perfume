@@ -19,7 +19,9 @@
     <!-- Header -->
     <div class="flex items-center justify-between mb-4">
       <h1 class="text-2xl font-bold">MAD Catalog Selector</h1>
-      <button class="bg-black text-white px-4 py-2 rounded-lg" onclick="toggleLang()">عربي / עברית</button>
+      <div class="flex items-center gap-2">
+        <button class="bg-black text-white px-4 py-2 rounded-lg" onclick="toggleLang()">عربي / עברית</button>
+      </div>
     </div>
 
     <!-- Load box -->
@@ -38,7 +40,7 @@
         </div>
 
         <div class="flex gap-2">
-          <button class="w-full bg-blue-600 text-white py-2 rounded-lg" onclick="loadRSS()">Load RSS</button>
+          <button class="w-full bg-blue-600 text-white py-2 rounded-lg" onclick="loadRSS(true)">Reload RSS</button>
           <button class="w-full bg-gray-200 py-2 rounded-lg" onclick="clearSelection()">Clear</button>
         </div>
       </div>
@@ -46,7 +48,30 @@
       <!-- Status -->
       <div class="mt-3 text-sm">
         <span class="font-semibold">Status:</span>
-        <span id="status" class="text-gray-600">Waiting...</span>
+        <span id="status" class="text-gray-600">Auto loading...</span>
+      </div>
+
+      <!-- Preview Mode -->
+      <div class="mt-3 border-t pt-3">
+        <label class="block text-sm font-semibold mb-2">WhatsApp Preview Mode</label>
+        <div class="flex flex-col md:flex-row gap-2">
+          <label class="flex items-center gap-2 bg-gray-50 border rounded-lg px-3 py-2 cursor-pointer">
+            <input type="radio" name="previewMode" value="firstLinkOnly" checked>
+            <span class="text-sm">
+              (Recommended) أول رابط فقط للـPreview + باقي المنتجات قائمة
+            </span>
+          </label>
+
+          <label class="flex items-center gap-2 bg-gray-50 border rounded-lg px-3 py-2 cursor-pointer">
+            <input type="radio" name="previewMode" value="allLinks">
+            <span class="text-sm">
+              كل الروابط (Preview غالباً لأول رابط فقط)
+            </span>
+          </label>
+        </div>
+        <p class="text-xs text-gray-500 mt-2">
+          ملاحظة: واتساب عادةً يعرض Preview لرابط واحد فقط داخل الرسالة.
+        </p>
       </div>
     </div>
 
@@ -100,25 +125,26 @@
     return "";
   }
 
+  function getPreviewMode(){
+    const el = document.querySelector('input[name="previewMode"]:checked');
+    return el ? el.value : "firstLinkOnly";
+  }
+
   // ===== Robust RSS load =====
-  async function loadRSS(){
+  async function loadRSS(isManual=false){
     const path = (document.getElementById("rssPath").value || "products.rss").trim();
-    statusEl().textContent = "Loading RSS...";
+    statusEl().textContent = isManual ? "Reloading RSS..." : "Auto loading RSS...";
 
     try {
       const res = await fetch(path, { cache: "no-store" });
-
-      // show content-type for debugging
       const ct = res.headers.get("content-type") || "unknown";
       if(!res.ok) throw new Error("HTTP " + res.status);
 
       const text = await res.text();
 
-      // Parse as XML explicitly (more reliable)
       const parser = new DOMParser();
       const xml = parser.parseFromString(text, "application/xml");
 
-      // detect parse errors
       const parseError = xml.getElementsByTagName("parsererror");
       if(parseError && parseError.length){
         console.error(parseError[0].textContent);
@@ -130,8 +156,8 @@
       const items = Array.from(xml.getElementsByTagName("item"));
       if(items.length === 0){
         statusEl().textContent = `Loaded but no <item> found (Content-Type: ${ct})`;
-        alert("تم تحميل RSS لكن ما لقينا <item>.\n\n1) تأكد إن الملف RSS فعلاً فيه منتجات.\n2) أو أنه ليس HTML.\n\n(تم تسجيل التفاصيل في Console)");
-        console.log("RSS raw text (first 800 chars):", text.slice(0,800));
+        alert("تم تحميل RSS لكن ما لقينا <item>.\n\nتم تسجيل جزء من النص في Console.");
+        console.log("RSS raw text (first 1200 chars):", text.slice(0,1200));
         return;
       }
 
@@ -157,7 +183,7 @@
     } catch (e) {
       console.error(e);
       statusEl().textContent = "Failed to fetch RSS ❌";
-      alert("مش قادر يقرأ RSS.\n\nتأكد إن products.rss بنفس المجلد.\nوتأكد إن الرابط يفتح:\n" + location.origin + "/" + (document.getElementById("rssPath").value||"products.rss") + "\n\nError: " + e.message);
+      alert("مش قادر يقرأ RSS.\n\nتأكد إن products.rss بنفس المجلد.\n\nError: " + e.message);
     }
   }
 
@@ -171,7 +197,7 @@
       if(cat.includes("סלקטיב")) return "سيليكتف";
       return cat;
     }
-    return cat; // Hebrew: keep original
+    return cat;
   }
 
   // ===== Categories render =====
@@ -254,16 +280,39 @@
     renderProducts(FILTERED);
   }
 
-  // ===== WhatsApp send =====
+  // ===== WhatsApp send (Preview-aware) =====
   function sendSelected(){
     if(SELECTED.size === 0) return alert(LANG==="ar" ? "اختر منتجات أولاً" : "בחר מוצרים קודם");
 
     const chosen = PRODUCTS.filter(p => SELECTED.has(p.id));
-    let msg = (LANG==="ar" ? "🛍 المنتجات المختارة:\n\n" : "🛍 המוצרים שנבחרו:\n\n");
+    const mode = getPreviewMode();
 
-    chosen.forEach(p => {
-      msg += `${p.title}\n${p.link}\n\n`;
-    });
+    // Put first product link early to maximize preview chance
+    const first = chosen[0];
+    const header = (LANG==="ar" ? "🛍 قائمة المنتجات:\n" : "🛍 רשימת מוצרים:\n");
+
+    let msg = header;
+
+    if(mode === "firstLinkOnly"){
+      // First link on top (for preview)
+      msg += `\n✅ ${first.title}\n${first.link}\n\n`;
+      msg += (LANG==="ar" ? "باقي المنتجات:\n" : "שאר המוצרים:\n");
+
+      // Rest without links (or with code only)
+      for(let i=1;i<chosen.length;i++){
+        msg += `• ${chosen[i].title}\n`;
+      }
+
+      // Optional: add a line to request “اكتب اسم العطر اللي بدك”
+      msg += `\n${LANG==="ar" ? "اكتبلي أسماء العطور اللي اخترتها ✅" : "כתוב לי את שמות הבשמים שבחרת ✅"}`;
+
+    } else {
+      // All links included (preview will still typically show only first link)
+      chosen.forEach(p => {
+        msg += `\n• ${p.title}\n${p.link}\n`;
+      });
+      msg += `\n${LANG==="ar" ? "اكتبلي شو بدك منهم ✅" : "כתוב לי מה תרצה מהם ✅"}`;
+    }
 
     openWhatsApp(msg);
   }
@@ -272,15 +321,35 @@
     if(CURRENT_CATEGORY === "ALL") return alert(LANG==="ar" ? "اختر كاتيجوري أولاً" : "בחר קטגוריה קודם");
 
     const chosen = PRODUCTS.filter(p => p.category === CURRENT_CATEGORY);
+    const mode = getPreviewMode();
     const catName = translateCategory(CURRENT_CATEGORY);
 
     let msg = (LANG==="ar")
-      ? `🧾 كاتيجوري: ${catName}\n\n`
-      : `🧾 קטגוריה: ${catName}\n\n`;
+      ? `🧾 كاتيجوري: ${catName}\n`
+      : `🧾 קטגוריה: ${catName}\n`;
 
-    chosen.forEach(p => {
-      msg += `${p.title}\n${p.link}\n\n`;
-    });
+    if(chosen.length === 0){
+      msg += (LANG==="ar" ? "\nلا يوجد منتجات" : "\nאין מוצרים");
+      return openWhatsApp(msg);
+    }
+
+    const first = chosen[0];
+
+    if(mode === "firstLinkOnly"){
+      // preview link
+      msg += `\n✅ ${first.title}\n${first.link}\n\n`;
+      msg += (LANG==="ar" ? "باقي المنتجات:\n" : "שאר המוצרים:\n");
+      // list rest without links
+      for(let i=1;i<chosen.length;i++){
+        msg += `• ${chosen[i].title}\n`;
+      }
+      msg += `\n${LANG==="ar" ? "اكتبلي شو بدك منهم ✅" : "כתוב לי מה תרצה מהם ✅"}`;
+    } else {
+      chosen.forEach(p => {
+        msg += `\n• ${p.title}\n${p.link}\n`;
+      });
+      msg += `\n${LANG==="ar" ? "اكتبلي شو بدك منهم ✅" : "כתוב לי מה תרצה מהם ✅"}`;
+    }
 
     openWhatsApp(msg);
   }
@@ -288,7 +357,6 @@
   function openWhatsApp(text){
     const number = (document.getElementById("waNumber").value || "").trim().replace(/\D/g,"");
     if(!number) return alert("حط رقم واتساب صحيح (بدون +)");
-
     const url = `https://wa.me/${number}?text=${encodeURIComponent(text)}`;
     window.open(url, "_blank");
   }
@@ -307,8 +375,10 @@
     return (s||"").replace(/[&<>"']/g, m => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;" }[m]));
   }
 
-  // Optional: auto-load on open
-  // window.addEventListener("load", loadRSS);
+  // ✅ AUTO LOAD on open
+  window.addEventListener("load", () => {
+    loadRSS(false);
+  });
 </script>
 </body>
 </html>
