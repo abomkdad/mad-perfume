@@ -1,352 +1,150 @@
 <!doctype html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>MAD | اختيار منتجات وإرسال واتساب</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MAD Staff Catalog</title>
 
-  <!-- Tailwind -->
-  <script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
 
-  <!-- Font -->
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
-
-  <style>
-    body { font-family: "Cairo", sans-serif; }
-    .card:hover { transform: translateY(-2px); }
-  </style>
+<style>
+body { font-family: 'Cairo', sans-serif; }
+.card:hover { transform: translateY(-2px); }
+</style>
 </head>
 
-<body class="bg-zinc-100 text-zinc-900">
-  <div class="max-w-7xl mx-auto p-4 md:p-6">
-    <!-- Header -->
-    <div class="rounded-2xl bg-black text-white p-5 md:p-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-      <div>
-        <div class="text-sm text-zinc-300">MAD Parfumeur • Staff Catalog Helper</div>
-        <h1 class="text-2xl md:text-3xl font-black">اختيار منتجات + إرسال عبر واتساب</h1>
-        <p class="text-zinc-300 mt-1">حدد المنتجات اللي بدك تبعثها للزبون، وبكبسة زر بتطلع رسالة واتساب جاهزة.</p>
-      </div>
+<body class="bg-gray-100">
 
-      <div class="flex gap-2 w-full md:w-auto">
-        <input id="search" type="text" placeholder="ابحث بالاسم..." class="w-full md:w-72 rounded-xl px-4 py-3 text-black" />
-        <button id="refreshBtn" class="rounded-xl bg-white text-black px-4 py-3 font-bold">تحديث</button>
-      </div>
-    </div>
+<div class="max-w-7xl mx-auto p-6 pb-32">
 
-    <!-- Status -->
-    <div id="status" class="mt-4 text-sm text-zinc-600"></div>
+<h1 class="text-3xl font-black mb-4">اختيار منتجات وإرسال للزبون</h1>
 
-    <!-- Filters -->
-    <div class="mt-4 flex flex-wrap gap-2" id="filters"></div>
+<input id="search" placeholder="بحث..." class="w-full p-3 rounded-xl mb-4">
 
-    <!-- Grid -->
-    <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4" id="grid"></div>
-  </div>
+<div id="filters" class="flex gap-2 flex-wrap mb-4"></div>
 
-  <!-- Sticky Cart -->
-  <div class="fixed bottom-4 left-4 right-4 max-w-7xl mx-auto">
-    <div class="rounded-2xl bg-white shadow-lg border border-zinc-200 p-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-      <div class="flex items-center justify-between md:justify-start gap-3">
-        <div class="font-black">المحدد:</div>
-        <div id="selectedCount" class="px-3 py-1 rounded-full bg-zinc-100 font-bold">0</div>
-        <button id="clearBtn" class="text-sm font-bold text-red-600 hover:underline">تفريغ</button>
-      </div>
+<div id="grid" class="grid grid-cols-2 md:grid-cols-4 gap-4"></div>
 
-      <div class="flex flex-col md:flex-row gap-2 w-full md:w-auto">
-        <input id="customerName" type="text" placeholder="اسم الزبون (اختياري)" class="w-full md:w-56 rounded-xl px-4 py-3 border border-zinc-200" />
-        <input id="waPhone" type="text" placeholder="واتساب الزبون (مثال: 9725xxxxxxx)" class="w-full md:w-64 rounded-xl px-4 py-3 border border-zinc-200" />
-        <button id="sendBtn" class="rounded-xl bg-black text-white px-5 py-3 font-black w-full md:w-auto">
-          إرسال واتساب
-        </button>
-      </div>
-    </div>
-  </div>
+</div>
+
+<div class="fixed bottom-4 left-4 right-4 bg-white shadow-xl p-4 rounded-xl flex gap-3 items-center">
+<div>المحدد: <span id="count">0</span></div>
+<button id="clear" class="text-red-600 font-bold">تفريغ</button>
+<button id="send" class="bg-black text-white px-4 py-2 rounded-xl font-bold">فتح واتساب</button>
+</div>
 
 <script>
-/** =========================
- *  CONFIG
- *  ========================= */
-const RSS_URL = "https://madperfume.co.il/?app=product.rss";
 
-// وسيط لتجاوز CORS (بدون باك-إند)
-const ALLORIGINS_RAW = (url) => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
+let products = []
+let selected = new Map()
+let activeCategory = "الكل"
+let categories = new Set(["الكل"])
 
-// رقم واتساب فريقك/الشركة لو بدك إرسال داخلي (اختياري)
-// إذا بدك فتح واتساب للزبون نفسه (الرقم اللي بتدخله تحت)، خلّي هذا فاضي.
-const WHATSAPP_PHONE_FALLBACK = ""; // مثال: "972524033442"
+async function loadRSS() {
+  const res = await fetch("products.rss")
+  const text = await res.text()
 
-/** =========================
- *  STATE
- *  ========================= */
-let products = [];
-let categories = new Set(["الكل"]);
-let activeCategory = "الكل";
-let searchTerm = "";
-let selected = new Map(); // key: link, value: product
+  const parser = new DOMParser()
+  const xml = parser.parseFromString(text, "text/xml")
 
-const elGrid = document.getElementById("grid");
-const elFilters = document.getElementById("filters");
-const elStatus = document.getElementById("status");
-const elSearch = document.getElementById("search");
-const elRefreshBtn = document.getElementById("refreshBtn");
-const elSelectedCount = document.getElementById("selectedCount");
-const elClearBtn = document.getElementById("clearBtn");
-const elSendBtn = document.getElementById("sendBtn");
-const elCustomerName = document.getElementById("customerName");
-const elWaPhone = document.getElementById("waPhone");
+  const items = [...xml.querySelectorAll("item")]
 
-/** =========================
- *  HELPERS
- *  ========================= */
-function setStatus(msg, isError=false) {
-  elStatus.innerHTML = `<span class="${isError ? 'text-red-600 font-bold' : ''}">${msg}</span>`;
-}
-
-function normalizeText(s) {
-  return (s || "").toString().toLowerCase().trim();
-}
-
-function parseRSS(xmlText) {
-  const parser = new DOMParser();
-  const xml = parser.parseFromString(xmlText, "text/xml");
-
-  // Try both RSS <item> and Atom <entry>
-  const items = [...xml.querySelectorAll("item")];
-  const entries = items.length ? items : [...xml.querySelectorAll("entry")];
-
-  const out = entries.map((node) => {
-    // Title
-    const title =
-      node.querySelector("title")?.textContent?.trim() ||
-      node.querySelector("name")?.textContent?.trim() ||
-      "Untitled";
-
-    // Link (RSS/Atom variations)
-    let link = node.querySelector("link")?.textContent?.trim() || "";
-    if (!link) {
-      const atomLink = node.querySelector('link[rel="alternate"]')?.getAttribute("href");
-      if (atomLink) link = atomLink;
-      const href = node.querySelector("link")?.getAttribute?.("href");
-      if (href) link = href;
+  products = items.map(item => {
+    return {
+      title: item.querySelector("g\\:title").textContent,
+      link: item.querySelector("g\\:link").textContent,
+      image: item.querySelector("g\\:image_link").textContent,
+      category: item.querySelector("g\\:product_type")?.textContent || "غير مصنف"
     }
+  })
 
-    // Image: try enclosure/media:content/content:encoded
-    let image = "";
-    const enclosure = node.querySelector("enclosure");
-    if (enclosure && enclosure.getAttribute("url")) image = enclosure.getAttribute("url");
+  products.forEach(p => categories.add(p.category))
 
-    if (!image) {
-      const media = node.querySelector("media\\:content, content");
-      if (media && media.getAttribute("url")) image = media.getAttribute("url");
-    }
-
-    if (!image) {
-      const encoded = node.querySelector("content\\:encoded, encoded, content")?.textContent || "";
-      const match = encoded.match(/<img[^>]+src=["']([^"']+)["']/i);
-      if (match && match[1]) image = match[1];
-    }
-
-    // Categories: RSS <category>
-    const cats = [...node.querySelectorAll("category")].map(c => c.textContent.trim()).filter(Boolean);
-
-    // Description
-    const desc =
-      node.querySelector("description")?.textContent?.trim() ||
-      node.querySelector("summary")?.textContent?.trim() ||
-      "";
-
-    return { title, link, image, categories: cats, desc };
-  }).filter(p => p.link); // keep only items with link
-
-  return out;
+  renderFilters()
+  renderGrid()
 }
 
 function renderFilters() {
-  const cats = Array.from(categories);
-  elFilters.innerHTML = cats.map(cat => {
-    const active = cat === activeCategory;
-    return `
-      <button data-cat="${cat}"
-        class="px-4 py-2 rounded-full border text-sm font-bold transition
-        ${active ? 'bg-black text-white border-black' : 'bg-white text-black border-zinc-200 hover:bg-zinc-50'}">
-        ${cat}
-      </button>
-    `;
-  }).join("");
+  const container = document.getElementById("filters")
+  container.innerHTML = ""
 
-  elFilters.querySelectorAll("button").forEach(btn => {
-    btn.addEventListener("click", () => {
-      activeCategory = btn.getAttribute("data-cat");
-      renderFilters();
-      renderGrid();
-    });
-  });
-}
-
-function isInActiveCategory(p) {
-  if (activeCategory === "الكل") return true;
-  return (p.categories || []).some(c => normalizeText(c) === normalizeText(activeCategory));
-}
-
-function matchesSearch(p) {
-  if (!searchTerm) return true;
-  const hay = normalizeText(`${p.title} ${p.desc} ${(p.categories||[]).join(" ")}`);
-  return hay.includes(searchTerm);
+  categories.forEach(cat => {
+    const btn = document.createElement("button")
+    btn.innerText = cat
+    btn.className = "px-4 py-2 bg-white rounded-xl border font-bold"
+    btn.onclick = () => {
+      activeCategory = cat
+      renderGrid()
+    }
+    container.appendChild(btn)
+  })
 }
 
 function renderGrid() {
-  const list = products.filter(p => isInActiveCategory(p) && matchesSearch(p));
-  if (!list.length) {
-    elGrid.innerHTML = `
-      <div class="col-span-full rounded-2xl bg-white border border-zinc-200 p-6">
-        <div class="font-black text-lg">لا يوجد نتائج</div>
-        <div class="text-zinc-600 mt-1">غيّر البحث أو اختر تصنيف مختلف.</div>
-      </div>
-    `;
-    return;
-  }
+  const grid = document.getElementById("grid")
+  grid.innerHTML = ""
 
-  elGrid.innerHTML = list.map(p => {
-    const checked = selected.has(p.link);
-    return `
-      <div class="card rounded-2xl bg-white border border-zinc-200 shadow-sm p-3 transition">
-        <div class="rounded-xl overflow-hidden bg-zinc-100 aspect-[4/3] flex items-center justify-center">
-          ${p.image
-            ? `<img src="${p.image}" alt="${p.title}" class="w-full h-full object-cover" loading="lazy">`
-            : `<div class="text-zinc-500 text-sm">No image</div>`
-          }
-        </div>
+  const search = document.getElementById("search").value.toLowerCase()
 
-        <div class="mt-3">
-          <div class="font-black leading-snug line-clamp-2">${p.title}</div>
-          <div class="text-xs text-zinc-500 mt-1 line-clamp-2">${(p.categories||[]).slice(0,3).join(" • ")}</div>
+  products
+    .filter(p =>
+      (activeCategory === "الكل" || p.category === activeCategory) &&
+      p.title.toLowerCase().includes(search)
+    )
+    .forEach(p => {
+      const card = document.createElement("div")
+      card.className = "bg-white p-3 rounded-xl card"
 
-          <div class="mt-3 flex gap-2">
-            <a href="${p.link}" target="_blank"
-               class="flex-1 text-center rounded-xl border border-zinc-200 px-3 py-2 text-sm font-bold hover:bg-zinc-50">
-              فتح المنتج
-            </a>
-            <button data-link="${p.link}" class="toggleBtn flex-1 rounded-xl px-3 py-2 text-sm font-black
-              ${checked ? 'bg-black text-white' : 'bg-zinc-100 text-black hover:bg-zinc-200'}">
-              ${checked ? 'مُحدد ✓' : 'تحديد'}
-            </button>
-          </div>
-        </div>
-      </div>
-    `;
-  }).join("");
+      card.innerHTML = `
+        <img src="${p.image}" class="w-full h-40 object-cover rounded-xl">
+        <div class="font-black mt-2">${p.title}</div>
+        <button class="mt-2 bg-gray-200 w-full py-2 rounded-xl font-bold">
+          ${selected.has(p.link) ? "محدد ✓" : "تحديد"}
+        </button>
+      `
 
-  elGrid.querySelectorAll(".toggleBtn").forEach(btn => {
-    btn.addEventListener("click", () => {
-      const link = btn.getAttribute("data-link");
-      const p = products.find(x => x.link === link);
-      if (!p) return;
+      card.querySelector("button").onclick = () => {
+        if (selected.has(p.link)) {
+          selected.delete(p.link)
+        } else {
+          selected.set(p.link, p)
+        }
+        updateCount()
+        renderGrid()
+      }
 
-      if (selected.has(link)) selected.delete(link);
-      else selected.set(link, p);
-
-      updateSelectedUI();
-      renderGrid();
-    });
-  });
+      grid.appendChild(card)
+    })
 }
 
-function updateSelectedUI() {
-  elSelectedCount.textContent = selected.size.toString();
+function updateCount() {
+  document.getElementById("count").innerText = selected.size
 }
 
-function buildWhatsAppText() {
-  const name = (elCustomerName.value || "").trim();
-  const chosen = Array.from(selected.values());
+document.getElementById("search").addEventListener("input", renderGrid)
 
-  let msg = "";
-  if (name) msg += `مرحباً ${name} 👋\n`;
-  msg += `هذه المنتجات المقترحة من MAD:\n\n`;
-
-  chosen.forEach((p, i) => {
-    msg += `${i+1}) ${p.title}\n${p.link}\n\n`;
-  });
-
-  msg += `إذا حابب، احكيلي كم قطعة بدك + عنوانك للتوصيل ✅`;
-  return msg;
+document.getElementById("clear").onclick = () => {
+  selected.clear()
+  updateCount()
+  renderGrid()
 }
 
-function openWhatsApp() {
-  const chosen = Array.from(selected.values());
-  if (!chosen.length) {
-    alert("حدد منتجات أولاً.");
-    return;
-  }
+document.getElementById("send").onclick = () => {
+  if (!selected.size) return alert("حدد منتجات أولاً")
 
-  const customerPhone = (elWaPhone.value || "").trim().replace(/[^\d]/g, "");
-  const phone = customerPhone || WHATSAPP_PHONE_FALLBACK;
+  let message = "هاي المنتجات المقترحة:\n\n"
 
-  // لو بدك “مشاركة” فقط (بدون رقم)، ممكن تستخدم wa.me/?text=...
-  const text = encodeURIComponent(buildWhatsAppText());
+  Array.from(selected.values()).forEach((p,i)=>{
+    message += `${i+1}) ${p.title}\n${p.link}\n\n`
+  })
 
-  const url = phone
-    ? `https://wa.me/${phone}?text=${text}`
-    : `https://wa.me/?text=${text}`;
-
-  window.open(url, "_blank");
+  window.open(`https://wa.me/?text=${encodeURIComponent(message)}`)
 }
 
-async function loadRSS() {
-  setStatus("جاري تحميل الكتالوج...");
-  products = [];
-  categories = new Set(["الكل"]);
-  activeCategory = "الكل";
-  selected.clear();
-  updateSelectedUI();
-  elGrid.innerHTML = "";
+loadRSS()
 
-  try {
-    // fetch via CORS proxy
-    const res = await fetch(ALLORIGINS_RAW(RSS_URL), { cache: "no-store" });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const xmlText = await res.text();
-
-    const parsed = parseRSS(xmlText);
-    products = parsed;
-
-    // collect categories
-    parsed.forEach(p => (p.categories||[]).forEach(c => categories.add(c)));
-
-    renderFilters();
-    renderGrid();
-
-    setStatus(`تم تحميل ${products.length} منتج ✅`);
-    if (!products.length) {
-      setStatus("الـ RSS رجّع 0 منتجات. افتح Console وشوف شكل البيانات.", true);
-      console.log("RSS RAW:", xmlText);
-    }
-  } catch (e) {
-    console.error(e);
-    setStatus(
-      "فشل تحميل RSS بسبب CORS أو شكل الـ RSS مختلف. افتح Console للمزيد. " +
-      "إذا بدك، بنعمل بديل: JSON feed أو ملف products.json على GitHub.",
-      true
-    );
-  }
-}
-
-/** =========================
- *  EVENTS
- *  ========================= */
-elSearch.addEventListener("input", (e) => {
-  searchTerm = normalizeText(e.target.value);
-  renderGrid();
-});
-elRefreshBtn.addEventListener("click", loadRSS);
-elClearBtn.addEventListener("click", () => {
-  selected.clear();
-  updateSelectedUI();
-  renderGrid();
-});
-elSendBtn.addEventListener("click", openWhatsApp);
-
-// Auto-load
-loadRSS();
 </script>
+
 </body>
 </html>
