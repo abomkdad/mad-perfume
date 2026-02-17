@@ -16,15 +16,11 @@
 <body class="p-4 bg-gray-100">
   <div class="max-w-7xl mx-auto">
 
-    <!-- Header -->
     <div class="flex items-center justify-between mb-4">
       <h1 class="text-2xl font-bold">MAD Catalog Selector</h1>
-      <div class="flex items-center gap-2">
-        <button class="bg-black text-white px-4 py-2 rounded-lg" onclick="toggleLang()">عربي / עברית</button>
-      </div>
+      <button class="bg-black text-white px-4 py-2 rounded-lg" onclick="toggleLang()">عربي / עברית</button>
     </div>
 
-    <!-- Load box -->
     <div class="bg-white rounded-xl shadow p-4 mb-4">
       <div class="grid grid-cols-1 md:grid-cols-3 gap-3 items-end">
         <div>
@@ -34,9 +30,9 @@
         </div>
 
         <div>
-          <label class="block text-sm font-semibold mb-1">WhatsApp Sender Number</label>
+          <label class="block text-sm font-semibold mb-1">WhatsApp Number</label>
           <input id="waNumber" class="w-full border rounded-lg p-2" value="972524033442" />
-          <p class="text-xs text-gray-500 mt-1">بدون + (مثال: 9725xxxxxxx)</p>
+          <p class="text-xs text-gray-500 mt-1">بدون +</p>
         </div>
 
         <div class="flex gap-2">
@@ -45,37 +41,43 @@
         </div>
       </div>
 
-      <!-- Status -->
       <div class="mt-3 text-sm">
         <span class="font-semibold">Status:</span>
         <span id="status" class="text-gray-600">Auto loading...</span>
       </div>
 
-      <!-- Preview Mode -->
+      <!-- Bundle actions -->
       <div class="mt-3 border-t pt-3">
-        <label class="block text-sm font-semibold mb-2">WhatsApp Preview Mode</label>
-        <div class="flex flex-col md:flex-row gap-2">
-          <label class="flex items-center gap-2 bg-gray-50 border rounded-lg px-3 py-2 cursor-pointer">
-            <input type="radio" name="previewMode" value="firstLinkOnly" checked>
-            <span class="text-sm">
-              (Recommended) أول رابط فقط للـPreview + باقي المنتجات قائمة
-            </span>
-          </label>
+        <div class="flex flex-col md:flex-row gap-2 md:items-center md:justify-between">
+          <div class="text-sm text-gray-600">
+            <span class="font-semibold">Products:</span> <span id="countAll">0</span>
+            <span class="mx-2">|</span>
+            <span class="font-semibold">Selected:</span> <span id="countSel">0</span>
+            <span class="mx-2">|</span>
+            <span class="font-semibold">Category:</span> <span id="catNow">ALL</span>
+          </div>
 
-          <label class="flex items-center gap-2 bg-gray-50 border rounded-lg px-3 py-2 cursor-pointer">
-            <input type="radio" name="previewMode" value="allLinks">
-            <span class="text-sm">
-              كل الروابط (Preview غالباً لأول رابط فقط)
-            </span>
-          </label>
+          <div class="flex gap-2">
+            <button class="bg-black text-white px-4 py-2 rounded-lg" onclick="createBundleFromSelected()">
+              Create Bundle (Selected)
+            </button>
+            <button class="bg-gray-900 text-white px-4 py-2 rounded-lg" onclick="createBundleFromCategory()">
+              Create Bundle (Category)
+            </button>
+          </div>
         </div>
+
+        <div class="mt-2 grid grid-cols-1 md:grid-cols-6 gap-2">
+          <input id="bundleLink" class="md:col-span-5 w-full border rounded-lg p-2" placeholder="Bundle link will appear here..." readonly>
+          <button class="md:col-span-1 bg-green-600 text-white py-2 rounded-lg" onclick="copyBundleLink()">Copy</button>
+        </div>
+
         <p class="text-xs text-gray-500 mt-2">
-          ملاحظة: واتساب عادةً يعرض Preview لرابط واحد فقط داخل الرسالة.
+          ملاحظة: رابط الباندل يعطي Preview واحد للصفحة (مش لكل منتج). داخل الصفحة رح تظهر كل الصور.
         </p>
       </div>
     </div>
 
-    <!-- Controls -->
     <div class="bg-white rounded-xl shadow p-4 mb-4">
       <div class="flex flex-col md:flex-row gap-3 md:items-center md:justify-between">
         <div class="w-full md:w-96">
@@ -83,29 +85,23 @@
           <input id="search" class="w-full border rounded-lg p-2" placeholder="ابحث بالاسم / الكود..." oninput="applyFilters()">
         </div>
 
-        <div class="text-sm text-gray-600">
-          <span class="font-semibold">Products:</span> <span id="countAll">0</span>
-          <span class="mx-2">|</span>
-          <span class="font-semibold">Selected:</span> <span id="countSel">0</span>
-        </div>
-
         <div class="flex gap-2">
-          <button class="bg-green-600 text-white px-4 py-2 rounded-lg" onclick="sendSelected()">إرسال المنتجات</button>
-          <button class="bg-black text-white px-4 py-2 rounded-lg" onclick="sendCategory()">إرسال الكاتيجوري</button>
+          <button class="bg-green-600 text-white px-4 py-2 rounded-lg" onclick="sendSelectedAsText()">
+            إرسال نص (واتساب)
+          </button>
+          <button class="bg-black text-white px-4 py-2 rounded-lg" onclick="sendCategoryAsText()">
+            إرسال كاتيجوري نص
+          </button>
         </div>
       </div>
     </div>
 
-    <!-- Categories -->
     <div id="categories" class="flex flex-wrap gap-2 mb-3"></div>
-
-    <!-- Products -->
     <div id="products" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4"></div>
 
   </div>
 
 <script>
-  // ===== State =====
   let PRODUCTS = [];
   let FILTERED = [];
   let SELECTED = new Set();
@@ -114,7 +110,6 @@
 
   const statusEl = () => document.getElementById("status");
 
-  // ===== Namespace-safe reader (works with g:xxx even if prefix changes) =====
   function getTextByLocalName(parent, localName){
     const nodes = parent.getElementsByTagName("*");
     const target = localName.toLowerCase();
@@ -125,12 +120,6 @@
     return "";
   }
 
-  function getPreviewMode(){
-    const el = document.querySelector('input[name="previewMode"]:checked');
-    return el ? el.value : "firstLinkOnly";
-  }
-
-  // ===== Robust RSS load =====
   async function loadRSS(isManual=false){
     const path = (document.getElementById("rssPath").value || "products.rss").trim();
     statusEl().textContent = isManual ? "Reloading RSS..." : "Auto loading RSS...";
@@ -141,7 +130,6 @@
       if(!res.ok) throw new Error("HTTP " + res.status);
 
       const text = await res.text();
-
       const parser = new DOMParser();
       const xml = parser.parseFromString(text, "application/xml");
 
@@ -149,14 +137,14 @@
       if(parseError && parseError.length){
         console.error(parseError[0].textContent);
         statusEl().textContent = `Parse error (Content-Type: ${ct})`;
-        alert("RSS وصل، لكن في مشكلة Parsing XML.\n\nافتح Console لمزيد من التفاصيل.");
+        alert("RSS وصل، لكن في مشكلة Parsing XML.");
         return;
       }
 
       const items = Array.from(xml.getElementsByTagName("item"));
       if(items.length === 0){
         statusEl().textContent = `Loaded but no <item> found (Content-Type: ${ct})`;
-        alert("تم تحميل RSS لكن ما لقينا <item>.\n\nتم تسجيل جزء من النص في Console.");
+        alert("تم تحميل RSS لكن ما لقينا <item>.");
         console.log("RSS raw text (first 1200 chars):", text.slice(0,1200));
         return;
       }
@@ -174,6 +162,7 @@
 
       document.getElementById("countAll").textContent = PRODUCTS.length;
       document.getElementById("countSel").textContent = "0";
+      document.getElementById("catNow").textContent = "ALL";
 
       statusEl().textContent = `OK ✅ Loaded ${PRODUCTS.length} products (Content-Type: ${ct})`;
 
@@ -183,11 +172,10 @@
     } catch (e) {
       console.error(e);
       statusEl().textContent = "Failed to fetch RSS ❌";
-      alert("مش قادر يقرأ RSS.\n\nتأكد إن products.rss بنفس المجلد.\n\nError: " + e.message);
+      alert("مش قادر يقرأ RSS.\n\nError: " + e.message);
     }
   }
 
-  // ===== Category translation =====
   function translateCategory(cat){
     if(LANG === "ar"){
       if(cat.includes("גברים")) return "عطور رجال";
@@ -200,7 +188,6 @@
     return cat;
   }
 
-  // ===== Categories render =====
   function renderCategories(){
     const container = document.getElementById("categories");
     container.innerHTML = "";
@@ -218,7 +205,12 @@
     b.className = "chip px-4 py-2 rounded-full bg-gray-200";
     b.textContent = label;
     b.dataset.cat = cat;
-    b.onclick = () => { CURRENT_CATEGORY = cat; applyFilters(); highlightCategory(); };
+    b.onclick = () => {
+      CURRENT_CATEGORY = cat;
+      document.getElementById("catNow").textContent = (cat === "ALL") ? "ALL" : translateCategory(cat);
+      applyFilters();
+      highlightCategory();
+    };
     return b;
   }
 
@@ -229,7 +221,6 @@
     });
   }
 
-  // ===== Filtering =====
   function applyFilters(){
     const q = (document.getElementById("search").value || "").trim().toLowerCase();
 
@@ -242,7 +233,6 @@
     renderProducts(FILTERED);
   }
 
-  // ===== Products render =====
   function renderProducts(list){
     const container = document.getElementById("products");
     container.innerHTML = "";
@@ -280,77 +270,63 @@
     renderProducts(FILTERED);
   }
 
-  // ===== WhatsApp send (Preview-aware) =====
-  function sendSelected(){
-    if(SELECTED.size === 0) return alert(LANG==="ar" ? "اختر منتجات أولاً" : "בחר מוצרים קודם");
-
-    const chosen = PRODUCTS.filter(p => SELECTED.has(p.id));
-    const mode = getPreviewMode();
-
-    // Put first product link early to maximize preview chance
-    const first = chosen[0];
-    const header = (LANG==="ar" ? "🛍 قائمة المنتجات:\n" : "🛍 רשימת מוצרים:\n");
-
-    let msg = header;
-
-    if(mode === "firstLinkOnly"){
-      // First link on top (for preview)
-      msg += `\n✅ ${first.title}\n${first.link}\n\n`;
-      msg += (LANG==="ar" ? "باقي المنتجات:\n" : "שאר המוצרים:\n");
-
-      // Rest without links (or with code only)
-      for(let i=1;i<chosen.length;i++){
-        msg += `• ${chosen[i].title}\n`;
-      }
-
-      // Optional: add a line to request “اكتب اسم العطر اللي بدك”
-      msg += `\n${LANG==="ar" ? "اكتبلي أسماء العطور اللي اخترتها ✅" : "כתוב לי את שמות הבשמים שבחרת ✅"}`;
-
-    } else {
-      // All links included (preview will still typically show only first link)
-      chosen.forEach(p => {
-        msg += `\n• ${p.title}\n${p.link}\n`;
-      });
-      msg += `\n${LANG==="ar" ? "اكتبلي شو بدك منهم ✅" : "כתוב לי מה תרצה מהם ✅"}`;
+  function createBundleLink(ids){
+    // Important: keep URL short. If too many items, URL gets huge.
+    const MAX_IDS = 60;
+    if(ids.length > MAX_IDS){
+      alert(`عدد كبير (${ids.length}). رح نعمل Bundle لأول ${MAX_IDS} فقط عشان الرابط ما يصير طويل.`);
+      ids = ids.slice(0, MAX_IDS);
     }
 
+    const base = location.origin + location.pathname.replace(/[^/]+$/, "") + "bundle.html";
+    const langParam = LANG;
+    const idsParam = encodeURIComponent(ids.join(","));
+    const wa = (document.getElementById("waNumber").value || "").trim().replace(/\D/g,"") || "";
+    const url = `${base}?ids=${idsParam}&lang=${encodeURIComponent(langParam)}&wa=${encodeURIComponent(wa)}`;
+
+    document.getElementById("bundleLink").value = url;
+    return url;
+  }
+
+  function createBundleFromSelected(){
+    if(SELECTED.size === 0) return alert(LANG==="ar" ? "اختر منتجات أولاً" : "בחר מוצרים קודם");
+    const ids = Array.from(SELECTED);
+    const url = createBundleLink(ids);
+    window.open(url, "_blank");
+  }
+
+  function createBundleFromCategory(){
+    if(CURRENT_CATEGORY === "ALL") return alert(LANG==="ar" ? "اختر كاتيجوري أولاً" : "בחר קטגוריה קודם");
+    const ids = PRODUCTS.filter(p => p.category === CURRENT_CATEGORY).map(p => p.id);
+    const url = createBundleLink(ids);
+    window.open(url, "_blank");
+  }
+
+  function copyBundleLink(){
+    const val = document.getElementById("bundleLink").value.trim();
+    if(!val) return alert("اعمل Create Bundle أولاً");
+    navigator.clipboard.writeText(val).then(()=>{
+      alert("تم نسخ رابط الباندل ✅");
+    }).catch(()=>{
+      alert("المتصفح منع النسخ — انسخه يدويًا.");
+    });
+  }
+
+  function sendSelectedAsText(){
+    if(SELECTED.size === 0) return alert(LANG==="ar" ? "اختر منتجات أولاً" : "בחר מוצרים קודם");
+    const chosen = PRODUCTS.filter(p => SELECTED.has(p.id));
+    let msg = (LANG==="ar" ? "🛍 المنتجات المختارة:\n\n" : "🛍 המוצרים שנבחרו:\n\n");
+    chosen.forEach(p => msg += `• ${p.title}\n${p.link}\n\n`);
     openWhatsApp(msg);
   }
 
-  function sendCategory(){
+  function sendCategoryAsText(){
     if(CURRENT_CATEGORY === "ALL") return alert(LANG==="ar" ? "اختر كاتيجوري أولاً" : "בחר קטגוריה קודם");
-
     const chosen = PRODUCTS.filter(p => p.category === CURRENT_CATEGORY);
-    const mode = getPreviewMode();
     const catName = translateCategory(CURRENT_CATEGORY);
-
-    let msg = (LANG==="ar")
-      ? `🧾 كاتيجوري: ${catName}\n`
-      : `🧾 קטגוריה: ${catName}\n`;
-
-    if(chosen.length === 0){
-      msg += (LANG==="ar" ? "\nلا يوجد منتجات" : "\nאין מוצרים");
-      return openWhatsApp(msg);
-    }
-
-    const first = chosen[0];
-
-    if(mode === "firstLinkOnly"){
-      // preview link
-      msg += `\n✅ ${first.title}\n${first.link}\n\n`;
-      msg += (LANG==="ar" ? "باقي المنتجات:\n" : "שאר המוצרים:\n");
-      // list rest without links
-      for(let i=1;i<chosen.length;i++){
-        msg += `• ${chosen[i].title}\n`;
-      }
-      msg += `\n${LANG==="ar" ? "اكتبلي شو بدك منهم ✅" : "כתוב לי מה תרצה מהם ✅"}`;
-    } else {
-      chosen.forEach(p => {
-        msg += `\n• ${p.title}\n${p.link}\n`;
-      });
-      msg += `\n${LANG==="ar" ? "اكتبلي شو بدك منهم ✅" : "כתוב לי מה תרצה מהם ✅"}`;
-    }
-
+    let msg = (LANG==="ar" ? `🧾 كاتيجوري: ${catName}\n\n` : `🧾 קטגוריה: ${catName}\n\n`);
+    chosen.slice(0, 40).forEach(p => msg += `• ${p.title}\n${p.link}\n\n`);
+    msg += (LANG==="ar" ? "✅ إذا بدك المزيد قلّي" : "✅ אם תרצה עוד תגיד לי");
     openWhatsApp(msg);
   }
 
@@ -361,24 +337,20 @@
     window.open(url, "_blank");
   }
 
-  // ===== Language toggle =====
   function toggleLang(){
     LANG = (LANG === "ar") ? "he" : "ar";
     document.documentElement.lang = (LANG === "ar") ? "ar" : "he";
     document.documentElement.dir = (LANG === "ar") ? "rtl" : "ltr";
     renderCategories();
     applyFilters();
+    document.getElementById("catNow").textContent = (CURRENT_CATEGORY === "ALL") ? "ALL" : translateCategory(CURRENT_CATEGORY);
   }
 
-  // ===== Utils =====
   function escapeHtml(s){
     return (s||"").replace(/[&<>"']/g, m => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;" }[m]));
   }
 
-  // ✅ AUTO LOAD on open
-  window.addEventListener("load", () => {
-    loadRSS(false);
-  });
+  window.addEventListener("load", () => loadRSS(false));
 </script>
 </body>
 </html>
