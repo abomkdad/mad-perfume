@@ -3,223 +3,468 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MAD Bundle</title>
+  <title>MAD - باقة مختارة</title>
 
-  <!-- OG Preview (ثابت للصفحة) -->
-  <meta property="og:title" content="MAD Parfumeur - Bundle" />
-  <meta property="og:description" content="Selected products bundle" />
+  <!-- OG preview (يعرض صورة واحدة فقط - طبيعي بواتساب) -->
+  <meta property="og:title" content="MAD - باقة مختارة" />
+  <meta property="og:description" content="اختر المنتجات المفضلة وتواصل عبر واتساب" />
   <meta property="og:type" content="website" />
-  <!-- حط صورة ثابتة عندك (بنر رجال/نساء/عروض) -->
   <meta property="og:image" content="https://www.mad-parfumeur.com/assets/hero/1.webp" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
 
   <script src="https://cdn.tailwindcss.com"></script>
+
   <style>
     body { font-family: Arial, sans-serif; background:#f6f7f9; }
+    .glass { backdrop-filter: blur(10px); background: rgba(255,255,255,.75); }
+    .shadow-soft { box-shadow: 0 10px 30px rgba(0,0,0,.08); }
+    .card { transition: .15s transform; }
+    .card:hover { transform: scale(1.02); }
+    .danger { background:#dc2626; }
+    .danger:hover { background:#b91c1c; }
   </style>
 </head>
 
-<body class="p-4">
-  <div class="max-w-6xl mx-auto">
+<body class="min-h-screen">
 
-    <div class="bg-white rounded-2xl shadow p-4 mb-4">
-      <div class="flex items-center justify-between gap-2">
+  <!-- Header -->
+  <div class="sticky top-0 z-30 border-b bg-white/80 glass">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <img src="https://www.mad-parfumeur.com/assets/hero/logo.png" class="h-10 w-10 rounded-xl object-contain bg-white border" alt="MAD">
         <div>
-          <h1 id="title" class="text-2xl font-bold">MAD Bundle</h1>
-          <p id="sub" class="text-sm text-gray-600">Browse selected products</p>
-        </div>
-        <button id="langBtn" class="bg-black text-white px-4 py-2 rounded-lg" onclick="toggleLang()">عربي / עברית</button>
-      </div>
-
-      <div class="mt-3 grid grid-cols-1 md:grid-cols-3 gap-2">
-        <div class="bg-gray-50 border rounded-xl p-3">
-          <div class="text-xs text-gray-500">Products</div>
-          <div id="count" class="text-lg font-bold">0</div>
-        </div>
-        <div class="bg-gray-50 border rounded-xl p-3">
-          <div class="text-xs text-gray-500">Status</div>
-          <div id="status" class="text-sm text-gray-700">Loading...</div>
-        </div>
-        <div class="bg-gray-50 border rounded-xl p-3">
-          <div class="text-xs text-gray-500">WhatsApp</div>
-          <div id="waView" class="text-sm font-semibold">—</div>
+          <div class="font-black text-lg" id="t_title">MAD - باقة مختارة</div>
+          <div class="text-xs text-gray-600" id="t_sub">اختر المنتجات المفضلة وتواصل عبر واتساب</div>
         </div>
       </div>
+      <button id="langBtn" class="px-4 py-2 rounded-xl bg-black text-white text-sm shadow-soft">عربي / עברית</button>
+    </div>
+  </div>
 
-      <div class="mt-4 flex flex-col md:flex-row gap-2">
-        <button class="bg-green-600 text-white px-5 py-3 rounded-xl" onclick="orderWhatsApp()">
-          <span id="btnOrder">اطلب عبر واتساب</span>
-        </button>
-        <button class="bg-gray-900 text-white px-5 py-3 rounded-xl" onclick="copyOrderText()">
-          <span id="btnCopy">نسخ نص الطلب</span>
-        </button>
+  <div class="max-w-7xl mx-auto px-4 py-6 pb-24">
+
+    <!-- Top Info + Actions -->
+    <div class="bg-white rounded-3xl shadow-soft border p-4">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+        <div class="rounded-2xl border p-3 bg-gray-50">
+          <div class="text-xs text-gray-500" id="t_wa">WhatsApp</div>
+          <div class="font-black text-lg" id="waBox">—</div>
+        </div>
+
+        <div class="rounded-2xl border p-3 bg-gray-50">
+          <div class="text-xs text-gray-500" id="t_status">Status</div>
+          <div class="font-bold" id="statusBox">Loading…</div>
+        </div>
+
+        <div class="rounded-2xl border p-3 bg-gray-50">
+          <div class="text-xs text-gray-500" id="t_products">Products</div>
+          <div class="font-black text-lg"><span id="countBox">0</span></div>
+        </div>
+      </div>
+
+      <div class="mt-4 flex flex-col md:flex-row gap-2 md:items-center md:justify-between">
+        <div class="text-xs text-gray-500" id="notePreview">
+          ملاحظة: واتساب يعرض Preview واحد للصفحة فقط — داخل الصفحة ستظهر كل الصور.
+        </div>
+
+        <div class="flex gap-2">
+          <button id="copyTextBtn" class="px-4 py-3 rounded-2xl bg-gray-900 text-white font-bold">
+            <span id="t_copy">نسخ نص الطلب</span>
+          </button>
+          <button id="sendBtnTop" class="px-4 py-3 rounded-2xl bg-green-600 text-white font-black">
+            <span id="t_send">الطلب عبر واتساب</span>
+          </button>
+        </div>
       </div>
     </div>
 
-    <div id="grid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4"></div>
+    <!-- Products -->
+    <div class="mt-5">
+      <div class="font-black mb-3" id="t_selected_products">المنتجات المختارة</div>
+      <div id="productsGrid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4"></div>
+      <div id="emptyState" class="hidden mt-4 p-6 rounded-3xl bg-white border shadow-soft text-center text-gray-700">
+        <div class="font-black text-lg" id="t_empty">لا يوجد منتجات في الباقة</div>
+        <div class="text-sm text-gray-500 mt-1" id="t_empty2">ارجع لصفحة الاختيار وأنشئ باقة جديدة.</div>
+      </div>
+    </div>
+
+    <!-- Order Form -->
+    <div class="mt-6 bg-white rounded-3xl shadow-soft border p-4">
+      <div class="font-black text-lg mb-2" id="t_form_title">فورم الطلب</div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <div>
+          <div class="text-xs text-gray-500 mb-1" id="t_name">الاسم</div>
+          <input id="custName" class="w-full border rounded-2xl p-3" placeholder="الاسم الكامل" />
+        </div>
+        <div>
+          <div class="text-xs text-gray-500 mb-1" id="t_phone">التلفون</div>
+          <input id="custPhone" class="w-full border rounded-2xl p-3" placeholder="رقم التلفون" inputmode="tel" />
+        </div>
+      </div>
+
+      <div class="mt-3">
+        <div class="text-xs text-gray-500 mb-1" id="t_address">العنوان</div>
+        <textarea id="custAddress" class="w-full border rounded-2xl p-3" rows="3" placeholder="العنوان الكامل"></textarea>
+      </div>
+
+      <div class="mt-3 grid grid-cols-1 md:grid-cols-2 gap-3">
+        <div class="rounded-2xl border p-3 bg-gray-50">
+          <div class="text-sm font-bold mb-2" id="t_pay">طريقة الدفع</div>
+          <label class="flex items-center gap-2 text-sm"><input type="radio" name="pay" value="COD" checked> <span id="t_cod">الدفع عند الاستلام</span></label>
+          <label class="flex items-center gap-2 text-sm mt-2"><input type="radio" name="pay" value="CARD"> <span id="t_card">بطاقة / تحويل</span></label>
+        </div>
+
+        <div class="rounded-2xl border p-3 bg-white">
+          <div class="flex items-center justify-between text-sm">
+            <span id="t_subtotal">المجموع الفرعي</span>
+            <span class="font-black">₪<span id="subtotal">0</span></span>
+          </div>
+          <div class="flex items-center justify-between text-sm mt-2">
+            <span id="t_ship">التوصيل</span>
+            <span class="font-black">₪<span id="shipping">50</span></span>
+          </div>
+          <div class="h-px bg-gray-200 my-3"></div>
+          <div class="flex items-center justify-between text-base">
+            <span class="font-black" id="t_total">الإجمالي</span>
+            <span class="font-black text-lg">₪<span id="total">50</span></span>
+          </div>
+        </div>
+      </div>
+
+      <button id="sendBtn" class="mt-4 w-full px-4 py-4 rounded-2xl bg-green-600 text-white font-black shadow-soft">
+        <span id="t_send2">إرسال الطلب عبر واتساب</span>
+      </button>
+    </div>
 
   </div>
 
 <script>
-  let LANG = "ar";
-  let WA = "";
-  let IDS = [];
-  let PRODUCTS = [];
-  let BUNDLE = [];
+/* =========================
+   CONFIG
+========================= */
+const RSS_PATH = "products.rss";
+const DELIVERY_FEE = 50;
+const DEFAULT_WA = "972524033442";
 
-  function qs(name){
-    const u = new URL(location.href);
-    return u.searchParams.get(name) || "";
+/* =========================
+   STATE
+========================= */
+let LANG = (navigator.language || "").toLowerCase().includes("he") ? "he" : "ar";
+let IDS = [];            // selected ids from query
+let PRODUCTS = [];       // all products from rss
+let SELECTED = [];       // selected products objects
+let WA = DEFAULT_WA;
+
+/* =========================
+   I18N
+========================= */
+function T(ar, he){ return (LANG==="he") ? he : ar; }
+
+function setTexts(){
+  document.documentElement.lang = LANG;
+  document.documentElement.dir  = (LANG==="he") ? "ltr" : "rtl";
+
+  document.getElementById("t_title").textContent = T("MAD - باقة مختارة","MAD - מארז מוצרים");
+  document.getElementById("t_sub").textContent   = T("اختر المنتجات المفضلة وتواصل عبر واتساب","בחר מוצרים ושילחו בוואטסאפ");
+  document.getElementById("t_wa").textContent = "WhatsApp";
+  document.getElementById("t_status").textContent = "Status";
+  document.getElementById("t_products").textContent = T("Products","מוצרים");
+  document.getElementById("notePreview").textContent = T(
+    "ملاحظة: واتساب يعرض Preview واحد للصفحة فقط — داخل الصفحة ستظهر كل الصور.",
+    "הערה: וואטסאפ מציג Preview אחד בלבד — בתוך הדף תופענה כל התמונות."
+  );
+  document.getElementById("t_copy").textContent = T("نسخ نص الطلب","העתק טקסט הזמנה");
+  document.getElementById("t_send").textContent = T("الطلب عبر واتساب","הזמנה בוואטסאפ");
+  document.getElementById("t_selected_products").textContent = T("المنتجات المختارة","מוצרים שנבחרו");
+  document.getElementById("t_empty").textContent = T("لا يوجد منتجات في الباقة","אין מוצרים במארז");
+  document.getElementById("t_empty2").textContent = T("ارجع لصفحة الاختيار وأنشئ باقة جديدة.","חזור לעמוד הבחירה וצור מארז חדש.");
+
+  document.getElementById("t_form_title").textContent = T("فورم الطلب","טופס הזמנה");
+  document.getElementById("t_name").textContent = T("الاسم","שם");
+  document.getElementById("custName").placeholder = T("الاسم الكامل","שם מלא");
+  document.getElementById("t_phone").textContent = T("التلفون","טלפון");
+  document.getElementById("custPhone").placeholder = T("رقم التلفون","מספר טלפון");
+  document.getElementById("t_address").textContent = T("العنوان","כתובת");
+  document.getElementById("custAddress").placeholder = T("العنوان الكامل","כתובת מלאה");
+
+  document.getElementById("t_pay").textContent = T("طريقة الدفع","אמצעי תשלום");
+  document.getElementById("t_cod").textContent = T("الدفع عند الاستلام","תשלום בעת מסירה");
+  document.getElementById("t_card").textContent = T("بطاقة / تحويل","כרטיס / העברה");
+
+  document.getElementById("t_subtotal").textContent = T("المجموع الفرعي","סכום ביניים");
+  document.getElementById("t_ship").textContent = T("التوصيل","משלוח");
+  document.getElementById("t_total").textContent = T("الإجمالي","סה״כ");
+
+  document.getElementById("t_send2").textContent = T("إرسال الطلب عبر واتساب","שלח הזמנה בוואטסאפ");
+}
+
+/* =========================
+   URL / QUERY
+========================= */
+function qs(name){
+  const u = new URL(location.href);
+  return u.searchParams.get(name) || "";
+}
+function normalizeWa(v){ return (v||"").toString().replace(/\D/g,"").trim(); }
+
+function updateUrlFromIds(){
+  const u = new URL(location.href);
+  u.searchParams.set("ids", IDS.join(","));
+  u.searchParams.set("lang", LANG);
+  u.searchParams.set("wa", WA);
+  history.replaceState({}, "", u.toString());
+}
+
+function readQuery(){
+  const idsRaw = (qs("ids") || "").trim();
+  IDS = idsRaw ? idsRaw.split(",").map(s=>s.trim()).filter(Boolean) : [];
+  const langQ = (qs("lang") || "").toLowerCase();
+  if(langQ === "ar" || langQ === "he") LANG = langQ;
+  WA = normalizeWa(qs("wa")) || DEFAULT_WA;
+  document.getElementById("waBox").textContent = WA;
+}
+
+/* =========================
+   RSS PARSE
+========================= */
+function getTextByLocalName(parent, localName){
+  const nodes = parent.getElementsByTagName("*");
+  const target = localName.toLowerCase();
+  for (let i=0;i<nodes.length;i++){
+    const ln = (nodes[i].localName || "").toLowerCase();
+    if (ln === target) return (nodes[i].textContent || "").trim();
+  }
+  return "";
+}
+function parsePrice(priceText){
+  if(!priceText) return 0;
+  const n = parseFloat(String(priceText).replace(/[^\d.]/g,""));
+  return isNaN(n) ? 0 : n;
+}
+
+async function loadRSS(){
+  const statusBox = document.getElementById("statusBox");
+  statusBox.textContent = "Loading RSS…";
+  try{
+    const res = await fetch(RSS_PATH, { cache:"no-store" });
+    if(!res.ok) throw new Error("HTTP " + res.status);
+    const text = await res.text();
+    const xml = new DOMParser().parseFromString(text, "application/xml");
+    const err = xml.getElementsByTagName("parsererror");
+    if(err && err.length) throw new Error("XML parse error");
+
+    const items = Array.from(xml.getElementsByTagName("item"));
+    PRODUCTS = items.map(item=>{
+      const priceRaw = getTextByLocalName(item, "price") || getTextByLocalName(item, "sale_price") || "";
+      return {
+        id: getTextByLocalName(item,"id"),
+        title: getTextByLocalName(item,"title"),
+        image: getTextByLocalName(item,"image_link"),
+        link: getTextByLocalName(item,"link"),
+        price_raw: priceRaw,
+        price: parsePrice(priceRaw)
+      };
+    }).filter(p=>p.id && p.title);
+
+    rebuildSelected();
+    statusBox.textContent = `OK ✅ Loaded bundle: ${IDS.length}`;
+  }catch(e){
+    console.error(e);
+    document.getElementById("statusBox").textContent = "Failed ❌";
+    alert("فشل تحميل products.rss\n" + e.message);
+  }
+}
+
+function rebuildSelected(){
+  const map = new Map(PRODUCTS.map(p=>[p.id,p]));
+  SELECTED = IDS.map(id => map.get(id)).filter(Boolean);
+  document.getElementById("countBox").textContent = String(SELECTED.length);
+
+  if(SELECTED.length === 0){
+    document.getElementById("productsGrid").innerHTML = "";
+    document.getElementById("emptyState").classList.remove("hidden");
+  }else{
+    document.getElementById("emptyState").classList.add("hidden");
+    renderProducts();
   }
 
-  function getTextByLocalName(parent, localName){
-    const nodes = parent.getElementsByTagName("*");
-    const target = localName.toLowerCase();
-    for (let i = 0; i < nodes.length; i++){
-      const ln = (nodes[i].localName || "").toLowerCase();
-      if (ln === target) return (nodes[i].textContent || "").trim();
-    }
-    return "";
-  }
+  renderTotals();
+  updateUrlFromIds();
+}
 
-  function setUiTexts(){
-    if(LANG === "ar"){
-      document.documentElement.lang = "ar";
-      document.documentElement.dir = "rtl";
-      document.getElementById("title").textContent = "MAD - باقة مختارة";
-      document.getElementById("sub").textContent = "اختر المنتج المناسب وتواصل عبر واتساب";
-      document.getElementById("btnOrder").textContent = "اطلب عبر واتساب";
-      document.getElementById("btnCopy").textContent = "نسخ نص الطلب";
-      document.getElementById("langBtn").textContent = "عربي / עברית";
-    } else {
-      document.documentElement.lang = "he";
-      document.documentElement.dir = "ltr";
-      document.getElementById("title").textContent = "MAD - מארז מוצרים";
-      document.getElementById("sub").textContent = "צפה במוצרים הנבחרים וצור קשר בוואטסאפ";
-      document.getElementById("btnOrder").textContent = "הזמנה בוואטסאפ";
-      document.getElementById("btnCopy").textContent = "העתק טקסט הזמנה";
-      document.getElementById("langBtn").textContent = "عربي / עברית";
-    }
-  }
+/* =========================
+   RENDER
+========================= */
+function renderProducts(){
+  const grid = document.getElementById("productsGrid");
+  grid.innerHTML = "";
 
-  function toggleLang(){
-    LANG = (LANG === "ar") ? "he" : "ar";
-    setUiTexts();
-    renderGrid();
-  }
+  SELECTED.forEach(p=>{
+    const card = document.createElement("div");
+    card.className = "card bg-white rounded-3xl shadow-soft border overflow-hidden relative";
 
-  function buildOrderText(){
-    if(!BUNDLE.length) return (LANG==="ar" ? "لا يوجد منتجات" : "אין מוצרים");
+    card.innerHTML = `
+      <div class="bg-gray-50">
+        <img src="${esc(p.image)}" class="w-full h-44 object-contain" alt="">
+      </div>
 
-    let msg = (LANG==="ar")
-      ? "مرحبا 👋\nهذه المنتجات اللي اخترتها:\n\n"
-      : "היי 👋\nאלו המוצרים שבחרתי:\n\n";
+      <div class="p-3">
+        <div class="text-center font-black">${esc(p.id)}</div>
 
-    BUNDLE.forEach(p => {
-      msg += `• ${p.title}\n${p.link}\n\n`;
-    });
+        <div class="mt-2 flex gap-2">
+          <a class="w-full px-3 py-3 rounded-2xl bg-black text-white font-bold text-sm text-center"
+             href="${esc(p.link)}" target="_blank">
+            ${esc(T("رابط المنتج","קישור למוצר"))}
+          </a>
 
-    msg += (LANG==="ar")
-      ? "✅ اكتبلي الكمية والعنوان"
-      : "✅ כתוב לי כמות וכתובת";
-
-    return msg;
-  }
-
-  function orderWhatsApp(){
-    if(!WA) return alert("WhatsApp number missing in URL (wa=...)");
-    const text = buildOrderText();
-    const url = `https://wa.me/${WA}?text=${encodeURIComponent(text)}`;
-    window.open(url, "_blank");
-  }
-
-  function copyOrderText(){
-    const text = buildOrderText();
-    navigator.clipboard.writeText(text).then(()=>{
-      alert(LANG==="ar" ? "تم النسخ ✅" : "הועתק ✅");
-    }).catch(()=>{
-      alert(LANG==="ar" ? "النسخ مرفوض من المتصفح" : "העתקה נחסמה בדפדפן");
-    });
-  }
-
-  function renderGrid(){
-    const grid = document.getElementById("grid");
-    grid.innerHTML = "";
-
-    BUNDLE.forEach(p => {
-      const card = document.createElement("div");
-      card.className = "bg-white rounded-2xl shadow p-2 border";
-      card.innerHTML = `
-        <img src="${escapeHtml(p.image)}" class="w-full h-36 object-contain bg-gray-50 rounded-xl" />
-        <div class="mt-2 text-sm font-semibold text-center">${escapeHtml(p.title)}</div>
-        <div class="mt-1 flex gap-2">
-          <a class="w-full text-center bg-black text-white py-2 rounded-xl text-sm"
-             href="${escapeHtml(p.link)}" target="_blank">${LANG==="ar" ? "رابط المنتج" : "קישור למוצר"}</a>
+          <button class="px-3 py-3 rounded-2xl danger text-white font-black text-sm"
+                  data-remove="${esc(p.id)}">
+            ${esc(T("حذف","מחק"))}
+          </button>
         </div>
-      `;
-      grid.appendChild(card);
-    });
 
-    document.getElementById("count").textContent = BUNDLE.length.toString();
+        <div class="mt-2 text-center text-sm font-black">
+          ₪${(p.price||0).toFixed(0)}
+        </div>
+      </div>
+    `;
+
+    card.querySelector(`[data-remove="${CSS.escape(p.id)}"]`).onclick = ()=>{
+      removeProduct(p.id);
+    };
+
+    grid.appendChild(card);
+  });
+}
+
+function removeProduct(id){
+  IDS = IDS.filter(x => x !== id);
+  rebuildSelected();
+}
+
+/* =========================
+   TOTALS
+========================= */
+function calcSubtotal(){
+  let sum = 0;
+  for(const p of SELECTED) sum += (p.price||0);
+  return sum;
+}
+function renderTotals(){
+  const sub = calcSubtotal();
+  document.getElementById("subtotal").textContent = sub.toFixed(0);
+  document.getElementById("shipping").textContent = DELIVERY_FEE.toFixed(0);
+  document.getElementById("total").textContent = (sub + DELIVERY_FEE).toFixed(0);
+}
+
+/* =========================
+   ORDER TEXT + SEND
+========================= */
+function getPay(){
+  const el = document.querySelector('input[name="pay"]:checked');
+  return el ? el.value : "COD";
+}
+
+function buildBundleUrl(){
+  const base = location.origin + location.pathname.replace(/[^/]+$/, "") + "bundle.html";
+  const idsParam = encodeURIComponent(IDS.join(","));
+  return `${base}?ids=${idsParam}&lang=${encodeURIComponent(LANG)}&wa=${encodeURIComponent(WA)}`;
+}
+
+function buildOrderText(){
+  const name = (document.getElementById("custName").value || "").trim();
+  const phone = (document.getElementById("custPhone").value || "").trim();
+  const addr = (document.getElementById("custAddress").value || "").trim();
+  const pay = getPay();
+
+  if(!name || !phone || !addr){
+    return { ok:false, text:"" };
   }
 
-  function escapeHtml(s){
-    return (s||"").replace(/[&<>"']/g, m => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;" }[m]));
+  const payTxt = (pay==="COD")
+    ? T("الدفع عند الاستلام","תשלום בעת מסירה")
+    : T("بطاقة/تحويل","כרטיס/העברה");
+
+  const sub = calcSubtotal();
+  const total = sub + DELIVERY_FEE;
+
+  let msg = T("🛒 طلب جديد\n","🛒 הזמנה חדשה\n");
+  msg += "----------------------\n";
+  msg += T(`👤 الاسم: ${name}\n`,`👤 שם: ${name}\n`);
+  msg += T(`📞 التلفون: ${phone}\n`,`📞 טלפון: ${phone}\n`);
+  msg += T(`📍 العنوان: ${addr}\n`,`📍 כתובת: ${addr}\n`);
+  msg += T(`💳 الدفع: ${payTxt}\n`,`💳 תשלום: ${payTxt}\n`);
+  msg += "----------------------\n";
+  msg += T("🧾 المنتجات:\n","🧾 מוצרים:\n");
+
+  SELECTED.forEach(p=>{
+    msg += `• ${p.title} — ₪${(p.price||0).toFixed(0)}\n`;
+  });
+
+  msg += "----------------------\n";
+  msg += T(`المجموع الفرعي: ₪${sub.toFixed(0)}\n`,`סכום ביניים: ₪${sub.toFixed(0)}\n`);
+  msg += T(`التوصيل: ₪${DELIVERY_FEE}\n`,`משלוח: ₪${DELIVERY_FEE}\n`);
+  msg += T(`الإجمالي: ₪${total.toFixed(0)}\n`,`סה״כ: ₪${total.toFixed(0)}\n`);
+  msg += "----------------------\n";
+  msg += T("📦 رابط الباقة:\n","📦 קישור למארז:\n");
+  msg += buildBundleUrl();
+
+  return { ok:true, text:msg };
+}
+
+async function copyOrderText(){
+  if(IDS.length===0) return alert(T("الباقة فارغة","המארז ריק"));
+  const data = buildOrderText();
+  if(!data.ok){
+    alert(T("املأ الاسم والتلفون والعنوان","מלא שם, טלפון וכתובת"));
+    return;
   }
-
-  async function loadRSS(){
-    const status = document.getElementById("status");
-    status.textContent = "Loading RSS...";
-    try{
-      const rssUrl = location.origin + location.pathname.replace(/[^/]+$/, "") + "products.rss";
-      const res = await fetch(rssUrl, { cache: "no-store" });
-      if(!res.ok) throw new Error("HTTP " + res.status);
-      const text = await res.text();
-
-      const parser = new DOMParser();
-      const xml = parser.parseFromString(text, "application/xml");
-      const parseError = xml.getElementsByTagName("parsererror");
-      if(parseError && parseError.length) throw new Error("XML parse error");
-
-      const items = Array.from(xml.getElementsByTagName("item"));
-      PRODUCTS = items.map(item => ({
-        id: getTextByLocalName(item, "id"),
-        title: getTextByLocalName(item, "title"),
-        image: getTextByLocalName(item, "image_link"),
-        link: getTextByLocalName(item, "link"),
-      })).filter(p => p.id && p.title);
-
-      const map = new Map(PRODUCTS.map(p => [p.id, p]));
-      BUNDLE = IDS.map(id => map.get(id)).filter(Boolean);
-
-      status.textContent = `OK ✅ Loaded bundle: ${BUNDLE.length}`;
-      renderGrid();
-    }catch(e){
-      console.error(e);
-      document.getElementById("status").textContent = "Failed ❌";
-      alert("فشل تحميل المنتجات. تأكد أن products.rss موجود في نفس المجلد.\n" + e.message);
-    }
+  try{
+    await navigator.clipboard.writeText(data.text);
+    alert(T("تم نسخ النص ✅","הטקסט הועתק ✅"));
+  }catch{
+    alert(T("انسخ يدويًا","העתק ידנית"));
   }
+}
 
-  // Init
-  (function init(){
-    LANG = qs("lang") || "ar";
-    WA = (qs("wa") || "").replace(/\D/g,"");
-    const idsStr = qs("ids") || "";
-    IDS = idsStr ? decodeURIComponent(idsStr).split(",").map(s=>s.trim()).filter(Boolean) : [];
+function sendWhatsApp(){
+  if(IDS.length===0) return alert(T("الباقة فارغة","המארז ריק"));
+  const data = buildOrderText();
+  if(!data.ok){
+    alert(T("املأ الاسم والتلفون والعنوان","מלא שם, טלפון וכתובת"));
+    return;
+  }
+  window.open(`https://wa.me/${WA}?text=${encodeURIComponent(data.text)}`, "_blank");
+}
 
-    setUiTexts();
-    document.getElementById("waView").textContent = WA ? WA : "—";
+/* =========================
+   UTILS
+========================= */
+function esc(s){
+  return (s||"").replace(/[&<>"']/g, m => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;" }[m]));
+}
 
-    if(!IDS.length){
-      document.getElementById("status").textContent = "No ids in URL";
-      alert("لا يوجد منتجات في الرابط. ارجع لصفحة الاختيار واعمل Create Bundle.");
-      return;
-    }
+/* =========================
+   EVENTS / INIT
+========================= */
+document.getElementById("langBtn").onclick = ()=>{
+  LANG = (LANG==="ar") ? "he" : "ar";
+  setTexts();
+  rebuildSelected();
+};
 
-    loadRSS();
-  })();
+document.getElementById("copyTextBtn").onclick = copyOrderText;
+document.getElementById("sendBtn").onclick = sendWhatsApp;
+document.getElementById("sendBtnTop").onclick = sendWhatsApp;
+
+(function init(){
+  readQuery();
+  setTexts();
+  loadRSS();
+})();
 </script>
+
 </body>
 </html>
