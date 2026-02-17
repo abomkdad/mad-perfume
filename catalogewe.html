@@ -1,161 +1,224 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MAD Catalog Sender</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<style>
-body { font-family: Arial; background:#f5f5f5 }
-.card:hover { transform:scale(1.03); transition:.2s }
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MAD Catalog Sender</title>
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="p-4">
+<body class="p-4 bg-gray-100">
+  <div class="max-w-7xl mx-auto">
+    <div class="flex items-center justify-between mb-4">
+      <h1 class="text-2xl font-bold">MAD Catalog Selector</h1>
+      <button class="bg-black text-white px-4 py-2 rounded-lg" onclick="toggleLang()">عربي / עברית</button>
+    </div>
 
-<div class="max-w-7xl mx-auto">
+    <div class="bg-white rounded-xl shadow p-4 mb-4">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-3 items-end">
+        <div>
+          <label class="block text-sm font-semibold mb-1">RSS filename (same folder)</label>
+          <input id="rssPath" class="w-full border rounded-lg p-2" value="products.rss" />
+          <p class="text-xs text-gray-500 mt-1">لازم يكون الملف بنفس مجلد الـ HTML</p>
+        </div>
+        <div>
+          <label class="block text-sm font-semibold mb-1">WhatsApp Sender Number</label>
+          <input id="waNumber" class="w-full border rounded-lg p-2" value="972524033442" />
+        </div>
+        <div class="flex gap-2">
+          <button class="w-full bg-blue-600 text-white py-2 rounded-lg" onclick="loadRSS()">Load RSS</button>
+          <button class="w-full bg-gray-200 py-2 rounded-lg" onclick="clearSelection()">Clear</button>
+        </div>
+      </div>
+    </div>
 
-<!-- Language Toggle -->
-<div class="flex justify-between mb-4">
-    <h1 class="text-2xl font-bold">MAD Product Selector</h1>
-    <button onclick="toggleLang()" class="bg-black text-white px-4 py-2 rounded">
-        عربي / עברית
-    </button>
-</div>
+    <div class="bg-white rounded-xl shadow p-4 mb-4">
+      <div class="flex flex-col md:flex-row gap-3 md:items-center md:justify-between">
+        <div class="w-full md:w-96">
+          <label class="block text-sm font-semibold mb-1">بحث</label>
+          <input id="search" class="w-full border rounded-lg p-2" placeholder="ابحث بالاسم / الكود..." oninput="applyFilters()">
+        </div>
+        <div class="text-sm text-gray-600">
+          <span class="font-semibold">Products:</span> <span id="countAll">0</span>
+          <span class="mx-2">|</span>
+          <span class="font-semibold">Selected:</span> <span id="countSel">0</span>
+        </div>
+        <div class="flex gap-2">
+          <button class="bg-green-600 text-white px-4 py-2 rounded-lg" onclick="sendSelected()">إرسال المنتجات</button>
+          <button class="bg-black text-white px-4 py-2 rounded-lg" onclick="sendCategory()">إرسال الكاتيجوري</button>
+        </div>
+      </div>
+    </div>
 
-<!-- Categories -->
-<div id="categories" class="flex flex-wrap gap-2 mb-6"></div>
-
-<!-- Products -->
-<div id="products" class="grid grid-cols-2 md:grid-cols-4 gap-4"></div>
-
-<!-- Actions -->
-<div class="fixed bottom-4 left-0 right-0 flex justify-center gap-3">
-    <button onclick="sendSelected()" class="bg-green-600 text-white px-6 py-3 rounded-xl shadow-lg">
-        إرسال المنتجات
-    </button>
-    <button onclick="sendCategory()" class="bg-black text-white px-6 py-3 rounded-xl shadow-lg">
-        إرسال الكاتيجوري
-    </button>
-</div>
-
-</div>
+    <div id="categories" class="flex flex-wrap gap-2 mb-3"></div>
+    <div id="products" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4"></div>
+  </div>
 
 <script>
+let PRODUCTS = [];
+let FILTERED = [];
+let SELECTED = new Set();
+let CURRENT_CATEGORY = "ALL";
+let LANG = "ar";
 
-let products = []
-let selected = []
-let currentCategory = ""
-let lang = "ar"
-const whatsappNumber = "972524033442" // حط رقم الواتساب تبعك
+function getTextByLocalName(parent, localName){
+  const nodes = parent.getElementsByTagName("*");
+  for (let i=0;i<nodes.length;i++){
+    if ((nodes[i].localName || "").toLowerCase() === localName.toLowerCase()){
+      return (nodes[i].textContent || "").trim();
+    }
+  }
+  return "";
+}
 
 async function loadRSS(){
-    const response = await fetch("products.rss")
-    const text = await response.text()
-    const parser = new DOMParser()
-    const xml = parser.parseFromString(text,"text/xml")
-    const items = xml.querySelectorAll("item")
-
-    items.forEach(item=>{
-        products.push({
-            id: item.querySelector("g\\:id").textContent,
-            title: item.querySelector("g\\:title").textContent,
-            image: item.querySelector("g\\:image_link").textContent,
-            link: item.querySelector("g\\:link").textContent,
-            category: item.querySelector("g\\:product_type").textContent
-        })
-    })
-
-    renderCategories()
+  const path = (document.getElementById("rssPath").value || "products.rss").trim();
+  try{
+    const res = await fetch(path, { cache: "no-store" });
+    if(!res.ok) throw new Error("HTTP " + res.status);
+    const xmlText = await res.text();
+    parseAndRender(xmlText);
+  }catch(e){
+    alert("مش قادر أقرأ products.rss.\n\nمهم: لازم تفتح الصفحة عبر GitHub/Netlify (مش file://)\n\n" + e.message);
+  }
 }
 
-function renderCategories(){
-    const container = document.getElementById("categories")
-    const cats = [...new Set(products.map(p=>p.category))]
+function parseAndRender(xmlText){
+  const parser = new DOMParser();
+  const xml = parser.parseFromString(xmlText, "text/xml");
+  if (xml.querySelector("parsererror")) return alert("الملف مش XML صحيح.");
 
-    cats.forEach(cat=>{
-        const btn = document.createElement("button")
-        btn.className = "bg-gray-200 px-4 py-2 rounded"
-        btn.innerText = translateCategory(cat)
-        btn.onclick = ()=>filterCategory(cat)
-        container.appendChild(btn)
-    })
-}
+  const items = Array.from(xml.getElementsByTagName("item"));
+  if(items.length===0) return alert("ما في <item> بالملف.");
 
-function filterCategory(cat){
-    currentCategory = cat
-    selected = []
-    const filtered = products.filter(p=>p.category===cat)
-    renderProducts(filtered)
-}
+  PRODUCTS = items.map(item => ({
+    id: getTextByLocalName(item, "id"),
+    title: getTextByLocalName(item, "title"),
+    image: getTextByLocalName(item, "image_link"),
+    link: getTextByLocalName(item, "link"),
+    category: getTextByLocalName(item, "product_type") || "Uncategorized"
+  })).filter(p => p.id && p.title);
 
-function renderProducts(list){
-    const container = document.getElementById("products")
-    container.innerHTML=""
-    list.forEach(p=>{
-        const div = document.createElement("div")
-        div.className="card bg-white p-2 rounded shadow cursor-pointer"
-        div.innerHTML=`
-            <img src="${p.image}" class="w-full h-40 object-contain">
-            <p class="text-center mt-2 font-semibold">${p.title}</p>
-        `
-        div.onclick=()=>toggleSelect(p.id,div)
-        container.appendChild(div)
-    })
-}
+  SELECTED = new Set();
+  CURRENT_CATEGORY = "ALL";
+  document.getElementById("countAll").textContent = PRODUCTS.length;
+  document.getElementById("countSel").textContent = "0";
 
-function toggleSelect(id,el){
-    if(selected.includes(id)){
-        selected = selected.filter(x=>x!==id)
-        el.classList.remove("ring","ring-green-500")
-    }else{
-        selected.push(id)
-        el.classList.add("ring","ring-green-500")
-    }
-}
-
-function sendSelected(){
-    if(selected.length===0) return alert("اختر منتجات")
-    const chosen = products.filter(p=>selected.includes(p.id))
-    let message = "🛍 المنتجات المختارة:\n\n"
-    chosen.forEach(p=>{
-        message += `${p.title}\n${p.link}\n\n`
-    })
-    openWhatsApp(message)
-}
-
-function sendCategory(){
-    if(!currentCategory) return alert("اختر كاتيجوري")
-    const chosen = products.filter(p=>p.category===currentCategory)
-    let message = "🛍 جميع منتجات الفئة:\n\n"
-    chosen.forEach(p=>{
-        message += `${p.title}\n${p.link}\n\n`
-    })
-    openWhatsApp(message)
-}
-
-function openWhatsApp(text){
-    const url = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(text)}`
-    window.open(url,"_blank")
-}
-
-function toggleLang(){
-    lang = lang==="ar" ? "he" : "ar"
-    location.reload()
+  renderCategories();
+  applyFilters();
 }
 
 function translateCategory(cat){
-    if(lang==="ar"){
-        if(cat.includes("גברים")) return "عطور رجال"
-        if(cat.includes("נשים")) return "عطور نساء"
-        if(cat.includes("מבצעים")) return "عروض"
-        return cat
-    }
-    return cat
+  if(LANG==="ar"){
+    if(cat.includes("גברים")) return "عطور رجال";
+    if(cat.includes("נשים")) return "عطور نساء";
+    if(cat.includes("מבצעים")) return "عروض";
+    return cat;
+  }
+  return cat; // Hebrew default
 }
 
-loadRSS()
+function renderCategories(){
+  const container = document.getElementById("categories");
+  container.innerHTML = "";
 
+  const cats = Array.from(new Set(PRODUCTS.map(p=>p.category))).sort((a,b)=>a.localeCompare(b));
+
+  container.appendChild(makeCatBtn("ALL", LANG==="ar" ? "كل المنتجات" : "כל המוצרים", true));
+  cats.forEach(cat => container.appendChild(makeCatBtn(cat, translateCategory(cat), false)));
+  highlightCategory();
+}
+
+function makeCatBtn(cat, label){
+  const b = document.createElement("button");
+  b.className = "px-4 py-2 rounded-full bg-gray-200";
+  b.textContent = label;
+  b.dataset.cat = cat;
+  b.onclick = ()=>{ CURRENT_CATEGORY = cat; applyFilters(); highlightCategory(); };
+  return b;
+}
+
+function highlightCategory(){
+  document.querySelectorAll("#categories button").forEach(b=>{
+    const active = b.dataset.cat === CURRENT_CATEGORY;
+    b.className = "px-4 py-2 rounded-full " + (active ? "bg-black text-white" : "bg-gray-200");
+  });
+}
+
+function applyFilters(){
+  const q = (document.getElementById("search").value||"").trim().toLowerCase();
+  FILTERED = PRODUCTS.filter(p=>{
+    const catOk = CURRENT_CATEGORY==="ALL" ? true : (p.category===CURRENT_CATEGORY);
+    const qOk = !q ? true : (p.title.toLowerCase().includes(q) || p.id.toLowerCase().includes(q));
+    return catOk && qOk;
+  });
+  renderProducts(FILTERED);
+}
+
+function renderProducts(list){
+  const container = document.getElementById("products");
+  container.innerHTML = "";
+  list.forEach(p=>{
+    const selected = SELECTED.has(p.id);
+    const card = document.createElement("div");
+    card.className = "bg-white rounded-xl shadow p-2 cursor-pointer border";
+    card.innerHTML = `
+      <div class="relative">
+        <img src="${escapeHtml(p.image)}" class="w-full h-36 object-contain bg-gray-50 rounded-lg" />
+        <div class="absolute top-2 left-2 px-2 py-1 text-xs rounded bg-white/90 border">${escapeHtml(p.id)}</div>
+        ${selected ? `<div class="absolute top-2 right-2 px-2 py-1 text-xs rounded bg-green-600 text-white">✓</div>` : ""}
+      </div>
+      <div class="mt-2 text-center font-semibold text-sm">${escapeHtml(p.title)}</div>
+      <div class="mt-1 text-center text-xs text-gray-500">${escapeHtml(translateCategory(p.category))}</div>
+    `;
+    card.onclick = ()=>{
+      if(SELECTED.has(p.id)) SELECTED.delete(p.id); else SELECTED.add(p.id);
+      document.getElementById("countSel").textContent = SELECTED.size;
+      renderProducts(FILTERED);
+    };
+    container.appendChild(card);
+  });
+}
+
+function clearSelection(){
+  SELECTED = new Set();
+  document.getElementById("countSel").textContent = "0";
+  renderProducts(FILTERED);
+}
+
+function sendSelected(){
+  if(SELECTED.size===0) return alert(LANG==="ar" ? "اختر منتجات أولاً" : "בחר מוצרים קודם");
+  const chosen = PRODUCTS.filter(p=>SELECTED.has(p.id));
+  let msg = (LANG==="ar" ? "🛍 المنتجات المختارة:\n\n" : "🛍 המוצרים שנבחרו:\n\n");
+  chosen.forEach(p=> msg += `${p.title}\n${p.link}\n\n`);
+  openWhatsApp(msg);
+}
+
+function sendCategory(){
+  if(CURRENT_CATEGORY==="ALL") return alert(LANG==="ar" ? "اختر كاتيجوري أولاً" : "בחר קטגוריה קודם");
+  const chosen = PRODUCTS.filter(p=>p.category===CURRENT_CATEGORY);
+  const catName = translateCategory(CURRENT_CATEGORY);
+  let msg = (LANG==="ar" ? `🧾 كاتيجوري: ${catName}\n\n` : `🧾 קטגוריה: ${catName}\n\n`);
+  chosen.forEach(p=> msg += `${p.title}\n${p.link}\n\n`);
+  openWhatsApp(msg);
+}
+
+function openWhatsApp(text){
+  const number = (document.getElementById("waNumber").value||"").trim().replace(/\D/g,"");
+  const url = `https://wa.me/${number}?text=${encodeURIComponent(text)}`;
+  window.open(url, "_blank");
+}
+
+function toggleLang(){
+  LANG = (LANG==="ar") ? "he" : "ar";
+  document.documentElement.lang = LANG==="ar" ? "ar" : "he";
+  document.documentElement.dir = LANG==="ar" ? "rtl" : "ltr";
+  renderCategories();
+  applyFilters();
+}
+
+function escapeHtml(s){
+  return (s||"").replace(/[&<>"']/g, m => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;" }[m]));
+}
 </script>
-
 </body>
 </html>
