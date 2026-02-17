@@ -5,113 +5,148 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>MAD - باقة مختارة</title>
 
-  <!-- OG preview (واتساب يعرض صورة واحدة فقط - طبيعي) -->
+  <!-- OG Preview (واتساب يعرض صورة واحدة فقط - طبيعي) -->
   <meta property="og:title" content="MAD - باقة مختارة" />
   <meta property="og:description" content="اختر المنتجات المفضلة وأرسل الطلب عبر واتساب" />
   <meta property="og:type" content="website" />
-  <meta property="og:image" content="https://www.mad-parfumeur.com/assets/hero/logo.png" />
+  <meta property="og:image" content="https://www.mad-parfumeur.com/assets/hero/1.webp" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
 
   <script src="https://cdn.tailwindcss.com"></script>
+
   <style>
-    body { font-family: Arial, sans-serif; background:#f6f7f9; }
-    .glass { backdrop-filter: blur(10px); background: rgba(255,255,255,.75); }
-    .shadow-soft { box-shadow: 0 10px 30px rgba(0,0,0,.08); }
-    .card { transition: .15s transform; }
-    .card:hover { transform: scale(1.02); }
-    .danger { background:#dc2626; }
-    .danger:hover { background:#b91c1c; }
-    .qtyBadge { min-width: 34px; height: 34px; display:flex; align-items:center; justify-content:center; border-radius: 999px; font-weight: 900; }
+    body { font-family: Arial, sans-serif; background: radial-gradient(1200px 600px at 20% 0%, rgba(197,160,89,.25), transparent 55%),
+                                           radial-gradient(900px 500px at 80% 10%, rgba(0,0,0,.12), transparent 55%),
+                                           linear-gradient(180deg, #0b0d10, #0f1116 45%, #f6f7f9 45%, #f6f7f9); }
+
+    .glass { backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); background: rgba(255,255,255,.10); border: 1px solid rgba(255,255,255,.18); }
+    .glassLight { backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); background: rgba(255,255,255,.78); border: 1px solid rgba(255,255,255,.55); }
+    .shadowLux { box-shadow: 0 18px 55px rgba(0,0,0,.18); }
+    .shadowSoft { box-shadow: 0 12px 32px rgba(0,0,0,.10); }
+    .card { transition: .18s transform, .18s box-shadow; }
+    .card:hover { transform: translateY(-2px); box-shadow: 0 18px 55px rgba(0,0,0,.16); }
+    .goldText { background: linear-gradient(90deg, #f6e27a, #c5a059, #fff2b6); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .goldBorder { border: 1px solid rgba(197,160,89,.45); }
+    .btnGold { background: linear-gradient(135deg, #f6e27a, #c5a059); color:#111; }
+    .btnGold:hover { filter: brightness(1.03); }
+    .btnDark { background: linear-gradient(180deg, #161a22, #0f1218); color: #fff; }
+    .btnDark:hover { filter: brightness(1.05); }
+
+    .qtyBadge { min-width: 36px; height: 36px; display:flex; align-items:center; justify-content:center; border-radius: 999px; font-weight: 900; }
+    .pill { border-radius: 999px; }
+    .fadeIn { animation: fadeIn .25s ease-out both; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px);} to {opacity:1; transform:none;} }
+
+    /* Mobile safe bottom bar */
+    .safeBottom { padding-bottom: env(safe-area-inset-bottom); }
   </style>
 </head>
 
 <body class="min-h-screen">
 
-  <!-- Header -->
-  <div class="sticky top-0 z-30 border-b bg-white/80 glass">
-    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
-      <div class="flex items-center gap-3">
-        <img src="https://www.mad-parfumeur.com/assets/hero/logo.png" class="h-10 w-10 rounded-xl object-contain bg-white border" alt="MAD">
-        <div>
-          <div class="font-black text-lg" id="t_title">MAD - باقة مختارة</div>
-          <div class="text-xs text-gray-600" id="t_sub">اختر المنتجات المفضلة وأرسل الطلب عبر واتساب</div>
+  <!-- Top Bar -->
+  <div class="sticky top-0 z-40">
+    <div class="glass shadowLux">
+      <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between gap-3">
+        <div class="flex items-center gap-3">
+          <div class="w-11 h-11 rounded-2xl bg-white/10 border border-white/15 flex items-center justify-center overflow-hidden">
+            <img src="https://www.mad-parfumeur.com/assets/hero/logo.png" class="w-9 h-9 object-contain" alt="MAD">
+          </div>
+          <div>
+            <div class="font-black text-lg leading-6 text-white">
+              <span class="goldText">MAD</span> <span id="t_title">- باقة مختارة</span>
+            </div>
+            <div class="text-xs text-white/70" id="t_sub">اختر المنتجات المفضلة وأرسل الطلب عبر واتساب</div>
+          </div>
+        </div>
+
+        <button id="langBtn" class="px-4 py-2 pill btnDark shadowSoft text-sm font-bold">
+          عربي / עברית
+        </button>
+      </div>
+
+      <!-- Actions row -->
+      <div class="max-w-7xl mx-auto px-4 pb-4">
+        <div class="glassLight shadowSoft rounded-3xl p-3 md:p-4">
+          <div class="grid grid-cols-2 gap-2">
+            <button id="sendBtnTop" class="w-full py-3 rounded-2xl bg-green-600 text-white font-black shadowSoft">
+              <span id="t_send">الطلب عبر واتساب</span>
+            </button>
+            <button id="copyTextBtn" class="w-full py-3 rounded-2xl btnDark font-black shadowSoft">
+              <span id="t_copy">نسخ نص الطلب</span>
+            </button>
+          </div>
+
+          <div class="mt-3 text-[11px] text-gray-600 leading-5" id="notePreview">
+            ملاحظة: واتساب يعرض Preview واحد للصفحة فقط — داخل الصفحة ستظهر كل الصور.
+          </div>
         </div>
       </div>
-      <button id="langBtn" class="px-4 py-2 rounded-xl bg-black text-white text-sm shadow-soft">عربي / עברית</button>
     </div>
   </div>
 
-  <div class="max-w-7xl mx-auto px-4 py-6 pb-24">
+  <!-- Content -->
+  <div class="max-w-7xl mx-auto px-4 pt-4 pb-28">
 
-    <!-- Top Info + Actions (بدون Status) -->
-    <div class="bg-white rounded-3xl shadow-soft border p-4">
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-        <div class="rounded-2xl border p-3 bg-gray-50">
-          <div class="text-xs text-gray-500" id="t_products">Products</div>
-          <div class="font-black text-lg"><span id="countBox">0</span></div>
-        </div>
-
-        <div class="rounded-2xl border p-3 bg-gray-50">
-          <div class="text-xs text-gray-500" id="t_wa">WhatsApp</div>
-          <div class="font-black text-lg" id="waBox">—</div>
-        </div>
+    <!-- Mini Stats -->
+    <div class="grid grid-cols-2 gap-3">
+      <div class="glassLight shadowSoft rounded-3xl p-4">
+        <div class="text-xs text-gray-500" id="t_products">Products</div>
+        <div class="mt-1 text-2xl font-black"><span id="countBox">0</span></div>
       </div>
-
-      <div class="mt-4 flex flex-col md:flex-row gap-2 md:items-center md:justify-between">
-        <div class="text-xs text-gray-500" id="notePreview">
-          ملاحظة: واتساب يعرض Preview واحد للصفحة فقط — داخل الصفحة ستظهر كل الصور.
-        </div>
-
-        <div class="flex gap-2">
-          <button id="copyTextBtn" class="px-4 py-3 rounded-2xl bg-gray-900 text-white font-bold">
-            <span id="t_copy">نسخ نص الطلب</span>
-          </button>
-          <button id="sendBtnTop" class="px-4 py-3 rounded-2xl bg-green-600 text-white font-black">
-            <span id="t_send">الطلب عبر واتساب</span>
-          </button>
-        </div>
+      <div class="glassLight shadowSoft rounded-3xl p-4">
+        <div class="text-xs text-gray-500" id="t_wa">WhatsApp</div>
+        <div class="mt-1 text-lg font-black" id="waBox">—</div>
       </div>
     </div>
 
     <!-- Products -->
-    <div class="mt-5">
-      <div class="font-black mb-3" id="t_selected_products">المنتجات المختارة</div>
-      <div id="productsGrid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4"></div>
-      <div id="emptyState" class="hidden mt-4 p-6 rounded-3xl bg-white border shadow-soft text-center text-gray-700">
+    <div class="mt-6">
+      <div class="flex items-center justify-between mb-3">
+        <div class="font-black text-lg" id="t_selected_products">المنتجات المختارة</div>
+        <div class="text-xs text-gray-500" id="t_hint">يمكنك تعديل الكمية أو حذف المنتج</div>
+      </div>
+
+      <div id="productsGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"></div>
+
+      <div id="emptyState" class="hidden mt-4 p-6 rounded-3xl glassLight shadowSoft text-center text-gray-700 fadeIn">
         <div class="font-black text-lg" id="t_empty">لا يوجد منتجات في الباقة</div>
         <div class="text-sm text-gray-500 mt-1" id="t_empty2">ارجع لصفحة الاختيار وأنشئ باقة جديدة.</div>
       </div>
     </div>
 
     <!-- Order Form -->
-    <div class="mt-6 bg-white rounded-3xl shadow-soft border p-4">
-      <div class="font-black text-lg mb-2" id="t_form_title">فورم الطلب</div>
+    <div class="mt-8 glassLight shadowLux rounded-3xl p-4 md:p-6">
+      <div class="flex items-center justify-between">
+        <div class="font-black text-xl" id="t_form_title">فورم الطلب</div>
+        <div class="text-xs text-gray-500" id="t_form_note">سيتم إرسال البيانات للواتساب</div>
+      </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+      <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-3">
         <div>
           <div class="text-xs text-gray-500 mb-1" id="t_name">الاسم</div>
-          <input id="custName" class="w-full border rounded-2xl p-3" placeholder="الاسم الكامل" />
+          <input id="custName" class="w-full border rounded-2xl p-3 bg-white/90" placeholder="الاسم الكامل" />
         </div>
         <div>
           <div class="text-xs text-gray-500 mb-1" id="t_phone">التلفون</div>
-          <input id="custPhone" class="w-full border rounded-2xl p-3" placeholder="رقم التلفون" inputmode="tel" />
+          <input id="custPhone" class="w-full border rounded-2xl p-3 bg-white/90" placeholder="رقم التلفون" inputmode="tel" />
         </div>
       </div>
 
       <div class="mt-3">
         <div class="text-xs text-gray-500 mb-1" id="t_address">العنوان</div>
-        <textarea id="custAddress" class="w-full border rounded-2xl p-3" rows="3" placeholder="العنوان الكامل"></textarea>
+        <textarea id="custAddress" class="w-full border rounded-2xl p-3 bg-white/90" rows="3" placeholder="العنوان الكامل"></textarea>
       </div>
 
-      <div class="mt-3 grid grid-cols-1 md:grid-cols-2 gap-3">
-        <div class="rounded-2xl border p-3 bg-gray-50">
-          <div class="text-sm font-bold mb-2" id="t_pay">طريقة الدفع</div>
+      <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-3">
+        <div class="rounded-3xl bg-white/85 border p-4 shadowSoft">
+          <div class="text-sm font-black mb-2" id="t_pay">طريقة الدفع</div>
           <label class="flex items-center gap-2 text-sm"><input type="radio" name="pay" value="COD" checked> <span id="t_cod">الدفع عند الاستلام</span></label>
           <label class="flex items-center gap-2 text-sm mt-2"><input type="radio" name="pay" value="CARD"> <span id="t_card">بطاقة / تحويل</span></label>
         </div>
 
-        <div class="rounded-2xl border p-3 bg-white">
+        <div class="rounded-3xl bg-white/85 border p-4 shadowSoft">
           <div class="flex items-center justify-between text-sm">
             <span id="t_subtotal">المجموع الفرعي</span>
             <span class="font-black">₪<span id="subtotal">0</span></span>
@@ -128,11 +163,26 @@
         </div>
       </div>
 
-      <button id="sendBtn" class="mt-4 w-full px-4 py-4 rounded-2xl bg-green-600 text-white font-black shadow-soft">
+      <button id="sendBtn" class="mt-5 w-full py-4 rounded-2xl btnGold shadowLux font-black text-lg">
         <span id="t_send2">إرسال الطلب عبر واتساب</span>
       </button>
     </div>
 
+  </div>
+
+  <!-- Sticky Bottom Checkout Bar -->
+  <div class="fixed bottom-0 left-0 right-0 z-50 safeBottom">
+    <div class="max-w-7xl mx-auto px-4 pb-4">
+      <div class="glass shadowLux rounded-3xl p-3 flex items-center justify-between gap-3">
+        <div>
+          <div class="text-xs text-white/70" id="t_bottom_total">الإجمالي</div>
+          <div class="text-white font-black text-xl">₪<span id="bottomTotal">50</span></div>
+        </div>
+        <button id="sendBtnBottom" class="px-5 py-3 rounded-2xl bg-green-600 text-white font-black shadowSoft">
+          <span id="t_send3">إرسال الطلب</span>
+        </button>
+      </div>
+    </div>
   </div>
 
 <script>
@@ -162,22 +212,28 @@ function setTexts(){
   document.documentElement.lang = LANG;
   document.documentElement.dir  = (LANG==="he") ? "ltr" : "rtl";
 
-  document.getElementById("t_title").textContent = T("MAD - باقة مختارة","MAD - מארז מוצרים");
+  document.getElementById("t_title").textContent = T("- باقة مختارة","- מארז מוצרים");
   document.getElementById("t_sub").textContent   = T("اختر المنتجات المفضلة وأرسل الطلب عبر واتساب","בחר מוצרים ושלח הזמנה בוואטסאפ");
-
   document.getElementById("t_products").textContent = T("Products","מוצרים");
   document.getElementById("t_wa").textContent = "WhatsApp";
+
+  document.getElementById("t_send").textContent = T("الطلب عبر واتساب","הזמנה בוואטסאפ");
+  document.getElementById("t_copy").textContent = T("نسخ نص الطلب","העתק טקסט הזמנה");
+
   document.getElementById("notePreview").textContent = T(
     "ملاحظة: واتساب يعرض Preview واحد للصفحة فقط — داخل الصفحة ستظهر كل الصور.",
     "הערה: וואטסאפ מציג Preview אחד בלבד — בתוך הדף תופענה כל התמונות."
   );
-  document.getElementById("t_copy").textContent = T("نسخ نص الطلب","העתק טקסט הזמנה");
-  document.getElementById("t_send").textContent = T("الطلب عبر واتساب","הזמנה בוואטסאפ");
+
   document.getElementById("t_selected_products").textContent = T("المنتجات المختارة","מוצרים שנבחרו");
+  document.getElementById("t_hint").textContent = T("يمكنك تعديل الكمية أو حذف المنتج","ניתן לעדכן כמות או למחוק מוצר");
+
   document.getElementById("t_empty").textContent = T("لا يوجد منتجات في الباقة","אין מוצרים במארז");
   document.getElementById("t_empty2").textContent = T("ارجع لصفحة الاختيار وأنشئ باقة جديدة.","חזור לעמוד הבחירה וצור מארז חדש.");
 
   document.getElementById("t_form_title").textContent = T("فورم الطلب","טופס הזמנה");
+  document.getElementById("t_form_note").textContent = T("سيتم إرسال البيانات للواتساب","הנתונים יישלחו לוואטסאפ");
+
   document.getElementById("t_name").textContent = T("الاسم","שם");
   document.getElementById("custName").placeholder = T("الاسم الكامل","שם מלא");
   document.getElementById("t_phone").textContent = T("التلفون","טלפון");
@@ -192,7 +248,10 @@ function setTexts(){
   document.getElementById("t_subtotal").textContent = T("المجموع الفرعي","סכום ביניים");
   document.getElementById("t_ship").textContent = T("التوصيل","משלוח");
   document.getElementById("t_total").textContent = T("الإجمالي","סה״כ");
+
   document.getElementById("t_send2").textContent = T("إرسال الطلب عبر واتساب","שלח הזמנה בוואטסאפ");
+  document.getElementById("t_bottom_total").textContent = T("الإجمالي","סה״כ");
+  document.getElementById("t_send3").textContent = T("إرسال الطلب","שלח הזמנה");
 }
 
 /* =========================
@@ -289,6 +348,7 @@ function rebuildSelectedUnique(){
   SELECTED_UNIQUE = Array.from(COUNTS.keys()).map(id => map.get(id)).filter(Boolean);
 
   document.getElementById("countBox").textContent = String(totalQty());
+
   if(SELECTED_UNIQUE.length === 0){
     document.getElementById("productsGrid").innerHTML = "";
     document.getElementById("emptyState").classList.remove("hidden");
@@ -308,7 +368,7 @@ function totalQty(){
 }
 
 /* =========================
-   RENDER
+   RENDER PRODUCTS
 ========================= */
 function renderProducts(){
   const grid = document.getElementById("productsGrid");
@@ -316,41 +376,43 @@ function renderProducts(){
 
   SELECTED_UNIQUE.forEach(p=>{
     const qty = COUNTS.get(p.id) || 1;
+    const lineTotal = ((p.price||0) * qty);
 
     const card = document.createElement("div");
-    card.className = "card bg-white rounded-3xl shadow-soft border overflow-hidden relative";
+    card.className = "card glassLight shadowLux rounded-3xl overflow-hidden fadeIn";
 
     card.innerHTML = `
-      <div class="relative bg-gray-50">
-        <img src="${esc(p.image)}" class="w-full h-44 object-contain" alt="">
-        <!-- Qty badge -->
-        <div class="absolute bottom-2 left-2 qtyBadge bg-white border shadow-soft text-black">
+      <div class="relative bg-white/40">
+        <img src="${esc(p.image)}" class="w-full h-56 object-contain" alt="">
+        <div class="absolute top-3 left-3 qtyBadge bg-white/90 goldBorder shadowSoft text-black">
           ${qty}
         </div>
       </div>
 
-      <div class="p-3">
-        <div class="text-center font-black">${esc(p.id)}</div>
-
-        <!-- Controls (بدون رابط المنتج) -->
-        <div class="mt-3 flex items-center justify-between gap-2">
-          <div class="flex items-center gap-2">
-            <button class="px-3 py-2 rounded-xl bg-gray-100 font-black" data-dec="${esc(p.id)}">-</button>
-            <div class="min-w-[34px] text-center font-black">${qty}</div>
-            <button class="px-3 py-2 rounded-xl bg-gray-100 font-black" data-inc="${esc(p.id)}">+</button>
+      <div class="p-4">
+        <div class="flex items-start justify-between gap-3">
+          <div>
+            <div class="text-xs text-gray-500 font-semibold">${esc(p.id)}</div>
+            <div class="font-black text-base leading-snug mt-1">${esc(p.title)}</div>
           </div>
 
-          <button class="px-3 py-2 rounded-xl danger text-white font-black text-sm" data-remove="${esc(p.id)}">
+          <button class="px-3 py-2 rounded-2xl bg-red-500 text-white text-sm font-black shadowSoft"
+                  data-remove="${esc(p.id)}">
             ${esc(T("حذف","מחק"))}
           </button>
         </div>
 
-        <div class="mt-3 text-center text-sm font-black">
-          ₪${((p.price||0)*qty).toFixed(0)}
-        </div>
+        <div class="mt-4 flex items-center justify-between gap-2">
+          <div class="flex items-center gap-3 bg-black/5 rounded-2xl px-3 py-2">
+            <button class="w-10 h-10 rounded-2xl bg-white shadowSoft font-black text-lg" data-dec="${esc(p.id)}">−</button>
+            <div class="min-w-[28px] text-center font-black text-lg">${qty}</div>
+            <button class="w-10 h-10 rounded-2xl bg-white shadowSoft font-black text-lg" data-inc="${esc(p.id)}">+</button>
+          </div>
 
-        <div class="mt-1 text-center text-xs text-gray-500">
-          ₪${(p.price||0).toFixed(0)} x ${qty}
+          <div class="text-right">
+            <div class="text-lg font-black">₪${lineTotal.toFixed(0)}</div>
+            <div class="text-xs text-gray-500 mt-1">₪${(p.price||0).toFixed(0)} × ${qty}</div>
+          </div>
         </div>
       </div>
     `;
@@ -366,14 +428,10 @@ function renderProducts(){
 function changeQty(id, delta){
   const now = COUNTS.get(id) || 0;
   const next = now + delta;
-  if(next <= 0){
-    COUNTS.delete(id);
-  }else{
-    COUNTS.set(id, next);
-  }
+  if(next <= 0) COUNTS.delete(id);
+  else COUNTS.set(id, next);
   rebuildSelectedUnique();
 }
-
 function removeAll(id){
   COUNTS.delete(id);
   rebuildSelectedUnique();
@@ -392,12 +450,13 @@ function calcSubtotal(){
   }
   return sum;
 }
-
 function renderTotals(){
   const sub = calcSubtotal();
+  const total = sub + DELIVERY_FEE;
   document.getElementById("subtotal").textContent = sub.toFixed(0);
   document.getElementById("shipping").textContent = DELIVERY_FEE.toFixed(0);
-  document.getElementById("total").textContent = (sub + DELIVERY_FEE).toFixed(0);
+  document.getElementById("total").textContent = total.toFixed(0);
+  document.getElementById("bottomTotal").textContent = total.toFixed(0);
 }
 
 /* =========================
@@ -430,7 +489,6 @@ function buildOrderText(){
   const sub = calcSubtotal();
   const total = sub + DELIVERY_FEE;
 
-  // build items
   const map = new Map(PRODUCTS.map(p=>[p.id,p]));
   let msg = T("🛒 طلب جديد\n","🛒 הזמנה חדשה\n");
   msg += "----------------------\n";
@@ -489,7 +547,7 @@ function esc(s){
 }
 
 /* =========================
-   EVENTS / INIT
+   INIT
 ========================= */
 document.getElementById("langBtn").onclick = ()=>{
   LANG = (LANG==="ar") ? "he" : "ar";
@@ -498,14 +556,31 @@ document.getElementById("langBtn").onclick = ()=>{
 };
 
 document.getElementById("copyTextBtn").onclick = copyOrderText;
-document.getElementById("sendBtn").onclick = sendWhatsApp;
 document.getElementById("sendBtnTop").onclick = sendWhatsApp;
+document.getElementById("sendBtn").onclick = sendWhatsApp;
+document.getElementById("sendBtnBottom").onclick = sendWhatsApp;
 
-(function init(){
-  readQuery();
+function init(){
+  // read query
+  const idsRaw = (qs("ids") || "").trim();
+  IDS = idsRaw ? idsRaw.split(",").map(s=>s.trim()).filter(Boolean) : [];
+
+  const langQ = (qs("lang") || "").toLowerCase();
+  if(langQ === "ar" || langQ === "he") LANG = langQ;
+
+  WA = normalizeWa(qs("wa")) || DEFAULT_WA;
+  document.getElementById("waBox").textContent = WA;
+
+  COUNTS = new Map();
+  for(const id of IDS){
+    COUNTS.set(id, (COUNTS.get(id)||0) + 1);
+  }
+
   setTexts();
   loadRSS();
-})();
+}
+
+init();
 </script>
 
 </body>
