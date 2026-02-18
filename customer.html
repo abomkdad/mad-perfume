@@ -1,232 +1,93 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>MAD Parfumeur | Catalog</title>
-
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;500;800&family=Noto+Sans+Arabic:wght@400;700;900&display=swap" rel="stylesheet">
-
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Plus Jakarta Sans', 'Noto Sans Arabic', 'sans-serif'],
-                    },
-                    colors: {
-                        premium: '#0A0A0A',
-                        luxuryGold: '#C5A059',
-                    }
-                }
-            }
-        }
-    </script>
-
-    <style>
-        :root { --gold: #C5A059; --dark: #0A0A0A; }
-        body { background-color: #FDFCFB; color: var(--dark); -webkit-tap-highlight-color: transparent; }
-        .glass-dark { background: rgba(10, 10, 10, 0.98); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); }
-        .product-card { transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); border-radius: 20px; }
-        .product-card:active { transform: scale(0.95); }
-        .gold-gradient { background: linear-gradient(135deg, #f6e27a 0%, #c5a059 50%, #f6e27a 100%); -webkit-background-clip: text; color: transparent; }
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        @keyframes reveal { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
-        .animate-reveal { animation: reveal 0.6s ease-out forwards; }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>MAD Parfumeur | كتالوج العميل</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root { --gold: #C5A059; --dark: #0A0A0A; }
+    body { background-color: #FDFCFB; font-family: sans-serif; }
+    .glass-dark { background: rgba(10, 10, 10, 0.98); backdrop-filter: blur(15px); }
+    .product-card { background: white; border-radius: 20px; transition: 0.3s; border: 1px solid #f0f0f0; }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+  </style>
 </head>
-
-<body class="antialiased font-sans">
-
-    <nav class="sticky top-0 z-50 glass-dark border-b border-white/10 px-4 py-3">
-        <div class="max-w-7xl mx-auto flex items-center justify-between">
-            <div class="flex items-center gap-3">
-                <img src="https://www.mad-parfumeur.com/assets/hero/logo.png" class="h-8 w-8 object-contain brightness-0 invert" alt="MAD">
-                <div>
-                    <p class="text-white font-black text-sm uppercase leading-none italic">MAD Parfumeur</p>
-                    <p class="text-[8px] text-luxuryGold font-bold tracking-widest uppercase mt-1">Maison de Parfum</p>
-                </div>
-            </div>
-
-            <div class="flex items-center gap-4">
-                <button id="langBtn" class="text-white/70 text-[10px] font-bold border border-white/20 px-2 py-1 rounded">AR / HE</button>
-                <button id="cartBtn" class="relative p-1">
-                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
-                    <span id="cartCountBadge" class="absolute -top-1 -right-1 bg-luxuryGold text-white text-[9px] w-4 h-4 flex items-center justify-center rounded-full font-bold">0</span>
-                </button>
-            </div>
-        </div>
-    </nav>
-
-    <section class="bg-premium pt-6 pb-12 px-6 text-center">
-        <div class="max-w-4xl mx-auto">
-            <h1 id="t_hero_title" class="text-white text-2xl font-black mb-4 leading-tight animate-reveal">
-                عالم من <span class="gold-gradient">الفخامة</span>
-            </h1>
-            <div class="max-w-md mx-auto bg-white/5 border border-white/10 p-1 rounded-xl flex items-center gap-2 animate-reveal">
-                <input id="search" type="text" class="flex-1 bg-transparent text-white px-3 outline-none text-xs py-2" placeholder="بحث...">
-            </div>
-        </div>
-    </section>
-
-    <div class="max-w-7xl mx-auto -mt-6 relative z-20 px-4">
-        <div id="categories" class="flex overflow-x-auto gap-2 no-scrollbar py-2"></div>
+<body>
+  <nav class="sticky top-0 z-50 glass-dark border-b border-white/10 px-4 py-3 flex justify-between items-center">
+    <img src="https://www.mad-parfumeur.com/assets/hero/logo.png" class="h-8 brightness-0 invert">
+    <div id="cartBtn" class="text-white relative">
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" stroke-width="2"/></svg>
+      <span id="cartCount" class="absolute -top-1 -right-1 bg-[#C5A059] text-xs w-4 h-4 rounded-full flex items-center justify-center">0</span>
     </div>
+  </nav>
 
-    <main class="max-w-7xl mx-auto px-3 py-10">
-        <div id="products" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-8"></div>
-    </main>
+  <section class="bg-[#0A0A0A] py-10 px-6 text-center">
+    <h1 class="text-white text-3xl font-black mb-4">اكتشف <span class="text-[#C5A059]">عطرك</span></h1>
+    <input id="search" class="max-w-md w-full bg-white/10 border border-white/20 rounded-xl p-3 text-white text-xs outline-none" placeholder="بحث...">
+  </section>
 
-    <div id="cartOverlay" class="fixed inset-0 bg-premium/80 backdrop-blur-md hidden z-[100]"></div>
-    <div id="cartDrawer" class="fixed top-0 right-0 h-full w-full max-w-md bg-white z-[101] translate-x-full transition-transform duration-500 shadow-2xl flex flex-col">
-        <div class="p-6 border-b flex items-center justify-between">
-            <h3 id="t_cart_title" class="text-xl font-black">حقيبة التسوق</h3>
-            <button id="closeCart" class="text-gray-400">✕</button>
-        </div>
-        <div class="flex-1 overflow-y-auto p-6" id="cartItems"></div>
-        <div class="p-6 bg-premium text-white rounded-t-[2rem]">
-            <input id="custName" class="w-full bg-white/10 border border-white/10 rounded-xl p-3 text-xs mb-3 outline-none" placeholder="الاسم الكامل">
-            <input id="custPhone" class="w-full bg-white/10 border border-white/10 rounded-xl p-3 text-xs mb-4 outline-none" placeholder="رقم الهاتف">
-            <button id="sendOrder" class="w-full bg-luxuryGold text-premium py-4 rounded-xl font-black text-xs uppercase">تأكيد الطلب</button>
-        </div>
-    </div>
+  <div id="categories" class="flex overflow-x-auto gap-2 px-4 py-4 no-scrollbar"></div>
+
+  <main class="px-3 pb-20">
+    <div id="products" class="grid grid-cols-2 gap-3"></div>
+  </main>
 
 <script>
-    const WHATSAPP_API = "972524033442";
-    const SHIPPING = 50;
-    const RSS_PATH = "products.rss";
+  let state = { products: [], filtered: [], currentCat: "ALL", cart: new Map() };
+  const SHIPPING = 50, WA_API = "972524033442";
 
-    let state = {
-        lang: (navigator.language || "").includes("he") ? "he" : "ar",
-        products: [],
-        filtered: [],
-        currentCat: "ALL",
-        cart: new Map()
-    };
+  async function init() {
+    const res = await fetch('products.rss?v=' + Date.now());
+    const xml = new DOMParser().parseFromString(await res.text(), "application/xml");
+    state.products = Array.from(xml.querySelectorAll("item")).map(i => ({
+      id: i.querySelector("id")?.textContent || i.querySelector("g\\:id")?.textContent,
+      title: i.querySelector("title")?.textContent,
+      image: i.querySelector("image_link")?.textContent || i.querySelector("g\\:image_link")?.textContent,
+      type: i.querySelector("product_type")?.textContent || i.querySelector("g\\:product_type")?.textContent || "General",
+      price: parseFloat((i.querySelector("price")?.textContent || "0").replace(/[^\d.]/g, "")) || 0
+    })).filter(p => p.id);
 
-    function T(ar, he) { return state.lang === "ar" ? ar : he; }
+    // المنطق الأساسي للربط: قراءة الرابط فوراً بعد تحميل البيانات
+    const urlParams = new URLSearchParams(window.location.search);
+    const catFromUrl = urlParams.get('cat');
+    if (catFromUrl) state.currentCat = decodeURIComponent(catFromUrl);
 
-    /* ✅ الوظيفة الأساسية: قراءة القسم من الرابط وتطبيقه */
-    function applyUrlCategory() {
-        const params = new URLSearchParams(window.location.search);
-        const catFromUrl = params.get('cat');
-        if (catFromUrl) {
-            state.currentCat = decodeURIComponent(catFromUrl);
-            applyFilter();
-            renderCategories();
-        }
-    }
+    applyFilter(); renderCategories();
+  }
 
-    async function init() {
-        updateStrings();
-        await fetchData();
-        applyUrlCategory(); // استدعاء الفلترة بعد تحميل البيانات
-        bindEvents();
-    }
+  function renderCategories() {
+    const cats = ["ALL", ...new Set(state.products.map(p => p.type))];
+    document.getElementById("categories").innerHTML = cats.map(c => `
+      <button onclick="state.currentCat='${c}'; applyFilter(); renderCategories();" 
+      class="px-6 py-2 rounded-xl text-[10px] font-black border transition-all ${state.currentCat === c ? 'bg-black text-white border-black' : 'bg-white text-gray-400 border-gray-100'}">
+      ${c === "ALL" ? "الكل" : c}
+      </button>`).join('');
+  }
 
-    async function fetchData() {
-        try {
-            const res = await fetch(RSS_PATH + '?v=' + Date.now());
-            const text = await res.text();
-            const xml = new DOMParser().parseFromString(text, "application/xml");
-            const items = Array.from(xml.querySelectorAll("item"));
+  function applyFilter() {
+    const q = document.getElementById("search").value.toLowerCase();
+    state.filtered = state.products.filter(p => (state.currentCat === "ALL" || p.type === state.currentCat) && p.title.toLowerCase().includes(q));
+    renderProducts();
+  }
 
-            state.products = items.map(item => {
-                const getG = (tag) => item.querySelector(tag)?.textContent || item.querySelector(`g\\:${tag}`)?.textContent || "";
-                return {
-                    id: getG("id").trim(),
-                    title: getG("title"),
-                    image: getG("image_link"),
-                    type: getG("product_type") || "General",
-                    price: parseFloat(getG("price").replace(/[^\d.]/g, "")) || 0
-                };
-            }).filter(p => p.id);
+  function renderProducts() {
+    document.getElementById("products").innerHTML = state.filtered.map(p => `
+      <div class="product-card p-3 flex flex-col">
+        <img src="${p.image}" class="w-full aspect-square object-contain mix-blend-multiply mb-2">
+        <h3 class="font-bold text-[10px] h-8 line-clamp-2 leading-tight">${p.title}</h3>
+        <div class="flex items-center justify-between mt-auto pt-2">
+          <span class="font-black text-sm">₪${p.price.toFixed(0)}</span>
+          <button onclick="addToCart('${p.id}')" class="w-8 h-8 ${state.cart.has(p.id) ? 'bg-black' : 'bg-[#C5A059]'} text-white rounded-lg flex items-center justify-center font-bold">
+            ${state.cart.has(p.id) ? '✓' : '+'}
+          </button>
+        </div>
+      </div>`).join('');
+  }
 
-            applyFilter();
-            renderCategories();
-        } catch (e) { console.error(e); }
-    }
-
-    function applyFilter() {
-        const query = document.getElementById("search").value.toLowerCase();
-        state.filtered = state.products.filter(p => {
-            const isCat = state.currentCat === "ALL" ? true : p.type === state.currentCat;
-            const isSearch = p.title.toLowerCase().includes(query) || p.id.toLowerCase().includes(query);
-            return isCat && isSearch;
-        });
-        renderProducts();
-    }
-
-    function renderCategories() {
-        const container = document.getElementById("categories");
-        const cats = ["ALL", ...new Set(state.products.map(p => p.type))];
-        container.innerHTML = cats.map(c => `
-            <button onclick="switchCat('${c}')" 
-                class="whitespace-nowrap px-6 py-2 rounded-xl text-[10px] font-black transition-all border
-                ${state.currentCat === c ? 'bg-premium text-white border-premium' : 'bg-white text-gray-400'}">
-                ${c === "ALL" ? T("الكل", "הכל") : c}
-            </button>
-        `).join('');
-    }
-
-    function renderProducts() {
-        const container = document.getElementById("products");
-        container.innerHTML = state.filtered.map(p => `
-            <div class="product-card bg-white rounded-3xl p-3 border border-gray-50 flex flex-col animate-reveal">
-                <div class="aspect-square mb-2 bg-gray-50 rounded-2xl p-2 overflow-hidden">
-                    <img src="${p.image}" class="w-full h-full object-contain mix-blend-multiply" loading="lazy">
-                </div>
-                <h3 class="font-bold text-[10px] h-8 line-clamp-2 mb-2 leading-tight">${p.title}</h3>
-                <div class="flex items-center justify-between mt-auto">
-                    <span class="text-xs font-black italic">₪${p.price.toFixed(0)}</span>
-                    <button onclick="addToCart('${p.id}')" class="w-8 h-8 ${state.cart.has(p.id) ? 'bg-black' : 'bg-luxuryGold'} text-white rounded-lg flex items-center justify-center">
-                        ${state.cart.has(p.id) ? '✓' : '+'}
-                    </button>
-                </div>
-            </div>
-        `).join('');
-    }
-
-    /* Cart Functions */
-    window.switchCat = (c) => { state.currentCat = c; applyFilter(); renderCategories(); };
-    window.addToCart = (id) => { state.cart.set(id, 1); renderCart(); renderProducts(); openCart(); };
-    function openCart() { document.getElementById("cartOverlay").classList.remove("hidden"); document.getElementById("cartDrawer").classList.remove("translate-x-full"); }
-    function closeCart() { document.getElementById("cartDrawer").classList.add("translate-x-full"); setTimeout(()=>document.getElementById("cartOverlay").classList.add("hidden"), 500); }
-
-    function renderCart() {
-        const container = document.getElementById("cartItems");
-        document.getElementById("cartCountBadge").textContent = state.cart.size;
-        let subtotal = 0;
-        let html = "";
-        state.cart.forEach((qty, id) => {
-            const p = state.products.find(x => x.id === id);
-            if (!p) return;
-            subtotal += p.price * qty;
-            html += `<div class="flex items-center gap-4 bg-gray-50 p-3 rounded-2xl mb-2">
-                <img src="${p.image}" class="w-12 h-12 object-contain">
-                <div class="flex-1 text-[10px] font-bold">${p.title}</div>
-                <button onclick="state.cart.delete('${id}'); renderCart(); renderProducts();" class="text-red-400">✕</button>
-            </div>`;
-        });
-        container.innerHTML = html || T("السلة فارغة", "העגלה ריקה");
-        document.getElementById("total").textContent = (subtotal > 0 ? subtotal + SHIPPING : 0).toFixed(0);
-    }
-
-    function bindEvents() {
-        document.getElementById("closeCart").onclick = closeCart;
-        document.getElementById("cartBtn").onclick = openCart;
-        document.getElementById("search").oninput = applyFilter;
-        document.getElementById("langBtn").onclick = () => { state.lang = state.lang === "ar" ? "he" : "ar"; init(); };
-    }
-
-    function updateStrings() {
-        document.getElementById("t_hero_title").innerHTML = T("عالم من <span class='gold-gradient'>الفخامة</span>", "עולם של <span class='gold-gradient'>יוקרה</span>");
-        document.getElementById("t_cart_title").textContent = T("حقيبة التسوق", "סל קניות");
-    }
-
-    init();
+  window.addToCart = (id) => { state.cart.set(id, 1); renderProducts(); document.getElementById("cartCount").textContent = state.cart.size; };
+  document.getElementById("search").oninput = applyFilter;
+  init();
 </script>
 </body>
 </html>
