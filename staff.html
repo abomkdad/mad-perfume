@@ -1,110 +1,119 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>MAD Staff | إدارة الروابط</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-    body { font-family: 'Segoe UI', sans-serif; background-color: #f3f4f6; }
-    .glass { backdrop-filter: blur(12px); background: rgba(15, 17, 22, 0.95); }
-    .glassLight { backdrop-filter: blur(10px); background: rgba(255, 255, 255, 0.9); border: 1px solid rgba(255, 255, 255, 0.3); }
-    .goldText { background: linear-gradient(90deg, #f6e27a, #c5a059, #fff2b6); -webkit-background-clip:text; background-clip:text; color: transparent; }
-    .btnGold { background: linear-gradient(135deg, #f6e27a, #c5a059); color:#111; }
-    .no-scrollbar::-webkit-scrollbar { display: none; }
-  </style>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>MAD Staff | إدارة الروابط</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f3f4f6; }
+        .glass { backdrop-filter: blur(12px); background: rgba(15, 17, 22, 0.95); }
+        .glassLight { backdrop-filter: blur(10px); background: rgba(255, 255, 255, 0.9); border: 1px solid rgba(255, 255, 255, 0.3); }
+        .goldText { background: linear-gradient(90deg, #f6e27a, #c5a059, #fff2b6); -webkit-background-clip:text; background-clip:text; color: transparent; }
+        .btnGold { background: linear-gradient(135deg, #f6e27a, #c5a059); color:#111; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+    </style>
 </head>
 <body class="min-h-screen pb-10">
-  <div class="fixed top-5 left-1/2 -translate-x-1/2 z-50 hidden" id="toastWrap">
-    <div class="glassLight p-4 rounded-2xl shadow-xl flex items-center gap-3">
-      <span id="toastMsg" class="text-sm font-bold"></span>
-      <button onclick="document.getElementById('toastWrap').classList.add('hidden')" class="bg-black text-white w-6 h-6 rounded-full">×</button>
-    </div>
-  </div>
 
-  <div class="sticky top-0 z-40 glass px-4 py-3 border-b border-white/10">
-    <div class="flex items-center justify-between mb-3">
-      <div class="flex items-center gap-2">
-        <img src="https://www.mad-parfumeur.com/assets/hero/logo.png" class="w-8 h-8 object-contain brightness-0 invert">
-        <div class="font-black text-white text-sm leading-none"><span class="goldText">MAD</span> <span>روابط الإدارة</span></div>
-      </div>
-      <button id="langBtn" class="bg-white/10 text-white px-3 py-1 rounded-full text-[10px] font-bold border border-white/20">AR / HE</button>
-    </div>
-
-    <div class="glassLight rounded-2xl p-3 shadow-lg space-y-3">
-      <input id="search" class="w-full bg-white border border-gray-200 rounded-xl px-4 py-2 text-sm outline-none" placeholder="بحث...">
-      <div class="grid grid-cols-1 gap-2">
-        <div class="flex items-center gap-1 bg-gray-50 p-1 rounded-xl border border-gray-100">
-          <input id="catLink" readonly class="bg-transparent flex-1 text-[10px] px-2 text-gray-500 truncate" placeholder="رابط القسم">
-          <button id="copyCatBtn" class="bg-emerald-600 text-white px-4 py-1.5 rounded-lg text-[10px] font-bold">نسخ القسم</button>
+    <div class="sticky top-0 z-40 glass px-4 py-3 border-b border-white/10">
+        <div class="flex items-center justify-between mb-3">
+            <div class="flex items-center gap-2">
+                <img src="https://www.mad-parfumeur.com/assets/hero/logo.png" class="h-8 object-contain brightness-0 invert">
+                <div class="font-black text-white text-sm leading-none"><span class="goldText">MAD</span> <span>روابط الإدارة</span></div>
+            </div>
+            <button id="langBtn" class="bg-white/10 text-white px-3 py-1 rounded-full text-[10px] font-bold border border-white/20">AR / HE</button>
         </div>
-        <div class="flex items-center gap-1 bg-gray-50 p-1 rounded-xl border border-gray-100">
-          <input id="bundleLink" readonly class="bg-transparent flex-1 text-[10px] px-2 text-gray-500 truncate" placeholder="رابط الباقة">
-          <button id="copyBundleBtn" class="btnGold px-4 py-1.5 rounded-lg text-[10px] font-bold">نسخ الباقة</button>
-        </div>
-      </div>
-      <div class="flex justify-between text-[10px] font-bold text-gray-400">
-        <span>القسم: <b id="catNow" class="text-black">ALL</b></span>
-        <span>المختارة: <b id="countSel" class="text-amber-600">0</b></span>
-      </div>
-    </div>
-    <div id="categories" class="flex overflow-x-auto gap-2 py-3 no-scrollbar"></div>
-  </div>
 
-  <div id="products" class="grid grid-cols-2 sm:grid-cols-3 gap-3 p-3"></div>
+        <div class="glassLight rounded-2xl p-3 shadow-lg space-y-3">
+            <input id="search" class="w-full bg-white border border-gray-200 rounded-xl px-4 py-2 text-sm outline-none" placeholder="بحث باسم المنتج...">
+            
+            <div class="grid grid-cols-1 gap-2">
+                <div class="flex items-center gap-1 bg-gray-50 p-1 rounded-xl border border-gray-100">
+                    <input id="catLink" readonly class="bg-transparent flex-1 text-[10px] px-2 text-gray-500 truncate" placeholder="اختر قسماً أولاً...">
+                    <button id="copyCatBtn" class="bg-emerald-600 text-white px-4 py-1.5 rounded-lg text-[10px] font-bold">نسخ القسم</button>
+                </div>
+                <div class="flex items-center gap-1 bg-gray-50 p-1 rounded-xl border border-gray-100">
+                    <input id="bundleLink" readonly class="bg-transparent flex-1 text-[10px] px-2 text-gray-500 truncate" placeholder="رابط الباقة...">
+                    <button id="copyBundleBtn" class="btnGold px-4 py-1.5 rounded-lg text-[10px] font-bold">نسخ الباقة</button>
+                </div>
+            </div>
+        </div>
+        <div id="categories" class="flex overflow-x-auto gap-2 py-3 no-scrollbar"></div>
+    </div>
+
+    <div id="products" class="grid grid-cols-2 sm:grid-cols-3 gap-3 p-3"></div>
 
 <script>
-const RSS_PATH = "products.rss";
-const WA_AGENT = "972524033442";
-let LANG = "ar", PRODUCTS = [], CURRENT_CAT = "ALL", SELECTED = new Map();
+    const RSS_PATH = "products.rss";
+    const WA_AGENT = "972524033442";
+    let LANG = "ar", PRODUCTS = [], CURRENT_CAT = "ALL", SELECTED = new Map();
 
-async function init() {
-  const res = await fetch(RSS_PATH + '?v=' + Date.now());
-  const xml = new DOMParser().parseFromString(await res.text(), "application/xml");
-  PRODUCTS = Array.from(xml.querySelectorAll("item")).map(i => ({
-    id: i.querySelector("id")?.textContent || i.querySelector("g\\:id")?.textContent,
-    title: i.querySelector("title")?.textContent,
-    image: i.querySelector("image_link")?.textContent || i.querySelector("g\\:image_link")?.textContent,
-    type: i.querySelector("product_type")?.textContent || i.querySelector("g\\:product_type")?.textContent || "General"
-  })).filter(p => p.id);
-  renderCategories(); applyFilters(); updateLinks();
-}
+    async function init() {
+        try {
+            const res = await fetch(RSS_PATH + '?v=' + Date.now());
+            const xml = new DOMParser().parseFromString(await res.text(), "application/xml");
+            PRODUCTS = Array.from(xml.querySelectorAll("item")).map(i => {
+                const getG = (t) => i.querySelector(t)?.textContent || i.querySelector(`g\\:${t}`)?.textContent || "";
+                return {
+                    id: getG("id").trim(),
+                    title: getG("title"),
+                    image: getG("image_link"),
+                    type: getG("product_type") || "General"
+                };
+            }).filter(p => p.id);
+            renderCategories(); applyFilters(); updateLinks();
+        } catch (e) { alert("خطأ في تحميل البيانات"); }
+    }
 
-function renderCategories() {
-  const container = document.getElementById("categories");
-  const cats = ["ALL", ...new Set(PRODUCTS.map(p => p.type))];
-  container.innerHTML = cats.map(c => `<button onclick="switchCat('${c}')" class="whitespace-nowrap px-4 py-1.5 rounded-full text-xs font-bold transition-all ${CURRENT_CAT === c ? 'bg-black text-white' : 'bg-white text-gray-500 border'}">${c}</button>`).join('');
-}
+    function renderCategories() {
+        const container = document.getElementById("categories");
+        const cats = ["ALL", ...new Set(PRODUCTS.map(p => p.type))];
+        container.innerHTML = cats.map(c => `
+            <button onclick="switchCat('${c}')" class="whitespace-nowrap px-5 py-2 rounded-full text-xs font-bold border transition-all 
+            ${CURRENT_CAT === c ? 'bg-black text-white' : 'bg-white text-gray-500 border-gray-200'}">${c}</button>
+        `).join('');
+    }
 
-function applyFilters() {
-  const q = document.getElementById("search").value.toLowerCase();
-  const filtered = PRODUCTS.filter(p => (CURRENT_CAT === "ALL" || p.type === CURRENT_CAT) && (p.title.toLowerCase().includes(q) || p.id.toLowerCase().includes(q)));
-  document.getElementById("products").innerHTML = filtered.map(p => `
-    <div class="bg-white rounded-2xl overflow-hidden p-2 flex flex-col shadow-sm">
-      <img src="${p.image}" class="w-full aspect-square object-contain mix-blend-multiply">
-      <p class="text-[10px] font-bold h-7 line-clamp-2 my-2">${p.title}</p>
-      <div class="flex gap-1 mt-auto">
-        <button onclick="changeQty('${p.id}', 1)" class="flex-1 btnGold py-1.5 rounded-lg text-[10px] font-black">إضافة</button>
-        ${SELECTED.has(p.id) ? `<span class="bg-amber-100 px-2 rounded-lg flex items-center text-xs font-bold">${SELECTED.get(p.id)}</span>` : ''}
-      </div>
-    </div>`).join('');
-}
+    function applyFilters() {
+        const q = document.getElementById("search").value.toLowerCase();
+        const filtered = PRODUCTS.filter(p => (CURRENT_CAT === "ALL" || p.type === CURRENT_CAT) && p.title.toLowerCase().includes(q));
+        document.getElementById("products").innerHTML = filtered.map(p => `
+            <div class="bg-white rounded-2xl p-2 flex flex-col shadow-sm">
+                <img src="${p.image}" class="w-full aspect-square object-contain mix-blend-multiply">
+                <p class="text-[10px] font-bold h-7 line-clamp-2 my-2 text-center">${p.title}</p>
+                <div class="flex gap-1 mt-auto">
+                    <button onclick="changeQty('${p.id}', 1)" class="flex-1 btnGold py-1.5 rounded-lg text-[10px] font-black">إضافة</button>
+                    ${SELECTED.has(p.id) ? `<span class="bg-amber-100 px-2 rounded-lg flex items-center text-xs font-bold">${SELECTED.get(p.id)}</span>` : ''}
+                </div>
+            </div>`).join('');
+    }
 
-window.switchCat = (c) => { CURRENT_CAT = c; document.getElementById("catNow").textContent = c; renderCategories(); applyFilters(); updateLinks(); };
-window.changeQty = (id, delta) => { let q = (SELECTED.get(id) || 0) + delta; if(q<=0) SELECTED.delete(id); else SELECTED.set(id, q); updateLinks(); applyFilters(); };
+    window.switchCat = (c) => { CURRENT_CAT = c; renderCategories(); applyFilters(); updateLinks(); };
+    window.changeQty = (id, delta) => { let q = (SELECTED.get(id) || 0) + delta; if(q<=0) SELECTED.delete(id); else SELECTED.set(id, q); updateLinks(); applyFilters(); };
 
-function updateLinks() {
-  const base = location.origin + location.pathname.replace(/[^/]+$/, "");
-  document.getElementById("catLink").value = CURRENT_CAT === "ALL" ? "" : `${base}customer.html?cat=${encodeURIComponent(CURRENT_CATEGORY)}&lang=${LANG}&wa=${WA_AGENT}`;
-  const ids = []; SELECTED.forEach((qty, id) => { for(let i=0; i<qty; i++) ids.push(id); });
-  document.getElementById("bundleLink").value = ids.length ? `${base}bundle.html?ids=${ids.join(",")}&lang=${LANG}&wa=${WA_AGENT}` : "";
-  document.getElementById("countSel").textContent = ids.length;
-}
+    function updateLinks() {
+        const base = location.origin + location.pathname.replace(/[^/]+$/, "");
+        document.getElementById("catLink").value = CURRENT_CAT === "ALL" ? "" : `${base}customer.html?cat=${encodeURIComponent(CURRENT_CAT)}&lang=${LANG}&wa=${WA_AGENT}`;
+        const ids = []; SELECTED.forEach((qty, id) => { for(let i=0; i<qty; i++) ids.push(id); });
+        document.getElementById("bundleLink").value = ids.length ? `${base}bundle.html?ids=${ids.join(",")}&lang=${LANG}&wa=${WA_AGENT}` : "";
+    }
 
-document.getElementById("copyCatBtn").onclick = () => { navigator.clipboard.writeText(document.getElementById("catLink").value); alert("تم النسخ"); };
-document.getElementById("copyBundleBtn").onclick = () => { navigator.clipboard.writeText(document.getElementById("bundleLink").value); alert("تم النسخ"); };
-document.getElementById("search").oninput = applyFilters;
-init();
+    async function copyVal(id) {
+        const el = document.getElementById(id);
+        if(!el.value) return alert("الرابط فارغ! اختر قسماً أولاً.");
+        try {
+            await navigator.clipboard.writeText(el.value);
+            alert("تم النسخ بنجاح ✅");
+        } catch (err) {
+            el.select(); document.execCommand("copy"); alert("تم النسخ ✅");
+        }
+    }
+
+    document.getElementById("copyCatBtn").onclick = () => copyVal("catLink");
+    document.getElementById("copyBundleBtn").onclick = () => copyVal("bundleLink");
+    document.getElementById("search").oninput = applyFilters;
+    init();
 </script>
 </body>
 </html>
