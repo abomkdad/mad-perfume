@@ -119,8 +119,7 @@
         <h2 class="font-black text-xl" id="t_selected_products">المنتجات المختارة</h2>
       </div>
 
-      <div id="productsGrid" class="space-y-6">
-        </div>
+      <div id="productsGrid" class="space-y-6"></div>
 
       <div id="emptyState" class="hidden py-16 text-center bg-gray-50 rounded-[40px] border-2 border-dashed border-gray-200">
         <p class="font-bold text-gray-400" id="t_empty">الباقة فارغة حالياً</p>
@@ -152,7 +151,7 @@
         <p class="w-full text-[11px] font-bold text-gray-400 mb-1" id="t_pay">طريقة الدفع</p>
         <label class="flex items-center gap-3 text-sm font-bold cursor-pointer">
           <input type="radio" name="pay" value="COD" checked class="w-5 h-5 accent-black">
-          <span id="t_cod">الدفع عند الاستلام</span>
+          <span id="t_cod">عند الاستلام</span>
         </label>
         <label class="flex items-center gap-3 text-sm font-bold cursor-pointer">
           <input type="radio" name="pay" value="CARD" class="w-5 h-5 accent-black">
@@ -182,7 +181,7 @@ const DELIVERY_FEE = 50;
 const DEFAULT_WA = "972524033442";
 
 let LANG = (navigator.language || "").toLowerCase().includes("he") ? "he" : "ar";
-let PRODUCTS = [];
+let ALL_STORE_PRODUCTS = []; // مخزن كل منتجات الـ RSS
 let COUNTS = new Map();
 let WA = DEFAULT_WA;
 
@@ -204,6 +203,7 @@ function setTexts(){
   document.getElementById("t_card").textContent = T("تحويل / بطاقة", "כרטיס");
   document.getElementById("t_total").textContent = T("الإجمالي النهائي", "סה״כ לתשלום");
   document.getElementById("t_send2").textContent = T("تأكيد عبر واتساب", "אישור בוואטסאפ");
+  document.getElementById("t_empty").textContent = T("الباقة فارغة حالياً", "המארז ריק כרגע");
 }
 
 async function loadRSS(){
@@ -221,33 +221,37 @@ async function loadRSS(){
     const xml = new DOMParser().parseFromString(text, "application/xml");
     const items = Array.from(xml.querySelectorAll("item"));
     
-    PRODUCTS = items.map(item => ({
-      id: item.querySelector("id")?.textContent || item.querySelector("g\\:id")?.textContent,
+    // حفظ كل المنتجات لنتمكن من فلترتها لاحقاً عند الحذف
+    ALL_STORE_PRODUCTS = items.map(item => ({
+      id: (item.querySelector("id")?.textContent || item.querySelector("g\\:id")?.textContent || "").trim(),
       title: item.querySelector("title")?.textContent,
       image: item.querySelector("image_link")?.textContent || item.querySelector("g\\:image_link")?.textContent,
       price: parseFloat((item.querySelector("price")?.textContent || "0").replace(/[^\d.]/g, ""))
-    })).filter(p => COUNTS.has(p.id));
+    }));
 
     render();
-  } catch (e) { console.error("RSS Error"); }
+  } catch (e) { console.error("RSS Error", e); }
 }
 
 function render(){
   const grid = document.getElementById("productsGrid");
   grid.innerHTML = "";
   let subtotal = 0;
-  let totalItems = 0;
+  let totalItemsCount = 0;
 
-  PRODUCTS.forEach(p => {
+  // استخراج المنتجات الموجودة في COUNTS فقط
+  const selectedProducts = ALL_STORE_PRODUCTS.filter(p => COUNTS.has(p.id));
+
+  selectedProducts.forEach(p => {
     const qty = COUNTS.get(p.id);
     subtotal += p.price * qty;
-    totalItems += qty;
+    totalItemsCount += qty;
 
     const div = document.createElement("div");
     div.className = "card-premium animate-fade";
     div.innerHTML = `
       <div class="image-container">
-        <img src="${p.image}" class="w-full h-64 object-contain">
+        <img src="${p.image}" class="w-full h-64 object-contain" alt="${p.title}">
       </div>
       <div class="p-6">
         <h3 class="font-black text-lg mb-1">${p.title}</h3>
@@ -268,17 +272,27 @@ function render(){
     grid.appendChild(div);
   });
 
-  document.getElementById("countBox").textContent = totalItems;
+  document.getElementById("countBox").textContent = totalItemsCount;
   document.getElementById("total").textContent = (subtotal + DELIVERY_FEE).toFixed(0);
   
-  if(totalItems === 0) document.getElementById("emptyState").classList.remove("hidden");
+  const emptyState = document.getElementById("emptyState");
+  if(totalItemsCount === 0) {
+    emptyState.classList.remove("hidden");
+  } else {
+    emptyState.classList.add("hidden");
+  }
 }
 
+// دالة تحديث الكمية (تعمل الآن بشكل سليم مع الحذف)
 window.updateQty = (id, delta) => {
   const current = COUNTS.get(id) || 0;
   const next = current + delta;
-  if(next <= 0) COUNTS.delete(id);
-  else COUNTS.set(id, next);
+  
+  if(next <= 0) {
+    COUNTS.delete(id);
+  } else {
+    COUNTS.set(id, next);
+  }
   render();
 };
 
@@ -288,6 +302,7 @@ document.getElementById("sendBtn").onclick = () => {
   const addr = document.getElementById("custAddress").value.trim();
   const pay = document.querySelector('input[name="pay"]:checked').value;
 
+  if(COUNTS.size === 0) return alert(T("الباقة فارغة", "המארז ריק"));
   if(!name || !phone || !addr) return alert(T("أكمل البيانات أولاً", "נא למלא את כל הפרטים"));
 
   let msg = `🛒 *طلب باقة MAD*\n\n`;
@@ -297,8 +312,10 @@ document.getElementById("sendBtn").onclick = () => {
   msg += `💳 الدفع: ${pay === 'COD' ? 'عند الاستلام' : 'بطاقة/تحويل'}\n\n`;
   msg += `📦 *محتويات الباقة:*\n`;
   
-  PRODUCTS.forEach(p => {
-    if(COUNTS.has(p.id)) msg += `• ${p.title} (x${COUNTS.get(p.id)})\n`;
+  ALL_STORE_PRODUCTS.forEach(p => {
+    if(COUNTS.has(p.id)) {
+      msg += `• ${p.title} (x${COUNTS.get(p.id)})\n`;
+    }
   });
 
   msg += `\n💰 *الإجمالي النهائي: ₪${document.getElementById("total").textContent}*`;
@@ -312,6 +329,7 @@ document.getElementById("langBtn").onclick = () => {
   render();
 };
 
+// تشغيل
 setTexts();
 loadRSS();
 </script>
