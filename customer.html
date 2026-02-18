@@ -1,93 +1,106 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>MAD Parfumeur | كتالوج العميل</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-    :root { --gold: #C5A059; --dark: #0A0A0A; }
-    body { background-color: #FDFCFB; font-family: sans-serif; }
-    .glass-dark { background: rgba(10, 10, 10, 0.98); backdrop-filter: blur(15px); }
-    .product-card { background: white; border-radius: 20px; transition: 0.3s; border: 1px solid #f0f0f0; }
-    .no-scrollbar::-webkit-scrollbar { display: none; }
-  </style>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>MAD Parfumeur | كتالوج العميل</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root { --gold: #C5A059; --dark: #0A0A0A; }
+        body { background-color: #FDFCFB; font-family: 'Segoe UI', sans-serif; }
+        .glass-dark { background: rgba(10, 10, 10, 0.98); backdrop-filter: blur(15px); }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .product-card { background: white; border-radius: 20px; transition: 0.3s; border: 1px solid #f0f0f0; }
+        @keyframes reveal { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-reveal { animation: reveal 0.6s ease-out forwards; }
+    </style>
 </head>
-<body>
-  <nav class="sticky top-0 z-50 glass-dark border-b border-white/10 px-4 py-3 flex justify-between items-center">
-    <img src="https://www.mad-parfumeur.com/assets/hero/logo.png" class="h-8 brightness-0 invert">
-    <div id="cartBtn" class="text-white relative">
-      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" stroke-width="2"/></svg>
-      <span id="cartCount" class="absolute -top-1 -right-1 bg-[#C5A059] text-xs w-4 h-4 rounded-full flex items-center justify-center">0</span>
-    </div>
-  </nav>
+<body class="antialiased">
 
-  <section class="bg-[#0A0A0A] py-10 px-6 text-center">
-    <h1 class="text-white text-3xl font-black mb-4">اكتشف <span class="text-[#C5A059]">عطرك</span></h1>
-    <input id="search" class="max-w-md w-full bg-white/10 border border-white/20 rounded-xl p-3 text-white text-xs outline-none" placeholder="بحث...">
-  </section>
+    <nav class="sticky top-0 z-50 glass-dark border-b border-white/10 px-4 py-3 flex justify-between items-center">
+        <div class="flex items-center gap-2">
+            <img src="https://www.mad-parfumeur.com/assets/hero/logo.png" class="h-8 brightness-0 invert">
+            <span class="text-white font-black text-sm italic uppercase tracking-tighter">MAD Parfumeur</span>
+        </div>
+        <div id="cartCount" class="bg-[#C5A059] text-white text-[10px] font-bold px-2 py-1 rounded-full">0 Items</div>
+    </nav>
 
-  <div id="categories" class="flex overflow-x-auto gap-2 px-4 py-4 no-scrollbar"></div>
+    <section class="bg-[#0A0A0A] pt-10 pb-16 px-6 text-center">
+        <h1 class="text-white text-3xl font-black mb-4 leading-tight">عالم من <span class="text-[#C5A059]">الفخامة</span></h1>
+        <input id="search" class="max-w-md w-full bg-white/10 border border-white/20 rounded-xl p-3 text-white text-xs outline-none focus:border-[#C5A059]" placeholder="ابحث عن عطرك المفضّل...">
+    </section>
 
-  <main class="px-3 pb-20">
-    <div id="products" class="grid grid-cols-2 gap-3"></div>
-  </main>
+    <div id="categories" class="flex overflow-x-auto gap-2 px-4 py-4 no-scrollbar -mt-6 relative z-20"></div>
+
+    <main class="px-3 pb-20 mt-4">
+        <div id="products" class="grid grid-cols-2 gap-3 md:grid-cols-4"></div>
+    </main>
 
 <script>
-  let state = { products: [], filtered: [], currentCat: "ALL", cart: new Map() };
-  const SHIPPING = 50, WA_API = "972524033442";
+    let state = { products: [], filtered: [], currentCat: "ALL", cart: new Map() };
+    const WA_API = "972524033442";
 
-  async function init() {
-    const res = await fetch('products.rss?v=' + Date.now());
-    const xml = new DOMParser().parseFromString(await res.text(), "application/xml");
-    state.products = Array.from(xml.querySelectorAll("item")).map(i => ({
-      id: i.querySelector("id")?.textContent || i.querySelector("g\\:id")?.textContent,
-      title: i.querySelector("title")?.textContent,
-      image: i.querySelector("image_link")?.textContent || i.querySelector("g\\:image_link")?.textContent,
-      type: i.querySelector("product_type")?.textContent || i.querySelector("g\\:product_type")?.textContent || "General",
-      price: parseFloat((i.querySelector("price")?.textContent || "0").replace(/[^\d.]/g, "")) || 0
-    })).filter(p => p.id);
+    async function init() {
+        try {
+            const res = await fetch('products.rss?v=' + Date.now());
+            const xml = new DOMParser().parseFromString(await res.text(), "application/xml");
+            state.products = Array.from(xml.querySelectorAll("item")).map(i => {
+                const getG = (t) => i.querySelector(t)?.textContent || i.querySelector(`g\\:${t}`)?.textContent || "";
+                return {
+                    id: getG("id").trim(),
+                    title: getG("title"),
+                    image: getG("image_link"),
+                    type: getG("product_type") || "General",
+                    price: parseFloat((i.querySelector("price")?.textContent || "0").replace(/[^\d.]/g, "")) || 0
+                };
+            }).filter(p => p.id);
 
-    // المنطق الأساسي للربط: قراءة الرابط فوراً بعد تحميل البيانات
-    const urlParams = new URLSearchParams(window.location.search);
-    const catFromUrl = urlParams.get('cat');
-    if (catFromUrl) state.currentCat = decodeURIComponent(catFromUrl);
+            // المنطق الأساسي للربط: قراءة القسم من الرابط (URL Parameters)
+            const urlParams = new URLSearchParams(window.location.search);
+            const catFromUrl = urlParams.get('cat');
+            if (catFromUrl) {
+                state.currentCat = decodeURIComponent(catFromUrl); // فك تشفير اسم القسم
+            }
 
-    applyFilter(); renderCategories();
-  }
+            applyFilter(); renderCategories();
+        } catch (e) { console.error("Error loading products"); }
+    }
 
-  function renderCategories() {
-    const cats = ["ALL", ...new Set(state.products.map(p => p.type))];
-    document.getElementById("categories").innerHTML = cats.map(c => `
-      <button onclick="state.currentCat='${c}'; applyFilter(); renderCategories();" 
-      class="px-6 py-2 rounded-xl text-[10px] font-black border transition-all ${state.currentCat === c ? 'bg-black text-white border-black' : 'bg-white text-gray-400 border-gray-100'}">
-      ${c === "ALL" ? "الكل" : c}
-      </button>`).join('');
-  }
+    function renderCategories() {
+        const container = document.getElementById("categories");
+        const cats = ["ALL", ...new Set(state.products.map(p => p.type))];
+        container.innerHTML = cats.map(c => `
+            <button onclick="switchCat('${c}')" 
+                class="whitespace-nowrap px-6 py-2 rounded-xl text-[10px] font-black border transition-all 
+                ${state.currentCat === c ? 'bg-black text-white border-black shadow-lg' : 'bg-white text-gray-400 border-gray-100'}">
+                ${c === "ALL" ? "الكل" : c}
+            </button>`).join('');
+    }
 
-  function applyFilter() {
-    const q = document.getElementById("search").value.toLowerCase();
-    state.filtered = state.products.filter(p => (state.currentCat === "ALL" || p.type === state.currentCat) && p.title.toLowerCase().includes(q));
-    renderProducts();
-  }
+    function applyFilter() {
+        const q = document.getElementById("search").value.toLowerCase();
+        state.filtered = state.products.filter(p => (state.currentCat === "ALL" || p.type === state.currentCat) && p.title.toLowerCase().includes(q));
+        renderProducts();
+    }
 
-  function renderProducts() {
-    document.getElementById("products").innerHTML = state.filtered.map(p => `
-      <div class="product-card p-3 flex flex-col">
-        <img src="${p.image}" class="w-full aspect-square object-contain mix-blend-multiply mb-2">
-        <h3 class="font-bold text-[10px] h-8 line-clamp-2 leading-tight">${p.title}</h3>
-        <div class="flex items-center justify-between mt-auto pt-2">
-          <span class="font-black text-sm">₪${p.price.toFixed(0)}</span>
-          <button onclick="addToCart('${p.id}')" class="w-8 h-8 ${state.cart.has(p.id) ? 'bg-black' : 'bg-[#C5A059]'} text-white rounded-lg flex items-center justify-center font-bold">
-            ${state.cart.has(p.id) ? '✓' : '+'}
-          </button>
-        </div>
-      </div>`).join('');
-  }
+    function renderProducts() {
+        document.getElementById("products").innerHTML = state.filtered.map(p => `
+            <div class="product-card p-3 flex flex-col animate-reveal shadow-sm">
+                <img src="${p.image}" class="w-full aspect-square object-contain mix-blend-multiply mb-2">
+                <h3 class="font-bold text-[10px] h-8 line-clamp-2 leading-tight mb-2">${p.title}</h3>
+                <div class="flex items-center justify-between mt-auto">
+                    <span class="font-black text-xs">₪${p.price.toFixed(0)}</span>
+                    <button onclick="addToCart('${p.id}')" class="w-8 h-8 ${state.cart.has(p.id) ? 'bg-black' : 'bg-[#C5A059]'} text-white rounded-lg flex items-center justify-center font-bold">
+                        ${state.cart.has(p.id) ? '✓' : '+'}
+                    </button>
+                </div>
+            </div>`).join('');
+    }
 
-  window.addToCart = (id) => { state.cart.set(id, 1); renderProducts(); document.getElementById("cartCount").textContent = state.cart.size; };
-  document.getElementById("search").oninput = applyFilter;
-  init();
+    window.switchCat = (c) => { state.currentCat = c; applyFilter(); renderCategories(); };
+    window.addToCart = (id) => { state.cart.set(id, 1); renderProducts(); document.getElementById("cartCount").textContent = state.cart.size + " Items"; };
+    document.getElementById("search").oninput = applyFilter;
+    init();
 </script>
 </body>
 </html>
