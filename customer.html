@@ -12,7 +12,6 @@
   <style>
     :root { --gold:#C5A059; --dark:#0A0A0A; }
 
-    /* Mobile-first feel (حتى على الديسكتوب بتشوفه مثل شاشة جوال) */
     body{
       background:#e9eaec;
       font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
@@ -38,7 +37,6 @@
     .no-scrollbar::-webkit-scrollbar{ display:none; }
     .no-scrollbar{ scrollbar-width: none; }
 
-    /* Fallback clamps (بدون اعتماد على line-clamp) */
     .clamp-1, .clamp-2{
       display:-webkit-box;
       -webkit-box-orient: vertical;
@@ -47,7 +45,6 @@
     .clamp-1{ -webkit-line-clamp:1; }
     .clamp-2{ -webkit-line-clamp:2; }
 
-    /* Bottom sheet drawer shadow */
     .sheet-shadow{ box-shadow: 0 -18px 40px rgba(0,0,0,.18); }
   </style>
 </head>
@@ -74,7 +71,7 @@
 
     <!-- HERO -->
     <section class="bg-[#0A0A0A] pt-8 pb-14 px-5 text-center">
-      <h1 class="text-white text-3xl font-black mb-4 leading-tight">
+      <h1 id="heroTitle" class="text-white text-3xl font-black mb-4 leading-tight">
         عالم من <span class="text-[#C5A059]">الفخامة</span>
       </h1>
 
@@ -83,15 +80,13 @@
                class="w-full bg-white/10 border border-white/20 rounded-2xl px-4 py-3.5 text-white text-sm outline-none focus:border-[#C5A059]"
                placeholder="بحث عن عطر..."
                autocomplete="off" />
-        <p class="text-white/60 text-[11px] mt-2">اكتب اسم العطر أو الكود</p>
+        <p id="searchHint" class="text-white/60 text-[11px] mt-2">اكتب اسم العطر أو الكود</p>
       </div>
     </section>
 
     <!-- CATEGORIES -->
     <div class="px-4 -mt-7 relative z-20">
-      <div id="categories"
-           class="flex overflow-x-auto gap-2 py-3 no-scrollbar">
-      </div>
+      <div id="categories" class="flex overflow-x-auto gap-2 py-3 no-scrollbar"></div>
     </div>
 
     <!-- PRODUCTS -->
@@ -104,25 +99,22 @@
   <!-- CART OVERLAY -->
   <div id="cartOverlay" class="fixed inset-0 bg-black/55 backdrop-blur-sm hidden z-[100] transition-opacity"></div>
 
-  <!-- CART DRAWER (BOTTOM SHEET - MOBILE) -->
+  <!-- CART DRAWER (BOTTOM SHEET) -->
   <div id="cartDrawer"
        class="fixed inset-x-0 bottom-0 z-[101] translate-y-full transition-transform duration-500 sheet-shadow bg-white rounded-t-[2rem] flex flex-col"
        style="height: min(92dvh, 760px); padding-bottom: env(safe-area-inset-bottom);">
 
-    <!-- Drag handle -->
     <div class="w-full pt-3 pb-1 flex justify-center">
       <div class="w-12 h-1.5 rounded-full bg-gray-200"></div>
     </div>
 
     <div class="px-5 pb-3 border-b flex items-center justify-between">
-      <h3 class="text-lg font-black">عربة التسوق</h3>
+      <h3 id="cartTitle" class="text-lg font-black">عربة التسوق</h3>
       <button id="closeCart" class="text-gray-400 text-2xl px-2 -my-2 active:scale-95 transition" aria-label="Close">✕</button>
     </div>
 
-    <!-- Items -->
     <div class="flex-1 overflow-y-auto px-5 py-4 space-y-3" id="cartItems"></div>
 
-    <!-- Checkout -->
     <div class="px-5 pt-4 pb-5 bg-[#0A0A0A] text-white rounded-t-[2rem]">
       <div class="mb-3 space-y-2.5">
         <input id="custName"
@@ -144,7 +136,7 @@
       </div>
 
       <div class="flex justify-between font-black text-base mb-3">
-        <span>الإجمالي (مع التوصيل)</span>
+        <span id="totalLabel">الإجمالي (مع التوصيل)</span>
         <span class="text-[#C5A059]">₪<span id="total">0</span></span>
       </div>
 
@@ -153,7 +145,7 @@
         إرسال الطلب عبر واتساب
       </button>
 
-      <p class="text-[11px] text-white/60 mt-2 text-center">
+      <p id="deliveryNote" class="text-[11px] text-white/60 mt-2 text-center">
         التوصيل: ₪50 — الدفع عند الاستلام
       </p>
     </div>
@@ -161,7 +153,97 @@
 
 <script>
   /* =========================
-     CONFIG & LOGIC (MOBILE)
+     LANG (AUTO: AR / HE)
+     ========================= */
+  const I18N = {
+    ar: {
+      pageTitle: "MAD Parfumeur | الموقع",
+      heroTitleHTML: `عالم من <span class="text-[#C5A059]">الفخامة</span>`,
+      searchPh: "بحث عن عطر...",
+      searchHint: "اكتب اسم العطر أو الكود",
+      all: "الكل",
+      cartTitle: "عربة التسوق",
+      namePh: "الاسم الكامل",
+      phonePh: "رقم الهاتف",
+      addrPh: "العنوان (اختياري)",
+      totalLabel: "الإجمالي (مع التوصيل)",
+      sendBtn: "إرسال الطلب عبر واتساب",
+      deliveryNote: "التوصيل: ₪50 — الدفع عند الاستلام",
+      emptyCart: "السلة فارغة",
+      loadFail: "تعذّر تحميل المنتجات",
+      noResults: "لا توجد نتائج",
+      alertEmpty: "السلة فارغة",
+      alertNeed: "يرجى تعبئة الاسم والهاتف",
+      wa: {
+        header: "✨ *طلب جديد | MAD Parfumeur*",
+        name: "👤 الاسم",
+        phone: "📞 الهاتف",
+        addr: "📍 العنوان",
+        cart: "🛒 السلة",
+        ship: "🚚 التوصيل",
+        total: "💰 الإجمالي"
+      }
+    },
+    he: {
+      pageTitle: "MAD Parfumeur | אתר",
+      heroTitleHTML: `עולם של <span class="text-[#C5A059]">יוקרה</span>`,
+      searchPh: "חיפוש בושם...",
+      searchHint: "הקלד שם בושם או קוד",
+      all: "הכל",
+      cartTitle: "עגלת קניות",
+      namePh: "שם מלא",
+      phonePh: "מספר טלפון",
+      addrPh: "כתובת (אופציונלי)",
+      totalLabel: "סה״כ (כולל משלוח)",
+      sendBtn: "שליחת הזמנה בוואטסאפ",
+      deliveryNote: "משלוח: ₪50 — תשלום בעת המסירה",
+      emptyCart: "העגלה ריקה",
+      loadFail: "לא ניתן לטעון מוצרים",
+      noResults: "אין תוצאות",
+      alertEmpty: "העגלה ריקה",
+      alertNeed: "נא למלא שם ומספר טלפון",
+      wa: {
+        header: "✨ *הזמנה חדשה | MAD Parfumeur*",
+        name: "👤 שם",
+        phone: "📞 טלפון",
+        addr: "📍 כתובת",
+        cart: "🛒 עגלה",
+        ship: "🚚 משלוח",
+        total: "💰 סה״כ"
+      }
+    }
+  };
+
+  function detectLang(){
+    const l = (navigator.language || navigator.userLanguage || "ar").toLowerCase();
+    return l.startsWith("he") ? "he" : "ar";
+  }
+
+  let LANG = detectLang();
+  let T = I18N[LANG] || I18N.ar;
+
+  function applyLangUI(){
+    // Hebrew + Arabic are RTL
+    document.documentElement.lang = LANG;
+    document.documentElement.dir = "rtl";
+    document.title = T.pageTitle;
+
+    document.getElementById("heroTitle").innerHTML = T.heroTitleHTML;
+    document.getElementById("search").placeholder = T.searchPh;
+    document.getElementById("searchHint").textContent = T.searchHint;
+
+    document.getElementById("cartTitle").textContent = T.cartTitle;
+    document.getElementById("custName").placeholder = T.namePh;
+    document.getElementById("custPhone").placeholder = T.phonePh;
+    document.getElementById("custAddress").placeholder = T.addrPh;
+
+    document.getElementById("totalLabel").textContent = T.totalLabel;
+    document.getElementById("sendOrder").textContent = T.sendBtn;
+    document.getElementById("deliveryNote").textContent = T.deliveryNote;
+  }
+
+  /* =========================
+     CONFIG & LOGIC
      ========================= */
   const WHATSAPP_API = "972524033442";
   const SHIPPING = 50;
@@ -175,6 +257,8 @@
   };
 
   async function init() {
+    applyLangUI();
+
     try {
       const res = await fetch(RSS_PATH + "?v=" + Date.now(), { cache: "no-store" });
       const xmlText = await res.text();
@@ -183,12 +267,11 @@
       state.products = Array.from(xml.querySelectorAll("item"))
         .map(i => {
           const getG = (t) => i.querySelector(t)?.textContent || i.querySelector(`g\\:${t}`)?.textContent || "";
-          const id = getG("id").trim();
+          const id = (getG("id") || "").trim();
           const title = (getG("title") || "").trim();
           const image = (getG("image_link") || "").trim();
           const type = (getG("product_type") || "General").trim();
           const price = parseFloat((getG("price") || "").replace(/[^\d.]/g, "")) || 0;
-
           return { id, title, image, type, price };
         })
         .filter(p => p.id && p.title);
@@ -205,7 +288,7 @@
     } catch (e) {
       console.error(e);
       document.getElementById("products").innerHTML =
-        `<div class="col-span-2 text-center text-gray-500 font-bold py-10">تعذّر تحميل المنتجات</div>`;
+        `<div class="col-span-2 text-center text-gray-500 font-bold py-10">${escapeHtml(T.loadFail)}</div>`;
     }
   }
 
@@ -226,7 +309,7 @@
       <button onclick="switchCat('${escapeQuotes(c)}')"
         class="whitespace-nowrap px-5 py-2.5 rounded-2xl text-xs font-black border transition-all active:scale-[0.99]
         ${state.currentCat === c ? 'bg-black text-white border-black shadow' : 'bg-white text-gray-500 border-gray-100'}">
-        ${c === "ALL" ? "الكل" : c}
+        ${c === "ALL" ? escapeHtml(T.all) : escapeHtml(c)}
       </button>
     `).join("");
   }
@@ -237,7 +320,7 @@
     if (!state.filtered.length) {
       container.innerHTML = `
         <div class="col-span-2 text-center text-gray-500 font-bold py-10">
-          لا توجد نتائج
+          ${escapeHtml(T.noResults)}
         </div>`;
       return;
     }
@@ -271,7 +354,7 @@
     }).join("");
   }
 
-  /* === CART FUNCTIONS (MOBILE) === */
+  /* === CART FUNCTIONS === */
   window.addToCart = (id) => {
     state.cart.set(id, (state.cart.get(id) || 0) + 1);
     updateCartUI();
@@ -297,7 +380,7 @@
     const container = document.getElementById("cartItems");
     const badge = document.getElementById("cartCountBadge");
 
-    // badge = total qty (أفضل للجوال)
+    // badge = total qty
     let totalQty = 0;
     state.cart.forEach(q => totalQty += q);
     badge.textContent = totalQty;
@@ -335,7 +418,7 @@
       `;
     });
 
-    container.innerHTML = html || `<p class="text-center py-10 text-gray-400 font-bold">السلة فارغة</p>`;
+    container.innerHTML = html || `<p class="text-center py-10 text-gray-400 font-bold">${escapeHtml(T.emptyCart)}</p>`;
 
     const total = subtotal > 0 ? (subtotal + SHIPPING) : 0;
     document.getElementById("total").textContent = Number(total).toFixed(0);
@@ -358,14 +441,14 @@
     const phone = document.getElementById("custPhone").value.trim();
     const addr = document.getElementById("custAddress").value.trim();
 
-    if (state.cart.size === 0) return alert("السلة فارغة");
-    if (!name || !phone) return alert("يرجى تعبئة الاسم والهاتف");
+    if (state.cart.size === 0) return alert(T.alertEmpty);
+    if (!name || !phone) return alert(T.alertNeed);
 
-    let msg = `✨ *طلب جديد | MAD Parfumeur*\n`;
-    msg += `👤 الاسم: ${name}\n`;
-    msg += `📞 الهاتف: ${phone}\n`;
-    if (addr) msg += `📍 العنوان: ${addr}\n`;
-    msg += `━━━━━━━━━━━━\n🛒 السلة:\n`;
+    let msg = `${T.wa.header}\n`;
+    msg += `${T.wa.name}: ${name}\n`;
+    msg += `${T.wa.phone}: ${phone}\n`;
+    if (addr) msg += `${T.wa.addr}: ${addr}\n`;
+    msg += `━━━━━━━━━━━━\n${T.wa.cart}:\n`;
 
     state.cart.forEach((qty, id) => {
       const p = state.products.find(x => x.id === id);
@@ -373,8 +456,8 @@
       msg += `▪️ ${p.title} (x${qty}) - ₪${(p.price * qty).toFixed(0)}\n`;
     });
 
-    msg += `━━━━━━━━━━━━\n🚚 التوصيل: ₪${SHIPPING}\n`;
-    msg += `💰 الإجمالي: ₪${document.getElementById("total").textContent}`;
+    msg += `━━━━━━━━━━━━\n${T.wa.ship}: ₪${SHIPPING}\n`;
+    msg += `${T.wa.total}: ₪${document.getElementById("total").textContent}`;
 
     window.open(`https://wa.me/${WHATSAPP_API}?text=${encodeURIComponent(msg)}`, "_blank");
   }
@@ -386,7 +469,6 @@
     document.getElementById("search").oninput = applyFilter;
     document.getElementById("sendOrder").onclick = sendWhatsApp;
 
-    // close on ESC (مفيد على الجوال/كمبيوتر)
     window.addEventListener("keydown", (e) => {
       if (e.key === "Escape") closeCart();
     });
@@ -398,7 +480,7 @@
     renderCategories();
   };
 
-  /* === small helpers === */
+  /* === helpers === */
   function escapeHtml(str){
     return String(str || "")
       .replaceAll("&","&amp;")
