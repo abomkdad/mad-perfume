@@ -2,207 +2,226 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8" />
-  <meta property="og:image" content="https://www.mad-parfumeur.com/assets/hero/logo2.webp" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MAD | Staff Order Tool</title>
-
+  <title>MAD Staff Catalog</title>
   <script src="https://cdn.tailwindcss.com"></script>
+
   <style>
-    body { font-family: Arial, sans-serif; background:#f6f7f9; }
-    .glass { backdrop-filter: blur(10px); background: rgba(255,255,255,.75); }
-    .shadow-soft { box-shadow: 0 10px 30px rgba(0,0,0,.08); }
-    .card { transition: .15s transform; }
-    .card:hover { transform: scale(1.02); }
-    .chip { white-space: nowrap; }
+    body{
+      font-family: Arial, sans-serif;
+      background:
+        radial-gradient(1200px 600px at 15% 0%, rgba(197,160,89,.25), transparent 55%),
+        radial-gradient(900px 500px at 85% 10%, rgba(0,0,0,.12), transparent 55%),
+        linear-gradient(180deg, #0b0d10, #0f1116 42%, #f6f7f9 42%, #f6f7f9);
+    }
+    .glass{ backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); background: rgba(255,255,255,.10); border: 1px solid rgba(255,255,255,.18); }
+    .glassLight{ backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); background: rgba(255,255,255,.78); border: 1px solid rgba(255,255,255,.55); }
+    .shadowLux{ box-shadow: 0 18px 55px rgba(0,0,0,.18); }
+    .shadowSoft{ box-shadow: 0 12px 32px rgba(0,0,0,.10); }
+    .goldText{ background: linear-gradient(90deg, #f6e27a, #c5a059, #fff2b6); -webkit-background-clip:text; background-clip:text; color: transparent; }
+    .btnGold{ background: linear-gradient(135deg, #f6e27a, #c5a059); color:#111; }
+    .btnGold:hover{ filter: brightness(1.03); }
+    .btnDark{ background: linear-gradient(180deg, #161a22, #0f1218); color:#fff; }
+    .btnDark:hover{ filter: brightness(1.05); }
+    .chip{ border-radius: 999px; white-space: nowrap; }
+    .card{ transition: .18s transform, .18s box-shadow; }
+    .card:hover{ transform: translateY(-2px); box-shadow: 0 18px 55px rgba(0,0,0,.16); }
+    .qtyBtn{ width: 38px; height: 38px; border-radius: 14px; font-weight: 900; }
+    .fadeIn{ animation: fadeIn .22s ease-out both; }
+    @keyframes fadeIn { from{opacity:0; transform: translateY(6px);} to{opacity:1; transform:none;} }
+    .toastWrap{ position: fixed; top: 14px; left:0; right:0; z-index: 9999; display:flex; justify-content:center; pointer-events:none; }
+    .toast{ pointer-events:auto; min-width: 280px; max-width: 92vw; border-radius: 18px; padding: 12px 14px; }
   </style>
 </head>
 
 <body class="min-h-screen">
 
-  <!-- Top Bar -->
-  <div class="sticky top-0 z-30 border-b bg-white/80 glass">
-    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
-      <div class="flex items-center gap-3">
-        <img src="https://www.mad-parfumeur.com/assets/hero/logo.png" alt="MAD" class="h-10 w-10 rounded-xl object-contain bg-white border">
+  <!-- Toast -->
+  <div class="toastWrap hidden" id="toastWrap">
+    <div class="toast glassLight shadowLux" id="toastBox">
+      <div class="flex items-start justify-between gap-3">
         <div>
-          <div class="font-black text-lg leading-5" id="t_title">MAD - صفحة الموظف</div>
-          <div class="text-xs text-gray-600" id="t_sub">اختيار منتجات + سلة + فورم + إرسال واتساب</div>
+          <div class="font-black" id="toastTitle">OK</div>
+          <div class="text-sm text-gray-600 mt-1" id="toastMsg">...</div>
         </div>
-      </div>
-
-      <div class="flex items-center gap-2">
-        <button id="langBtn" class="px-4 py-2 rounded-xl bg-black text-white text-sm shadow-soft">عربي / עברית</button>
-
-        <button id="cartBtn" class="relative px-4 py-2 rounded-xl bg-green-600 text-white text-sm shadow-soft">
-          <span id="t_cart">السلة</span>
-          <span id="cartCountBadge" class="absolute -top-2 -right-2 bg-black text-white text-xs px-2 py-1 rounded-full">0</span>
-        </button>
+        <button class="px-3 py-2 rounded-2xl btnDark text-sm font-bold" onclick="hideToast()">×</button>
       </div>
     </div>
   </div>
 
-  <!-- Main -->
-  <div class="max-w-7xl mx-auto px-4 pt-6 pb-24">
-
-    <!-- Controls -->
-    <div class="bg-white rounded-3xl shadow-soft border p-4">
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-3 items-end">
-        <div class="md:col-span-2">
-          <div class="text-xs text-gray-500 font-semibold" id="t_search">بحث</div>
-          <input id="search" class="mt-2 w-full border rounded-2xl p-3" placeholder="ابحث بالاسم / الكود..." />
-          <div class="mt-2 text-xs text-gray-500">
-            <span id="t_status">Status:</span> <span id="status">Auto loading...</span>
+  <!-- Header -->
+  <div class="sticky top-0 z-40">
+    <div class="glass shadowLux">
+      <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between gap-3">
+        <div class="flex items-center gap-3">
+          <div class="w-11 h-11 rounded-2xl bg-white/10 border border-white/15 flex items-center justify-center overflow-hidden">
+            <img src="https://www.mad-parfumeur.com/assets/hero/logo.png" class="w-9 h-9 object-contain" alt="MAD">
+          </div>
+          <div>
+            <div class="font-black text-lg leading-6 text-white">
+              <span class="goldText">MAD</span> <span id="t_title">- صفحة الموظفين</span>
+            </div>
+            <div class="text-xs text-white/70" id="t_sub">اختر كاتيجوري/منتجات بسرعة واصنع رابط باقة</div>
           </div>
         </div>
 
-        <div>
-          <div class="text-xs text-gray-500 font-semibold" id="t_wa">WhatsApp (خدمة العملاء)</div>
-          <input id="waNumber" class="mt-2 w-full border rounded-2xl p-3" value="972524033442" />
-          <div class="mt-2 text-xs text-gray-500" id="t_wa_note">بدون +</div>
-        </div>
-
-        <div class="flex gap-2">
-          <button id="reloadBtn" class="w-full px-4 py-3 rounded-2xl bg-blue-600 text-white font-bold">Reload RSS</button>
-          <button id="clearBtn" class="w-full px-4 py-3 rounded-2xl bg-gray-100 font-bold" id="t_clear">Clear</button>
-        </div>
+        <button id="langBtn" class="px-4 py-2 chip btnDark shadowSoft text-sm font-bold">
+          عربي / עברית
+        </button>
       </div>
 
-      <div class="mt-4 flex flex-col md:flex-row gap-2 md:items-center md:justify-between">
-        <div class="text-sm text-gray-600">
-          <span class="font-semibold" id="t_products">Products:</span> <span id="countAll">0</span>
-          <span class="mx-2">|</span>
-          <span class="font-semibold" id="t_selected">Selected:</span> <span id="countSel">0</span>
+      <!-- Controls -->
+      <div class="max-w-7xl mx-auto px-4 pb-4">
+        <div class="glassLight shadowSoft rounded-3xl p-4">
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-3 items-end">
+
+            <div class="lg:col-span-3">
+              <div class="text-xs text-gray-500 mb-1" id="t_rss">RSS filename (same folder)</div>
+              <input id="rssPath" class="w-full border rounded-2xl p-3 bg-white/90" value="products.rss">
+              <div class="text-[11px] text-gray-500 mt-1" id="t_rss_hint">لازم يكون الملف بنفس مجلد الصفحة</div>
+            </div>
+
+            <div class="lg:col-span-3">
+              <div class="text-xs text-gray-500 mb-1" id="t_wa_agent">رقم الوكيل/خدمة العملاء (wa)</div>
+              <input id="waAgent" class="w-full border rounded-2xl p-3 bg-white/90" value="972524033442" inputmode="numeric">
+              <div class="text-[11px] text-gray-500 mt-1" id="t_wa_hint">بدون + (سيظهر داخل الباندل)</div>
+            </div>
+
+            <div class="lg:col-span-3">
+              <div class="text-xs text-gray-500 mb-1" id="t_wa_client">رقم واتساب العميل (لإرسال الرابط)</div>
+              <input id="waClient" class="w-full border rounded-2xl p-3 bg-white/90" placeholder="9725..." inputmode="numeric">
+              <div class="text-[11px] text-gray-500 mt-1" id="t_wa_client_hint">اكتب رقم العميل لإرسال رابط الباقة له</div>
+            </div>
+
+            <div class="lg:col-span-3 flex gap-2">
+              <button class="w-full py-3 rounded-2xl btnDark shadowSoft font-black" id="reloadBtn">
+                <span id="t_reload">تحديث RSS</span>
+              </button>
+              <button class="w-full py-3 rounded-2xl bg-gray-200 shadowSoft font-black" id="clearBtn">
+                <span id="t_clear">مسح</span>
+              </button>
+            </div>
+
+          </div>
+
+          <div class="mt-3 grid grid-cols-1 lg:grid-cols-12 gap-3 items-center">
+            <div class="lg:col-span-4">
+              <div class="text-xs text-gray-500 mb-1" id="t_search">بحث سريع</div>
+              <input id="search" class="w-full border rounded-2xl p-3 bg-white/90" placeholder="ابحث بالاسم / الكود...">
+            </div>
+
+            <div class="lg:col-span-8">
+              <div class="grid grid-cols-1 md:grid-cols-12 gap-2 items-end">
+                <div class="md:col-span-7">
+                  <div class="text-xs text-gray-500 mb-1" id="t_bundle_link">رابط الباقة</div>
+                  <input id="bundleLink" class="w-full border rounded-2xl p-3 bg-white/90" readonly placeholder="سيظهر هنا...">
+                </div>
+                <div class="md:col-span-5 flex gap-2">
+                  <button class="w-full py-3 rounded-2xl btnGold shadowLux font-black" id="makeBundleBtn">
+                    <span id="t_make_bundle">اصنع الرابط</span>
+                  </button>
+                  <button class="w-full py-3 rounded-2xl bg-green-600 text-white shadowLux font-black" id="copyBtn">
+                    <span id="t_copy">نسخ</span>
+                  </button>
+                  <button class="w-full py-3 rounded-2xl bg-black text-white shadowLux font-black" id="sendBtn">
+                    <span id="t_send">إرسال للعميل</span>
+                  </button>
+                </div>
+              </div>
+
+              <div class="mt-2 text-xs text-gray-500">
+                <span class="font-black" id="t_statsA">المنتجات:</span> <span id="countAll">0</span>
+                <span class="mx-2">|</span>
+                <span class="font-black" id="t_statsB">المختارة:</span> <span id="countSel">0</span>
+                <span class="mx-2">|</span>
+                <span class="font-black" id="t_statsC">الكاتيجوري:</span> <span id="catNow">ALL</span>
+              </div>
+            </div>
+          </div>
+
         </div>
-
-        <div class="flex flex-wrap gap-2">
-          <button id="openBundleBtn" class="px-4 py-3 rounded-2xl bg-black text-white font-bold">شاهد المنتجات المختاره</button>
-          <button id="copyBundleBtn" class="px-4 py-3 rounded-2xl bg-gray-900 text-white font-bold">انسخ رابط المنتجات</button>
-        </div>
-      </div>
-
-      <div class="mt-3 grid grid-cols-1 md:grid-cols-6 gap-2">
-        <input id="bundleLink" class="md:col-span-5 w-full border rounded-2xl p-3" placeholder="Bundle link will appear here..." readonly />
-        <button id="genBundleBtn" class="md:col-span-1 px-4 py-3 rounded-2xl bg-green-600 text-white font-bold">Generate</button>
-      </div>
-
-      <div class="mt-2 text-xs text-gray-500">
-        ⚠️ واتساب عبر رابط wa.me يعرض Preview لصورة واحدة فقط. إرسال صور فعلية يتم عبر زر “Share Images” (يفضل من الموبايل).
       </div>
     </div>
-
-    <!-- Categories -->
-    <div class="mt-4">
-      <div class="font-bold" id="t_categories">التصنيفات</div>
-      <div id="categories" class="mt-3 flex flex-wrap gap-2"></div>
-    </div>
-
-    <!-- Products -->
-    <div id="products" class="mt-4 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4"></div>
-
   </div>
 
-  <!-- Cart Drawer -->
-  <div id="cartOverlay" class="fixed inset-0 bg-black/40 hidden z-40"></div>
-  <div id="cartDrawer" class="fixed top-0 right-0 h-full w-full max-w-md bg-white z-50 translate-x-full transition-transform duration-200 shadow-soft">
-    <div class="p-4 border-b flex items-center justify-between">
-      <div>
-        <div class="font-black text-lg" id="t_cart_title">سلة الموظف</div>
-        <div class="text-xs text-gray-600" id="t_cart_sub">حذف/كمية + فورم + إرسال</div>
-      </div>
-      <button id="closeCart" class="px-3 py-2 rounded-xl bg-gray-100">✕</button>
-    </div>
+  <!-- Body -->
+  <div class="max-w-7xl mx-auto px-4 pt-4 pb-10">
+    <div id="categories" class="flex flex-wrap gap-2 mb-4"></div>
+    <div id="products" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4"></div>
 
-    <div class="p-4 space-y-4 overflow-y-auto" style="height: calc(100% - 190px);">
-      <div class="flex gap-2">
-        <button id="clearCart" class="w-full px-4 py-3 rounded-xl bg-gray-100 font-semibold">مسح السلة</button>
-        <button id="openBundle2" class="w-full px-4 py-3 rounded-xl bg-black text-white font-semibold">عرض الباندل</button>
-      </div>
-
-      <div class="text-sm text-gray-600">
-        <span id="t_cart_selected">Selected:</span> <span id="countSel2">0</span>
-      </div>
-
-      <div id="cartItems" class="space-y-3"></div>
-
-      <!-- Order Form -->
-      <div class="rounded-2xl border p-3 bg-gray-50">
-        <div class="font-black mb-2" id="t_form">فورم الطلب</div>
-        <div class="space-y-2">
-          <input id="custName" class="w-full border rounded-xl p-3" placeholder="اسم الزبون" />
-          <input id="custPhone" class="w-full border rounded-xl p-3" placeholder="تلفون" inputmode="tel" />
-          <textarea id="custAddress" class="w-full border rounded-xl p-3" rows="3" placeholder="العنوان"></textarea>
-
-          <div class="border rounded-xl p-3 bg-white">
-            <div class="text-sm font-bold mb-2" id="t_pay">طريقة الدفع</div>
-            <label class="flex items-center gap-2 text-sm"><input type="radio" name="pay" value="COD" checked /> <span id="t_cod">الدفع عند الاستلام</span></label>
-            <label class="flex items-center gap-2 text-sm mt-2"><input type="radio" name="pay" value="CARD" /> <span id="t_card">بطاقة / تحويل</span></label>
-          </div>
-        </div>
-      </div>
-
-      <!-- Totals -->
-      <div class="rounded-2xl border p-3 bg-white">
-        <div class="flex items-center justify-between text-sm">
-          <span id="t_subtotal">المجموع الفرعي</span>
-          <span class="font-black">₪<span id="subtotal">0</span></span>
-        </div>
-        <div class="flex items-center justify-between text-sm mt-2">
-          <span id="t_ship">التوصيل</span>
-          <span class="font-black">₪<span id="shipping">50</span></span>
-        </div>
-        <div class="h-px bg-gray-200 my-3"></div>
-        <div class="flex items-center justify-between text-base">
-          <span class="font-black" id="t_total">الإجمالي</span>
-          <span class="font-black text-lg">₪<span id="total">50</span></span>
-        </div>
-      </div>
-
-      <!-- Actions -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
-        <button id="sendWhatsApp" class="px-4 py-4 rounded-2xl bg-green-600 text-white font-black shadow-soft">
-          إرسال واتساب (نص + رابط)
-        </button>
-        <button id="shareImages" class="px-4 py-4 rounded-2xl bg-gray-900 text-white font-black shadow-soft">
-          Share Images (موبايل)
-        </button>
-      </div>
-
-      <div class="text-xs text-gray-500">
-        ✅ Share Images يعمل أفضل على الموبايل (Chrome / Safari). إذا ما اشتغل بسبب CORS، رح يعطيك رسالة.
-      </div>
-
-    </div>
-
-    <div class="absolute bottom-0 left-0 right-0 p-4 border-t bg-white">
-      <div class="text-xs text-gray-500">
-        سيتم الإرسال للرقم الموجود بالأعلى.
-      </div>
+    <div id="emptyState" class="hidden mt-6 p-6 rounded-3xl glassLight shadowSoft text-center text-gray-700 fadeIn">
+      <div class="font-black text-lg" id="t_empty">لا يوجد منتجات</div>
+      <div class="text-sm text-gray-500 mt-1" id="t_empty2">تأكد من products.rss في نفس المجلد</div>
     </div>
   </div>
 
 <script>
-/* =========================
-   CONFIG
-========================= */
-const DELIVERY_FEE = 50;
-const DEFAULT_WA = "972524033442";
-
 /* =========================
    STATE
 ========================= */
 let LANG = (navigator.language || "").toLowerCase().includes("he") ? "he" : "ar";
 let PRODUCTS = [];
 let FILTERED = [];
-let SELECTED = new Map(); // id -> qty
 let CURRENT_CATEGORY = "ALL";
 
+/* Selected as Map: id => qty */
+let SELECTED = new Map();
+
 /* =========================
-   HELPERS
+   I18N
 ========================= */
 function T(ar, he){ return (LANG==="he") ? he : ar; }
-function escapeHtml(s){ return (s||"").replace(/[&<>"']/g, m => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;" }[m])); }
-function normalizeWa(v){ return (v||"").toString().replace(/\D/g,"").trim(); }
 
+function setTexts(){
+  document.documentElement.lang = LANG;
+  document.documentElement.dir = (LANG==="he") ? "ltr" : "rtl";
+
+  document.getElementById("t_title").textContent = T("- صفحة الموظفين","- עמוד עובדים");
+  document.getElementById("t_sub").textContent   = T("اختر كاتيجوري/منتجات بسرعة واصنع رابط باقة","בחר קטגוריה/מוצרים מהר וצור קישור מארז");
+
+  document.getElementById("t_rss").textContent = T("RSS filename (same folder)","שם קובץ RSS (באותה תיקייה)");
+  document.getElementById("t_rss_hint").textContent = T("لازم يكون الملف بنفس مجلد الصفحة","הקובץ חייב להיות באותה תיקייה");
+  document.getElementById("t_wa_agent").textContent = T("رقم الوكيل/خدمة العملاء (wa)","מספר סוכן/שירות לקוחות (wa)");
+  document.getElementById("t_wa_hint").textContent = T("بدون + (سيظهر داخل الباندل)","ללא + (יופיע בתוך המארז)");
+  document.getElementById("t_wa_client").textContent = T("رقم واتساب العميل (لإرسال الرابط)","מספר הוואטסאפ של הלקוח (לשליחה)");
+  document.getElementById("t_wa_client_hint").textContent = T("اكتب رقم العميل لإرسال رابط الباقة له","הזן מספר לקוח כדי לשלוח קישור");
+
+  document.getElementById("t_reload").textContent = T("تحديث RSS","רענון RSS");
+  document.getElementById("t_clear").textContent = T("مسح","איפוס");
+
+  document.getElementById("t_search").textContent = T("بحث سريع","חיפוש מהיר");
+  document.getElementById("search").placeholder = T("ابحث بالاسم / الكود...","חפש לפי שם / קוד...");
+
+  document.getElementById("t_bundle_link").textContent = T("رابط الباقة","קישור מארז");
+  document.getElementById("t_make_bundle").textContent = T("اصنع الرابط","צור קישור");
+  document.getElementById("t_copy").textContent = T("نسخ","העתקה");
+  document.getElementById("t_send").textContent = T("إرسال للعميل","שלח ללקוח");
+
+  document.getElementById("t_statsA").textContent = T("المنتجات:","מוצרים:");
+  document.getElementById("t_statsB").textContent = T("المختارة:","נבחרו:");
+  document.getElementById("t_statsC").textContent = T("الكاتيجوري:","קטגוריה:");
+
+  document.getElementById("t_empty").textContent = T("لا يوجد منتجات","אין מוצרים");
+  document.getElementById("t_empty2").textContent = T("تأكد من products.rss في نفس المجلد","ודא ש-products.rss באותה תיקייה");
+}
+
+/* =========================
+   TOAST
+========================= */
+function showToast(title, msg){
+  document.getElementById("toastTitle").textContent = title;
+  document.getElementById("toastMsg").textContent = msg;
+  document.getElementById("toastWrap").classList.remove("hidden");
+}
+function hideToast(){
+  document.getElementById("toastWrap").classList.add("hidden");
+}
+
+function normNum(v){ return (v||"").toString().replace(/\D/g,"").trim(); }
+
+/* =========================
+   RSS PARSE
+========================= */
 function getTextByLocalName(parent, localName){
   const nodes = parent.getElementsByTagName("*");
   const target = localName.toLowerCase();
@@ -213,134 +232,69 @@ function getTextByLocalName(parent, localName){
   return "";
 }
 
-function parsePrice(priceText){
-  if(!priceText) return 0;
-  const n = parseFloat(String(priceText).replace(/[^\d.]/g,""));
-  return isNaN(n) ? 0 : n;
-}
+async function loadRSS(isManual=false){
+  const path = (document.getElementById("rssPath").value || "products.rss").trim();
 
-function translateCategory(cat){
-  if(LANG==="ar"){
-    if(cat.includes("גברים")) return "عطور رجال";
-    if(cat.includes("נשים")) return "عطور نساء";
-    if(cat.includes("מבצעים")) return "عروض";
-    if(cat.includes("נישה") || cat.includes("ניש")) return "نيش";
-    if(cat.includes("סלקטיב")) return "سيليكتف";
-    return cat;
-  }
-  return cat;
-}
-
-/* =========================
-   TEXTS
-========================= */
-function setTexts(){
-  document.documentElement.lang = LANG;
-  document.documentElement.dir = (LANG==="he") ? "ltr" : "rtl";
-
-  document.getElementById("t_title").textContent = T("MAD - صفحة الموظف","MAD - עמוד עובדים");
-  document.getElementById("t_sub").textContent = T("اختيار منتجات + سلة + فورم + إرسال واتساب","בחירת מוצרים + עגלה + טופס + שליחה");
-  document.getElementById("t_cart").textContent = T("السلة","עגלה");
-  document.getElementById("t_search").textContent = T("بحث","חיפוש");
-  document.getElementById("search").placeholder = T("ابحث بالاسم / الكود...","חפש לפי שם / קוד...");
-  document.getElementById("t_status").textContent = "Status:";
-  document.getElementById("t_wa").textContent = T("WhatsApp (خدمة العملاء)","WhatsApp (שירות לקוחות)");
-  document.getElementById("t_wa_note").textContent = T("بدون +","ללא +");
-  document.getElementById("reloadBtn").textContent = "Reload RSS";
-  document.getElementById("clearBtn").textContent = T("Clear","נקה");
-  document.getElementById("t_products").textContent = T("Products:","מוצרים:");
-  document.getElementById("t_selected").textContent = T("Selected:","נבחרו:");
-  document.getElementById("t_categories").textContent = T("التصنيفات","קטגוריות");
-
-  document.getElementById("t_cart_title").textContent = T("سلة الموظف","עגלת עובדים");
-  document.getElementById("t_cart_sub").textContent = T("حذف/كمية + فورم + إرسال","מחיקה/כמות + טופס + שליחה");
-  document.getElementById("t_cart_selected").textContent = T("Selected:","נבחרו:");
-  document.getElementById("t_form").textContent = T("فورم الطلب","טופס הזמנה");
-  document.getElementById("custName").placeholder = T("اسم الزبون","שם לקוח");
-  document.getElementById("custPhone").placeholder = T("تلفون","טלפון");
-  document.getElementById("custAddress").placeholder = T("العنوان","כתובת");
-  document.getElementById("t_pay").textContent = T("طريقة الدفع","אמצעי תשלום");
-  document.getElementById("t_cod").textContent = T("الدفع عند الاستلام","תשלום בעת מסירה");
-  document.getElementById("t_card").textContent = T("بطاقة / تحويل","כרטיס / העברה");
-  document.getElementById("t_subtotal").textContent = T("المجموع الفرعي","סכום ביניים");
-  document.getElementById("t_ship").textContent = T("التوصيل","משלוח");
-  document.getElementById("t_total").textContent = T("الإجمالي","סה״כ");
-}
-document.getElementById("langBtn").onclick = ()=>{
-  LANG = (LANG==="ar") ? "he" : "ar";
-  setTexts();
-  renderCategories();
-  applyFilters();
-  renderCart();
-};
-
-/* =========================
-   LOAD RSS
-========================= */
-async function loadRSS(){
-  const status = document.getElementById("status");
-  status.textContent = "Loading...";
   try{
-    const res = await fetch("products.rss", { cache:"no-store" });
-    const ct = res.headers.get("content-type") || "unknown";
+    const res = await fetch(path, { cache:"no-store" });
     if(!res.ok) throw new Error("HTTP " + res.status);
-
     const text = await res.text();
+
     const xml = new DOMParser().parseFromString(text, "application/xml");
-    const err = xml.getElementsByTagName("parsererror");
-    if(err && err.length) throw new Error("XML parse error");
+    const parseErr = xml.getElementsByTagName("parsererror");
+    if(parseErr && parseErr.length) throw new Error("XML parse error");
 
     const items = Array.from(xml.getElementsByTagName("item"));
-    PRODUCTS = items.map(item=>{
-      const priceRaw = getTextByLocalName(item, "price") || getTextByLocalName(item, "sale_price") || "";
-      return {
-        id: getTextByLocalName(item, "id"),
-        title: getTextByLocalName(item, "title"),
-        image: getTextByLocalName(item, "image_link"),
-        link: getTextByLocalName(item, "link"),
-        category: getTextByLocalName(item, "product_type") || "Uncategorized",
-        price_raw: priceRaw,
-        price: parsePrice(priceRaw)
-      };
-    }).filter(p=>p.id && p.title);
+    PRODUCTS = items.map(item=>({
+      id: getTextByLocalName(item,"id"),
+      title: getTextByLocalName(item,"title"),
+      image: getTextByLocalName(item,"image_link"),
+      link: getTextByLocalName(item,"link"),
+      category: getTextByLocalName(item,"product_type") || "Uncategorized"
+    })).filter(p=>p.id && p.title);
 
-    document.getElementById("countAll").textContent = PRODUCTS.length.toString();
-    status.textContent = `OK ✅ (${PRODUCTS.length})`;
-    CURRENT_CATEGORY = "ALL";
+    document.getElementById("countAll").textContent = String(PRODUCTS.length);
 
     renderCategories();
     applyFilters();
-    syncSelectedBadges();
+
+    if(PRODUCTS.length === 0){
+      document.getElementById("emptyState").classList.remove("hidden");
+    }else{
+      document.getElementById("emptyState").classList.add("hidden");
+    }
+
+    if(isManual) showToast(T("تم ✅","בוצע ✅"), T("تم تحديث الـ RSS بنجاح","ה-RSS עודכן בהצלחה"));
+
   }catch(e){
     console.error(e);
-    document.getElementById("status").textContent = "Failed ❌";
-    alert("فشل تحميل products.rss\n" + e.message);
+    showToast(T("خطأ ❌","שגיאה ❌"), T("فشل تحميل products.rss","נכשל טעינת products.rss") + " — " + e.message);
   }
 }
 
-document.getElementById("reloadBtn").onclick = loadRSS;
-
 /* =========================
-   CATEGORIES
+   CATEGORIES / FILTER
 ========================= */
 function renderCategories(){
   const container = document.getElementById("categories");
   container.innerHTML = "";
 
-  const cats = Array.from(new Set(PRODUCTS.map(p => p.category))).sort((a,b)=>a.localeCompare(b));
+  const cats = Array.from(new Set(PRODUCTS.map(p=>p.category))).sort((a,b)=>a.localeCompare(b));
+
   container.appendChild(makeCatBtn("ALL", T("كل المنتجات","כל המוצרים")));
-  cats.forEach(cat => container.appendChild(makeCatBtn(cat, translateCategory(cat))));
+  cats.forEach(c => container.appendChild(makeCatBtn(c, c)));
 
   highlightCategory();
 }
 
 function makeCatBtn(cat, label){
   const b = document.createElement("button");
-  b.className = "chip px-4 py-2 rounded-full bg-gray-200";
+  b.className = "chip px-4 py-2 bg-gray-200 shadowSoft font-black text-sm";
   b.textContent = label;
   b.dataset.cat = cat;
-  b.onclick = () => {
+  b.onclick = ()=>{
     CURRENT_CATEGORY = cat;
+    document.getElementById("catNow").textContent = cat === "ALL" ? "ALL" : cat;
     applyFilters();
     highlightCategory();
   };
@@ -348,352 +302,202 @@ function makeCatBtn(cat, label){
 }
 
 function highlightCategory(){
-  document.querySelectorAll("#categories button").forEach(b => {
+  document.querySelectorAll("#categories button").forEach(b=>{
     const active = b.dataset.cat === CURRENT_CATEGORY;
-    b.className = "chip px-4 py-2 rounded-full " + (active ? "bg-black text-white" : "bg-gray-200");
+    b.className = "chip px-4 py-2 shadowSoft font-black text-sm " + (active ? "bg-black text-white" : "bg-gray-200");
   });
 }
-
-/* =========================
-   FILTER + RENDER
-========================= */
-document.getElementById("search").addEventListener("input", applyFilters);
 
 function applyFilters(){
   const q = (document.getElementById("search").value || "").trim().toLowerCase();
-
-  FILTERED = PRODUCTS.filter(p => {
-    const catOk = (CURRENT_CATEGORY === "ALL") ? true : (p.category === CURRENT_CATEGORY);
+  FILTERED = PRODUCTS.filter(p=>{
+    const catOk = CURRENT_CATEGORY === "ALL" ? true : p.category === CURRENT_CATEGORY;
     const qOk = !q ? true : (p.title.toLowerCase().includes(q) || p.id.toLowerCase().includes(q));
     return catOk && qOk;
   });
-
   renderProducts(FILTERED);
 }
 
+/* =========================
+   RENDER PRODUCTS
+========================= */
 function renderProducts(list){
   const container = document.getElementById("products");
   container.innerHTML = "";
 
   list.forEach(p=>{
-    const inCart = SELECTED.has(p.id);
-    const qty = SELECTED.get(p.id) || 1;
+    const qty = SELECTED.get(p.id) || 0;
 
     const card = document.createElement("div");
-    card.className = "card bg-white rounded-3xl shadow-soft border overflow-hidden";
+    card.className = "card glassLight shadowLux rounded-3xl overflow-hidden fadeIn";
 
     card.innerHTML = `
-      <div class="bg-gray-50">
-        <img src="${escapeHtml(p.image)}" class="w-full h-44 object-contain" alt="">
+      <div class="relative bg-white/40">
+        <img src="${esc(p.image)}" class="w-full h-36 object-contain" />
+        <div class="absolute top-2 left-2 px-2 py-1 text-[11px] rounded-xl bg-white/90 border shadowSoft font-black">${esc(p.id)}</div>
+        ${qty>0 ? `<div class="absolute top-2 right-2 px-3 py-1 text-[11px] rounded-xl bg-green-600 text-white shadowSoft font-black">x${qty}</div>` : ``}
       </div>
-      <div class="p-3">
-        <div class="text-xs text-gray-500 font-semibold">${escapeHtml(p.id)}</div>
-        <div class="mt-1 font-bold text-sm leading-snug min-h-[40px]">${escapeHtml(p.title)}</div>
 
-        <div class="mt-2 flex items-center justify-between">
-          <div class="text-sm font-black">₪${(p.price||0).toFixed(0)}</div>
-          <div class="text-xs text-gray-500">${escapeHtml(translateCategory(p.category))}</div>
+      <div class="p-3">
+        <div class="font-black text-sm leading-snug">${esc(p.title)}</div>
+        <div class="text-xs text-gray-500 mt-1">${esc(p.category)}</div>
+
+        <div class="mt-3 flex items-center justify-between gap-2 bg-black/5 rounded-2xl p-2">
+          <button class="qtyBtn bg-white shadowSoft" data-dec="${esc(p.id)}">−</button>
+          <div class="text-center">
+            <div class="text-xs text-gray-500">${esc(T("الكمية","כמות"))}</div>
+            <div class="font-black text-lg">${qty}</div>
+          </div>
+          <button class="qtyBtn bg-white shadowSoft" data-inc="${esc(p.id)}">+</button>
         </div>
 
         <div class="mt-3 flex gap-2">
-          <button class="w-full px-3 py-3 rounded-2xl ${inCart ? "bg-black text-white" : "bg-green-600 text-white"} font-bold text-sm">
-            ${inCart ? "✓ " + T("بالسلة","בעגלה") : "+ " + T("أضف","הוסף")}
+          <button class="w-full py-2 rounded-2xl btnDark shadowSoft font-black text-sm" data-add="${esc(p.id)}">
+            ${esc(T("إضافة سريع","הוספה מהירה"))}
           </button>
-          <a class="px-3 py-3 rounded-2xl bg-gray-100 text-black text-sm font-bold" href="${escapeHtml(p.link)}" target="_blank">
-            ${escapeHtml(T("رابط","קישור"))}
-          </a>
+          <button class="px-3 py-2 rounded-2xl bg-red-500 text-white shadowSoft font-black text-sm" data-del="${esc(p.id)}">
+            ${esc(T("حذف","מחק"))}
+          </button>
         </div>
-
-        ${inCart ? `
-        <div class="mt-2 flex items-center justify-between">
-          <div class="text-xs text-gray-500">${T("الكمية","כמות")}</div>
-          <div class="flex items-center gap-2">
-            <button class="px-3 py-1 rounded-lg bg-gray-100 font-bold" data-act="dec">-</button>
-            <div class="min-w-[28px] text-center font-black">${qty}</div>
-            <button class="px-3 py-1 rounded-lg bg-gray-100 font-bold" data-act="inc">+</button>
-            <button class="px-3 py-1 rounded-lg bg-red-600 text-white font-bold" data-act="rm">${T("حذف","מחק")}</button>
-          </div>
-        </div>` : ``}
       </div>
     `;
 
-    const mainBtn = card.querySelector("button");
-    mainBtn.onclick = ()=>{
-      if(SELECTED.has(p.id)) SELECTED.delete(p.id);
-      else SELECTED.set(p.id, 1);
-      syncSelectedBadges();
-      renderProducts(FILTERED);
-      renderCart();
-    };
-
-    const dec = card.querySelector('[data-act="dec"]');
-    const inc = card.querySelector('[data-act="inc"]');
-    const rm  = card.querySelector('[data-act="rm"]');
-    if(dec) dec.onclick = ()=>{
-      const now = SELECTED.get(p.id) || 1;
-      if(now <= 1) SELECTED.delete(p.id);
-      else SELECTED.set(p.id, now-1);
-      syncSelectedBadges(); renderProducts(FILTERED); renderCart();
-    };
-    if(inc) inc.onclick = ()=>{
-      const now = SELECTED.get(p.id) || 1;
-      SELECTED.set(p.id, now+1);
-      syncSelectedBadges(); renderProducts(FILTERED); renderCart();
-    };
-    if(rm) rm.onclick = ()=>{
-      SELECTED.delete(p.id);
-      syncSelectedBadges(); renderProducts(FILTERED); renderCart();
-    };
+    card.querySelector(`[data-inc="${CSS.escape(p.id)}"]`).onclick = ()=> setQty(p.id, qty+1);
+    card.querySelector(`[data-dec="${CSS.escape(p.id)}"]`).onclick = ()=> setQty(p.id, Math.max(0, qty-1));
+    card.querySelector(`[data-add="${CSS.escape(p.id)}"]`).onclick = ()=> setQty(p.id, qty+1);
+    card.querySelector(`[data-del="${CSS.escape(p.id)}"]`).onclick = ()=> setQty(p.id, 0);
 
     container.appendChild(card);
   });
+
+  updateSelectedCount();
 }
 
-/* =========================
-   CART DRAWER
-========================= */
-const cartBtn = document.getElementById("cartBtn");
-const cartDrawer = document.getElementById("cartDrawer");
-const cartOverlay = document.getElementById("cartOverlay");
-const closeCart = document.getElementById("closeCart");
-
-cartBtn.onclick = openCart;
-cartOverlay.onclick = closeCartFn;
-closeCart.onclick = closeCartFn;
-
-function openCart(){
-  cartOverlay.classList.remove("hidden");
-  cartDrawer.classList.remove("translate-x-full");
-  renderCart();
-}
-function closeCartFn(){
-  cartOverlay.classList.add("hidden");
-  cartDrawer.classList.add("translate-x-full");
+function setQty(id, qty){
+  if(qty <= 0) SELECTED.delete(id);
+  else SELECTED.set(id, qty);
+  updateSelectedCount();
+  renderProducts(FILTERED);
 }
 
-document.getElementById("clearBtn").onclick = ()=>{ SELECTED.clear(); syncSelectedBadges(); renderProducts(FILTERED); renderCart(); };
-document.getElementById("clearCart").onclick = ()=>{ SELECTED.clear(); syncSelectedBadges(); renderProducts(FILTERED); renderCart(); };
-
-function syncSelectedBadges(){
-  const count = SELECTED.size;
-  document.getElementById("countSel").textContent = count.toString();
-  document.getElementById("countSel2").textContent = count.toString();
-  document.getElementById("cartCountBadge").textContent = count.toString();
-}
-
-function calcSubtotal(){
-  const map = new Map(PRODUCTS.map(p=>[p.id,p]));
-  let sum = 0;
-  for(const [id, qty] of SELECTED.entries()){
-    const p = map.get(id);
-    if(!p) continue;
-    sum += (p.price||0) * qty;
-  }
-  return sum;
-}
-
-function renderTotals(){
-  const sub = calcSubtotal();
-  document.getElementById("subtotal").textContent = sub.toFixed(0);
-  document.getElementById("shipping").textContent = DELIVERY_FEE.toFixed(0);
-  document.getElementById("total").textContent = (sub + DELIVERY_FEE).toFixed(0);
-}
-
-function renderCart(){
-  const wrap = document.getElementById("cartItems");
-  wrap.innerHTML = "";
-  if(SELECTED.size===0){
-    wrap.innerHTML = `<div class="p-4 rounded-2xl bg-gray-50 border text-gray-700 text-sm">${escapeHtml(T("السلة فارغة…","העגלה ריקה…"))}</div>`;
-    renderTotals();
-    return;
-  }
-
-  const map = new Map(PRODUCTS.map(p=>[p.id,p]));
-
-  for(const [id, qty] of SELECTED.entries()){
-    const p = map.get(id);
-    if(!p) continue;
-
-    const row = document.createElement("div");
-    row.className = "flex gap-3 p-3 rounded-2xl border bg-white shadow-soft";
-    row.innerHTML = `
-      <img src="${escapeHtml(p.image)}" class="w-16 h-16 rounded-xl object-contain bg-gray-50 border" alt="">
-      <div class="flex-1">
-        <div class="text-xs text-gray-500 font-semibold">${escapeHtml(p.id)}</div>
-        <div class="font-bold text-sm">${escapeHtml(p.title)}</div>
-        <div class="mt-1 text-sm font-black">₪${(p.price||0).toFixed(0)} <span class="text-xs text-gray-500 font-normal">x${qty}</span></div>
-        <div class="mt-2 flex items-center gap-2">
-          <button class="px-3 py-1 rounded-lg bg-gray-100 font-bold" data-act="dec">-</button>
-          <div class="min-w-[28px] text-center font-black">${qty}</div>
-          <button class="px-3 py-1 rounded-lg bg-gray-100 font-bold" data-act="inc">+</button>
-        </div>
-      </div>
-      <button class="px-3 py-2 rounded-xl bg-red-600 text-white text-xs font-bold h-fit" data-act="rm">${escapeHtml(T("حذف","מחק"))}</button>
-    `;
-
-    row.querySelector('[data-act="dec"]').onclick = ()=>{
-      const now = SELECTED.get(id) || 1;
-      if(now<=1) SELECTED.delete(id); else SELECTED.set(id, now-1);
-      syncSelectedBadges(); renderProducts(FILTERED); renderCart();
-    };
-    row.querySelector('[data-act="inc"]').onclick = ()=>{
-      const now = SELECTED.get(id) || 1;
-      SELECTED.set(id, now+1);
-      syncSelectedBadges(); renderCart();
-    };
-    row.querySelector('[data-act="rm"]').onclick = ()=>{
-      SELECTED.delete(id);
-      syncSelectedBadges(); renderProducts(FILTERED); renderCart();
-    };
-
-    wrap.appendChild(row);
-  }
-
-  renderTotals();
+function updateSelectedCount(){
+  let total = 0;
+  for(const v of SELECTED.values()) total += v;
+  document.getElementById("countSel").textContent = String(total);
 }
 
 /* =========================
    BUNDLE LINK
 ========================= */
-function buildBundleUrl(ids){
-  const base = location.origin + location.pathname.replace(/[^/]+$/, "") + "bundle.html";
-  const idsParam = encodeURIComponent(ids.join(","));
-  const wa = normalizeWa(document.getElementById("waNumber").value || "") || DEFAULT_WA;
-  return `${base}?ids=${idsParam}&lang=${encodeURIComponent(LANG)}&wa=${encodeURIComponent(wa)}`;
-}
-
-function generateBundle(){
-  if(SELECTED.size===0) return alert(T("اختر منتجات أولاً","בחר מוצרים קודם"));
-  let ids = Array.from(SELECTED.keys());
-  const MAX_IDS = 60;
-  if(ids.length > MAX_IDS){
-    alert(T(`عدد كبير (${ids.length}). سيتم أخذ أول ${MAX_IDS} فقط.`,`יותר מדי (${ids.length}). ניקח רק ${MAX_IDS}.`));
-    ids = ids.slice(0, MAX_IDS);
+function buildBundleLink(){
+  if(SELECTED.size === 0){
+    showToast(T("تنبيه","שים לב"), T("اختر منتجات أولاً","בחר מוצרים קודם"));
+    return "";
   }
-  const url = buildBundleUrl(ids);
+
+  // Build ids list with qty
+  const ids = [];
+  for(const [id, qty] of SELECTED.entries()){
+    for(let i=0;i<qty;i++) ids.push(id);
+  }
+
+  // Keep URL from exploding
+  const MAX_IDS = 80;
+  let finalIds = ids;
+  if(ids.length > MAX_IDS){
+    finalIds = ids.slice(0, MAX_IDS);
+    showToast(T("ملاحظة","הערה"), T(`تم قص الباقة لأول ${MAX_IDS} عنصر لتجنب طول الرابط`, `הקישור קוצר ל-${MAX_IDS} פריטים כדי לא להאריך`));
+  }
+
+  const wa = normNum(document.getElementById("waAgent").value || "");
+  if(!wa){
+    showToast(T("تنبيه","שים לב"), T("حط رقم الوكيل/خدمة العملاء (wa)","הזן מספר סוכן/שירות לקוחות (wa)"));
+    return "";
+  }
+
+  const base = location.origin + location.pathname.replace(/[^/]+$/, "") + "bundle.html";
+  const url = `${base}?ids=${encodeURIComponent(finalIds.join(","))}&lang=${encodeURIComponent(LANG)}&wa=${encodeURIComponent(wa)}`;
+
   document.getElementById("bundleLink").value = url;
   return url;
 }
 
-document.getElementById("genBundleBtn").onclick = generateBundle;
-document.getElementById("openBundleBtn").onclick = ()=>{ const u = generateBundle(); if(u) window.open(u,"_blank"); };
-document.getElementById("openBundle2").onclick = ()=>{ const u = generateBundle(); if(u) window.open(u,"_blank"); };
-
-document.getElementById("copyBundleBtn").onclick = async ()=>{
-  const u = generateBundle();
-  if(!u) return;
-  try{ await navigator.clipboard.writeText(u); alert(T("تم النسخ ✅","הועתק ✅")); }
-  catch{ alert(T("انسخ يدويًا","העתק ידנית")); }
-};
-
-/* =========================
-   SEND WHATSAPP (TEXT + BUNDLE)
-========================= */
-function getPay(){
-  const el = document.querySelector('input[name="pay"]:checked');
-  return el ? el.value : "COD";
-}
-
-document.getElementById("sendWhatsApp").onclick = ()=>{
-  if(SELECTED.size===0) return alert(T("اختر منتجات أولاً","בחר מוצרים קודם"));
-
-  const name = (document.getElementById("custName").value || "").trim();
-  const phone = (document.getElementById("custPhone").value || "").trim();
-  const addr = (document.getElementById("custAddress").value || "").trim();
-  const pay = getPay();
-
-  if(!name || !phone || !addr){
-    alert(T("املأ الاسم والتلفون والعنوان","מלא שם, טלפון וכתובת"));
-    openCart();
-    return;
-  }
-
-  const wa = normalizeWa(document.getElementById("waNumber").value || "") || DEFAULT_WA;
-  const ids = Array.from(SELECTED.keys());
-  const bundleUrl = buildBundleUrl(ids);
-
-  const map = new Map(PRODUCTS.map(p=>[p.id,p]));
-  let msg = T("🛒 طلب موظف\n","🛒 הזמנת עובד\n");
-  msg += "----------------------\n";
-  msg += T(`👤 الاسم: ${name}\n`,`👤 שם: ${name}\n`);
-  msg += T(`📞 التلفون: ${phone}\n`,`📞 טלפון: ${phone}\n`);
-  msg += T(`📍 العنوان: ${addr}\n`,`📍 כתובת: ${addr}\n`);
-  msg += T(`💳 الدفع: ${pay==="COD" ? "الدفع عند الاستلام" : "بطاقة/تحويل"}\n`,
-           `💳 תשלום: ${pay==="COD" ? "בעת מסירה" : "כרטיס/העברה"}\n`);
-  msg += "----------------------\n";
-  msg += T("🧾 المنتجات:\n","🧾 מוצרים:\n");
-
-  for(const [id, qty] of SELECTED.entries()){
-    const p = map.get(id);
-    if(!p) continue;
-    msg += `• ${p.title} (x${qty}) — ₪${(((p.price||0)*qty)).toFixed(0)}\n`;
-  }
-
-  const sub = calcSubtotal();
-  msg += "----------------------\n";
-  msg += T(`المجموع الفرعي: ₪${sub.toFixed(0)}\n`,`סכום ביניים: ₪${sub.toFixed(0)}\n`);
-  msg += T(`التوصيل: ₪${DELIVERY_FEE}\n`,`משלוח: ₪${DELIVERY_FEE}\n`);
-  msg += T(`الإجمالي: ₪${(sub+DELIVERY_FEE).toFixed(0)}\n`,`סה״כ: ₪${(sub+DELIVERY_FEE).toFixed(0)}\n`);
-  msg += "----------------------\n";
-  msg += T("📦 رابط الباندل (صور):\n","📦 קישור לבאנדל (תמונות):\n");
-  msg += bundleUrl;
-
-  window.open(`https://wa.me/${wa}?text=${encodeURIComponent(msg)}`, "_blank");
-};
-
-/* =========================
-   SHARE IMAGES (MOBILE)
-========================= */
-async function fetchAsFile(url, filename){
-  const res = await fetch(url, { mode:"cors" });
-  const blob = await res.blob();
-  const ext = (blob.type && blob.type.includes("png")) ? "png" : "jpg";
-  return new File([blob], `${filename}.${ext}`, { type: blob.type || "image/jpeg" });
-}
-
-document.getElementById("shareImages").onclick = async ()=>{
-  if(SELECTED.size===0) return alert(T("اختر منتجات أولاً","בחר מוצרים קודם"));
-
-  if(!navigator.share){
-    alert(T("المشاركة غير مدعومة على هذا الجهاز. افتح الصفحة من الموبايل.","שיתוף לא נתמך במכשיר הזה. פתח במובייל."));
-    return;
-  }
-
+async function copyLink(){
+  const val = (document.getElementById("bundleLink").value || "").trim() || buildBundleLink();
+  if(!val) return;
   try{
-    const map = new Map(PRODUCTS.map(p=>[p.id,p]));
-    const files = [];
-    for(const [id] of SELECTED.entries()){
-      const p = map.get(id);
-      if(!p || !p.image) continue;
-      // حد عملي: 10 صور للمشاركة دفعة واحدة
-      if(files.length >= 10) break;
-      files.push(await fetchAsFile(p.image, id));
-    }
-
-    if(files.length===0){
-      alert(T("لا توجد صور قابلة للمشاركة","אין תמונות לשיתוף"));
-      return;
-    }
-
-    await navigator.share({
-      title: "MAD Products",
-      text: T("صور المنتجات المختارة","תמונות המוצרים שנבחרו"),
-      files
-    });
-  }catch(e){
-    console.error(e);
-    alert(T("فشل إرسال الصور. غالباً بسبب CORS أو الجهاز منع مشاركة الملفات.","נכשל לשתף תמונות (כנראה CORS או חסימה)."));
+    await navigator.clipboard.writeText(val);
+    showToast(T("تم ✅","בוצע ✅"), T("تم نسخ الرابط","הקישור הועתק"));
+  }catch{
+    showToast(T("انسخ يدويًا","העתק ידנית"), val);
   }
+}
+
+function sendToClient(){
+  const url = (document.getElementById("bundleLink").value || "").trim() || buildBundleLink();
+  if(!url) return;
+
+  const client = normNum(document.getElementById("waClient").value || "");
+  if(!client){
+    showToast(T("تنبيه","שים לב"), T("اكتب رقم واتساب العميل أولاً","הזן מספר הוואטסאפ של הלקוח"));
+    return;
+  }
+
+  const msg = T(
+    `✨ هاي الباقة المختارة لك:\n${url}\n\nافتح الرابط، عدّل الكميات، واملأ الفورم لإرسال الطلب ✅`,
+    `✨ זה המארז שנבחר עבורך:\n${url}\n\nפתח את הקישור, עדכן כמויות ומלא טופס לשליחת הזמנה ✅`
+  );
+
+  window.open(`https://wa.me/${client}?text=${encodeURIComponent(msg)}`, "_blank");
+}
+
+/* =========================
+   UTIL
+========================= */
+function esc(s){
+  return (s||"").replace(/[&<>"']/g, m => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;" }[m]));
+}
+
+/* =========================
+   EVENTS
+========================= */
+document.getElementById("langBtn").onclick = ()=>{
+  LANG = (LANG==="ar") ? "he" : "ar";
+  setTexts();
+  renderCategories();
+  applyFilters();
+  const url = (document.getElementById("bundleLink").value || "").trim();
+  if(url) buildBundleLink();
 };
+
+document.getElementById("reloadBtn").onclick = ()=> loadRSS(true);
+document.getElementById("clearBtn").onclick = ()=>{
+  SELECTED = new Map();
+  updateSelectedCount();
+  document.getElementById("bundleLink").value = "";
+  renderProducts(FILTERED);
+  showToast(T("تم","בוצע"), T("تم مسح الاختيار","האיפוס הושלם"));
+};
+
+document.getElementById("search").addEventListener("input", applyFilters);
+
+document.getElementById("makeBundleBtn").onclick = ()=>{
+  const u = buildBundleLink();
+  if(u) showToast(T("جاهز ✅","מוכן ✅"), T("تم إنشاء الرابط","הקישור נוצר"));
+};
+
+document.getElementById("copyBtn").onclick = copyLink;
+document.getElementById("sendBtn").onclick = sendToClient;
 
 /* =========================
    INIT
 ========================= */
-document.getElementById("waNumber").value = normalizeWa(new URL(location.href).searchParams.get("wa")) || DEFAULT_WA;
-document.getElementById("waNumber").addEventListener("input", (e)=>{ e.target.value = normalizeWa(e.target.value); });
-
-setTexts();
-window.addEventListener("load", loadRSS);
+function init(){
+  setTexts();
+  loadRSS(false);
+}
+init();
 </script>
+
 </body>
 </html>
