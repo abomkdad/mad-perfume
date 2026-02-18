@@ -17,8 +17,8 @@
 
   <!-- Leaflet Map CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-     integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
-     crossorigin=""/>
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+      crossorigin=""/>
 
   <!-- Tracking Scripts -->
   <script>
@@ -59,6 +59,7 @@
       --primary:#d97706;
       --primary-light:#fbbf24;
       --bg-dark:#020202;
+      --bg-card: rgba(30, 30, 30, 0.6);
       --glass:rgba(10,10,10,.85);
       --border-glass:rgba(255,255,255,.1);
       --live-green:#10b981;
@@ -69,6 +70,7 @@
 
     body{
       background-color:var(--bg-dark);
+      background-image: radial-gradient(circle at 50% 0%, #1a1a1a 0%, #020202 70%);
       color:#f4f4f4;
       font-family:'Assistant','Inter',sans-serif;
       overflow-x:hidden;
@@ -78,6 +80,12 @@
       padding-bottom: 70px; /* Space for Trust Bar */
     }
     .font-serif{font-family:'Playfair Display',serif;}
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: #111; }
+    ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
 
     /* Loader */
     .page-loader{
@@ -89,14 +97,15 @@
     @keyframes pulse{0%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.8)}100%{opacity:1;transform:scale(1)}}
 
     /* Header Video */
-    .video-header{position:relative;height:auto;min-height:85vh;width:100%;overflow:hidden;display:flex;align-items:center;justify-content:center;text-align:center;}
-    .video-bg{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;z-index:0;opacity:.6;}
-    .video-overlay{position:absolute;inset:0;background:linear-gradient(to top,#020202 5%,rgba(0,0,0,.3) 60%,#020202 100%);z-index:1;}
+    .video-header{position:relative;height:auto;min-height:75vh;width:100%;overflow:hidden;display:flex;align-items:center;justify-content:center;text-align:center;}
+    .video-bg{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;z-index:0;opacity:.5;}
+    .video-overlay{position:absolute;inset:0;background:linear-gradient(to top,#020202 5%,rgba(0,0,0,.4) 60%,#020202 100%);z-index:1;}
     .header-content{position:relative;z-index:10;padding:20px;width:100%; max-width: 800px;}
 
-    /* --- New Header Elements CSS --- */
-    .logo img { height: 70px; margin: 0 auto 15px; display: block; filter: drop-shadow(0 0 10px rgba(212, 175, 55, 0.3)); }
-    .brand-name { font-family: 'Playfair Display', serif; font-size: 2rem; font-weight: 900; color: #fff; letter-spacing: 2px; margin-bottom: 30px; text-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+    /* --- Header Elements CSS --- */
+    .logo img { height: 80px; margin: 0 auto 15px; display: block; filter: drop-shadow(0 0 15px rgba(212, 175, 55, 0.4)); transition: transform 0.3s; }
+    .logo img:hover { transform: scale(1.05); }
+    .brand-name { font-family: 'Playfair Display', serif; font-size: 2.2rem; font-weight: 900; color: #fff; letter-spacing: 2px; margin-bottom: 30px; text-shadow: 0 4px 10px rgba(0,0,0,0.8); }
 
     .action-grid {
       display: grid;
@@ -105,108 +114,159 @@
       margin-bottom: 30px;
     }
     .action-item {
-      background: rgba(255,255,255,0.08);
-      border: 1px solid rgba(255,255,255,0.15);
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
       border-radius: 16px;
       padding: 15px 10px;
       text-align: center;
       color: #fff;
       text-decoration: none;
-      transition: all 0.3s ease;
-      backdrop-filter: blur(5px);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      backdrop-filter: blur(10px);
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       min-height: 110px;
     }
-    .action-item:hover { background: rgba(212, 175, 55, 0.2); border-color: var(--gold); transform: translateY(-3px); }
+    .action-item:hover { background: rgba(212, 175, 55, 0.15); border-color: var(--gold); transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
     .action-item i { font-size: 24px; margin-bottom: 8px; color: var(--gold); }
     .action-item span { font-weight: 800; font-size: 0.95rem; display: block; line-height: 1.2; }
-    .action-item .desc { font-size: 0.7rem; opacity: 0.8; margin-top: 4px; color: #ddd; }
+    .action-item .desc { font-size: 0.7rem; opacity: 0.7; margin-top: 4px; color: #ccc; }
     .action-item .hotline { font-family: 'Inter', sans-serif; font-weight: 900; font-size: 0.8rem; margin-top: 6px; color: var(--gold); letter-spacing: 0.5px; }
 
-    /* GPS Button */
-    .container { width: 100%; padding: 0 16px; position: relative; z-index: 5; }
-    .gps-trigger {
-      background: linear-gradient(135deg, #111 0%, #222 100%);
+    /* GPS & Search */
+    .search-container {
+      position: sticky;
+      top: 10px;
+      z-index: 40;
+      margin-bottom: 20px;
+      padding: 0 10px;
+    }
+    .search-box {
+      background: rgba(20, 20, 20, 0.95);
+      backdrop-filter: blur(12px);
       border: 1px solid var(--gold);
-      color: var(--gold);
-      width: 100%;
-      max-width: 400px;
-      margin: 0 auto 10px;
-      padding: 16px;
       border-radius: 50px;
-      font-weight: 900;
-      font-size: 1.1rem;
+      padding: 8px 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    .search-box input {
+      background: transparent;
+      border: none;
+      color: #fff;
+      width: 100%;
+      outline: none;
+      font-size: 1rem;
+      font-family: inherit;
+    }
+    .search-box i { color: var(--gold); }
+
+    .gps-btn-small {
+      background: var(--gold);
+      color: #000;
+      border: none;
+      border-radius: 50%;
+      width: 36px;
+      height: 36px;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 10px;
       cursor: pointer;
-      box-shadow: 0 4px 15px rgba(212, 175, 55, 0.15);
-      transition: all 0.3s;
+      flex-shrink: 0;
+      transition: transform 0.2s;
     }
-    .gps-trigger:hover { box-shadow: 0 0 20px rgba(212, 175, 55, 0.4); transform: scale(1.02); background: #000; }
-    .gps-sub { text-align: center; color: #888; font-size: 0.8rem; margin-bottom: 30px; }
+    .gps-btn-small:hover { transform: scale(1.1); }
+    
+    .gps-message { text-align: center; color: #888; font-size: 0.8rem; margin-bottom: 15px; height: 20px; }
 
     /* Branch Card */
     .branch-card {
-      background: rgba(255,255,255,0.03);
+      background: var(--bg-card);
       border: 1px solid var(--border-glass);
       border-radius: 20px;
-      padding: 24px;
+      padding: 20px;
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 12px;
       transition: all 0.3s ease;
       position: relative;
       overflow: hidden;
     }
     .branch-card:hover {
       border-color: var(--primary);
-      background: rgba(255,255,255,0.05);
+      background: rgba(40, 40, 40, 0.8);
       transform: translateY(-5px);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
     }
-    .branch-header { display: flex; justify-content: space-between; align-items: flex-start; }
-    .branch-title { font-size: 1.5rem; font-weight: 900; color: #fff; line-height: 1.2; font-family: 'Playfair Display', serif; }
+    .branch-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+    .branch-title { font-size: 1.4rem; font-weight: 900; color: #fff; line-height: 1.2; font-family: 'Playfair Display', serif; }
     .status-pill {
-      font-size: 0.75rem; font-weight: 800; padding: 4px 10px; border-radius: 99px;
-      display: flex; align-items: center; gap: 6px; white-space: nowrap;
+      font-size: 0.7rem; font-weight: 800; padding: 4px 8px; border-radius: 99px;
+      display: flex; align-items: center; gap: 5px; white-space: nowrap; flex-shrink: 0;
     }
-    .status-pill.open { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
-    .status-pill.closed { background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }
-    .dot { width: 8px; height: 8px; border-radius: 50%; }
-    .status-pill.open .dot { background: #34d399; box-shadow: 0 0 8px #34d399; animation: pulse 2s infinite; }
+    .status-pill.open { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
+    .status-pill.closed { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }
+    .dot { width: 6px; height: 6px; border-radius: 50%; }
+    .status-pill.open .dot { background: #34d399; box-shadow: 0 0 6px #34d399; animation: pulse 2s infinite; }
     .status-pill.closed .dot { background: #f87171; }
 
-    .hours-text {
+    /* Collapsible Hours */
+    .hours-container {
+      background: rgba(0,0,0,0.2);
+      border-radius: 12px;
+      padding: 10px;
+      font-size: 0.9rem;
+    }
+    .today-hours {
+      display: flex; justify-content: space-between; align-items: center;
+      font-weight: bold; color: #ddd;
+    }
+    .expand-btn {
+      background: none; border: none; color: var(--primary); font-size: 0.8rem; cursor: pointer; text-decoration: underline;
+    }
+    .week-hours {
+      display: none; /* Hidden by default */
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid rgba(255,255,255,0.1);
       font-size: 0.85rem;
-      color: #ccc;
-      display: flex;
+      color: #bbb;
       flex-direction: column;
       gap: 4px;
-      background: rgba(255,255,255,0.03);
-      padding: 10px;
-      border-radius: 8px;
     }
+    .week-hours.show { display: flex; animation: fadeIn 0.3s; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
 
-    .social-grid { display: flex; gap: 10px; flex-wrap: wrap; margin-top: auto; }
-    .s-btn {
-      flex: 1; height: 44px; border-radius: 12px;
+    /* Action Buttons in Card */
+    .card-actions { display: flex; gap: 8px; margin-top: auto; padding-top: 10px; }
+    .action-btn {
+      flex: 1; height: 40px; border-radius: 10px;
       display: flex; align-items: center; justify-content: center;
-      font-size: 1.2rem; color: #fff; border: 1px solid rgba(255,255,255,0.1);
+      font-size: 1rem; color: #fff; border: 1px solid rgba(255,255,255,0.1);
       background: rgba(255,255,255,0.05); transition: 0.2s;
-      min-width: 44px; max-width: 60px;
-      text-decoration: none;
+      text-decoration: none; font-weight: 600; gap: 6px;
     }
-    .s-btn:hover { background: var(--primary); color: #000; border-color: var(--primary); }
+    .action-btn:hover { background: rgba(255,255,255,0.1); transform: translateY(-2px); }
+    
+    .btn-waze { background: rgba(51, 204, 255, 0.1); color: #33ccff; border-color: rgba(51, 204, 255, 0.3); }
+    .btn-waze:hover { background: #33ccff; color: #000; }
+    
+    .btn-map { background: rgba(217, 119, 6, 0.1); color: var(--primary); border-color: rgba(217, 119, 6, 0.3); }
+    .btn-map:hover { background: var(--primary); color: #000; }
 
-    .waze-btn { background: #33ccff20; color: #33ccff; border-color: #33ccff40; flex-grow: 2; max-width: none; font-size: 1rem; font-weight: bold; gap: 8px; }
-    .waze-btn:hover { background: #33ccff; color: #000; }
+    .btn-call { width: 40px; flex: none; font-size: 1.1rem; }
 
-    .wa-btn { background: #25D36620; color: #25D366; border-color: #25D36640; flex-grow: 2; max-width: none; font-size: 1rem; font-weight: bold; gap: 8px; }
-    .wa-btn:hover { background: #25D366; color: #fff; }
+    /* Social Icons Row */
+    .social-row { display: flex; gap: 12px; justify-content: center; margin-top: 5px; opacity: 0.7; transition: opacity 0.3s; }
+    .branch-card:hover .social-row { opacity: 1; }
+    .social-icon { color: #888; transition: 0.2s; font-size: 1.1rem; }
+    .social-icon:hover { color: var(--primary); transform: scale(1.2); }
 
     /* Trust Bar & Overlay */
     .trust-bar {
@@ -236,10 +296,11 @@
     .overlay-content iframe { width: 100%; height: 100%; border: none; }
 
     /* Map */
-    #map { height: 500px; width: 100%; border-radius: 20px; z-index: 1; }
+    #map { height: 500px; width: 100%; border-radius: 20px; z-index: 1; border: 1px solid var(--border-glass); }
     .leaflet-popup-content-wrapper { background: #111; color: #fff; border: 1px solid var(--primary); border-radius: 12px; }
     .leaflet-popup-tip { background: var(--primary); }
-    .map-btn {
+    .leaflet-popup-content { margin: 10px; text-align: center; }
+    .map-popup-btn {
       display: inline-block; background: var(--primary); color: #000;
       padding: 6px 12px; border-radius: 6px; font-weight: bold; margin-top: 8px;
       text-decoration: none; font-size: 0.9rem;
@@ -304,22 +365,30 @@
     </div>
   </header>
 
-  <!-- CONTAINER WITH GPS & BRANCHES -->
-  <div class="container bg-[#050505] min-h-screen py-8">
-    <button class="gps-trigger" onclick="requestLocation()">
-      <i class="fas fa-location-arrow"></i>
-      <span id="l-gps-btn"></span>
-    </button>
-    <div class="gps-sub" id="l-gps-sub"></div>
+  <!-- SEARCH & GPS CONTAINER -->
+  <div class="container bg-transparent min-h-screen py-4 relative z-20 -mt-10">
+    
+    <div class="search-container">
+      <div class="search-box">
+        <i class="fas fa-search"></i>
+        <input type="text" id="searchInput" placeholder="Search branch..." onkeyup="filterBranches()">
+        <button class="gps-btn-small" onclick="requestLocation()" title="Nearest Branch">
+          <i class="fas fa-location-arrow"></i>
+        </button>
+      </div>
+    </div>
+    
+    <div class="gps-message" id="l-gps-sub"></div>
 
-    <div id="branches-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 max-w-7xl mx-auto">
+    <div id="branches-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 max-w-7xl mx-auto px-4">
       <!-- Generated by JS -->
     </div>
   </div>
 
   <!-- MAP SECTION -->
-  <section id="locations-map" class="py-16 px-4 bg-black border-t border-white/10">
-    <div class="max-w-6xl mx-auto border border-white/10 rounded-3xl p-2 bg-[#111]">
+  <section id="locations-map" class="py-16 px-4 bg-[#0a0a0a] border-t border-white/5">
+    <div class="max-w-7xl mx-auto">
+      <h2 class="text-2xl font-bold text-center mb-8 text-amber-500 font-serif" id="l-map-title">Locations Map</h2>
       <div id="map"></div>
     </div>
   </section>
@@ -348,7 +417,7 @@
 
   <script>
     /***********************
-     * ✅ EMBEDDED DATA (FIXED)
+     * ✅ EMBEDDED DATA
      ***********************/
     const BRANCH_DB = {
       brand: "MAD Perfume Israel",
@@ -461,8 +530,6 @@
             "waze": "https://ul.waze.com/ul?ll=32.0551044,34.7563944&navigate=yes"
           }
         },
-
-        /* ✅ باقي الفروع كما أرسلتها أنت (بدون أي تغيير بالبيانات) */
         {
           "id": 5,
           "name_ar": "بئر السبع",
@@ -490,7 +557,6 @@
             "waze": "https://ul.waze.com/ul?ll=31.2505504,34.7997184&navigate=yes"
           }
         },
-
         {
           "id": 6,
           "name_ar": "رهط",
@@ -518,7 +584,6 @@
             "waze": "https://ul.waze.com/ul?ll=31.39311472743736,34.76669884068543&navigate=yes"
           }
         },
-
         {
           "id": 7,
           "name_ar": "هيرتسيليا",
@@ -546,7 +611,6 @@
             "waze": "https://ul.waze.com/ul?ll=32.1674011,34.8406291&navigate=yes"
           }
         },
-
         {
           "id": 8,
           "name_ar": "كفر قاسم",
@@ -574,7 +638,6 @@
             "waze": "https://ul.waze.com/ul?ll=32.11686449706096,34.96966481208802&navigate=yes"
           }
         },
-
         {
           "id": 9,
           "name_ar": "القدس - صلاح الدين",
@@ -602,7 +665,6 @@
             "waze": "https://www.waze.com/en/live-map/directions?latlng=31.784379200484757%2C35.23228526115418&navigate=yes"
           }
         },
-
         {
           "id": 10,
           "name_ar": "القدس - سلطان سليمان",
@@ -630,7 +692,6 @@
             "waze": "https://ul.waze.com/ul?ll=31.7824888,35.2302307&navigate=yes"
           }
         },
-
         {
           "id": 11,
           "name_ar": "بيت حنينا",
@@ -658,7 +719,6 @@
             "waze": "https://www.waze.com/en/live-map/directions?latlng=31.842427570527473%2C35.22839069366456&navigate=yes"
           }
         },
-
         {
           "id": 12,
           "name_ar": "حيفا",
@@ -686,7 +746,6 @@
             "waze": "https://www.waze.com/en/live-map/directions?latlng=32.81853830472855%2C34.989749193191535&navigate=yes"
           }
         },
-
         {
           "id": 13,
           "name_ar": "بقعاثا - الجولان",
@@ -714,7 +773,6 @@
             "waze": "https://ul.waze.com/ul?ll=33.199718,35.774596&navigate=yes"
           }
         },
-
         {
           "id": 14,
           "name_ar": "الخضيرة",
@@ -742,7 +800,6 @@
             "waze": "https://ul.waze.com/ul?ll=32.4417243,34.8950613&navigate=yes"
           }
         },
-
         {
           "id": 15,
           "name_ar": "باقة الغربية",
@@ -770,7 +827,6 @@
             "waze": "https://ul.waze.com/ul?ll=32.422896,35.0345152&navigate=yes"
           }
         },
-
         {
           "id": 16,
           "name_ar": "الطيبة",
@@ -798,7 +854,6 @@
             "waze": "https://www.waze.com/en/live-map/directions?latlng=32.26151386119032%2C35.01563787460328&navigate=yes"
           }
         },
-
         {
           "id": 17,
           "name_ar": "كفر قرع",
@@ -826,7 +881,6 @@
             "waze": "https://ul.waze.com/ul?ll=32.49817837862339,35.06429314613343&navigate=yes"
           }
         },
-
         {
           "id": 18,
           "name_ar": "أم الفحم",
@@ -854,7 +908,6 @@
             "waze": "https://www.waze.com/en/live-map/directions?latlng=32.5205984893912%2C35.155584812164314&navigate=yes"
           }
         },
-
         {
           "id": 19,
           "name_ar": "العفولة",
@@ -882,7 +935,6 @@
             "waze": "https://www.waze.com/en/live-map/directions/%D7%A2%D7%A4%D7%95%D7%9C%D7%94?latlng=32.61128033227187%2C35.28692722320557&navigate=yes"
           }
         },
-
         {
           "id": 20,
           "name_ar": "الناصرة",
@@ -910,7 +962,6 @@
             "waze": "https://www.waze.com/en/live-map/directions?latlng=32.695956816585245%2C35.29783844947816"
           }
         },
-
         {
           "id": 21,
           "name_ar": "طمرة",
@@ -938,7 +989,6 @@
             "waze": "https://www.waze.com/en/live-map/directions?latlng=32.85736357825591%2C35.1744031906128&navigate=yes"
           }
         },
-
         {
           "id": 22,
           "name_ar": "سخنين",
@@ -966,7 +1016,6 @@
             "waze": "https://www.waze.com/en/live-map/directions?latlng=32.861815596309135%2C35.29805302619935&navigate=yes"
           }
         },
-
         {
           "id": 23,
           "name_ar": "جديدة المكر",
@@ -994,7 +1043,6 @@
             "waze": "https://maps.app.goo.gl/fXD7p4mQuGqmhBdf8"
           }
         },
-
         {
           "id": 24,
           "name_ar": "يركا",
@@ -1022,7 +1070,6 @@
             "waze": "https://www.waze.com/en/live-map/directions?latlng=32.947444%2C35.1740662&navigate=yes"
           }
         },
-
         {
           "id": 25,
           "name_ar": "طبريا",
@@ -1050,7 +1097,6 @@
             "waze": "https://ul.waze.com/ul?ll=32.787786997753585,35.53945183753968&navigate=yes"
           }
         },
-
         {
           "id": 26,
           "name_ar": "مجدل شمس - الجولان",
@@ -1078,7 +1124,6 @@
             "waze": "https://ul.waze.com/ul?ll=33.267009,35.767214&navigate=yes"
           }
         },
-
         {
           "id": 27,
           "name_ar": "نابلس - بيت وزن",
@@ -1106,7 +1151,6 @@
             "waze": "https://ul.waze.com/ul?ll=32.2211,35.2544&navigate=yes"
           }
         },
-
         {
           "id": 28,
           "name_ar": "طولكرم - مركز المدينة",
@@ -1134,7 +1178,6 @@
             "waze": "https://ul.waze.com/ul?ll=32.316,35.029&navigate=yes"
           }
         },
-
         {
           "id": 29,
           "name_ar": "رام الله - الأيكون مول",
@@ -1162,7 +1205,6 @@
             "waze": "https://ul.waze.com/ul?ll=31.9038,35.2034&navigate=yes"
           }
         },
-
         {
           "id": 30,
           "name_ar": "صابات مول - بيت لحم",
@@ -1190,7 +1232,6 @@
             "waze": "https://ul.waze.com/ul?ll=31.705,35.202&navigate=yes"
           }
         },
-
         {
           "id": 31,
           "name_ar": "قلقيلية - شارع التربية",
@@ -1218,7 +1259,6 @@
             "waze": "https://ul.waze.com/ul?ll=32.19,34.981&navigate=yes"
           }
         },
-
         {
           "id": 32,
           "name_ar": "دوار مركز البلد - أريحا",
@@ -1246,7 +1286,6 @@
             "waze": "https://ul.waze.com/ul?ll=31.857,35.46&navigate=yes"
           }
         },
-
         {
           "id": 33,
           "name_ar": " قريبا-كفر كنا",
@@ -1274,7 +1313,6 @@
             "waze": "https://ul.waze.com/ul?ll=32.74861753739389,35.33757985729934&navigate=yes"
           }
         },
-
         {
           "id": 36,
           "name_ar": "جنين",
@@ -1302,7 +1340,6 @@
             "waze": "https://ul.waze.com/ul?ll=32.4611923772691,35.297239888518824&navigate=yes"
           }
         },
-
         {
           "id": 37,
           "name_ar": " قريبا كفر عقب",
@@ -1330,7 +1367,6 @@
             "waze": "https://ul.waze.com/ul?ll=31.871790357071745,35.22684574127198&navigate=yes"
           }
         },
-
         {
           "id": 271,
           "name_ar": "نابلس - شارع يافا",
@@ -1358,7 +1394,6 @@
             "waze": "https://ul.waze.com/ul?ll=32.2211,35.2544&navigate=yes"
           }
         },
-
         {
           "id": 272,
           "name_ar": "نابلس - سيتي مول",
@@ -1386,7 +1421,6 @@
             "waze": "https://ul.waze.com/ul?ll=32.2211,35.2544&navigate=yes"
           }
         },
-
         {
           "id": 291,
           "name_ar": "رام الله - شارع الإرسال (مقابل KFC)",
@@ -1433,9 +1467,16 @@
         l_gps_btn: "أقرب فرع لي",
         l_cta: "معايير الجودة",
         l_bar_main: "IFRA معتمد عالمياً",
+        l_search_ph: "بحث عن فرع...",
+        l_map_title: "خريطة الفروع",
         open: "مفتوح الآن",
         closed: "مغلق",
-        navWaze: "افتح في Waze",
+        navWaze: "Waze",
+        showMap: "عرض الخريطة",
+        call: "اتصال",
+        today: "اليوم",
+        view_week: "عرض الأسبوع",
+        hide_week: "إخفاء",
         closedLabel: "مغلق",
         weekDays: {
           sun: "الأحد", mon: "الاثنين", tue: "الثلاثاء", wed: "الأربعاء", thu: "الخميس", fri: "الجمعة", sat: "السبت"
@@ -1453,9 +1494,16 @@
         l_gps_btn: "הסניף הקרוב אליי",
         l_cta: "תקני איכות",
         l_bar_main: "IFRA מוסמך עולמית",
+        l_search_ph: "חפש סניף...",
+        l_map_title: "מפת סניפים",
         open: "פתוח עכשיו",
         closed: "סגור",
-        navWaze: "פתח ב-Waze",
+        navWaze: "Waze",
+        showMap: "הצג במפה",
+        call: "התקשר",
+        today: "היום",
+        view_week: "הצג שבוע",
+        hide_week: "הסתר",
         closedLabel: "סגור",
         weekDays: {
           sun: "ראשון", mon: "שני", tue: "שלישי", wed: "רביעי", thu: "חמישי", fri: "שישי", sat: "שבת"
@@ -1511,52 +1559,80 @@
       document.getElementById("l-store-desc").innerText = t.l_store_desc;
       document.getElementById("l-franchise").innerText = t.l_franchise;
       document.getElementById("l-franchise-desc").innerText = t.l_franchise_desc;
-      document.getElementById("l-gps-btn").innerText = t.l_gps_btn;
       document.getElementById("l-cta").innerText = t.l_cta;
       document.getElementById("l-bar-main").innerText = t.l_bar_main;
+      document.getElementById("searchInput").placeholder = t.l_search_ph;
+      document.getElementById("l-map-title").innerText = t.l_map_title;
 
       renderBranchesGrid();
       initMap();
     }
 
-    function generateScheduleHtml(schedule) {
+    // Filter Logic
+    function filterBranches() {
+      const query = document.getElementById("searchInput").value.toLowerCase();
+      renderBranchesGrid(query);
+    }
+
+    function getTodayHours(schedule) {
+      if (!schedule) return null;
+      const days = ["sun","mon","tue","wed","thu","fri","sat"];
+      const dayKey = days[new Date().getDay()];
+      const slots = schedule[dayKey];
+      if (!slots || !slots.length) return TEXTS[lang].closedLabel;
+      return slots.map(s => `${s[0]} - ${s[1]}`).join(', ');
+    }
+
+    function generateWeekHtml(schedule) {
       if (!schedule) return "";
       const t = TEXTS[lang];
       const days = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
-
-      const getTime = (d) => {
-        const slots = schedule[d];
-        if (!slots || !slots.length || (slots[0][0] === "00:00" && slots[0][1] === "00:00")) return null;
-        return slots.map(s => `${s[0]} - ${s[1]}`).join(', ');
-      };
-
-      let groups = [];
-      let currentGroup = null;
-
-      days.forEach(day => {
-        const time = getTime(day);
-        const dayName = t.weekDays[day];
-
-        if (currentGroup && currentGroup.time === time) {
-          currentGroup.endDay = dayName;
-        } else {
-          if (currentGroup) groups.push(currentGroup);
-          currentGroup = { startDay: dayName, endDay: dayName, time: time };
-        }
-      });
-      if (currentGroup) groups.push(currentGroup);
-
-      return groups.map(g => {
-        const dayLabel = (g.startDay === g.endDay) ? g.startDay : `${g.startDay} - ${g.endDay}`;
-        const timeLabel = g.time ? g.time : t.closedLabel;
-        return `<div class="flex justify-between w-full"><span class="font-bold text-amber-500">${dayLabel}:</span> <span>${timeLabel}</span></div>`;
+      
+      return days.map(day => {
+        const slots = schedule[day];
+        const timeStr = (slots && slots.length) ? slots.map(s => `${s[0]} - ${s[1]}`).join(', ') : t.closedLabel;
+        const isToday = day === days[new Date().getDay()];
+        const style = isToday ? 'color: var(--primary); font-weight:bold;' : '';
+        return `<div style="display:flex; justify-content:space-between; ${style}">
+          <span>${t.weekDays[day]}</span>
+          <span>${timeStr}</span>
+        </div>`;
       }).join("");
     }
 
-    function renderBranchesGrid(){
-      const container = document.getElementById("branches-grid");
-      const branches = BRANCH_DB.branches || [];
+    function toggleHours(id) {
+      const el = document.getElementById(`week-${id}`);
+      const btn = document.getElementById(`btn-week-${id}`);
       const t = TEXTS[lang];
+      
+      if (el.style.display === "flex") {
+        el.style.display = "none";
+        btn.innerText = t.view_week;
+      } else {
+        el.style.display = "flex";
+        btn.innerText = t.hide_week;
+        // animate
+        el.classList.add('show');
+      }
+    }
+
+    function renderBranchesGrid(filter = "") {
+      const container = document.getElementById("branches-grid");
+      let branches = BRANCH_DB.branches || [];
+      const t = TEXTS[lang];
+
+      // Filter
+      if (filter) {
+        branches = branches.filter(b => 
+          (b.name_ar && b.name_ar.toLowerCase().includes(filter)) || 
+          (b.name_he && b.name_he.toLowerCase().includes(filter))
+        );
+      }
+
+      if (branches.length === 0) {
+        container.innerHTML = `<div class="col-span-full text-center text-gray-500 py-10">${lang === 'ar' ? 'لا توجد نتائج' : 'אין תוצאות'}</div>`;
+        return;
+      }
 
       container.innerHTML = branches.map(b => {
         const name = (lang === 'ar') ? b.name_ar : b.name_he;
@@ -1564,11 +1640,13 @@
         const statusClass = isOpen ? 'open' : 'closed';
         const statusText = isOpen ? t.open : t.closed;
 
-        const socials = buildSocialButtons(b);
-        const scheduleHtml = generateScheduleHtml(b.schedule);
+        const wazeUrl = b.social && b.social.waze ? b.social.waze : `https://waze.com/ul?ll=${b.lat},${b.lng}&navigate=yes`;
+        const todayHours = getTodayHours(b.schedule);
+        const weekHtml = generateWeekHtml(b.schedule);
+        const socials = buildSocialRow(b);
 
         return `
-          <div class="branch-card">
+          <div class="branch-card" id="branch-${b.id}">
             <div class="branch-header">
               <div class="branch-title">${name}</div>
               <div class="status-pill ${statusClass}">
@@ -1577,11 +1655,23 @@
               </div>
             </div>
 
-            <div class="hours-text">
-              ${scheduleHtml}
+            <div class="hours-container">
+              <div class="today-hours">
+                <span>${t.today}: <span class="text-white font-normal">${todayHours || t.closedLabel}</span></span>
+                <button class="expand-btn" id="btn-week-${b.id}" onclick="toggleHours(${b.id})">${t.view_week}</button>
+              </div>
+              <div class="week-hours" id="week-${b.id}">
+                ${weekHtml}
+              </div>
             </div>
 
-            <div class="social-grid">
+            <div class="card-actions">
+              <a href="tel:${b.phone}" class="action-btn btn-call" onclick="trackLead('Call Branch')"><i class="fas fa-phone-alt"></i></a>
+              <a href="${wazeUrl}" target="_blank" class="action-btn btn-waze" onclick="trackLead('Waze Branch')"><i class="fab fa-waze"></i> ${t.navWaze}</a>
+              <button class="action-btn btn-map" onclick="showOnMap(${b.lat}, ${b.lng}, ${b.id})"><i class="fas fa-map-marked-alt"></i> ${t.showMap}</button>
+            </div>
+
+            <div class="social-row">
               ${socials}
             </div>
           </div>
@@ -1616,29 +1706,37 @@
       return open;
     }
 
-    function buildSocialButtons(b){
+    function buildSocialRow(b){
       const s = b.social || {};
       let html = "";
       const waPhone = normalizePhoneForWhatsApp(b.phone);
 
-      if(waPhone){
-        html += `<a href="https://wa.me/${waPhone}" target="_blank" class="s-btn wa-btn" onclick="trackLead('WhatsApp Branch')"><i class="fab fa-whatsapp"></i> WhatsApp</a>`;
-      }
-
-      const wazeUrl = s.waze || `https://waze.com/ul?ll=${b.lat},${b.lng}&navigate=yes`;
-      html += `<a href="${wazeUrl}" target="_blank" class="s-btn waze-btn" onclick="trackLead('Waze Branch')"><i class="fab fa-waze"></i> Waze</a>`;
-
-      if(b.phone){
-        html += `<a href="tel:${b.phone}" class="s-btn" onclick="trackLead('Call Branch')"><i class="fas fa-phone"></i></a>`;
-      }
-
-      if(s.instagram) html += `<a href="${s.instagram}" target="_blank" class="s-btn" onclick="trackView('Instagram')"><i class="fab fa-instagram"></i></a>`;
-      if(s.tiktok) html += `<a href="${s.tiktok}" target="_blank" class="s-btn" onclick="trackView('TikTok')"><i class="fab fa-tiktok"></i></a>`;
-      if(s.facebook) html += `<a href="${s.facebook}" target="_blank" class="s-btn" onclick="trackView('Facebook')"><i class="fab fa-facebook-f"></i></a>`;
-      if(s.youtube) html += `<a href="${s.youtube}" target="_blank" class="s-btn" onclick="trackView('YouTube')"><i class="fab fa-youtube"></i></a>`;
-      if(s.snapchat) html += `<a href="${s.snapchat}" target="_blank" class="s-btn" onclick="trackView('Snapchat')"><i class="fab fa-snapchat"></i></a>`;
-
+      if(waPhone) html += `<a href="https://wa.me/${waPhone}" target="_blank" class="social-icon"><i class="fab fa-whatsapp"></i></a>`;
+      if(s.instagram) html += `<a href="${s.instagram}" target="_blank" class="social-icon"><i class="fab fa-instagram"></i></a>`;
+      if(s.tiktok) html += `<a href="${s.tiktok}" target="_blank" class="social-icon"><i class="fab fa-tiktok"></i></a>`;
+      if(s.facebook) html += `<a href="${s.facebook}" target="_blank" class="social-icon"><i class="fab fa-facebook-f"></i></a>`;
+      
       return html;
+    }
+
+    // Scroll to map and popup
+    function showOnMap(lat, lng, id) {
+      document.getElementById('locations-map').scrollIntoView({ behavior: 'smooth' });
+      if (map) {
+        map.setView([lat, lng], 15);
+        // Find marker logic could be better, but re-opening popup works if we stored ref.
+        // Simplified: Re-init map markers to find the one to open? 
+        // Better: Just set view. The user will see the marker in center.
+        // Let's iterate layers to open popup
+        map.eachLayer(function(layer) {
+          if (layer instanceof L.Marker) {
+             const ll = layer.getLatLng();
+             if (Math.abs(ll.lat - lat) < 0.0001 && Math.abs(ll.lng - lng) < 0.0001) {
+               layer.openPopup();
+             }
+          }
+        });
+      }
     }
 
     function initMap() {
@@ -1661,8 +1759,8 @@
           const marker = L.marker([b.lat, b.lng]).addTo(map);
           const popupContent = `
             <div>
-              <h3 style="font-weight:900; margin-bottom:5px;">${name}</h3>
-              <a href="${wazeUrl}" target="_blank" class="map-btn" onclick="trackLead('Waze Map')">
+              <h3 style="font-weight:900; margin-bottom:5px; color:#333;">${name}</h3>
+              <a href="${wazeUrl}" target="_blank" class="map-popup-btn" onclick="trackLead('Waze Map')">
                 <i class="fab fa-waze"></i> ${t.navWaze}
               </a>
             </div>
