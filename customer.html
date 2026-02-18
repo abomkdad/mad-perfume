@@ -24,9 +24,9 @@
             sans: ['Cairo', 'sans-serif'],
           },
           colors: {
-            brand: '#111111',     // Deep Luxury Black
-            gold: '#C5A059',      // Elegant Gold
-            paper: '#F9F9F9',     // Soft Off-White
+            brand: '#111111',
+            gold: '#C5A059',
+            paper: '#F9F9F9',
           }
         }
       }
@@ -39,8 +39,6 @@
     .shadow-soft { box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05); }
     .shadow-hover:hover { box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08); transform: translateY(-2px); }
     .transition-all { transition: all 0.3s ease; }
-    
-    /* Hide scrollbar for horizontal mobile scrolling */
     .hide-scrollbar::-webkit-scrollbar { display: none; }
     .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
   </style>
@@ -124,7 +122,7 @@
     <div class="p-5 overflow-y-auto flex-1 space-y-5">
       
       <div class="flex gap-2">
-        <button id="clearCart" class="flex-1 px-4 py-2.5 rounded-lg bg-gray-200 text-gray-700 text-sm font-bold transition-all hover:bg-gray-300" id="t_clear">مسح السلة</button>
+        <button id="clearCart" class="flex-1 px-4 py-2.5 rounded-lg bg-gray-200 text-gray-700 text-sm font-bold transition-all hover:bg-gray-300">مسح السلة</button>
         <button id="openBundle" class="flex-1 px-4 py-2.5 rounded-lg bg-brand text-white text-sm font-bold shadow-soft transition-all hover:bg-black">
           <span id="t_bundle">شارك المنتجات</span>
         </button>
@@ -202,7 +200,55 @@ let LANG = (navigator.language || "").toLowerCase().includes("he") ? "he" : "ar"
 let PRODUCTS = [];
 let FILTERED = [];
 let CURRENT_CAT_KEY = CUSTOMER_CATEGORIES[0].key;
+
+/* ✅ دعم كاتيجوري مخصص من الرابط */
+let CUSTOM_CAT_MATCH = ""; // إذا ما كان من القوايم
+
 let CART = new Map();
+
+/* ========= URL PARAMS (NEW) ========= */
+function getParam(name){
+  try{
+    return new URLSearchParams(location.search).get(name) || "";
+  }catch{
+    return "";
+  }
+}
+
+function applyCatFromUrl(){
+  // يقبل: cat=men / women / offers / niche
+  // أو cat=גברים / נשים / מבצעים / נישה
+  // أو cat=عطور رجالية / عطور نسائية...
+  const raw = (getParam("cat") || "").trim();
+  if(!raw) return;
+
+  const lc = raw.toLowerCase();
+
+  // 1) key direct
+  const byKey = CUSTOMER_CATEGORIES.find(c => c.key.toLowerCase() === lc);
+  if(byKey){
+    CURRENT_CAT_KEY = byKey.key;
+    CUSTOM_CAT_MATCH = "";
+    return;
+  }
+
+  // 2) match ar/he label or hebrew match word
+  const byLabel = CUSTOMER_CATEGORIES.find(c =>
+    (c.ar || "").toLowerCase() === lc ||
+    (c.he || "").toLowerCase() === lc ||
+    (c.match || "").toLowerCase() === lc ||
+    raw.includes(c.match)
+  );
+  if(byLabel){
+    CURRENT_CAT_KEY = byLabel.key;
+    CUSTOM_CAT_MATCH = "";
+    return;
+  }
+
+  // 3) custom: استخدم raw كـ substring على product_type
+  CURRENT_CAT_KEY = "__custom";
+  CUSTOM_CAT_MATCH = raw;
+}
 
 /* ========= UI TEXT ========= */
 function T(ar, he){ return (LANG==="he") ? he : ar; }
@@ -293,27 +339,39 @@ async function loadRSS(){
     status.textContent = "ONLINE ✅";
     status.className = "text-green-500 font-bold";
 
+    // ✅ بعد ما المنتجات صارت جاهزة: طبّق cat من الرابط ثم ارسم
+    applyCatFromUrl();
     renderCategories();
     applyFilters();
   }catch(e){
     console.error(e);
     status.textContent = "OFFLINE ❌";
     status.className = "text-red-500 font-bold";
-    // alert("فشل تحميل المنتجات\n"+e.message);
   }
 }
 
 /* ========= CATEGORIES ========= */
 function catLabel(cat){ return (LANG==="he") ? cat.he : cat.ar; }
+
 function renderCategories(){
   const wrap = document.getElementById("categories");
   wrap.innerHTML="";
+
+  // ✅ إذا في كاتيجوري مخصص من الرابط: اعرض زر واحد فقط (حتى ما نلخبط العميل)
+  if(CURRENT_CAT_KEY === "__custom" && CUSTOM_CAT_MATCH){
+    const b = document.createElement("button");
+    b.className = "whitespace-nowrap px-5 py-2 rounded-full text-sm font-bold transition-all border bg-brand text-white border-brand shadow-md";
+    b.textContent = CUSTOM_CAT_MATCH;
+    wrap.appendChild(b);
+    return;
+  }
+
   CUSTOMER_CATEGORIES.forEach(cat=>{
     const active = (cat.key===CURRENT_CAT_KEY);
     const b = document.createElement("button");
     b.className = `whitespace-nowrap px-5 py-2 rounded-full text-sm font-bold transition-all border ${active ? "bg-brand text-white border-brand shadow-md" : "bg-white text-gray-600 border-gray-200 hover:border-gray-300"}`;
     b.textContent = catLabel(cat);
-    b.onclick = ()=>{ CURRENT_CAT_KEY = cat.key; applyFilters(); renderCategories(); };
+    b.onclick = ()=>{ CURRENT_CAT_KEY = cat.key; CUSTOM_CAT_MATCH=""; applyFilters(); renderCategories(); };
     wrap.appendChild(b);
   });
 }
@@ -325,10 +383,18 @@ function matchesCategory(pt, matchWord){ return (pt||"").includes(matchWord); }
 
 function applyFilters(){
   const q = (document.getElementById("search").value||"").trim().toLowerCase();
-  const cat = CUSTOMER_CATEGORIES.find(c=>c.key===CURRENT_CAT_KEY);
 
   FILTERED = PRODUCTS.filter(p=>{
-    const catOk = matchesCategory(p.product_type, cat.match);
+    // ✅ category logic
+    let catOk = true;
+
+    if(CURRENT_CAT_KEY === "__custom" && CUSTOM_CAT_MATCH){
+      catOk = matchesCategory(p.product_type, CUSTOM_CAT_MATCH);
+    } else {
+      const cat = CUSTOMER_CATEGORIES.find(c=>c.key===CURRENT_CAT_KEY) || CUSTOMER_CATEGORIES[0];
+      catOk = matchesCategory(p.product_type, cat.match);
+    }
+
     const qOk = !q ? true : (p.title.toLowerCase().includes(q) || p.id.toLowerCase().includes(q));
     return catOk && qOk;
   });
@@ -345,7 +411,6 @@ function renderProducts(list){
     const card = document.createElement("div");
     card.className = "bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex flex-col transition-all shadow-hover group";
 
-    // Luxury Layout for Cards
     card.innerHTML = `
       <div class="relative w-full aspect-[4/5] bg-paper p-4 flex items-center justify-center">
         <img src="${escapeHtml(p.image)}" class="max-h-full max-w-full object-contain mix-blend-multiply group-hover:scale-105 transition-transform duration-500" alt="">
@@ -391,7 +456,6 @@ closeCart.onclick = closeCartFn;
 
 function openCart(){
   cartOverlay.classList.remove("hidden");
-  // Small delay for smooth transition
   setTimeout(() => cartDrawer.classList.remove("translate-x-full"), 10);
   renderCart();
 }
@@ -411,11 +475,8 @@ function syncCartBadges(){
   const count = CART.size;
   const badge = document.getElementById("cartCountBadge");
   badge.textContent = count.toString();
-  
-  // Animate badge
   badge.classList.add("scale-125");
   setTimeout(() => badge.classList.remove("scale-125"), 200);
-
   document.getElementById("countSel").textContent = count.toString();
 }
 
@@ -473,7 +534,7 @@ function renderCart(){
           </div>
         </div>
       </div>
-      <button class="absolute top-3 ${LANG==='he' ? 'left-3' : 'left-3'} w-7 h-7 bg-red-50 text-red-500 rounded-full flex items-center justify-center hover:bg-red-100 transition-colors" data-act="rm">
+      <button class="absolute top-3 left-3 w-7 h-7 bg-red-50 text-red-500 rounded-full flex items-center justify-center hover:bg-red-100 transition-colors" data-act="rm">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
       </button>
     `;
