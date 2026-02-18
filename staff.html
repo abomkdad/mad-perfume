@@ -1,232 +1,243 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>MAD Parfumeur | Catalog</title>
+  <meta charset="UTF-8" />
+  <meta property="og:image" content="https://www.mad-parfumeur.com/assets/hero/logo2.webp" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>MAD Staff - Mobile Optimized</title>
+  <script src="https://cdn.tailwindcss.com"></script>
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;500;800&family=Noto+Sans+Arabic:wght@400;700;900&display=swap" rel="stylesheet">
-
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Plus Jakarta Sans', 'Noto Sans Arabic', 'sans-serif'],
-                    },
-                    colors: {
-                        premium: '#0A0A0A',
-                        luxuryGold: '#C5A059',
-                    }
-                }
-            }
-        }
-    </script>
-
-    <style>
-        :root { --gold: #C5A059; --dark: #0A0A0A; }
-        body { background-color: #FDFCFB; color: var(--dark); -webkit-tap-highlight-color: transparent; }
-        .glass-dark { background: rgba(10, 10, 10, 0.98); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); }
-        .product-card { transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); border-radius: 20px; }
-        .product-card:active { transform: scale(0.95); }
-        .gold-gradient { background: linear-gradient(135deg, #f6e27a 0%, #c5a059 50%, #f6e27a 100%); -webkit-background-clip: text; color: transparent; }
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        @keyframes reveal { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
-        .animate-reveal { animation: reveal 0.6s ease-out forwards; }
-    </style>
+  <style>
+    body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f3f4f6; }
+    .glass { backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); background: rgba(15, 17, 22, 0.95); }
+    .glassLight { backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); background: rgba(255, 255, 255, 0.9); border: 1px solid rgba(255, 255, 255, 0.3); }
+    .shadowLux { box-shadow: 0 10px 30px -5px rgba(0,0,0,0.1); }
+    .goldText { background: linear-gradient(90deg, #f6e27a, #c5a059, #fff2b6); -webkit-background-clip:text; background-clip:text; color: transparent; }
+    .btnGold { background: linear-gradient(135deg, #f6e27a, #c5a059); color:#111; }
+    .btnDark { background: #161a22; color:#fff; }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    .card { transition: transform 0.1s ease; }
+    .card:active { transform: scale(0.97); }
+    .toastWrap { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 9999; width: 90%; max-width: 400px; pointer-events: none; }
+    .toast { pointer-events: auto; border-radius: 20px; padding: 15px; border: 1px solid rgba(0,0,0,0.05); }
+  </style>
 </head>
 
-<body class="antialiased font-sans">
+<body class="min-h-screen pb-10">
 
-    <nav class="sticky top-0 z-50 glass-dark border-b border-white/10 px-4 py-3">
-        <div class="max-w-7xl mx-auto flex items-center justify-between">
-            <div class="flex items-center gap-3">
-                <img src="https://www.mad-parfumeur.com/assets/hero/logo.png" class="h-8 w-8 object-contain brightness-0 invert" alt="MAD">
-                <div>
-                    <p class="text-white font-black text-sm uppercase leading-none italic">MAD Parfumeur</p>
-                    <p class="text-[8px] text-luxuryGold font-bold tracking-widest uppercase mt-1">Maison de Parfum</p>
-                </div>
-            </div>
-
-            <div class="flex items-center gap-4">
-                <button id="langBtn" class="text-white/70 text-[10px] font-bold border border-white/20 px-2 py-1 rounded">AR / HE</button>
-                <button id="cartBtn" class="relative p-1">
-                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
-                    <span id="cartCountBadge" class="absolute -top-1 -right-1 bg-luxuryGold text-white text-[9px] w-4 h-4 flex items-center justify-center rounded-full font-bold">0</span>
-                </button>
-            </div>
-        </div>
-    </nav>
-
-    <section class="bg-premium pt-6 pb-12 px-6 text-center">
-        <div class="max-w-4xl mx-auto">
-            <h1 id="t_hero_title" class="text-white text-2xl font-black mb-4 leading-tight animate-reveal">
-                عالم من <span class="gold-gradient">الفخامة</span>
-            </h1>
-            <div class="max-w-md mx-auto bg-white/5 border border-white/10 p-1 rounded-xl flex items-center gap-2 animate-reveal">
-                <input id="search" type="text" class="flex-1 bg-transparent text-white px-3 outline-none text-xs py-2" placeholder="بحث...">
-            </div>
-        </div>
-    </section>
-
-    <div class="max-w-7xl mx-auto -mt-6 relative z-20 px-4">
-        <div id="categories" class="flex overflow-x-auto gap-2 no-scrollbar py-2"></div>
+  <div class="toastWrap hidden" id="toastWrap">
+    <div class="toast glassLight shadowLux flex items-center justify-between gap-3">
+      <div>
+        <div class="font-black text-sm" id="toastTitle">OK</div>
+        <div class="text-xs text-gray-600" id="toastMsg">...</div>
+      </div>
+      <button class="w-8 h-8 flex items-center justify-center rounded-full bg-black text-white text-lg" onclick="hideToast()">×</button>
     </div>
+  </div>
 
-    <main class="max-w-7xl mx-auto px-3 py-10">
-        <div id="products" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-8"></div>
-    </main>
+  <div class="sticky top-0 z-40">
+    <div class="glass px-4 py-3 border-b border-white/10">
+      <div class="flex items-center justify-between mb-3">
+        <div class="flex items-center gap-2">
+          <img src="https://www.mad-parfumeur.com/assets/hero/logo.png" class="w-8 h-8 object-contain" alt="MAD">
+          <div class="font-black text-white text-sm leading-none"><span class="goldText">MAD</span> <span id="t_title">روابط</span></div>
+        </div>
+        <button id="langBtn" class="bg-white/10 text-white px-3 py-1 rounded-full text-[10px] font-bold border border-white/20">AR / HE</button>
+      </div>
 
-    <div id="cartOverlay" class="fixed inset-0 bg-premium/80 backdrop-blur-md hidden z-[100]"></div>
-    <div id="cartDrawer" class="fixed top-0 right-0 h-full w-full max-w-md bg-white z-[101] translate-x-full transition-transform duration-500 shadow-2xl flex flex-col">
-        <div class="p-6 border-b flex items-center justify-between">
-            <h3 id="t_cart_title" class="text-xl font-black">حقيبة التسوق</h3>
-            <button id="closeCart" class="text-gray-400">✕</button>
+      <div class="glassLight rounded-2xl p-3 shadowLux">
+        <div class="space-y-3">
+          <input id="search" class="w-full bg-white border border-gray-200 rounded-xl px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-amber-500" placeholder="بحث..." />
+          
+          <div class="grid grid-cols-1 gap-2">
+            <div class="flex items-center gap-1 bg-gray-50 p-1 rounded-xl border border-gray-100">
+              <input id="catLink" readonly class="bg-transparent flex-1 text-[10px] px-2 text-gray-500 truncate" placeholder="رابط القسم..." />
+              <button id="copyCatBtn" class="bg-emerald-600 text-white px-3 py-1.5 rounded-lg text-[10px] font-bold">نسخ</button>
+              <button id="openCatBtn" class="bg-black text-white p-1.5 rounded-lg">
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+              </button>
+            </div>
+            <div class="flex items-center gap-1 bg-gray-50 p-1 rounded-xl border border-gray-100">
+              <input id="bundleLink" readonly class="bg-transparent flex-1 text-[10px] px-2 text-gray-500 truncate" placeholder="رابط الباقة..." />
+              <button id="copyBundleBtn" class="btnGold px-3 py-1.5 rounded-lg text-[10px] font-bold">نسخ</button>
+              <button id="openBundleBtn" class="bg-black text-white p-1.5 rounded-lg">
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="flex items-center justify-between text-[10px] font-bold text-gray-400 uppercase px-1">
+             <div><span id="t_now">القسم:</span> <span id="catNow" class="text-black">ALL</span></div>
+             <div><span id="t_sel">المختارة:</span> <span id="countSel" class="text-amber-600">0</span></div>
+          </div>
         </div>
-        <div class="flex-1 overflow-y-auto p-6" id="cartItems"></div>
-        <div class="p-6 bg-premium text-white rounded-t-[2rem]">
-            <input id="custName" class="w-full bg-white/10 border border-white/10 rounded-xl p-3 text-xs mb-3 outline-none" placeholder="الاسم الكامل">
-            <input id="custPhone" class="w-full bg-white/10 border border-white/10 rounded-xl p-3 text-xs mb-4 outline-none" placeholder="رقم الهاتف">
-            <button id="sendOrder" class="w-full bg-luxuryGold text-premium py-4 rounded-xl font-black text-xs uppercase">تأكيد الطلب</button>
-        </div>
+      </div>
     </div>
+    <div id="categories" class="flex overflow-x-auto gap-2 px-4 py-3 no-scrollbar bg-gray-50 border-b border-gray-200"></div>
+  </div>
+
+  <div class="max-w-7xl mx-auto px-3 mt-4">
+    <div id="products" class="grid grid-cols-2 sm:grid-cols-3 gap-3"></div>
+  </div>
 
 <script>
-    const WHATSAPP_API = "972524033442";
-    const SHIPPING = 50;
-    const RSS_PATH = "products.rss";
+const RSS_PATH = "products.rss";
+const BUNDLE_PAGE = "bundle.html";
+const CUSTOMER_PAGE = "customer.html";
+const WA_AGENT_FIXED = "972524033442";
 
-    let state = {
-        lang: (navigator.language || "").includes("he") ? "he" : "ar",
-        products: [],
-        filtered: [],
-        currentCat: "ALL",
-        cart: new Map()
+let LANG = (navigator.language || "").toLowerCase().includes("he") ? "he" : "ar";
+let PRODUCTS = [];
+let FILTERED = [];
+let CURRENT_CATEGORY = "ALL";
+let SELECTED = new Map();
+
+function T(ar, he){ return (LANG==="he") ? he : ar; }
+
+function setTexts(){
+  document.documentElement.lang = LANG;
+  document.documentElement.dir = (LANG==="he") ? "ltr" : "rtl";
+  document.getElementById("t_title").textContent = T("- روابط سريعة","- קישורים מהירים");
+  document.getElementById("search").placeholder = T("بحث باسم المنتج أو الكود...","חיפוש שם או קוד...");
+  document.getElementById("t_now").textContent = T("القسم:","קטגוריה:");
+  document.getElementById("t_sel").textContent = T("المختارة:","נבחרו:");
+  document.getElementById("copyCatBtn").textContent = T("نسخ","העתק");
+  document.getElementById("copyBundleBtn").textContent = T("نسخ","העתק");
+}
+
+function showToast(title, msg){
+  document.getElementById("toastTitle").textContent = title;
+  document.getElementById("toastMsg").textContent = msg;
+  document.getElementById("toastWrap").classList.remove("hidden");
+  setTimeout(hideToast, 3000);
+}
+function hideToast(){ document.getElementById("toastWrap").classList.add("hidden"); }
+
+async function loadRSS(){
+  try {
+    const res = await fetch(RSS_PATH, { cache:"no-store" });
+    const text = await res.text();
+    const xml = new DOMParser().parseFromString(text, "application/xml");
+    const items = Array.from(xml.getElementsByTagName("item"));
+    
+    PRODUCTS = items.map(item => {
+      const getTag = (tag) => {
+        const el = item.getElementsByTagName(tag)[0] || item.getElementsByTagName(`g:${tag}`)[0];
+        return el ? el.textContent.trim() : "";
+      };
+      return {
+        id: getTag("id"),
+        title: getTag("title"),
+        image: getTag("image_link"),
+        category: getTag("product_type") || "General"
+      };
+    }).filter(p => p.id);
+
+    renderCategories();
+    applyFilters();
+    updateLinks(); // تحديث الروابط فور التحميل
+  } catch (e) {
+    showToast("Error", "فشل تحميل البيانات");
+  }
+}
+
+function renderCategories(){
+  const container = document.getElementById("categories");
+  container.innerHTML = "";
+  const cats = ["ALL", ...new Set(PRODUCTS.map(p=>p.category))];
+  cats.forEach(c => {
+    const b = document.createElement("button");
+    b.className = `whitespace-nowrap px-4 py-1.5 rounded-full text-xs font-bold transition-all ${CURRENT_CATEGORY === c ? 'bg-black text-white shadow-md' : 'bg-white text-gray-600 border border-gray-200'}`;
+    b.textContent = c === "ALL" ? T("الكل", "הכל") : c;
+    b.onclick = () => { 
+      CURRENT_CATEGORY = c; 
+      document.getElementById("catNow").textContent = c; 
+      renderCategories(); 
+      applyFilters(); 
+      updateLinks(); 
     };
+    container.appendChild(b);
+  });
+}
 
-    function T(ar, he) { return state.lang === "ar" ? ar : he; }
+function applyFilters(){
+  const q = document.getElementById("search").value.toLowerCase();
+  FILTERED = PRODUCTS.filter(p => {
+    const catOk = CURRENT_CATEGORY === "ALL" || p.category === CURRENT_CATEGORY;
+    const qOk = p.title.toLowerCase().includes(q) || p.id.toLowerCase().includes(q);
+    return catOk && qOk;
+  });
+  renderProducts();
+}
 
-    /* ✅ الوظيفة الأساسية: قراءة القسم من الرابط وتطبيقه */
-    function applyUrlCategory() {
-        const params = new URLSearchParams(window.location.search);
-        const catFromUrl = params.get('cat');
-        if (catFromUrl) {
-            state.currentCat = decodeURIComponent(catFromUrl);
-            applyFilter();
-            renderCategories();
-        }
-    }
+function renderProducts(){
+  const container = document.getElementById("products");
+  container.innerHTML = "";
+  FILTERED.forEach(p => {
+    const qty = SELECTED.get(p.id) || 0;
+    const div = document.createElement("div");
+    div.className = "card glassLight rounded-2xl overflow-hidden shadow-sm flex flex-col";
+    div.innerHTML = `
+      <div class="relative aspect-square bg-white p-2">
+        <img src="${p.image}" class="w-full h-full object-contain" loading="lazy">
+        <div class="absolute top-1 left-1 bg-black/50 text-white text-[8px] px-1.5 py-0.5 rounded-md">${p.id}</div>
+        ${qty > 0 ? `<div class="absolute top-1 right-1 bg-amber-500 text-white text-[10px] w-5 h-5 flex items-center justify-center rounded-full font-bold shadow-lg">${qty}</div>` : ''}
+      </div>
+      <div class="p-2 flex flex-col flex-1">
+        <div class="text-[11px] font-bold line-clamp-2 mb-2 h-8 text-gray-800">${p.title}</div>
+        <div class="flex gap-1 mt-auto">
+          <button onclick="changeQty('${p.id}', 1)" class="flex-1 btnGold py-1.5 rounded-lg text-[10px] font-black">إضافة</button>
+          <button onclick="changeQty('${p.id}', -1)" class="w-8 bg-gray-100 text-gray-400 py-1.5 rounded-lg text-[10px] font-black">×</button>
+        </div>
+      </div>
+    `;
+    container.appendChild(div);
+  });
+}
 
-    async function init() {
-        updateStrings();
-        await fetchData();
-        applyUrlCategory(); // استدعاء الفلترة بعد تحميل البيانات
-        bindEvents();
-    }
+window.changeQty = (id, delta) => {
+  let q = (SELECTED.get(id) || 0) + delta;
+  if (q <= 0) SELECTED.delete(id);
+  else SELECTED.set(id, q);
+  document.getElementById("countSel").textContent = Array.from(SELECTED.values()).reduce((a, b) => a + b, 0);
+  renderProducts();
+  updateLinks();
+};
 
-    async function fetchData() {
-        try {
-            const res = await fetch(RSS_PATH + '?v=' + Date.now());
-            const text = await res.text();
-            const xml = new DOMParser().parseFromString(text, "application/xml");
-            const items = Array.from(xml.querySelectorAll("item"));
+function updateLinks(){
+  const base = location.origin + location.pathname.replace(/[^/]+$/, "");
+  
+  // Cat Link: يتم إنشاؤه دائماً بناءً على CURRENT_CATEGORY المختار
+  const catUrl = (CURRENT_CATEGORY === "ALL") ? "" : `${base}${CUSTOMER_PAGE}?cat=${encodeURIComponent(CURRENT_CATEGORY)}&lang=${LANG}&wa=${WA_AGENT_FIXED}`;
+  document.getElementById("catLink").value = catUrl;
 
-            state.products = items.map(item => {
-                const getG = (tag) => item.querySelector(tag)?.textContent || item.querySelector(`g\\:${tag}`)?.textContent || "";
-                return {
-                    id: getG("id").trim(),
-                    title: getG("title"),
-                    image: getG("image_link"),
-                    type: getG("product_type") || "General",
-                    price: parseFloat(getG("price").replace(/[^\d.]/g, "")) || 0
-                };
-            }).filter(p => p.id);
+  // Bundle Link: يتم إنشاؤه فقط إذا كان هناك منتجات في SELECTED
+  const ids = [];
+  SELECTED.forEach((qty, id) => { for(let i=0; i<qty; i++) ids.push(id); });
+  const bundleUrl = ids.length ? `${base}${BUNDLE_PAGE}?ids=${ids.join(",")}&lang=${LANG}&wa=${WA_AGENT_FIXED}` : "";
+  document.getElementById("bundleLink").value = bundleUrl;
+}
 
-            applyFilter();
-            renderCategories();
-        } catch (e) { console.error(e); }
-    }
+async function copyVal(id){
+  const v = document.getElementById(id).value;
+  if(!v) {
+    const msg = (id === "catLink") ? T("اختر كاتيجوري أولاً", "בחר קטגוריה קודם") : T("أضف منتجات للسلة أولاً", "הוסף מוצרים לעגלה קודם");
+    return showToast("تنبيه", msg);
+  }
+  await navigator.clipboard.writeText(v);
+  showToast("تم ✅", T("تم نسخ الرابط بنجاح", "הקישור הועתק בהצלחה"));
+}
 
-    function applyFilter() {
-        const query = document.getElementById("search").value.toLowerCase();
-        state.filtered = state.products.filter(p => {
-            const isCat = state.currentCat === "ALL" ? true : p.type === state.currentCat;
-            const isSearch = p.title.toLowerCase().includes(query) || p.id.toLowerCase().includes(query);
-            return isCat && isSearch;
-        });
-        renderProducts();
-    }
+document.getElementById("copyCatBtn").onclick = () => copyVal("catLink");
+document.getElementById("copyBundleBtn").onclick = () => copyVal("bundleLink");
+document.getElementById("openCatBtn").onclick = () => { const v = document.getElementById("catLink").value; if(v) window.open(v, "_blank"); else showToast("تنبيه", T("اختر كاتيجوري أولاً", "בחר קטגוריה קודם")); };
+document.getElementById("openBundleBtn").onclick = () => { const v = document.getElementById("bundleLink").value; if(v) window.open(v, "_blank"); else showToast("تنبيه", T("أضف منتجات أولاً", "הוסף מוצרים קודם")); };
+document.getElementById("search").oninput = applyFilters;
+document.getElementById("langBtn").onclick = () => { LANG = LANG === "ar" ? "he" : "ar"; setTexts(); renderCategories(); applyFilters(); updateLinks(); };
 
-    function renderCategories() {
-        const container = document.getElementById("categories");
-        const cats = ["ALL", ...new Set(state.products.map(p => p.type))];
-        container.innerHTML = cats.map(c => `
-            <button onclick="switchCat('${c}')" 
-                class="whitespace-nowrap px-6 py-2 rounded-xl text-[10px] font-black transition-all border
-                ${state.currentCat === c ? 'bg-premium text-white border-premium' : 'bg-white text-gray-400'}">
-                ${c === "ALL" ? T("الكل", "הכל") : c}
-            </button>
-        `).join('');
-    }
-
-    function renderProducts() {
-        const container = document.getElementById("products");
-        container.innerHTML = state.filtered.map(p => `
-            <div class="product-card bg-white rounded-3xl p-3 border border-gray-50 flex flex-col animate-reveal">
-                <div class="aspect-square mb-2 bg-gray-50 rounded-2xl p-2 overflow-hidden">
-                    <img src="${p.image}" class="w-full h-full object-contain mix-blend-multiply" loading="lazy">
-                </div>
-                <h3 class="font-bold text-[10px] h-8 line-clamp-2 mb-2 leading-tight">${p.title}</h3>
-                <div class="flex items-center justify-between mt-auto">
-                    <span class="text-xs font-black italic">₪${p.price.toFixed(0)}</span>
-                    <button onclick="addToCart('${p.id}')" class="w-8 h-8 ${state.cart.has(p.id) ? 'bg-black' : 'bg-luxuryGold'} text-white rounded-lg flex items-center justify-center">
-                        ${state.cart.has(p.id) ? '✓' : '+'}
-                    </button>
-                </div>
-            </div>
-        `).join('');
-    }
-
-    /* Cart Functions */
-    window.switchCat = (c) => { state.currentCat = c; applyFilter(); renderCategories(); };
-    window.addToCart = (id) => { state.cart.set(id, 1); renderCart(); renderProducts(); openCart(); };
-    function openCart() { document.getElementById("cartOverlay").classList.remove("hidden"); document.getElementById("cartDrawer").classList.remove("translate-x-full"); }
-    function closeCart() { document.getElementById("cartDrawer").classList.add("translate-x-full"); setTimeout(()=>document.getElementById("cartOverlay").classList.add("hidden"), 500); }
-
-    function renderCart() {
-        const container = document.getElementById("cartItems");
-        document.getElementById("cartCountBadge").textContent = state.cart.size;
-        let subtotal = 0;
-        let html = "";
-        state.cart.forEach((qty, id) => {
-            const p = state.products.find(x => x.id === id);
-            if (!p) return;
-            subtotal += p.price * qty;
-            html += `<div class="flex items-center gap-4 bg-gray-50 p-3 rounded-2xl mb-2">
-                <img src="${p.image}" class="w-12 h-12 object-contain">
-                <div class="flex-1 text-[10px] font-bold">${p.title}</div>
-                <button onclick="state.cart.delete('${id}'); renderCart(); renderProducts();" class="text-red-400">✕</button>
-            </div>`;
-        });
-        container.innerHTML = html || T("السلة فارغة", "העגלה ריקה");
-        document.getElementById("total").textContent = (subtotal > 0 ? subtotal + SHIPPING : 0).toFixed(0);
-    }
-
-    function bindEvents() {
-        document.getElementById("closeCart").onclick = closeCart;
-        document.getElementById("cartBtn").onclick = openCart;
-        document.getElementById("search").oninput = applyFilter;
-        document.getElementById("langBtn").onclick = () => { state.lang = state.lang === "ar" ? "he" : "ar"; init(); };
-    }
-
-    function updateStrings() {
-        document.getElementById("t_hero_title").innerHTML = T("عالم من <span class='gold-gradient'>الفخامة</span>", "עולם של <span class='gold-gradient'>יוקרה</span>");
-        document.getElementById("t_cart_title").textContent = T("حقيبة التسوق", "סל קניות");
-    }
-
-    init();
+setTexts();
+loadRSS();
 </script>
 </body>
 </html>
