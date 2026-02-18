@@ -3,8 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MAD Staff (Simple)</title>
+  <title>MAD Staff (Copy Links)</title>
   <script src="https://cdn.tailwindcss.com"></script>
+
   <style>
     body{
       font-family: Arial, sans-serif;
@@ -23,13 +24,29 @@
     .btnDark{ background: linear-gradient(180deg, #161a22, #0f1218); color:#fff; }
     .btnDark:hover{ filter: brightness(1.05); }
     .chip{ border-radius: 999px; white-space: nowrap; }
-    .card{ transition: .15s transform; }
-    .card:hover{ transform: translateY(-2px); }
+    .card{ transition: .15s transform, .15s box-shadow; }
+    .card:hover{ transform: translateY(-2px); box-shadow: 0 18px 55px rgba(0,0,0,.16); }
+    .toastWrap{ position: fixed; top: 14px; left:0; right:0; z-index: 9999; display:flex; justify-content:center; pointer-events:none; }
+    .toast{ pointer-events:auto; min-width: 280px; max-width: 92vw; border-radius: 18px; padding: 12px 14px; }
   </style>
 </head>
 
 <body class="min-h-screen">
-  <!-- Top -->
+
+  <!-- Toast -->
+  <div class="toastWrap hidden" id="toastWrap">
+    <div class="toast glassLight shadowLux">
+      <div class="flex items-start justify-between gap-3">
+        <div>
+          <div class="font-black" id="toastTitle">OK</div>
+          <div class="text-sm text-gray-600 mt-1" id="toastMsg">...</div>
+        </div>
+        <button class="px-3 py-2 rounded-2xl btnDark text-sm font-bold" onclick="hideToast()">×</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Header -->
   <div class="sticky top-0 z-40">
     <div class="glass shadowLux">
       <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between gap-3">
@@ -39,9 +56,9 @@
           </div>
           <div>
             <div class="font-black text-lg leading-6 text-white">
-              <span class="goldText">MAD</span> <span id="t_title">- إرسال سريع</span>
+              <span class="goldText">MAD</span> <span id="t_title">- روابط سريعة</span>
             </div>
-            <div class="text-xs text-white/70" id="t_sub">اختر كاتيجوري ثم اضغط إرسال</div>
+            <div class="text-xs text-white/70" id="t_sub">اختيار كاتيجوري/منتجات ثم نسخ الرابط</div>
           </div>
         </div>
 
@@ -50,29 +67,45 @@
         </button>
       </div>
 
-      <!-- Super Simple Bar -->
+      <!-- Action Bar -->
       <div class="max-w-7xl mx-auto px-4 pb-4">
         <div class="glassLight shadowSoft rounded-3xl p-4">
-          <div class="grid grid-cols-1 md:grid-cols-12 gap-3 items-end">
-            <div class="md:col-span-4">
-              <div class="text-xs text-gray-500 mb-1" id="t_client">رقم واتساب العميل</div>
-              <input id="waClient" class="w-full border rounded-2xl p-3 bg-white/90" placeholder="9725..." inputmode="numeric">
-              <div class="text-[11px] text-gray-500 mt-1" id="t_client_hint">بدون +</div>
-            </div>
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-3 items-end">
 
-            <div class="md:col-span-4">
+            <div class="lg:col-span-4">
               <div class="text-xs text-gray-500 mb-1" id="t_search">بحث</div>
               <input id="search" class="w-full border rounded-2xl p-3 bg-white/90" placeholder="اسم / كود..." />
             </div>
 
-            <div class="md:col-span-4 flex gap-2">
-              <button id="sendCatBtn" class="w-full py-3 rounded-2xl btnGold shadowLux font-black">
-                <span id="t_send_cat">إرسال الكاتيجوري</span>
-              </button>
-              <button id="sendBundleBtn" class="w-full py-3 rounded-2xl bg-black text-white shadowLux font-black">
-                <span id="t_send_bundle">إرسال باقة</span>
-              </button>
+            <div class="lg:col-span-8 grid grid-cols-1 md:grid-cols-12 gap-2 items-end">
+              <div class="md:col-span-6">
+                <div class="text-xs text-gray-500 mb-1" id="t_cat_link">رابط الكاتيجوري</div>
+                <input id="catLink" class="w-full border rounded-2xl p-3 bg-white/90" readonly placeholder="اختر كاتيجوري أولاً..." />
+              </div>
+              <div class="md:col-span-6">
+                <div class="text-xs text-gray-500 mb-1" id="t_bundle_link">رابط الباقة</div>
+                <input id="bundleLink" class="w-full border rounded-2xl p-3 bg-white/90" readonly placeholder="اختر منتجات لعمل باقة..." />
+              </div>
+
+              <div class="md:col-span-6 flex gap-2">
+                <button id="copyCatBtn" class="w-full py-3 rounded-2xl bg-emerald-700 text-white shadowLux font-black">
+                  <span id="t_copy_cat">نسخ الكاتيجوري</span>
+                </button>
+                <button id="openCatBtn" class="w-full py-3 rounded-2xl btnDark shadowLux font-black">
+                  <span id="t_open_cat">فتح</span>
+                </button>
+              </div>
+
+              <div class="md:col-span-6 flex gap-2">
+                <button id="copyBundleBtn" class="w-full py-3 rounded-2xl btnGold shadowLux font-black">
+                  <span id="t_copy_bundle">نسخ الباقة</span>
+                </button>
+                <button id="openBundleBtn" class="w-full py-3 rounded-2xl btnDark shadowLux font-black">
+                  <span id="t_open_bundle">فتح</span>
+                </button>
+              </div>
             </div>
+
           </div>
 
           <div class="mt-3 text-xs text-gray-500">
@@ -82,6 +115,7 @@
             <span class="font-black" id="t_sel">المختارة:</span>
             <span id="countSel">0</span>
           </div>
+
         </div>
       </div>
     </div>
@@ -103,7 +137,7 @@ const RSS_PATH = "products.rss";
 const BUNDLE_PAGE = "bundle.html";
 const CUSTOMER_PAGE = "customer.html";
 
-/* ✅ رقم الوكيل ثابت (الموظف ما يلمسه) */
+/* ✅ رقم الوكيل ثابت داخل الروابط */
 const WA_AGENT_FIXED = "972524033442";
 
 /* ===== STATE ===== */
@@ -114,28 +148,37 @@ let CURRENT_CATEGORY = "ALL";
 let SELECTED = new Map(); // id => qty
 
 function T(ar, he){ return (LANG==="he") ? he : ar; }
-function normNum(v){ return (v||"").toString().replace(/\D/g,"").trim(); }
 
 function setTexts(){
   document.documentElement.lang = LANG;
   document.documentElement.dir = (LANG==="he") ? "ltr" : "rtl";
 
-  document.getElementById("t_title").textContent = T("- إرسال سريع","- שליחה מהירה");
-  document.getElementById("t_sub").textContent   = T("اختر كاتيجوري ثم اضغط إرسال","בחר קטגוריה ואז לחץ שליחה");
-
-  document.getElementById("t_client").textContent = T("رقم واتساب العميل","מספר וואטסאפ לקוח");
-  document.getElementById("waClient").placeholder = T("9725...","9725...");
-  document.getElementById("t_client_hint").textContent = T("بدون +","ללא +");
+  document.getElementById("t_title").textContent = T("- روابط سريعة","- קישורים מהירים");
+  document.getElementById("t_sub").textContent   = T("اختيار كاتيجوري/منتجات ثم نسخ الرابط","בחר קטגוריה/מוצרים ואז העתק קישור");
 
   document.getElementById("t_search").textContent = T("بحث","חיפוש");
   document.getElementById("search").placeholder = T("اسم / كود...","שם / קוד...");
 
-  document.getElementById("t_send_cat").textContent = T("إرسال الكاتيجوري","שלח קטגוריה");
-  document.getElementById("t_send_bundle").textContent = T("إرسال باقة","שלח מארז");
+  document.getElementById("t_cat_link").textContent = T("رابط الكاتيجوري","קישור קטגוריה");
+  document.getElementById("t_bundle_link").textContent = T("رابط الباقة","קישור מארז");
+
+  document.getElementById("t_copy_cat").textContent = T("نسخ الكاتيجوري","העתק קטגוריה");
+  document.getElementById("t_open_cat").textContent = T("فتح","פתח");
+
+  document.getElementById("t_copy_bundle").textContent = T("نسخ الباقة","העתק מארז");
+  document.getElementById("t_open_bundle").textContent = T("فتح","פתח");
 
   document.getElementById("t_now").textContent = T("الكاتيجوري:","קטגוריה:");
   document.getElementById("t_sel").textContent = T("المختارة:","נבחרו:");
 }
+
+/* ===== TOAST ===== */
+function showToast(title, msg){
+  document.getElementById("toastTitle").textContent = title;
+  document.getElementById("toastMsg").textContent = msg;
+  document.getElementById("toastWrap").classList.remove("hidden");
+}
+function hideToast(){ document.getElementById("toastWrap").classList.add("hidden"); }
 
 /* ===== RSS ===== */
 function getTextByLocalName(parent, localName){
@@ -152,6 +195,7 @@ async function loadRSS(){
   const res = await fetch(RSS_PATH, { cache:"no-store" });
   if(!res.ok) throw new Error("HTTP " + res.status);
   const text = await res.text();
+
   const xml = new DOMParser().parseFromString(text, "application/xml");
   const parseErr = xml.getElementsByTagName("parsererror");
   if(parseErr && parseErr.length) throw new Error("XML parse error");
@@ -167,6 +211,7 @@ async function loadRSS(){
 
   renderCategories();
   applyFilters();
+  updateLinks();
 }
 
 /* ===== UI ===== */
@@ -174,7 +219,6 @@ function renderCategories(){
   const container = document.getElementById("categories");
   container.innerHTML = "";
   const cats = Array.from(new Set(PRODUCTS.map(p=>p.category))).sort((a,b)=>a.localeCompare(b));
-
   container.appendChild(makeCatBtn("ALL", T("كل المنتجات","כל המוצרים")));
   cats.forEach(c => container.appendChild(makeCatBtn(c, c)));
   highlightCategory();
@@ -190,6 +234,7 @@ function makeCatBtn(cat, label){
     document.getElementById("catNow").textContent = cat==="ALL" ? "ALL" : cat;
     applyFilters();
     highlightCategory();
+    updateLinks();
   };
   return b;
 }
@@ -247,6 +292,7 @@ function setQty(id, qty){
   else SELECTED.set(id, qty);
   updateSelectedCount();
   renderProducts(FILTERED);
+  updateLinks();
 }
 
 function updateSelectedCount(){
@@ -274,31 +320,26 @@ function buildBundleUrl(){
   return `${base}?ids=${encodeURIComponent(finalIds.join(","))}&lang=${encodeURIComponent(LANG)}&wa=${encodeURIComponent(WA_AGENT_FIXED)}`;
 }
 
-function sendWhatsApp(text){
-  const client = normNum(document.getElementById("waClient").value || "");
-  if(!client) { alert(T("اكتب رقم العميل أولاً","הזן מספר לקוח קודם")); return; }
-  window.open(`https://wa.me/${client}?text=${encodeURIComponent(text)}`, "_blank");
+function updateLinks(){
+  const catUrl = buildCategoryUrl();
+  const bunUrl = buildBundleUrl();
+
+  document.getElementById("catLink").value = catUrl || "";
+  document.getElementById("bundleLink").value = bunUrl || "";
 }
 
-/* ===== ACTIONS ===== */
-function sendCategory(){
-  if(CURRENT_CATEGORY==="ALL") { alert(T("اختر كاتيجوري أولاً","בחר קטגוריה קודם")); return; }
-  const url = buildCategoryUrl();
-  const msg = T(
-    `✨ عروض ${CURRENT_CATEGORY}:\n${url}\n\nافتح الرابط واختر المنتجات واملأ الفورم لإرسال الطلب ✅`,
-    `✨ קטגוריה ${CURRENT_CATEGORY}:\n${url}\n\nפתח קישור, בחר מוצרים ומלא טופס לשליחה ✅`
-  );
-  sendWhatsApp(msg);
-}
-
-function sendBundle(){
-  if(SELECTED.size===0) { alert(T("اختر منتجات أولاً","בחר מוצרים קודם")); return; }
-  const url = buildBundleUrl();
-  const msg = T(
-    `✨ هاي باقة جاهزة لك:\n${url}\n\nافتح الرابط، عدّل الكميات، واملأ الفورم لإرسال الطلب ✅`,
-    `✨ זה מארז מוכן עבורך:\n${url}\n\nפתח קישור, עדכן כמויות ומלא טופס לשליחה ✅`
-  );
-  sendWhatsApp(msg);
+async function copyFromInput(id){
+  const val = (document.getElementById(id).value || "").trim();
+  if(!val){
+    showToast(T("تنبيه","שים לב"), T("لا يوجد رابط جاهز","אין קישור מוכן"));
+    return;
+  }
+  try{
+    await navigator.clipboard.writeText(val);
+    showToast(T("تم ✅","בוצע ✅"), T("تم نسخ الرابط","הקישור הועתק"));
+  }catch{
+    showToast(T("انسخ يدويًا","העתק ידנית"), val);
+  }
 }
 
 /* ===== UTIL ===== */
@@ -306,21 +347,43 @@ function esc(s){
   return (s||"").replace(/[&<>"']/g, m => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;" }[m]));
 }
 
-/* ===== INIT ===== */
+/* ===== EVENTS ===== */
 document.getElementById("langBtn").onclick = ()=>{
   LANG = (LANG==="ar") ? "he" : "ar";
   setTexts();
   renderCategories();
   applyFilters();
+  updateLinks();
 };
-document.getElementById("search").addEventListener("input", applyFilters);
-document.getElementById("sendCatBtn").onclick = sendCategory;
-document.getElementById("sendBundleBtn").onclick = sendBundle;
 
+document.getElementById("search").addEventListener("input", ()=>{
+  applyFilters();
+});
+
+document.getElementById("copyCatBtn").onclick = ()=> copyFromInput("catLink");
+document.getElementById("copyBundleBtn").onclick = ()=> copyFromInput("bundleLink");
+
+document.getElementById("openCatBtn").onclick = ()=>{
+  const url = (document.getElementById("catLink").value || "").trim();
+  if(!url) return showToast(T("تنبيه","שים לב"), T("اختر كاتيجوري أولاً","בחר קטגוריה קודם"));
+  window.open(url, "_blank");
+};
+
+document.getElementById("openBundleBtn").onclick = ()=>{
+  const url = (document.getElementById("bundleLink").value || "").trim();
+  if(!url) return showToast(T("تنبيه","שים לב"), T("اختر منتجات أولاً","בחר מוצרים קודם"));
+  window.open(url, "_blank");
+};
+
+/* ===== INIT ===== */
 (async ()=>{
   setTexts();
-  try{ await loadRSS(); }
-  catch(e){ alert("RSS Error: " + e.message); }
+  try{
+    await loadRSS();
+  }catch(e){
+    console.error(e);
+    showToast("RSS Error", e.message);
+  }
 })();
 </script>
 
