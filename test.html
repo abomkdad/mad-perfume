@@ -305,6 +305,9 @@
       subLabel: "المجموع",
       shipLabel: "التوصيل",
       totalLabel: "الإجمالي",
+      codeLabel: "الكود",
+      unitLabel: "سعر القطعة",
+      lineLabel: "المجموع",
       sendBtn: "إرسال الطلب عبر واتساب",
       deliveryNote: "الدفع عند الاستلام — سيتم تأكيد التفاصيل عبر واتساب",
       emptyCart: "السلة فارغة",
@@ -322,6 +325,9 @@
         phone: "📞 الهاتف",
         addr: "📍 العنوان",
         cart: "🛒 السلة",
+        code: "🏷️ الكود",
+        unit: "💵 سعر القطعة",
+        line: "🧾 مجموع السطر",
         sub: "🧾 المجموع",
         ship: "🚚 التوصيل",
         total: "💰 الإجمالي"
@@ -340,6 +346,9 @@
       subLabel: "סכום ביניים",
       shipLabel: "משלוח",
       totalLabel: "סה״כ",
+      codeLabel: "קוד",
+      unitLabel: "מחיר יחידה",
+      lineLabel: "סכום",
       sendBtn: "שליחת הזמנה בוואטסאפ",
       deliveryNote: "תשלום בעת המסירה — ניצור קשר בוואטסאפ לאישור פרטים",
       emptyCart: "העגלה ריקה",
@@ -357,6 +366,9 @@
         phone: "📞 טלפון",
         addr: "📍 כתובת",
         cart: "🛒 עגלה",
+        code: "🏷️ קוד",
+        unit: "💵 מחיר יחידה",
+        line: "🧾 סה״כ שורה",
         sub: "🧾 סכום ביניים",
         ship: "🚚 משלוח",
         total: "💰 סה״כ"
@@ -411,21 +423,9 @@
     purchaseFired: false
   };
 
-  // TRUE if string looks like only a code (I101 / W183 / X102 / P104 / XM A.102 ...etc)
-  function isCodeOnly(str){
-    const s = String(str || "").trim();
-    if(!s) return false;
-    // common patterns: I101, W183, X102, P104, XM A.102, A.102, W.150
-    return (
-      /^[A-Z]{1,4}\d{2,4}$/i.test(s) ||
-      /^[A-Z]{1,4}\s*\.?\s*[A-Z]?\s*\.?\s*\d{2,4}$/i.test(s)
-    );
-  }
-
-  // Remove codes inside a longer title
+  // Remove codes inside a longer title (ONLY for display/search)
   function stripCodesFromTitle(title){
     let t = String(title || "");
-    // remove token-like codes anywhere
     t = t.replace(/\b[A-Z]{1,4}\s*\.?\s*[A-Z]?\s*\.?\s*\d{2,4}\b/gi, " ");
     t = t.replace(/[\|\-–—]+/g, " ");
     t = t.replace(/\s{2,}/g, " ").trim();
@@ -443,21 +443,15 @@
       state.products = Array.from(xml.querySelectorAll("item"))
         .map(i => {
           const getG = (t) => i.querySelector(t)?.textContent || i.querySelector(`g\\:${t}`)?.textContent || "";
-          const id = (getG("id") || "").trim();
-
+          const id = (getG("id") || "").trim();          // <-- THIS is the CODE shown in cart
           const rawTitle = (getG("title") || "").trim();
-          let title = stripCodesFromTitle(rawTitle);
-
-          // If title becomes empty OR title itself is just a code -> hide it completely
-          if (!title || isCodeOnly(rawTitle) || isCodeOnly(title)) title = "";
-
+          const titleClean = stripCodesFromTitle(rawTitle); // display name without codes
           const image = (getG("image_link") || "").trim();
           const type = (getG("product_type") || "General").trim();
           const price = parseFloat((getG("price") || "").replace(/[^\d.]/g, "")) || 0;
-
-          return { id, title, rawTitle, image, type, price };
+          return { id, rawTitle, titleClean, image, type, price };
         })
-        .filter(p => p.id && p.image); // keep products even if title hidden
+        .filter(p => p.id && p.image);
 
       const urlParams = new URLSearchParams(window.location.search);
       const catFromUrl = urlParams.get("cat");
@@ -480,9 +474,10 @@
     state.filtered = state.products.filter(p => {
       const okCat = (state.currentCat === "ALL" || p.type === state.currentCat);
 
-      // search by cleaned title only (no codes)
-      const title = (p.title || "").toLowerCase();
-      const okQ = !q ? true : title.includes(q);
+      // search by clean title + allow search by code without showing it
+      const t = (p.titleClean || "").toLowerCase();
+      const c = (p.id || "").toLowerCase();
+      const okQ = !q ? true : (t.includes(q) || c.includes(q));
 
       return okCat && okQ;
     });
@@ -517,7 +512,7 @@
     container.innerHTML = state.filtered.map(p => {
       const inCart = state.cart.has(p.id);
 
-      // IMPORTANT: No code, no price, no id shown here.
+      // IMPORTANT: No code, no price shown here.
       return `
         <div class="product-card p-3 flex flex-col shadow-sm">
           <div class="aspect-square mb-2 bg-gray-50 rounded-2xl p-2 overflow-hidden">
@@ -532,10 +527,10 @@
             ${escapeHtml(p.type)}
           </p>
 
-          <!-- Optional: title (only if NOT code). If you want remove names completely, delete this block. -->
-          ${p.title ? `
+          <!-- Name without codes (optional) -->
+          ${p.titleClean ? `
             <h3 class="font-black text-[12px] leading-snug mb-3 clamp-2" style="min-height: 2.4em;">
-              ${escapeHtml(p.title)}
+              ${escapeHtml(p.titleClean)}
             </h3>
           ` : `<div class="mb-3" style="min-height:2.4em;"></div>`}
 
@@ -602,6 +597,7 @@
       const p = state.products.find(x => x.id === id);
       if (!p) return;
 
+      const code = p.id; // <-- code shown in cart
       const unit = Number(p.price || 0);
       const line = unit * qty;
 
@@ -611,13 +607,25 @@
             <img src="${p.image}" class="w-14 h-14 object-contain mix-blend-multiply" alt="MAD">
 
             <div class="flex-1 min-w-0">
-              <p class="font-black text-[12px] leading-tight clamp-2">${escapeHtml(p.title || p.type)}</p>
+              <p class="font-black text-[12px] leading-tight clamp-2">${escapeHtml(p.titleClean || p.type)}</p>
               <p class="text-[11px] font-black text-gray-500 mt-1 clamp-1">${escapeHtml(p.type)}</p>
 
-              <!-- PRICE INSIDE CART ONLY -->
+              <!-- CODE IN CART -->
+              <div class="mt-1">
+                <span class="inline-flex items-center gap-2 bg-white border px-2.5 py-1 rounded-xl">
+                  <span class="text-[11px] font-black text-gray-500">${escapeHtml(T.codeLabel)}</span>
+                  <span class="text-[11px] font-black text-black">${escapeHtml(code)}</span>
+                </span>
+              </div>
+
+              <!-- PRICE IN CART -->
               <div class="flex items-center justify-between mt-2">
-                <span class="text-[#C5A059] font-black text-sm">₪${unit.toFixed(0)}</span>
-                <span class="text-gray-600 font-black text-sm">₪${line.toFixed(0)}</span>
+                <div class="text-[12px] font-black text-gray-700">
+                  ${escapeHtml(T.unitLabel)}: <span class="text-[#C5A059]">₪${unit.toFixed(0)}</span>
+                </div>
+                <div class="text-[12px] font-black text-gray-700">
+                  ${escapeHtml(T.lineLabel)}: <span class="text-black">₪${line.toFixed(0)}</span>
+                </div>
               </div>
 
               <div class="flex items-center gap-3 mt-2">
@@ -677,8 +685,14 @@
     state.cart.forEach((qty, id) => {
       const p = state.products.find(x => x.id === id);
       if (!p) return;
-      const line = (Number(p.price || 0) * qty);
-      msg += `▪️ ${p.title || p.type} (x${qty}) - ₪${line.toFixed(0)}\n`;
+
+      const code = p.id;
+      const unit = Number(p.price || 0);
+      const line = unit * qty;
+
+      msg += `▪️ ${p.titleClean || p.type}\n`;
+      msg += `   ${T.wa.code}: ${code}\n`;
+      msg += `   ${T.wa.unit}: ₪${unit.toFixed(0)} | x${qty} | ${T.wa.line}: ₪${line.toFixed(0)}\n`;
     });
 
     msg += `━━━━━━━━━━━━\n${T.wa.sub}: ₪${subtotal.toFixed(0)}\n`;
