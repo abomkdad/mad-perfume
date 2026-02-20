@@ -144,10 +144,23 @@
       try{ if(window.snaptr) snaptr('track', 'START_CHECKOUT'); }catch(e){}
     }
 
-    function firePurchaseEvent(){
-      try{ if(window.fbq) fbq('track', 'Purchase'); }catch(e){}
-      try{ if(window.ttq) ttq.track('CompletePayment'); }catch(e){}
-      try{ if(window.snaptr) snaptr('track', 'PURCHASE'); }catch(e){}
+    function firePurchaseEvent(totalValue){
+      // totalValue optional
+      try{
+        if(window.fbq){
+          fbq('track', 'Purchase', (typeof totalValue === "number" ? {value: totalValue, currency: "ILS"} : undefined));
+        }
+      }catch(e){}
+      try{
+        if(window.ttq){
+          ttq.track('CompletePayment', (typeof totalValue === "number" ? {value: totalValue, currency: "ILS"} : undefined));
+        }
+      }catch(e){}
+      try{
+        if(window.snaptr){
+          snaptr('track', 'PURCHASE', (typeof totalValue === "number" ? {price: totalValue, currency: "ILS"} : undefined));
+        }
+      }catch(e){}
     }
   </script>
 </head>
@@ -246,9 +259,22 @@
                   autocomplete="street-address"></textarea>
       </div>
 
-      <div class="flex justify-between font-black text-base mb-3">
-        <span id="totalLabel">إجمالي القطع</span>
-        <span class="text-[#C5A059]"><span id="totalItems">0</span></span>
+      <!-- PRICE SUMMARY (INSIDE CART ONLY) -->
+      <div class="mb-3 space-y-2">
+        <div class="flex justify-between text-sm font-black">
+          <span id="subLabel">المجموع</span>
+          <span class="text-white">₪<span id="subtotal">0</span></span>
+        </div>
+
+        <div class="flex justify-between text-sm font-black">
+          <span id="shipLabel">التوصيل</span>
+          <span class="text-white">₪<span id="shipping">50</span></span>
+        </div>
+
+        <div class="flex justify-between font-black text-base pt-2 border-t border-white/10">
+          <span id="totalLabel">الإجمالي</span>
+          <span class="text-[#C5A059]">₪<span id="total">0</span></span>
+        </div>
       </div>
 
       <button id="sendOrder"
@@ -277,7 +303,9 @@
       namePh: "الاسم الكامل",
       phonePh: "رقم الهاتف",
       addrPh: "العنوان (اختياري)",
-      totalLabel: "إجمالي القطع",
+      subLabel: "المجموع",
+      shipLabel: "التوصيل",
+      totalLabel: "الإجمالي",
       sendBtn: "إرسال الطلب عبر واتساب",
       deliveryNote: "الدفع عند الاستلام — سيتم تأكيد التفاصيل عبر واتساب",
       emptyCart: "السلة فارغة",
@@ -285,6 +313,8 @@
       noResults: "لا توجد نتائج",
       alertEmpty: "السلة فارغة",
       alertNeed: "يرجى تعبئة الاسم والهاتف",
+      addToCart: "أضف للسلة",
+      addMore: "أضف المزيد",
       waFabBadge: "مساعدة",
       waFabMsg: "مرحبا، عندي استفسار عن العطور.",
       wa: {
@@ -292,7 +322,10 @@
         name: "👤 الاسم",
         phone: "📞 الهاتف",
         addr: "📍 العنوان",
-        cart: "🛒 السلة"
+        cart: "🛒 السلة",
+        sub: "🧾 المجموع",
+        ship: "🚚 التوصيل",
+        total: "💰 الإجمالي"
       }
     },
     he: {
@@ -305,7 +338,9 @@
       namePh: "שם מלא",
       phonePh: "מספר טלפון",
       addrPh: "כתובת (אופציונלי)",
-      totalLabel: "סה״כ פריטים",
+      subLabel: "סכום ביניים",
+      shipLabel: "משלוח",
+      totalLabel: "סה״כ",
       sendBtn: "שליחת הזמנה בוואטסאפ",
       deliveryNote: "תשלום בעת המסירה — ניצור קשר בוואטסאפ לאישור פרטים",
       emptyCart: "העגלה ריקה",
@@ -313,6 +348,8 @@
       noResults: "אין תוצאות",
       alertEmpty: "העגלה ריקה",
       alertNeed: "נא למלא שם ומספר טלפון",
+      addToCart: "הוסף לעגלה",
+      addMore: "הוסף עוד",
       waFabBadge: "עזרה",
       waFabMsg: "היי, יש לי שאלה לגבי הבשמים.",
       wa: {
@@ -320,7 +357,10 @@
         name: "👤 שם",
         phone: "📞 טלפון",
         addr: "📍 כתובת",
-        cart: "🛒 עגלה"
+        cart: "🛒 עגלה",
+        sub: "🧾 סכום ביניים",
+        ship: "🚚 משלוח",
+        total: "💰 סה״כ"
       }
     }
   };
@@ -348,6 +388,8 @@
     document.getElementById("custPhone").placeholder = T.phonePh;
     document.getElementById("custAddress").placeholder = T.addrPh;
 
+    document.getElementById("subLabel").textContent = T.subLabel;
+    document.getElementById("shipLabel").textContent = T.shipLabel;
     document.getElementById("totalLabel").textContent = T.totalLabel;
     document.getElementById("sendOrder").textContent = T.sendBtn;
     document.getElementById("deliveryNote").textContent = T.deliveryNote;
@@ -359,6 +401,7 @@
      CONFIG & LOGIC
      ========================= */
   const WHATSAPP_API = "972524033442";
+  const SHIPPING = 50;
   const RSS_PATH = "products.rss";
 
   const state = {
@@ -395,7 +438,8 @@
           const title = cleanTitle(rawTitle);
           const image = (getG("image_link") || "").trim();
           const type = (getG("product_type") || "General").trim();
-          return { id, title, rawTitle, image, type };
+          const price = parseFloat((getG("price") || "").replace(/[^\d.]/g, "")) || 0;
+          return { id, title, rawTitle, image, type, price };
         })
         .filter(p => p.id && p.title);
 
@@ -459,18 +503,19 @@
                  alt="${escapeHtml(p.title)}">
           </div>
 
-          <h3 class="font-black text-[12px] leading-snug mb-2 clamp-2" style="min-height: 2.4em;">
+          <!-- CATEGORY UNDER IMAGE -->
+          <p class="text-[11px] font-black text-gray-500 mb-2 clamp-1">
+            ${escapeHtml(p.type)}
+          </p>
+
+          <h3 class="font-black text-[12px] leading-snug mb-3 clamp-2" style="min-height: 2.4em;">
             ${escapeHtml(p.title)}
           </h3>
 
-          <div class="flex items-center justify-between mt-auto">
-            <span class="text-[11px] text-gray-400 font-bold">${inCart ? "✓" : ""}</span>
-
-            <button onclick="addToCart('${escapeQuotes(p.id)}')"
-              class="w-full bg-[#C5A059] text-black py-2.5 rounded-2xl font-black text-xs active:scale-95 transition">
-              ${inCart ? (LANG === "he" ? "הוסף עוד" : "أضف المزيد") : (LANG === "he" ? "הוסף לעגלה" : "أضف للسلة")}
-            </button>
-          </div>
+          <button onclick="addToCart('${escapeQuotes(p.id)}')"
+            class="mt-auto w-full ${inCart ? 'bg-black text-white' : 'bg-[#C5A059] text-black'} py-3 rounded-2xl font-black text-xs active:scale-95 transition">
+            ${inCart ? escapeHtml(T.addMore) : escapeHtml(T.addToCart)}
+          </button>
         </div>
       `;
     }).join("");
@@ -498,15 +543,31 @@
     renderProducts();
   };
 
+  function calcTotals(){
+    let subtotal = 0;
+    let totalQty = 0;
+
+    state.cart.forEach((qty, id) => {
+      const p = state.products.find(x => x.id === id);
+      if (!p) return;
+      totalQty += qty;
+      subtotal += (Number(p.price || 0) * qty);
+    });
+
+    const total = totalQty > 0 ? (subtotal + SHIPPING) : 0;
+    return { subtotal, total, totalQty };
+  }
+
   function updateCartUI() {
     const container = document.getElementById("cartItems");
     const badge = document.getElementById("cartCountBadge");
 
-    // badge = total qty
-    let totalQty = 0;
-    state.cart.forEach(q => totalQty += q);
+    const { subtotal, total, totalQty } = calcTotals();
+
     badge.textContent = totalQty;
-    document.getElementById("totalItems").textContent = totalQty;
+    document.getElementById("shipping").textContent = Number(SHIPPING).toFixed(0);
+    document.getElementById("subtotal").textContent = Number(subtotal).toFixed(0);
+    document.getElementById("total").textContent = Number(total).toFixed(0);
 
     let html = "";
 
@@ -514,25 +575,38 @@
       const p = state.products.find(x => x.id === id);
       if (!p) return;
 
+      const unit = Number(p.price || 0);
+      const line = unit * qty;
+
       html += `
-        <div class="flex items-center gap-3 bg-gray-50 p-3 rounded-2xl">
-          <img src="${p.image}" class="w-14 h-14 object-contain mix-blend-multiply" alt="${escapeHtml(p.title)}">
-          <div class="flex-1 min-w-0">
-            <p class="font-black text-[12px] leading-tight clamp-2">${escapeHtml(p.title)}</p>
+        <div class="bg-gray-50 p-3 rounded-2xl">
+          <div class="flex items-center gap-3">
+            <img src="${p.image}" class="w-14 h-14 object-contain mix-blend-multiply" alt="${escapeHtml(p.title)}">
 
-            <div class="flex items-center gap-3 mt-2">
-              <button onclick="changeQty('${escapeQuotes(id)}', -1)"
-                class="w-9 h-9 rounded-2xl bg-white border flex items-center justify-center font-black text-gray-700 active:scale-95 transition">-</button>
+            <div class="flex-1 min-w-0">
+              <p class="font-black text-[12px] leading-tight clamp-2">${escapeHtml(p.title)}</p>
+              <p class="text-[11px] font-black text-gray-500 mt-1 clamp-1">${escapeHtml(p.type)}</p>
 
-              <span class="text-sm font-black w-6 text-center">${qty}</span>
+              <!-- PRICE INSIDE CART -->
+              <div class="flex items-center justify-between mt-2">
+                <span class="text-[#C5A059] font-black text-sm">₪${unit.toFixed(0)}</span>
+                <span class="text-gray-600 font-black text-sm">₪${line.toFixed(0)}</span>
+              </div>
 
-              <button onclick="changeQty('${escapeQuotes(id)}', 1)"
-                class="w-9 h-9 rounded-2xl bg-white border flex items-center justify-center font-black text-gray-700 active:scale-95 transition">+</button>
+              <div class="flex items-center gap-3 mt-2">
+                <button onclick="changeQty('${escapeQuotes(id)}', -1)"
+                  class="w-9 h-9 rounded-2xl bg-white border flex items-center justify-center font-black text-gray-700 active:scale-95 transition">-</button>
+
+                <span class="text-sm font-black w-6 text-center">${qty}</span>
+
+                <button onclick="changeQty('${escapeQuotes(id)}', 1)"
+                  class="w-9 h-9 rounded-2xl bg-white border flex items-center justify-center font-black text-gray-700 active:scale-95 transition">+</button>
+              </div>
             </div>
-          </div>
 
-          <button onclick="removeItem('${escapeQuotes(id)}')"
-            class="text-gray-300 text-xl px-2 active:scale-95 transition" aria-label="Remove">✕</button>
+            <button onclick="removeItem('${escapeQuotes(id)}')"
+              class="text-gray-300 text-xl px-2 active:scale-95 transition" aria-label="Remove">✕</button>
+          </div>
         </div>
       `;
     });
@@ -541,7 +615,7 @@
   }
 
   /* === OPEN/CLOSE SHEET === */
-  function openCart(fromAdd=false) {
+  function openCart() {
     document.getElementById("cartOverlay").classList.remove("hidden");
     document.getElementById("cartDrawer").classList.remove("translate-y-full");
 
@@ -566,6 +640,8 @@
     if (state.cart.size === 0) return alert(T.alertEmpty);
     if (!name || !phone) return alert(T.alertNeed);
 
+    const { subtotal, total } = calcTotals();
+
     let msg = `${T.wa.header}\n`;
     msg += `${T.wa.name}: ${name}\n`;
     msg += `${T.wa.phone}: ${phone}\n`;
@@ -575,13 +651,18 @@
     state.cart.forEach((qty, id) => {
       const p = state.products.find(x => x.id === id);
       if (!p) return;
-      msg += `▪️ ${p.title} (x${qty})\n`;
+      const line = (Number(p.price || 0) * qty);
+      msg += `▪️ ${p.title} (x${qty}) - ₪${line.toFixed(0)}\n`;
     });
+
+    msg += `━━━━━━━━━━━━\n${T.wa.sub}: ₪${subtotal.toFixed(0)}\n`;
+    msg += `${T.wa.ship}: ₪${Number(SHIPPING).toFixed(0)}\n`;
+    msg += `${T.wa.total}: ₪${total.toFixed(0)}`;
 
     // Pixel purchase BEFORE redirect to WhatsApp
     if (!state.purchaseFired) {
       state.purchaseFired = true;
-      firePurchaseEvent();
+      firePurchaseEvent(total);
     }
 
     setTimeout(() => {
@@ -596,7 +677,7 @@
   }
 
   function bindEvents() {
-    document.getElementById("cartBtn").onclick = () => openCart(false);
+    document.getElementById("cartBtn").onclick = openCart;
     document.getElementById("closeCart").onclick = closeCart;
     document.getElementById("cartOverlay").onclick = closeCart;
     document.getElementById("search").oninput = applyFilter;
