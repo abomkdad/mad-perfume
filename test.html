@@ -103,7 +103,7 @@
       }catch(e){ console.warn("FB Pixel error", e); }
     })();
 
-    // TikTok Pixel (FIXED)
+    // TikTok Pixel
     (function(){
       try{
         if(!PIXELS.tiktok) return;
@@ -206,7 +206,7 @@
 
   </div>
 
-  <!-- FLOATING WHATSAPP (LANG-BASED) -->
+  <!-- FLOATING WHATSAPP HELP -->
   <button id="waFab" class="fab" aria-label="WhatsApp">
     <span id="waFabBadge" class="fab-badge">WA</span>
     <svg viewBox="0 0 32 32" width="26" height="26" fill="currentColor" aria-hidden="true">
@@ -320,7 +320,7 @@
         phone: "📞 الهاتف",
         addr: "📍 العنوان",
         cart: "🛒 السلة",
-        code: "🏷️ الكود",
+        code: "🏷️ الكود الحقيقي",
         unit: "💵 سعر القطعة",
         line: "🧾 مجموع السطر",
         sub: "🧾 المجموع",
@@ -361,7 +361,7 @@
         phone: "📞 טלפון",
         addr: "📍 כתובת",
         cart: "🛒 עגלה",
-        code: "🏷️ קוד",
+        code: "🏷️ קוד אמיתי",
         unit: "💵 מחיר יחידה",
         line: "🧾 סה״כ שורה",
         sub: "🧾 סכום ביניים",
@@ -413,41 +413,41 @@
     products: [],
     filtered: [],
     currentCat: "ALL",
-    cart: new Map(),
+    cart: new Map(),  // feedId -> qty
     leadCartFired: false,
     leadOrderFired: false
   };
 
   /* =========================
-     REAL CODE EXTRACTOR
+     REAL CODE EXTRACTOR (✅ title first)
      Priority:
-       1) g:mpn / mpn
-       2) g:sku / sku
-       3) extract from title (W.150 / A.102 / X102 ...)
-       4) fallback to g:id
+       1) extract from title (W183 / W.150 / A.102 / X102 ...)
+       2) g:mpn / mpn
+       3) g:sku / sku
+       4) fallback to g:id (feed id)
      ========================= */
   function normalizeCode(x){
     return String(x || "").toUpperCase().trim().replace(/[^A-Z0-9]/g, "");
   }
+
   function extractCodeFromTitle(title){
     const s = String(title || "").toUpperCase();
-    // Examples matched:
-    // W150, W.150, W-150, A.102, X102, XM A.102 (will match A102), P 104, etc.
     const m = s.match(/\b([A-Z]{1,3})\s*[\.\-_]?\s*(\d{2,4})\b/);
     if(!m) return "";
-    return normalizeCode(m[1] + m[2]);
+    return normalizeCode(m[1] + m[2]); // ex: W + 183 => W183
   }
-  function chooseRealCode({ mpn, sku, title, id }){
+
+  function chooseRealCode({ mpn, sku, title, feedId }){
+    const fromTitle = extractCodeFromTitle(title);
+    if(fromTitle) return fromTitle;
+
     const a = normalizeCode(mpn);
     if(a) return a;
 
     const b = normalizeCode(sku);
     if(b) return b;
 
-    const c = extractCodeFromTitle(title);
-    if(c) return c;
-
-    return normalizeCode(id) || String(id || "").trim();
+    return normalizeCode(feedId) || String(feedId || "").trim();
   }
 
   async function init() {
@@ -462,19 +462,20 @@
         .map(i => {
           const getG = (t) => i.querySelector(t)?.textContent || i.querySelector(`g\\:${t}`)?.textContent || "";
 
-          const id = (getG("id") || "").trim();                 // feed id
-          const title = (getG("title") || "").trim();           // title (may contain real code)
-          const mpn = (getG("mpn") || "").trim();               // optional
-          const sku = (getG("sku") || "").trim();               // optional
-          const image = (getG("image_link") || "").trim();
-          const type = (getG("product_type") || "General").trim();
-          const price = parseFloat((getG("price") || "").replace(/[^\d.]/g, "")) || 0;
+          const feedId = (getG("id") || "").trim();        // g:id (internal)
+          const title  = (getG("title") || "").trim();     // g:title (usually W183)
+          const mpn    = (getG("mpn") || "").trim();
+          const sku    = (getG("sku") || "").trim();
 
-          const realCode = chooseRealCode({ mpn, sku, title, id });
+          const image  = (getG("image_link") || "").trim();
+          const type   = (getG("product_type") || "General").trim();
+          const price  = parseFloat((getG("price") || "").replace(/[^\d.]/g, "")) || 0;
 
-          return { id, title, mpn, sku, realCode, image, type, price };
+          const realCode = chooseRealCode({ mpn, sku, title, feedId });
+
+          return { feedId, title, mpn, sku, realCode, image, type, price };
         })
-        .filter(p => p.id && p.image);
+        .filter(p => p.feedId && p.image);
 
       const urlParams = new URLSearchParams(window.location.search);
       const catFromUrl = urlParams.get("cat");
@@ -497,10 +498,9 @@
     state.filtered = state.products.filter(p => {
       const okCat = (state.currentCat === "ALL" || p.type === state.currentCat);
 
-      // Search by title OR real code OR id (without showing them)
-      const t = (p.title || "").toLowerCase();
+      const t  = (p.title || "").toLowerCase();
       const c1 = (p.realCode || "").toLowerCase();
-      const c2 = (p.id || "").toLowerCase();
+      const c2 = (p.feedId || "").toLowerCase();
 
       const okQ = !q ? true : (t.includes(q) || c1.includes(q) || c2.includes(q));
       return okCat && okQ;
@@ -534,9 +534,9 @@
     }
 
     container.innerHTML = state.filtered.map(p => {
-      const inCart = state.cart.has(p.id);
+      const inCart = state.cart.has(p.feedId);
 
-      // No code / no price on cards (only category under image)
+      // ✅ No code / no price on cards — only category under image
       return `
         <div class="product-card p-3 flex flex-col shadow-sm">
           <div class="aspect-square mb-2 bg-gray-50 rounded-2xl p-2 overflow-hidden">
@@ -546,11 +546,12 @@
                  alt="MAD">
           </div>
 
+          <!-- CATEGORY UNDER IMAGE -->
           <p class="text-[11px] font-black text-gray-500 mb-3 clamp-1">
             ${escapeHtml(p.type)}
           </p>
 
-          <button onclick="addToCart('${escapeQuotes(p.id)}')"
+          <button onclick="addToCart('${escapeQuotes(p.feedId)}')"
             class="mt-auto w-full ${inCart ? 'bg-black text-white' : 'bg-[#C5A059] text-black'} py-3 rounded-2xl font-black text-xs active:scale-95 transition">
             ${inCart ? escapeHtml(T.addMore) : escapeHtml(T.addToCart)}
           </button>
@@ -560,23 +561,23 @@
   }
 
   /* === CART FUNCTIONS === */
-  window.addToCart = (id) => {
-    state.cart.set(id, (state.cart.get(id) || 0) + 1);
+  window.addToCart = (feedId) => {
+    state.cart.set(feedId, (state.cart.get(feedId) || 0) + 1);
     updateCartUI();
     renderProducts();
     openCart();
   };
 
-  window.changeQty = (id, delta) => {
-    const next = (state.cart.get(id) || 0) + delta;
-    if (next <= 0) state.cart.delete(id);
-    else state.cart.set(id, next);
+  window.changeQty = (feedId, delta) => {
+    const next = (state.cart.get(feedId) || 0) + delta;
+    if (next <= 0) state.cart.delete(feedId);
+    else state.cart.set(feedId, next);
     updateCartUI();
     renderProducts();
   };
 
-  window.removeItem = (id) => {
-    state.cart.delete(id);
+  window.removeItem = (feedId) => {
+    state.cart.delete(feedId);
     updateCartUI();
     renderProducts();
   };
@@ -585,8 +586,8 @@
     let subtotal = 0;
     let totalQty = 0;
 
-    state.cart.forEach((qty, id) => {
-      const p = state.products.find(x => x.id === id);
+    state.cart.forEach((qty, feedId) => {
+      const p = state.products.find(x => x.feedId === feedId);
       if (!p) return;
       totalQty += qty;
       subtotal += (Number(p.price || 0) * qty);
@@ -609,11 +610,11 @@
 
     let html = "";
 
-    state.cart.forEach((qty, id) => {
-      const p = state.products.find(x => x.id === id);
+    state.cart.forEach((qty, feedId) => {
+      const p = state.products.find(x => x.feedId === feedId);
       if (!p) return;
 
-      const code = p.realCode || p.id; // ✅ REAL CODE
+      const code = p.realCode || p.title || p.feedId; // ✅ REAL CODE
       const unit = Number(p.price || 0);
       const line = unit * qty;
 
@@ -623,15 +624,18 @@
             <img src="${p.image}" class="w-14 h-14 object-contain mix-blend-multiply" alt="MAD">
 
             <div class="flex-1 min-w-0">
-              <p class="font-black text-[12px] leading-tight clamp-1">${escapeHtml(p.type)}</p>
+              <p class="font-black text-[13px] leading-tight clamp-1">${escapeHtml(code)}</p>
+              <p class="text-[11px] font-black text-gray-500 mt-1 clamp-1">${escapeHtml(p.type)}</p>
 
-              <div class="mt-1">
+              <!-- CODE IN CART -->
+              <div class="mt-2">
                 <span class="inline-flex items-center gap-2 bg-white border px-2.5 py-1 rounded-xl">
                   <span class="text-[11px] font-black text-gray-500">${escapeHtml(T.codeLabel)}</span>
                   <span class="text-[11px] font-black text-black">${escapeHtml(code)}</span>
                 </span>
               </div>
 
+              <!-- PRICE IN CART -->
               <div class="flex items-center justify-between mt-2">
                 <div class="text-[12px] font-black text-gray-700">
                   ${escapeHtml(T.unitLabel)}: <span class="text-[#C5A059]">₪${unit.toFixed(0)}</span>
@@ -642,17 +646,17 @@
               </div>
 
               <div class="flex items-center gap-3 mt-2">
-                <button onclick="changeQty('${escapeQuotes(id)}', -1)"
+                <button onclick="changeQty('${escapeQuotes(feedId)}', -1)"
                   class="w-9 h-9 rounded-2xl bg-white border flex items-center justify-center font-black text-gray-700 active:scale-95 transition">-</button>
 
                 <span class="text-sm font-black w-6 text-center">${qty}</span>
 
-                <button onclick="changeQty('${escapeQuotes(id)}', 1)"
+                <button onclick="changeQty('${escapeQuotes(feedId)}', 1)"
                   class="w-9 h-9 rounded-2xl bg-white border flex items-center justify-center font-black text-gray-700 active:scale-95 transition">+</button>
               </div>
             </div>
 
-            <button onclick="removeItem('${escapeQuotes(id)}')"
+            <button onclick="removeItem('${escapeQuotes(feedId)}')"
               class="text-gray-300 text-xl px-2 active:scale-95 transition" aria-label="Remove">✕</button>
           </div>
         </div>
@@ -694,17 +698,18 @@
     if (addr) msg += `${T.wa.addr}: ${addr}\n`;
     msg += `━━━━━━━━━━━━\n${T.wa.cart}:\n`;
 
-    state.cart.forEach((qty, id) => {
-      const p = state.products.find(x => x.id === id);
+    state.cart.forEach((qty, feedId) => {
+      const p = state.products.find(x => x.feedId === feedId);
       if (!p) return;
 
-      const code = p.realCode || p.id; // ✅ REAL CODE
+      const code = p.realCode || p.title || p.feedId; // ✅ REAL CODE
       const unit = Number(p.price || 0);
       const line = unit * qty;
 
-      msg += `▪️ ${p.type}\n`;
+      msg += `▪️ ${code}\n`;
       msg += `   ${T.wa.code}: ${code}\n`;
       msg += `   ${T.wa.unit}: ₪${unit.toFixed(0)} | x${qty} | ${T.wa.line}: ₪${line.toFixed(0)}\n`;
+      msg += `   ${p.type}\n`;
     });
 
     msg += `━━━━━━━━━━━━\n${T.wa.sub}: ₪${subtotal.toFixed(0)}\n`;
