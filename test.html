@@ -80,6 +80,7 @@
 
   <!-- =========================
        PIXELS (FB / TikTok / Snap)
+       All events here are Lead (per your rule)
        ========================= -->
   <script>
     const PIXELS = {
@@ -103,20 +104,32 @@
       }catch(e){ console.warn("FB Pixel error", e); }
     })();
 
-    // TikTok Pixel
+    // TikTok Pixel (FIXED)
     (function(){
       try{
         if(!PIXELS.tiktok) return;
         !function (w, d, t) {
-          w.TiktokAnalyticsObject=t; var ttq=w[t]=w[t]||[];
+          w.TiktokAnalyticsObject=t;
+          var ttq=w[t]=w[t]||[];
           ttq.methods=["page","track","identify","instances","debug","on","off","once","ready","alias","group","enableCookie","disableCookie"];
-          ttq.setAndDefer=function(t,e){t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}};
-          for(var i=0;i<ttq.methods.length;i++) ttq.setAndDefer(ttq,ttq.methods[i]);
-          ttq.instance=function(t){for(var e=ttq._i[t]||[],n=0;n<ttq.methods.length;n++) ttq.setAndDefer(e,ttq.methods[n]); return e};
-          ttq.load=function(e,n){var i="https://analytics.tiktok.com/i18n/pixel/events.js";
-            ttq._i=ttq._i||{}; ttq._i[e]=[]; ttq._i[e]._u=i; ttq._t=ttq._t||{}; ttq._t[e]=+new Date; ttq._o=ttq._o||{}; ttq._o[e]=n||{};
-            var o=d.createElement("script"); o.type="text/javascript"; o.async=!0; o.src=i+"?sdkid="+e+"&lib="+t;
-            var a=d.getElementsByTagName("script")[0]; a.parentNode.insertBefore(o,a)};
+          ttq.setAndDefer=function(t,e){ t[e]=function(){ t.push([e].concat([].slice.call(arguments,0))); }; };
+          for(var i=0;i<ttq.methods.length;i++) ttq.setAndDefer(ttq, ttq.methods[i]);
+          ttq.instance=function(t){ for(var e=ttq._i[t]||[],n=0;n<ttq.methods.length;n++) ttq.setAndDefer(e,ttq.methods[n]); return e; };
+          ttq.load=function(e,n){
+            var i="https://analytics.tiktok.com/i18n/pixel/events.js";
+            ttq._i=ttq._i||{};
+            ttq._i[e]=[];
+            ttq._i[e]._u=i;
+            ttq._t=ttq._t||{};
+            ttq._t[e]=+new Date;
+            ttq._o=ttq._o||{};
+            ttq._o[e]=n||{};
+            var o=d.createElement("script");
+            o.type="text/javascript"; o.async=!0;
+            o.src=i+"?sdkid="+e+"&lib="+t;
+            var a=d.getElementsByTagName("script")[0];
+            a.parentNode.insertBefore(o,a);
+          };
           ttq.load(PIXELS.tiktok);
           ttq.page();
         }(window, document, 'ttq');
@@ -138,26 +151,23 @@
       }catch(e){ console.warn("Snap Pixel error", e); }
     })();
 
-    function fireCheckoutEvent(){
-      try{ if(window.fbq) fbq('track', 'InitiateCheckout'); }catch(e){}
-      try{ if(window.ttq) ttq.track('InitiateCheckout'); }catch(e){}
-      try{ if(window.snaptr) snaptr('track', 'START_CHECKOUT'); }catch(e){}
-    }
-
-    function firePurchaseEvent(totalValue){
+    // Unified LEAD event
+    function fireLeadEvent(extra){
       try{
         if(window.fbq){
-          fbq('track', 'Purchase', (typeof totalValue === "number" ? {value: totalValue, currency: "ILS"} : undefined));
+          fbq('track', 'Lead', extra || {});
         }
       }catch(e){}
       try{
         if(window.ttq){
-          ttq.track('CompletePayment', (typeof totalValue === "number" ? {value: totalValue, currency: "ILS"} : undefined));
+          // Custom event name "Lead"
+          ttq.track('Lead', extra || {});
         }
       }catch(e){}
       try{
         if(window.snaptr){
-          snaptr('track', 'PURCHASE', (typeof totalValue === "number" ? {price: totalValue, currency: "ILS"} : undefined));
+          // Snap doesn't support arbitrary names everywhere -> use CUSTOM_EVENT_1 as Lead
+          snaptr('track', 'CUSTOM_EVENT_1', Object.assign({ label: 'Lead' }, (extra||{})));
         }
       }catch(e){}
     }
@@ -195,7 +205,7 @@
                class="w-full bg-white/10 border border-white/20 rounded-2xl px-4 py-3.5 text-white text-sm outline-none focus:border-[#C5A059]"
                placeholder="بحث عن عطر..."
                autocomplete="off" />
-        <p id="searchHint" class="text-white/60 text-[11px] mt-2">اكتب اسم العطر</p>
+        <p id="searchHint" class="text-white/60 text-[11px] mt-2">اكتب اسم العطر أو الباركود</p>
       </div>
     </section>
 
@@ -296,7 +306,7 @@
       pageTitle: "MAD Parfumeur | الموقع",
       heroTitleHTML: `عالم من <span class="text-[#C5A059]">الفخامة</span>`,
       searchPh: "بحث عن عطر...",
-      searchHint: "اكتب اسم العطر",
+      searchHint: "اكتب اسم العطر أو الباركود",
       all: "الكل",
       cartTitle: "عربة التسوق",
       namePh: "الاسم الكامل",
@@ -305,7 +315,7 @@
       subLabel: "المجموع",
       shipLabel: "التوصيل",
       totalLabel: "الإجمالي",
-      codeLabel: "الكود",
+      codeLabel: "الباركود",
       unitLabel: "سعر القطعة",
       lineLabel: "المجموع",
       sendBtn: "إرسال الطلب عبر واتساب",
@@ -325,7 +335,7 @@
         phone: "📞 الهاتف",
         addr: "📍 العنوان",
         cart: "🛒 السلة",
-        code: "🏷️ الكود",
+        code: "🏷️ الباركود",
         unit: "💵 سعر القطعة",
         line: "🧾 مجموع السطر",
         sub: "🧾 المجموع",
@@ -337,7 +347,7 @@
       pageTitle: "MAD Parfumeur | אתר",
       heroTitleHTML: `עולם של <span class="text-[#C5A059]">יוקרה</span>`,
       searchPh: "חיפוש בושם...",
-      searchHint: "הקלד שם בושם",
+      searchHint: "הקלד שם בושם או ברקוד",
       all: "הכל",
       cartTitle: "עגלת קניות",
       namePh: "שם מלא",
@@ -346,7 +356,7 @@
       subLabel: "סכום ביניים",
       shipLabel: "משלוח",
       totalLabel: "סה״כ",
-      codeLabel: "קוד",
+      codeLabel: "ברקוד",
       unitLabel: "מחיר יחידה",
       lineLabel: "סכום",
       sendBtn: "שליחת הזמנה בוואטסאפ",
@@ -366,7 +376,7 @@
         phone: "📞 טלפון",
         addr: "📍 כתובת",
         cart: "🛒 עגלה",
-        code: "🏷️ קוד",
+        code: "🏷️ ברקוד",
         unit: "💵 מחיר יחידה",
         line: "🧾 סה״כ שורה",
         sub: "🧾 סכום ביניים",
@@ -418,19 +428,10 @@
     products: [],
     filtered: [],
     currentCat: "ALL",
-    cart: new Map(), // id -> qty
-    checkoutFired: false,
-    purchaseFired: false
+    cart: new Map(),
+    leadCartFired: false,
+    leadOrderFired: false
   };
-
-  // Remove codes inside a longer title (ONLY for display/search)
-  function stripCodesFromTitle(title){
-    let t = String(title || "");
-    t = t.replace(/\b[A-Z]{1,4}\s*\.?\s*[A-Z]?\s*\.?\s*\d{2,4}\b/gi, " ");
-    t = t.replace(/[\|\-–—]+/g, " ");
-    t = t.replace(/\s{2,}/g, " ").trim();
-    return t;
-  }
 
   async function init() {
     applyLangUI();
@@ -443,13 +444,12 @@
       state.products = Array.from(xml.querySelectorAll("item"))
         .map(i => {
           const getG = (t) => i.querySelector(t)?.textContent || i.querySelector(`g\\:${t}`)?.textContent || "";
-          const id = (getG("id") || "").trim();          // <-- THIS is the CODE shown in cart
-          const rawTitle = (getG("title") || "").trim();
-          const titleClean = stripCodesFromTitle(rawTitle); // display name without codes
+          const id = (getG("id") || "").trim();                // CODE (only shown in cart)
+          const title = (getG("title") || "").trim();          // used ONLY for search (not displayed)
           const image = (getG("image_link") || "").trim();
           const type = (getG("product_type") || "General").trim();
           const price = parseFloat((getG("price") || "").replace(/[^\d.]/g, "")) || 0;
-          return { id, rawTitle, titleClean, image, type, price };
+          return { id, title, image, type, price };
         })
         .filter(p => p.id && p.image);
 
@@ -474,8 +474,8 @@
     state.filtered = state.products.filter(p => {
       const okCat = (state.currentCat === "ALL" || p.type === state.currentCat);
 
-      // search by clean title + allow search by code without showing it
-      const t = (p.titleClean || "").toLowerCase();
+      // Search can match title OR code, without showing them
+      const t = (p.title || "").toLowerCase();
       const c = (p.id || "").toLowerCase();
       const okQ = !q ? true : (t.includes(q) || c.includes(q));
 
@@ -512,7 +512,7 @@
     container.innerHTML = state.filtered.map(p => {
       const inCart = state.cart.has(p.id);
 
-      // IMPORTANT: No code, no price shown here.
+      // IMPORTANT: No code, no price, no name here. ONLY category under image.
       return `
         <div class="product-card p-3 flex flex-col shadow-sm">
           <div class="aspect-square mb-2 bg-gray-50 rounded-2xl p-2 overflow-hidden">
@@ -522,17 +522,9 @@
                  alt="MAD">
           </div>
 
-          <!-- CATEGORY UNDER IMAGE -->
           <p class="text-[11px] font-black text-gray-500 mb-3 clamp-1">
             ${escapeHtml(p.type)}
           </p>
-
-          <!-- Name without codes (optional) -->
-          ${p.titleClean ? `
-            <h3 class="font-black text-[12px] leading-snug mb-3 clamp-2" style="min-height: 2.4em;">
-              ${escapeHtml(p.titleClean)}
-            </h3>
-          ` : `<div class="mb-3" style="min-height:2.4em;"></div>`}
 
           <button onclick="addToCart('${escapeQuotes(p.id)}')"
             class="mt-auto w-full ${inCart ? 'bg-black text-white' : 'bg-[#C5A059] text-black'} py-3 rounded-2xl font-black text-xs active:scale-95 transition">
@@ -597,7 +589,7 @@
       const p = state.products.find(x => x.id === id);
       if (!p) return;
 
-      const code = p.id; // <-- code shown in cart
+      const code = p.id; // CODE shown in cart
       const unit = Number(p.price || 0);
       const line = unit * qty;
 
@@ -607,8 +599,7 @@
             <img src="${p.image}" class="w-14 h-14 object-contain mix-blend-multiply" alt="MAD">
 
             <div class="flex-1 min-w-0">
-              <p class="font-black text-[12px] leading-tight clamp-2">${escapeHtml(p.titleClean || p.type)}</p>
-              <p class="text-[11px] font-black text-gray-500 mt-1 clamp-1">${escapeHtml(p.type)}</p>
+              <p class="font-black text-[12px] leading-tight clamp-1">${escapeHtml(p.type)}</p>
 
               <!-- CODE IN CART -->
               <div class="mt-1">
@@ -654,9 +645,10 @@
     document.getElementById("cartOverlay").classList.remove("hidden");
     document.getElementById("cartDrawer").classList.remove("translate-y-full");
 
-    if (!state.checkoutFired && state.cart.size > 0) {
-      state.checkoutFired = true;
-      fireCheckoutEvent();
+    // Lead when cart opened first time with items
+    if (!state.leadCartFired && state.cart.size > 0) {
+      state.leadCartFired = true;
+      fireLeadEvent({ source: "cart_open" });
     }
   }
 
@@ -690,7 +682,7 @@
       const unit = Number(p.price || 0);
       const line = unit * qty;
 
-      msg += `▪️ ${p.titleClean || p.type}\n`;
+      msg += `▪️ ${p.type}\n`;
       msg += `   ${T.wa.code}: ${code}\n`;
       msg += `   ${T.wa.unit}: ₪${unit.toFixed(0)} | x${qty} | ${T.wa.line}: ₪${line.toFixed(0)}\n`;
     });
@@ -699,9 +691,10 @@
     msg += `${T.wa.ship}: ₪${Number(SHIPPING).toFixed(0)}\n`;
     msg += `${T.wa.total}: ₪${total.toFixed(0)}`;
 
-    if (!state.purchaseFired) {
-      state.purchaseFired = true;
-      firePurchaseEvent(total);
+    // Lead before redirect to WhatsApp (once)
+    if (!state.leadOrderFired) {
+      state.leadOrderFired = true;
+      fireLeadEvent({ source: "whatsapp_order", value: total, currency: "ILS" });
     }
 
     setTimeout(() => {
