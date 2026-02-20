@@ -145,7 +145,6 @@
     }
 
     function firePurchaseEvent(totalValue){
-      // totalValue optional
       try{
         if(window.fbq){
           fbq('track', 'Purchase', (typeof totalValue === "number" ? {value: totalValue, currency: "ILS"} : undefined));
@@ -374,7 +373,6 @@
   let T = I18N[LANG] || I18N.ar;
 
   function applyLangUI(){
-    // Hebrew + Arabic are RTL
     document.documentElement.lang = LANG;
     document.documentElement.dir = "rtl";
     document.title = T.pageTitle;
@@ -398,7 +396,7 @@
   }
 
   /* =========================
-     CONFIG & LOGIC
+     CONFIG
      ========================= */
   const WHATSAPP_API = "972524033442";
   const SHIPPING = 50;
@@ -413,13 +411,25 @@
     purchaseFired: false
   };
 
-  function cleanTitle(title){
-    // remove codes like W150 / W.150 / X102 / P104 / XM A.102 etc.
+  // TRUE if string looks like only a code (I101 / W183 / X102 / P104 / XM A.102 ...etc)
+  function isCodeOnly(str){
+    const s = String(str || "").trim();
+    if(!s) return false;
+    // common patterns: I101, W183, X102, P104, XM A.102, A.102, W.150
+    return (
+      /^[A-Z]{1,4}\d{2,4}$/i.test(s) ||
+      /^[A-Z]{1,4}\s*\.?\s*[A-Z]?\s*\.?\s*\d{2,4}$/i.test(s)
+    );
+  }
+
+  // Remove codes inside a longer title
+  function stripCodesFromTitle(title){
     let t = String(title || "");
-    t = t.replace(/\b([A-Z]{1,4}\s*\.?\s*[A-Z]?\s*\.?\s*\d{2,4})\b/gi, " ");
+    // remove token-like codes anywhere
+    t = t.replace(/\b[A-Z]{1,4}\s*\.?\s*[A-Z]?\s*\.?\s*\d{2,4}\b/gi, " ");
     t = t.replace(/[\|\-–—]+/g, " ");
     t = t.replace(/\s{2,}/g, " ").trim();
-    return t || String(title || "").trim();
+    return t;
   }
 
   async function init() {
@@ -434,16 +444,21 @@
         .map(i => {
           const getG = (t) => i.querySelector(t)?.textContent || i.querySelector(`g\\:${t}`)?.textContent || "";
           const id = (getG("id") || "").trim();
+
           const rawTitle = (getG("title") || "").trim();
-          const title = cleanTitle(rawTitle);
+          let title = stripCodesFromTitle(rawTitle);
+
+          // If title becomes empty OR title itself is just a code -> hide it completely
+          if (!title || isCodeOnly(rawTitle) || isCodeOnly(title)) title = "";
+
           const image = (getG("image_link") || "").trim();
           const type = (getG("product_type") || "General").trim();
           const price = parseFloat((getG("price") || "").replace(/[^\d.]/g, "")) || 0;
+
           return { id, title, rawTitle, image, type, price };
         })
-        .filter(p => p.id && p.title);
+        .filter(p => p.id && p.image); // keep products even if title hidden
 
-      // قراءة القسم من الرابط
       const urlParams = new URLSearchParams(window.location.search);
       const catFromUrl = urlParams.get("cat");
       if (catFromUrl) state.currentCat = decodeURIComponent(catFromUrl);
@@ -461,10 +476,17 @@
 
   function applyFilter() {
     const q = (document.getElementById("search").value || "").toLowerCase().trim();
-    state.filtered = state.products.filter(p =>
-      (state.currentCat === "ALL" || p.type === state.currentCat) &&
-      (p.title.toLowerCase().includes(q) || p.rawTitle.toLowerCase().includes(q))
-    );
+
+    state.filtered = state.products.filter(p => {
+      const okCat = (state.currentCat === "ALL" || p.type === state.currentCat);
+
+      // search by cleaned title only (no codes)
+      const title = (p.title || "").toLowerCase();
+      const okQ = !q ? true : title.includes(q);
+
+      return okCat && okQ;
+    });
+
     renderProducts();
   }
 
@@ -494,23 +516,28 @@
 
     container.innerHTML = state.filtered.map(p => {
       const inCart = state.cart.has(p.id);
+
+      // IMPORTANT: No code, no price, no id shown here.
       return `
         <div class="product-card p-3 flex flex-col shadow-sm">
           <div class="aspect-square mb-2 bg-gray-50 rounded-2xl p-2 overflow-hidden">
             <img src="${p.image}"
                  class="w-full h-full object-contain mix-blend-multiply"
                  loading="lazy"
-                 alt="${escapeHtml(p.title)}">
+                 alt="MAD">
           </div>
 
           <!-- CATEGORY UNDER IMAGE -->
-          <p class="text-[11px] font-black text-gray-500 mb-2 clamp-1">
+          <p class="text-[11px] font-black text-gray-500 mb-3 clamp-1">
             ${escapeHtml(p.type)}
           </p>
 
-          <h3 class="font-black text-[12px] leading-snug mb-3 clamp-2" style="min-height: 2.4em;">
-            ${escapeHtml(p.title)}
-          </h3>
+          <!-- Optional: title (only if NOT code). If you want remove names completely, delete this block. -->
+          ${p.title ? `
+            <h3 class="font-black text-[12px] leading-snug mb-3 clamp-2" style="min-height: 2.4em;">
+              ${escapeHtml(p.title)}
+            </h3>
+          ` : `<div class="mb-3" style="min-height:2.4em;"></div>`}
 
           <button onclick="addToCart('${escapeQuotes(p.id)}')"
             class="mt-auto w-full ${inCart ? 'bg-black text-white' : 'bg-[#C5A059] text-black'} py-3 rounded-2xl font-black text-xs active:scale-95 transition">
@@ -526,7 +553,7 @@
     state.cart.set(id, (state.cart.get(id) || 0) + 1);
     updateCartUI();
     renderProducts();
-    openCart(true);
+    openCart();
   };
 
   window.changeQty = (id, delta) => {
@@ -581,13 +608,13 @@
       html += `
         <div class="bg-gray-50 p-3 rounded-2xl">
           <div class="flex items-center gap-3">
-            <img src="${p.image}" class="w-14 h-14 object-contain mix-blend-multiply" alt="${escapeHtml(p.title)}">
+            <img src="${p.image}" class="w-14 h-14 object-contain mix-blend-multiply" alt="MAD">
 
             <div class="flex-1 min-w-0">
-              <p class="font-black text-[12px] leading-tight clamp-2">${escapeHtml(p.title)}</p>
+              <p class="font-black text-[12px] leading-tight clamp-2">${escapeHtml(p.title || p.type)}</p>
               <p class="text-[11px] font-black text-gray-500 mt-1 clamp-1">${escapeHtml(p.type)}</p>
 
-              <!-- PRICE INSIDE CART -->
+              <!-- PRICE INSIDE CART ONLY -->
               <div class="flex items-center justify-between mt-2">
                 <span class="text-[#C5A059] font-black text-sm">₪${unit.toFixed(0)}</span>
                 <span class="text-gray-600 font-black text-sm">₪${line.toFixed(0)}</span>
@@ -619,7 +646,6 @@
     document.getElementById("cartOverlay").classList.remove("hidden");
     document.getElementById("cartDrawer").classList.remove("translate-y-full");
 
-    // Pixel event after cart popup (checkout)
     if (!state.checkoutFired && state.cart.size > 0) {
       state.checkoutFired = true;
       fireCheckoutEvent();
@@ -652,14 +678,13 @@
       const p = state.products.find(x => x.id === id);
       if (!p) return;
       const line = (Number(p.price || 0) * qty);
-      msg += `▪️ ${p.title} (x${qty}) - ₪${line.toFixed(0)}\n`;
+      msg += `▪️ ${p.title || p.type} (x${qty}) - ₪${line.toFixed(0)}\n`;
     });
 
     msg += `━━━━━━━━━━━━\n${T.wa.sub}: ₪${subtotal.toFixed(0)}\n`;
     msg += `${T.wa.ship}: ₪${Number(SHIPPING).toFixed(0)}\n`;
     msg += `${T.wa.total}: ₪${total.toFixed(0)}`;
 
-    // Pixel purchase BEFORE redirect to WhatsApp
     if (!state.purchaseFired) {
       state.purchaseFired = true;
       firePurchaseEvent(total);
