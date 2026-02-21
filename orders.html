@@ -261,8 +261,11 @@ function analyzeText() {
 async function load() {
   showLoading(true);
   try {
-    const res = await fetch(`${SCRIPT_URL}?action=get&_=${Date.now()}`);
-    allOrders = await res.json();
+    // ✅ صار يرسل KEY (عشان الباك اند محمي)
+    const res = await fetch(`${SCRIPT_URL}?action=get&key=${encodeURIComponent(DASH_KEY)}&_=${Date.now()}`);
+    const data = await res.json();
+    if(data && data.result === "ERROR") throw new Error(data.message || "ERROR");
+    allOrders = Array.isArray(data) ? data : [];
     renderOrders(allOrders);
   } catch(e) { showToast("خطأ في جلب البيانات"); }
   showLoading(false);
@@ -270,7 +273,7 @@ async function load() {
 
 function filterOrders() {
   const term = document.getElementById('searchInput').value.toLowerCase();
-  const filtered = allOrders.filter(o => safe(o.name).toLowerCase().includes(term) || safe(o.phone).includes(term));
+  const filtered = allOrders.filter(o => safe(o.name).toLowerCase().includes(term) || formatLocalPhone(safe(o.phone)).includes(term) || safe(o.phone).includes(term));
   renderOrders(filtered);
 }
 
@@ -348,7 +351,6 @@ async function sendMsg(row, lang) {
     ? (lang === "he" ? `\n${E.truck} חברת משלוח: ${safe(o.delivery)}` : `\n${E.truck} شركة التوصيل: ${safe(o.delivery)}`)
     : "";
 
-  // ✅ روابط قابلة للضغط داخل واتساب
   const serviceWaLink = `https://wa.me/${CUSTOMER_SERVICE_PHONE}`;
   const telStarLink = `tel:${CUSTOMER_SERVICE_STAR}`;
 
@@ -388,9 +390,15 @@ async function approve(row) {
     status: "بانتظار الإرسال للتجهيز"
   });
   try {
-    await fetch(`${SCRIPT_URL}?${p.toString()}`);
-    showToast("تم الاعتماد بنجاح ✨");
-    load();
+    const res = await fetch(`${SCRIPT_URL}?${p.toString()}`);
+    const data = await res.json();
+    if(data.result === "SUCCESS") {
+      showToast("تم الاعتماد بنجاح ✨");
+      load();
+    } else {
+      showToast("فشل التحديث");
+      showLoading(false);
+    }
   } catch(e) {
     showToast("فشل التحديث");
     showLoading(false);
