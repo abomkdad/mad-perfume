@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#0A0A0A" />
+  <meta property="og:image" content="https://www.mad-parfumeur.com/assets/hero/logo2.webp" />
+  <title>MAD Parfumeur | website</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    :root { --gold:#C5A059; --dark:#0A0A0A; }
+
+    body{
+      background:#e9eaec;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      -webkit-tap-highlight-color: transparent;
+      overscroll-behavior-y: none;
+    }
+    .app{
+      max-width:520px;
+      margin:0 auto;
+      min-height:100dvh;
+      background:#FDFCFB;
+      box-shadow:0 10px 40px rgba(0,0,0,.12);
+    }
+    @media (max-width: 560px){
+      body{ background:#FDFCFB; }
+      .app{ max-width:none; box-shadow:none; }
+    }
+
+    .glass-dark{ background: rgba(10,10,10,.98); backdrop-filter: blur(14px); }
+    .product-card{ background:#fff; border-radius:18px; transition:.2s; border:1px solid #f0f0f0; }
+    .product-card:active{ transform: scale(.99); }
+
+    .no-scrollbar::-webkit-scrollbar{ display:none; }
+    .no-scrollbar{ scrollbar-width: none; }
+
+    .clamp-1, .clamp-2{
+      display:-webkit-box;
+      -webkit-box-orient: vertical;
+      overflow:hidden;
+    }
+    .clamp-1{ -webkit-line-clamp:1; }
+    .clamp-2{ -webkit-line-clamp:2; }
+
+    .sheet-shadow{ box-shadow: 0 -18px 40px rgba(0,0,0,.18); }
+
+    .toast{
+      position: fixed;
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: calc(16px + env(safe-area-inset-bottom));
+      z-index: 9999;
+      background: rgba(10,10,10,.92);
+      color: #fff;
+      padding: 10px 14px;
+      border-radius: 16px;
+      font-size: 12px;
+      font-weight: 900;
+      display: none;
+      box-shadow: 0 14px 30px rgba(0,0,0,.28);
+      max-width: min(520px, calc(100vw - 24px));
+      text-align:center;
+    }
+  </style>
+
+  <!-- =========================
+       PIXELS (FB / TikTok / Snap)
+       ========================= -->
+  <script>
+    const PIXELS = {
+      facebook: "1072283127290819",
+      tiktok: "D2D02JBC77U4ENLN9SBG",
+      snapchat: "b143822e-1c3c-40ff-93f7-edadee74e626"
+    };
+
+    // Facebook Pixel
+    (function(){
+      try{
+        !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+          n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
+          n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
+          t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window, document,'script',
+          'https://connect.facebook.net/en_US/fbevents.js');
+        if(PIXELS.facebook){
+          fbq('init', PIXELS.facebook);
+          fbq('track', 'PageView');
+        }
+      }catch(e){ console.warn("FB Pixel error", e); }
+    })();
+
+    // TikTok Pixel
+    (function(){
+      try{
+        if(!PIXELS.tiktok) return;
+        !function (w, d, t) {
+          w.TiktokAnalyticsObject=t;
+          var ttq=w[t]=w[t]||[];
+          ttq.methods=["page","track","identify","instances","debug","on","off","once","ready","alias","group","enableCookie","disableCookie"];
+          ttq.setAndDefer=function(t,e){ t[e]=function(){ t.push([e].concat([].slice.call(arguments,0))); }; };
+          for(var i=0;i<ttq.methods.length;i++) ttq.setAndDefer(ttq, ttq.methods[i]);
+          ttq.instance=function(t){ for(var e=ttq._i[t]||[],n=0;n<ttq.methods.length;n++) ttq.setAndDefer(e,ttq.methods[n]); return e; };
+          ttq.load=function(e,n){
+            var i="https://analytics.tiktok.com/i18n/pixel/events.js";
+            ttq._i=ttq._i||{};
+            ttq._i[e]=[];
+            ttq._i[e]._u=i;
+            ttq._t=ttq._t||{};
+            ttq._t[e]=+new Date;
+            ttq._o=ttq._o||{};
+            ttq._o[e]=n||{};
+            var o=d.createElement("script");
+            o.type="text/javascript"; o.async=!0;
+            o.src=i+"?sdkid="+e+"&lib="+t;
+            var a=d.getElementsByTagName("script")[0];
+            a.parentNode.insertBefore(o,a);
+          };
+          ttq.load(PIXELS.tiktok);
+          ttq.page();
+        }(window, document, 'ttq');
+      }catch(e){ console.warn("TikTok Pixel error", e); }
+    })();
+
+    // Snap Pixel
+    (function(){
+      try{
+        if(!PIXELS.snapchat) return;
+        (function(e,t,n){if(e.snaptr)return;var a=e.snaptr=function()
+          {a.handleRequest?a.handleRequest.apply(a,arguments):a.queue.push(arguments)};
+          a.queue=[];var s='script';var r=t.createElement(s);r.async=!0;
+          r.src=n;var u=t.getElementsByTagName(s)[0];u.parentNode.insertBefore(r,u);
+        })(window,document,'https://sc-static.net/scevent.min.js');
+
+        snaptr('init', PIXELS.snapchat, { 'user_email': '' });
+        snaptr('track', 'PAGE_VIEW');
+      }catch(e){ console.warn("Snap Pixel error", e); }
+    })();
+
+    function makeEventId(prefix){
+      try{ if(window.crypto && crypto.randomUUID) return (prefix||"evt") + "_" + crypto.randomUUID(); }catch(e){}
+      return (prefix||"evt") + "_" + (Date.now().toString(16) + Math.random().toString(16).slice(2));
+    }
+    function getCookie(name){
+      try{
+        const m = document.cookie.match(new RegExp("(^|; )" + name + "=([^;]*)"));
+        return m ? decodeURIComponent(m[2]) : "";
+      }catch(e){ return ""; }
+    }
+    function getFbc(){
+      try{
+        const fbclid = new URLSearchParams(location.search).get("fbclid");
+        const existing = getCookie("_fbc");
+        if(!fbclid) return existing || "";
+        const fbc = `fb.1.${Math.floor(Date.now()/1000)}.${fbclid}`;
+        try{ document.cookie = `_fbc=${encodeURIComponent(fbc)}; path=/; max-age=7776000; SameSite=Lax`; }catch(e){}
+        return fbc;
+      }catch(e){
+        return getCookie("_fbc") || "";
+      }
+    }
+
+    // Lead (Meta + TikTok + Snap) — Meta uses eventID for dedup later
+    function fireLeadEvent(extra, eventID){
+      const payload = Object.assign({}, (extra||{}));
+      const eid = eventID || makeEventId("lead");
+      payload.event_id = eid;
+      payload.event_source_url = location.href;
+
+      try{ if(window.fbq) fbq('track', 'Lead', payload, { eventID: eid }); }catch(e){}
+      try{ if(window.ttq) ttq.track('Lead', payload); }catch(e){}
+      try{ if(window.snaptr) snaptr('track', 'CUSTOM_EVENT_1', Object.assign({ label: 'Lead' }, payload)); }catch(e){}
+
+      return eid;
+    }
+  </script>
+</head>
+
+<body class="antialiased">
+  <div class="app">
+
+    <!-- TOP NAV -->
+    <nav class="sticky top-0 z-50 glass-dark border-b border-white/10 px-4 py-3 flex justify-between items-center"
+         style="padding-top: calc(0.75rem + env(safe-area-inset-top));">
+      <div class="flex items-center gap-2">
+        <img src="https://www.mad-parfumeur.com/assets/hero/logo.png" class="h-8 brightness-0 invert" alt="MAD" />
+        <span class="text-white font-black text-sm italic uppercase tracking-tighter">MAD Parfumeur</span>
+      </div>
+
+      <button id="cartBtn" class="relative p-2 text-white active:scale-95 transition" aria-label="Cart">
+        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+        </svg>
+        <span id="cartCountBadge"
+              class="absolute -top-1 -right-1 bg-[#C5A059] text-white text-[10px] w-5 h-5 flex items-center justify-center rounded-full font-black">0</span>
+      </button>
+    </nav>
+
+    <!-- HERO -->
+    <section class="bg-[#0A0A0A] pt-8 pb-14 px-5 text-center">
+      <h1 id="heroTitle" class="text-white text-3xl font-black mb-4 leading-tight">
+        عالم من <span class="text-[#C5A059]">الفخامة</span>
+      </h1>
+
+      <div class="mx-auto max-w-md">
+        <input id="search"
+               class="w-full bg-white/10 border border-white/20 rounded-2xl px-4 py-3.5 text-white text-sm outline-none focus:border-[#C5A059]"
+               placeholder="بحث عن عطر..."
+               autocomplete="off" />
+        <p id="searchHint" class="text-white/60 text-[11px] mt-2">اكتب اسم العطر</p>
+        <p id="freeShipHint" class="text-white/70 text-[11px] mt-2 font-black"></p>
+      </div>
+    </section>
+
+    <!-- CATEGORIES -->
+    <div class="px-4 -mt-7 relative z-20">
+      <div id="categories" class="flex overflow-x-auto gap-2 py-3 no-scrollbar"></div>
+    </div>
+
+    <!-- PRODUCTS -->
+    <main class="px-3 pb-24 mt-3" style="padding-bottom: calc(6rem + env(safe-area-inset-bottom));">
+      <div id="products" class="grid grid-cols-2 gap-3"></div>
+    </main>
+
+  </div>
+
+  <!-- TOAST -->
+  <div id="toast" class="toast"></div>
+
+  <!-- SUCCESS MODAL -->
+  <div id="successModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden z-[9999]">
+    <div class="min-h-full flex items-center justify-center p-4">
+      <div class="bg-white rounded-[28px] shadow-2xl w-full max-w-md p-5">
+        <div class="flex items-start justify-between gap-3">
+          <h3 id="successTitle" class="text-lg font-black text-black">شكراً لك!</h3>
+          <button id="closeSuccess" class="text-gray-400 text-2xl px-2 -my-2 active:scale-95 transition" aria-label="Close">✕</button>
+        </div>
+        <p id="successDesc" class="text-sm text-gray-600 font-bold mt-2">تم استلام طلبك بنجاح.</p>
+
+        <div class="mt-4 bg-gray-50 rounded-2xl p-4">
+          <p class="text-[12px] font-black text-gray-500 mb-2" id="successHint">رقم الطلب:</p>
+          <p class="font-black text-black text-base" id="successOrderId">—</p>
+        </div>
+
+        <button id="okSuccess"
+                class="mt-4 w-full bg-[#C5A059] text-black py-3 rounded-2xl font-black active:scale-[0.99] transition">
+          OK
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CART OVERLAY -->
+  <div id="cartOverlay" class="fixed inset-0 bg-black/55 backdrop-blur-sm hidden z-[100] transition-opacity"></div>
+
+  <!-- CART DRAWER (BOTTOM SHEET) -->
+  <div id="cartDrawer"
+       class="fixed inset-x-0 bottom-0 z-[101] translate-y-full transition-transform duration-500 sheet-shadow bg-white rounded-t-[2rem] flex flex-col"
+       style="height: min(92dvh, 760px); padding-bottom: env(safe-area-inset-bottom);">
+
+    <div class="w-full pt-3 pb-1 flex justify-center">
+      <div class="w-12 h-1.5 rounded-full bg-gray-200"></div>
+    </div>
+
+    <div class="px-5 pb-3 border-b flex items-center justify-between">
+      <h3 id="cartTitle" class="text-lg font-black">عربة التسوق</h3>
+      <button id="closeCart" class="text-gray-400 text-2xl px-2 -my-2 active:scale-95 transition" aria-label="Close">✕</button>
+    </div>
+
+    <div class="flex-1 overflow-y-auto px-5 py-4 space-y-3" id="cartItems"></div>
+
+    <div class="px-5 pt-4 pb-5 bg-[#0A0A0A] text-white rounded-t-[2rem]">
+      <div class="mb-3 space-y-2.5">
+        <input id="custName"
+               class="w-full bg-white/10 border border-white/10 rounded-2xl px-4 py-3 text-sm outline-none focus:border-[#C5A059]"
+               placeholder="الاسم الكامل"
+               autocomplete="name" />
+
+        <input id="custPhone"
+               class="w-full bg-white/10 border border-white/10 rounded-2xl px-4 py-3 text-sm outline-none focus:border-[#C5A059]"
+               placeholder="رقم الهاتف"
+               inputmode="tel"
+               autocomplete="tel" />
+
+        <textarea id="custAddress"
+                  class="w-full bg-white/10 border border-white/10 rounded-2xl px-4 py-3 text-sm outline-none focus:border-[#C5A059]"
+                  rows="2"
+                  placeholder="العنوان (اختياري)"
+                  autocomplete="street-address"></textarea>
+      </div>
+
+      <!-- PRICE SUMMARY (INSIDE CART ONLY) -->
+      <div class="mb-3 space-y-2">
+        <div class="flex justify-between text-sm font-black">
+          <span id="subLabel">المجموع</span>
+          <span class="text-white">₪<span id="subtotal">0</span></span>
+        </div>
+
+        <div class="flex justify-between text-sm font-black items-center">
+          <span class="flex items-center gap-2">
+            <span id="shipLabel">التوصيل</span>
+            <span id="shipFreeBadge" class="hidden text-[10px] font-black bg-white/10 border border-white/10 px-2 py-0.5 rounded-full">
+              مجاني
+            </span>
+          </span>
+          <span class="text-white">₪<span id="shipping">0</span></span>
+        </div>
+
+        <div class="flex justify-between font-black text-base pt-2 border-t border-white/10">
+          <span id="totalLabel">الإجمالي</span>
+          <span class="text-[#C5A059]">₪<span id="total">0</span></span>
+        </div>
+
+        <p id="cartFreeShipNote" class="text-[11px] text-white/65 font-bold pt-1"></p>
+      </div>
+
+      <button id="sendOrder"
+              class="w-full bg-[#C5A059] text-black py-4 rounded-2xl font-black text-sm uppercase tracking-widest flex items-center justify-center gap-2 active:scale-[0.99] transition">
+        <span id="sendOrderText">تأكيد الطلب</span>
+        <span id="sendOrderSpinner" class="hidden w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin"></span>
+      </button>
+
+      <p id="deliveryNote" class="text-[11px] text-white/60 mt-2 text-center">
+        الدفع عند الاستلام — سيتم تأكيد التفاصيل
+      </p>
+    </div>
+  </div>
+
+<script>
+  /* =========================
+     LANG (AUTO: AR / HE) — لغة الجهاز تلقائي
+     ========================= */
+  const I18N = {
+    ar: {
+      pageTitle: "MAD Parfumeur | الموقع",
+      heroTitleHTML: `عالم من <span class="text-[#C5A059]">الفخامة</span>`,
+      searchPh: "بحث عن عطر...",
+      searchHint: "اكتب اسم العطر",
+      freeShipTop: "🚚 التوصيل مجاني للطلبات فوق ₪500",
+      all: "الكل",
+      cartTitle: "عربة التسوق",
+      namePh: "الاسم الكامل",
+      phonePh: "رقم الهاتف",
+      addrPh: "العنوان (اختياري)",
+      subLabel: "المجموع",
+      shipLabel: "التوصيل",
+      shipFreeBadge: "مجاني",
+      shipNoteBelow: "التوصيل مجاني للطلبات فوق ₪500",
+      totalLabel: "الإجمالي",
+      codeLabel: "الكود",
+      unitLabel: "سعر القطعة",
+      lineLabel: "المجموع",
+      sendBtn: "تأكيد الطلب",
+      sending: "جارٍ الإرسال...",
+      deliveryNote: "الدفع عند الاستلام — سيتم تأكيد التفاصيل",
+      emptyCart: "السلة فارغة",
+      loadFail: "تعذّر تحميل المنتجات",
+      noResults: "لا توجد نتائج",
+      alertEmpty: "السلة فارغة",
+      alertNeed: "يرجى تعبئة الاسم والهاتف",
+      addToCart: "أضف للسلة",
+      addMore: "أضف المزيد",
+      sentOk: "✅ تم إرسال الطلب بنجاح",
+      sentFail: "⚠️ حدث خطأ بالإرسال، جرّب مرة ثانية",
+      successTitle: "شكراً لك!",
+      successDesc: "تم استلام طلبك بنجاح.",
+      successHint: "رقم الطلب:"
+    },
+    he: {
+      pageTitle: "MAD Parfumeur | אתר",
+      heroTitleHTML: `עולם של <span class="text-[#C5A059]">יוקרה</span>`,
+      searchPh: "חיפוש בושם...",
+      searchHint: "הקלד שם בושם",
+      freeShipTop: "🚚 משלוח חינם להזמנות מעל ₪500",
+      all: "הכל",
+      cartTitle: "עגלת קניות",
+      namePh: "שם מלא",
+      phonePh: "מספר טלפון",
+      addrPh: "כתובת (אופציונלי)",
+      subLabel: "סכום ביניים",
+      shipLabel: "משלוח",
+      shipFreeBadge: "חינם",
+      shipNoteBelow: "משלוח חינם להזמנות מעל ₪500",
+      totalLabel: 'סה״כ',
+      codeLabel: "קוד",
+      unitLabel: "מחיר יחידה",
+      lineLabel: "סכום",
+      sendBtn: "אישור הזמנה",
+      sending: "שולח...",
+      deliveryNote: "תשלום בעת המסירה — ניצור קשר לאישור פרטים",
+      emptyCart: "העגלה ריקה",
+      loadFail: "לא ניתן לטעון מוצרים",
+      noResults: "אין תוצאות",
+      alertEmpty: "העגלה ריקה",
+      alertNeed: "נא למלא שם ומספר טלפון",
+      addToCart: "הוסף לעגלה",
+      addMore: "הוסף עוד",
+      sentOk: "✅ ההזמנה נשלחה בהצלחה",
+      sentFail: "⚠️ שגיאה בשליחה, נסה שוב",
+      successTitle: "תודה רבה!",
+      successDesc: "ההזמנה התקבלה בהצלחה.",
+      successHint: "מספר הזמנה:"
+    }
+  };
+
+  function detectLang(){
+    const l = (navigator.language || navigator.userLanguage || "ar").toLowerCase();
+    return l.startsWith("he") ? "he" : "ar";
+  }
+
+  let LANG = detectLang();
+  let T = I18N[LANG] || I18N.ar;
+
+  function applyLangUI(){
+    document.documentElement.lang = LANG;
+    document.documentElement.dir = "rtl"; // AR + HE both RTL
+    document.title = T.pageTitle;
+
+    document.getElementById("heroTitle").innerHTML = T.heroTitleHTML;
+    document.getElementById("search").placeholder = T.searchPh;
+    document.getElementById("searchHint").textContent = T.searchHint;
+    document.getElementById("freeShipHint").textContent = T.freeShipTop;
+
+    document.getElementById("cartTitle").textContent = T.cartTitle;
+    document.getElementById("custName").placeholder = T.namePh;
+    document.getElementById("custPhone").placeholder = T.phonePh;
+    document.getElementById("custAddress").placeholder = T.addrPh;
+
+    document.getElementById("subLabel").textContent = T.subLabel;
+    document.getElementById("shipLabel").textContent = T.shipLabel;
+    document.getElementById("shipFreeBadge").textContent = T.shipFreeBadge;
+    document.getElementById("totalLabel").textContent = T.totalLabel;
+
+    document.getElementById("sendOrderText").textContent = T.sendBtn;
+    document.getElementById("deliveryNote").textContent = T.deliveryNote;
+
+    document.getElementById("successTitle").textContent = T.successTitle;
+    document.getElementById("successDesc").textContent = T.successDesc;
+    document.getElementById("successHint").textContent = T.successHint;
+
+    document.getElementById("cartFreeShipNote").textContent = T.shipNoteBelow;
+  }
+
+  /* =========================
+     CONFIG
+     ========================= */
+  const ZAPIER_HOOK_URL = "https://hooks.zapier.com/hooks/catch/14790106/ue4uy7j/";
+  const RSS_PATH = "products.rss";
+
+  const SHIPPING_BASE = 50;
+  const FREE_SHIP_THRESHOLD = 500;
+  const CURRENCY = "ILS";
+
+  const state = {
+    products: [],
+    filtered: [],
+    currentCat: "ALL",
+    cart: new Map(),  // feedId -> qty
+    isSending: false
+  };
+
+  /* =========================
+     Category "extension" (shareable link لكل كتيجوريا)
+     - URL becomes: ?cat=<encodedCategory>
+     ========================= */
+  function catToKey(cat){
+    if(cat === "ALL") return "all";
+    return encodeURIComponent(String(cat || ""));
+  }
+  function keyToCat(key){
+    if(!key || key === "all") return "ALL";
+    try { return decodeURIComponent(key); } catch(e) { return "ALL"; }
+  }
+  function setCatInUrl(cat){
+    const u = new URL(location.href);
+    if(cat === "ALL") u.searchParams.delete("cat");
+    else u.searchParams.set("cat", catToKey(cat));
+    history.replaceState(null, "", u.toString());
+  }
+  function getCatFromUrl(){
+    const u = new URL(location.href);
+    const key = u.searchParams.get("cat");
+    return keyToCat(key);
+  }
+
+  /* =========================
+     REAL CODE EXTRACTOR (title first)
+     ========================= */
+  function normalizeCode(x){
+    return String(x || "").toUpperCase().trim().replace(/[^A-Z0-9]/g, "");
+  }
+  function extractCodeFromTitle(title){
+    const s = String(title || "").toUpperCase();
+    const m = s.match(/\b([A-Z]{1,3})\s*[\.\-_]?\s*(\d{2,4})\b/);
+    if(!m) return "";
+    return normalizeCode(m[1] + m[2]); // W + 183 => W183
+  }
+  function chooseRealCode({ mpn, sku, title, feedId }){
+    const fromTitle = extractCodeFromTitle(title);
+    if(fromTitle) return fromTitle;
+    const a = normalizeCode(mpn); if(a) return a;
+    const b = normalizeCode(sku); if(b) return b;
+    return normalizeCode(feedId) || String(feedId || "").trim();
+  }
+
+  /* =========================
+     Toast + Success
+     ========================= */
+  function showToast(msg){
+    const el = document.getElementById("toast");
+    el.textContent = String(msg || "");
+    el.style.display = "block";
+    clearTimeout(showToast._t);
+    showToast._t = setTimeout(() => { el.style.display = "none"; }, 2200);
+  }
+
+  function openSuccess(orderId){
+    document.getElementById("successOrderId").textContent = orderId || "—";
+    document.getElementById("successModal").classList.remove("hidden");
+  }
+  function closeSuccess(){
+    document.getElementById("successModal").classList.add("hidden");
+  }
+
+  document.getElementById("closeSuccess").onclick = closeSuccess;
+  document.getElementById("okSuccess").onclick = closeSuccess;
+
+  /* =========================
+     Webhook sender (Zapier)
+     ========================= */
+  function postBeacon(url, payloadObj){
+    if(!url) return false;
+    try{
+      const bodyStr = JSON.stringify(payloadObj || {});
+      const blob = new Blob([bodyStr], { type: "text/plain;charset=UTF-8" });
+      if (navigator.sendBeacon) return navigator.sendBeacon(url, blob);
+    }catch(e){}
+    return false;
+  }
+
+  async function postWebhook(url, payload){
+    // 1) Try normal fetch JSON
+    try{
+      const r = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+        cache: "no-store",
+        keepalive: true
+      });
+      if (r && r.ok) return { ok:true, mode:"fetch_json", status:r.status };
+    }catch(e){}
+
+    // 2) sendBeacon
+    if(postBeacon(url, payload)) return { ok:true, mode:"beacon" };
+
+    // 3) no-cors fallback (can't read response but will reach Zapier)
+    try{
+      await fetch(url, {
+        method: "POST",
+        body: JSON.stringify(payload),
+        cache: "no-store",
+        keepalive: true,
+        mode: "no-cors",
+        credentials: "omit"
+      });
+      return { ok:true, mode:"fetch_no_cors" };
+    }catch(e){
+      return { ok:false, mode:"failed" };
+    }
+  }
+
+  /* =========================
+     Free shipping logic
+     ========================= */
+  function calcTotals(){
+    let subtotal = 0;
+    let totalQty = 0;
+
+    state.cart.forEach((qty, feedId) => {
+      const p = state.products.find(x => x.feedId === feedId);
+      if (!p) return;
+      totalQty += qty;
+      subtotal += (Number(p.price || 0) * qty);
+    });
+
+    const shipping = (totalQty > 0 && subtotal >= FREE_SHIP_THRESHOLD) ? 0 : (totalQty > 0 ? SHIPPING_BASE : 0);
+    const total = totalQty > 0 ? (subtotal + shipping) : 0;
+    return { subtotal, shipping, total, totalQty };
+  }
+
+  /* =========================
+     Load products
+     ========================= */
+  async function init() {
+    applyLangUI();
+
+    try {
+      const res = await fetch(RSS_PATH + "?v=" + Date.now(), { cache: "no-store" });
+      const xmlText = await res.text();
+      const xml = new DOMParser().parseFromString(xmlText, "application/xml");
+
+      state.products = Array.from(xml.querySelectorAll("item"))
+        .map(i => {
+          const getG = (t) => i.querySelector(t)?.textContent || i.querySelector(`g\\:${t}`)?.textContent || "";
+
+          const feedId = (getG("id") || "").trim();
+          const title  = (getG("title") || "").trim();
+          const mpn    = (getG("mpn") || "").trim();
+          const sku    = (getG("sku") || "").trim();
+
+          const image  = (getG("image_link") || "").trim();
+          const type   = (getG("product_type") || "General").trim();
+          const price  = parseFloat((getG("price") || "").replace(/[^\d.]/g, "")) || 0;
+
+          const realCode = chooseRealCode({ mpn, sku, title, feedId });
+
+          return { feedId, title, mpn, sku, realCode, image, type, price };
+        })
+        .filter(p => p.feedId && p.image);
+
+      // ✅ Category extension from URL
+      const catFromUrl = getCatFromUrl();
+      const cats = new Set(state.products.map(p => p.type));
+      if(catFromUrl === "ALL" || cats.has(catFromUrl)) state.currentCat = catFromUrl;
+      else state.currentCat = "ALL";
+
+      renderCategories();
+      applyFilter();
+      bindEvents();
+      updateCartUI();
+    } catch (e) {
+      console.error(e);
+      document.getElementById("products").innerHTML =
+        `<div class="col-span-2 text-center text-gray-500 font-bold py-10">${escapeHtml(T.loadFail)}</div>`;
+    }
+  }
+
+  function applyFilter() {
+    const q = (document.getElementById("search").value || "").toLowerCase().trim();
+
+    state.filtered = state.products.filter(p => {
+      const okCat = (state.currentCat === "ALL" || p.type === state.currentCat);
+
+      const t  = (p.title || "").toLowerCase();
+      const c1 = (p.realCode || "").toLowerCase();
+      const c2 = (p.feedId || "").toLowerCase();
+
+      const okQ = !q ? true : (t.includes(q) || c1.includes(q) || c2.includes(q));
+      return okCat && okQ;
+    });
+
+    renderProducts();
+  }
+
+  function renderCategories() {
+    const container = document.getElementById("categories");
+    const cats = ["ALL", ...new Set(state.products.map(p => p.type))];
+
+    container.innerHTML = cats.map(c => `
+      <button onclick="switchCat('${escapeQuotes(c)}')"
+        class="whitespace-nowrap px-5 py-2.5 rounded-2xl text-xs font-black border transition-all active:scale-[0.99]
+        ${state.currentCat === c ? 'bg-black text-white border-black shadow' : 'bg-white text-gray-500 border-gray-100'}">
+        ${c === "ALL" ? escapeHtml(T.all) : escapeHtml(c)}
+      </button>
+    `).join("");
+  }
+
+  function renderProducts() {
+    const container = document.getElementById("products");
+
+    if (!state.filtered.length) {
+      container.innerHTML = `
+        <div class="col-span-2 text-center text-gray-500 font-bold py-10">
+          ${escapeHtml(T.noResults)}
+        </div>`;
+      return;
+    }
+
+    container.innerHTML = state.filtered.map(p => {
+      const inCart = state.cart.has(p.feedId);
+
+      return `
+        <div class="product-card p-3 flex flex-col shadow-sm">
+          <div class="aspect-square mb-2 bg-gray-50 rounded-2xl p-2 overflow-hidden">
+            <img src="${p.image}"
+                 class="w-full h-full object-contain mix-blend-multiply"
+                 loading="lazy"
+                 alt="MAD">
+          </div>
+
+          <p class="text-[11px] font-black text-gray-500 mb-3 clamp-1">
+            ${escapeHtml(p.type)}
+          </p>
+
+          <button onclick="addToCart('${escapeQuotes(p.feedId)}')"
+            class="mt-auto w-full ${inCart ? 'bg-black text-white' : 'bg-[#C5A059] text-black'} py-3 rounded-2xl font-black text-xs active:scale-95 transition">
+            ${inCart ? escapeHtml(T.addMore) : escapeHtml(T.addToCart)}
+          </button>
+        </div>
+      `;
+    }).join("");
+  }
+
+  /* =========================
+     Cart
+     ========================= */
+  window.addToCart = (feedId) => {
+    state.cart.set(feedId, (state.cart.get(feedId) || 0) + 1);
+    updateCartUI();
+    renderProducts();
+    openCart();
+  };
+
+  window.changeQty = (feedId, delta) => {
+    const next = (state.cart.get(feedId) || 0) + delta;
+    if (next <= 0) state.cart.delete(feedId);
+    else state.cart.set(feedId, next);
+    updateCartUI();
+    renderProducts();
+  };
+
+  window.removeItem = (feedId) => {
+    state.cart.delete(feedId);
+    updateCartUI();
+    renderProducts();
+  };
+
+  function updateCartUI() {
+    const container = document.getElementById("cartItems");
+    const badge = document.getElementById("cartCountBadge");
+
+    const { subtotal, shipping, total, totalQty } = calcTotals();
+
+    badge.textContent = totalQty;
+    document.getElementById("subtotal").textContent = Number(subtotal).toFixed(0);
+    document.getElementById("shipping").textContent = Number(shipping).toFixed(0);
+    document.getElementById("total").textContent = Number(total).toFixed(0);
+
+    const shipFreeBadge = document.getElementById("shipFreeBadge");
+    shipFreeBadge.classList.toggle("hidden", !(totalQty > 0 && shipping === 0 && subtotal >= FREE_SHIP_THRESHOLD));
+
+    let html = "";
+
+    state.cart.forEach((qty, feedId) => {
+      const p = state.products.find(x => x.feedId === feedId);
+      if (!p) return;
+
+      const code = p.realCode || p.title || p.feedId;
+      const unit = Number(p.price || 0);
+      const line = unit * qty;
+
+      html += `
+        <div class="bg-gray-50 p-3 rounded-2xl">
+          <div class="flex items-center gap-3">
+            <img src="${p.image}" class="w-14 h-14 object-contain mix-blend-multiply" alt="MAD">
+
+            <div class="flex-1 min-w-0">
+              <p class="font-black text-[13px] leading-tight clamp-1">${escapeHtml(code)}</p>
+              <p class="text-[11px] font-black text-gray-500 mt-1 clamp-1">${escapeHtml(p.type)}</p>
+
+              <div class="mt-2">
+                <span class="inline-flex items-center gap-2 bg-white border px-2.5 py-1 rounded-xl">
+                  <span class="text-[11px] font-black text-gray-500">${escapeHtml(T.codeLabel)}</span>
+                  <span class="text-[11px] font-black text-black">${escapeHtml(code)}</span>
+                </span>
+              </div>
+
+              <div class="flex items-center justify-between mt-2">
+                <div class="text-[12px] font-black text-gray-700">
+                  ${escapeHtml(T.unitLabel)}: <span class="text-[#C5A059]">₪${unit.toFixed(0)}</span>
+                </div>
+                <div class="text-[12px] font-black text-gray-700">
+                  ${escapeHtml(T.lineLabel)}: <span class="text-black">₪${line.toFixed(0)}</span>
+                </div>
+              </div>
+
+              <div class="flex items-center gap-3 mt-2">
+                <button onclick="changeQty('${escapeQuotes(feedId)}', -1)"
+                  class="w-9 h-9 rounded-2xl bg-white border flex items-center justify-center font-black text-gray-700 active:scale-95 transition">-</button>
+
+                <span class="text-sm font-black w-6 text-center">${qty}</span>
+
+                <button onclick="changeQty('${escapeQuotes(feedId)}', 1)"
+                  class="w-9 h-9 rounded-2xl bg-white border flex items-center justify-center font-black text-gray-700 active:scale-95 transition">+</button>
+              </div>
+            </div>
+
+            <button onclick="removeItem('${escapeQuotes(feedId)}')"
+              class="text-gray-300 text-xl px-2 active:scale-95 transition" aria-label="Remove">✕</button>
+          </div>
+        </div>
+      `;
+    });
+
+    container.innerHTML = html || `<p class="text-center py-10 text-gray-400 font-bold">${escapeHtml(T.emptyCart)}</p>`;
+  }
+
+  function openCart() {
+    document.getElementById("cartOverlay").classList.remove("hidden");
+    document.getElementById("cartDrawer").classList.remove("translate-y-full");
+  }
+
+  function closeCart() {
+    document.getElementById("cartDrawer").classList.add("translate-y-full");
+    setTimeout(() => document.getElementById("cartOverlay").classList.add("hidden"), 450);
+  }
+
+  /* =========================
+     Order -> Webhook + Lead
+     ========================= */
+  const LEAD_ONCE_KEY = "mad_lead_order_sent_v1";
+  function canFireLeadOnce(){
+    try{ return localStorage.getItem(LEAD_ONCE_KEY) !== "1"; }catch(e){ return true; }
+  }
+  function markLeadFired(){
+    try{ localStorage.setItem(LEAD_ONCE_KEY, "1"); }catch(e){}
+  }
+
+  function genOrderId(){
+    const a = Date.now().toString(36).toUpperCase();
+    const b = Math.random().toString(36).slice(2,6).toUpperCase();
+    return "MAD-" + a.slice(-6) + "-" + b;
+  }
+
+  function setSending(on){
+    state.isSending = !!on;
+    document.getElementById("sendOrderSpinner").classList.toggle("hidden", !on);
+    document.getElementById("sendOrder").disabled = on;
+    document.getElementById("sendOrderText").textContent = on ? T.sending : T.sendBtn;
+  }
+
+  async function sendOrderToWebhook(){
+    const name = document.getElementById("custName").value.trim();
+    const phone = document.getElementById("custPhone").value.trim();
+    const addr = document.getElementById("custAddress").value.trim();
+
+    if (state.cart.size === 0) return alert(T.alertEmpty);
+    if (!name || !phone) return alert(T.alertNeed);
+
+    if(state.isSending) return;
+    setSending(true);
+
+    const { subtotal, shipping, total, totalQty } = calcTotals();
+    const order_id = genOrderId();
+
+    // build items
+    const items = [];
+    state.cart.forEach((qty, feedId) => {
+      const p = state.products.find(x => x.feedId === feedId);
+      if(!p) return;
+      items.push({
+        feedId: p.feedId,
+        code: p.realCode || p.title || p.feedId,
+        category: p.type,
+        price: Number(p.price || 0),
+        qty: Number(qty || 0),
+        line_total: Number(p.price || 0) * Number(qty || 0),
+        image: p.image
+      });
+    });
+
+    // ✅ Lead event id (same id goes to webhook)
+    const event_id = makeEventId("lead_order");
+
+    if(canFireLeadOnce()){
+      fireLeadEvent({ source: "webhook_order", value: total, currency: CURRENCY, lang: LANG }, event_id);
+      markLeadFired();
+    }
+
+    const payload = {
+      type: "order",
+      order_id,
+      lang: LANG,
+      page_url: location.href,
+      timestamp: new Date().toISOString(),
+
+      customer: { name, phone, address: addr || "" },
+
+      totals: {
+        qty: totalQty,
+        subtotal: Number(subtotal.toFixed(2)),
+        shipping: Number(shipping.toFixed(2)),
+        total: Number(total.toFixed(2)),
+        currency: CURRENCY,
+        free_shipping_threshold: FREE_SHIP_THRESHOLD
+      },
+
+      items,
+
+      tracking: {
+        event_id,
+        fbp: (typeof getCookie === "function" ? getCookie("_fbp") : ""),
+        fbc: (typeof getFbc === "function" ? getFbc() : ""),
+        user_agent: navigator.userAgent || ""
+      }
+    };
+
+    const result = await postWebhook(ZAPIER_HOOK_URL, payload);
+
+    setSending(false);
+
+    if(result.ok){
+      showToast(T.sentOk);
+      openSuccess(order_id);
+
+      // reset
+      state.cart.clear();
+      updateCartUI();
+      renderProducts();
+      closeCart();
+
+      document.getElementById("custName").value = "";
+      document.getElementById("custPhone").value = "";
+      document.getElementById("custAddress").value = "";
+    }else{
+      showToast(T.sentFail);
+    }
+  }
+
+  /* =========================
+     Events
+     ========================= */
+  function bindEvents() {
+    document.getElementById("cartBtn").onclick = openCart;
+    document.getElementById("closeCart").onclick = closeCart;
+    document.getElementById("cartOverlay").onclick = closeCart;
+    document.getElementById("search").oninput = applyFilter;
+    document.getElementById("sendOrder").onclick = sendOrderToWebhook;
+
+    window.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") closeCart();
+    });
+  }
+
+  window.switchCat = (c) => {
+    state.currentCat = c;
+    setCatInUrl(c);            // ✅ امتداد/رابط خاص لكل كتيجوريا
+    applyFilter();
+    renderCategories();
+  };
+
+  /* =========================
+     Utils
+     ========================= */
+  function escapeHtml(str){
+    return String(str || "")
+      .replaceAll("&","&amp;")
+      .replaceAll("<","&lt;")
+      .replaceAll(">","&gt;")
+      .replaceAll('"',"&quot;")
+      .replaceAll("'","&#039;");
+  }
+  function escapeQuotes(str){
+    return String(str || "").replaceAll("\\","\\\\").replaceAll("'","\\'");
+  }
+
+  init();
+</script>
+</body>
+</html>
