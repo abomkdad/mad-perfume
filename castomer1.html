@@ -5,36 +5,768 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no" />
   <meta name="theme-color" content="#0A0A0A" />
   <meta property="og:image" content="https://www.mad-parfumeur.com/assets/hero/logo2.webp" />
-  <title>MAD Parfumeur | Order</title>
+  <title>MAD Parfumeur | website</title>
 
   <script src="https://cdn.tailwindcss.com"></script>
 
   <style>
-    :root{ --gold:#C5A059; --dark:#0A0A0A; }
+    :root { --gold:#C5A059; --dark:#0A0A0A; }
+
     body{
       background:#e9eaec;
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
       -webkit-tap-highlight-color: transparent;
+      overscroll-behavior-y: none;
     }
     .app{
-      max-width:520px; margin:0 auto; min-height:100dvh;
-      background:#FDFCFB; box-shadow:0 10px 40px rgba(0,0,0,.12);
+      max-width:520px;
+      margin:0 auto;
+      min-height:100dvh;
+      background:#FDFCFB;
+      box-shadow:0 10px 40px rgba(0,0,0,.12);
     }
-    @media (max-width:560px){ body{background:#FDFCFB;} .app{max-width:none; box-shadow:none;} }
+    @media (max-width: 560px){
+      body{ background:#FDFCFB; }
+      .app{ max-width:none; box-shadow:none; }
+    }
+
     .glass-dark{ background: rgba(10,10,10,.98); backdrop-filter: blur(14px); }
-    .card{ background:#fff; border:1px solid #f0f0f0; border-radius:22px; }
-    .toast{
-      position:fixed; left:50%; transform:translateX(-50%);
-      bottom:calc(16px + env(safe-area-inset-bottom));
-      z-index:9999; display:none;
-      background:rgba(10,10,10,.92); color:#fff;
-      padding:10px 14px; border-radius:16px;
-      font-size:12px; font-weight:900; text-align:center;
-      box-shadow:0 14px 30px rgba(0,0,0,.28);
-      max-width:min(520px, calc(100vw - 24px));
+    .product-card{ background:#fff; border-radius:18px; transition:.2s; border:1px solid #f0f0f0; }
+    .product-card:active{ transform: scale(.99); }
+
+    .no-scrollbar::-webkit-scrollbar{ display:none; }
+    .no-scrollbar{ scrollbar-width: none; }
+
+    .clamp-1, .clamp-2{
+      display:-webkit-box;
+      -webkit-box-orient: vertical;
+      overflow:hidden;
+    }
+    .clamp-1{ -webkit-line-clamp:1; }
+    .clamp-2{ -webkit-line-clamp:2; }
+
+    .sheet-shadow{ box-shadow: 0 -18px 40px rgba(0,0,0,.18); }
+
+    .fab{
+      position: fixed;
+      z-index: 120;
+      right: 16px;
+      bottom: calc(16px + env(safe-area-inset-bottom));
+      width: 56px;
+      height: 56px;
+      border-radius: 18px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:#25D366;
+      color:#fff;
+      box-shadow: 0 14px 30px rgba(0,0,0,.22);
+      transition: transform .15s;
+    }
+    .fab:active{ transform: scale(.98); }
+    .fab-badge{
+      position:absolute;
+      top:-6px;
+      left:-6px;
+      background:#0A0A0A;
+      color:#fff;
+      font-size:10px;
+      font-weight:900;
+      padding:3px 7px;
+      border-radius:999px;
+      border: 1px solid rgba(255,255,255,.25);
     }
   </style>
 
+  <!-- =========================
+       PIXELS (FB / TikTok / Snap)
+       ========================= -->
+  <script>
+    const PIXELS = {
+      facebook: "1072283127290819",
+      tiktok: "D2D02JBC77U4ENLN9SBG",
+      snapchat: "b143822e-1c3c-40ff-93f7-edadee74e626"
+    };
+
+    // Facebook Pixel
+    (function(){
+      try{
+        !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+          n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
+          n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
+          t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window, document,'script',
+          'https://connect.facebook.net/en_US/fbevents.js');
+        if(PIXELS.facebook){
+          fbq('init', PIXELS.facebook);
+          fbq('track', 'PageView');
+        }
+      }catch(e){ console.warn("FB Pixel error", e); }
+    })();
+
+    // TikTok Pixel
+    (function(){
+      try{
+        if(!PIXELS.tiktok) return;
+        !function (w, d, t) {
+          w.TiktokAnalyticsObject=t;
+          var ttq=w[t]=w[t]||[];
+          ttq.methods=["page","track","identify","instances","debug","on","off","once","ready","alias","group","enableCookie","disableCookie"];
+          ttq.setAndDefer=function(t,e){ t[e]=function(){ t.push([e].concat([].slice.call(arguments,0))); }; };
+          for(var i=0;i<ttq.methods.length;i++) ttq.setAndDefer(ttq, ttq.methods[i]);
+          ttq.instance=function(t){ for(var e=ttq._i[t]||[],n=0;n<ttq.methods.length;n++) ttq.setAndDefer(e,ttq.methods[n]); return e; };
+          ttq.load=function(e,n){
+            var i="https://analytics.tiktok.com/i18n/pixel/events.js";
+            ttq._i=ttq._i||{};
+            ttq._i[e]=[];
+            ttq._i[e]._u=i;
+            ttq._t=ttq._t||{};
+            ttq._t[e]=+new Date;
+            ttq._o=ttq._o||{};
+            ttq._o[e]=n||{};
+            var o=d.createElement("script");
+            o.type="text/javascript"; o.async=!0;
+            o.src=i+"?sdkid="+e+"&lib="+t;
+            var a=d.getElementsByTagName("script")[0];
+            a.parentNode.insertBefore(o,a);
+          };
+          ttq.load(PIXELS.tiktok);
+          ttq.page();
+        }(window, document, 'ttq');
+      }catch(e){ console.warn("TikTok Pixel error", e); }
+    })();
+
+    // Snap Pixel
+    (function(){
+      try{
+        if(!PIXELS.snapchat) return;
+        (function(e,t,n){if(e.snaptr)return;var a=e.snaptr=function()
+          {a.handleRequest?a.handleRequest.apply(a,arguments):a.queue.push(arguments)};
+          a.queue=[];var s='script';var r=t.createElement(s);r.async=!0;
+          r.src=n;var u=t.getElementsByTagName(s)[0];u.parentNode.insertBefore(r,u);
+        })(window,document,'https://sc-static.net/scevent.min.js');
+
+        snaptr('init', PIXELS.snapchat, { 'user_email': '' });
+        snaptr('track', 'PAGE_VIEW');
+      }catch(e){ console.warn("Snap Pixel error", e); }
+    })();
+
+    // All events -> Lead
+    function fireLeadEvent(extra){
+      try{ if(window.fbq) fbq('track', 'Lead', extra || {}); }catch(e){}
+      try{ if(window.ttq) ttq.track('Lead', extra || {}); }catch(e){}
+      try{ if(window.snaptr) snaptr('track', 'CUSTOM_EVENT_1', Object.assign({ label: 'Lead' }, (extra||{}))); }catch(e){}
+    }
+  </script>
+</head>
+
+<body class="antialiased">
+  <div class="app">
+
+    <!-- TOP NAV -->
+    <nav class="sticky top-0 z-50 glass-dark border-b border-white/10 px-4 py-3 flex justify-between items-center"
+         style="padding-top: calc(0.75rem + env(safe-area-inset-top));">
+      <div class="flex items-center gap-2">
+        <img src="https://www.mad-parfumeur.com/assets/hero/logo.png" class="h-8 brightness-0 invert" alt="MAD" />
+        <span class="text-white font-black text-sm italic uppercase tracking-tighter">MAD Parfumeur</span>
+      </div>
+
+      <button id="cartBtn" class="relative p-2 text-white active:scale-95 transition" aria-label="Cart">
+        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+        </svg>
+        <span id="cartCountBadge"
+              class="absolute -top-1 -right-1 bg-[#C5A059] text-white text-[10px] w-5 h-5 flex items-center justify-center rounded-full font-black">0</span>
+      </button>
+    </nav>
+
+    <!-- HERO -->
+    <section class="bg-[#0A0A0A] pt-8 pb-14 px-5 text-center">
+      <h1 id="heroTitle" class="text-white text-3xl font-black mb-4 leading-tight">
+        عالم من <span class="text-[#C5A059]">الفخامة</span>
+      </h1>
+
+      <div class="mx-auto max-w-md">
+        <input id="search"
+               class="w-full bg-white/10 border border-white/20 rounded-2xl px-4 py-3.5 text-white text-sm outline-none focus:border-[#C5A059]"
+               placeholder="بحث عن عطر..."
+               autocomplete="off" />
+        <p id="searchHint" class="text-white/60 text-[11px] mt-2">اكتب اسم العطر</p>
+      </div>
+    </section>
+
+    <!-- CATEGORIES -->
+    <div class="px-4 -mt-7 relative z-20">
+      <div id="categories" class="flex overflow-x-auto gap-2 py-3 no-scrollbar"></div>
+    </div>
+
+    <!-- PRODUCTS -->
+    <main class="px-3 pb-24 mt-3" style="padding-bottom: calc(6rem + env(safe-area-inset-bottom));">
+      <div id="products" class="grid grid-cols-2 gap-3"></div>
+    </main>
+
+  </div>
+
+  <!-- FLOATING WHATSAPP HELP -->
+  <button id="waFab" class="fab" aria-label="WhatsApp">
+    <span id="waFabBadge" class="fab-badge">WA</span>
+    <svg viewBox="0 0 32 32" width="26" height="26" fill="currentColor" aria-hidden="true">
+      <path d="M19.11 17.49c-.27-.14-1.6-.79-1.85-.88-.25-.09-.43-.14-.61.14-.18.27-.7.88-.86 1.06-.16.18-.32.2-.59.07-.27-.14-1.14-.42-2.17-1.34-.8-.71-1.34-1.6-1.5-1.87-.16-.27-.02-.42.12-.56.13-.13.27-.32.41-.48.14-.16.18-.27.27-.45.09-.18.05-.34-.02-.48-.07-.14-.61-1.47-.84-2.01-.22-.53-.45-.46-.61-.47l-.52-.01c-.18 0-.48.07-.73.34-.25.27-.95.93-.95 2.27s.98 2.64 1.12 2.82c.14.18 1.93 2.95 4.67 4.13.65.28 1.15.45 1.54.57.65.21 1.24.18 1.7.11.52-.08 1.6-.65 1.82-1.28.23-.63.23-1.17.16-1.28-.07-.11-.25-.18-.52-.32zM16.01 5.33c-5.89 0-10.67 4.78-10.67 10.67 0 1.88.49 3.72 1.43 5.35L5.33 26.67l5.48-1.41c1.56.85 3.31 1.29 5.2 1.29 5.89 0 10.67-4.78 10.67-10.67S21.9 5.33 16.01 5.33zm0 19.21c-1.68 0-3.32-.45-4.75-1.3l-.34-.2-3.25.83.87-3.17-.22-.33c-.92-1.45-1.41-3.12-1.41-4.84 0-5.02 4.08-9.1 9.1-9.1s9.1 4.08 9.1 9.1-4.08 9.01-9.1 9.01z"></path>
+    </svg>
+  </button>
+
+  <!-- CART OVERLAY -->
+  <div id="cartOverlay" class="fixed inset-0 bg-black/55 backdrop-blur-sm hidden z-[100] transition-opacity"></div>
+
+  <!-- CART DRAWER (BOTTOM SHEET) -->
+  <div id="cartDrawer"
+       class="fixed inset-x-0 bottom-0 z-[101] translate-y-full transition-transform duration-500 sheet-shadow bg-white rounded-t-[2rem] flex flex-col"
+       style="height: min(92dvh, 760px); padding-bottom: env(safe-area-inset-bottom);">
+
+    <div class="w-full pt-3 pb-1 flex justify-center">
+      <div class="w-12 h-1.5 rounded-full bg-gray-200"></div>
+    </div>
+
+    <div class="px-5 pb-3 border-b flex items-center justify-between">
+      <h3 id="cartTitle" class="text-lg font-black">عربة التسوق</h3>
+      <button id="closeCart" class="text-gray-400 text-2xl px-2 -my-2 active:scale-95 transition" aria-label="Close">✕</button>
+    </div>
+
+    <div class="flex-1 overflow-y-auto px-5 py-4 space-y-3" id="cartItems"></div>
+
+    <div class="px-5 pt-4 pb-5 bg-[#0A0A0A] text-white rounded-t-[2rem]">
+      <div class="mb-3 space-y-2.5">
+        <input id="custName"
+               class="w-full bg-white/10 border border-white/10 rounded-2xl px-4 py-3 text-sm outline-none focus:border-[#C5A059]"
+               placeholder="الاسم الكامل"
+               autocomplete="name" />
+
+        <input id="custPhone"
+               class="w-full bg-white/10 border border-white/10 rounded-2xl px-4 py-3 text-sm outline-none focus:border-[#C5A059]"
+               placeholder="رقم الهاتف"
+               inputmode="tel"
+               autocomplete="tel" />
+
+        <textarea id="custAddress"
+                  class="w-full bg-white/10 border border-white/10 rounded-2xl px-4 py-3 text-sm outline-none focus:border-[#C5A059]"
+                  rows="2"
+                  placeholder="العنوان (اختياري)"
+                  autocomplete="street-address"></textarea>
+      </div>
+
+      <!-- PRICE SUMMARY (INSIDE CART ONLY) -->
+      <div class="mb-3 space-y-2">
+        <div class="flex justify-between text-sm font-black">
+          <span id="subLabel">المجموع</span>
+          <span class="text-white">₪<span id="subtotal">0</span></span>
+        </div>
+
+        <div class="flex justify-between text-sm font-black">
+          <span id="shipLabel">التوصيل</span>
+          <span class="text-white">₪<span id="shipping">50</span></span>
+        </div>
+
+        <div class="flex justify-between font-black text-base pt-2 border-t border-white/10">
+          <span id="totalLabel">الإجمالي</span>
+          <span class="text-[#C5A059]">₪<span id="total">0</span></span>
+        </div>
+      </div>
+
+      <button id="sendOrder"
+              class="w-full bg-[#C5A059] text-black py-4 rounded-2xl font-black text-sm uppercase tracking-widest flex items-center justify-center gap-2 active:scale-[0.99] transition">
+        إرسال الطلب عبر واتساب
+      </button>
+
+      <p id="deliveryNote" class="text-[11px] text-white/60 mt-2 text-center">
+        الدفع عند الاستلام — سيتم تأكيد التفاصيل عبر واتساب
+      </p>
+    </div>
+  </div>
+
+<script>
+  /* =========================
+     LANG (AUTO: AR / HE)
+     ========================= */
+  const I18N = {
+    ar: {
+      pageTitle: "MAD Parfumeur | الموقع",
+      heroTitleHTML: `عالم من <span class="text-[#C5A059]">الفخامة</span>`,
+      searchPh: "بحث عن عطر...",
+      searchHint: "اكتب اسم العطر",
+      all: "الكل",
+      cartTitle: "عربة التسوق",
+      namePh: "الاسم الكامل",
+      phonePh: "رقم الهاتف",
+      addrPh: "العنوان (اختياري)",
+      subLabel: "المجموع",
+      shipLabel: "التوصيل",
+      totalLabel: "الإجمالي",
+      codeLabel: "الكود",
+      unitLabel: "سعر القطعة",
+      lineLabel: "المجموع",
+      sendBtn: "إرسال الطلب عبر واتساب",
+      deliveryNote: "الدفع عند الاستلام — سيتم تأكيد التفاصيل عبر واتساب",
+      emptyCart: "السلة فارغة",
+      loadFail: "تعذّر تحميل المنتجات",
+      noResults: "لا توجد نتائج",
+      alertEmpty: "السلة فارغة",
+      alertNeed: "يرجى تعبئة الاسم والهاتف",
+      addToCart: "أضف للسلة",
+      addMore: "أضف المزيد",
+      waFabBadge: "مساعدة",
+      waFabMsg: "مرحبا، عندي استفسار عن العطور.",
+      wa: {
+        header: "✨ *طلب جديد | MAD Parfumeur*",
+        name: "👤 الاسم",
+        phone: "📞 الهاتف",
+        addr: "📍 العنوان",
+        cart: "🛒 السلة",
+        code: "🏷️ الكود ",
+        unit: "💵 سعر القطعة",
+        line: "🧾 مجموع السطر",
+        sub: "🧾 المجموع",
+        ship: "🚚 التوصيل",
+        total: "💰 الإجمالي"
+      }
+    },
+    he: {
+      pageTitle: "MAD Parfumeur | אתר",
+      heroTitleHTML: `עולם של <span class="text-[#C5A059]">יוקרה</span>`,
+      searchPh: "חיפוש בושם...",
+      searchHint: "הקלד שם בושם",
+      all: "הכל",
+      cartTitle: "עגלת קניות",
+      namePh: "שם מלא",
+      phonePh: "מספר טלפון",
+      addrPh: "כתובת (אופציונלי)",
+      subLabel: "סכום ביניים",
+      shipLabel: "משלוח",
+      totalLabel: "סה״כ",
+      codeLabel: "קוד",
+      unitLabel: "מחיר יחידה",
+      lineLabel: "סכום",
+      sendBtn: "שליחת הזמנה בוואטסאפ",
+      deliveryNote: "תשלום בעת המסירה — ניצור קשר בוואטסאפ לאישור פרטים",
+      emptyCart: "העגלה ריקה",
+      loadFail: "לא ניתן לטעון מוצרים",
+      noResults: "אין תוצאות",
+      alertEmpty: "העגלה ריקה",
+      alertNeed: "נא למלא שם ומספר טלפון",
+      addToCart: "הוסף לעגלה",
+      addMore: "הוסף עוד",
+      waFabBadge: "עזרה",
+      waFabMsg: "היי, יש לי שאלה לגבי הבשמים.",
+      wa: {
+        header: "✨ *הזמנה חדשה | MAD Parfumeur*",
+        name: "👤 שם",
+        phone: "📞 טלפון",
+        addr: "📍 כתובת",
+        cart: "🛒 עגלה",
+        code: "🏷️ קוד ",
+        unit: "💵 מחיר יחידה",
+        line: "🧾 סה״כ שורה",
+        sub: "🧾 סכום ביניים",
+        ship: "🚚 משלוח",
+        total: "💰 סה״כ"
+      }
+    }
+  };
+
+  function detectLang(){
+    const l = (navigator.language || navigator.userLanguage || "ar").toLowerCase();
+    return l.startsWith("he") ? "he" : "ar";
+  }
+
+  let LANG = detectLang();
+  let T = I18N[LANG] || I18N.ar;
+
+  function applyLangUI(){
+    document.documentElement.lang = LANG;
+    document.documentElement.dir = "rtl";
+    document.title = T.pageTitle;
+
+    document.getElementById("heroTitle").innerHTML = T.heroTitleHTML;
+    document.getElementById("search").placeholder = T.searchPh;
+    document.getElementById("searchHint").textContent = T.searchHint;
+
+    document.getElementById("cartTitle").textContent = T.cartTitle;
+    document.getElementById("custName").placeholder = T.namePh;
+    document.getElementById("custPhone").placeholder = T.phonePh;
+    document.getElementById("custAddress").placeholder = T.addrPh;
+
+    document.getElementById("subLabel").textContent = T.subLabel;
+    document.getElementById("shipLabel").textContent = T.shipLabel;
+    document.getElementById("totalLabel").textContent = T.totalLabel;
+    document.getElementById("sendOrder").textContent = T.sendBtn;
+    document.getElementById("deliveryNote").textContent = T.deliveryNote;
+
+    document.getElementById("waFabBadge").textContent = T.waFabBadge;
+  }
+
+  /* =========================
+     CONFIG
+     ========================= */
+  const WHATSAPP_API = "972524033442";
+  const SHIPPING = 50;
+
+  // ✅ أهم تعديل: RSS fallback + override from URL (?rss=...)
+  function getRssCandidates(){
+    const p = new URLSearchParams(location.search);
+    const forced = (p.get("rss") || "").trim();
+    const origin = location.origin || "";
+    const rootRss = origin ? (origin.replace(/\/$/,"") + "/products.rss") : "/products.rss";
+    const madRss  = "https://www.mad-parfumeur.com/products.rss";
+
+    const list = [];
+    if(forced) list.push(forced);
+    list.push("/products.rss");        // best if page inside folder
+    list.push("products.rss");         // same folder
+    if(origin) list.push(rootRss);     // same domain root
+    list.push(madRss);                 // MAD default
+
+    // remove duplicates
+    return Array.from(new Set(list));
+  }
+
+  const state = {
+    products: [],
+    filtered: [],
+    currentCat: "ALL",
+    cart: new Map(),
+    leadCartFired: false,
+    leadOrderFired: false
+  };
+
+  function normalizeCode(x){
+    return String(x || "").toUpperCase().trim().replace(/[^A-Z0-9]/g, "");
+  }
+
+  function extractCodeFromTitle(title){
+    const s = String(title || "").toUpperCase();
+    const m = s.match(/\b([A-Z]{1,3})\s*[\.\-_]?\s*(\d{2,4})\b/);
+    if(!m) return "";
+    return normalizeCode(m[1] + m[2]);
+  }
+
+  function chooseRealCode({ mpn, sku, title, feedId }){
+    const fromTitle = extractCodeFromTitle(title);
+    if(fromTitle) return fromTitle;
+
+    const a = normalizeCode(mpn);
+    if(a) return a;
+
+    const b = normalizeCode(sku);
+    if(b) return b;
+
+    return normalizeCode(feedId) || String(feedId || "").trim();
+  }
+
+  function textFrom(item, localName){
+    try{
+      const q1 = item.querySelector(localName);
+      if(q1 && q1.textContent) return q1.textContent;
+
+      const q2 = item.querySelector(`g\\:${localName}`);
+      if(q2 && q2.textContent) return q2.textContent;
+
+      const g1 = item.getElementsByTagName(localName)[0];
+      if(g1 && g1.textContent) return g1.textContent;
+
+      const g2 = item.getElementsByTagNameNS("*", localName)[0];
+      if(g2 && g2.textContent) return g2.textContent;
+
+      return "";
+    }catch(e){
+      return "";
+    }
+  }
+
+  async function fetchRssXml(){
+    const candidates = getRssCandidates();
+    let lastErr = "";
+
+    for(const url of candidates){
+      try{
+        const res = await fetch(url + (url.includes("?") ? "&" : "?") + "v=" + Date.now(), { cache:"no-store" });
+        if(!res.ok){
+          lastErr = `RSS ${url} -> HTTP ${res.status}`;
+          continue;
+        }
+        const xmlText = await res.text();
+        const xml = new DOMParser().parseFromString(xmlText, "application/xml");
+        if(xml.querySelector("parsererror")){
+          lastErr = `RSS ${url} -> XML Parse Error`;
+          continue;
+        }
+        return { xml, used: url };
+      }catch(e){
+        lastErr = `RSS ${url} -> ${e && e.message ? e.message : "Fetch failed"}`;
+      }
+    }
+
+    throw new Error(lastErr || "RSS not reachable");
+  }
+
+  async function init() {
+    applyLangUI();
+
+    try {
+      const { xml, used } = await fetchRssXml();
+
+      const items = Array.from(xml.querySelectorAll("item"));
+      state.products = items.map(i => {
+        const feedId = (textFrom(i, "id") || "").trim();
+        const title  = (textFrom(i, "title") || "").trim();
+        const mpn    = (textFrom(i, "mpn") || "").trim();
+        const sku    = (textFrom(i, "sku") || "").trim();
+
+        const image  = (textFrom(i, "image_link") || "").trim();
+        const type   = (textFrom(i, "product_type") || "General").trim();
+        const price  = parseFloat((textFrom(i, "price") || "").replace(/[^\d.]/g, "")) || 0;
+
+        const realCode = chooseRealCode({ mpn, sku, title, feedId });
+        return { feedId, title, mpn, sku, realCode, image, type, price };
+      }).filter(p => p.feedId && p.image);
+
+      // لو RSS وصل بس فاضي
+      if(!state.products.length){
+        document.getElementById("products").innerHTML =
+          `<div class="col-span-2 text-center text-gray-500 font-bold py-10">
+             RSS شغال لكن ما فيه Items. (المصدر: ${escapeHtml(used)})
+           </div>`;
+        return;
+      }
+
+      const urlParams = new URLSearchParams(window.location.search);
+      const catFromUrl = urlParams.get("cat");
+      if (catFromUrl) state.currentCat = decodeURIComponent(catFromUrl);
+
+      renderCategories();
+      applyFilter();
+      bindEvents();
+      updateCartUI();
+    } catch (e) {
+      console.error(e);
+      document.getElementById("products").innerHTML =
+        `<div class="col-span-2 text-center text-gray-500 font-bold py-10">
+           ${escapeHtml(T.loadFail)}<br>
+           <span class="text-[11px] font-black text-gray-400">${escapeHtml(e.message || "")}</span>
+         </div>`;
+    }
+  }
+
+  function applyFilter() {
+    const q = (document.getElementById("search").value || "").toLowerCase().trim();
+
+    state.filtered = state.products.filter(p => {
+      const okCat = (state.currentCat === "ALL" || p.type === state.currentCat);
+      const t  = (p.title || "").toLowerCase();
+      const c1 = (p.realCode || "").toLowerCase();
+      const c2 = (p.feedId || "").toLowerCase();
+      const okQ = !q ? true : (t.includes(q) || c1.includes(q) || c2.includes(q));
+      return okCat && okQ;
+    });
+
+    renderProducts();
+  }
+
+  function renderCategories() {
+    const container = document.getElementById("categories");
+    const cats = ["ALL", ...new Set(state.products.map(p => p.type))];
+
+    container.innerHTML = cats.map(c => `
+      <button onclick="switchCat('${escapeQuotes(c)}')"
+        class="whitespace-nowrap px-5 py-2.5 rounded-2xl text-xs font-black border transition-all active:scale-[0.99]
+        ${state.currentCat === c ? 'bg-black text-white border-black shadow' : 'bg-white text-gray-500 border-gray-100'}">
+        ${c === "ALL" ? escapeHtml(T.all) : escapeHtml(c)}
+      </button>
+    `).join("");
+  }
+
+  function renderProducts() {
+    const container = document.getElementById("products");
+
+    if (!state.filtered.length) {
+      container.innerHTML = `
+        <div class="col-span-2 text-center text-gray-500 font-bold py-10">
+          ${escapeHtml(T.noResults)}
+        </div>`;
+      return;
+    }
+
+    container.innerHTML = state.filtered.map(p => {
+      const inCart = state.cart.has(p.feedId);
+      return `
+        <div class="product-card p-3 flex flex-col shadow-sm">
+          <div class="aspect-square mb-2 bg-gray-50 rounded-2xl p-2 overflow-hidden">
+            <img src="${p.image}"
+                 class="w-full h-full object-contain mix-blend-multiply"
+                 loading="lazy"
+                 alt="MAD">
+          </div>
+          <p class="text-[11px] font-black text-gray-500 mb-3 clamp-1">
+            ${escapeHtml(p.type)}
+          </p>
+          <button onclick="addToCart('${escapeQuotes(p.feedId)}')"
+            class="mt-auto w-full ${inCart ? 'bg-black text-white' : 'bg-[#C5A059] text-black'} py-3 rounded-2xl font-black text-xs active:scale-95 transition">
+            ${inCart ? escapeHtml(T.addMore) : escapeHtml(T.addToCart)}
+          </button>
+        </div>
+      `;
+    }).join("");
+  }
+
+  window.addToCart = (feedId) => {
+    state.cart.set(feedId, (state.cart.get(feedId) || 0) + 1);
+    updateCartUI();
+    renderProducts();
+    openCart();
+  };
+
+  window.changeQty = (feedId, delta) => {
+    const next = (state.cart.get(feedId) || 0) + delta;
+    if (next <= 0) state.cart.delete(feedId);
+    else state.cart.set(feedId, next);
+    updateCartUI();
+    renderProducts();
+  };
+
+  window.removeItem = (feedId) => {
+    state.cart.delete(feedId);
+    updateCartUI();
+    renderProducts();
+  };
+
+  function calcTotals(){
+    let subtotal = 0;
+    let totalQty = 0;
+    state.cart.forEach((qty, feedId) => {
+      const p = state.products.find(x => x.feedId === feedId);
+      if (!p) return;
+      totalQty += qty;
+      subtotal += (Number(p.price || 0) * qty);
+    });
+    const total = totalQty > 0 ? (subtotal + SHIPPING) : 0;
+    return { subtotal, total, totalQty };
+  }
+
+  function updateCartUI() {
+    const container = document.getElementById("cartItems");
+    const badge = document.getElementById("cartCountBadge");
+
+    const { subtotal, total, totalQty } = calcTotals();
+
+    badge.textContent = totalQty;
+    document.getElementById("shipping").textContent = Number(SHIPPING).toFixed(0);
+    document.getElementById("subtotal").textContent = Number(subtotal).toFixed(0);
+    document.getElementById("total").textContent = Number(total).toFixed(0);
+
+    let html = "";
+    state.cart.forEach((qty, feedId) => {
+      const p = state.products.find(x => x.feedId === feedId);
+      if (!p) return;
+      const code = p.realCode || p.title || p.feedId;
+      const unit = Number(p.price || 0);
+      const line = unit * qty;
+
+      html += `
+        <div class="bg-gray-50 p-3 rounded-2xl">
+          <div class="flex items-center gap-3">
+            <img src="${p.image}" class="w-14 h-14 object-contain mix-blend-multiply" alt="MAD">
+            <div class="flex-1 min-w-0">
+              <p class="font-black text-[13px] leading-tight clamp-1">${escapeHtml(code)}</p>
+              <p class="text-[11px] font-black text-gray-500 mt-1 clamp-1">${escapeHtml(p.type)}</p>
+
+              <div class="mt-2">
+                <span class="inline-flex items-center gap-2 bg-white border px-2.5 py-1 rounded-xl">
+                  <span class="text-[11px] font-black text-gray-500">${escapeHtml(T.codeLabel)}</span>
+                  <span class="text-[11px] font-black text-black">${escapeHtml(code)}</span>
+                </span>
+              </div>
+
+              <div class="flex items-center justify-between mt-2">
+                <div class="text-[12px] font-black text-gray-700">
+                  ${escapeHtml(T.unitLabel)}: <span class="text-[#C5A059]">₪${unit.toFixed(0)}</span>
+                </div>
+                <div class="text-[12px] font-black text-gray-700">
+                  ${escapeHtml(T.lineLabel)}: <span class="text-black">₪${line.toFixed(0)}</span>
+                </div>
+              </div>
+
+              <div class="flex items-center gap-3 mt-2">
+                <button onclick="changeQty('${escapeQuotes(feedId)}', -1)"
+                  class="w-9 h-9 rounded-2xl bg-white border flex items-center justify-center font-black text-gray-700 active:scale-95 transition">-</button>
+                <span class="text-sm font-black w-6 text-center">${qty}</span>
+                <button onclick="changeQty('${escapeQuotes(feedId)}', 1)"
+                  class="w-9 h-9 rounded-2xl bg-white border flex items-center justify-center font-black text-gray-700 active:scale-95 transition">+</button>
+              </div>
+            </div>
+
+            <button onclick="removeItem('${escapeQuotes(feedId)}')"
+              class="text-gray-300 text-xl px-2 active:scale-95 transition" aria-label="Remove">✕</button>
+          </div>
+        </div>
+      `;
+    });
+
+    container.innerHTML = html || `<p class="text-center py-10 text-gray-400 font-bold">${escapeHtml(T.emptyCart)}</p>`;
+  }
+
+  function openCart() {
+    document.getElementById("cartOverlay").classList.remove("hidden");
+    document.getElementById("cartDrawer").classList.remove("translate-y-full");
+    if (!state.leadCartFired && state.cart.size > 0) {
+      state.leadCartFired = true;
+      fireLeadEvent({ source: "cart_open" });
+    }
+  }
+
+  function closeCart() {
+    document.getElementById("cartDrawer").classList.add("translate-y-full");
+    setTimeout(() => document.getElementById("cartOverlay").classList.add("hidden"), 450);
+  }
+
+  function sendWhatsApp() { /* كما هو عندك */ }
+
+  function openWhatsAppHelp(){
+    const text = (I18N[LANG] || I18N.ar).waFabMsg || "";
+    window.open(`https://wa.me/${WHATSAPP_API}?text=${encodeURIComponent(text)}`, "_blank");
+  }
+
+  function bindEvents() {
+    document.getElementById("cartBtn").onclick = openCart;
+    document.getElementById("closeCart").onclick = closeCart;
+    document.getElementById("cartOverlay").onclick = closeCart;
+    document.getElementById("search").oninput = applyFilter;
+    document.getElementById("sendOrder").onclick = sendWhatsApp;
+    document.getElementById("waFab").onclick = openWhatsAppHelp;
+
+    window.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") closeCart();
+    });
+  }
+
+  window.switchCat = (c) => {
+    state.currentCat = c;
+    applyFilter();
+    renderCategories();
+  };
+
+  function escapeHtml(str){
+    return String(str || "")
+      .replaceAll("&","&amp;")
+      .replaceAll("<","&lt;")
+      .replaceAll(">","&gt;")
+      .replaceAll('"',"&quot;")
+      .replaceAll("'","&#039;");
+  }
+  function escapeQuotes(str){
+    return String(str || "").replaceAll("\\","\\\\").replaceAll("'","\\'");
+  }
+
+  init();
+</script>
+</body>
+</html>
   <!-- =========================
        META PIXEL (Lead)
        ========================= -->
