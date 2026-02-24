@@ -45,64 +45,10 @@
     .clamp-1{ -webkit-line-clamp:1; }
     .clamp-2{ -webkit-line-clamp:2; }
 
-    .sheet-shadow{ box-shadow: 0 -18px 40px rgba(0,0,0,.18); }
-
-    /* أيقونة الواتساب العائمة */
-    .fab{
-      position: fixed;
-      z-index: 120;
-      right: 16px;
-      bottom: calc(16px + env(safe-area-inset-bottom));
-      width: 56px;
-      height: 56px;
-      border-radius: 18px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      background:#25D366;
-      color:#fff;
-      box-shadow: 0 14px 30px rgba(0,0,0,.22);
-      transition: transform .15s;
-    }
-    .fab:active{ transform: scale(.98); }
-    
-    /* أيقونة عربة التسوق العائمة الجديدة */
-    .fab-cart {
-      position: fixed;
-      z-index: 120;
-      left: 16px; /* تم وضعها على اليسار لتجنب التداخل مع الواتساب والمساعد */
-      bottom: calc(16px + env(safe-area-inset-bottom));
-      width: 56px;
-      height: 56px;
-      border-radius: 18px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: var(--dark);
-      color: #fff;
-      box-shadow: 0 14px 30px rgba(0,0,0,.22);
-      transition: transform .15s;
-    }
-    .fab-cart:active { transform: scale(.98); }
-
-    .fab-badge{
-      position:absolute;
-      top:-6px;
-      right:-6px;
-      background:#C5A059; /* لون ذهبي ليتناسب مع الهوية */
-      color:#fff;
-      font-size:10px;
-      font-weight:900;
-      padding:3px 7px;
-      border-radius:999px;
-      border: 1px solid rgba(255,255,255,.25);
-    }
-    
-    /* تعديل موقع شارة الواتساب لتكون على اليسار */
-    .fab .fab-badge {
-        right: auto;
-        left: -6px;
-        background: #0A0A0A;
+    /* تحسينات النافذة المنبثقة للكمبيوتر والجوال */
+    .modal-container {
+      max-height: calc(100dvh - 2rem);
+      margin-top: env(safe-area-inset-top);
     }
   </style>
 
@@ -185,114 +131,115 @@
 </head>
 
 <body class="antialiased">
-  <div class="app">
+  <div class="app relative">
 
-    <nav class="sticky top-0 z-50 glass-dark border-b border-white/10 px-4 py-3 flex justify-center items-center"
+    <nav class="sticky top-0 z-40 glass-dark border-b border-white/10 px-4 py-3 flex justify-between items-center"
          style="padding-top: calc(0.75rem + env(safe-area-inset-top));">
-      <div class="flex items-center gap-2">
-        <img src="https://www.mad-parfumeur.com/assets/hero/logo.png" class="h-8 brightness-0 invert" alt="MAD" />
-        <span class="text-white font-black text-sm italic uppercase tracking-tighter">MAD Parfumeur</span>
+      
+      <button id="menuBtn" class="p-2 text-white active:scale-95 transition" aria-label="Menu">
+        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+        </svg>
+      </button>
+
+      <div class="flex items-center gap-2 absolute left-1/2 -translate-x-1/2 pointer-events-none">
+        <img src="https://www.mad-parfumeur.com/assets/hero/logo.png" class="h-6 sm:h-8 brightness-0 invert" alt="MAD" />
+        <span class="text-white font-black text-sm italic uppercase tracking-tighter hidden sm:inline-block">MAD Parfumeur</span>
       </div>
+
+      <button id="cartBtn" class="relative p-2 text-white active:scale-95 transition" aria-label="Cart">
+        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+        </svg>
+        <span id="cartCountBadge"
+              class="absolute top-0 right-0 bg-[#C5A059] text-white text-[10px] w-5 h-5 flex items-center justify-center rounded-full font-black shadow">0</span>
+      </button>
     </nav>
 
-    <section class="bg-[#0A0A0A] pt-8 pb-14 px-5 text-center">
-      <h1 id="heroTitle" class="text-white text-3xl font-black mb-4 leading-tight">
+    <section class="bg-[#0A0A0A] pt-10 pb-16 px-5 text-center relative z-10 rounded-b-[2rem] shadow-sm">
+      <h1 id="heroTitle" class="text-white text-3xl font-black mb-6 leading-tight">
         عالم من <span class="text-[#C5A059]">الفخامة</span>
       </h1>
 
       <div class="mx-auto max-w-md">
         <input id="search"
-               class="w-full bg-white/10 border border-white/20 rounded-2xl px-4 py-3.5 text-white text-sm outline-none focus:border-[#C5A059]"
+               class="w-full bg-white/10 border border-white/20 rounded-2xl px-4 py-3.5 text-white text-sm outline-none focus:border-[#C5A059] transition-colors"
                placeholder="بحث عن عطر..."
                autocomplete="off" />
-        <p id="searchHint" class="text-white/60 text-[11px] mt-2">اكتب اسم العطر</p>
+        <p id="searchHint" class="text-white/60 text-[11px] mt-3">اكتب اسم العطر أو الكود</p>
       </div>
     </section>
 
-    <div class="px-4 -mt-7 relative z-20">
-      <div id="categories" class="flex overflow-x-auto gap-2 py-3 no-scrollbar"></div>
-    </div>
-
-    <main class="px-3 pb-24 mt-3" style="padding-bottom: calc(6rem + env(safe-area-inset-bottom));">
+    <main class="px-3 pb-10 mt-6" style="padding-bottom: calc(2rem + env(safe-area-inset-bottom));">
+      <h2 id="currentCategoryTitle" class="text-lg font-black text-gray-800 px-2 mb-4">الكل</h2>
       <div id="products" class="grid grid-cols-2 gap-3"></div>
     </main>
 
   </div>
 
-  <button id="waFab" class="fab" aria-label="WhatsApp">
-    <span id="waFabBadge" class="fab-badge">WA</span>
-    <svg viewBox="0 0 32 32" width="26" height="26" fill="currentColor" aria-hidden="true">
-      <path d="M19.11 17.49c-.27-.14-1.6-.79-1.85-.88-.25-.09-.43-.14-.61.14-.18.27-.7.88-.86 1.06-.16.18-.32.2-.59.07-.27-.14-1.14-.42-2.17-1.34-.8-.71-1.34-1.6-1.5-1.87-.16-.27-.02-.42.12-.56.13-.13.27-.32.41-.48.14-.16.18-.27.27-.45.09-.18.05-.34-.02-.48-.07-.14-.61-1.47-.84-2.01-.22-.53-.45-.46-.61-.47l-.52-.01c-.18 0-.48.07-.73.34-.25.27-.95.93-.95 2.27s.98 2.64 1.12 2.82c.14.18 1.93 2.95 4.67 4.13.65.28 1.15.45 1.54.57.65.21 1.24.18 1.7.11.52-.08 1.6-.65 1.82-1.28.23-.63.23-1.17.16-1.28-.07-.11-.25-.18-.52-.32zM16.01 5.33c-5.89 0-10.67 4.78-10.67 10.67 0 1.88.49 3.72 1.43 5.35L5.33 26.67l5.48-1.41c1.56.85 3.31 1.29 5.2 1.29 5.89 0 10.67-4.78 10.67-10.67S21.9 5.33 16.01 5.33zm0 19.21c-1.68 0-3.32-.45-4.75-1.3l-.34-.2-3.25.83.87-3.17-.22-.33c-.92-1.45-1.41-3.12-1.41-4.84 0-5.02 4.08-9.1 9.1-9.1s9.1 4.08 9.1 9.1-4.08 9.01-9.1 9.01z"></path>
-    </svg>
-  </button>
-
-  <button id="cartBtn" class="fab-cart" aria-label="Cart">
-    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
-    </svg>
-    <span id="cartCountBadge" class="fab-badge">0</span>
-  </button>
-
-  <div id="cartOverlay" class="fixed inset-0 bg-black/55 backdrop-blur-sm hidden z-[100] transition-opacity"></div>
-
-  <div id="cartDrawer"
-       class="fixed inset-x-0 bottom-0 z-[101] translate-y-full transition-transform duration-500 sheet-shadow bg-white rounded-t-[2rem] flex flex-col"
-       style="height: min(92dvh, 760px); padding-bottom: env(safe-area-inset-bottom);">
-
-    <div class="w-full pt-3 pb-1 flex justify-center">
-      <div class="w-12 h-1.5 rounded-full bg-gray-200"></div>
+  <div id="menuOverlay" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden z-[100] transition-opacity duration-300 opacity-0"></div>
+  <div id="menuDrawer" class="fixed top-0 right-0 bottom-0 w-64 bg-[#0A0A0A] z-[101] translate-x-full transition-transform duration-300 flex flex-col shadow-2xl border-l border-white/10">
+    <div class="p-5 flex items-center justify-between border-b border-white/10" style="padding-top: calc(1.25rem + env(safe-area-inset-top));">
+      <span class="text-white font-black text-lg">الأقسام</span>
+      <button id="closeMenu" class="text-gray-400 text-2xl active:scale-95 transition" aria-label="Close Menu">✕</button>
     </div>
+    <div class="flex-1 overflow-y-auto p-4 space-y-2 no-scrollbar" id="categoriesMenu">
+      </div>
+  </div>
 
-    <div class="px-5 pb-3 border-b flex items-center justify-between">
-      <h3 id="cartTitle" class="text-lg font-black">عربة التسوق</h3>
+  <div id="cartOverlay" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden z-[100] transition-opacity duration-300 opacity-0"></div>
+  <div id="cartModal" class="fixed inset-4 sm:inset-auto sm:w-[440px] sm:top-1/2 sm:left-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2 bg-white rounded-[2rem] z-[101] flex flex-col shadow-2xl transition-all duration-300 opacity-0 scale-95 pointer-events-none modal-container">
+    
+    <div class="px-5 py-4 border-b flex items-center justify-between shrink-0">
+      <h3 id="cartTitle" class="text-lg font-black text-gray-900">عربة التسوق</h3>
       <button id="closeCart" class="text-gray-400 text-2xl px-2 -my-2 active:scale-95 transition" aria-label="Close">✕</button>
     </div>
 
-    <div class="flex-1 overflow-y-auto px-5 py-4 space-y-3" id="cartItems"></div>
+    <div class="flex-1 overflow-y-auto px-4 py-4 space-y-3 bg-gray-50/50" id="cartItems"></div>
 
-    <div class="px-5 pt-4 pb-5 bg-[#0A0A0A] text-white rounded-t-[2rem]">
-      <div class="mb-3 space-y-2.5">
+    <div class="p-5 bg-[#0A0A0A] text-white rounded-b-[2rem] shrink-0 border-t border-white/10">
+      <div class="mb-4 space-y-2.5">
         <input id="custName"
-               class="w-full bg-white/10 border border-white/10 rounded-2xl px-4 py-3 text-sm outline-none focus:border-[#C5A059]"
+               class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm outline-none focus:border-[#C5A059] focus:bg-white/10 transition-colors"
                placeholder="الاسم الكامل"
                autocomplete="name" />
 
         <input id="custPhone"
-               class="w-full bg-white/10 border border-white/10 rounded-2xl px-4 py-3 text-sm outline-none focus:border-[#C5A059]"
+               class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm outline-none focus:border-[#C5A059] focus:bg-white/10 transition-colors"
                placeholder="رقم الهاتف"
                inputmode="tel"
                autocomplete="tel" />
 
         <textarea id="custAddress"
-                  class="w-full bg-white/10 border border-white/10 rounded-2xl px-4 py-3 text-sm outline-none focus:border-[#C5A059]"
+                  class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm outline-none focus:border-[#C5A059] focus:bg-white/10 transition-colors"
                   rows="2"
                   placeholder="العنوان (اختياري)"
                   autocomplete="street-address"></textarea>
       </div>
 
-      <div class="mb-3 space-y-2">
-        <div class="flex justify-between text-sm font-black">
+      <div class="mb-4 space-y-2">
+        <div class="flex justify-between text-sm font-black text-gray-300">
           <span id="subLabel">المجموع</span>
-          <span class="text-white">₪<span id="subtotal">0</span></span>
+          <span>₪<span id="subtotal">0</span></span>
         </div>
 
-        <div class="flex justify-between text-sm font-black">
+        <div class="flex justify-between text-sm font-black text-gray-300">
           <span id="shipLabel">التوصيل</span>
-          <span class="text-white">₪<span id="shipping">50</span></span>
+          <span>₪<span id="shipping">50</span></span>
         </div>
 
-        <div class="flex justify-between font-black text-base pt-2 border-t border-white/10">
+        <div class="flex justify-between font-black text-lg pt-2 border-t border-white/10 mt-2">
           <span id="totalLabel">الإجمالي</span>
           <span class="text-[#C5A059]">₪<span id="total">0</span></span>
         </div>
       </div>
 
       <button id="sendOrder"
-              class="w-full bg-[#C5A059] text-black py-4 rounded-2xl font-black text-sm uppercase tracking-widest flex items-center justify-center gap-2 active:scale-[0.99] transition">
+              class="w-full bg-[#C5A059] text-black py-4 rounded-xl font-black text-sm uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-[#d4b06a] active:scale-[0.98] transition">
         إرسال الطلب عبر واتساب
       </button>
 
-      <p id="deliveryNote" class="text-[11px] text-white/60 mt-2 text-center">
+      <p id="deliveryNote" class="text-[10px] text-white/50 mt-3 text-center">
         الدفع عند الاستلام — سيتم تأكيد التفاصيل عبر واتساب
       </p>
     </div>
@@ -307,7 +254,7 @@
       pageTitle: "MAD Parfumeur | الموقع",
       heroTitleHTML: `عالم من <span class="text-[#C5A059]">الفخامة</span>`,
       searchPh: "بحث عن عطر...",
-      searchHint: "اكتب اسم العطر",
+      searchHint: "اكتب اسم العطر أو الكود",
       all: "الكل",
       cartTitle: "عربة التسوق",
       namePh: "الاسم الكامل",
@@ -328,8 +275,6 @@
       alertNeed: "يرجى تعبئة الاسم والهاتف",
       addToCart: "أضف للسلة",
       addMore: "أضف المزيد",
-      waFabBadge: "مساعدة",
-      waFabMsg: "مرحبا، عندي استفسار عن العطور.",
       wa: {
         header: "✨ *طلب جديد | MAD Parfumeur*",
         name: "👤 الاسم",
@@ -369,8 +314,6 @@
       alertNeed: "נא למלא שם ומספר טלפון",
       addToCart: "הוסף לעגלה",
       addMore: "הוסף עוד",
-      waFabBadge: "עזרה",
-      waFabMsg: "היי, יש לי שאלה לגבי הבשמים.",
       wa: {
         header: "✨ *הזמנה חדשה | MAD Parfumeur*",
         name: "👤 שם",
@@ -414,8 +357,6 @@
     document.getElementById("totalLabel").textContent = T.totalLabel;
     document.getElementById("sendOrder").textContent = T.sendBtn;
     document.getElementById("deliveryNote").textContent = T.deliveryNote;
-
-    document.getElementById("waFabBadge").textContent = T.waFabBadge;
   }
 
   /* =========================
@@ -489,7 +430,7 @@
       const catFromUrl = urlParams.get("cat");
       if (catFromUrl) state.currentCat = decodeURIComponent(catFromUrl);
 
-      renderCategories();
+      renderCategoriesMenu();
       applyFilter();
       bindEvents();
       updateCartUI();
@@ -514,17 +455,20 @@
       return okCat && okQ;
     });
 
+    // تحديث عنوان القسم
+    document.getElementById("currentCategoryTitle").textContent = state.currentCat === "ALL" ? T.all : state.currentCat;
+    
     renderProducts();
   }
 
-  function renderCategories() {
-    const container = document.getElementById("categories");
+  function renderCategoriesMenu() {
+    const container = document.getElementById("categoriesMenu");
     const cats = ["ALL", ...new Set(state.products.map(p => p.type))];
 
     container.innerHTML = cats.map(c => `
       <button onclick="switchCat('${escapeQuotes(c)}')"
-        class="whitespace-nowrap px-5 py-2.5 rounded-2xl text-xs font-black border transition-all active:scale-[0.99]
-        ${state.currentCat === c ? 'bg-black text-white border-black shadow' : 'bg-white text-gray-500 border-gray-100'}">
+        class="w-full text-right px-4 py-3.5 rounded-xl font-black transition-all active:scale-[0.98]
+        ${state.currentCat === c ? 'bg-[#C5A059] text-black shadow-md' : 'bg-white/5 text-gray-300 hover:bg-white/10'}">
         ${c === "ALL" ? escapeHtml(T.all) : escapeHtml(c)}
       </button>
     `).join("");
@@ -535,7 +479,7 @@
 
     if (!state.filtered.length) {
       container.innerHTML = `
-        <div class="col-span-2 text-center text-gray-500 font-bold py-10">
+        <div class="col-span-2 text-center text-gray-400 font-bold py-10 bg-white rounded-2xl border border-gray-100">
           ${escapeHtml(T.noResults)}
         </div>`;
       return;
@@ -546,19 +490,14 @@
 
       return `
         <div class="product-card p-3 flex flex-col shadow-sm">
-          <div class="aspect-square mb-2 bg-gray-50 rounded-2xl p-2 overflow-hidden">
-            <img src="${p.image}"
-                 class="w-full h-full object-contain mix-blend-multiply"
-                 loading="lazy"
-                 alt="MAD">
+          <div class="aspect-square mb-2 bg-gray-50 rounded-2xl p-2 overflow-hidden relative">
+            <img src="${p.image}" class="w-full h-full object-contain mix-blend-multiply" loading="lazy" alt="MAD">
           </div>
 
-          <p class="text-[11px] font-black text-gray-500 mb-3 clamp-1">
-            ${escapeHtml(p.type)}
-          </p>
+          <p class="text-[11px] font-black text-gray-400 mb-3 clamp-1">${escapeHtml(p.type)}</p>
 
           <button onclick="addToCart('${escapeQuotes(p.feedId)}')"
-            class="mt-auto w-full ${inCart ? 'bg-black text-white' : 'bg-[#C5A059] text-black'} py-3 rounded-2xl font-black text-xs active:scale-95 transition">
+            class="mt-auto w-full ${inCart ? 'bg-black text-white' : 'bg-gray-100 text-gray-800'} py-3 rounded-xl font-black text-xs active:scale-95 transition hover:bg-[#C5A059] hover:text-black">
             ${inCart ? escapeHtml(T.addMore) : escapeHtml(T.addToCart)}
           </button>
         </div>
@@ -566,6 +505,33 @@
     }).join("");
   }
 
+  /* === MENU LOGIC === */
+  function openMenu() {
+    const overlay = document.getElementById("menuOverlay");
+    const drawer = document.getElementById("menuDrawer");
+    overlay.classList.remove("hidden");
+    requestAnimationFrame(() => {
+      overlay.classList.remove("opacity-0");
+      drawer.classList.remove("translate-x-full");
+    });
+  }
+
+  function closeMenu() {
+    const overlay = document.getElementById("menuOverlay");
+    const drawer = document.getElementById("menuDrawer");
+    overlay.classList.add("opacity-0");
+    drawer.classList.add("translate-x-full");
+    setTimeout(() => overlay.classList.add("hidden"), 300);
+  }
+
+  window.switchCat = (c) => {
+    state.currentCat = c;
+    applyFilter();
+    renderCategoriesMenu(); // تحديث الألوان في القائمة
+    closeMenu(); // إغلاق القائمة بعد الاختيار
+  };
+
+  /* === CART LOGIC === */
   window.addToCart = (feedId) => {
     state.cart.set(feedId, (state.cart.get(feedId) || 0) + 1);
     updateCartUI();
@@ -624,38 +590,28 @@
       const line = unit * qty;
 
       html += `
-        <div class="bg-gray-50 p-3 rounded-2xl">
+        <div class="bg-white p-3 rounded-2xl border border-gray-100 shadow-sm">
           <div class="flex items-center gap-3">
-            <img src="${p.image}" class="w-14 h-14 object-contain mix-blend-multiply" alt="MAD">
+            <div class="w-16 h-16 bg-gray-50 rounded-xl p-1 shrink-0">
+              <img src="${p.image}" class="w-full h-full object-contain mix-blend-multiply" alt="MAD">
+            </div>
 
             <div class="flex-1 min-w-0">
-              <p class="font-black text-[13px] leading-tight clamp-1">${escapeHtml(code)}</p>
-              <p class="text-[11px] font-black text-gray-500 mt-1 clamp-1">${escapeHtml(p.type)}</p>
+              <p class="font-black text-[13px] text-gray-800 leading-tight clamp-1">${escapeHtml(code)}</p>
+              <p class="text-[10px] font-black text-gray-400 mt-1 clamp-1">${escapeHtml(p.type)}</p>
 
-              <div class="mt-2">
-                <span class="inline-flex items-center gap-2 bg-white border px-2.5 py-1 rounded-xl">
-                  <span class="text-[11px] font-black text-gray-500">${escapeHtml(T.codeLabel)}</span>
-                  <span class="text-[11px] font-black text-black">${escapeHtml(code)}</span>
-                </span>
-              </div>
-
-              <div class="flex items-center justify-between mt-2">
-                <div class="text-[12px] font-black text-gray-700">
-                  ${escapeHtml(T.unitLabel)}: <span class="text-[#C5A059]">₪${unit.toFixed(0)}</span>
+              <div class="flex items-center justify-between mt-3">
+                <div class="text-[11px] font-black text-gray-600 bg-gray-50 px-2 py-1 rounded-md">
+                  <span class="text-[#C5A059]">₪${unit.toFixed(0)}</span>
                 </div>
-                <div class="text-[12px] font-black text-gray-700">
-                  ${escapeHtml(T.lineLabel)}: <span class="text-black">₪${line.toFixed(0)}</span>
+                
+                <div class="flex items-center gap-3">
+                  <button onclick="changeQty('${escapeQuotes(feedId)}', -1)"
+                    class="w-7 h-7 rounded-lg bg-gray-50 hover:bg-gray-100 flex items-center justify-center font-black text-gray-700 transition">-</button>
+                  <span class="text-sm font-black w-4 text-center">${qty}</span>
+                  <button onclick="changeQty('${escapeQuotes(feedId)}', 1)"
+                    class="w-7 h-7 rounded-lg bg-gray-50 hover:bg-gray-100 flex items-center justify-center font-black text-gray-700 transition">+</button>
                 </div>
-              </div>
-
-              <div class="flex items-center gap-3 mt-2">
-                <button onclick="changeQty('${escapeQuotes(feedId)}', -1)"
-                  class="w-9 h-9 rounded-2xl bg-white border flex items-center justify-center font-black text-gray-700 active:scale-95 transition">-</button>
-
-                <span class="text-sm font-black w-6 text-center">${qty}</span>
-
-                <button onclick="changeQty('${escapeQuotes(feedId)}', 1)"
-                  class="w-9 h-9 rounded-2xl bg-white border flex items-center justify-center font-black text-gray-700 active:scale-95 transition">+</button>
               </div>
             </div>
 
@@ -666,12 +622,22 @@
       `;
     });
 
-    container.innerHTML = html || `<p class="text-center py-10 text-gray-400 font-bold">${escapeHtml(T.emptyCart)}</p>`;
+    container.innerHTML = html || `
+      <div class="flex flex-col items-center justify-center py-10 opacity-60">
+        <svg class="w-16 h-16 text-gray-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+        <p class="text-gray-500 font-bold">${escapeHtml(T.emptyCart)}</p>
+      </div>`;
   }
 
   function openCart() {
-    document.getElementById("cartOverlay").classList.remove("hidden");
-    document.getElementById("cartDrawer").classList.remove("translate-y-full");
+    const overlay = document.getElementById("cartOverlay");
+    const modal = document.getElementById("cartModal");
+    
+    overlay.classList.remove("hidden");
+    requestAnimationFrame(() => {
+      overlay.classList.remove("opacity-0");
+      modal.classList.remove("opacity-0", "scale-95", "pointer-events-none");
+    });
 
     if (!state.leadCartFired && state.cart.size > 0) {
       state.leadCartFired = true;
@@ -680,8 +646,13 @@
   }
 
   function closeCart() {
-    document.getElementById("cartDrawer").classList.add("translate-y-full");
-    setTimeout(() => document.getElementById("cartOverlay").classList.add("hidden"), 450);
+    const overlay = document.getElementById("cartOverlay");
+    const modal = document.getElementById("cartModal");
+    
+    overlay.classList.add("opacity-0");
+    modal.classList.add("opacity-0", "scale-95", "pointer-events-none");
+    
+    setTimeout(() => overlay.classList.add("hidden"), 300);
   }
 
   function sendWhatsApp() {
@@ -728,29 +699,28 @@
     }, 120);
   }
 
-  function openWhatsAppHelp(){
-    const text = (I18N[LANG] || I18N.ar).waFabMsg || "";
-    window.open(`https://wa.me/${WHATSAPP_API}?text=${encodeURIComponent(text)}`, "_blank");
-  }
-
   function bindEvents() {
+    // Cart Events
     document.getElementById("cartBtn").onclick = openCart;
     document.getElementById("closeCart").onclick = closeCart;
     document.getElementById("cartOverlay").onclick = closeCart;
-    document.getElementById("search").oninput = applyFilter;
     document.getElementById("sendOrder").onclick = sendWhatsApp;
-    document.getElementById("waFab").onclick = openWhatsAppHelp;
+    
+    // Menu Events
+    document.getElementById("menuBtn").onclick = openMenu;
+    document.getElementById("closeMenu").onclick = closeMenu;
+    document.getElementById("menuOverlay").onclick = closeMenu;
+
+    // Search Event
+    document.getElementById("search").oninput = applyFilter;
 
     window.addEventListener("keydown", (e) => {
-      if (e.key === "Escape") closeCart();
+      if (e.key === "Escape") {
+        closeCart();
+        closeMenu();
+      }
     });
   }
-
-  window.switchCat = (c) => {
-    state.currentCat = c;
-    applyFilter();
-    renderCategories();
-  };
 
   function escapeHtml(str){
     return String(str || "")
