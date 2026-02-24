@@ -434,7 +434,7 @@
   /* =========================
      CONFIG
      ========================= */
-  const WHATSAPP_API = "97246725089"; // تم تغيير الرقم حسب الطلب
+  const WHATSAPP_API = "97246725089"; 
   const SHIPPING = 50;
   const RSS_PATH = "products.rss";
 
@@ -447,28 +447,12 @@
     leadOrderFired: false
   };
 
-  function normalizeCode(x){
-    return String(x || "").toUpperCase().trim().replace(/[^A-Z0-9]/g, "");
-  }
-
-  function extractCodeFromTitle(title){
-    const s = String(title || "").toUpperCase();
-    const m = s.match(/\b([A-Z]{1,3})\s*[\.\-_]?\s*(\d{2,4})\b/);
-    if(!m) return "";
-    return normalizeCode(m[1] + m[2]); 
-  }
-
-  function chooseRealCode({ mpn, sku, title, feedId }){
-    const fromTitle = extractCodeFromTitle(title);
-    if(fromTitle) return fromTitle;
-
-    const a = normalizeCode(mpn);
-    if(a) return a;
-
-    const b = normalizeCode(sku);
-    if(b) return b;
-
-    return normalizeCode(feedId) || String(feedId || "").trim();
+  // دالة لجلب الاسم الكامل بدون قصه أو تشويهه
+  function chooseDisplayName({ mpn, sku, title, feedId }){
+    if (title) return String(title).trim();
+    if (mpn) return String(mpn).trim();
+    if (sku) return String(sku).trim();
+    return String(feedId || "").trim();
   }
 
   async function init() {
@@ -492,7 +476,8 @@
           const type   = (getG("product_type") || "General").trim();
           const price  = parseFloat((getG("price") || "").replace(/[^\d.]/g, "")) || 0;
 
-          const realCode = chooseRealCode({ mpn, sku, title, feedId });
+          // نستخدم الاسم كما هو
+          const realCode = chooseDisplayName({ mpn, sku, title, feedId });
 
           return { feedId, title, mpn, sku, realCode, image, type, price };
         })
@@ -702,7 +687,7 @@
             </div>
 
             <div class="flex-1 min-w-0">
-              <p class="font-black text-[13px] text-gray-800 leading-tight clamp-1">${escapeHtml(code)}</p>
+              <p class="font-black text-[13px] text-gray-800 leading-tight clamp-2">${escapeHtml(code)}</p>
               <p class="text-[10px] font-black text-gray-400 mt-1 clamp-1">${escapeHtml(p.type)}</p>
 
               <div class="flex items-center justify-between mt-3">
@@ -811,7 +796,6 @@
       const line = unit * qty;
 
       msg += `▪️ ${code}\n`;
-      msg += `   ${T.wa.code}: ${code}\n`;
       msg += `   ${T.wa.unit}: ₪${unit.toFixed(0)} | x${qty} | ${T.wa.line}: ₪${line.toFixed(0)}\n`;
       msg += `   ${p.type}\n`;
     });
