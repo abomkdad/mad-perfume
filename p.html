@@ -1,80 +1,322 @@
 <!doctype html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>MAD | Product</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>MAD | طلب المنتج</title>
 
-<style>
-body{margin:0;font-family:system-ui;background:#0b0d10;color:#fff;padding:20px}
-.card{max-width:900px;margin:auto;background:#111;border-radius:20px;padding:20px}
-img{width:100%;border-radius:16px;margin-bottom:15px}
-h1{margin:0 0 10px}
-.desc{background:#1a1a1a;padding:15px;border-radius:14px;margin:15px 0;line-height:1.8}
-.btn{display:inline-block;padding:12px 16px;border-radius:12px;text-decoration:none;font-weight:700;margin:5px 5px 0 0}
-.gold{background:#C5A059;color:#000}
-.dark{background:#222;color:#fff}
-</style>
+  <style>
+    :root{--bg:#0b0d10;--card:#121620;--muted:#aab3c2;--text:#f2f5fb;--gold:#C5A059;}
+    *{box-sizing:border-box}
+    body{
+      margin:0; font-family: system-ui,-apple-system,Segoe UI,Roboto,Arial;
+      background: radial-gradient(1200px 700px at 50% -200px, rgba(197,160,89,.25), transparent 60%),
+                  linear-gradient(180deg, #07090c, var(--bg));
+      color:var(--text);
+      min-height:100vh;
+      padding:18px;
+    }
+    .wrap{max-width:1000px;margin:0 auto}
+    .top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
+    .brand{display:flex;align-items:center;gap:10px;font-weight:900}
+    .dot{width:10px;height:10px;border-radius:999px;background:var(--gold);box-shadow:0 0 18px rgba(197,160,89,.7)}
+    .pill{color:#0b0d10;background:linear-gradient(90deg,#f6e27a,#c5a059);padding:8px 12px;border-radius:999px;font-weight:800;font-size:13px}
+
+    .card{
+      background: rgba(18,22,32,.92);
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:22px;
+      box-shadow:0 16px 50px rgba(0,0,0,.45);
+      overflow:hidden;
+    }
+    .grid{display:grid;grid-template-columns: 1.05fr .95fr;gap:0}
+    @media (max-width:950px){ .grid{grid-template-columns:1fr} }
+
+    .imgBox{background:#0a0c10;display:flex;align-items:center;justify-content:center;padding:14px;min-height:420px}
+    .imgBox img{max-width:100%;width:100%;height:auto;border-radius:18px;border:1px solid rgba(255,255,255,.08);background:#0a0c10}
+
+    .info{padding:18px 18px 22px}
+    h1{margin:0 0 10px;font-size:22px;line-height:1.25}
+    .meta{color:var(--muted);font-weight:700;margin-bottom:10px}
+    .desc{
+      color:#e9eef9;opacity:.92;line-height:1.8;
+      background: rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.06);
+      padding:12px;border-radius:16px;white-space:pre-wrap;
+    }
+
+    .form{
+      margin-top:14px;
+      background: rgba(255,255,255,.03);
+      border:1px solid rgba(255,255,255,.06);
+      border-radius:18px;
+      padding:12px;
+    }
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    @media (max-width:650px){ .row{grid-template-columns:1fr} }
+    label{font-size:12px;color:var(--muted);font-weight:700}
+    input, textarea{
+      width:100%;
+      background: rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.10);
+      color:var(--text);
+      border-radius:14px;
+      padding:11px 12px;
+      outline:none;
+      font-size:14px;
+    }
+    textarea{min-height:90px;resize:vertical}
+
+    .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+    .btn{
+      appearance:none;border:0;cursor:pointer;
+      padding:12px 14px;border-radius:14px;
+      font-weight:900;font-size:15px;
+      text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:8px;
+      min-width:170px;
+      transition:transform .08s ease;
+    }
+    .btn:active{transform:scale(.98)}
+    .b1{background:linear-gradient(90deg,#f6e27a,#c5a059);color:#0b0d10}
+    .b2{background:rgba(255,255,255,.10);color:var(--text);border:1px solid rgba(255,255,255,.12)}
+    .b3{background:rgba(255,255,255,.06);color:var(--muted);border:1px solid rgba(255,255,255,.10)}
+    .small{margin-top:10px;font-size:12px;color:var(--muted);line-height:1.6}
+    .err{padding:16px;border-radius:16px;background:rgba(255,0,0,.08);border:1px solid rgba(255,0,0,.18); color:#ffd9d9}
+    code{background:rgba(255,255,255,.08);padding:2px 6px;border-radius:10px}
+  </style>
 </head>
 
 <body>
-<div class="card">
-<h1 id="title">Loading...</h1>
-<img id="img" src="">
-<div class="desc" id="desc"></div>
+  <div class="wrap">
+    <div class="top">
+      <div class="brand"><span class="dot"></span> MAD Parfumeur</div>
+      <div class="pill" id="pill">Product</div>
+    </div>
 
-<a id="viewBtn" class="btn gold" target="_blank">شاهد المنتج</a>
-<a id="waBtn" class="btn dark" target="_blank">اطلب على واتساب</a>
-</div>
+    <div class="card" id="card">
+      <div class="grid">
+        <div class="imgBox">
+          <img id="img" alt="MAD Product" src="https://www.mad-parfumeur.com/assets/hero/logo2.webp" />
+        </div>
+
+        <div class="info">
+          <h1 id="title">جارٍ تحميل المنتج…</h1>
+          <div class="meta" id="meta"></div>
+          <div class="desc" id="desc">...</div>
+
+          <div class="form">
+            <div class="row">
+              <div>
+                <label>الكمية</label>
+                <input id="qty" type="number" min="1" value="1" />
+              </div>
+              <div>
+                <label>الاسم</label>
+                <input id="name" type="text" placeholder="اسمك" />
+              </div>
+              <div>
+                <label>رقم الهاتف</label>
+                <input id="phone" type="tel" placeholder="05xxxxxxxx" />
+              </div>
+              <div>
+                <label>المدينة</label>
+                <input id="city" type="text" placeholder="مثال: أم الفحم" />
+              </div>
+              <div style="grid-column:1/-1">
+                <label>عنوان التوصيل</label>
+                <input id="address" type="text" placeholder="الشارع + رقم البيت + تفاصيل" />
+              </div>
+              <div style="grid-column:1/-1">
+                <label>ملاحظات (اختياري)</label>
+                <textarea id="notes" placeholder="مثال: وقت مناسب للتواصل / ملاحظة للموصل"></textarea>
+              </div>
+            </div>
+
+            <div class="actions">
+              <a class="btn b1" id="btnWA" href="#" target="_blank" rel="noopener">✅ أكمل الطلب على واتساب</a>
+              <a class="btn b2" id="btnView" href="#" target="_blank" rel="noopener">شاهد المنتج</a>
+              <button class="btn b3" id="btnCopy" type="button">نسخ رسالة الطلب</button>
+            </div>
+
+            <div class="small">
+              ✳️ الزبون بس يضغط الزر الذهبي—الوَاتساب بيفتح ومعه رسالة جاهزة، وبضغط “إرسال” خلص.
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <div style="height:12px"></div>
+    <div class="small">
+      مثال رابط الصفحة:
+      <code>p.html?code=XF%20A.112&to=972524033442</code>
+    </div>
+  </div>
 
 <script>
-const CSV_URL = "p.csv"; // اسم الملف اللي رفعتَه
-const DEFAULT_WA = "972524033442";
+  const CSV_URL = "p.csv";               // لازم يكون بنفس مكان p.html
+  const DEFAULT_WA_TO = "972524033442";  // رقم الواتساب الافتراضي
 
-function qs(name){
-  return new URL(location.href).searchParams.get(name) || "";
-}
-
-async function load(){
-  const code = qs("code");
-  if(!code){
-    document.body.innerHTML = "لازم تضيف ?code=XF A.112 بالرابط";
-    return;
+  function qs(name){
+    const u = new URL(location.href);
+    return (u.searchParams.get(name) || "").trim();
+  }
+  function normalizePhone(p){
+    return String(p||"").replace(/[^\d]/g,"");
   }
 
-  const res = await fetch(CSV_URL + "?v=" + Date.now());
-  const text = await res.text();
-  const rows = text.split("\n").map(r=>r.split(","));
-  const headers = rows.shift();
+  // CSV parser يدعم الاقتباسات
+  function parseCSV(text){
+    const rows = [];
+    let row = [], cur = "", inQ = false;
+    for(let i=0;i<text.length;i++){
+      const ch = text[i];
+      const next = text[i+1];
 
-  const idx = (name)=>headers.indexOf(name);
+      if(ch === '"' && inQ && next === '"'){ cur += '"'; i++; continue; }
+      if(ch === '"'){ inQ = !inQ; continue; }
 
-  const CODE = idx("PRODUCT CODE");
-  const LINK = idx("LINK");
-  const IMG  = idx("FRAG_URL"); // إذا بدك صورة من فراغرانتيكا
-  const DESC = idx("DESC_AR");
-
-  const found = rows.find(r => r[CODE] && r[CODE].trim() === code.trim());
-
-  if(!found){
-    document.body.innerHTML = "لم يتم العثور على المنتج";
-    return;
+      if(ch === ',' && !inQ){ row.push(cur); cur = ""; continue; }
+      if((ch === '\n' || ch === '\r') && !inQ){
+        if(cur.length || row.length){ row.push(cur); rows.push(row); }
+        cur = ""; row = [];
+        continue;
+      }
+      cur += ch;
+    }
+    if(cur.length || row.length){ row.push(cur); rows.push(row); }
+    return rows;
   }
 
-  document.getElementById("title").innerText = found[CODE];
-  document.getElementById("desc").innerText  = found[DESC] || "";
+  function idxOf(headers, name){
+    const i = headers.indexOf(name);
+    return i >= 0 ? i : -1;
+  }
 
-  // صورة من رابط المنتج نفسه (أذكى)
-  document.getElementById("img").src = "https://madperfume.co.il/upload/01-2026/product/697baa1c54b65.png";
+  function val(r, i){
+    if(i < 0) return "";
+    return (r[i] ?? "").toString().trim();
+  }
 
-  document.getElementById("viewBtn").href = found[LINK];
+  function safe(v){
+    return (v||"").toString().trim();
+  }
 
-  const msg = `مرحبا، بدي هذا المنتج: ${found[CODE]}\n${found[LINK]}`;
-  document.getElementById("waBtn").href =
-    `https://wa.me/${DEFAULT_WA}?text=${encodeURIComponent(msg)}`;
-}
+  async function load(){
+    const code = qs("code");
+    const waTo = normalizePhone(qs("to") || DEFAULT_WA_TO);
 
-load();
+    if(!code){
+      document.getElementById("card").innerHTML =
+        `<div class="err">لازم تحط كود المنتج بالرابط مثل: <code>p.html?code=XF%20A.112</code></div>`;
+      return;
+    }
+
+    document.getElementById("pill").textContent = `Code: ${code}`;
+
+    const res = await fetch(CSV_URL + "?v=" + Date.now(), {cache:"no-store"});
+    if(!res.ok){
+      document.getElementById("card").innerHTML =
+        `<div class="err">مش قادر أفتح <code>${CSV_URL}</code> — تأكد إنه موجود بجذر الموقع.</div>`;
+      return;
+    }
+
+    const text = await res.text();
+    const rows = parseCSV(text).filter(r => r.some(c => String(c||"").trim() !== ""));
+    const headers = rows.shift().map(h => String(h||"").trim());
+
+    const I_CODE  = idxOf(headers, "PRODUCT CODE");
+    const I_LINK  = idxOf(headers, "LINK");
+    const I_IMG   = idxOf(headers, "IMAGE_LINK");
+    const I_DESC  = idxOf(headers, "DESC_AR");
+    const I_PRICE = idxOf(headers, "PRICE");
+    const I_TYPE  = idxOf(headers, "PRODUCT TYPE");
+    const I_NAME  = idxOf(headers, "FRAG_MATCH_NAME"); // اسم احتياطي إذا بدك
+
+    // صفوف فيها كود فقط
+    const data = rows.filter(r => safe(val(r, I_CODE)) !== "");
+
+    const found = data.find(r => safe(val(r, I_CODE)).toLowerCase() === code.toLowerCase());
+    if(!found){
+      document.getElementById("card").innerHTML =
+        `<div class="err">مش لاقي المنتج: <code>${code}</code><br>تأكد إن الكود موجود بالـ p.csv.</div>`;
+      return;
+    }
+
+    const pCode = safe(val(found, I_CODE));
+    const pLink = safe(val(found, I_LINK));
+    const pImg  = safe(val(found, I_IMG));
+    const pDesc = safe(val(found, I_DESC)) || "اضغط أكمل الطلب على واتساب.";
+    const pPrice= safe(val(found, I_PRICE));
+    const pType = safe(val(found, I_TYPE));
+    const pName = safe(val(found, I_NAME));
+
+    document.title = `${pCode} | MAD`;
+
+    document.getElementById("title").textContent = pName ? `${pCode} — ${pName}` : pCode;
+    document.getElementById("meta").textContent =
+      [pType, pPrice ? (pPrice + "₪") : ""].filter(Boolean).join(" • ");
+    document.getElementById("desc").textContent = pDesc;
+
+    document.getElementById("img").src = pImg || "https://www.mad-parfumeur.com/assets/hero/logo2.webp";
+    document.getElementById("btnView").href = pLink || "https://madperfume.co.il/";
+
+    function buildMessage(){
+      const qty = Math.max(1, parseInt(document.getElementById("qty").value || "1", 10));
+      const name = safe(document.getElementById("name").value);
+      const phone = safe(document.getElementById("phone").value);
+      const city = safe(document.getElementById("city").value);
+      const address = safe(document.getElementById("address").value);
+      const notes = safe(document.getElementById("notes").value);
+
+      // رسالة جاهزة واضحة للإدارة (سلسة للزبون: يضغط Send وخلاص)
+      let msg = `طلب جديد ✅\n`;
+      msg += `المنتج: ${pCode}\n`;
+      if(pPrice) msg += `السعر: ${pPrice}₪\n`;
+      msg += `الكمية: ${qty}\n`;
+      if(pLink) msg += `رابط المنتج: ${pLink}\n`;
+      msg += `\nبيانات الزبون:\n`;
+      if(name) msg += `الاسم: ${name}\n`;
+      if(phone) msg += `الهاتف: ${phone}\n`;
+      if(city) msg += `المدينة: ${city}\n`;
+      if(address) msg += `العنوان: ${address}\n`;
+      if(notes) msg += `ملاحظات: ${notes}\n`;
+      return msg.trim();
+    }
+
+    function refreshWA(){
+      const msg = buildMessage();
+      const waLink = `https://wa.me/${waTo}?text=${encodeURIComponent(msg)}`;
+      document.getElementById("btnWA").href = waLink;
+      return msg;
+    }
+
+    // أول تحميل
+    refreshWA();
+
+    // كل تغيير ينعكس على رابط الواتساب
+    ["qty","name","phone","city","address","notes"].forEach(id=>{
+      document.getElementById(id).addEventListener("input", refreshWA);
+      document.getElementById(id).addEventListener("change", refreshWA);
+    });
+
+    // زر النسخ
+    document.getElementById("btnCopy").addEventListener("click", async ()=>{
+      const msg = refreshWA();
+      try{
+        await navigator.clipboard.writeText(msg);
+        document.getElementById("btnCopy").textContent = "✅ تم النسخ";
+        setTimeout(()=> document.getElementById("btnCopy").textContent = "نسخ رسالة الطلب", 1200);
+      }catch(e){
+        alert("ما قدرت أنسخ تلقائياً. انسخ يدويًا من الواتساب.");
+      }
+    });
+  }
+
+  load().catch(err=>{
+    document.getElementById("card").innerHTML = `<div class="err">خطأ: ${String(err.message||err)}</div>`;
+  });
 </script>
 </body>
 </html>
