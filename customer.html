@@ -43,7 +43,7 @@
       overflow:hidden;
     }
     .clamp-1{ -webkit-line-clamp:1; }
-    .clamp-2{ -webkit-line-clamp:2; }
+    .clamp-2{ -webkit-line-clamp:2; } /* ضرورية لأسماء المنتجات الطويلة */
 
     .modal-container {
       max-height: calc(100dvh - 2rem);
@@ -60,13 +60,44 @@
       animation: cartPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
 
-    /* وميض כל המוצרים للفت الانتباه */
+    /* وميض الأقسام للفت الانتباه */
     @keyframes attentionBlink {
       0%, 100% { color: #fff; transform: scale(1); filter: drop-shadow(0 0 0px transparent); }
       50% { color: var(--gold); transform: scale(1.15); filter: drop-shadow(0 0 8px rgba(197, 160, 89, 0.6)); }
     }
     .animate-menu-blink {
       animation: attentionBlink 2s infinite ease-in-out;
+    }
+
+    /* زر الواتساب العائم */
+    .fab {
+      position: fixed;
+      z-index: 120;
+      right: 16px;
+      bottom: calc(16px + env(safe-area-inset-bottom));
+      width: 56px;
+      height: 56px;
+      border-radius: 18px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:#25D366;
+      color:#fff;
+      box-shadow: 0 14px 30px rgba(0,0,0,.22);
+      transition: transform .15s;
+    }
+    .fab:active { transform: scale(.98); }
+    .fab-badge {
+      position:absolute;
+      top:-6px;
+      left:-6px;
+      background:#0A0A0A;
+      color:#fff;
+      font-size:10px;
+      font-weight:900;
+      padding:3px 7px;
+      border-radius:999px;
+      border: 1px solid rgba(255,255,255,.25);
     }
   </style>
 
@@ -187,17 +218,24 @@
       </div>
     </section>
 
-    <main class="px-3 pb-10 mt-6" style="padding-bottom: calc(2rem + env(safe-area-inset-bottom));">
+    <main class="px-3 pb-10 mt-6" style="padding-bottom: calc(6rem + env(safe-area-inset-bottom));">
       <h2 id="currentCategoryTitle" class="text-lg font-black text-gray-800 px-2 mb-4">الكل</h2>
       <div id="products" class="grid grid-cols-2 gap-3"></div>
     </main>
 
   </div>
 
+  <button id="waFab" class="fab" aria-label="WhatsApp">
+    <span id="waFabBadge" class="fab-badge">WA</span>
+    <svg viewBox="0 0 32 32" width="26" height="26" fill="currentColor" aria-hidden="true">
+      <path d="M19.11 17.49c-.27-.14-1.6-.79-1.85-.88-.25-.09-.43-.14-.61.14-.18.27-.7.88-.86 1.06-.16.18-.32.2-.59.07-.27-.14-1.14-.42-2.17-1.34-.8-.71-1.34-1.6-1.5-1.87-.16-.27-.02-.42.12-.56.13-.13.27-.32.41-.48.14-.16.18-.27.27-.45.09-.18.05-.34-.02-.48-.07-.14-.61-1.47-.84-2.01-.22-.53-.45-.46-.61-.47l-.52-.01c-.18 0-.48.07-.73.34-.25.27-.95.93-.95 2.27s.98 2.64 1.12 2.82c.14.18 1.93 2.95 4.67 4.13.65.28 1.15.45 1.54.57.65.21 1.24.18 1.7.11.52-.08 1.6-.65 1.82-1.28.23-.63.23-1.17.16-1.28-.07-.11-.25-.18-.52-.32zM16.01 5.33c-5.89 0-10.67 4.78-10.67 10.67 0 1.88.49 3.72 1.43 5.35L5.33 26.67l5.48-1.41c1.56.85 3.31 1.29 5.2 1.29 5.89 0 10.67-4.78 10.67-10.67S21.9 5.33 16.01 5.33zm0 19.21c-1.68 0-3.32-.45-4.75-1.3l-.34-.2-3.25.83.87-3.17-.22-.33c-.92-1.45-1.41-3.12-1.41-4.84 0-5.02 4.08-9.1 9.1-9.1s9.1 4.08 9.1 9.1-4.08 9.01-9.1 9.01z"></path>
+    </svg>
+  </button>
+
   <div id="menuOverlay" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden z-[100] transition-opacity duration-300 opacity-0"></div>
   <div id="menuDrawer" class="fixed top-0 right-0 bottom-0 w-64 bg-[#0A0A0A] z-[101] translate-x-full transition-transform duration-300 flex flex-col shadow-2xl border-l border-white/10">
     <div class="p-5 flex items-center justify-between border-b border-white/10" style="padding-top: calc(1.25rem + env(safe-area-inset-top));">
-      <span class="text-white font-black text-lg">כל המוצרים</span>
+      <span class="text-white font-black text-lg">الأقسام</span>
       <button id="closeMenu" class="text-gray-400 text-2xl active:scale-95 transition" aria-label="Close Menu">✕</button>
     </div>
     <div class="flex-1 overflow-y-auto p-4 space-y-2 no-scrollbar" id="categoriesMenu"></div>
@@ -302,6 +340,8 @@
       alertNeed: "يرجى تعبئة الاسم والهاتف",
       addToCart: "أضف للسلة",
       addMore: "أضف المزيد",
+      waFabBadge: "مساعدة",
+      waFabMsg: "مرحبا، عندي استفسار عن العطور.",
       wa: {
         header: "✨ *طلب جديد | MAD Parfumeur*",
         name: "👤 الاسم",
@@ -342,6 +382,8 @@
       alertNeed: "נא למלא שם ומספר טלפון",
       addToCart: "הוסף לעגלה",
       addMore: "הוסף עוד",
+      waFabBadge: "עזרה",
+      waFabMsg: "היי, יש לי שאלה לגבי הבשמים.",
       wa: {
         header: "✨ *הזמנה חדשה | MAD Parfumeur*",
         name: "👤 שם",
@@ -386,12 +428,13 @@
     document.getElementById("totalLabel").textContent = T.totalLabel;
     document.getElementById("sendOrder").textContent = T.sendBtn;
     document.getElementById("deliveryNote").textContent = T.deliveryNote;
+    document.getElementById("waFabBadge").textContent = T.waFabBadge;
   }
 
   /* =========================
      CONFIG
      ========================= */
-  const WHATSAPP_API = "972524033442";
+  const WHATSAPP_API = "972524033442"; // الرقم الجديد للواتساب
   const SHIPPING = 50;
   const RSS_PATH = "products.rss";
 
@@ -404,28 +447,12 @@
     leadOrderFired: false
   };
 
-  function normalizeCode(x){
-    return String(x || "").toUpperCase().trim().replace(/[^A-Z0-9]/g, "");
-  }
-
-  function extractCodeFromTitle(title){
-    const s = String(title || "").toUpperCase();
-    const m = s.match(/\b([A-Z]{1,3})\s*[\.\-_]?\s*(\d{2,4})\b/);
-    if(!m) return "";
-    return normalizeCode(m[1] + m[2]); 
-  }
-
-  function chooseRealCode({ mpn, sku, title, feedId }){
-    const fromTitle = extractCodeFromTitle(title);
-    if(fromTitle) return fromTitle;
-
-    const a = normalizeCode(mpn);
-    if(a) return a;
-
-    const b = normalizeCode(sku);
-    if(b) return b;
-
-    return normalizeCode(feedId) || String(feedId || "").trim();
+  // دالة لجلب الاسم الكامل بدون قصه أو تشويهه
+  function chooseDisplayName({ mpn, sku, title, feedId }){
+    if (title) return String(title).trim();
+    if (mpn) return String(mpn).trim();
+    if (sku) return String(sku).trim();
+    return String(feedId || "").trim();
   }
 
   async function init() {
@@ -449,7 +476,8 @@
           const type   = (getG("product_type") || "General").trim();
           const price  = parseFloat((getG("price") || "").replace(/[^\d.]/g, "")) || 0;
 
-          const realCode = chooseRealCode({ mpn, sku, title, feedId });
+          // نستخدم الاسم كما هو
+          const realCode = chooseDisplayName({ mpn, sku, title, feedId });
 
           return { feedId, title, mpn, sku, realCode, image, type, price };
         })
@@ -659,7 +687,7 @@
             </div>
 
             <div class="flex-1 min-w-0">
-              <p class="font-black text-[13px] text-gray-800 leading-tight clamp-1">${escapeHtml(code)}</p>
+              <p class="font-black text-[13px] text-gray-800 leading-tight clamp-2">${escapeHtml(code)}</p>
               <p class="text-[10px] font-black text-gray-400 mt-1 clamp-1">${escapeHtml(p.type)}</p>
 
               <div class="flex items-center justify-between mt-3">
@@ -737,6 +765,12 @@
     setTimeout(() => modal.classList.add("hidden"), 300);
   };
 
+  /* === WHATSAPP HELP LOGIC === */
+  function openWhatsAppHelp(){
+    const text = (I18N[LANG] || I18N.ar).waFabMsg || "";
+    window.open(`https://wa.me/${WHATSAPP_API}?text=${encodeURIComponent(text)}`, "_blank");
+  }
+
   function sendWhatsApp() {
     const name = document.getElementById("custName").value.trim();
     const phone = document.getElementById("custPhone").value.trim();
@@ -762,7 +796,6 @@
       const line = unit * qty;
 
       msg += `▪️ ${code}\n`;
-      msg += `   ${T.wa.code}: ${code}\n`;
       msg += `   ${T.wa.unit}: ₪${unit.toFixed(0)} | x${qty} | ${T.wa.line}: ₪${line.toFixed(0)}\n`;
       msg += `   ${p.type}\n`;
     });
@@ -796,6 +829,9 @@
     // Search Event
     document.getElementById("search").oninput = applyFilter;
 
+    // WhatsApp Help Event
+    document.getElementById("waFab").onclick = openWhatsAppHelp;
+
     window.addEventListener("keydown", (e) => {
       if (e.key === "Escape") {
         closeCart();
@@ -820,6 +856,5 @@
   init();
 </script>
 
-<script id="respondio__widget" src="https://cdn.respond.io/webchat/widget/widget.js?cId=7df11f0c81a76b774961209256f2f0e"></script>
 </body>
 </html>
