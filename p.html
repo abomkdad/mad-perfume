@@ -102,12 +102,12 @@
           <div class="desc" id="desc">...</div>
 
           <div class="actions">
-            <a class="btn yes" id="btnYes" href="#" target="_blank" rel="noopener">✅ ...</a>
-            <a class="btn alt" id="btnOther" href="#" target="_blank" rel="noopener">🔁 ...</a>
+            <a class="btn yes" id="btnYes" href="#" target="_blank" rel="noopener">✅ نعم أريد هذا المنتج</a>
+            <a class="btn alt" id="btnOther" href="#" target="_blank" rel="noopener">🔁 ارسل منتج اخر</a>
           </div>
 
-          <div class="note" id="previewHint">...</div>
-          <div class="small" id="hint">...</div>
+          <div class="note">مهم: استنى ثانيتين داخل واتساب لحد ما يظهر Preview للمنتج، وبعدها اضغط إرسال.</div>
+          <div class="small">الزبون يضغط زر واحد ويرجع للواتساب.</div>
         </div>
       </div>
     </div>
@@ -131,43 +131,6 @@
     return String(p||"").replace(/[^\d]/g,"");
   }
 
-  // Auto language (AR / HE). You can force with ?lang=ar or ?lang=he
-  function detectLang(){
-    const forced = (qs("lang") || "").toLowerCase();
-    if(forced === "ar" || forced === "he") return forced;
-
-    const nav = (navigator.language || navigator.userLanguage || "").toLowerCase();
-    if(nav.startsWith("he") || nav.startsWith("iw")) return "he";
-    if(nav.startsWith("ar")) return "ar";
-    return "ar";
-  }
-
-  const I18N = {
-    ar: {
-      wantThis: "✅ نعم أريد هذا المنتج",
-      other: "🔁 ارسل منتج اخر",
-      loading: "جارٍ تحميل المنتج…",
-      notFound: "مش لاقي المنتج:",
-      needCode: "لازم تحط كود المنتج بالرابط مثل:",
-      metaJoin: " • ",
-      hint: "الزبون يضغط زر واحد ويرجع للواتساب.",
-      previewHint: "مهم: استنى ثانيتين داخل واتساب لحد ما يظهر Preview للمنتج، وبعدها اضغط إرسال.",
-      msgOther: "🔁 ارسل منتج اخر"
-    },
-    he: {
-      wantThis: "✅ כן, אני רוצה את המוצר הזה",
-      other: "🔁 תשלח מוצר אחר",
-      loading: "טוען מוצר…",
-      notFound: "המוצר לא נמצא:",
-      needCode: "צריך לשים קוד מוצר בקישור, לדוגמה:",
-      metaJoin: " • ",
-      hint: "בלחיצה אחת חוזרים לוואטסאפ.",
-      previewHint: "חשוב: חכה 2 שניות בוואטסאפ עד שמופיע Preview למוצר, ואז שלח.",
-      msgOther: "🔁 תשלח מוצר אחר"
-    }
-  };
-
-  // CSV parser supports quotes
   function parseCSV(text){
     const rows = [];
     let row = [], cur = "", inQ = false;
@@ -211,21 +174,9 @@
     const code = qs("code");
     const waTo = normalizePhone(qs("to") || DEFAULT_WA_TO);
 
-    const lang = detectLang();
-    const t = I18N[lang];
-
-    document.documentElement.lang = lang;
-    document.documentElement.dir = "rtl"; // AR & HE are RTL
-
-    document.getElementById("btnYes").textContent = t.wantThis;
-    document.getElementById("btnOther").textContent = t.other;
-    document.getElementById("hint").textContent = t.hint;
-    document.getElementById("previewHint").textContent = t.previewHint;
-    document.getElementById("title").textContent = t.loading;
-
     if(!code){
       document.getElementById("card").innerHTML =
-        `<div class="err">${t.needCode} <code>p2.html?code=XF%20A.104</code></div>`;
+        `<div class="err">لازم تحط كود المنتج بالرابط مثل: <code>p2.html?code=XF%20A.104</code></div>`;
       return;
     }
 
@@ -246,7 +197,6 @@
     const I_LINK  = idxOf(headers, "LINK");
     const I_IMG   = idxOf(headers, "IMAGE_LINK");
     const I_DESC_AR  = idxOf(headers, "DESC_AR");
-    const I_DESC_HE  = idxOf(headers, "DESC_HE");
     const I_PRICE = idxOf(headers, "PRICE");
     const I_TYPE  = idxOf(headers, "PRODUCT TYPE");
     const I_NAME  = idxOf(headers, "FRAG_MATCH_NAME");
@@ -256,7 +206,7 @@
 
     if(!found){
       document.getElementById("card").innerHTML =
-        `<div class="err">${t.notFound} <code>${code}</code></div>`;
+        `<div class="err">مش لاقي المنتج: <code>${code}</code></div>`;
       return;
     }
 
@@ -268,21 +218,18 @@
     const pPrice= safe(val(found, I_PRICE));
     const pType = safe(val(found, I_TYPE));
     const pName = safe(val(found, I_NAME));
-
-    const desc = (lang === "he")
-      ? (safe(val(found, I_DESC_HE)) || safe(val(found, I_DESC_AR)) || "")
-      : (safe(val(found, I_DESC_AR)) || safe(val(found, I_DESC_HE)) || "");
+    const pDesc = safe(val(found, I_DESC_AR)) || "وصف عام.";
 
     document.title = `${pCode} | MAD`;
     document.getElementById("title").textContent = pName ? `${pCode} — ${pName}` : pCode;
     document.getElementById("meta").textContent =
-      [pType, pPrice ? (pPrice + "₪") : ""].filter(Boolean).join(t.metaJoin);
-    document.getElementById("desc").textContent = desc || "...";
+      [pType, pPrice ? (pPrice + "₪") : ""].filter(Boolean).join(" • ");
+    document.getElementById("desc").textContent = pDesc;
 
     document.getElementById("img").src = pImgOriginal || "https://www.mad-parfumeur.com/assets/hero/logo2.webp";
 
-    // ✅ موافقة: نخلي رابط المنتج أول الرسالة عشان Preview،
-    // وبعده الرسالة "بالضبط" مثل ما طلبت (3 سطور).
+    // ✅ Preview from PRODUCT LINK only (first line),
+    // then EXACT 3 lines block as requested.
     const exactBlock =
       `✅ موافق على المنتج\n` +
       `الكود: ${pCode}\n` +
@@ -293,8 +240,7 @@
     document.getElementById("btnYes").href =
       `https://wa.me/${waTo}?text=${encodeURIComponent(msgYes)}`;
 
-    // زر منتج آخر
-    const msgOther = (lang === "he") ? t.msgOther : t.msgOther;
+    const msgOther = `🔁 ارسل منتج اخر`;
     document.getElementById("btnOther").href =
       `https://wa.me/${waTo}?text=${encodeURIComponent(msgOther)}`;
   }
