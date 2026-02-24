@@ -168,8 +168,8 @@
 
         <div class="buy-box">
           <div class="actions">
-            <a class="btn yes" id="btnYes" href="#" target="_blank" rel="noopener">✅ نعم، أريد هذا المنتج</a>
-            <a class="btn alt" id="btnOther" href="#" target="_blank" rel="noopener">🔁 منتج آخر</a>
+            <a class="btn yes" id="btnYes" target="_blank" rel="noopener">✅ نعم، أريد هذا المنتج</a>
+            <a class="btn alt" id="btnOther" target="_blank" rel="noopener">🔁 منتج آخر</a>
           </div>
           <div class="note" id="previewHint">...</div>
           <div class="small" id="hint">...</div>
@@ -332,7 +332,7 @@
     document.getElementById("img").src = pImgOriginal || "https://www.mad-parfumeur.com/assets/hero/logo2.webp";
 
     // ----------------------------------------------------
-    // إضافة رابط الصورة لنهاية الرسالة ليقوم الواتساب بإظهارها
+    // استخدام api.whatsapp.com لأنه الأفضل والأكثر استقراراً
     // ----------------------------------------------------
     let msgYes = "";
     if (lang === "he") {
@@ -341,12 +341,13 @@
        msgYes = `✅ موافق على المنتج\nالكود: ${pCode}\nالرابط: ${pLink || ""}\nالصورة: ${pImgOriginal || ""}`;
     }
 
+    // هنا التغيير الأساسي لحل المشكلة
     document.getElementById("btnYes").href =
-      `https://wa.me/${waTo}?text=${encodeURIComponent(msgYes)}`;
+      `https://api.whatsapp.com/send?phone=${waTo}&text=${encodeURIComponent(msgYes)}`;
 
     const msgOther = (lang === "he") ? t.msgOther : t.msgOther;
     document.getElementById("btnOther").href =
-      `https://wa.me/${waTo}?text=${encodeURIComponent(msgOther)}`;
+      `https://api.whatsapp.com/send?phone=${waTo}&text=${encodeURIComponent(msgOther)}`;
   }
 
   load().catch(err=>{
