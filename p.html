@@ -5,12 +5,6 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <title>MAD | المنتج</title>
 
-  <meta property="og:title" content="MAD Parfumeur | المنتج" id="ogTitle">
-  <meta property="og:description" content="تفاصيل المنتج من MAD Parfumeur" id="ogDesc">
-  <meta property="og:image" content="https://www.mad-parfumeur.com/assets/hero/logo2.webp" id="ogImage">
-  <meta property="og:type" content="product">
-  <meta property="og:url" content="https://www.mad-parfumeur.com/">
-
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
@@ -36,7 +30,6 @@
       -webkit-tap-highlight-color: transparent;
     }
 
-    /* الشريط العلوي */
     .header {
       background-color: #131921; 
       color: #ffffff;
@@ -50,10 +43,8 @@
     .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--gold-mad); }
     .pill { background: transparent; border: 1px solid var(--gold-mad); color: var(--gold-mad); padding: 4px 12px; border-radius: 6px; font-size: 13px; font-weight: 700; }
 
-    /* الحاوية الرئيسية */
     .wrap { max-width: 1100px; margin: 20px auto; padding: 0 15px; }
 
-    /* تخطيط البطاقة */
     .card {
       background: var(--bg-card);
       border-radius: 8px;
@@ -67,7 +58,6 @@
       .card { grid-template-columns: 1fr; padding: 20px 15px; gap: 20px; }
     }
 
-    /* منطقة الصورة */
     .imgBox {
       display: flex;
       align-items: flex-start;
@@ -84,7 +74,6 @@
       padding: 10px;
     }
 
-    /* منطقة التفاصيل */
     .info { display: flex; flex-direction: column; }
     
     h1 { margin: 0 0 10px; font-size: 24px; font-weight: 700; line-height: 1.4; color: var(--text-main); }
@@ -101,7 +90,6 @@
       margin-bottom: 25px;
     }
 
-    /* صندوق الشراء (Buy Box) */
     .buy-box {
       border: 1px solid var(--border-color);
       border-radius: 8px;
@@ -336,37 +324,29 @@
       ? (safe(val(found, I_DESC_HE)) || safe(val(found, I_DESC_AR)) || "")
       : (safe(val(found, I_DESC_AR)) || safe(val(found, I_DESC_HE)) || "");
 
-    const fullTitle = pName ? `${pCode} — ${pName}` : pCode;
-
     document.title = `${pCode} | MAD Parfumeur`;
-    document.getElementById("title").textContent = fullTitle;
+    document.getElementById("title").textContent = pName ? `${pCode} — ${pName}` : pCode;
     document.getElementById("metaPrice").textContent = pPrice ? `₪${pPrice}` : "";
     document.getElementById("metaType").textContent = pType || "";
     document.getElementById("desc").textContent = desc || "لا يوجد وصف إضافي.";
     document.getElementById("img").src = pImgOriginal || "https://www.mad-parfumeur.com/assets/hero/logo2.webp";
 
-    // ✅ تحديث أكواد الـ Open Graph ديناميكياً
-    document.getElementById("ogTitle").setAttribute("content", fullTitle);
-    document.getElementById("ogDesc").setAttribute("content", desc || "تفاصيل المنتج");
-    if(pImgOriginal) {
-      document.getElementById("ogImage").setAttribute("content", pImgOriginal);
-    }
-    
-    // تحديث رابط الصفحة الحالي ليكون الرابط الفعلي في الـ OG
-    document.querySelector('meta[property="og:url"]')?.setAttribute("content", window.location.href);
-
-    // رسالة الواتساب
+    // ----------------------------------------------------
+    // إضافة رابط الصورة لنهاية الرسالة ليقوم الواتساب بإظهارها
+    // ----------------------------------------------------
     let msgYes = "";
     if (lang === "he") {
-       msgYes = `✅ מאשר את המוצר\nקוד: ${pCode}\nקישור: ${pLink || ""}`;
+       msgYes = `✅ מאשר את המוצר\nקוד: ${pCode}\nקישור: ${pLink || ""}\nתמונה: ${pImgOriginal || ""}`;
     } else {
-       msgYes = `✅ موافق على المنتج\nالكود: ${pCode}\nالرابط: ${pLink || ""}`;
+       msgYes = `✅ موافق على المنتج\nالكود: ${pCode}\nالرابط: ${pLink || ""}\nالصورة: ${pImgOriginal || ""}`;
     }
 
-    document.getElementById("btnYes").href = `https://wa.me/${waTo}?text=${encodeURIComponent(msgYes)}`;
-    
+    document.getElementById("btnYes").href =
+      `https://wa.me/${waTo}?text=${encodeURIComponent(msgYes)}`;
+
     const msgOther = (lang === "he") ? t.msgOther : t.msgOther;
-    document.getElementById("btnOther").href = `https://wa.me/${waTo}?text=${encodeURIComponent(msgOther)}`;
+    document.getElementById("btnOther").href =
+      `https://wa.me/${waTo}?text=${encodeURIComponent(msgOther)}`;
   }
 
   load().catch(err=>{
