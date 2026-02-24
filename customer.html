@@ -59,6 +59,15 @@
     .animate-cart-pop {
       animation: cartPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
+
+    /* وميض الأقسام للفت الانتباه */
+    @keyframes attentionBlink {
+      0%, 100% { color: #fff; transform: scale(1); filter: drop-shadow(0 0 0px transparent); }
+      50% { color: var(--gold); transform: scale(1.15); filter: drop-shadow(0 0 8px rgba(197, 160, 89, 0.6)); }
+    }
+    .animate-menu-blink {
+      animation: attentionBlink 2s infinite ease-in-out;
+    }
   </style>
 
   <script>
@@ -142,19 +151,18 @@
 <body class="antialiased">
   <div class="app relative">
 
-    <nav class="sticky top-0 z-40 glass-dark border-b border-white/10 px-4 py-3 flex justify-between items-center"
+    <nav class="sticky top-0 z-40 glass-dark border-b border-white/10 px-4 py-3 flex justify-between items-center relative"
          style="padding-top: calc(0.75rem + env(safe-area-inset-top));">
       
-      <button id="menuBtn" class="p-2 text-white active:scale-95 transition" aria-label="Menu">
+      <button id="menuBtn" class="p-2 text-white active:scale-95 transition animate-menu-blink" aria-label="Menu">
         <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
         </svg>
       </button>
 
-      <div class="flex items-center gap-2 absolute left-1/2 -translate-x-1/2 pointer-events-none">
-        <img src="https://www.mad-parfumeur.com/assets/hero/logo.png" class="h-6 sm:h-8 brightness-0 invert" alt="MAD" />
-        <span class="text-white font-black text-sm italic uppercase tracking-tighter hidden sm:inline-block">MAD Parfumeur</span>
-      </div>
+      <a href="#" onclick="goHome(event)" class="absolute left-1/2 -translate-x-1/2 flex items-center justify-center active:scale-95 transition p-2">
+        <img src="https://www.mad-parfumeur.com/assets/hero/logo.png" class="h-6 sm:h-7 brightness-0 invert object-contain" alt="MAD Parfumeur" />
+      </a>
 
       <button id="cartBtn" class="relative p-2 text-white active:scale-95 transition" aria-label="Cart">
         <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -453,7 +461,6 @@
       if (catFromUrl) {
         state.currentCat = decodeURIComponent(catFromUrl);
       } else {
-        // البحث التلقائي عن قسم العروض "מבצעים" ليكون الافتراضي
         const allCats = Array.from(new Set(state.products.map(p => p.type)));
         const offersCat = allCats.find(c => c.includes("מבצעים") || c.includes("عروض"));
         state.currentCat = offersCat || "ALL";
@@ -470,6 +477,21 @@
     }
   }
 
+  /* === HOME RESET === */
+  window.goHome = (e) => {
+    e.preventDefault();
+    document.getElementById("search").value = "";
+    
+    // إعادة تعيين إلى قسم العروض أو الكل
+    const allCats = Array.from(new Set(state.products.map(p => p.type)));
+    const offersCat = allCats.find(c => c.includes("מבצעים") || c.includes("عروض"));
+    state.currentCat = offersCat || "ALL";
+    
+    applyFilter();
+    renderCategoriesMenu();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   function applyFilter() {
     const q = (document.getElementById("search").value || "").toLowerCase().trim();
 
@@ -484,7 +506,6 @@
       return okCat && okQ;
     });
 
-    // تحديث عنوان القسم
     document.getElementById("currentCategoryTitle").textContent = state.currentCat === "ALL" ? T.all : state.currentCat;
     
     renderProducts();
@@ -559,8 +580,8 @@
   window.switchCat = (c) => {
     state.currentCat = c;
     applyFilter();
-    renderCategoriesMenu(); // تحديث الألوان في القائمة
-    closeMenu(); // إغلاق القائمة بعد الاختيار
+    renderCategoriesMenu();
+    closeMenu();
   };
 
   /* === CART LOGIC === */
@@ -572,10 +593,9 @@
     // تشغيل حركة العربة لشد الانتباه بدون فتحها
     const cartBtn = document.getElementById("cartBtn");
     cartBtn.classList.remove("animate-cart-pop");
-    void cartBtn.offsetWidth; // Trigger reflow لإعادة الحركة
+    void cartBtn.offsetWidth; // Trigger reflow
     cartBtn.classList.add("animate-cart-pop");
     
-    // إزالة كلاس الحركة بعد الانتهاء لتعمل في المرة القادمة
     setTimeout(() => {
       cartBtn.classList.remove("animate-cart-pop");
     }, 400);
