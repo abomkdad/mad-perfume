@@ -60,7 +60,7 @@
       padding:14px 16px;border-radius:16px;
       font-weight:900;font-size:15px;
       text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:8px;
-      min-width:220px;
+      min-width:240px;
       transition:transform .08s ease;
       user-select:none;
     }
@@ -68,6 +68,16 @@
     .yes{background:linear-gradient(90deg,#f6e27a,#c5a059);color:#0b0d10}
     .alt{background:rgba(255,255,255,.10);color:var(--text);border:1px solid rgba(255,255,255,.12)}
     .small{margin-top:10px;font-size:12px;color:var(--muted);line-height:1.6}
+    .note{
+      margin-top:10px;
+      font-size:12px;
+      color:#f7f0df;
+      background: rgba(197,160,89,.10);
+      border:1px solid rgba(197,160,89,.25);
+      padding:10px 12px;
+      border-radius:14px;
+      line-height:1.6;
+    }
     .err{padding:16px;border-radius:16px;background:rgba(255,0,0,.08);border:1px solid rgba(255,0,0,.18); color:#ffd9d9}
     code{background:rgba(255,255,255,.08);padding:2px 6px;border-radius:10px}
   </style>
@@ -96,6 +106,7 @@
             <a class="btn alt" id="btnOther" href="#" target="_blank" rel="noopener">🔁 ...</a>
           </div>
 
+          <div class="note" id="previewHint">...</div>
           <div class="small" id="hint">...</div>
         </div>
       </div>
@@ -120,43 +131,39 @@
     return String(p||"").replace(/[^\d]/g,"");
   }
 
-  // Detect language automatically (AR / HE)
+  // Auto language (AR / HE). You can force with ?lang=ar or ?lang=he
   function detectLang(){
     const forced = (qs("lang") || "").toLowerCase();
     if(forced === "ar" || forced === "he") return forced;
 
     const nav = (navigator.language || navigator.userLanguage || "").toLowerCase();
-    // Hebrew is "he" or old "iw"
     if(nav.startsWith("he") || nav.startsWith("iw")) return "he";
-    // Arabic starts with "ar"
     if(nav.startsWith("ar")) return "ar";
-
-    // default Arabic for your audience
     return "ar";
   }
 
   const I18N = {
     ar: {
       wantThis: "✅ نعم أريد هذا المنتج",
-      other: "🔁 أرسل منتج آخر",
-      hint: "عند الموافقة راح يفتح واتساب ومعه صورة Preview + رسالة جاهزة.",
+      other: "🔁 ارسل منتج اخر",
       loading: "جارٍ تحميل المنتج…",
       notFound: "مش لاقي المنتج:",
       needCode: "لازم تحط كود المنتج بالرابط مثل:",
       metaJoin: " • ",
-      msgWant: "أريد هذا المنتج",
-      msgOther: "ابعتلي منتج آخر (بديل)"
+      hint: "الزبون يضغط زر واحد ويرجع للواتساب.",
+      previewHint: "مهم: استنى ثانيتين داخل واتساب لحد ما يظهر Preview للمنتج، وبعدها اضغط إرسال.",
+      msgOther: "🔁 ارسل منتج اخر"
     },
     he: {
       wantThis: "✅ כן, אני רוצה את המוצר הזה",
       other: "🔁 תשלח מוצר אחר",
-      hint: "בלחיצה על אישור—ייפתח וואטסאפ עם Preview לתמונה והודעה מוכנה.",
       loading: "טוען מוצר…",
       notFound: "המוצר לא נמצא:",
       needCode: "צריך לשים קוד מוצר בקישור, לדוגמה:",
       metaJoin: " • ",
-      msgWant: "אני רוצה את המוצר הזה",
-      msgOther: "תשלח לי מוצר אחר"
+      hint: "בלחיצה אחת חוזרים לוואטסאפ.",
+      previewHint: "חשוב: חכה 2 שניות בוואטסאפ עד שמופיע Preview למוצר, ואז שלח.",
+      msgOther: "🔁 תשלח מוצר אחר"
     }
   };
 
@@ -207,14 +214,13 @@
     const lang = detectLang();
     const t = I18N[lang];
 
-    // Set direction + lang
     document.documentElement.lang = lang;
-    document.documentElement.dir = (lang === "he") ? "rtl" : "rtl"; // Hebrew RTL too
-    // (إذا بدك العبري RTL والإنجليزي LTR لاحقًا بنعملها)
+    document.documentElement.dir = "rtl"; // AR & HE are RTL
 
     document.getElementById("btnYes").textContent = t.wantThis;
     document.getElementById("btnOther").textContent = t.other;
     document.getElementById("hint").textContent = t.hint;
+    document.getElementById("previewHint").textContent = t.previewHint;
     document.getElementById("title").textContent = t.loading;
 
     if(!code){
@@ -273,23 +279,24 @@
       [pType, pPrice ? (pPrice + "₪") : ""].filter(Boolean).join(t.metaJoin);
     document.getElementById("desc").textContent = desc || "...";
 
-    // Show image in page
     document.getElementById("img").src = pImgOriginal || "https://www.mad-parfumeur.com/assets/hero/logo2.webp";
 
-    // ✅ WhatsApp message:
-    // Put IMAGE URL first for preview, then "I want this product" text.
-    // (WhatsApp usually previews the first URL it sees.)
-    const yesLines = [];
-    if(pImgOriginal) yesLines.push(pImgOriginal);
-    yesLines.push(t.msgWant);
-    yesLines.push(`CODE: ${pCode}`);
-    if(pLink) yesLines.push(pLink);
+    // ✅ موافقة: نخلي رابط المنتج أول الرسالة عشان Preview،
+    // وبعده الرسالة "بالضبط" مثل ما طلبت (3 سطور).
+    const exactBlock =
+      `✅ موافق على المنتج\n` +
+      `الكود: ${pCode}\n` +
+      `الرابط: ${pLink || ""}`.trim();
 
-    const msgYes = yesLines.join("\n");
-    document.getElementById("btnYes").href = `https://wa.me/${waTo}?text=${encodeURIComponent(msgYes)}`;
+    const msgYes = (pLink ? (pLink + "\n\n" + exactBlock) : exactBlock);
 
-    const msgOther = t.msgOther;
-    document.getElementById("btnOther").href = `https://wa.me/${waTo}?text=${encodeURIComponent(msgOther)}`;
+    document.getElementById("btnYes").href =
+      `https://wa.me/${waTo}?text=${encodeURIComponent(msgYes)}`;
+
+    // زر منتج آخر
+    const msgOther = (lang === "he") ? t.msgOther : t.msgOther;
+    document.getElementById("btnOther").href =
+      `https://wa.me/${waTo}?text=${encodeURIComponent(msgOther)}`;
   }
 
   load().catch(err=>{
