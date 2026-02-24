@@ -43,7 +43,7 @@
       overflow:hidden;
     }
     .clamp-1{ -webkit-line-clamp:1; }
-    .clamp-2{ -webkit-line-clamp:2; }
+    .clamp-2{ -webkit-line-clamp:2; } 
 
     .modal-container {
       max-height: calc(100dvh - 2rem);
@@ -103,8 +103,8 @@
 
   <script>
     const PIXELS = {
-      facebook: "1072283127290819",
-      tiktok: "D2D02JBC77U4ENLN9SBG",
+      facebook: "1072283127290819", 
+      tiktok: "D2D02JBC77U4ENLN9SBG", 
       snapchat: "b143822e-1c3c-40ff-93f7-edadee74e626"
     };
 
@@ -170,11 +170,11 @@
       }catch(e){ console.warn("Snap Pixel error", e); }
     })();
 
-    // All events -> Lead
-    function fireLeadEvent(extra){
-      try{ if(window.fbq) fbq('track', 'Lead', extra || {}); }catch(e){}
-      try{ if(window.ttq) ttq.track('Lead', extra || {}); }catch(e){}
-      try{ if(window.snaptr) snaptr('track', 'CUSTOM_EVENT_1', Object.assign({ label: 'Lead' }, (extra||{}))); }catch(e){}
+    // دالة موحدة لإرسال أحداث البيكسل مع المعلمات (Parameters)
+    function firePixelEvent(eventName, extra){
+      try{ if(window.fbq) fbq('track', eventName, extra || {}); }catch(e){}
+      try{ if(window.ttq) ttq.track(eventName, extra || {}); }catch(e){}
+      try{ if(window.snaptr) snaptr('track', eventName === 'Lead' ? 'SIGN_UP' : eventName, extra || {}); }catch(e){}
     }
   </script>
 </head>
@@ -342,7 +342,7 @@
       addMore: "أضف المزيد",
       waFabBadge: "مساعدة",
       waFabMsg: "مرحبا، عندي استفسار عن العطور.",
-      free: "مجاني", // كلمة مجاني للغة العربية
+      free: "مجاني", 
       wa: {
         header: "✨ *طلب جديد | MAD Parfumeur*",
         name: "👤 الاسم",
@@ -385,7 +385,7 @@
       addMore: "הוסף עוד",
       waFabBadge: "עזרה",
       waFabMsg: "היי, יש לי שאלה לגבי הבשמים.",
-      free: "חינם", // كلمة مجاني للغة العبرية
+      free: "חינם", 
       wa: {
         header: "✨ *הזמנה חדשה | MAD Parfumeur*",
         name: "👤 שם",
@@ -436,7 +436,7 @@
   /* =========================
      CONFIG
      ========================= */
-  const WHATSAPP_API = "97246725089"; 
+  const WHATSAPP_API = "972524033442"; 
   const SHIPPING = 50;
   const RSS_PATH = "products.rss";
 
@@ -445,11 +445,10 @@
     filtered: [],
     currentCat: "ALL",
     cart: new Map(),  // feedId -> qty
-    leadCartFired: false,
     leadOrderFired: false
   };
 
-  // دالة لجلب الاسم الكامل بدون قصه أو تشويهه
+  // دالة لجلب الاسم الكامل بدون قصه
   function chooseDisplayName({ mpn, sku, title, feedId }){
     if (title) return String(title).trim();
     if (mpn) return String(mpn).trim();
@@ -478,7 +477,6 @@
           const type   = (getG("product_type") || "General").trim();
           const price  = parseFloat((getG("price") || "").replace(/[^\d.]/g, "")) || 0;
 
-          // نستخدم الاسم كما هو
           const realCode = chooseDisplayName({ mpn, sku, title, feedId });
 
           return { feedId, title, mpn, sku, realCode, image, type, price };
@@ -512,10 +510,12 @@
     e.preventDefault();
     document.getElementById("search").value = "";
     
-    // إعادة تعيين إلى قسم العروض أو الكل
     const allCats = Array.from(new Set(state.products.map(p => p.type)));
     const offersCat = allCats.find(c => c.includes("מבצעים") || c.includes("عروض"));
     state.currentCat = offersCat || "ALL";
+    
+    // إزالة امتداد القسم من الرابط عند العودة للرئيسية
+    window.history.pushState({}, '', window.location.pathname);
     
     applyFilter();
     renderCategoriesMenu();
@@ -609,6 +609,16 @@
 
   window.switchCat = (c) => {
     state.currentCat = c;
+    
+    // إضافة القسم إلى الرابط
+    const url = new URL(window.location);
+    if (c === "ALL") {
+      url.searchParams.delete('cat');
+    } else {
+      url.searchParams.set('cat', c);
+    }
+    window.history.pushState({}, '', url);
+
     applyFilter();
     renderCategoriesMenu();
     closeMenu();
@@ -620,10 +630,10 @@
     updateCartUI();
     renderProducts();
     
-    // تشغيل حركة العربة لشد الانتباه بدون فتحها
+    // حركة العربة
     const cartBtn = document.getElementById("cartBtn");
     cartBtn.classList.remove("animate-cart-pop");
-    void cartBtn.offsetWidth; // Trigger reflow
+    void cartBtn.offsetWidth;
     cartBtn.classList.add("animate-cart-pop");
     
     setTimeout(() => {
@@ -656,7 +666,6 @@
       subtotal += (Number(p.price || 0) * qty);
     });
 
-    // إضافة شرط التوصيل المجاني هنا
     const currentShipping = (subtotal >= 500) ? 0 : SHIPPING;
     const total = totalQty > 0 ? (subtotal + currentShipping) : 0;
     
@@ -671,7 +680,6 @@
 
     badge.textContent = totalQty;
     
-    // إظهار التوصيل كمجاني إذا توفر الشرط
     if (currentShipping === 0) {
       document.getElementById("shippingDisplay").innerHTML = `<span class="text-[#C5A059] font-black">${T.free}</span>`;
     } else {
@@ -740,11 +748,6 @@
       overlay.classList.remove("opacity-0");
       modal.classList.remove("opacity-0", "scale-95", "pointer-events-none");
     });
-
-    if (!state.leadCartFired && state.cart.size > 0) {
-      state.leadCartFired = true;
-      fireLeadEvent({ source: "cart_open" });
-    }
   }
 
   function closeCart() {
@@ -813,36 +816,36 @@
     });
 
     msg += `━━━━━━━━━━━━\n${T.wa.sub}: ₪${subtotal.toFixed(0)}\n`;
-    // كتابة التوصيل مجاني إذا توفر الشرط في الواتساب
     msg += `${T.wa.ship}: ${currentShipping === 0 ? T.free : '₪' + currentShipping}\n`;
     msg += `${T.wa.total}: ₪${total.toFixed(0)}`;
 
+    // ============================================
+    // إطلاق حدث البيكسل مع الـ Parameter المخصص هنا
+    // ============================================
     if (!state.leadOrderFired) {
       state.leadOrderFired = true;
-      fireLeadEvent({ source: "whatsapp_order", value: total, currency: "ILS" });
+      firePixelEvent('Lead', { 
+        content_name: 'WhatsApp_MAD', // هذه هي بطاقة التعريف التي ستستخدمها في Custom Conversions
+        source: 'Landing_Page',
+        value: total, 
+        currency: "ILS" 
+      });
     }
 
     setTimeout(() => {
       window.open(`https://wa.me/${WHATSAPP_API}?text=${encodeURIComponent(msg)}`, "_blank");
-    }, 120);
+    }, 150);
   }
 
   function bindEvents() {
-    // Cart Events
     document.getElementById("cartBtn").onclick = openCart;
     document.getElementById("closeCart").onclick = closeCart;
     document.getElementById("cartOverlay").onclick = closeCart;
     document.getElementById("sendOrder").onclick = sendWhatsApp;
-    
-    // Menu Events
     document.getElementById("menuBtn").onclick = openMenu;
     document.getElementById("closeMenu").onclick = closeMenu;
     document.getElementById("menuOverlay").onclick = closeMenu;
-
-    // Search Event
     document.getElementById("search").oninput = applyFilter;
-
-    // WhatsApp Help Event
     document.getElementById("waFab").onclick = openWhatsAppHelp;
 
     window.addEventListener("keydown", (e) => {
