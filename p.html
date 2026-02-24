@@ -2,8 +2,13 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <title>MAD | طلب المنتج</title>
+
+  <!-- WhatsApp / Social preview (اختياري) -->
+  <meta property="og:title" content="MAD Parfumeur" />
+  <meta property="og:description" content="اطلب بسهولة عبر واتساب" />
+  <meta property="og:image" content="https://www.mad-parfumeur.com/assets/hero/logo2.webp" />
 
   <style>
     :root{--bg:#0b0d10;--card:#121620;--muted:#aab3c2;--text:#f2f5fb;--gold:#C5A059;}
@@ -15,8 +20,9 @@
       color:var(--text);
       min-height:100vh;
       padding:18px;
+      -webkit-tap-highlight-color: transparent;
     }
-    .wrap{max-width:1000px;margin:0 auto}
+    .wrap{max-width:1100px;margin:0 auto}
     .top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
     .brand{display:flex;align-items:center;gap:10px;font-weight:900}
     .dot{width:10px;height:10px;border-radius:999px;background:var(--gold);box-shadow:0 0 18px rgba(197,160,89,.7)}
@@ -32,8 +38,17 @@
     .grid{display:grid;grid-template-columns: 1.05fr .95fr;gap:0}
     @media (max-width:950px){ .grid{grid-template-columns:1fr} }
 
-    .imgBox{background:#0a0c10;display:flex;align-items:center;justify-content:center;padding:14px;min-height:420px}
-    .imgBox img{max-width:100%;width:100%;height:auto;border-radius:18px;border:1px solid rgba(255,255,255,.08);background:#0a0c10}
+    .imgBox{background:#0a0c10;display:flex;align-items:center;justify-content:center;padding:14px}
+    .imgBox img{
+      width:100%;
+      max-width:520px;
+      height:auto;
+      border-radius:18px;
+      border:1px solid rgba(255,255,255,.10);
+      background:#0a0c10;
+      image-rendering:auto;
+      display:block;
+    }
 
     .info{padding:18px 18px 22px}
     h1{margin:0 0 10px;font-size:22px;line-height:1.25}
@@ -74,7 +89,8 @@
       font-weight:900;font-size:15px;
       text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:8px;
       min-width:170px;
-      transition:transform .08s ease;
+      transition:transform .08s ease, opacity .08s ease;
+      user-select:none;
     }
     .btn:active{transform:scale(.98)}
     .b1{background:linear-gradient(90deg,#f6e27a,#c5a059);color:#0b0d10}
@@ -83,14 +99,135 @@
     .small{margin-top:10px;font-size:12px;color:var(--muted);line-height:1.6}
     .err{padding:16px;border-radius:16px;background:rgba(255,0,0,.08);border:1px solid rgba(255,0,0,.18); color:#ffd9d9}
     code{background:rgba(255,255,255,.08);padding:2px 6px;border-radius:10px}
+
+    /* Cart */
+    .cartBar{
+      position:sticky; top:10px; z-index:20;
+      display:flex; align-items:center; justify-content:space-between;
+      gap:10px; margin-bottom:10px;
+      padding:10px 12px;
+      border-radius:16px;
+      border:1px solid rgba(255,255,255,.08);
+      background: rgba(10,12,16,.55);
+      backdrop-filter: blur(10px);
+    }
+    .cartCount{
+      display:inline-flex; align-items:center; gap:8px;
+      font-weight:900; color:#0b0d10;
+      background: linear-gradient(90deg,#f6e27a,#c5a059);
+      padding:8px 10px; border-radius:999px;
+      font-size:13px;
+    }
+    .cartBtn{
+      background: rgba(255,255,255,.10);
+      border:1px solid rgba(255,255,255,.12);
+      color: var(--text);
+      padding:10px 12px;
+      border-radius:14px;
+      font-weight:900;
+      cursor:pointer;
+    }
+    .modal{
+      position:fixed; inset:0;
+      background: rgba(0,0,0,.55);
+      display:none; align-items:flex-end; justify-content:center;
+      z-index:99;
+    }
+    .modal.open{display:flex}
+    .sheet{
+      width:100%;
+      max-width:700px;
+      border-radius:22px 22px 0 0;
+      background: rgba(18,22,32,.96);
+      border:1px solid rgba(255,255,255,.10);
+      box-shadow:0 -16px 60px rgba(0,0,0,.5);
+      overflow:hidden;
+      max-height:82vh;
+      display:flex;
+      flex-direction:column;
+    }
+    .sheetHead{
+      padding:12px 14px;
+      display:flex; align-items:center; justify-content:space-between;
+      border-bottom:1px solid rgba(255,255,255,.08);
+    }
+    .sheetTitle{font-weight:900}
+    .xBtn{
+      background: rgba(255,255,255,.10);
+      border:1px solid rgba(255,255,255,.12);
+      color:#fff;
+      border-radius:12px;
+      padding:8px 10px;
+      cursor:pointer;
+      font-weight:900;
+    }
+    .sheetBody{padding:12px 14px; overflow:auto}
+    .item{
+      display:flex; gap:10px; align-items:center;
+      padding:10px;
+      border-radius:16px;
+      background: rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.06);
+      margin-bottom:10px;
+    }
+    .thumb{
+      width:64px; height:64px; border-radius:14px;
+      border:1px solid rgba(255,255,255,.10);
+      background:#0a0c10;
+      object-fit:cover;
+      flex:0 0 auto;
+    }
+    .itemMain{flex:1}
+    .itemCode{font-weight:900}
+    .itemMeta{color:var(--muted);font-weight:700;font-size:12px;margin-top:2px}
+    .qtyRow{display:flex; gap:6px; align-items:center; margin-top:8px}
+    .qBtn{
+      width:34px; height:34px; border-radius:12px;
+      background: rgba(255,255,255,.10);
+      border:1px solid rgba(255,255,255,.12);
+      color:#fff; font-weight:900; cursor:pointer;
+    }
+    .qVal{
+      min-width:44px; text-align:center; font-weight:900;
+      background: rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.10);
+      padding:7px 10px;
+      border-radius:12px;
+    }
+    .delBtn{
+      background: rgba(255,0,0,.10);
+      border:1px solid rgba(255,0,0,.25);
+      color:#ffd9d9;
+      border-radius:12px;
+      padding:8px 10px;
+      font-weight:900;
+      cursor:pointer;
+    }
+    .sheetFoot{
+      padding:12px 14px;
+      border-top:1px solid rgba(255,255,255,.08);
+      display:flex; gap:10px; flex-wrap:wrap; justify-content:space-between; align-items:center;
+    }
+    .mutedSmall{color:var(--muted);font-size:12px;font-weight:700}
   </style>
 </head>
 
 <body>
   <div class="wrap">
-    <div class="top">
+
+    <div class="cartBar">
       <div class="brand"><span class="dot"></span> MAD Parfumeur</div>
+      <div style="display:flex;gap:10px;align-items:center">
+        <div class="cartCount" id="cartCount">🛒 السلة: 0</div>
+        <button class="cartBtn" id="openCart">فتح السلة</button>
+      </div>
+    </div>
+
+    <div class="top">
       <div class="pill" id="pill">Product</div>
+      <div style="display:flex;gap:10px;align-items:center">
+        <a class="btn b3" id="goHome" href="https://www.mad-parfumeur.com" target="_blank" rel="noopener" style="min-width:auto">الموقع</a>
+      </div>
     </div>
 
     <div class="card" id="card">
@@ -133,13 +270,13 @@
             </div>
 
             <div class="actions">
-              <a class="btn b1" id="btnWA" href="#" target="_blank" rel="noopener">✅ أكمل الطلب على واتساب</a>
-              <a class="btn b2" id="btnView" href="#" target="_blank" rel="noopener">شاهد المنتج</a>
-              <button class="btn b3" id="btnCopy" type="button">نسخ رسالة الطلب</button>
+              <button class="btn b2" id="btnAdd" type="button">➕ أضف للسلة</button>
+              <a class="btn b1" id="btnWA" href="#" target="_blank" rel="noopener">✅ إكمال الطلب على واتساب</a>
+              <a class="btn b3" id="btnView" href="#" target="_blank" rel="noopener" style="min-width:auto">شاهد المنتج</a>
             </div>
 
             <div class="small">
-              ✳️ الزبون بس يضغط الزر الذهبي—الوَاتساب بيفتح ومعه رسالة جاهزة، وبضغط “إرسال” خلص.
+              ✅ اضغط "أضف للسلة" (حتى لو 5 عطور)، وبالآخر "إكمال الطلب على واتساب" يرسل السلة كاملة جاهزة.
             </div>
           </div>
 
@@ -150,13 +287,35 @@
     <div style="height:12px"></div>
     <div class="small">
       مثال رابط الصفحة:
-      <code>p.html?code=XF%20A.112&to=972524033442</code>
+      <code>p.html?code=W.181&to=972524033442</code>
+    </div>
+  </div>
+
+  <!-- Cart Modal -->
+  <div class="modal" id="cartModal" aria-hidden="true">
+    <div class="sheet" role="dialog" aria-modal="true">
+      <div class="sheetHead">
+        <div class="sheetTitle">🛒 السلة</div>
+        <button class="xBtn" id="closeCart">إغلاق</button>
+      </div>
+      <div class="sheetBody" id="cartBody"></div>
+      <div class="sheetFoot">
+        <div class="mutedSmall" id="cartSummary">0 منتج</div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <button class="btn b3" id="clearCart" type="button" style="min-width:auto">مسح السلة</button>
+          <a class="btn b1" id="btnWAFromCart" href="#" target="_blank" rel="noopener" style="min-width:auto">✅ إرسال السلة على واتساب</a>
+        </div>
+      </div>
     </div>
   </div>
 
 <script>
   const CSV_URL = "p.csv";               // لازم يكون بنفس مكان p.html
   const DEFAULT_WA_TO = "972524033442";  // رقم الواتساب الافتراضي
+
+  // صورك العالية على موقعك (غيره إذا بدك)
+  // لازم يكون عندك: /img/W.181.webp  ... بنفس اسم الكود
+  const HIGH_IMG_BASE = "https://www.mad-parfumeur.com/img/";
 
   function qs(name){
     const u = new URL(location.href);
@@ -193,27 +352,206 @@
     const i = headers.indexOf(name);
     return i >= 0 ? i : -1;
   }
-
   function val(r, i){
     if(i < 0) return "";
     return (r[i] ?? "").toString().trim();
   }
-
   function safe(v){
     return (v||"").toString().trim();
   }
 
-  async function load(){
-    const code = qs("code");
-    const waTo = normalizePhone(qs("to") || DEFAULT_WA_TO);
+  // Cart (localStorage)
+  const CART_KEY = "MAD_CART_V1";
 
-    if(!code){
-      document.getElementById("card").innerHTML =
-        `<div class="err">لازم تحط كود المنتج بالرابط مثل: <code>p.html?code=XF%20A.112</code></div>`;
+  function getCart(){
+    try { return JSON.parse(localStorage.getItem(CART_KEY) || "[]"); }
+    catch(e){ return []; }
+  }
+  function setCart(items){
+    localStorage.setItem(CART_KEY, JSON.stringify(items));
+  }
+  function cartCount(){
+    const c = getCart();
+    return c.reduce((sum, it) => sum + (parseInt(it.qty||1,10) || 1), 0);
+  }
+  function updateCartBadge(){
+    document.getElementById("cartCount").textContent = `🛒 السلة: ${cartCount()}`;
+  }
+
+  // Build WhatsApp message from cart + customer fields
+  function buildWAFromCart(waTo){
+    const items = getCart();
+    const name = safe(document.getElementById("name")?.value);
+    const phone = safe(document.getElementById("phone")?.value);
+    const city = safe(document.getElementById("city")?.value);
+    const address = safe(document.getElementById("address")?.value);
+    const notes = safe(document.getElementById("notes")?.value);
+
+    let msg = `طلب جديد ✅\n\n`;
+
+    if(items.length){
+      msg += `السلة:\n`;
+      items.forEach((it, idx) => {
+        msg += `${idx+1}) ${it.code} × ${it.qty}`;
+        if(it.price) msg += ` — ${it.price}₪`;
+        msg += `\n`;
+        if(it.link) msg += `   ${it.link}\n`;
+      });
+      msg += `\n`;
+    } else {
+      msg += `السلة فارغة.\n\n`;
+    }
+
+    msg += `بيانات الزبون:\n`;
+    if(name) msg += `الاسم: ${name}\n`;
+    if(phone) msg += `الهاتف: ${phone}\n`;
+    if(city) msg += `المدينة: ${city}\n`;
+    if(address) msg += `العنوان: ${address}\n`;
+    if(notes) msg += `ملاحظات: ${notes}\n`;
+
+    return `https://wa.me/${waTo}?text=${encodeURIComponent(msg.trim())}`;
+  }
+
+  function openCart(){
+    renderCart();
+    document.getElementById("cartModal").classList.add("open");
+  }
+  function closeCart(){
+    document.getElementById("cartModal").classList.remove("open");
+  }
+
+  function renderCart(){
+    const body = document.getElementById("cartBody");
+    const items = getCart();
+
+    body.innerHTML = "";
+    if(!items.length){
+      body.innerHTML = `<div class="small">السلة فاضية. اضغط "أضف للسلة" من صفحة أي منتج.</div>`;
+      document.getElementById("cartSummary").textContent = `0 منتج`;
+      updateCartBadge();
+      const waTo = normalizePhone(qs("to") || DEFAULT_WA_TO);
+      document.getElementById("btnWAFromCart").href = buildWAFromCart(waTo);
       return;
     }
 
-    document.getElementById("pill").textContent = `Code: ${code}`;
+    let totalQty = 0;
+    items.forEach((it, index) => {
+      totalQty += (parseInt(it.qty||1,10) || 1);
+
+      const row = document.createElement("div");
+      row.className = "item";
+
+      const img = document.createElement("img");
+      img.className = "thumb";
+      img.alt = it.code;
+      img.src = it.img || "https://www.mad-parfumeur.com/assets/hero/logo2.webp";
+
+      const main = document.createElement("div");
+      main.className = "itemMain";
+
+      const code = document.createElement("div");
+      code.className = "itemCode";
+      code.textContent = it.code;
+
+      const meta = document.createElement("div");
+      meta.className = "itemMeta";
+      meta.textContent = [it.type, it.price ? (it.price + "₪") : ""].filter(Boolean).join(" • ");
+
+      const qtyRow = document.createElement("div");
+      qtyRow.className = "qtyRow";
+
+      const minus = document.createElement("button");
+      minus.className = "qBtn";
+      minus.textContent = "−";
+      minus.onclick = () => {
+        const c = getCart();
+        c[index].qty = Math.max(1, (parseInt(c[index].qty||1,10)||1) - 1);
+        setCart(c); renderCart();
+      };
+
+      const qv = document.createElement("div");
+      qv.className = "qVal";
+      qv.textContent = it.qty;
+
+      const plus = document.createElement("button");
+      plus.className = "qBtn";
+      plus.textContent = "+";
+      plus.onclick = () => {
+        const c = getCart();
+        c[index].qty = (parseInt(c[index].qty||1,10)||1) + 1;
+        setCart(c); renderCart();
+      };
+
+      const del = document.createElement("button");
+      del.className = "delBtn";
+      del.textContent = "حذف";
+      del.onclick = () => {
+        const c = getCart();
+        c.splice(index, 1);
+        setCart(c); renderCart();
+      };
+
+      qtyRow.appendChild(minus);
+      qtyRow.appendChild(qv);
+      qtyRow.appendChild(plus);
+
+      main.appendChild(code);
+      main.appendChild(meta);
+      main.appendChild(qtyRow);
+
+      row.appendChild(img);
+      row.appendChild(main);
+      row.appendChild(del);
+
+      body.appendChild(row);
+    });
+
+    document.getElementById("cartSummary").textContent = `${items.length} منتج • مجموع الكمية: ${totalQty}`;
+    updateCartBadge();
+
+    const waTo = normalizePhone(qs("to") || DEFAULT_WA_TO);
+    document.getElementById("btnWAFromCart").href = buildWAFromCart(waTo);
+  }
+
+  async function load(){
+    const codeParam = qs("code");
+    const waTo = normalizePhone(qs("to") || DEFAULT_WA_TO);
+
+    updateCartBadge();
+
+    document.getElementById("openCart").onclick = openCart;
+    document.getElementById("closeCart").onclick = closeCart;
+    document.getElementById("cartModal").addEventListener("click", (e)=>{
+      if(e.target.id === "cartModal") closeCart();
+    });
+    document.getElementById("clearCart").onclick = ()=>{
+      setCart([]);
+      renderCart();
+      updateCartBadge();
+    };
+
+    // WA from main button always sends cart (not only single product)
+    const refreshWAButtons = ()=>{
+      document.getElementById("btnWA").href = buildWAFromCart(waTo);
+      document.getElementById("btnWAFromCart").href = buildWAFromCart(waTo);
+    };
+
+    ["name","phone","city","address","notes"].forEach(id=>{
+      const el = document.getElementById(id);
+      if(!el) return;
+      el.addEventListener("input", refreshWAButtons);
+      el.addEventListener("change", refreshWAButtons);
+    });
+
+    refreshWAButtons();
+
+    if(!codeParam){
+      document.getElementById("card").innerHTML =
+        `<div class="err">لازم تحط كود المنتج بالرابط مثل: <code>p.html?code=W.181</code></div>`;
+      return;
+    }
+
+    document.getElementById("pill").textContent = `Code: ${codeParam}`;
 
     const res = await fetch(CSV_URL + "?v=" + Date.now(), {cache:"no-store"});
     if(!res.ok){
@@ -228,90 +566,84 @@
 
     const I_CODE  = idxOf(headers, "PRODUCT CODE");
     const I_LINK  = idxOf(headers, "LINK");
-    const I_IMG   = idxOf(headers, "IMAGE_LINK");
     const I_DESC  = idxOf(headers, "DESC_AR");
     const I_PRICE = idxOf(headers, "PRICE");
     const I_TYPE  = idxOf(headers, "PRODUCT TYPE");
-    const I_NAME  = idxOf(headers, "FRAG_MATCH_NAME"); // اسم احتياطي إذا بدك
+    const I_NAME  = idxOf(headers, "FRAG_MATCH_NAME");
+    const I_IMG   = idxOf(headers, "IMAGE_LINK"); // احتياطي فقط
 
-    // صفوف فيها كود فقط
     const data = rows.filter(r => safe(val(r, I_CODE)) !== "");
+    const found = data.find(r => safe(val(r, I_CODE)).toLowerCase() === codeParam.toLowerCase());
 
-    const found = data.find(r => safe(val(r, I_CODE)).toLowerCase() === code.toLowerCase());
     if(!found){
       document.getElementById("card").innerHTML =
-        `<div class="err">مش لاقي المنتج: <code>${code}</code><br>تأكد إن الكود موجود بالـ p.csv.</div>`;
+        `<div class="err">مش لاقي المنتج: <code>${codeParam}</code><br>تأكد إن الكود موجود بالـ p.csv.</div>`;
       return;
     }
 
     const pCode = safe(val(found, I_CODE));
     const pLink = safe(val(found, I_LINK));
-    const pImg  = safe(val(found, I_IMG));
-    const pDesc = safe(val(found, I_DESC)) || "اضغط أكمل الطلب على واتساب.";
+    const pDesc = safe(val(found, I_DESC)) || "اضغط أضف للسلة أو أكمل الطلب على واتساب.";
     const pPrice= safe(val(found, I_PRICE));
     const pType = safe(val(found, I_TYPE));
     const pName = safe(val(found, I_NAME));
+    const pImgCsv = safe(val(found, I_IMG));
 
     document.title = `${pCode} | MAD`;
-
     document.getElementById("title").textContent = pName ? `${pCode} — ${pName}` : pCode;
     document.getElementById("meta").textContent =
       [pType, pPrice ? (pPrice + "₪") : ""].filter(Boolean).join(" • ");
     document.getElementById("desc").textContent = pDesc;
 
-    document.getElementById("img").src = pImg || "https://www.mad-parfumeur.com/assets/hero/logo2.webp";
+    // ✅ الصورة العالية: من موقعك حسب الكود
+    // مثال: https://www.mad-parfumeur.com/img/W.181.webp
+    const highImg = HIGH_IMG_BASE + encodeURIComponent(pCode) + ".webp";
+
+    // fallback: إذا ما لقاها، يجرب IMAGE_LINK من CSV
+    const imgEl = document.getElementById("img");
+    imgEl.src = highImg;
+    imgEl.onerror = () => {
+      imgEl.onerror = null;
+      imgEl.src = pImgCsv || "https://www.mad-parfumeur.com/assets/hero/logo2.webp";
+    };
+
     document.getElementById("btnView").href = pLink || "https://madperfume.co.il/";
 
-    function buildMessage(){
+    // Add to cart
+    document.getElementById("btnAdd").onclick = ()=>{
       const qty = Math.max(1, parseInt(document.getElementById("qty").value || "1", 10));
-      const name = safe(document.getElementById("name").value);
-      const phone = safe(document.getElementById("phone").value);
-      const city = safe(document.getElementById("city").value);
-      const address = safe(document.getElementById("address").value);
-      const notes = safe(document.getElementById("notes").value);
+      const cart = getCart();
 
-      // رسالة جاهزة واضحة للإدارة (سلسة للزبون: يضغط Send وخلاص)
-      let msg = `طلب جديد ✅\n`;
-      msg += `المنتج: ${pCode}\n`;
-      if(pPrice) msg += `السعر: ${pPrice}₪\n`;
-      msg += `الكمية: ${qty}\n`;
-      if(pLink) msg += `رابط المنتج: ${pLink}\n`;
-      msg += `\nبيانات الزبون:\n`;
-      if(name) msg += `الاسم: ${name}\n`;
-      if(phone) msg += `الهاتف: ${phone}\n`;
-      if(city) msg += `المدينة: ${city}\n`;
-      if(address) msg += `العنوان: ${address}\n`;
-      if(notes) msg += `ملاحظات: ${notes}\n`;
-      return msg.trim();
-    }
+      const existing = cart.find(it => (it.code||"").toLowerCase() === pCode.toLowerCase());
+      const item = {
+        code: pCode,
+        qty: qty,
+        price: pPrice,
+        type: pType,
+        link: pLink,
+        img: highImg
+      };
 
-    function refreshWA(){
-      const msg = buildMessage();
-      const waLink = `https://wa.me/${waTo}?text=${encodeURIComponent(msg)}`;
-      document.getElementById("btnWA").href = waLink;
-      return msg;
-    }
-
-    // أول تحميل
-    refreshWA();
-
-    // كل تغيير ينعكس على رابط الواتساب
-    ["qty","name","phone","city","address","notes"].forEach(id=>{
-      document.getElementById(id).addEventListener("input", refreshWA);
-      document.getElementById(id).addEventListener("change", refreshWA);
-    });
-
-    // زر النسخ
-    document.getElementById("btnCopy").addEventListener("click", async ()=>{
-      const msg = refreshWA();
-      try{
-        await navigator.clipboard.writeText(msg);
-        document.getElementById("btnCopy").textContent = "✅ تم النسخ";
-        setTimeout(()=> document.getElementById("btnCopy").textContent = "نسخ رسالة الطلب", 1200);
-      }catch(e){
-        alert("ما قدرت أنسخ تلقائياً. انسخ يدويًا من الواتساب.");
+      if(existing){
+        existing.qty = (parseInt(existing.qty||1,10)||1) + qty;
+      } else {
+        cart.push(item);
       }
-    });
+
+      setCart(cart);
+      updateCartBadge();
+      renderCart();
+      // تحديث روابط WA
+      document.getElementById("btnWA").href = buildWAFromCart(waTo);
+      document.getElementById("btnWAFromCart").href = buildWAFromCart(waTo);
+      openCart();
+    };
+
+    // تحديث روابط واتساب أول بأول
+    document.getElementById("qty").addEventListener("input", refreshWAButtons);
+    document.getElementById("qty").addEventListener("change", refreshWAButtons);
+
+    refreshWAButtons();
   }
 
   load().catch(err=>{
