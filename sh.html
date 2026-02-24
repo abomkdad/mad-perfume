@@ -192,7 +192,7 @@
       </button>
 
       <a href="#" onclick="goHome(event)" class="absolute left-1/2 -translate-x-1/2 flex items-center justify-center active:scale-95 transition p-2">
-        <img src="https://www.mad-parfumeur.com/assets/hero/logo.png" class="h-6 sm:h-7 brightness-0 invert object-contain" alt="MAD Parfumeur" />
+        <img src="https://www.mad-parfumeur.com/assets/hero/logo2.webp" class="h-6 sm:h-7 brightness-0 invert object-contain" alt="MAD Parfumeur" />
       </a>
 
       <button id="cartBtn" class="relative p-2 text-white active:scale-95 transition" aria-label="Cart">
@@ -282,7 +282,7 @@
 
         <div class="flex justify-between text-sm font-black text-gray-300">
           <span id="shipLabel">التوصيل</span>
-          <span>₪<span id="shipping">50</span></span>
+          <span id="shippingDisplay" class="text-white">₪50</span>
         </div>
 
         <div class="flex justify-between font-black text-lg pt-2 border-t border-white/10 mt-2">
@@ -342,6 +342,7 @@
       addMore: "أضف المزيد",
       waFabBadge: "مساعدة",
       waFabMsg: "مرحبا، عندي استفسار عن العطور.",
+      free: "مجاني", // كلمة مجاني للغة العربية
       wa: {
         header: "✨ *طلب جديد | MAD Parfumeur*",
         name: "👤 الاسم",
@@ -384,6 +385,7 @@
       addMore: "הוסף עוד",
       waFabBadge: "עזרה",
       waFabMsg: "היי, יש לי שאלה לגבי הבשמים.",
+      free: "חינם", // كلمة مجاني للغة العبرية
       wa: {
         header: "✨ *הזמנה חדשה | MAD Parfumeur*",
         name: "👤 שם",
@@ -654,18 +656,28 @@
       subtotal += (Number(p.price || 0) * qty);
     });
 
-    const total = totalQty > 0 ? (subtotal + SHIPPING) : 0;
-    return { subtotal, total, totalQty };
+    // إضافة شرط التوصيل المجاني هنا
+    const currentShipping = (subtotal >= 500) ? 0 : SHIPPING;
+    const total = totalQty > 0 ? (subtotal + currentShipping) : 0;
+    
+    return { subtotal, total, totalQty, currentShipping };
   }
 
   function updateCartUI() {
     const container = document.getElementById("cartItems");
     const badge = document.getElementById("cartCountBadge");
 
-    const { subtotal, total, totalQty } = calcTotals();
+    const { subtotal, total, totalQty, currentShipping } = calcTotals();
 
     badge.textContent = totalQty;
-    document.getElementById("shipping").textContent = Number(SHIPPING).toFixed(0);
+    
+    // إظهار التوصيل كمجاني إذا توفر الشرط
+    if (currentShipping === 0) {
+      document.getElementById("shippingDisplay").innerHTML = `<span class="text-[#C5A059] font-black">${T.free}</span>`;
+    } else {
+      document.getElementById("shippingDisplay").textContent = `₪${currentShipping}`;
+    }
+
     document.getElementById("subtotal").textContent = Number(subtotal).toFixed(0);
     document.getElementById("total").textContent = Number(total).toFixed(0);
 
@@ -779,7 +791,7 @@
     if (state.cart.size === 0) return alert(T.alertEmpty);
     if (!name || !phone) return alert(T.alertNeed);
 
-    const { subtotal, total } = calcTotals();
+    const { subtotal, total, currentShipping } = calcTotals();
 
     let msg = `${T.wa.header}\n`;
     msg += `${T.wa.name}: ${name}\n`;
@@ -801,7 +813,8 @@
     });
 
     msg += `━━━━━━━━━━━━\n${T.wa.sub}: ₪${subtotal.toFixed(0)}\n`;
-    msg += `${T.wa.ship}: ₪${Number(SHIPPING).toFixed(0)}\n`;
+    // كتابة التوصيل مجاني إذا توفر الشرط في الواتساب
+    msg += `${T.wa.ship}: ${currentShipping === 0 ? T.free : '₪' + currentShipping}\n`;
     msg += `${T.wa.total}: ₪${total.toFixed(0)}`;
 
     if (!state.leadOrderFired) {
