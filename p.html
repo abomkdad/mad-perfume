@@ -1,358 +1,119 @@
-<!doctype html>
-<html lang="ar" dir="rtl">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>MAD | المنتج</title>
+export default async (request: Request) => {
+  const url = new URL(request.url);
+  const code = (url.searchParams.get("code") || "").trim();
+  const to = (url.searchParams.get("to") || "972524033442").trim();
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
-
-  <style>
-    :root {
-      --bg-page: #eaeded; 
-      --bg-card: #ffffff;
-      --text-main: #0f1111; 
-      --text-muted: #565959;
-      --gold-mad: #c5a059;
-      --border-color: #d5d9d9;
-    }
-
-    * { box-sizing: border-box; }
-
-    body {
-      margin: 0; 
-      font-family: 'Tajawal', system-ui, -apple-system, sans-serif;
-      background-color: var(--bg-page);
-      color: var(--text-main);
-      min-height: 100vh;
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    .header {
-      background-color: #131921; 
-      color: #ffffff;
-      padding: 14px 20px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-    .brand { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 1.2rem; }
-    .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--gold-mad); }
-    .pill { background: transparent; border: 1px solid var(--gold-mad); color: var(--gold-mad); padding: 4px 12px; border-radius: 6px; font-size: 13px; font-weight: 700; }
-
-    .wrap { max-width: 1100px; margin: 20px auto; padding: 0 15px; }
-
-    .card {
-      background: var(--bg-card);
-      border-radius: 8px;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 30px;
-      padding: 30px;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.05);
-    }
-    @media (max-width: 850px) {
-      .card { grid-template-columns: 1fr; padding: 20px 15px; gap: 20px; }
-    }
-
-    .imgBox {
-      display: flex;
-      align-items: flex-start;
-      justify-content: center;
-      position: relative;
-    }
-    .imgBox img {
-      width: 100%;
-      max-width: 450px;
-      height: auto;
-      object-fit: contain;
-      border: 1px solid var(--border-color);
-      border-radius: 8px;
-      padding: 10px;
-    }
-
-    .info { display: flex; flex-direction: column; }
-    
-    h1 { margin: 0 0 10px; font-size: 24px; font-weight: 700; line-height: 1.4; color: var(--text-main); }
-    
-    .price-wrap { border-bottom: 1px solid var(--border-color); padding-bottom: 15px; margin-bottom: 15px; }
-    .meta { color: #B12704; font-weight: 700; font-size: 26px; direction: ltr; display: inline-block;}
-    .meta-type { color: var(--text-muted); font-size: 14px; display: block; margin-top: 4px; font-weight: 500;}
-
-    .desc {
-      color: #333;
-      line-height: 1.8; 
-      font-size: 15px;
-      white-space: pre-wrap;
-      margin-bottom: 25px;
-    }
-
-    .buy-box {
-      border: 1px solid var(--border-color);
-      border-radius: 8px;
-      padding: 20px;
-      background: #fdfdfd;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.02);
-    }
-
-    .actions { display: flex; flex-direction: column; gap: 12px; }
-    
-    .btn {
-      appearance: none; border: 0; cursor: pointer;
-      padding: 14px 20px; border-radius: 100px;
-      font-weight: 700; font-size: 15px; font-family: inherit;
-      text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px;
-      width: 100%;
-      transition: all 0.2s ease;
-      user-select: none;
-    }
-    .btn:active { transform: scale(0.98); }
-    
-    .yes {
-      background: linear-gradient(to bottom, #f7dfa5, #f0c14b);
-      border: 1px solid #a88734;
-      color: #111;
-      box-shadow: 0 1px 0 rgba(255,255,255,.4) inset;
-    }
-    .yes:hover { background: linear-gradient(to bottom, #f5d78e, #eeb933); }
-    
-    .alt {
-      background: #e3e6e6;
-      border: 1px solid var(--border-color);
-      color: var(--text-main);
-      box-shadow: 0 1px 0 rgba(255,255,255,.5) inset;
-    }
-    .alt:hover { background: #d5d9d9; }
-
-    .note {
-      margin-top: 15px;
-      font-size: 13px;
-      color: #b12704;
-      background: #fcf4f4;
-      border-right: 3px solid #b12704;
-      padding: 10px 12px;
-      border-radius: 4px;
-      font-weight: 500;
-      line-height: 1.5;
-    }
-    .small { margin-top: 15px; font-size: 13px; color: var(--text-muted); line-height: 1.5; text-align: center; }
-    .err { padding: 16px; border-radius: 8px; background: #fff0f0; border: 1px solid #d0021b; color: #d0021b; font-weight: 700; margin-top: 20px;}
-    code { background: #f0f2f2; padding: 4px 8px; border-radius: 4px; font-family: monospace; color: #c60; }
-  </style>
-</head>
-
-<body>
-  <div class="header">
-    <div class="brand"><span class="dot"></span> MAD Parfumeur</div>
-    <div class="pill" id="pill">Product</div>
-  </div>
-
-  <div class="wrap">
-    <div class="card" id="card">
-      <div class="imgBox">
-        <img id="img" alt="MAD Product" src="https://www.mad-parfumeur.com/assets/hero/logo2.webp" />
-      </div>
-
-      <div class="info">
-        <h1 id="title">...</h1>
-        
-        <div class="price-wrap">
-          <div class="meta" id="metaPrice"></div>
-          <div class="meta-type" id="metaType"></div>
-        </div>
-        
-        <div class="desc" id="desc">...</div>
-
-        <div class="buy-box">
-          <div class="actions">
-            <a class="btn yes" id="btnYes" target="_blank" rel="noopener">✅ نعم، أريد هذا المنتج</a>
-            <a class="btn alt" id="btnOther" target="_blank" rel="noopener">🔁 منتج آخر</a>
-          </div>
-          <div class="note" id="previewHint">...</div>
-          <div class="small" id="hint">...</div>
-        </div>
-
-      </div>
-    </div>
-  </div>
-
-<script>
-  const CSV_URL = "p.csv";
-  const DEFAULT_WA_TO = "972524033442";
-
-  function qs(name){
-    const u = new URL(location.href);
-    return (u.searchParams.get(name) || "").trim();
-  }
-  function normalizePhone(p){
-    return String(p||"").replace(/[^\d]/g,"");
+  if (!code) {
+    return new Response("Missing code", { status: 400 });
   }
 
-  function detectLang(){
-    const forced = (qs("lang") || "").toLowerCase();
-    if(forced === "ar" || forced === "he") return forced;
-    const nav = (navigator.language || navigator.userLanguage || "").toLowerCase();
-    if(nav.startsWith("he") || nav.startsWith("iw")) return "he";
-    return "ar";
-  }
+  // رابط ملف CSV عندك (بنفس الدومين)
+  const csvUrl = new URL("/p.csv", url.origin).toString();
 
-  const I18N = {
-    ar: {
-      wantThis: "✅ إتمام الطلب عبر واتساب",
-      other: "🔁 تصفح منتج آخر",
-      loading: "جارٍ تحميل تفاصيل المنتج…",
-      notFound: "عذراً، لم نتمكن من العثور على المنتج:",
-      needCode: "يرجى إضافة كود المنتج للرابط، مثال:",
-      hint: "سيتم تحويلك إلى واتساب لإرسال كود المنتج وإتمام عملية الشراء.",
-      previewHint: "✨ تنويه هام: يرجى الانتظار لثانيتين داخل الواتساب حتى تظهر صورة المعاينة (Preview) قبل إرسال الرسالة.",
-      msgOther: "🔁 أرغب برؤية منتج آخر"
-    },
-    he: {
-      wantThis: "✅ הזמן עכשיו בוואטסאפ",
-      other: "🔁 תשלח מוצר אחר",
-      loading: "טוען מוצר…",
-      notFound: "המוצר לא נמצא:",
-      needCode: "צריך לשים קוד מוצר בקישור, לדוגמה:",
-      hint: "בלחיצה אחת תועבר לוואטסאפ להשלמת ההזמנה.",
-      previewHint: "חשוב: חכה 2 שניות בוואטסאפ עד שמופיע Preview למוצר, ואז שלח.",
-      msgOther: "🔁 תשלח מוצר אחר"
-    }
-  };
+  const res = await fetch(csvUrl, { headers: { "cache-control": "no-cache" } });
+  if (!res.ok) return new Response("Cannot load p.csv", { status: 500 });
 
-  function parseCSV(text){
-    const rows = [];
-    let row = [], cur = "", inQ = false;
-    for(let i=0;i<text.length;i++){
+  const csv = await res.text();
+
+  // CSV parser بسيط (يدعم quotes)
+  function parseCSV(text: string): string[][] {
+    const rows: string[][] = [];
+    let row: string[] = [];
+    let cur = "";
+    let inQ = false;
+
+    for (let i = 0; i < text.length; i++) {
       const ch = text[i];
-      const next = text[i+1];
-      if(ch === '"' && inQ && next === '"'){ cur += '"'; i++; continue; }
-      if(ch === '"'){ inQ = !inQ; continue; }
-      if(ch === ',' && !inQ){ row.push(cur); cur = ""; continue; }
-      if((ch === '\n' || ch === '\r') && !inQ){
-        if(cur.length || row.length){ row.push(cur); rows.push(row); }
+      const next = text[i + 1];
+
+      if (ch === '"' && inQ && next === '"') { cur += '"'; i++; continue; }
+      if (ch === '"') { inQ = !inQ; continue; }
+
+      if (ch === "," && !inQ) { row.push(cur); cur = ""; continue; }
+
+      if ((ch === "\n" || ch === "\r") && !inQ) {
+        if (cur.length || row.length) { row.push(cur); rows.push(row); }
         cur = ""; row = [];
         continue;
       }
+
       cur += ch;
     }
-    if(cur.length || row.length){ row.push(cur); rows.push(row); }
+    if (cur.length || row.length) { row.push(cur); rows.push(row); }
     return rows;
   }
 
-  function idxOf(headers, name){
-    const i = headers.indexOf(name);
-    return i >= 0 ? i : -1;
-  }
-  function val(r, i){
-    if(i < 0) return "";
-    return (r[i] ?? "").toString().trim();
-  }
-  function safe(v){ return (v||"").toString().trim(); }
+  const rows = parseCSV(csv).filter(r => r.some(c => (c || "").trim() !== ""));
+  const headers = (rows.shift() || []).map(h => (h || "").trim());
 
-  function fix450px(url){
-    if(!url) return "";
-    let u = String(url).trim();
-    u = u.replace(/-450px(\.(png|jpg|jpeg|webp))$/i, ".$2");
-    return u;
-  }
+  const idx = (name: string) => headers.indexOf(name);
 
-  async function load(){
-    const code = qs("code");
-    const waTo = normalizePhone(qs("to") || DEFAULT_WA_TO);
+  const I_CODE = idx("PRODUCT CODE");
+  const I_LINK = idx("LINK");
+  const I_IMG  = idx("IMAGE_LINK");
+  const I_NAME = idx("FRAG_MATCH_NAME");
+  const I_DESC_AR = idx("DESC_AR");
+  const I_DESC_HE = idx("DESC_HE");
 
-    const lang = detectLang();
-    const t = I18N[lang];
+  const norm = (s: any) => String(s ?? "").trim();
 
-    document.documentElement.lang = lang;
-    document.documentElement.dir = "rtl";
+  const found = rows.find(r => norm(r[I_CODE]).toLowerCase() === code.toLowerCase());
+  if (!found) return new Response("Product not found", { status: 404 });
 
-    document.getElementById("btnYes").textContent = t.wantThis;
-    document.getElementById("btnOther").textContent = t.other;
-    document.getElementById("hint").textContent = t.hint;
-    document.getElementById("previewHint").textContent = t.previewHint;
-    document.getElementById("title").textContent = t.loading;
+  const pCode = norm(found[I_CODE]);
+  const pLink = norm(found[I_LINK]) || `${url.origin}/`;
+  let pImg = norm(found[I_IMG]) || `${url.origin}/assets/hero/logo2.webp`;
+  const pName = norm(found[I_NAME]) || pCode;
 
-    if(!code){
-      document.getElementById("card").innerHTML =
-        `<div class="err">${t.needCode} <br><br><code>p2.html?code=XF%20A.104</code></div>`;
-      return;
-    }
+  // حاول يرجع للصورة الأصلية بدل -450px إن وجدت
+  pImg = pImg.replace(/-450px(\.(png|jpg|jpeg|webp))$/i, ".$2");
 
-    document.getElementById("pill").textContent = `${code}`;
+  // وصف قصير (اختر عربي/عبري حسب متصفح البوت: غالبًا en — فخليه عربي افتراضي)
+  const desc = norm(found[I_DESC_AR]) || norm(found[I_DESC_HE]) || "MAD Parfumeur";
 
-    const res = await fetch(CSV_URL + "?v=" + Date.now(), {cache:"no-store"});
-    if(!res.ok){
-      document.getElementById("card").innerHTML =
-        `<div class="err">مش قادر أفتح <code>${CSV_URL}</code> — تأكد إنه موجود بنفس المجلد.</div>`;
-      return;
-    }
+  // صفحة العرض الحقيقية للزبون (بعد ما البوت يقرأ OG)
+  const redirectTo = `${url.origin}/p2.html?code=${encodeURIComponent(pCode)}&to=${encodeURIComponent(to)}`;
 
-    const text = await res.text();
-    const rows = parseCSV(text).filter(r => r.some(c => String(c||"").trim() !== ""));
-    const headers = rows.shift().map(h => String(h||"").trim());
+  // HTML مع OG tags + تحويل تلقائي للزبون
+  const html = `<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>${escapeHtml(pName)} | MAD</title>
 
-    const I_CODE  = idxOf(headers, "PRODUCT CODE");
-    const I_LINK  = idxOf(headers, "LINK");
-    const I_IMG   = idxOf(headers, "IMAGE_LINK");
-    const I_DESC_AR  = idxOf(headers, "DESC_AR");
-    const I_DESC_HE  = idxOf(headers, "DESC_HE");
-    const I_PRICE = idxOf(headers, "PRICE");
-    const I_TYPE  = idxOf(headers, "PRODUCT TYPE");
-    const I_NAME  = idxOf(headers, "FRAG_MATCH_NAME");
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="${escapeHtml(pName)}" />
+  <meta property="og:description" content="${escapeHtml(desc)}" />
+  <meta property="og:image" content="${escapeHtml(pImg)}" />
+  <meta property="og:url" content="${escapeHtml(pLink)}" />
 
-    const data = rows.filter(r => safe(val(r, I_CODE)) !== "");
-    const found = data.find(r => safe(val(r, I_CODE)).toLowerCase() === code.toLowerCase());
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="${escapeHtml(pName)}" />
+  <meta name="twitter:description" content="${escapeHtml(desc)}" />
+  <meta name="twitter:image" content="${escapeHtml(pImg)}" />
 
-    if(!found){
-      document.getElementById("card").innerHTML =
-        `<div class="err">${t.notFound} <code>${code}</code></div>`;
-      return;
-    }
-
-    const pCode = safe(val(found, I_CODE));
-    const pLink = safe(val(found, I_LINK));
-    const pImg  = safe(val(found, I_IMG));
-    const pImgOriginal = fix450px(pImg) || pImg;
-    const pPrice= safe(val(found, I_PRICE));
-    const pType = safe(val(found, I_TYPE));
-    const pName = safe(val(found, I_NAME));
-
-    const desc = (lang === "he")
-      ? (safe(val(found, I_DESC_HE)) || safe(val(found, I_DESC_AR)) || "")
-      : (safe(val(found, I_DESC_AR)) || safe(val(found, I_DESC_HE)) || "");
-
-    document.title = `${pCode} | MAD Parfumeur`;
-    document.getElementById("title").textContent = pName ? `${pCode} — ${pName}` : pCode;
-    document.getElementById("metaPrice").textContent = pPrice ? `₪${pPrice}` : "";
-    document.getElementById("metaType").textContent = pType || "";
-    document.getElementById("desc").textContent = desc || "لا يوجد وصف إضافي.";
-    document.getElementById("img").src = pImgOriginal || "https://www.mad-parfumeur.com/assets/hero/logo2.webp";
-
-    // ----------------------------------------------------
-    // استخدام api.whatsapp.com لأنه الأفضل والأكثر استقراراً
-    // ----------------------------------------------------
-    let msgYes = "";
-    if (lang === "he") {
-       msgYes = `✅ מאשר את המוצר\nקוד: ${pCode}\nקישור: ${pLink || ""}\nתמונה: ${pImgOriginal || ""}`;
-    } else {
-       msgYes = `✅ موافق على المنتج\nالكود: ${pCode}\nالرابط: ${pLink || ""}\nالصورة: ${pImgOriginal || ""}`;
-    }
-
-    // هنا التغيير الأساسي لحل المشكلة
-    document.getElementById("btnYes").href =
-      `https://api.whatsapp.com/send?phone=${waTo}&text=${encodeURIComponent(msgYes)}`;
-
-    const msgOther = (lang === "he") ? t.msgOther : t.msgOther;
-    document.getElementById("btnOther").href =
-      `https://api.whatsapp.com/send?phone=${waTo}&text=${encodeURIComponent(msgOther)}`;
-  }
-
-  load().catch(err=>{
-    document.getElementById("card").innerHTML = `<div class="err">خطأ: ${String(err.message||err)}</div>`;
-  });
-</script>
+  <meta http-equiv="refresh" content="0; url=${escapeHtml(redirectTo)}" />
+</head>
+<body>
+  <a href="${escapeHtml(redirectTo)}">Continue</a>
 </body>
-</html>
+</html>`;
+
+  return new Response(html, {
+    headers: {
+      "content-type": "text/html; charset=utf-8",
+      // خليه caching قليل عشان يتحدّث بسرعة
+      "cache-control": "public, max-age=60"
+    }
+  });
+};
+
+function escapeHtml(s: string) {
+  return s
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;");
+}
