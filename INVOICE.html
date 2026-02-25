@@ -3,63 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Enterprise Commercial Invoice</title>
+    <title>Enterprise Commercial Invoice - Pro Version</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     
     <style>
-        body {
-            font-family: 'Helvetica Neue', 'Helvetica', Arial, sans-serif;
-            color: #222;
-            background-color: #eef2f5;
-            margin: 0;
-            padding: 20px;
-        }
+        body { font-family: 'Helvetica Neue', 'Helvetica', Arial, sans-serif; color: #222; background-color: #eef2f5; margin: 0; padding: 20px; }
         
-        /* لوحة التحكم */
-        .controls {
-            max-width: 850px;
-            margin: 0 auto 20px auto;
-            background: #fff;
-            padding: 15px;
-            border-radius: 8px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            align-items: center;
-        }
-        .controls button, .controls label.file-btn {
-            background-color: #004080;
-            color: white;
-            border: none;
-            padding: 10px 15px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 14px;
-            transition: 0.3s;
-            font-weight: bold;
-        }
+        .controls { max-width: 900px; margin: 0 auto 20px auto; background: #fff; padding: 15px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.08); display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+        .controls button, .controls label.file-btn { background-color: #004080; color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; font-size: 14px; transition: 0.3s; font-weight: bold; }
         .controls button:hover, .controls label.file-btn:hover { background-color: #00264d; }
         .controls input[type="file"] { display: none; }
         .controls .lang-toggle { background-color: #218838; }
         .controls .lang-toggle:hover { background-color: #1e7e34; }
+        .controls .add-col-btn { background-color: #fd7e14; }
+        .controls .add-col-btn:hover { background-color: #e86e04; }
 
-        /* تصميم الفاتورة */
-        .invoice-box {
-            max-width: 850px;
-            margin: auto;
-            padding: 40px;
-            background-color: #fff;
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
-        }
-        .header {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 30px;
-            border-bottom: 3px solid #004080;
-            padding-bottom: 20px;
-        }
+        .invoice-box { max-width: 900px; margin: auto; padding: 40px; background-color: #fff; box-shadow: 0 0 15px rgba(0, 0, 0, 0.1); }
+        .header { display: flex; justify-content: space-between; margin-bottom: 30px; border-bottom: 3px solid #004080; padding-bottom: 20px; }
         .header h1 { margin: 0; font-size: 32px; color: #004080; letter-spacing: 1px;}
         .invoice-details p { margin: 5px 0; text-align: right; font-size: 15px;}
         .company-info { display: flex; justify-content: space-between; margin-bottom: 30px; }
@@ -72,8 +33,8 @@
         table th { background-color: #f8f9fa; color: #333; font-weight: bold; }
         .right { text-align: right; }
         
-        td[contenteditable="true"], span[contenteditable="true"] { outline: none; transition: background 0.2s; }
-        td[contenteditable="true"]:hover, span[contenteditable="true"]:hover { background-color: #f1f8ff; border-bottom: 1px dashed #004080; }
+        td[contenteditable="true"], th[contenteditable="true"], span[contenteditable="true"] { outline: none; transition: background 0.2s; }
+        td[contenteditable="true"]:hover, th[contenteditable="true"]:hover, span[contenteditable="true"]:hover { background-color: #f1f8ff; border-bottom: 1px dashed #004080; }
         
         .totals-wrapper { display: flex; justify-content: space-between; margin-top: 30px; margin-bottom: 20px; page-break-inside: avoid;}
         .stamp-box { width: 40%; text-align: center; min-height: 120px; border: 2px dashed #bbb; display: flex; align-items: center; justify-content: center; position: relative;}
@@ -88,16 +49,14 @@
 
         .delete-btn { color: #dc3545; cursor: pointer; font-weight: bold; border: none; background: none; font-size: 16px;}
 
-        /* إعدادات الطباعة والـ PDF المتقدمة */
         @media print {
-            .controls, .delete-btn { display: none !important; }
+            .controls, .delete-btn, .no-print { display: none !important; }
             body { background-color: #fff; padding: 0; }
             .invoice-box { box-shadow: none; padding: 0; border: none; max-width: 100%;}
             .stamp-box { border: none; }
             .stamp-text { display: none; }
         }
 
-        /* منع انقسام الأسطر بين الصفحات وتكرار رأس الجدول */
         thead { display: table-header-group; }
         tfoot { display: table-footer-group; }
         tr { page-break-inside: avoid; page-break-after: auto; }
@@ -108,8 +67,10 @@
 
 <div class="controls no-print">
     <button onclick="addRow()">+ Add Row / سطر جديد</button>
+    <button class="add-col-btn" onclick="addColumn()">+ Add Column / إضافة عمود</button>
+    
     <label class="file-btn">
-        Import Excel / استيراد إكسيل
+        Import Excel / استيراد ذكي
         <input type="file" id="excelUpload" accept=".xlsx, .xls, .csv" onchange="importExcel(event)">
     </label>
     <label class="file-btn">
@@ -154,10 +115,10 @@
     <table id="invoice-table">
         <thead>
             <tr>
-                <th id="lbl-desc">Description of Goods</th>
-                <th class="right" id="lbl-qty">Quantity</th>
-                <th class="right" id="lbl-price">Unit Price</th>
-                <th class="right" id="lbl-amount">Amount</th>
+                <th id="lbl-desc" contenteditable="true">Description of Goods</th>
+                <th contenteditable="true" class="right">Unit</th> <th class="right" id="lbl-qty" contenteditable="true">Quantity</th>
+                <th class="right" id="lbl-price" contenteditable="true">Unit Price</th>
+                <th class="right" id="lbl-amount" contenteditable="true">Amount</th>
                 <th class="no-print">✖</th>
             </tr>
         </thead>
@@ -192,59 +153,70 @@
 </div>
 
 <script>
+    // البيانات الافتراضية
     const defaultData = [
-        { desc: "100 CC PARFUME", qty: 80110, price: 0 },
-        { desc: "200 CC PARFUME", qty: 1344, price: 0 },
-        { desc: "50 CC PARFUME", qty: 288, price: 0 }
+        { desc: "100 CC PARFUME", unit: "PCS", qty: 80110, price: 0 },
+        { desc: "200 CC PARFUME", unit: "PCS", qty: 1344, price: 0 },
+        { desc: "50 CC PARFUME", unit: "PCS", qty: 288, price: 0 }
     ];
 
-    const translations = {
-        en: { title: "COMMERCIAL INVOICE", invNo: "Invoice No:", date: "Date:", currency: "Currency:", seller: "Seller", buyer: "Buyer", tax: "Tax No:", vat: "VAT:", tel: "Tel:", desc: "Description of Goods", qty: "Quantity", price: "Unit Price", amount: "Amount", totalQty: "Total Quantity:", totalAmount: "Total Amount:", bankTitle: "Bank Details", bankName: "Bank Name:", branch: "Branch:" },
-        tr: { title: "TİCARİ FATURA", invNo: "Fatura No:", date: "Tarih:", currency: "Para Birimi:", seller: "Satıcı", buyer: "Alıcı", tax: "Vergi No:", vat: "KDV No:", tel: "Tel:", desc: "Mal Tanımı", qty: "Miktar", price: "Birim Fiyatı", amount: "Tutar", totalQty: "Toplam Miktar:", totalAmount: "Toplam Tutar:", bankTitle: "Banka Bilgileri", bankName: "Banka Adı:", branch: "Şube:" }
-    };
-
-    let currentLang = 'en';
-
     window.onload = () => {
-        defaultData.forEach(item => addRow(item.desc, item.qty, item.price));
+        defaultData.forEach(item => addRow(item.desc, item.unit, item.qty, item.price));
         calculateTotals();
     };
 
-    function toggleLanguage() {
-        currentLang = currentLang === 'en' ? 'tr' : 'en';
-        const t = translations[currentLang];
-        document.getElementById("lbl-title").innerText = t.title;
-        document.getElementById("lbl-inv-no").innerText = t.invNo;
-        document.getElementById("lbl-date").innerText = t.date;
-        document.getElementById("lbl-currency").innerText = t.currency;
-        document.getElementById("lbl-seller").innerText = t.seller;
-        document.getElementById("lbl-buyer").innerText = t.buyer;
-        document.getElementById("lbl-tax").innerText = t.tax;
-        document.getElementById("lbl-vat").innerText = t.vat;
-        document.getElementById("lbl-tel").innerText = t.tel;
-        document.getElementById("lbl-desc").innerText = t.desc;
-        document.getElementById("lbl-qty").innerText = t.qty;
-        document.getElementById("lbl-price").innerText = t.price;
-        document.getElementById("lbl-amount").innerText = t.amount;
-        document.getElementById("lbl-total-qty").innerText = t.totalQty;
-        document.getElementById("lbl-total-amount").innerText = t.totalAmount;
-        document.getElementById("lbl-bank-title").innerText = t.bankTitle;
-        document.getElementById("lbl-bank-name").innerText = t.bankName;
-        document.getElementById("lbl-branch").innerText = t.branch;
-    }
-
-    function addRow(desc = "New Item", qty = 1, price = 0) {
+    function addRow(desc = "New Item", unit = "PCS", qty = 1, price = 0) {
         const tbody = document.getElementById("table-body");
         const tr = document.createElement("tr");
-        tr.innerHTML = `
+        
+        // جلب عدد الأعمدة الحالي لإنشاء خلايا متطابقة
+        const colCount = document.querySelectorAll("#invoice-table thead th").length;
+        
+        let html = `
             <td contenteditable="true">${desc}</td>
+            <td contenteditable="true" class="right">${unit}</td>
             <td contenteditable="true" class="right qty-cell" oninput="calculateRow(this)">${qty}</td>
             <td contenteditable="true" class="right price-cell" oninput="calculateRow(this)">${price}</td>
+        `;
+        
+        // إضافة الخلايا الإضافية الفارغة إذا كان المستخدم قد أضاف أعمدة جديدة
+        for(let i = 5; i < colCount; i++){
+            html += `<td contenteditable="true" class="right">-</td>`;
+        }
+
+        html += `
             <td class="right amount-cell">0.00</td>
             <td class="no-print"><button class="delete-btn" onclick="deleteRow(this)">✖</button></td>
         `;
+        
+        tr.innerHTML = html;
         tbody.appendChild(tr);
         calculateRow(tr.querySelector('.qty-cell'));
+    }
+
+    // ميزة إضافة عمود جديد (مثل الوزن أو غيره)
+    function addColumn() {
+        const colName = prompt("أدخل اسم العمود الجديد (مثال: Net Weight, HS Code):", "New Column");
+        if (!colName) return;
+
+        // إضافة العنوان في الترويسة (قبل عمود Amount)
+        const theadTr = document.querySelector("#invoice-table thead tr");
+        const newTh = document.createElement("th");
+        newTh.innerText = colName;
+        newTh.contentEditable = "true";
+        newTh.className = "right";
+        // الإدراج قبل العمودين الأخيرين (Amount و زر الحذف)
+        theadTr.insertBefore(newTh, theadTr.children[theadTr.children.length - 2]);
+
+        // إضافة الخلية في جميع الأسطر الموجودة
+        const rows = document.querySelectorAll("#table-body tr");
+        rows.forEach(tr => {
+            const newTd = document.createElement("td");
+            newTd.contentEditable = "true";
+            newTd.className = "right";
+            newTd.innerText = "-";
+            tr.insertBefore(newTd, tr.children[tr.children.length - 2]);
+        });
     }
 
     function deleteRow(btn) { btn.closest("tr").remove(); calculateTotals(); }
@@ -267,6 +239,7 @@
         document.getElementById("total-amount").innerText = totalAmount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
     }
 
+    // استيراد ذكي يقرأ العناوين لتجنب مشكلة المسافات والأعمدة الفارغة
     function importExcel(event) {
         const file = event.target.files[0];
         if (!file) return;
@@ -276,10 +249,41 @@
             const workbook = XLSX.read(data, {type: 'array'});
             const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
             const jsonData = XLSX.utils.sheet_to_json(firstSheet, {header: 1});
-            document.getElementById("table-body").innerHTML = "";
-            for (let i = 1; i < jsonData.length; i++) {
+            
+            // البحث عن مكان الأعمدة الأساسية
+            let colMap = { desc: -1, qty: -1, price: -1 };
+            let headerRowIndex = -1;
+
+            for (let i = 0; i < Math.min(20, jsonData.length); i++) {
                 let row = jsonData[i];
-                if (row.length > 0 && row[0]) { addRow(row[0] || "", row[1] || 0, row[2] || 0); }
+                if (!row) continue;
+                for (let j = 0; j < row.length; j++) {
+                    let cellVal = String(row[j] || "").toUpperCase().trim();
+                    if (cellVal.includes("DESCRIPTION")) colMap.desc = j;
+                    if (cellVal.includes("QUANTITY") || cellVal === "QTY") colMap.qty = j;
+                    if (cellVal.includes("UNIT PRICE") || cellVal.includes("PRICE")) colMap.price = j;
+                }
+                if (colMap.desc !== -1 && colMap.qty !== -1) {
+                    headerRowIndex = i;
+                    break;
+                }
+            }
+
+            document.getElementById("table-body").innerHTML = "";
+            let startRow = headerRowIndex !== -1 ? headerRowIndex + 1 : 1;
+
+            for (let i = startRow; i < jsonData.length; i++) {
+                let row = jsonData[i];
+                if (!row || row.length === 0) continue;
+                
+                // إذا لم يجد العناوين، يفترض الأعمدة 0 و 1
+                let desc = colMap.desc !== -1 ? (row[colMap.desc] || "") : (row[0] || "");
+                let qty = colMap.qty !== -1 ? (row[colMap.qty] || 0) : (row[1] || 0);
+                let price = colMap.price !== -1 ? (row[colMap.price] || 0) : 0;
+                
+                if (desc.toString().trim() !== "" && desc.toString().toUpperCase() !== "DESCRIPTION") {
+                    addRow(desc, "PCS", qty, price);
+                }
             }
         };
         reader.readAsArrayBuffer(file);
@@ -298,23 +302,19 @@
         }
     }
 
-    // تصدير احترافي مع ترقيم صفحات
     function exportPDF() {
         const element = document.getElementById('invoice');
-        
-        // إعدادات المسافات والهوامش (تترك مساحة سفلية لترقيم الصفحات)
         const opt = {
-            margin:       [0.5, 0.5, 0.8, 0.5], // أعلى, يسار, أسفل, يمين (بالإنش)
+            margin:       [0.5, 0.5, 0.8, 0.5],
             filename:     'Commercial_Invoice_Enterprise.pdf',
             image:        { type: 'jpeg', quality: 1 },
             html2canvas:  { scale: 2, useCORS: true },
             jsPDF:        { unit: 'in', format: 'A4', orientation: 'portrait' },
-            pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] } // لمنع قطع الجدول
+            pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] }
         };
         
         document.querySelectorAll('.no-print').forEach(el => el.style.display = 'none');
         
-        // إنشاء الـ PDF ثم إضافة أرقام الصفحات
         html2pdf().set(opt).from(element).toPdf().get('pdf').then(function (pdf) {
             const totalPages = pdf.internal.getNumberOfPages();
             const pageWidth = pdf.internal.pageSize.getWidth();
@@ -323,24 +323,48 @@
             for (let i = 1; i <= totalPages; i++) {
                 pdf.setPage(i);
                 pdf.setFontSize(10);
-                pdf.setTextColor(120); // لون رمادي احترافي
-                
-                // إضافة خط خفيف أعلى رقم الصفحة
+                pdf.setTextColor(120);
                 pdf.setDrawColor(200);
                 pdf.setLineWidth(0.01);
                 pdf.line(0.5, pageHeight - 0.6, pageWidth - 0.5, pageHeight - 0.6);
                 
-                // نص رقم الصفحة (يمين الصفحة)
                 const text = `Page ${i} of ${totalPages}`;
                 const textWidth = pdf.getStringUnitWidth(text) * pdf.internal.getFontSize() / pdf.internal.scaleFactor;
                 pdf.text(text, pageWidth - textWidth - 0.5, pageHeight - 0.4);
-                
-                // إضافة اسم الشركة في اليسار كعلامة احترافية
                 pdf.text("UGUR SAHIN TEKSTIL LTD STI", 0.5, pageHeight - 0.4);
             }
         }).save().then(() => {
             document.querySelectorAll('.no-print').forEach(el => el.style.display = '');
         });
+    }
+
+    const translations = {
+        en: { title: "COMMERCIAL INVOICE", invNo: "Invoice No:", date: "Date:", currency: "Currency:", seller: "Seller", buyer: "Buyer", tax: "Tax No:", vat: "VAT:", tel: "Tel:", desc: "Description of Goods", qty: "Quantity", price: "Unit Price", amount: "Amount", totalQty: "Total Quantity:", totalAmount: "Total Amount:", bankTitle: "Bank Details", bankName: "Bank Name:", branch: "Branch:" },
+        tr: { title: "TİCARİ FATURA", invNo: "Fatura No:", date: "Tarih:", currency: "Para Birimi:", seller: "Satıcı", buyer: "Alıcı", tax: "Vergi No:", vat: "KDV No:", tel: "Tel:", desc: "Mal Tanımı", qty: "Miktar", price: "Birim Fiyatı", amount: "Tutar", totalQty: "Toplam Miktar:", totalAmount: "Toplam Tutar:", bankTitle: "Banka Bilgileri", bankName: "Banka Adı:", branch: "Şube:" }
+    };
+
+    let currentLang = 'en';
+    function toggleLanguage() {
+        currentLang = currentLang === 'en' ? 'tr' : 'en';
+        const t = translations[currentLang];
+        document.getElementById("lbl-title").innerText = t.title;
+        document.getElementById("lbl-inv-no").innerText = t.invNo;
+        document.getElementById("lbl-date").innerText = t.date;
+        document.getElementById("lbl-currency").innerText = t.currency;
+        document.getElementById("lbl-seller").innerText = t.seller;
+        document.getElementById("lbl-buyer").innerText = t.buyer;
+        document.getElementById("lbl-tax").innerText = t.tax;
+        document.getElementById("lbl-vat").innerText = t.vat;
+        document.getElementById("lbl-tel").innerText = t.tel;
+        document.getElementById("lbl-desc").innerText = t.desc;
+        document.getElementById("lbl-qty").innerText = t.qty;
+        document.getElementById("lbl-price").innerText = t.price;
+        document.getElementById("lbl-amount").innerText = t.amount;
+        document.getElementById("lbl-total-qty").innerText = t.totalQty;
+        document.getElementById("lbl-total-amount").innerText = t.totalAmount;
+        document.getElementById("lbl-bank-title").innerText = t.bankTitle;
+        document.getElementById("lbl-bank-name").innerText = t.bankName;
+        document.getElementById("lbl-branch").innerText = t.branch;
     }
 </script>
 
