@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Enterprise Commercial Invoice - Dynamic Excel</title>
+    <title>Enterprise Commercial Invoice - Raw Import</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     
@@ -67,10 +67,10 @@
 
 <div class="controls no-print">
     <button onclick="addRow()">+ Add Row / سطر جديد</button>
-    <button class="add-col-btn" onclick="addColumn()">+ Add Column / إضافة عمود يدوياً</button>
+    <button class="add-col-btn" onclick="addColumn()">+ Add Column / إضافة عمود</button>
     
     <label class="file-btn">
-        Import Excel / استيراد ذكي شامل
+        Import Raw Excel / استيراد حرفي للملف
         <input type="file" id="excelUpload" accept=".xlsx, .xls, .csv" onchange="importExcel(event)">
     </label>
     <label class="file-btn">
@@ -154,32 +154,28 @@
 </div>
 
 <script>
-    // عند تحميل الصفحة يتم إضافة صف فارغ ليتعرف المستخدم على الشكل
     window.onload = () => { addRow(); };
 
-    // ميزة إضافة سطر جديد متوافقة مع أي عدد من الأعمدة موجود حالياً
     function addRow() {
         const tbody = document.getElementById("table-body");
         const headers = document.querySelectorAll("#table-head th");
         const tr = document.createElement("tr");
         
         let html = "";
-        for (let i = 0; i < headers.length - 1; i++) { // -1 لتجاهل زر الحذف
+        for (let i = 0; i < headers.length - 1; i++) {
             let headerText = headers[i].innerText.toUpperCase();
             let cls = "right";
             let onInput = "";
-            let defVal = "0";
+            let defVal = "-";
 
             if (headerText.includes("QTY") || headerText.includes("QUANTITY")) {
-                cls += " qty-cell"; onInput = `oninput="calculateRow(this)"`; defVal = "1";
+                cls += " qty-cell"; onInput = `oninput="calculateRow(this)"`; defVal = "0";
             } else if (headerText.includes("PRICE")) {
-                cls += " price-cell"; onInput = `oninput="calculateRow(this)"`;
+                cls += " price-cell"; onInput = `oninput="calculateRow(this)"`; defVal = "0";
             } else if (headerText.includes("AMOUNT") || headerText.includes("TOTAL")) {
                 cls += " amount-cell"; defVal = "0.00";
             } else if (i === 0 || headerText.includes("DESC")) {
                 cls = ""; defVal = "New Item";
-            } else {
-                defVal = "-"; // للأعمدة الأخرى
             }
 
             html += `<td contenteditable="true" class="${cls}" ${onInput}>${defVal}</td>`;
@@ -241,7 +237,7 @@
         document.getElementById("total-amount").innerText = totalAmount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
     }
 
-    // الاستيراد الديناميكي الشامل (ينسخ كل الأعمدة الموجودة في الإكسيل تلقائياً)
+    // الاستيراد الحرفي (Raw Import)
     function importExcel(event) {
         const file = event.target.files[0];
         if (!file) return;
@@ -252,64 +248,66 @@
             const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
             const jsonData = XLSX.utils.sheet_to_json(firstSheet, {header: 1, defval: ""});
             
-            // 1. البحث عن صف العناوين (الهيدر)
+            // 1. إيجاد أول سطر يحتوي على أكثر من خلية ممتلئة (لتجاوز العناوين الكبيرة)
             let headerRowIndex = -1;
             for (let i = 0; i < Math.min(30, jsonData.length); i++) {
-                let rowText = jsonData[i].join(" ").toUpperCase();
-                if (rowText.includes("DESCRIPTION") || rowText.includes("QTY") || rowText.includes("QUANTITY")) {
-                    headerRowIndex = i;
-                    break;
+                let row = jsonData[i];
+                if (row) {
+                    let nonEmptyCells = row.filter(cell => String(cell).trim() !== "").length;
+                    if (nonEmptyCells > 1) { // نعتبر السطر الذي فيه أكثر من عمودين هو الهيدر
+                        headerRowIndex = i;
+                        break;
+                    }
                 }
             }
 
             if (headerRowIndex === -1) {
-                alert("يرجى التأكد من أن ملف الإكسيل يحتوي على عمود باسم Description أو Quantity ليتمكن من التعرف على البيانات.");
+                alert("يبدو أن الملف فارغ أو لا يحتوي على أعمدة واضحة.");
                 return;
             }
 
-            // 2. تصفية الأعمدة واستخراج أسمائها الحقيقية
+            // 2. أخذ الأعمدة كما هي بالضبط
             let headers = jsonData[headerRowIndex];
             let validCols = [];
             headers.forEach((h, index) => {
                 let hStr = String(h).trim();
-                if (hStr !== "") {
-                    validCols.push({ index: index, name: hStr });
-                }
+                // إذا كان اسم العمود فارغاً لكن هناك أعمدة أخرى بجانبه
+                if (hStr === "" && index < headers.length) hStr = "Col " + (index + 1);
+                if (hStr !== "") validCols.push({ index: index, name: hStr });
             });
 
-            // 3. إعادة بناء ترويسة الجدول بناءً على الإكسيل فقط
+            // 3. طباعة رؤوس الجدول
             let theadHTML = "";
-            validCols.forEach(col => {
-                theadHTML += `<th contenteditable="true" class="${col.name.toUpperCase().includes('DESC') ? '' : 'right'}">${col.name}</th>`;
+            validCols.forEach((col, i) => {
+                theadHTML += `<th contenteditable="true" class="${i===0 ? '' : 'right'}">${col.name}</th>`;
             });
             theadHTML += `<th class="no-print">✖</th>`;
             document.querySelector("#table-head").innerHTML = `<tr>${theadHTML}</tr>`;
 
-            // 4. مسح البيانات القديمة وإضافة بيانات الإكسيل
+            // 4. تعبئة البيانات حرفياً
             const tbody = document.getElementById("table-body");
             tbody.innerHTML = "";
 
             for (let i = headerRowIndex + 1; i < jsonData.length; i++) {
                 let row = jsonData[i];
-                if (!row || row.join("").trim() === "") continue; // تجاهل الأسطر الفارغة بالكامل
+                if (!row || row.join("").trim() === "") continue;
 
                 const tr = document.createElement("tr");
                 let trHTML = "";
                 
-                validCols.forEach(col => {
-                    let cellValue = row[col.index];
+                validCols.forEach((col, index) => {
+                    let cellValue = row[col.index] || "";
                     let upperName = col.name.toUpperCase();
-                    let cls = "right";
+                    let cls = index === 0 ? "" : "right"; 
                     let onInput = "";
 
+                    // محاولة إعطاء الكلاسات لتشغيل الحسابات التلقائية إن توافقت الأسماء
                     if (upperName.includes("QTY") || upperName.includes("QUANTITY")) {
                         cls += " qty-cell"; onInput = `oninput="calculateRow(this)"`;
                     } else if (upperName.includes("PRICE")) {
                         cls += " price-cell"; onInput = `oninput="calculateRow(this)"`;
                     } else if (upperName.includes("AMOUNT") || upperName.includes("TOTAL")) {
                         cls += " amount-cell";
-                    } else if (upperName.includes("DESC")) {
-                        cls = ""; // الوصف يكون محاذاة لليسار
                     }
 
                     trHTML += `<td contenteditable="true" class="${cls}" ${onInput}>${cellValue}</td>`;
@@ -320,7 +318,6 @@
                 tbody.appendChild(tr);
             }
 
-            // 5. حساب المجاميع في حال وجود القيمة والكمية
             calculateTotals();
         };
         reader.readAsArrayBuffer(file);
@@ -343,7 +340,7 @@
         const element = document.getElementById('invoice');
         const opt = {
             margin:       [0.5, 0.5, 0.8, 0.5],
-            filename:     'Commercial_Invoice_Dynamic.pdf',
+            filename:     'Commercial_Invoice.pdf',
             image:        { type: 'jpeg', quality: 1 },
             html2canvas:  { scale: 2, useCORS: true },
             jsPDF:        { unit: 'in', format: 'A4', orientation: 'portrait' },
