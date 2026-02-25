@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Enterprise Commercial Invoice - Pro Stamp & Currency</title>
+    <title>Enterprise Commercial Invoice - Ultimate Version</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     
@@ -19,11 +19,7 @@
         .controls .add-col-btn { background-color: #fd7e14; }
         .controls .add-col-btn:hover { background-color: #e86e04; }
 
-        /* شريط تحجيم الختم */
-        .stamp-resizer { display: none; align-items: center; gap: 10px; background: #f8f9fa; padding: 5px 15px; border-radius: 5px; border: 1px solid #ccc;}
-        .stamp-resizer input { cursor: pointer; }
-
-        .invoice-box { max-width: 900px; margin: auto; padding: 40px; background-color: #fff; box-shadow: 0 0 15px rgba(0, 0, 0, 0.1); }
+        .invoice-box { max-width: 900px; margin: auto; padding: 40px; background-color: #fff; box-shadow: 0 0 15px rgba(0, 0, 0, 0.1); position: relative;}
         .header { display: flex; justify-content: space-between; margin-bottom: 30px; border-bottom: 3px solid #004080; padding-bottom: 20px; }
         .header h1 { margin: 0; font-size: 32px; color: #004080; letter-spacing: 1px;}
         .invoice-details p { margin: 5px 0; text-align: right; font-size: 15px;}
@@ -37,14 +33,17 @@
         table th { background-color: #f8f9fa; color: #333; font-weight: bold; }
         .right { text-align: right; }
         
-        td[contenteditable="true"], th[contenteditable="true"], span[contenteditable="true"] { outline: none; transition: background 0.2s; }
-        td[contenteditable="true"]:hover, th[contenteditable="true"]:hover, span[contenteditable="true"]:hover { background-color: #f1f8ff; border-bottom: 1px dashed #004080; }
+        td[contenteditable="true"], th[contenteditable="true"], span[contenteditable="true"], strong[contenteditable="true"] { outline: none; transition: background 0.2s; }
+        td[contenteditable="true"]:hover, th[contenteditable="true"]:hover, span[contenteditable="true"]:hover, strong[contenteditable="true"]:hover { background-color: #f1f8ff; border-bottom: 1px dashed #004080; cursor: text;}
         
-        .totals-wrapper { display: flex; justify-content: space-between; margin-top: 30px; margin-bottom: 20px; page-break-inside: avoid; align-items: center;}
+        .totals-wrapper { display: flex; justify-content: space-between; margin-top: 30px; margin-bottom: 20px; page-break-inside: avoid; align-items: flex-end;}
         
-        /* مربع الختم */
-        .stamp-box { width: 40%; text-align: center; min-height: 120px; border: 2px dashed #bbb; display: flex; align-items: center; justify-content: center; position: relative;}
-        .stamp-box img { width: 150px; /* الحجم الافتراضي */ max-width: 100%; object-fit: contain; display: none; }
+        /* إعدادات الختم والتحجيم */
+        .stamp-wrapper { width: 40%; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+        .stamp-box { width: 100%; text-align: center; min-height: 120px; border: 2px dashed #bbb; display: flex; align-items: center; justify-content: center; position: relative;}
+        .stamp-box img { width: 150px; max-width: 100%; object-fit: contain; display: none; }
+        .stamp-slider-container { display: none; width: 100%; background: #f1f1f1; padding: 5px; border-radius: 4px; text-align: center;}
+        .stamp-slider-container input { width: 90%; cursor: pointer; }
         
         .totals { width: 45%; }
         .totals table { border: none; }
@@ -55,9 +54,10 @@
         .bank-details p { margin: 5px 0; font-size: 14px; color: #444;}
 
         .delete-btn { color: #dc3545; cursor: pointer; font-weight: bold; border: none; background: none; font-size: 16px;}
+        .auto-btn { background: #28a745; color: white; border: none; padding: 3px 8px; font-size: 12px; border-radius: 4px; cursor: pointer; margin-left: 10px; display: none;}
 
         @media print {
-            .controls, .delete-btn, .no-print { display: none !important; }
+            .controls, .delete-btn, .no-print, .stamp-slider-container, .auto-btn { display: none !important; }
             body { background-color: #fff; padding: 0; }
             .invoice-box { box-shadow: none; padding: 0; border: none; max-width: 100%;}
             .stamp-box { border: none; }
@@ -78,19 +78,14 @@
     <button class="add-col-btn" onclick="addColumn()">+ Add Column / إضافة عمود</button>
     
     <label class="file-btn">
-        Import Raw Excel / استيراد الملف
+        Import Excel / استيراد الملف
         <input type="file" id="excelUpload" accept=".xlsx, .xls, .csv" onchange="importExcel(event)">
     </label>
     
-    <label class="file-btn">
+    <label class="file-btn" style="background-color: #6f42c1;">
         Add Stamp / إضافة ختم
         <input type="file" id="stampUpload" accept="image/*" onchange="addStamp(event)">
     </label>
-
-    <div class="stamp-resizer" id="stamp-resizer-container">
-        <label style="font-size: 13px; font-weight: bold;">Stamp Size:</label>
-        <input type="range" id="stamp-slider" min="50" max="350" value="150" oninput="resizeStamp(this.value)">
-    </div>
 
     <button class="lang-toggle" onclick="toggleLanguage()">🇹🇷 / 🇬🇧 Language</button>
     <button onclick="exportPDF()" style="background-color: #dc3545; margin-left: auto; font-size: 15px;">📄 Export Enterprise PDF</button>
@@ -105,6 +100,7 @@
             <p><strong id="lbl-inv-no">Invoice No:</strong> <span contenteditable="true">UGR2026000000001</span></p>
             <p><strong id="lbl-date">Date:</strong> <span contenteditable="true">11.02.2026</span></p>
             <p><strong id="lbl-currency">Currency:</strong> <span contenteditable="true">USD ($)</span></p>
+            <p><strong id="lbl-origin">Country of Origin:</strong> <span contenteditable="true">Turkey</span></p>
         </div>
     </div>
 
@@ -143,10 +139,17 @@
     </table>
 
     <div class="totals-wrapper">
-        <div class="stamp-box" id="stamp-container">
-            <span class="stamp-text no-print" style="color:#999; font-weight:bold;">Click to Upload Stamp / Signature</span>
-            <img id="stamp-img" src="" alt="Stamp">
+        <div class="stamp-wrapper">
+            <div class="stamp-box" id="stamp-container">
+                <span class="stamp-text no-print" style="color:#999; font-weight:bold;">Click 'Add Stamp' to upload</span>
+                <img id="stamp-img" src="" alt="Stamp">
+            </div>
+            <div class="stamp-slider-container no-print" id="stamp-slider-container">
+                <span style="font-size: 12px; font-weight: bold; color: #555;">Resize Stamp 🔍</span><br>
+                <input type="range" id="stamp-slider" min="50" max="400" value="150" oninput="resizeStamp(this.value)">
+            </div>
         </div>
+        
         <div class="totals">
             <table>
                 <tr>
@@ -155,7 +158,10 @@
                 </tr>
                 <tr>
                     <th id="lbl-total-amount">Total Amount:</th>
-                    <td class="right"><strong style="color: #004080; font-size: 20px;" id="total-amount">$ 0.00</strong></td>
+                    <td class="right">
+                        <strong style="color: #004080; font-size: 20px;" id="total-amount" contenteditable="true" oninput="manualTotalOverride()">$ 0.00</strong>
+                        <button id="auto-calc-btn" class="auto-btn no-print" onclick="enableAutoCalc()">🔄 Auto</button>
+                    </td>
                 </tr>
             </table>
         </div>
@@ -169,13 +175,27 @@
 </div>
 
 <script>
+    let isTotalManual = false; // متغير لمعرفة ما إذا كان المستخدم عدّل التوتال يدوياً
+
     window.onload = () => { addRow(); };
 
-    // فلترة الأرقام لضمان حسابها حتى لو كتب المستخدم $ أو فواصل
     function parseNumber(str) {
         if (!str) return 0;
-        let numStr = String(str).replace(/[^0-9.-]+/g, ""); // يحذف كل شيء عدا الأرقام والنقاط
+        let numStr = String(str).replace(/[^0-9.-]+/g, ""); 
         return parseFloat(numStr) || 0;
+    }
+
+    // إيقاف الحساب التلقائي إذا تم التعديل اليدوي
+    function manualTotalOverride() {
+        isTotalManual = true;
+        document.getElementById("auto-calc-btn").style.display = "inline-block"; // إظهار زر الإرجاع للتلقائي
+    }
+
+    // إرجاع التوتال للحساب التلقائي
+    function enableAutoCalc() {
+        isTotalManual = false;
+        document.getElementById("auto-calc-btn").style.display = "none";
+        calculateTotals();
     }
 
     function addRow() {
@@ -240,7 +260,6 @@
         if (qtyEl && priceEl && amountEl) {
             const qty = parseNumber(qtyEl.innerText);
             const price = parseNumber(priceEl.innerText);
-            // إضافة رمز الدولار $ للسطر
             amountEl.innerText = "$ " + (qty * price).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
         }
         calculateTotals();
@@ -257,8 +276,11 @@
         });
         
         document.getElementById("total-qty").innerText = totalQty.toLocaleString();
-        // إضافة رمز الدولار $ للمجموع الكلي
-        document.getElementById("total-amount").innerText = "$ " + totalAmount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        
+        // لا تقم بتغيير التوتال إذا كان المستخدم قد عدّله يدوياً
+        if (!isTotalManual) {
+            document.getElementById("total-amount").innerText = "$ " + totalAmount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        }
     }
 
     function importExcel(event) {
@@ -337,12 +359,12 @@
                 tbody.appendChild(tr);
             }
 
-            calculateTotals();
+            enableAutoCalc(); // عند استيراد ملف جديد، أعد تشغيل الحساب التلقائي
         };
         reader.readAsArrayBuffer(file);
     }
 
-    // وظائف الختم والتحجيم
+    // التحكم بالختم والتحجيم
     function addStamp(event) {
         const file = event.target.files[0];
         if (file) {
@@ -351,9 +373,10 @@
                 document.getElementById('stamp-img').src = e.target.result;
                 document.getElementById('stamp-img').style.display = 'block';
                 document.querySelector('.stamp-text').style.display = 'none';
+                document.querySelector('.stamp-box').style.border = 'none'; // إخفاء الحدود عند رفع الختم لتبدو طبيعية
                 
-                // إظهار شريط التحجيم بعد رفع الختم
-                document.getElementById('stamp-resizer-container').style.display = 'flex';
+                // إظهار شريط التحجيم أسفل الختم مباشرة
+                document.getElementById('stamp-slider-container').style.display = 'block';
             }
             reader.readAsDataURL(file);
         }
@@ -367,7 +390,7 @@
         const element = document.getElementById('invoice');
         const opt = {
             margin:       [0.5, 0.5, 0.8, 0.5],
-            filename:     'Commercial_Invoice.pdf',
+            filename:     'Commercial_Invoice_Final.pdf',
             image:        { type: 'jpeg', quality: 1 },
             html2canvas:  { scale: 2, useCORS: true },
             jsPDF:        { unit: 'in', format: 'A4', orientation: 'portrait' },
@@ -396,12 +419,15 @@
             }
         }).save().then(() => {
             document.querySelectorAll('.no-print').forEach(el => el.style.display = '');
+            if(document.getElementById('stamp-img').style.display === 'block') {
+                 document.getElementById('stamp-slider-container').style.display = 'block';
+            }
         });
     }
 
     const translations = {
-        en: { title: "COMMERCIAL INVOICE", invNo: "Invoice No:", date: "Date:", currency: "Currency:", seller: "Seller", buyer: "Buyer", tax: "Tax No:", vat: "VAT:", tel: "Tel:", totalQty: "Total Quantity:", totalAmount: "Total Amount:", bankTitle: "Bank Details", bankName: "Bank Name:", branch: "Branch:" },
-        tr: { title: "TİCARİ FATURA", invNo: "Fatura No:", date: "Tarih:", currency: "Para Birimi:", seller: "Satıcı", buyer: "Alıcı", tax: "Vergi No:", vat: "KDV No:", tel: "Tel:", totalQty: "Toplam Miktar:", totalAmount: "Toplam Tutar:", bankTitle: "Banka Bilgileri", bankName: "Banka Adı:", branch: "Şube:" }
+        en: { title: "COMMERCIAL INVOICE", invNo: "Invoice No:", date: "Date:", currency: "Currency:", origin: "Country of Origin:", seller: "Seller", buyer: "Buyer", tax: "Tax No:", vat: "VAT:", tel: "Tel:", totalQty: "Total Quantity:", totalAmount: "Total Amount:", bankTitle: "Bank Details", bankName: "Bank Name:", branch: "Branch:" },
+        tr: { title: "TİCARİ FATURA", invNo: "Fatura No:", date: "Tarih:", currency: "Para Birimi:", origin: "Menşei Ülke:", seller: "Satıcı", buyer: "Alıcı", tax: "Vergi No:", vat: "KDV No:", tel: "Tel:", totalQty: "Toplam Miktar:", totalAmount: "Toplam Tutar:", bankTitle: "Banka Bilgileri", bankName: "Banka Adı:", branch: "Şube:" }
     };
 
     let currentLang = 'en';
@@ -412,13 +438,14 @@
         document.getElementById("lbl-inv-no").innerText = t.invNo;
         document.getElementById("lbl-date").innerText = t.date;
         document.getElementById("lbl-currency").innerText = t.currency;
+        document.getElementById("lbl-origin").innerText = t.origin;
         document.getElementById("lbl-seller").innerText = t.seller;
         document.getElementById("lbl-buyer").innerText = t.buyer;
         document.getElementById("lbl-tax").innerText = t.tax;
         document.getElementById("lbl-vat").innerText = t.vat;
         document.getElementById("lbl-tel").innerText = t.tel;
         document.getElementById("lbl-total-qty").innerText = t.totalQty;
-        document.getElementById("lbl-total-amount").innerHTML = `<strong style="color: #004080; font-size: 20px;">$ ${parseNumber(document.getElementById("total-amount").innerText).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</strong>`;
+        document.getElementById("lbl-total-amount").previousElementSibling.innerText = t.totalAmount; // تغيير النص فقط للحفاظ على الرقم
         document.getElementById("lbl-bank-title").innerText = t.bankTitle;
         document.getElementById("lbl-bank-name").innerText = t.bankName;
         document.getElementById("lbl-branch").innerText = t.branch;
