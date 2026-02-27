@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>MAD — Product</title>
-  <meta name="description" content="MAD Product Page (AR/HE) + Smart Cart + Order Form + Respond.io Widget" />
+  <meta name="description" content="MAD Product Page (AR/HE) + Smart Cart + Order Form + Respond.io Widget + Multi-language search (q)" />
   <style>
     :root{
       --bg:#0b0b0f; --card:#12121a; --muted:#a7a7b4; --txt:#fff; --brand:#d4af37;
@@ -57,7 +57,7 @@
     .kv:last-child{border-bottom:none}
     .pill{font-size:12px;border:1px solid var(--line);background:rgba(255,255,255,.03);padding:6px 10px;border-radius:999px;cursor:pointer;font-weight:900}
     .pill.active{border-color:rgba(212,175,55,.45);background:rgba(212,175,55,.10)}
-    .input, .select, textarea{
+    .input, textarea{
       width:100%;
       padding:12px 12px;
       border-radius:14px;
@@ -71,9 +71,7 @@
     .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
     @media (max-width:600px){.grid2{grid-template-columns:1fr}}
     .note{font-size:12px;color:var(--muted);line-height:1.6;margin-top:8px}
-    .tagOK{background:var(--ok);border:1px solid rgba(80,255,160,.25);padding:10px;border-radius:14px}
     .tagWARN{background:var(--warn);border:1px solid rgba(255,190,80,.25);padding:10px;border-radius:14px}
-    .tagBAD{background:var(--bad);border:1px solid rgba(255,80,80,.25);padding:10px;border-radius:14px}
     .mono{font-family: ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace}
     .qty{display:flex;gap:8px;align-items:center}
     .qty button{min-width:auto;width:42px}
@@ -87,7 +85,7 @@
   <div class="wrap">
     <div class="topbar">
       <div class="brand"><span class="dot"></span><span>MAD PERFUME</span></div>
-      <div class="badge">AR/HE • Cart • Order Form • Widget • format=json</div>
+      <div class="badge">AR/HE • Cart • Order Form • Widget • format=json • q=search</div>
     </div>
 
     <div class="grid" id="uiRoot">
@@ -137,7 +135,7 @@
 
         <div class="box">
           <div class="kv"><span id="lblSource">مصدر البيانات</span><span class="mono">./catalog.json</span></div>
-          <div class="kv"><span id="lblCall">الاستدعاء</span><span class="mono">?id=87 | ?key=alien</span></div>
+          <div class="kv"><span id="lblCall">الاستدعاء</span><span class="mono">?q=alien | ?q=אלינ | ?q=الين | ?q=87</span></div>
           <div class="kv"><span id="lblJulia">مرجع جوليا</span><span class="mono">&format=json</span></div>
           <div class="kv"><span id="lblJsonExample">مثال</span><span class="mono" id="jsonExample">—</span></div>
         </div>
@@ -188,7 +186,7 @@
           </div>
 
           <div class="tagWARN note" id="orderHelp">
-            سيتم إنشاء نص طلب جاهز. يمكنك نسخه وإرساله للموظف أو عبر واتساب.  
+            سيتم إنشاء نص طلب جاهز. يمكنك نسخه وإرساله للموظف أو عبر واتساب.
             (الويدجت موجود أسفل لفتح محادثة أيضًا)
           </div>
         </div>
@@ -210,7 +208,7 @@
     // ====== SETTINGS ======
     const DATA_URL = "./catalog.json";
     const CURRENCY_SYMBOL = "₪";
-    const DEFAULT_WA_NUMBER = "972000000000"; // غيّره لرقم الواتساب (بدون +) إذا بدك زر واتساب يرسل للمحل
+    const DEFAULT_WA_NUMBER = "972000000000"; // غيّره لرقم واتساب التجاري بدون +
 
     // ====== i18n ======
     const I18N = {
@@ -224,8 +222,8 @@
         cartNote:"السلة تحفظ محليًا على جهاز العميل (LocalStorage).",
         qtyErr:"الكمية لازم تكون 1 أو أكثر.",
         notFound:"المنتج غير موجود",
-        tryHint:"جرّب: ?id=87 أو ?key=alien أو ?code=XF%20A.112 أو ?app=product.show.87",
-        hintLine:"✅ إذا بدك مرجع جوليا: ضف &format=json لنفس الرابط."
+        tryHint:"جرّب: ?q=alien أو ?q=אלינ أو ?q=الين أو ?q=87 أو ?q=XF%20A.112",
+        hintLine:"✅ مصدر معرفة جوليا: ضف &format=json لنفس الرابط."
       },
       HE: {
         source:"מקור נתונים", call:"קריאה", julia:"מקור ידע לג׳וליה", example:"דוגמה",
@@ -237,28 +235,20 @@
         cartNote:"העגלה נשמרת מקומית במכשיר (LocalStorage).",
         qtyErr:"כמות חייבת להיות 1 ומעלה.",
         notFound:"המוצר לא נמצא",
-        tryHint:"נסה: ?id=87 או ?key=alien או ?code=XF%20A.112 או ?app=product.show.87",
-        hintLine:"✅ למקור ידע: הוסף &format=json לאותו קישור."
+        tryHint:"נסה: ?q=alien או ?q=אלינ או ?q=الين או ?q=87 או ?q=XF%20A.112",
+        hintLine:"✅ מקור ידע: הוסף &format=json לאותו קישור."
       }
     };
 
     // ====== Helpers ======
     const qs = new URLSearchParams(location.search);
     const $ = (id) => document.getElementById(id);
-
     function safe(v){ return (v ?? "").toString(); }
-    function lower(v){ return safe(v).trim().toLowerCase(); }
-
-    function getIdFromApp(v){
-      const m = safe(v).match(/product\.show\.(\d+)/i);
-      return m ? m[1] : "";
-    }
 
     function setLang(lang){
       const L = I18N[lang] || I18N.AR;
-      const isRTL = (lang === "AR" || lang === "HE");
       document.documentElement.lang = (lang === "HE") ? "he" : "ar";
-      document.documentElement.dir = isRTL ? "rtl" : "ltr";
+      document.documentElement.dir  = "rtl";
 
       $("langAR").classList.toggle("active", lang === "AR");
       $("langHE").classList.toggle("active", lang === "HE");
@@ -327,17 +317,31 @@
     function pageBaseUrl(){
       return location.origin + location.pathname;
     }
-
     function buildSelfLink(params){
       const u = new URL(pageBaseUrl());
       for (const [k,v] of params.entries()) u.searchParams.set(k,v);
       return u.toString();
     }
 
-    function buildJsonLink(){
-      const p = new URLSearchParams(qs.toString());
-      p.set("format","json");
-      return buildSelfLink(p);
+    // Normalize for multi-language matching
+    function normalizeQuery(s){
+      s = safe(s).trim();
+      try { s = decodeURIComponent(s); } catch {}
+      s = s.toLowerCase();
+
+      // Latin accents
+      try { s = s.normalize("NFKD").replace(/[\u0300-\u036f]/g, ""); } catch {}
+
+      // Arabic normalization
+      s = s
+        .replace(/[\u064B-\u065F\u0670\u06D6-\u06ED]/g, "") // tashkeel
+        .replace(/[أإآ]/g, "ا")
+        .replace(/ى/g, "ي")
+        .replace(/ة/g, "ه");
+
+      // Remove punctuation/spaces/RTL marks
+      s = s.replace(/[\s\-_.,/\\|()[\]{}'"“”‘’`~!@#$%^&*+=?:;<>\u200f\u200e]/g, "");
+      return s;
     }
 
     // ====== Smart Cart (localStorage) ======
@@ -382,7 +386,7 @@
         line.innerHTML = `
           <div>
             <div style="font-weight:900">${x.name}</div>
-            <div class="note muted">${x.code} • ${x.qty} × ${CURRENCY_SYMBOL}${x.price}</div>
+            <div class="note muted">${x.code || ""} • ${x.qty} × ${CURRENCY_SYMBOL}${x.price}</div>
           </div>
           <div class="row" style="gap:6px;justify-content:flex-end">
             <button class="pill" data-act="dec" data-i="${idx}">-</button>
@@ -411,7 +415,6 @@
     }
 
     function buildOrderText(lang){
-      const L = I18N[lang] || I18N.AR;
       const cart = loadCart();
       const name = safe($("custName").value).trim();
       const phone = safe($("custPhone").value).trim();
@@ -430,7 +433,7 @@
         lines.push(lang === "HE" ? "- (אין)" : "- (فارغة)");
       } else {
         cart.forEach(x => {
-          lines.push(`- ${x.name} | ${x.code} | ${x.qty} × ${CURRENCY_SYMBOL}${x.price} = ${CURRENCY_SYMBOL}${Number(x.price||0)*Number(x.qty||0)}`);
+          lines.push(`- ${x.name} | ${x.code || ""} | ${x.qty} × ${CURRENCY_SYMBOL}${x.price} = ${CURRENCY_SYMBOL}${Number(x.price||0)*Number(x.qty||0)}`);
         });
         lines.push("");
         lines.push((lang === "HE" ? "סה״כ: " : "المجموع: ") + CURRENCY_SYMBOL + cartTotal().toFixed(0));
@@ -448,51 +451,84 @@
     }
 
     function buildWaLink(text){
-      // sends to a fixed number if you want; if not, you can remove the number for user choose (not supported officially by wa.me)
       return "https://wa.me/" + DEFAULT_WA_NUMBER + "?text=" + encodeURIComponent(text);
     }
 
     // ====== Main ======
     async function main(){
-      // lang default: AR
       const lang = (qs.get("lang") || "AR").toUpperCase();
       const L = setLang(lang);
 
       $("langAR").onclick = () => { qs.set("lang","AR"); location.search = qs.toString(); };
       $("langHE").onclick = () => { qs.set("lang","HE"); location.search = qs.toString(); };
 
-      // Params
-      const format = lower(qs.get("format"));
-      const idParam   = safe(qs.get("id"));
-      const appParam  = safe(qs.get("app"));
-      const keyParam  = safe(qs.get("key"));
-      const codeParam = safe(qs.get("code"));
+      const format = (qs.get("format") || "").trim().toLowerCase();
 
-      const targetId = idParam || getIdFromApp(appParam);
+      // ONE smart param: q (multi-language)
+      // We also support id/key/code/app for backward compatibility
+      const qParam    = safe(qs.get("q") || "");
+      const idParam   = safe(qs.get("id") || "");
+      const keyParam  = safe(qs.get("key") || "");
+      const codeParam = safe(qs.get("code") || "");
+      const appParam  = safe(qs.get("app") || "");
+
+      function getIdFromApp(v){
+        const m = safe(v).match(/product\.show\.(\d+)/i);
+        return m ? m[1] : "";
+      }
+
+      // Decide the query text
+      const queryRaw = qParam || keyParam || codeParam || idParam || getIdFromApp(appParam);
+      const queryNorm = normalizeQuery(queryRaw);
+
+      // if query is numeric, treat as ID
+      const isNumeric = /^[0-9]+$/.test(safe(queryRaw).trim());
+      const idToUse = isNumeric ? safe(queryRaw).trim() : (idParam || getIdFromApp(appParam));
 
       // Load catalog
       const res = await fetch(DATA_URL, { cache:"no-store" });
       const raw = await res.json();
       const products = Array.isArray(raw) ? raw : (Array.isArray(raw.products) ? raw.products : []);
 
+      // Find product: by ID inside LINK OR by matching names/keys/codes across languages
       const product = products.find(p => {
         const link = safe(p.LINK || "");
-        const code = safe(p["PRODUCT CODE"] || "");
-        const key  = safe(p.SEARCH_KEY || p.orig_norm || p.orig_can || "");
-        if (targetId && link.includes("product.show." + targetId)) return true;
-        if (keyParam && lower(key) === lower(keyParam)) return true;
-        if (codeParam && lower(code) === lower(codeParam)) return true;
+
+        // match by ID inside LINK (product.show.ID)
+        if (idToUse && link.includes("product.show." + idToUse)) return true;
+
+        if(!queryNorm) return false;
+
+        const key   = safe(p.SEARCH_KEY || p.orig_norm || p.orig_can || "");
+        const code  = safe(p["PRODUCT CODE"] || "");
+        const en    = safe(p.ORIGINAL_EN || "");
+        const ar    = safe(p.ORIGINAL_AR || "");
+        const he    = safe(p.ORIGINAL_HE || "");
+
+        const fields = [key, code, en, ar, he].map(normalizeQuery);
+
+        // exact match after normalization
+        if (fields.includes(queryNorm)) return true;
+
+        // forgiving match
+        if (fields.some(f => f && (f.includes(queryNorm) || queryNorm.includes(f)))) return true;
+
         return false;
       });
 
       let out;
       if(!product){
-        out = { ok:false, error:"NOT_FOUND", hint:L.tryHint };
+        out = { ok:false, error:"NOT_FOUND", hint:L.tryHint, q: queryRaw };
       } else {
         const t = pickLangText(product, lang);
         out = {
           ok:true,
-          id: targetId || null,
+          id: (function(){
+            // try to extract numeric ID from LINK if exists
+            const m = safe(product.LINK||"").match(/product\.show\.(\d+)/i);
+            return m ? m[1] : (isNumeric ? safe(queryRaw).trim() : null);
+          })(),
+          q: queryRaw,
           search_key: safe(product.SEARCH_KEY || product.orig_norm || ""),
           product_code: safe(product["PRODUCT CODE"] || ""),
           description: t.desc,
@@ -514,9 +550,11 @@
         return;
       }
 
-      // UI fill
+      // UI
       const jsonLink = (function(){
         const p = new URLSearchParams(qs.toString());
+        // always create a q=... based link if empty
+        if(!p.get("q") && queryRaw) p.set("q", queryRaw);
         p.set("format","json");
         return buildSelfLink(p);
       })();
@@ -527,15 +565,10 @@
         catch{ prompt("Copy:", jsonLink); }
       };
 
-      // cart render on load
       renderCart();
 
       $("clearCartBtn").onclick = () => clearCart();
-
-      $("fillFormBtn").onclick = () => {
-        // if user didn't fill, just focus name
-        $("custName").focus();
-      };
+      $("fillFormBtn").onclick = () => $("custName").focus();
 
       if(!out.ok){
         $("pName").textContent = (lang==="HE") ? I18N.HE.notFound : I18N.AR.notFound;
@@ -578,7 +611,6 @@
       $("plusBtn").onclick = () => { $("qtyInput").value = String(clampQty()+1); };
       $("minusBtn").onclick = () => { $("qtyInput").value = String(Math.max(1, clampQty()-1)); };
 
-      // Add to cart
       $("addToCartBtn").onclick = () => {
         const qty = clampQty();
         if(qty < 1){ alert(L.qtyErr); return; }
@@ -594,13 +626,11 @@
         alert(lang==="HE" ? "נוסף לעגלה ✅" : "تمت الإضافة للسلة ✅");
       };
 
-      // Order actions
       $("copyOrderBtn").onclick = async () => {
         const text = buildOrderText(lang);
         try{ await navigator.clipboard.writeText(text); alert(lang==="HE" ? "הועתק ✅" : "تم النسخ ✅"); }
         catch{ prompt("Copy:", text); }
       };
-
       $("waOrderBtn").href = buildWaLink(buildOrderText(lang));
     }
 
