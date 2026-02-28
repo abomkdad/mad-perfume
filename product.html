@@ -89,7 +89,6 @@
     </div>
 
     <div class="grid" id="uiRoot">
-      <!-- LEFT: PRODUCT -->
       <div class="card">
         <div class="media"><img id="pImage" alt="Product image" /></div>
         <div class="content">
@@ -123,7 +122,6 @@
         </div>
       </div>
 
-      <!-- RIGHT: LANG + CART + ORDER + WIDGET -->
       <div class="card side">
         <div class="row" style="justify-content:space-between;margin-bottom:8px">
           <div class="row" style="gap:8px">
@@ -140,7 +138,6 @@
           <div class="kv"><span id="lblJsonExample">مثال</span><span class="mono" id="jsonExample">—</span></div>
         </div>
 
-        <!-- CART -->
         <div class="box">
           <div class="h3" id="cartTitle">السلة</div>
           <div id="cartItems"></div>
@@ -155,7 +152,6 @@
           <div class="note" id="cartNote"></div>
         </div>
 
-        <!-- ORDER FORM -->
         <div class="box">
           <div class="h3" id="orderTitle">نموذج الطلب</div>
 
@@ -191,26 +187,21 @@
           </div>
         </div>
 
-        <!-- RESPOND.IO WIDGET -->
         <div class="box">
           <div class="h3" id="widgetTitle">محادثة مباشرة</div>
           <div class="small" id="widgetHint">إذا فتح العميل الشات، انسخ الطلب والصقه أو أرسله عبر واتساب.</div>
         </div>
 
-        <!-- This site is converting visitors into subscribers and customers with https://respond.io -->
         <script id="respondio__widget" src="https://cdn.respond.io/webchat/widget/widget.js?cId=7df11f0c81a76b774961209256f2f0e"></script>
-        <!-- https://respond.io -->
       </div>
     </div>
   </div>
 
   <script>
-    // ====== SETTINGS ======
     const DATA_URL = "./catalog.json";
     const CURRENCY_SYMBOL = "₪";
-    const DEFAULT_WA_NUMBER = "972000000000"; // غيّره لرقم واتساب التجاري بدون +
+    const DEFAULT_WA_NUMBER = "972000000000";
 
-    // ====== i18n ======
     const I18N = {
       AR: {
         source:"مصدر البيانات", call:"الاستدعاء", julia:"مرجع جوليا", example:"مثال",
@@ -222,8 +213,8 @@
         cartNote:"السلة تحفظ محليًا على جهاز العميل (LocalStorage).",
         qtyErr:"الكمية لازم تكون 1 أو أكثر.",
         notFound:"المنتج غير موجود",
-        tryHint:"جرّب: ?q=alien أو ?q=אלינ أو ?q=الين أو ?q=87 أو ?q=XF%20A.112",
-        hintLine:"✅ مصدر معرفة جوليا: ضف &format=json لنفس الرابط."
+        tryHint:"جرّب: ?q=alien أو ?q=אלינ או ?q=الين أو ?q=87 أو ?q=XF%20A.112",
+        hintLine:"✅ مصدر معرفة: أضف &format=json لنفس الرابط."
       },
       HE: {
         source:"מקור נתונים", call:"קריאה", julia:"מקור ידע לג׳וליה", example:"דוגמה",
@@ -240,10 +231,9 @@
       }
     };
 
-    // ====== Helpers ======
     const qs = new URLSearchParams(location.search);
     const $ = (id) => document.getElementById(id);
-    function safe(v){ return (v ?? "").toString(); }
+    const safe = (v) => (v ?? "").toString();
 
     function setLang(lang){
       const L = I18N[lang] || I18N.AR;
@@ -257,94 +247,73 @@
       $("lblCall").textContent = L.call;
       $("lblJulia").textContent = L.julia;
       $("lblJsonExample").textContent = L.example;
-
       $("cartTitle").textContent = L.cart;
       $("totalLabel").textContent = L.total;
       $("clearCartBtn").textContent = L.clear;
       $("fillFormBtn").textContent = L.fill;
-
       $("orderTitle").textContent = L.order;
       $("nameLbl").textContent = L.name;
       $("phoneLbl").textContent = L.phone;
       $("addrLbl").textContent = L.addr;
       $("notesLbl").textContent = L.notes;
-
       $("copyOrderBtn").textContent = L.copyOrder;
       $("waOrderBtn").textContent = L.sendWA;
-
       $("addToCartBtn").textContent = L.add;
       $("openBtn").textContent = L.open;
-
       $("widgetTitle").textContent = L.chat;
       $("widgetHint").textContent = L.chatHint;
-
       $("cartNote").textContent = L.cartNote;
       $("hintLine").textContent = L.hintLine;
 
       return L;
     }
 
-    function pickLangText(p, lang){
-      const nameEN = safe(p.ORIGINAL_EN || p.DESCRIPTION || "");
-      const nameAR = safe(p.ORIGINAL_AR || p.DESCRIPTION || "");
-      const nameHE = safe(p.ORIGINAL_HE || p.DESCRIPTION || "");
-
-      const descAR = safe(p.DESC_AR || "");
-      const descHE = safe(p.DESC_HE || "");
-      const descEN = safe(p.DESCRIPTION || "");
-
-      const pyrAR = safe(p.PYRAMID_AR || "");
-      const pyrHE = safe(p.PYRAMID_HE || "");
-      const bestAR = safe(p.BEST_TIME_AR || "");
-      const bestHE = safe(p.BEST_TIME_HE || "");
-
-      let name = nameEN, desc = descEN, pyramid="", best_time="";
-      if (lang === "AR"){
-        name = nameAR || nameEN;
-        desc = descAR || descEN;
-        pyramid = pyrAR; best_time = bestAR;
-      } else if (lang === "HE"){
-        name = nameHE || nameEN;
-        desc = descHE || descEN;
-        pyramid = pyrHE; best_time = bestHE;
-      } else {
-        name = nameEN || nameAR || nameHE;
-        desc = descEN || descAR || descHE;
-      }
-      return {name, desc, pyramid, best_time};
-    }
-
     function pageBaseUrl(){
       return location.origin + location.pathname;
     }
+
     function buildSelfLink(params){
       const u = new URL(pageBaseUrl());
       for (const [k,v] of params.entries()) u.searchParams.set(k,v);
       return u.toString();
     }
 
-    // Normalize for multi-language matching
     function normalizeQuery(s){
       s = safe(s).trim();
       try { s = decodeURIComponent(s); } catch {}
       s = s.toLowerCase();
-
-      // Latin accents
       try { s = s.normalize("NFKD").replace(/[\u0300-\u036f]/g, ""); } catch {}
-
-      // Arabic normalization
       s = s
-        .replace(/[\u064B-\u065F\u0670\u06D6-\u06ED]/g, "") // tashkeel
+        .replace(/[\u064B-\u065F\u0670\u06D6-\u06ED]/g, "")
         .replace(/[أإآ]/g, "ا")
         .replace(/ى/g, "ي")
         .replace(/ة/g, "ه");
-
-      // Remove punctuation/spaces/RTL marks
       s = s.replace(/[\s\-_.,/\\|()[\]{}'"“”‘’`~!@#$%^&*+=?:;<>\u200f\u200e]/g, "");
       return s;
     }
 
-    // ====== Smart Cart (localStorage) ======
+    function getIdFromApp(v){
+      const m = safe(v).match(/product\.show\.(\d+)/i);
+      return m ? m[1] : "";
+    }
+
+    function pickLangText(p, lang){
+      const nameEN = safe(p.ORIGINAL_EN || p.DESCRIPTION || "");
+      const nameAR = safe(p.ORIGINAL_AR || p.DESCRIPTION || "");
+      const nameHE = safe(p.ORIGINAL_HE || p.DESCRIPTION || "");
+      const descAR = safe(p.DESC_AR || "");
+      const descHE = safe(p.DESC_HE || "");
+      const descEN = safe(p.DESCRIPTION || "");
+      const pyrAR = safe(p.PYRAMID_AR || "");
+      const pyrHE = safe(p.PYRAMID_HE || "");
+      const bestAR = safe(p.BEST_TIME_AR || "");
+      const bestHE = safe(p.BEST_TIME_HE || "");
+
+      if (lang === "AR") return { name: nameAR || nameEN, desc: descAR || descEN, pyramid: pyrAR, best_time: bestAR };
+      if (lang === "HE") return { name: nameHE || nameEN, desc: descHE || descEN, pyramid: pyrHE, best_time: bestHE };
+      return { name: nameEN || nameAR || nameHE, desc: descEN || descAR || descHE, pyramid: "", best_time: "" };
+    }
+
     const CART_KEY = "mad_cart_v1";
     function loadCart(){
       try{ return JSON.parse(localStorage.getItem(CART_KEY) || "[]"); }catch{ return []; }
@@ -354,7 +323,7 @@
     }
     function addToCart(item){
       const cart = loadCart();
-      const existing = cart.find(x => x.key === item.key);
+      const existing = cart.find((x) => x.key === item.key);
       if(existing) existing.qty += item.qty;
       else cart.push(item);
       saveCart(cart);
@@ -397,7 +366,7 @@
         root.appendChild(line);
       });
 
-      root.querySelectorAll("button[data-act]").forEach(btn => {
+      root.querySelectorAll("button[data-act]").forEach((btn) => {
         btn.onclick = () => {
           const act = btn.getAttribute("data-act");
           const i = Number(btn.getAttribute("data-i"));
@@ -423,16 +392,16 @@
 
       const lines = [];
       lines.push(lang === "HE" ? "הזמנה חדשה" : "طلب جديد");
-      if(name)  lines.push((lang === "HE" ? "שם: " : "الاسم: ") + name);
+      if(name) lines.push((lang === "HE" ? "שם: " : "الاسم: ") + name);
       if(phone) lines.push((lang === "HE" ? "טלפון: " : "الهاتف: ") + phone);
-      if(addr)  lines.push((lang === "HE" ? "כתובת: " : "العنوان: ") + addr);
+      if(addr) lines.push((lang === "HE" ? "כתובת: " : "العنوان: ") + addr);
 
       lines.push("");
       lines.push(lang === "HE" ? "פריטים:" : "المنتجات:");
       if(cart.length === 0){
         lines.push(lang === "HE" ? "- (אין)" : "- (فارغة)");
       } else {
-        cart.forEach(x => {
+        cart.forEach((x) => {
           lines.push(`- ${x.name} | ${x.code || ""} | ${x.qty} × ${CURRENCY_SYMBOL}${x.price} = ${CURRENCY_SYMBOL}${Number(x.price||0)*Number(x.qty||0)}`);
         });
         lines.push("");
@@ -454,7 +423,6 @@
       return "https://wa.me/" + DEFAULT_WA_NUMBER + "?text=" + encodeURIComponent(text);
     }
 
-    // ====== Main ======
     async function main(){
       const lang = (qs.get("lang") || "AR").toUpperCase();
       const L = setLang(lang);
@@ -464,70 +432,48 @@
 
       const format = (qs.get("format") || "").trim().toLowerCase();
 
-      // ONE smart param: q (multi-language)
-      // We also support id/key/code/app for backward compatibility
       const qParam    = safe(qs.get("q") || "");
       const idParam   = safe(qs.get("id") || "");
       const keyParam  = safe(qs.get("key") || "");
       const codeParam = safe(qs.get("code") || "");
       const appParam  = safe(qs.get("app") || "");
 
-      function getIdFromApp(v){
-        const m = safe(v).match(/product\.show\.(\d+)/i);
-        return m ? m[1] : "";
-      }
-
-      // Decide the query text
       const queryRaw = qParam || keyParam || codeParam || idParam || getIdFromApp(appParam);
       const queryNorm = normalizeQuery(queryRaw);
-
-      // if query is numeric, treat as ID
       const isNumeric = /^[0-9]+$/.test(safe(queryRaw).trim());
       const idToUse = isNumeric ? safe(queryRaw).trim() : (idParam || getIdFromApp(appParam));
 
-      // Load catalog
-      const res = await fetch(DATA_URL, { cache:"no-store" });
+      const res = await fetch(DATA_URL, { cache: "no-store" });
       const raw = await res.json();
       const products = Array.isArray(raw) ? raw : (Array.isArray(raw.products) ? raw.products : []);
 
-      // Find product: by ID inside LINK OR by matching names/keys/codes across languages
-      const product = products.find(p => {
+      const product = products.find((p) => {
         const link = safe(p.LINK || "");
-
-        // match by ID inside LINK (product.show.ID)
         if (idToUse && link.includes("product.show." + idToUse)) return true;
+        if (!queryNorm) return false;
 
-        if(!queryNorm) return false;
+        const fields = [
+          safe(p.SEARCH_KEY || p.orig_norm || p.orig_can || ""),
+          safe(p["PRODUCT CODE"] || ""),
+          safe(p.ORIGINAL_EN || ""),
+          safe(p.ORIGINAL_AR || ""),
+          safe(p.ORIGINAL_HE || ""),
+        ].map(normalizeQuery);
 
-        const key   = safe(p.SEARCH_KEY || p.orig_norm || p.orig_can || "");
-        const code  = safe(p["PRODUCT CODE"] || "");
-        const en    = safe(p.ORIGINAL_EN || "");
-        const ar    = safe(p.ORIGINAL_AR || "");
-        const he    = safe(p.ORIGINAL_HE || "");
-
-        const fields = [key, code, en, ar, he].map(normalizeQuery);
-
-        // exact match after normalization
         if (fields.includes(queryNorm)) return true;
-
-        // forgiving match
-        if (fields.some(f => f && (f.includes(queryNorm) || queryNorm.includes(f)))) return true;
-
+        if (fields.some((f) => f && (f.includes(queryNorm) || queryNorm.includes(f)))) return true;
         return false;
       });
 
       let out;
-      if(!product){
-        out = { ok:false, error:"NOT_FOUND", hint:L.tryHint, q: queryRaw };
+      if (!product) {
+        out = { ok: false, error: "NOT_FOUND", hint: L.tryHint, q: queryRaw };
       } else {
         const t = pickLangText(product, lang);
+        const idMatch = safe(product.LINK || "").match(/product\.show\.(\d+)/i);
         out = {
-          ok:true,
-          id: (function(){
-            // try to extract numeric ID from LINK if exists
-            const m = safe(product.LINK||"").match(/product\.show\.(\d+)/i);
-            return m ? m[1] : (isNumeric ? safe(queryRaw).trim() : null);
-          })(),
+          ok: true,
+          id: idMatch ? idMatch[1] : (isNumeric ? safe(queryRaw).trim() : null),
           q: queryRaw,
           search_key: safe(product.SEARCH_KEY || product.orig_norm || ""),
           product_code: safe(product["PRODUCT CODE"] || ""),
@@ -535,14 +481,17 @@
           pyramid: t.pyramid,
           best_time: t.best_time,
           name: t.name,
+          short: safe(product.DESCRIPTION || ""),
           price: product.PRICE ?? null,
           currency: "ILS",
           image: safe(product.IMAGE_LINK || ""),
-          link: safe(product.LINK || "")
+          link: safe(product.LINK || ""),
+          gender: safe(product.GENDER || ""),
+          size: safe(product.SIZE || ""),
+          product_type: safe(product["PRODUCT TYPE"] || "")
         };
       }
 
-      // JSON mode (Julia reference)
       if(format === "json"){
         document.open();
         document.write(JSON.stringify(out, null, 2));
@@ -550,28 +499,29 @@
         return;
       }
 
-      // UI
-      const jsonLink = (function(){
-        const p = new URLSearchParams(qs.toString());
-        // always create a q=... based link if empty
-        if(!p.get("q") && queryRaw) p.set("q", queryRaw);
-        p.set("format","json");
-        return buildSelfLink(p);
-      })();
+      const jsonParams = new URLSearchParams();
+      if(qParam) jsonParams.set("q", qParam);
+      if(idParam) jsonParams.set("id", idParam);
+      if(keyParam) jsonParams.set("key", keyParam);
+      if(codeParam) jsonParams.set("code", codeParam);
+      if(appParam) jsonParams.set("app", appParam);
+      if(lang) jsonParams.set("lang", lang);
+      if(!jsonParams.get("q") && queryRaw) jsonParams.set("q", queryRaw);
+      jsonParams.set("format", "json");
+      const jsonLink = buildSelfLink(jsonParams);
       $("jsonExample").textContent = jsonLink;
 
       $("copyJsonBtn").onclick = async () => {
-        try{ await navigator.clipboard.writeText(jsonLink); alert(lang==="HE" ? "הועתק ✅" : "تم النسخ ✅"); }
-        catch{ prompt("Copy:", jsonLink); }
+        try { await navigator.clipboard.writeText(jsonLink); alert(lang==="HE" ? "הועתק ✅" : "تم النسخ ✅"); }
+        catch { prompt("Copy:", jsonLink); }
       };
 
       renderCart();
-
       $("clearCartBtn").onclick = () => clearCart();
       $("fillFormBtn").onclick = () => $("custName").focus();
 
       if(!out.ok){
-        $("pName").textContent = (lang==="HE") ? I18N.HE.notFound : I18N.AR.notFound;
+        $("pName").textContent = (lang === "HE") ? I18N.HE.notFound : I18N.AR.notFound;
         $("pShort").textContent = out.hint || "";
         $("pDesc").textContent = "";
         $("pPrice").textContent = "—";
@@ -583,16 +533,12 @@
       }
 
       $("pName").textContent = out.name || "Product";
-      $("pShort").textContent = safe(product.DESCRIPTION || "");
+      $("pShort").textContent = safe(out.short || "");
       $("pDesc").textContent = [out.description, out.pyramid, out.best_time].filter(Boolean).join("\n\n");
-
-      $("pPrice").textContent = (out.price !== null && out.price !== undefined && safe(out.price)!=="")
+      $("pPrice").textContent = (out.price !== null && out.price !== undefined && safe(out.price) !== "")
         ? (CURRENCY_SYMBOL + safe(out.price))
         : "—";
-
-      $("pMeta").textContent =
-        `${safe(product.GENDER||"")} • ${safe(product.SIZE||"")} • ${safe(product["PRODUCT TYPE"]||"")}`;
-
+      $("pMeta").textContent = `${safe(out.gender || "")} • ${safe(out.size || "")} • ${safe(out.product_type || "")}`;
       $("pCode").textContent = out.product_code || "—";
       $("pKey").textContent  = out.search_key || "—";
       $("openBtn").href = out.link || "#";
@@ -601,7 +547,6 @@
       img.src = out.image || "";
       img.onerror = () => { img.alt = "Image error"; };
 
-      // Qty controls
       function clampQty(){
         let q = Number($("qtyInput").value || 1);
         if(!Number.isFinite(q) || q < 1) q = 1;
@@ -619,7 +564,7 @@
           name: out.name,
           code: out.product_code,
           price: Number(out.price || 0),
-          qty: qty,
+          qty,
           link: out.link,
           image: out.image
         });
@@ -628,8 +573,8 @@
 
       $("copyOrderBtn").onclick = async () => {
         const text = buildOrderText(lang);
-        try{ await navigator.clipboard.writeText(text); alert(lang==="HE" ? "הועתק ✅" : "تم النسخ ✅"); }
-        catch{ prompt("Copy:", text); }
+        try { await navigator.clipboard.writeText(text); alert(lang==="HE" ? "הועתק ✅" : "تم النسخ ✅"); }
+        catch { prompt("Copy:", text); }
       };
       $("waOrderBtn").href = buildWaLink(buildOrderText(lang));
     }
