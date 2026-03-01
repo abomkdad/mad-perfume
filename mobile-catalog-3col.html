@@ -1,0 +1,302 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <title>MAD Mobile Catalog</title>
+  <meta name="description" content="Mobile-first catalog, 3 products per row, ordered categories." />
+  <style>
+    :root {
+      --bg: #0b0d12;
+      --card: #171c27;
+      --line: rgba(255,255,255,.14);
+      --txt: #f4f7ff;
+      --muted: #a8b0c2;
+      --gold: #d8b35f;
+      --wa: #25d366;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
+      background: linear-gradient(180deg, #0b0d12 0%, #090b10 100%);
+      color: var(--txt);
+    }
+    .wrap {
+      max-width: 480px;
+      margin: 0 auto;
+      padding: 10px 8px 20px;
+    }
+    .top {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: rgba(11,13,18,.92);
+      backdrop-filter: blur(4px);
+      padding: 8px 0 10px;
+      border-bottom: 1px solid rgba(255,255,255,.06);
+      margin-bottom: 10px;
+    }
+    .title {
+      margin: 0 0 6px;
+      font-size: 22px;
+      letter-spacing: .3px;
+      font-weight: 900;
+    }
+    .search {
+      width: 100%;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.04);
+      color: var(--txt);
+      border-radius: 10px;
+      padding: 10px 11px;
+      font-size: 14px;
+      outline: none;
+    }
+    .section {
+      margin-top: 14px;
+    }
+    .section-head {
+      margin: 0 0 8px;
+      font-size: 15px;
+      color: var(--gold);
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px dashed rgba(255,255,255,.16);
+      padding-bottom: 6px;
+    }
+    .count {
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 6px;
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      overflow: hidden;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+    }
+    .img {
+      width: 100%;
+      aspect-ratio: 1/1;
+      object-fit: cover;
+      background: rgba(255,255,255,.04);
+    }
+    .body {
+      padding: 6px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .name {
+      margin: 0;
+      font-size: 11px;
+      line-height: 1.25;
+      min-height: 26px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .price {
+      margin: 0;
+      color: var(--gold);
+      font-size: 12px;
+      font-weight: 800;
+    }
+    .btn {
+      margin-top: 2px;
+      text-decoration: none;
+      text-align: center;
+      font-size: 10px;
+      font-weight: 800;
+      border-radius: 7px;
+      padding: 6px 4px;
+      border: 1px solid rgba(37,211,102,.45);
+      color: #d8ffe9;
+      background: rgba(37,211,102,.16);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .empty {
+      color: var(--muted);
+      border: 1px dashed var(--line);
+      border-radius: 10px;
+      padding: 12px;
+      text-align: center;
+      margin-top: 16px;
+      font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <header class="top">
+      <h1 class="title">MAD Mobile Catalog</h1>
+      <input id="search" class="search" placeholder="Search by code or name" />
+    </header>
+    <div id="content"></div>
+    <div id="empty" class="empty" hidden>No matching products.</div>
+  </main>
+
+  <script>
+    const DATA_URLS = [
+      "./MAD_Professional_Catalog_v1.json",
+      "/MAD_Professional_Catalog_v1.json",
+      "./data/MAD_Professional_Catalog_v1.json"
+    ];
+    const qs = new URLSearchParams(location.search);
+    const WA_NUMBER = (qs.get("wa") || "972000000000").replace(/\D+/g, "");
+
+    const content = document.getElementById("content");
+    const search = document.getElementById("search");
+    const empty = document.getElementById("empty");
+    let products = [];
+
+    const order = [
+      "מבצעים",      // عروض
+      "בשמי גברים",  // رجالي
+      "בשמי נשים",   // ستاتي
+      "בשמי נישה"    // نيش
+    ];
+
+    const labelMap = {
+      "מבצעים": "العروض",
+      "בשמי גברים": "رجالي",
+      "בשמי נשים": "ستاتي",
+      "בשמי נישה": "نيش",
+      "קולוניה": "Cologne",
+      "בושם גוף": "Body Mist",
+      "לבית ומשרד": "Home & Office",
+      "נירות": "Candles",
+      "לרכב": "Car",
+      "סבון": "Soap",
+      "מטהר אוויר": "Air Freshener",
+      "מטהר אוויר חדש 250 מייל": "Air Freshener 250ml",
+      "בושם לשיער": "Hair Perfume"
+    };
+
+    const safe = (v) => (v ?? "").toString();
+    const pname = (p) => safe(p?.name?.en || p?.name?.ar || p?.name?.he || "Product");
+    const pcode = (p) => safe(p.id);
+    const pcat = (p) => safe(p?.category?.he || p?.category?.ar || "Other");
+    const pimg = (p) => safe(p?.links?.image || "");
+    const pprice = (p) => safe(p.price_ils);
+
+    function sectionLabel(cat) {
+      return labelMap[cat] || safe(cat) || "Other";
+    }
+
+    function waLink(p) {
+      const msg = [
+        "Hello, I want this product",
+        `Product code: ${pcode(p)}`,
+        `Price: ${pprice(p)} ILS`,
+        `Image link: ${pimg(p)}`
+      ].join("\n");
+      return `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(msg)}`;
+    }
+
+    function sortCategories(cats) {
+      const fixed = order.filter((k) => cats.includes(k));
+      const rest = cats
+        .filter((k) => !order.includes(k))
+        .sort((a, b) => sectionLabel(a).localeCompare(sectionLabel(b), "en"));
+      return [...fixed, ...rest];
+    }
+
+    function render() {
+      const q = safe(search.value).trim().toLowerCase();
+      const filtered = products.filter((p) => {
+        const hay = `${pname(p)} ${pcode(p)} ${safe(p?.name?.ar)} ${safe(p?.name?.he)}`.toLowerCase();
+        return !q || hay.includes(q);
+      });
+
+      const grouped = new Map();
+      for (const p of filtered) {
+        const cat = pcat(p);
+        if (!grouped.has(cat)) grouped.set(cat, []);
+        grouped.get(cat).push(p);
+      }
+
+      const categories = sortCategories([...grouped.keys()]);
+      content.innerHTML = "";
+
+      for (const cat of categories) {
+        const list = grouped.get(cat) || [];
+        list.sort((a, b) => pcode(a).localeCompare(pcode(b), "en", { numeric: true }));
+        const section = document.createElement("section");
+        section.className = "section";
+        section.innerHTML = `
+          <h2 class="section-head">
+            <span>${sectionLabel(cat)}</span>
+            <span class="count">${list.length}</span>
+          </h2>
+          <div class="grid"></div>
+        `;
+        const grid = section.querySelector(".grid");
+        for (const p of list) {
+          const card = document.createElement("article");
+          card.className = "card";
+          card.innerHTML = `
+            <img class="img" src="${pimg(p)}" alt="${pname(p)}" loading="lazy">
+            <div class="body">
+              <h3 class="name">${pname(p)}</h3>
+              <p class="price">₪${pprice(p)}</p>
+              <a class="btn" href="${waLink(p)}" target="_blank" rel="noopener">WhatsApp</a>
+            </div>
+          `;
+          grid.appendChild(card);
+        }
+        content.appendChild(section);
+      }
+
+      empty.hidden = filtered.length !== 0;
+    }
+
+    async function loadCatalog() {
+      let last = "";
+      for (const url of DATA_URLS) {
+        try {
+          const res = await fetch(url, { cache: "no-store" });
+          if (!res.ok) {
+            last = `${url} (${res.status})`;
+            continue;
+          }
+          const raw = await res.json();
+          const list = Array.isArray(raw?.products) ? raw.products : [];
+          if (list.length) return list;
+          last = `${url} (empty)`;
+        } catch (e) {
+          last = `${url} (${e?.message || "error"})`;
+        }
+      }
+      throw new Error(last || "catalog load failed");
+    }
+
+    search.addEventListener("input", render);
+
+    (async function init() {
+      try {
+        products = await loadCatalog();
+        render();
+      } catch (e) {
+        content.innerHTML = `<div class="empty">Failed to load catalog: ${e.message}</div>`;
+        empty.hidden = true;
+      }
+    })();
+  </script>
+</body>
+</html>
+HTML"}}
