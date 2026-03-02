@@ -29,14 +29,8 @@
           },
           keyframes: {
             'gradient-x': {
-              '0%, 100%': {
-                'background-size': '200% 200%',
-                'background-position': 'left center'
-              },
-              '50%': {
-                'background-size': '200% 200%',
-                'background-position': 'right center'
-              }
+              '0%, 100%': { 'background-size': '200% 200%', 'background-position': 'left center' },
+              '50%': { 'background-size': '200% 200%', 'background-position': 'right center' }
             }
           }
         }
@@ -58,14 +52,11 @@
       background-color: theme('colors.brand.950');
       color: theme('colors.slate.100');
       -webkit-tap-highlight-color: transparent;
-      /* مساحة سفلية للأزرار الثابتة */
       padding-bottom: 160px; 
     }
     
-    /* منع التكبير التلقائي في الآيفون عند التركيز على الحقول */
     input, textarea, select { font-size: 16px !important; }
 
-    /* إعدادات الطباعة للوصل الحراري */
     @media print {
       @page { size: 10cm 10cm; margin: 0; }
       body { background: white !important; margin: 0 !important; padding: 0 !important; }
@@ -160,7 +151,6 @@
 
     <!-- Form Fields -->
     <div class="bg-card p-5 rounded-3xl border border-white/5 shadow-xl relative">
-      <!-- AI Welcome Message Button placed inside the form near the top -->
       <button onclick="generateWelcomeMessage()" class="absolute top-4 left-4 bg-purple-500/20 text-purple-300 hover:bg-purple-500/30 border border-purple-500/30 px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all active:scale-95">
         <i class="fa fa-magic"></i> رسالة للزبون ✨
       </button>
@@ -220,7 +210,6 @@
         </button>
       </div>
 
-      <!-- شريط البحث الذكي الجديد -->
       <div class="relative mb-4">
         <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
           <i class="fa fa-search text-slate-500"></i>
@@ -240,12 +229,10 @@
   <!-- Sticky Bottom Actions -->
   <div class="fixed bottom-0 left-0 right-0 bg-brand-950/95 backdrop-blur-xl border-t border-white/10 p-4 shadow-[0_-10px_40px_rgba(0,0,0,0.5)] z-50">
     <div class="max-w-md mx-auto flex flex-col gap-3">
-      <!-- زر هي اكسبرس الرئيسي -->
       <button onclick="saveOrder('high_express')" class="w-full bg-gradient-to-r from-amber-500 to-orange-500 text-black font-black py-4 rounded-2xl text-[18px] flex items-center justify-center gap-2 shadow-lg shadow-amber-500/20 active:scale-95 transition-all">
         <i class="fa fa-rocket text-xl"></i> دخل الطلب هي اكسبرس
       </button>
       
-      <!-- أزرار الحفظ والطباعة -->
       <div class="grid grid-cols-2 gap-3">
         <button onclick="saveOrder('normal')" class="w-full bg-slate-800 text-white hover:bg-slate-700 font-bold py-3.5 rounded-2xl text-[15px] flex items-center justify-center gap-2 active:scale-95 transition-all border border-slate-700">
           <i class="fa fa-save"></i> حفظ فقط
@@ -294,10 +281,10 @@
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxaA4Wc7cEyU6gx-MzuA_C8psZPuWCLmIJ9TPjnqX_RGG4SDQR0Jeeqcnf85Q65NdlK/exec";
     const DASH_KEY = "12345678";
     
-    let allOrders = []; // مصفوفة لتخزين الطلبات السابقة
+    // ✅ مفتاح Gemini API هنا للتخاطب المباشر من المتصفح
+    const apiKey = "AIzaSyDHnnmFi0hgGDwvF5NuhZhc1qb3M8RaVIU";
 
-    // Gemini API Configuration
-    const apiKey = ""; // API Key is injected by the environment
+    let allOrders = [];
 
     // --- Utility Functions ---
     const showLoading = (s, text = "جاري حفظ الطلب...") => {
@@ -325,7 +312,6 @@
 
     const safe = (v) => (v === undefined || v === null) ? "" : String(v).trim();
     
-    // HTML Escape to prevent XSS
     const esc = (str) => {
       if (!str) return "";
       const div = document.createElement('div');
@@ -361,7 +347,7 @@
       const el = document.getElementById(id);
       if(el && el.value) {
         el.style.transition = 'all 0.4s ease';
-        el.style.borderColor = '#8b5cf6'; // Purple for AI
+        el.style.borderColor = '#8b5cf6';
         el.style.backgroundColor = 'rgba(139, 92, 246, 0.15)';
         el.style.boxShadow = '0 0 10px rgba(139, 92, 246, 0.2)';
         setTimeout(() => {
@@ -372,7 +358,7 @@
       }
     };
 
-    // --- Gemini API Implementation ---
+    // --- Gemini API Implementation (Direct HTML Fetch) ---
     async function callGeminiAPI(prompt, isJson = false) {
       const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
       const payload = {
@@ -380,15 +366,12 @@
       };
       
       if (isJson) {
-        payload.generationConfig = {
-          responseMimeType: "application/json"
-        };
+        payload.generationConfig = { responseMimeType: "application/json" };
       }
 
+      // محاولة الإرسال عدة مرات في حال كان الإنترنت ضعيفاً
       const delays = [1000, 2000, 4000, 8000, 16000];
-      const retries = 5;
-
-      for (let i = 0; i < retries; i++) {
+      for (let i = 0; i < 5; i++) {
         try {
           const response = await fetch(url, {
             method: 'POST',
@@ -399,9 +382,9 @@
           if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
           
           const data = await response.json();
-          return data.candidates[0].content.parts[0].text;
+          return data.candidates?.[0]?.content?.parts?.[0]?.text || "";
         } catch (error) {
-          if (i === retries - 1) throw error;
+          if (i === 4) throw error;
           await new Promise(r => setTimeout(r, delays[i]));
         }
       }
@@ -409,29 +392,32 @@
 
     async function analyzeWithGemini() {
       const rawText = document.getElementById('smartInput').value;
-      if (!rawText.trim()) {
-        return showToast("الرجاء لصق النص أولاً ليقوم الذكاء الاصطناعي بتحليله", 'error');
-      }
+      if (!rawText.trim()) return showToast("الرجاء لصق النص أولاً ليقوم الذكاء الاصطناعي بتحليله", 'error');
 
       showLoading(true, "الذكاء الاصطناعي يقوم بتحليل الطلب ✨...");
 
-      const prompt = `أنت مساعد ذكي لمتجر عطور (MAD Parfumeur). استخرج البيانات التالية من النص المقدم أدناه بدقة.
-      يجب أن تُرجع البيانات بصيغة JSON حصراً، باستخدام المفاتيح التالية:
+      const prompt = `أنت مساعد ذكي لمتجر عطور (MAD Parfumeur). استخرج البيانات التالية من النص المقدم أدناه بدقة بصيغة JSON حصراً، باستخدام المفاتيح التالية:
       - "name": اسم الزبون.
-      - "phone": رقم الهاتف (يُفضل تنظيفه من الفراغات).
+      - "phone": رقم الهاتف.
       - "price": السعر الإجمالي (رقم فقط بدون عملة).
       - "city": اسم المدينة أو البلدة.
       - "address": العنوان التفصيلي إن وجد (الشارع، الحي، إلخ).
-      - "offer": المنتجات المطلوبة بالتفصيل (عطور، أحجام).
-      - "notes": أي ملاحظات إضافية موجودة بالنص مثل مواعيد التوصيل أو تغليف كهدية.
-      
-      إذا لم تجد حقلاً معيناً، اتركه فارغاً (""). لا تضف أي نص آخر غير الـ JSON.
-      
-      النص: "${rawText}"`;
+      - "offer": المنتجات المطلوبة بالتفصيل.
+      - "notes": أي ملاحظات إضافية.
+      إذا لم تجد حقلاً، اتركه فارغاً (""). النص: "${rawText}"`;
 
       try {
         const result = await callGeminiAPI(prompt, true);
-        const parsedData = JSON.parse(result);
+        
+        // تنظيف الاستجابة بشكل آمن يمنع توقف الكود
+        let cleanResult = result.trim();
+        const bt = String.fromCharCode(96, 96, 96); // رمز ` المكرر 3 مرات
+        if (cleanResult.startsWith(bt)) {
+            cleanResult = cleanResult.replace(new RegExp('^' + bt + '(?:json)?\\n?'), '');
+            cleanResult = cleanResult.replace(new RegExp('\\n?' + bt + '$'), '');
+        }
+
+        const parsedData = JSON.parse(cleanResult);
 
         if(parsedData.name) document.getElementById('f_name').value = parsedData.name;
         if(parsedData.phone) document.getElementById('f_phone').value = formatLocalPhone(parsedData.phone);
@@ -445,7 +431,8 @@
         showToast("اكتمل التحليل بالذكاء الاصطناعي بنجاح ✨", 'ai');
         document.getElementById('f_name').scrollIntoView({ behavior: 'smooth', block: 'center' });
       } catch (error) {
-        showToast("تعذر تحليل النص عبر الذكاء الاصطناعي، يرجى المحاولة مرة أخرى", 'error');
+        console.error("Gemini Error:", error);
+        showToast("تعذر تحليل النص عبر الذكاء الاصطناعي، تأكد من النص.", 'error');
       } finally {
         showLoading(false);
       }
@@ -457,36 +444,19 @@
       const price = document.getElementById('f_price').value.trim();
       const city = document.getElementById('f_city').value.trim();
 
-      if (!name || !offer) {
-        return showToast("يرجى إدخال اسم الزبون والأصناف المطلوبة على الأقل لتوليد الرسالة", 'error');
-      }
+      if (!name || !offer) return showToast("يرجى إدخال اسم الزبون والأصناف المطلوبة على الأقل", 'error');
 
       showLoading(true, "يتم صياغة رسالة احترافية ✨...");
 
-      const prompt = `أنت ممثل خدمة عملاء لمتجر عطور راقي اسمه "MAD Parfumeur".
-      اكتب رسالة واتساب قصيرة، ودودة، ومحترفة لتأكيد الطلب مع الزبون.
-      استخدم لغة عربية سليمة ومريحة واستخدم الإيموجي المناسبة.
-      
-      تفاصيل الطلب:
-      - اسم الزبون: ${name}
-      - المنتجات المطلوبة: ${offer}
-      ${price ? `- السعر الإجمالي: ${price} شيكل` : ''}
-      ${city ? `- مدينة التوصيل: ${city}` : ''}
-      
-      يجب أن تتضمن الرسالة:
-      1. ترحيب حار بالزبون.
-      2. تأكيد المنتجات والسعر.
-      3. شكر على اختيار متجرنا.
-      
-      لا تضف أي مقدمات أو ملاحظات خارجية، فقط اكتب نص الرسالة الجاهزة للإرسال.`;
+      const prompt = `أنت ممثل خدمة عملاء لمتجر عطور راقي اسمه "MAD Parfumeur". اكتب رسالة واتساب قصيرة وودودة لتأكيد الطلب مع الزبون.
+      تفاصيل الطلب: اسم الزبون: ${name}، المنتجات: ${offer} ${price ? `، السعر: ${price} شيكل` : ''} ${city ? `، مدينة التوصيل: ${city}` : ''}.
+      تتضمن: ترحيب، تأكيد المنتجات والسعر، وشكر. لا تضف أي مقدمات، فقط نص الرسالة الجاهزة.`;
 
       try {
         const result = await callGeminiAPI(prompt, false);
-        
         document.getElementById('aiMessageContent').value = result.trim();
         document.getElementById('aiMessageModal').classList.remove('hidden');
         document.getElementById('aiMessageModal').classList.add('flex');
-        
       } catch (error) {
         showToast("حدث خطأ أثناء صياغة الرسالة", 'error');
       } finally {
@@ -501,13 +471,9 @@
 
     function sendAiMessageToWhatsApp() {
       const phone = document.getElementById('f_phone').value.trim();
-      if (!phone) {
-         showToast("رقم الهاتف غير مسجل في الطلب!", "error");
-         return;
-      }
+      if (!phone) { showToast("رقم الهاتف غير مسجل في الطلب!", "error"); return; }
       const message = document.getElementById('aiMessageContent').value;
-      const url = `https://wa.me/${normalizePhoneForLink(phone)}?text=${encodeURIComponent(message)}`;
-      window.open(url, '_blank');
+      window.open(`https://wa.me/${normalizePhoneForLink(phone)}?text=${encodeURIComponent(message)}`, '_blank');
       closeAiModal();
     }
 
@@ -523,9 +489,7 @@
     const autoAnalyze = () => {
       clearTimeout(analyzeTimeout);
       analyzeTimeout = setTimeout(() => {
-        if(document.getElementById('smartInput').value.trim().length > 10) {
-          analyzeTextFast(true);
-        }
+        if(document.getElementById('smartInput').value.trim().length > 10) analyzeTextFast(true);
       }, 300);
     };
 
@@ -541,8 +505,7 @@
         const phoneMatch = line.match(/(?:05|972|5)\d{8,11}/);
         if (phoneMatch && !document.getElementById('f_phone').value) {
           document.getElementById('f_phone').value = formatLocalPhone(phoneMatch[0]);
-          usedLines.add(i);
-          parsedSomething = true;
+          usedLines.add(i); parsedSomething = true;
         }
       });
 
@@ -550,8 +513,7 @@
         const priceMatch = line.match(/(\d{2,4})\s*(?:₪|shekel|ILS|السعر|شيكل)/i) || line.match(/(?:₪|السعر|Price|المبلغ)\s*:?\s*(\d{2,4})/i);
         if (priceMatch && !document.getElementById('f_price').value) {
           document.getElementById('f_price').value = priceMatch[1];
-          usedLines.add(i);
-          parsedSomething = true;
+          usedLines.add(i); parsedSomething = true;
         }
       });
 
@@ -559,8 +521,7 @@
       lines.forEach((line, i) => {
         if (nameRegex.test(line) && !usedLines.has(i)) {
           document.getElementById('f_name').value = line.match(nameRegex)[1].trim();
-          usedLines.add(i);
-          parsedSomething = true;
+          usedLines.add(i); parsedSomething = true;
         }
       });
 
@@ -568,9 +529,7 @@
         for(let i=0; i < lines.length; i++) {
           if(!usedLines.has(i) && lines[i].length > 2 && lines[i].length < 40 && !/\d{5}/.test(lines[i]) && !lines[i].includes('₪') && !/عطر|مل|ml/i.test(lines[i])) {
             document.getElementById('f_name').value = lines[i];
-            usedLines.add(i);
-            parsedSomething = true;
-            break;
+            usedLines.add(i); parsedSomething = true; break;
           }
         }
       }
@@ -579,8 +538,7 @@
       lines.forEach((line, i) => {
         if (cityRegex.test(line) && !usedLines.has(i)) {
           document.getElementById('f_city').value = line.match(cityRegex)[1].trim();
-          usedLines.add(i);
-          parsedSomething = true;
+          usedLines.add(i); parsedSomething = true;
         }
       });
 
@@ -588,9 +546,7 @@
         for(let i=0; i < lines.length; i++) {
           if(!usedLines.has(i) && lines[i].length > 2 && lines[i].length < 30 && !/\d{4}/.test(lines[i]) && !/عطر|طقم|مل|ml|perfume/i.test(lines[i])) {
             document.getElementById('f_city').value = lines[i];
-            usedLines.add(i);
-            parsedSomething = true;
-            break;
+            usedLines.add(i); parsedSomething = true; break;
           }
         }
       }
@@ -599,8 +555,7 @@
       lines.forEach((line, i) => {
         if (addressRegex.test(line) && !usedLines.has(i)) {
           document.getElementById('f_address').value = line.match(addressRegex)[1].trim();
-          usedLines.add(i);
-          parsedSomething = true;
+          usedLines.add(i); parsedSomething = true;
         }
       });
 
@@ -617,8 +572,7 @@
       if (offerLines.length === 0) {
         lines.forEach((line, i) => {
           if (!usedLines.has(i) && !/\d{2,4}\s*₪/.test(line)) {
-            offerLines.push(line);
-            usedLines.add(i);
+            offerLines.push(line); usedLines.add(i);
           }
         });
       }
@@ -640,6 +594,59 @@
       }
     };
 
+    // --- Order Load & Search ---
+    const loadOrders = async () => {
+      const container = document.getElementById('ordersList');
+      container.innerHTML = `<div class="text-center py-8 text-slate-500"><i class="fa fa-spinner fa-spin text-2xl mb-2 opacity-50"></i><p class="text-sm font-semibold mt-2">جاري تحميل الطلبات...</p></div>`;
+      
+      try {
+        const res = await fetch(`${SCRIPT_URL}?action=get&key=${encodeURIComponent(DASH_KEY)}&_=${Date.now()}`);
+        const data = await res.json();
+        
+        if (data && data.result === "ERROR") throw new Error(data.message || "ERROR");
+        
+        allOrders = Array.isArray(data) ? data : [];
+        renderOrders(allOrders);
+      } catch (e) {
+        container.innerHTML = `<div class="text-center py-8 text-slate-500"><i class="fa fa-exclamation-triangle text-2xl mb-2 opacity-50 text-red-400"></i><p class="text-sm font-semibold mt-2">تعذّر تحميل الطلبات</p></div>`;
+      }
+    };
+
+    const renderOrders = (list) => {
+      const container = document.getElementById('ordersList');
+      if (!list || list.length === 0) {
+        container.innerHTML = `<div class="text-center py-8 text-slate-500 bg-black/20 rounded-2xl border border-white/5"><i class="fa fa-box-open text-2xl opacity-50 mb-2"></i><p class="text-sm font-bold">لا توجد طلبات سابقة</p></div>`;
+        return;
+      }
+      const reversedList = [...list].filter(o => o.rowIndex).reverse();
+      container.innerHTML = reversedList.map(o => {
+        const isPrep = (o.status || "").includes("تجهيز") || (o.status || "").includes("الإرسال");
+        return `
+          <div class="bg-card p-4 rounded-2xl border border-white/5 shadow-lg relative overflow-hidden">
+            <div class="flex justify-between items-start mb-2">
+              <span class="text-xs font-mono text-slate-400 bg-slate-800 px-2 py-1 rounded-md border border-slate-700">#${esc(o.orderId) || '---'}</span>
+              <span class="text-[10px] font-bold px-2 py-1 rounded-full ${isPrep ? 'bg-emerald-500/10 text-emerald-400' : 'bg-brand-500/10 text-brand-400'}">${esc(o.status) || 'جديد'}</span>
+            </div>
+            <h4 class="text-white font-bold text-[15px] mb-0.5">${esc(o.name) || "—"}</h4>
+            <div class="text-slate-400 text-xs mb-2.5 flex items-center gap-1.5" dir="ltr"><i class="fa fa-phone text-[10px]"></i> ${esc(formatLocalPhone(o.phone)) || "—"}</div>
+            <div class="text-brand-200 text-xs bg-brand-900/20 p-2.5 rounded-lg border-r-2 border-brand-500 mb-3 truncate font-semibold">${esc(o.offer) || "—"}</div>
+            <div class="flex flex-wrap gap-2 text-[10px] text-slate-300 font-semibold">
+              <span class="bg-slate-800 px-2 py-1.5 rounded-md flex items-center gap-1"><i class="fa fa-map-marker-alt text-red-400"></i> ${esc(o.city) || "—"}</span>
+              <span class="bg-slate-800 px-2 py-1.5 rounded-md flex items-center gap-1"><i class="fa fa-shekel-sign text-emerald-400"></i> ${esc(o.price) || "—"}</span>
+            </div>
+          </div>`;
+      }).join('');
+    };
+
+    const filterOrders = () => {
+      const term = document.getElementById('searchOrdersInput').value.toLowerCase();
+      const filtered = allOrders.filter(o => {
+        const n = safe(o.name).toLowerCase(), p = safe(o.phone), c = safe(o.city).toLowerCase(), id = safe(o.orderId).toLowerCase();
+        return n.includes(term) || p.includes(term) || formatLocalPhone(p).includes(term) || c.includes(term) || id.includes(term);
+      });
+      renderOrders(filtered);
+    };
+
     // --- Print Order Logic ---
     const printCurrentOrder = async () => {
       const name = document.getElementById('f_name').value.trim();
@@ -651,9 +658,7 @@
       const delivery = document.getElementById('f_delivery').value;
       const payment = document.getElementById('f_payment').value;
 
-      if (!name || !phone) {
-        return showToast("الرجاء إدخال الاسم ورقم الهاتف قبل الطباعة!", 'error');
-      }
+      if (!name || !phone) return showToast("الرجاء إدخال الاسم ورقم الهاتف قبل الطباعة!", 'error');
 
       const now = new Date();
       document.getElementById('p_date').textContent = `DATE: ${String(now.getDate()).padStart(2,'0')}.${String(now.getMonth() + 1).padStart(2,'0')}.${now.getFullYear()}`;
@@ -675,7 +680,6 @@
       `;
 
       showLoading(true, "تجهيز الطباعة...");
-      
       await new Promise((resolve) => {
         qrImg.onload = resolve;
         qrImg.onerror = resolve;
@@ -691,29 +695,18 @@
       const name = document.getElementById('f_name').value.trim();
       const phone = document.getElementById('f_phone').value.trim();
 
-      if (!name || !phone) {
-        return showToast("الرجاء إدخال الاسم ورقم الهاتف على الأقل!", 'error');
-      }
+      if (!name || !phone) return showToast("الرجاء إدخال الاسم ورقم الهاتف على الأقل!", 'error');
 
-      if (mode === 'high_express') {
-        document.getElementById('f_delivery').value = "High Express - أم الفحم";
-      }
+      if (mode === 'high_express') document.getElementById('f_delivery').value = "High Express - أم الفحم";
 
       showLoading(true, "جاري رفع الطلب...");
 
       const payload = {
-        action: "addOrder",
-        key: DASH_KEY,
-        row: "", 
-        name: safe(name),
-        phone: safe(phone),
-        offer: safe(document.getElementById('f_offer').value),
-        price: safe(document.getElementById('f_price').value),
-        city: safe(document.getElementById('f_city').value),
-        address: safe(document.getElementById('f_address').value),
-        notes: safe(document.getElementById('f_notes').value),
-        payment: safe(document.getElementById('f_payment').value),
-        delivery: safe(document.getElementById('f_delivery').value),
+        action: "addOrder", key: DASH_KEY, row: "", 
+        name: safe(name), phone: safe(phone), offer: safe(document.getElementById('f_offer').value),
+        price: safe(document.getElementById('f_price').value), city: safe(document.getElementById('f_city').value),
+        address: safe(document.getElementById('f_address').value), notes: safe(document.getElementById('f_notes').value),
+        payment: safe(document.getElementById('f_payment').value), delivery: safe(document.getElementById('f_delivery').value),
         status: "NEW" 
       };
 
@@ -724,10 +717,8 @@
         if (data.result === "SUCCESS") {
           showToast(`تم إدخال الطلب بنجاح 🚀`, 'success');
           clearForm();
-          loadOrders(); // تحديث القائمة تلقائياً بعد إضافة الطلب
-        } else {
-          throw new Error(data.message);
-        }
+          loadOrders();
+        } else throw new Error(data.message);
       } catch (e) {
         showToast("حدث خطأ أثناء حفظ الطلب. تأكد من اتصالك بالإنترنت.", 'error');
       } finally {
@@ -735,87 +726,6 @@
       }
     };
 
-    // --- Load Previous Orders ---
-    const loadOrders = async () => {
-      const container = document.getElementById('ordersList');
-      container.innerHTML = `
-        <div class="text-center py-8 text-slate-500">
-          <i class="fa fa-spinner fa-spin text-2xl mb-2 opacity-50"></i>
-          <p class="text-sm font-semibold mt-2">جاري تحميل الطلبات...</p>
-        </div>`;
-      
-      try {
-        const res = await fetch(`${SCRIPT_URL}?action=get&key=${encodeURIComponent(DASH_KEY)}&_=${Date.now()}`);
-        const data = await res.json();
-        
-        if (data && data.result === "ERROR") throw new Error(data.message || "ERROR");
-        
-        allOrders = Array.isArray(data) ? data : [];
-        renderOrders(allOrders);
-      } catch (e) {
-        container.innerHTML = `
-          <div class="text-center py-8 text-slate-500">
-            <i class="fa fa-exclamation-triangle text-2xl mb-2 opacity-50 text-red-400"></i>
-            <p class="text-sm font-semibold mt-2">تعذّر تحميل الطلبات</p>
-          </div>`;
-      }
-    };
-
-    const renderOrders = (list) => {
-      const container = document.getElementById('ordersList');
-      if (!list || list.length === 0) {
-        container.innerHTML = `
-          <div class="text-center py-8 text-slate-500 bg-black/20 rounded-2xl border border-white/5">
-            <i class="fa fa-box-open text-2xl opacity-50 mb-2"></i>
-            <p class="text-sm font-bold">لا توجد طلبات سابقة</p>
-          </div>`;
-        return;
-      }
-
-      const reversedList = [...list].filter(o => o.rowIndex).reverse();
-
-      container.innerHTML = reversedList.map(o => {
-        const isPrep = (o.status || "").includes("تجهيز") || (o.status || "").includes("الإرسال");
-        return `
-          <div class="bg-card p-4 rounded-2xl border border-white/5 shadow-lg relative overflow-hidden">
-            <div class="flex justify-between items-start mb-2">
-              <span class="text-xs font-mono text-slate-400 bg-slate-800 px-2 py-1 rounded-md border border-slate-700">#${esc(o.orderId) || '---'}</span>
-              <span class="text-[10px] font-bold px-2 py-1 rounded-full ${isPrep ? 'bg-emerald-500/10 text-emerald-400' : 'bg-brand-500/10 text-brand-400'}">${esc(o.status) || 'جديد'}</span>
-            </div>
-            <h4 class="text-white font-bold text-[15px] mb-0.5">${esc(o.name) || "—"}</h4>
-            <div class="text-slate-400 text-xs mb-2.5 flex items-center gap-1.5" dir="ltr"><i class="fa fa-phone text-[10px]"></i> ${esc(formatLocalPhone(o.phone)) || "—"}</div>
-            <div class="text-brand-200 text-xs bg-brand-900/20 p-2.5 rounded-lg border-r-2 border-brand-500 mb-3 truncate font-semibold">
-              ${esc(o.offer) || "—"}
-            </div>
-            <div class="flex flex-wrap gap-2 text-[10px] text-slate-300 font-semibold">
-              <span class="bg-slate-800 px-2 py-1.5 rounded-md flex items-center gap-1"><i class="fa fa-map-marker-alt text-red-400"></i> ${esc(o.city) || "—"}</span>
-              <span class="bg-slate-800 px-2 py-1.5 rounded-md flex items-center gap-1"><i class="fa fa-shekel-sign text-emerald-400"></i> ${esc(o.price) || "—"}</span>
-            </div>
-          </div>`;
-      }).join('');
-    };
-
-    // --- Search & Filter Logic ---
-    const filterOrders = () => {
-      const term = document.getElementById('searchOrdersInput').value.toLowerCase();
-      
-      const filtered = allOrders.filter(o => {
-        const n = safe(o.name).toLowerCase();
-        const p = safe(o.phone);
-        const c = safe(o.city).toLowerCase();
-        const id = safe(o.orderId).toLowerCase();
-        
-        return n.includes(term) || 
-               p.includes(term) || 
-               formatLocalPhone(p).includes(term) || 
-               c.includes(term) || 
-               id.includes(term);
-      });
-      
-      renderOrders(filtered);
-    };
-
-    // Initialize: تحميل الطلبات السابقة عند فتح الصفحة
     window.onload = loadOrders;
   </script>
 </body>
