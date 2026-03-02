@@ -97,7 +97,7 @@
       <h4 class="m-0 mb-3 text-[15px] font-bold text-brand-400 flex items-center justify-between">
         <span class="flex items-center gap-2"><i class="fa fa-robot"></i> المحلل الذكي</span>
       </h4>
-      <textarea id="smartInput" oninput="autoAnalyze()" placeholder="الصق نص الطلب هنا..." class="w-full h-24 p-3 mb-3 bg-black/30 border border-brand-500/20 rounded-2xl text-white text-[16px] outline-none focus:border-brand-500 resize-none"></textarea>
+      <textarea id="smartInput" oninput="autoAnalyze()" placeholder="الصق نص الطلب هنا..." class="w-full h-24 p-3 mb-3 bg-black/30 border border-brand-500/20 rounded-2xl text-white text-[16px] outline-none focus:border-brand-500 resize-none transition-all"></textarea>
       
       <div class="flex gap-2">
         <button onclick="analyzeWithGemini()" class="flex-1 bg-gradient-to-r from-indigo-600 via-purple-600 to-brand-600 text-white font-bold py-3 rounded-xl text-[14px] flex items-center justify-center gap-2 active:scale-95 shadow-lg animate-gradient-x border border-white/10">
@@ -216,55 +216,59 @@
   <script>
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxaA4Wc7cEyU6gx-MzuA_C8psZPuWCLmIJ9TPjnqX_RGG4SDQR0Jeeqcnf85Q65NdlK/exec";
     const DASH_KEY = "12345678";
-    const apiKey = "AIzaSyAERYBqIrBHPftNhdbDnb-8ej9lWZsfiPw"; 
+    const apiKey = ""; // تم تركها فارغة ليتم حقنها من البيئة
 
     let allOrders = [];
 
-    const showLoading = (s, text = "جاري العمل...") => {
-      document.getElementById('loadingOverlay').style.display = s ? 'flex' : 'none';
-      document.getElementById('loadingText').textContent = text;
-    };
+    function showLoading(s, text = "جاري العمل...") {
+      const overlay = document.getElementById('loadingOverlay');
+      const textEl = document.getElementById('loadingText');
+      if (overlay) overlay.style.display = s ? 'flex' : 'none';
+      if (textEl) textEl.textContent = text;
+    }
 
-    const showToast = (m, type = 'success') => {
+    function showToast(m, type = 'success') {
       const t = document.getElementById('toast');
+      if (!t) return;
       const icon = t.querySelector('i');
       t.querySelector('span').textContent = m;
       t.className = `fixed top-4 left-1/2 -translate-x-1/2 px-6 py-4 rounded-2xl font-bold text-[16px] shadow-2xl z-[3000] transition-all duration-300 flex items-center gap-3 w-[90%] max-w-[400px] ${
         type === 'error' ? 'bg-red-500 text-white' : (type === 'ai' ? 'bg-purple-600 text-white' : 'bg-emerald-500 text-white')
       }`;
-      icon.className = type === 'error' ? 'fa fa-exclamation-triangle' : (type === 'ai' ? 'fa fa-sparkles' : 'fa fa-check-circle');
+      if (icon) icon.className = type === 'error' ? 'fa fa-exclamation-triangle' : (type === 'ai' ? 'fa fa-sparkles' : 'fa fa-check-circle');
       t.classList.remove('-translate-y-20', 'opacity-0');
       setTimeout(() => t.classList.add('-translate-y-20', 'opacity-0'), 3500);
-    };
+    }
 
-    const safe = (v) => (v === undefined || v === null) ? "" : String(v).trim();
-    const esc = (str) => { if (!str) return ""; const div = document.createElement('div'); div.appendChild(document.createTextNode(str)); return div.innerHTML; };
+    function safe(v) { return (v === undefined || v === null) ? "" : String(v).trim(); }
+    function esc(str) { if (!str) return ""; const div = document.createElement('div'); div.appendChild(document.createTextNode(str)); return div.innerHTML; }
 
-    const formatLocalPhone = (p) => {
+    function formatLocalPhone(p) {
       if (!p) return "";
       let d = String(p).replace(/\D/g, "");
       if (d.startsWith("972")) d = "0" + d.substring(3);
       if (!d.startsWith("0") && d.length === 9) d = "0" + d;
       return d;
-    };
+    }
 
-    const normalizePhoneForLink = (p) => {
+    function normalizePhoneForLink(p) {
       let d = String(p || "").replace(/\D/g, "");
       if (d.startsWith("0")) d = "972" + d.substring(1);
       if (!d.startsWith("972") && d.length === 9) d = "972" + d;
       return d;
-    };
+    }
 
-    const clearForm = () => {
+    function clearForm() {
       document.getElementById('smartInput').value = "";
       ['name', 'phone', 'offer', 'price', 'city', 'address', 'notes', 'delivery'].forEach(id => {
         const el = document.getElementById(`f_${id}`);
         if (el) el.value = "";
       });
       document.getElementById('f_payment').value = "دفع عند الاستلام";
-    };
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
 
-    const flashField = (id) => {
+    function flashField(id) {
       const el = document.getElementById(id);
       if(el && el.value) {
         el.style.transition = 'all 0.4s ease';
@@ -272,7 +276,7 @@
         el.style.backgroundColor = 'rgba(139, 92, 246, 0.15)';
         setTimeout(() => { el.style.borderColor = ''; el.style.backgroundColor = ''; }, 1500);
       }
-    };
+    }
 
     async function callGeminiAPI(prompt, isJson = false, base64File = null, mimeType = "application/pdf") {
       const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
@@ -302,7 +306,6 @@
     function processGeminiResult(result) {
       try {
         let cleanResult = result.trim();
-        // Safe cleaning of markdown blocks
         if (cleanResult.includes('```')) {
           const parts = cleanResult.split('```');
           cleanResult = parts[1] || parts[0];
@@ -377,19 +380,37 @@
       closeAiModal();
     }
 
-    const loadOrders = async () => {
+    let analyzeTimeout;
+    function autoAnalyze() {
+      clearTimeout(analyzeTimeout);
+      analyzeTimeout = setTimeout(() => {
+        const input = document.getElementById('smartInput');
+        if(input && input.value.trim().length > 10) {
+          const raw = input.value;
+          const phoneMatch = raw.match(/(?:05|972|5)\d{8,11}/);
+          if (phoneMatch && !document.getElementById('f_phone').value) {
+            document.getElementById('f_phone').value = formatLocalPhone(phoneMatch[0]);
+          }
+        }
+      }, 500);
+    }
+
+    async function loadOrders() {
       const container = document.getElementById('ordersList');
-      container.innerHTML = `<div class="text-center py-8 text-slate-500"><i class="fa fa-spinner fa-spin text-2xl"></i></div>`;
+      if (container) container.innerHTML = `<div class="text-center py-8 text-slate-500"><i class="fa fa-spinner fa-spin text-2xl"></i></div>`;
       try {
         const res = await fetch(`${SCRIPT_URL}?action=get&key=${encodeURIComponent(DASH_KEY)}&_=${Date.now()}`);
         const data = await res.json();
         allOrders = Array.isArray(data) ? data : [];
         renderOrders(allOrders);
-      } catch (e) { container.innerHTML = `<p class="text-center py-8 text-red-400">خطأ في الاتصال بالبيانات</p>`; }
-    };
+      } catch (e) { 
+        if (container) container.innerHTML = `<p class="text-center py-8 text-red-400">خطأ في الاتصال بالبيانات</p>`; 
+      }
+    }
 
-    const renderOrders = (list) => {
+    function renderOrders(list) {
       const container = document.getElementById('ordersList');
+      if (!container) return;
       if (!list.length) { container.innerHTML = `<p class="text-center py-8 text-slate-500">لا توجد طلبات سابقة</p>`; return; }
       container.innerHTML = [...list].filter(o => o.rowIndex).reverse().map(o => `
         <div class="bg-card p-4 rounded-2xl border border-white/5 shadow-lg mb-3">
@@ -402,45 +423,76 @@
           <div class="text-brand-200 text-xs bg-brand-900/10 p-2 rounded border-r-2 border-brand-500 truncate">${esc(o.offer)}</div>
           <div class="flex gap-4 mt-3 text-[10px] font-bold text-slate-300"><span>📍 ${esc(o.city)}</span><span>₪${esc(o.price)}</span></div>
         </div>`).join('');
-    };
+    }
 
-    const filterOrders = () => {
+    function filterOrders() {
       const term = document.getElementById('searchOrdersInput').value.toLowerCase();
       renderOrders(allOrders.filter(o => safe(o.name).toLowerCase().includes(term) || safe(o.phone).includes(term) || safe(o.city).toLowerCase().includes(term)));
-    };
+    }
 
-    const printCurrentOrder = async () => {
+    async function printCurrentOrder() {
       const name = document.getElementById('f_name').value;
       const phone = document.getElementById('f_phone').value;
       const delivery = document.getElementById('f_delivery').value;
       if (!name || !phone) return showToast("بيانات ناقصة!", 'error');
       if (delivery.includes("High Express")) return showToast("طلبات هي اكسبرس لا تُطبع يدوياً", "error");
-      document.getElementById('p_date').textContent = new Date().toLocaleDateString();
-      document.getElementById('p_total').textContent = document.getElementById('f_price').value || "0";
-      document.getElementById('p_content_lang').innerHTML = `<b>الاسم:</b> ${esc(name)}<br><b>الهاتف:</b> ${esc(phone)}<br><b>المدينة:</b> ${esc(document.getElementById('f_city').value)}<br><b>الأصناف:</b> ${esc(document.getElementById('f_offer').value)}`;
+      
+      const dateEl = document.getElementById('p_date');
+      const totalEl = document.getElementById('p_total');
+      const contentEl = document.getElementById('p_content_lang');
+      
+      if (dateEl) dateEl.textContent = new Date().toLocaleDateString();
+      if (totalEl) totalEl.textContent = document.getElementById('f_price').value || "0";
+      if (contentEl) contentEl.innerHTML = `<b>الاسم:</b> ${esc(name)}<br><b>الهاتف:</b> ${esc(phone)}<br><b>المدينة:</b> ${esc(document.getElementById('f_city').value)}<br><b>الأصناف:</b> ${esc(document.getElementById('f_offer').value)}`;
+      
       showLoading(true, "تجهيز...");
       const qrImg = document.getElementById('p_qr');
       qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=https://wa.me/${normalizePhoneForLink(phone)}`;
       await new Promise(r => qrImg.onload = r);
-      showLoading(false); window.print();
-    };
+      showLoading(false); 
+      window.print();
+    }
 
-    const saveOrder = async (mode) => {
+    async function saveOrder(mode) {
       const name = document.getElementById('f_name').value;
       const phone = document.getElementById('f_phone').value;
       const delivery = document.getElementById('f_delivery').value;
       if (!name || !phone) return showToast("الاسم والهاتف مطلوبان", 'error');
       if (mode === 'normal' && delivery.includes("High Express")) return showToast("استخدم زر هي اكسبرس المخصص", 'error');
       if (mode === 'high_express') document.getElementById('f_delivery').value = "High Express - أم الفحم";
+      
       showLoading(true, "جاري الحفظ...");
-      const p = { action: "addOrder", key: DASH_KEY, name, phone, offer: document.getElementById('f_offer').value, price: document.getElementById('f_price').value, city: document.getElementById('f_city').value, address: document.getElementById('f_address').value, notes: document.getElementById('f_notes').value, payment: document.getElementById('f_payment').value, delivery: document.getElementById('f_delivery').value, status: "NEW" };
+      const p = { 
+        action: "addOrder", 
+        key: DASH_KEY, 
+        name, 
+        phone, 
+        offer: document.getElementById('f_offer').value, 
+        price: document.getElementById('f_price').value, 
+        city: document.getElementById('f_city').value, 
+        address: document.getElementById('f_address').value, 
+        notes: document.getElementById('f_notes').value, 
+        payment: document.getElementById('f_payment').value, 
+        delivery: document.getElementById('f_delivery').value, 
+        status: "NEW" 
+      };
+      
       try {
         const res = await fetch(`${SCRIPT_URL}?${new URLSearchParams(p)}`);
         const data = await res.json();
-        if (data.result === "SUCCESS") { showToast("تم الحفظ 🚀"); clearForm(); loadOrders(); }
-      } catch (e) { showToast("فشل الحفظ", 'error'); }
-      finally { showLoading(false); }
-    };
+        if (data.result === "SUCCESS") { 
+          showToast("تم الحفظ 🚀"); 
+          clearForm(); 
+          loadOrders(); 
+        } else {
+          showToast("حدث خطأ في السيرفر", 'error');
+        }
+      } catch (e) { 
+        showToast("فشل الحفظ، تحقق من الاتصال", 'error'); 
+      } finally { 
+        showLoading(false); 
+      }
+    }
 
     window.onload = loadOrders;
   </script>
