@@ -147,7 +147,7 @@
         <button onclick="analyzeWithGemini()" class="flex-1 bg-gradient-to-r from-indigo-600 via-purple-600 to-brand-600 text-white font-bold py-3 rounded-xl text-[14px] flex items-center justify-center gap-2 active:scale-95 transition-all shadow-lg animate-gradient-x border border-white/10">
           <i class="fa fa-sparkles"></i> استخراج عميق بالذكاء الاصطناعي ✨
         </button>
-        <button onclick="document.getElementById('pdfUpload').click()" title="تحليل طلب من ملف PDF" class="w-14 bg-red-500/20 text-red-400 hover:bg-red-500/40 border border-red-500/40 rounded-xl flex items-center justify-center active:scale-95 transition-all shadow-lg">
+        <button onclick="document.getElementById('pdfUpload').click()" title="تحليل طلب من ملف PDF" class="w-14 bg-red-500/20 text-red-400 hover:bg-red-500/40 border border-red-500/40 rounded-xl flex items-center justify-center active:scale-scale transition-all shadow-lg">
           <i class="fa fa-file-pdf text-xl"></i>
         </button>
         <input type="file" id="pdfUpload" accept="application/pdf" class="hidden" onchange="handlePdfUpload(event)">
@@ -287,13 +287,13 @@
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxaA4Wc7cEyU6gx-MzuA_C8psZPuWCLmIJ9TPjnqX_RGG4SDQR0Jeeqcnf85Q65NdlK/exec";
     const DASH_KEY = "12345678";
     
-    // ✅ مفتاح Gemini API هنا للتخاطب المباشر من المتصفح
-    const apiKey = "AIzaSyDHnnmFi0hgGDwvF5NuhZhc1qb3M8RaVIU";
+    // ✅ مفتاح Gemini API تم حذفه لأن البيئة التنفيذية ستقوم بحقنه (Injected by environment)
+    const apiKey = ""; 
 
     let allOrders = [];
 
     // --- Utility Functions ---
-    const showLoading = (s, text = "جاري حفظ الطلب...") => {
+    const showLoading = (s, text = "جاري العمل...") => {
       document.getElementById('loadingText').textContent = text;
       document.getElementById('loadingOverlay').style.display = s ? 'flex' : 'none';
     };
@@ -364,7 +364,7 @@
       }
     };
 
-    // --- Gemini API Implementation (Direct HTML Fetch) ---
+    // --- Gemini API Implementation ---
     async function callGeminiAPI(prompt, isJson = false, base64File = null, mimeType = "application/pdf") {
       const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
       
@@ -386,7 +386,6 @@
         payload.generationConfig = { responseMimeType: "application/json" };
       }
 
-      // محاولة الإرسال عدة مرات في حال كان الإنترنت ضعيفاً
       const delays = [1000, 2000, 4000, 8000, 16000];
       for (let i = 0; i < 5; i++) {
         try {
@@ -396,23 +395,26 @@
             body: JSON.stringify(payload)
           });
           
-          if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
+          if (!response.ok) {
+             const errorData = await response.json();
+             throw new Error(`HTTP Error: ${response.status} - ${errorData.error?.message || 'Unknown error'}`);
+          }
           
           const data = await response.json();
           return data.candidates?.[0]?.content?.parts?.[0]?.text || "";
         } catch (error) {
           if (i === 4) throw error;
+          console.warn(`Gemini API retry ${i + 1} after error:`, error);
           await new Promise(r => setTimeout(r, delays[i]));
         }
       }
     }
 
-    // دالة مساعدة لمعالجة نتيجة JSON الواردة من Gemini وتوزيعها على الحقول
     function processGeminiResult(result) {
       let cleanResult = result.trim();
-      const bt = String.fromCharCode(96, 96, 96); // رمز ` المكرر 3 مرات
+      const bt = String.fromCharCode(96, 96, 96);
       if (cleanResult.startsWith(bt)) {
-          cleanResult = cleanResult.replace(new RegExp('^' + bt + '(?:json)?\\n?'), '');
+          cleanResult = cleanResult.replace(new RegExp('^' + bt + '(?:json)?\\n?', 'i'), '');
           cleanResult = cleanResult.replace(new RegExp('\\n?' + bt + '$'), '');
       }
 
@@ -466,7 +468,7 @@
           showToast("تعذر تحليل ملف الـ PDF، تأكد من وضوح الملف.", 'error');
         } finally {
           showLoading(false);
-          event.target.value = ''; // Reset input
+          event.target.value = '';
         }
       };
       
@@ -727,7 +729,7 @@
 
       if (!name || !phone) return showToast("الرجاء إدخال الاسم ورقم الهاتف قبل الطباعة!", 'error');
 
-      if (delivery.includes("High Express")) {
+      if (delivery && delivery.includes("High Express")) {
         return showToast("طلبات هي اكسبرس يجب إدخالها عبر الزر البرتقالي المخصص ولا تُطبع يدوياً!", "error");
       }
 
@@ -769,7 +771,7 @@
 
       if (!name || !phone) return showToast("الرجاء إدخال الاسم ورقم الهاتف على الأقل!", 'error');
 
-      if (mode === 'normal' && deliveryVal.includes("High Express")) {
+      if (mode === 'normal' && deliveryVal && deliveryVal.includes("High Express")) {
         return showToast("الرجاء استخدام الزر البرتقالي (دخل الطلب هي اكسبرس) لحفظ وإرسال هذا الطلب!", 'error');
       }
 
