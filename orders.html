@@ -1,3 +1,4 @@
+```html
 <!doctype html>
 <html lang="ar" dir="rtl">
 <head>
@@ -103,7 +104,6 @@
     }
     input:focus, textarea:focus { border-color: var(--primary); background: rgba(0,0,0,0.4); }
 
-    /* 10cm x 10cm label */
     .invoice-box {
       background: white;
       color: black;
@@ -172,7 +172,6 @@
 <div id="loadingOverlay"><div class="spinner"></div></div>
 <div id="toast">✅ تمت العملية</div>
 
-<!-- Invoice Preview Modal -->
 <div class="modal-overlay" id="printModal">
   <div class="invoice-box" id="invoicePreview">
     <div class="inv-header">
@@ -197,13 +196,13 @@
     </div>
     <div style="position: absolute; bottom: -75px; left: 0; right: 0; display: flex; gap: 12px; justify-content: center;" class="no-print">
       <button class="btn btn-outline" onclick="closeModal('printModal')" style="flex-direction:row; padding:10px 20px;">إلغاء</button>
-      <button class="btn btn-primary" onclick="window.print()" style="flex-direction:row; padding:10px 20px;"><i class="fa fa-print"></i> طباعة الوصل</button>
-      <button class="btn btn-success" onclick="downloadPdfLabel()" style="flex-direction:row; padding:10px 20px;"><i class="fa fa-file-pdf"></i> تحميل PDF</button>
+      <button class="btn btn-success" onclick="downloadPdfLabel()" style="flex-direction:row; padding:10px 20px;">
+        <i class="fa fa-file-pdf"></i> طباعة PDF
+      </button>
     </div>
   </div>
 </div>
 
-<!-- Order Modal (Add/Edit) -->
 <div class="modal-overlay" id="orderModal">
   <div class="modal-content">
     <h3 id="modalTitle" style="margin-top:0;">إضافة طلب جديد</h3>
@@ -290,7 +289,6 @@ function formatLocalPhone(p) {
   if (!d.startsWith("0") && d.length === 9) d = "0" + d;
   return d;
 }
-
 function normalizePhoneForLink(p) {
   let d = String(p || "").replace(/\D/g, "");
   if (d.startsWith("0")) d = "972" + d.substring(1);
@@ -327,12 +325,10 @@ async function load() {
   try {
     const res = await fetch(`${SCRIPT_URL}?action=get&key=${encodeURIComponent(DASH_KEY)}&_=${Date.now()}`);
     const data = await res.json();
-
     if (data && data.result === "ERROR") throw new Error(data.message || "ERROR");
-
     allOrders = Array.isArray(data) ? data : [];
     renderOrders(allOrders);
-  } catch (e) {
+  } catch(e) {
     showToast("خطأ في جلب البيانات");
     document.getElementById('ordersList').innerHTML =
       `<div style="text-align:center; padding:50px; color:var(--muted);">تعذّر تحميل الطلبات</div>`;
@@ -402,7 +398,7 @@ function renderOrders(list) {
 
 async function sendMsg(row, lang) {
   const o = allOrders.find(x => x.rowIndex == row);
-  if (!o) return;
+  if(!o) return;
 
   const E = {
     blackHeart: "\u{1F5A4}",
@@ -460,7 +456,7 @@ ${E.card} תשלום: ${paymentMethod}${deliveryTxt}${noteTxt}${contactBlock}${s
 async function approve(row) {
   showLoading(true);
   const o = allOrders.find(x => x.rowIndex == row);
-  if (!o) { showLoading(false); return; }
+  if(!o) { showLoading(false); return; }
 
   const p = new URLSearchParams({
     action: "updateOrder", key: DASH_KEY, row: row,
@@ -474,33 +470,33 @@ async function approve(row) {
   try {
     const res = await fetch(`${SCRIPT_URL}?${p.toString()}`);
     const data = await res.json();
-    if (data.result === "SUCCESS") {
+    if(data.result === "SUCCESS") {
       showToast("تم الاعتماد بنجاح ✨");
       load();
     } else {
       showToast(data.message || "فشل التحديث");
       showLoading(false);
     }
-  } catch (e) {
+  } catch(e) {
     showToast("فشل التحديث");
     showLoading(false);
   }
 }
 
-async function sendToDelivery(row) {
+async function sendToDelivery(row){
   showLoading(true);
-  try {
+  try{
     const res = await fetch(`${SCRIPT_URL}?action=sendToDelivery&key=${encodeURIComponent(DASH_KEY)}&row=${row}&_=${Date.now()}`);
     const data = await res.json();
 
-    if (data.result === "SUCCESS") {
+    if(data.result === "SUCCESS"){
       showToast(data.delivery_order_id ? `تم الإرسال ✅ رقم: ${data.delivery_order_id}` : "تم الإرسال ✅");
       load();
     } else {
       showToast(data.message || "فشل الإرسال");
       showLoading(false);
     }
-  } catch (e) {
+  }catch(e){
     showToast("فشل الإرسال");
     showLoading(false);
   }
@@ -525,7 +521,7 @@ function openAddModal() {
 
 function openEditModal(row) {
   const o = allOrders.find(x => x.rowIndex == row);
-  if (!o) return;
+  if(!o) return;
 
   editingRow = row;
   document.getElementById('modalTitle').textContent = "تعديل تفاصيل الطلب";
@@ -568,7 +564,7 @@ async function saveOrder() {
     const res = await fetch(`${SCRIPT_URL}?` + new URLSearchParams(payload).toString());
     const data = await res.json();
 
-    if (data.result === "SUCCESS") {
+    if(data.result === "SUCCESS") {
       showToast(isAdd ? "تمت إضافة الطلب بنجاح ✨" : "تم الحفظ بنجاح ✨");
       closeModal('orderModal');
       load();
@@ -576,7 +572,7 @@ async function saveOrder() {
       showToast(data.message || "فشل الحفظ");
       showLoading(false);
     }
-  } catch (e) {
+  } catch(e) {
     showToast("فشل الحفظ");
     showLoading(false);
   }
@@ -587,7 +583,7 @@ function openPrintModal(row, lang) {
   if (!o) return;
 
   const now = new Date();
-  document.getElementById('p_date').textContent = `DATE: ${now.getDate()}.${now.getMonth() + 1}.${now.getFullYear()}`;
+  document.getElementById('p_date').textContent = `DATE: ${now.getDate()}.${now.getMonth()+1}.${now.getFullYear()}`;
   document.getElementById('p_ord').textContent = "ORD: " + (safe(o.orderId) || "MAD-00000");
   document.getElementById('p_total').textContent = safe(o.price) || "0";
   document.getElementById('p_qr').src = `https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=https://wa.me/${normalizePhoneForLink(o.phone)}`;
@@ -623,11 +619,14 @@ async function downloadPdfLabel() {
     });
 
     pdf.addImage(img, "PNG", 0, 0, 100, 100);
-    const ord = (document.getElementById("p_ord").textContent || "MAD-Label").replace(/[^\w\-]+/g, "_");
+
+    const ord = (document.getElementById("p_ord").textContent || "MAD-Label")
+      .replace(/[^\w\-]+/g, "_");
+
     pdf.save(`${ord}_10x10.pdf`);
-    showToast("تم تحميل PDF ✅");
+    showToast("تم تنزيل PDF ✅");
   } catch (e) {
-    showToast("فشل تحميل PDF");
+    showToast("فشل تنزيل PDF");
   }
   showLoading(false);
 }
