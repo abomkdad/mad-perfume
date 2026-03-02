@@ -2,287 +2,640 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>MAD Label PDF 10x10</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=0"/>
+  <title>MAD Manager v4.6 - Latest Orders First</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
   <style>
     :root {
-      --bg: #0b1220;
-      --card: #111827;
-      --line: rgba(255,255,255,0.12);
-      --text: #f3f4f6;
-      --muted: #9ca3af;
-      --primary: #2563eb;
-      --ok: #059669;
+      --bg: #0a0f1e;
+      --card: #161b2c;
+      --primary: #3b82f6;
+      --success: #10b981;
+      --ready: #f59e0b;
+      --hebrew: #8b5cf6;
+      --danger: #ef4444;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --border: rgba(255,255,255,0.08);
+      --grad: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
     }
-
-    * { box-sizing: border-box; }
 
     body {
-      margin: 0;
-      font-family: Tahoma, Arial, sans-serif;
-      background: radial-gradient(circle at top, #18243c 0%, var(--bg) 45%);
-      color: var(--text);
-      min-height: 100vh;
-      padding: 24px;
+      margin: 0; font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+      background: var(--bg); color: var(--text); padding-bottom: 90px;
+      line-height: 1.5;
     }
 
-    .wrap {
-      max-width: 980px;
-      margin: 0 auto;
-      display: grid;
-      grid-template-columns: 1.1fr 1fr;
-      gap: 16px;
+    .header {
+      background: rgba(16, 21, 36, 0.85); backdrop-filter: blur(12px);
+      padding: 12px 16px; position: sticky; top: 0; z-index: 100;
+      border-bottom: 1px solid var(--border);
     }
 
-    .panel {
-      background: rgba(17,24,39,0.88);
-      border: 1px solid var(--line);
-      border-radius: 16px;
-      padding: 16px;
-      backdrop-filter: blur(8px);
+    .container { padding: 16px; max-width: 600px; margin: 0 auto; }
+
+    .order-card {
+      background: var(--card); border-radius: 24px; padding: 20px;
+      margin-bottom: 20px; border: 1px solid var(--border);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+      transition: transform 0.2s;
     }
 
-    h1 {
-      font-size: 20px;
-      margin: 0 0 8px 0;
-    }
+    .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+    .order-id { font-family: monospace; color: var(--muted); background: rgba(255,255,255,0.05); padding: 2px 8px; border-radius: 6px; font-size: 13px; }
 
-    .sub {
-      color: var(--muted);
-      margin: 0 0 16px 0;
-      font-size: 13px;
-    }
+    .status-pill { font-size: 11px; padding: 4px 12px; border-radius: 20px; font-weight: 700; text-transform: uppercase; }
+    .status-new { background: rgba(59, 130, 246, 0.1); color: #60a5fa; }
+    .status-prep { background: rgba(16, 185, 129, 0.1); color: #34d399; }
 
-    .grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-    }
+    .customer-name { font-size: 19px; font-weight: 800; display: block; margin-bottom: 4px; }
+    .customer-phone { color: var(--muted); font-size: 14px; display: flex; align-items: center; gap: 6px; }
 
-    label {
-      display: block;
-      margin: 0 0 6px;
-      font-size: 13px;
-      color: #d1d5db;
-    }
-
-    input, textarea {
-      width: 100%;
-      border: 1px solid var(--line);
-      background: rgba(0,0,0,0.2);
-      color: #fff;
-      border-radius: 10px;
-      padding: 10px;
+    .offer-details {
+      margin: 12px 0; padding: 12px; background: rgba(59, 130, 246, 0.05);
+      border-radius: 12px; color: #93c5fd; font-weight: 600; border-right: 3px solid var(--primary);
       font-size: 14px;
-      outline: none;
-    }
-
-    textarea { min-height: 74px; resize: vertical; }
-
-    .actions {
-      display: flex;
-      gap: 10px;
-      margin-top: 14px;
-      flex-wrap: wrap;
-    }
-
-    button {
-      border: 0;
-      color: #fff;
-      font-weight: 700;
-      padding: 11px 14px;
-      border-radius: 10px;
-      cursor: pointer;
-      font-size: 14px;
-    }
-
-    .btn-primary { background: var(--primary); }
-    .btn-ok { background: var(--ok); }
-
-    .hint {
-      color: var(--muted);
-      font-size: 12px;
-      margin-top: 10px;
-    }
-
-    #invoicePreview {
-      width: 10cm;
-      height: 10cm;
-      margin: 0 auto;
-      background: #fff;
-      color: #000;
-      padding: 8mm;
-      border-radius: 2px;
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .inv-header {
-      text-align: center;
-      border-bottom: 2px solid #000;
-      margin-bottom: 8px;
-      padding-bottom: 6px;
-    }
-
-    .inv-body {
-      flex: 1;
-      font-size: 11px;
-      line-height: 1.55;
-      direction: rtl;
-      overflow: hidden;
       word-break: break-word;
     }
 
-    .inv-footer {
-      border-top: 2px solid #000;
-      padding-top: 7px;
+    .meta-line { display: flex; flex-wrap: wrap; gap: 10px; font-size: 12px; color: var(--muted); margin-top: 8px; }
+    .meta-tag { background: rgba(255,255,255,0.05); padding: 2px 8px; border-radius: 6px; }
+
+    .actions-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 20px; }
+    .actions-secondary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 8px; }
+
+    .btn {
+      padding: 10px 4px; border-radius: 14px; border: none; font-weight: 700;
+      cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center;
+      font-size: 10px; transition: 0.2s; gap: 6px; text-decoration: none;
+    }
+    .btn i { font-size: 18px; }
+    .btn-primary { background: var(--grad); color: white; }
+    .btn-success { background: #059669; color: white; }
+    .btn-wa-ar { background: #d97706; color: white; }
+    .btn-wa-he { background: #7c3aed; color: white; }
+    .btn-outline { background: rgba(255,255,255,0.03); color: white; border: 1px solid var(--border); }
+
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px);
+      display: none; align-items: center; justify-content: center; z-index: 2000; padding: 20px;
+    }
+    .modal-overlay.show { display: flex; }
+    .modal-content {
+      background: var(--card); width: 100%; max-width: 450px; padding: 24px;
+      border-radius: 32px; border: 1px solid var(--border); overflow-y: auto; max-height: 90vh;
+    }
+
+    .smart-box {
+      background: rgba(59, 130, 246, 0.1); border: 1px dashed var(--primary);
+      padding: 15px; border-radius: 16px; margin-bottom: 20px;
+    }
+    .smart-box h4 {
+      margin: 0 0 10px 0; font-size: 14px; color: var(--primary);
+      display: flex; align-items: center; gap: 8px;
+    }
+
+    input, select, textarea {
+      width: 100%; padding: 12px; margin-bottom: 12px; border-radius: 12px;
+      border: 1px solid var(--border); background: rgba(0,0,0,0.2); color: white;
+      outline: none; font-size: 15px; box-sizing: border-box;
+    }
+    input:focus, textarea:focus { border-color: var(--primary); background: rgba(0,0,0,0.4); }
+
+    /* 10cm x 10cm label */
+    .invoice-box {
+      background: white;
+      color: black;
+      width: 10cm;
+      height: 10cm;
+      padding: 8mm;
+      box-sizing: border-box;
       display: flex;
-      justify-content: space-between;
-      align-items: flex-end;
-      gap: 8px;
+      flex-direction: column;
+      position: relative;
+      border-radius: 2px;
+      overflow: hidden;
     }
 
-    .total {
-      text-align: left;
-      font-weight: 900;
-      font-size: 22px;
-      line-height: 1;
-    }
+    .inv-header { text-align: center; border-bottom: 2px solid #000; padding-bottom: 8px; margin-bottom: 10px; }
+    .inv-footer { border-top: 2px solid #000; padding-top: 8px; display: flex; justify-content: space-between; align-items: flex-end; }
 
-    @media (max-width: 900px) {
-      .wrap { grid-template-columns: 1fr; }
+    #toast {
+      position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+      background: #10b981; color: white; padding: 14px 28px; border-radius: 50px; font-weight: 700;
+      z-index: 3000; display: none; box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+    }
+    #loadingOverlay {
+      position: fixed; inset: 0; background: rgba(6, 9, 20, 0.7); z-index: 4000;
+      display: none; align-items: center; justify-content: center; backdrop-filter: blur(4px);
+    }
+    .spinner {
+      width: 44px; height: 44px; border: 4px solid rgba(59, 130, 246, 0.1);
+      border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    @media print {
+      @page { size: 10cm 10cm; margin: 0; }
+
+      html, body {
+        width: 10cm;
+        height: 10cm;
+        margin: 0 !important;
+        padding: 0 !important;
+        overflow: hidden !important;
+      }
+
+      body * { visibility: hidden !important; }
+      #invoicePreview, #invoicePreview * { visibility: visible !important; }
+
+      #invoicePreview {
+        position: fixed !important;
+        inset: 0 !important;
+        width: 10cm !important;
+        height: 10cm !important;
+        border: none !important;
+        padding: 8mm !important;
+        margin: 0 !important;
+        box-shadow: none !important;
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+      }
+
+      .no-print { display: none !important; }
     }
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <section class="panel">
-      <h1>صفحة ملصق MAD - تنزيل PDF</h1>
-      <p class="sub">عبّي البيانات واضغط "تحميل PDF". ينزل ملف جاهز بمقاس 10سم × 10سم.</p>
 
-      <div class="grid">
-        <div>
-          <label for="f_name">الاسم</label>
-          <input id="f_name" value="محمد جلبوني"/>
-        </div>
-        <div>
-          <label for="f_phone">الهاتف</label>
-          <input id="f_phone" value="0599123456"/>
-        </div>
+<div id="loadingOverlay"><div class="spinner"></div></div>
+<div id="toast">✅ تمت العملية</div>
+
+<!-- Invoice Preview Modal -->
+<div class="modal-overlay" id="printModal">
+  <div class="invoice-box" id="invoicePreview">
+    <div class="inv-header">
+      <h1 style="margin:0; font-size: 32px; letter-spacing: 4px; font-weight: 900;">MAD</h1>
+      <div style="font-size: 11px; font-weight: 800; color: #333;">PARFUMEUR</div>
+      <div style="display: flex; justify-content: space-between; font-size: 10px; font-weight: 900; margin-top:8px; border-top: 1px solid #eee; padding-top: 4px;">
+        <span id="p_date">DATE: 00.00.0000</span>
+        <span id="p_ord">ORD: MAD-00000</span>
       </div>
+    </div>
+    <div class="inv-body" id="p_content_lang" style="font-size: 12px; flex-grow: 1; line-height: 1.5;"></div>
+    <div class="inv-footer">
+      <div style="text-align:center;">
+        <img id="p_qr" src="" style="width:48px; height:48px; border:1px solid #000;">
+        <div id="p_footer_phone" style="font-size:9px; font-weight:900; margin-top:4px;"></div>
+      </div>
+      <div id="p_promo" style="font-size: 8px; text-align: center; flex: 1; padding: 0 8px; font-weight: 800;">🎁 صور اللحظة وارسلها واتساب واحصل على هدية فورية!</div>
+      <div style="text-align: left;">
+        <div id="p_label_total" style="font-size: 11px; font-weight: 700;">TOTAL:</div>
+        <div style="font-size: 24px; font-weight: 900; color: #000;">₪<span id="p_total">0</span></div>
+      </div>
+    </div>
+    <div style="position: absolute; bottom: -75px; left: 0; right: 0; display: flex; gap: 12px; justify-content: center;" class="no-print">
+      <button class="btn btn-outline" onclick="closeModal('printModal')" style="flex-direction:row; padding:10px 20px;">إلغاء</button>
+      <button class="btn btn-primary" onclick="window.print()" style="flex-direction:row; padding:10px 20px;"><i class="fa fa-print"></i> طباعة الوصل</button>
+      <button class="btn btn-success" onclick="downloadPdfLabel()" style="flex-direction:row; padding:10px 20px;"><i class="fa fa-file-pdf"></i> تحميل PDF</button>
+    </div>
+  </div>
+</div>
 
-      <div class="grid" style="margin-top:10px;">
-        <div>
-          <label for="f_city">المدينة</label>
-          <input id="f_city" value="أم الفحم"/>
+<!-- Order Modal (Add/Edit) -->
+<div class="modal-overlay" id="orderModal">
+  <div class="modal-content">
+    <h3 id="modalTitle" style="margin-top:0;">إضافة طلب جديد</h3>
+
+    <div class="smart-box" id="smartSection">
+      <h4><i class="fa fa-magic"></i> المحلل الذكي للبيانات</h4>
+      <textarea id="smartInput" placeholder="الصق نص الطلب هنا (الاسم، الهاتف، العنوان...) ثم اضغط تحليل..." style="height: 80px; margin-bottom: 8px; font-size: 13px;"></textarea>
+      <button class="btn btn-primary" onclick="analyzeText()" style="width: 100%; flex-direction: row; height: 35px; font-size: 13px;">تحليل وتعبئة تلقائية</button>
+    </div>
+
+    <label>الاسم الكامل</label><input type="text" id="f_name">
+    <label>رقم الهاتف</label><input type="tel" id="f_phone">
+    <label>الأصناف المطلوبة</label><textarea id="f_offer" rows="2"></textarea>
+
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+      <div><label>السعر (₪)</label><input type="number" id="f_price"></div>
+      <div>
+        <label>طريقة الدفع</label>
+        <select id="f_payment">
+          <option value="دفع عند الاستلام">دفع عند الاستلام</option>
+          <option value="شراء من الموقع - مدفوع">شراء من الموقع - مدفوع</option>
+          <option value="شراء عبر الرابط">شراء عبر الرابط</option>
+        </select>
+      </div>
+    </div>
+
+    <label>المدينة</label><input type="text" id="f_city">
+    <label>العنوان التفصيلي</label><input type="text" id="f_address">
+    <label>ملاحظات إضافية</label><textarea id="f_notes" rows="2"></textarea>
+
+    <label>شركة التوصيل</label>
+    <select id="f_delivery">
+      <option value="">-- اختر شركة الشحن --</option>
+      <option value="High Express - أم الفحم">High Express - أم الفحم</option>
+      <option value="Lama (050-5102019)">Lama (050-5102019)</option>
+      <option value="Marwah (052-7035370)">Marwah (052-7035370)</option>
+      <option value="Areen (052-5118966)">Areen (052-5118966)</option>
+      <option value="Pickup">Pickup</option>
+    </select>
+
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:10px;">
+      <button class="btn btn-outline" onclick="closeModal('orderModal')">إلغاء</button>
+      <button class="btn btn-primary" onclick="saveOrder()" id="saveBtn">حفظ الطلب ✨</button>
+    </div>
+  </div>
+</div>
+
+<div class="header">
+  <div class="header-top" style="display:flex; justify-content:space-between; align-items:center;">
+    <div class="logo" style="font-weight:900; font-size:20px;">MAD <span>MANAGER</span></div>
+    <div style="display:flex; gap:10px;">
+      <button class="btn btn-outline" onclick="load()" style="width:40px; height:40px;"><i class="fa fa-sync"></i></button>
+      <button class="btn btn-primary" onclick="openAddModal()" style="width:40px; height:40px;"><i class="fa fa-plus"></i></button>
+    </div>
+  </div>
+  <div style="margin-top:10px;">
+    <input type="text" id="searchInput" placeholder="بحث باسم العميل أو رقم الهاتف..." oninput="filterOrders()" style="margin-bottom:0; background:rgba(255,255,255,0.05);">
+  </div>
+</div>
+
+<div class="container" id="ordersList"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+
+<script>
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxaA4Wc7cEyU6gx-MzuA_C8psZPuWCLmIJ9TPjnqX_RGG4SDQR0Jeeqcnf85Q65NdlK/exec";
+const DASH_KEY = "12345678";
+
+const CUSTOMER_SERVICE_PHONE = "972524033442";
+const CUSTOMER_SERVICE_STAR = "*9935";
+
+let allOrders = [];
+let editingRow = null;
+
+function showLoading(s) { document.getElementById('loadingOverlay').style.display = s ? 'flex' : 'none'; }
+function showToast(m) { const t = document.getElementById('toast'); t.textContent = m; t.style.display = 'block'; setTimeout(() => t.style.display = 'none', 2500); }
+const safe = (v) => (v === undefined || v === null || String(v).toLowerCase() === "undefined" || String(v).toLowerCase() === "null") ? "" : String(v).trim();
+
+function formatLocalPhone(p) {
+  if (!p) return "";
+  let d = String(p).replace(/\D/g, "");
+  if (d.startsWith("972")) d = "0" + d.substring(3);
+  if (!d.startsWith("0") && d.length === 9) d = "0" + d;
+  return d;
+}
+
+function normalizePhoneForLink(p) {
+  let d = String(p || "").replace(/\D/g, "");
+  if (d.startsWith("0")) d = "972" + d.substring(1);
+  if (!d.startsWith("972") && d.length === 9) d = "972" + d;
+  return d;
+}
+
+function analyzeText() {
+  const raw = document.getElementById('smartInput').value;
+  if (!raw.trim()) return showToast("الصق نصاً أولاً");
+
+  const phoneMatch = raw.match(/(?:05|972|5)\d{8,11}/);
+  if (phoneMatch) document.getElementById('f_phone').value = formatLocalPhone(phoneMatch[0]);
+
+  const priceMatch = raw.match(/(\d{2,4})\s*(?:₪|shekel|ILS|السعر)/i) || raw.match(/(?:₪|السعر|Price)\s*:?\s*(\d{2,4})/i);
+  if (priceMatch) document.getElementById('f_price').value = priceMatch[1];
+
+  const nameMatch = raw.match(/(?:الاسم|Name)\s*:?\s*([^\n|]+)/i);
+  if (nameMatch) document.getElementById('f_name').value = nameMatch[1].trim();
+  else {
+    const firstLine = raw.split('\n')[0].trim();
+    if (firstLine.length < 30) document.getElementById('f_name').value = firstLine;
+  }
+
+  const cityMatch = raw.match(/(?:المدينة|city|عنوان|من)\s*:?\s*([^\n|]+)/i);
+  if (cityMatch) document.getElementById('f_city').value = cityMatch[1].trim();
+
+  document.getElementById('f_offer').value = raw.substring(0, 100).trim();
+  showToast("تم تحليل البيانات بنجاح ⚡");
+}
+
+async function load() {
+  showLoading(true);
+  try {
+    const res = await fetch(`${SCRIPT_URL}?action=get&key=${encodeURIComponent(DASH_KEY)}&_=${Date.now()}`);
+    const data = await res.json();
+
+    if (data && data.result === "ERROR") throw new Error(data.message || "ERROR");
+
+    allOrders = Array.isArray(data) ? data : [];
+    renderOrders(allOrders);
+  } catch (e) {
+    showToast("خطأ في جلب البيانات");
+    document.getElementById('ordersList').innerHTML =
+      `<div style="text-align:center; padding:50px; color:var(--muted);">تعذّر تحميل الطلبات</div>`;
+  }
+  showLoading(false);
+}
+
+function filterOrders() {
+  const term = document.getElementById('searchInput').value.toLowerCase();
+  const filtered = allOrders.filter(o => {
+    const n = safe(o.name).toLowerCase();
+    const p = safe(o.phone);
+    return n.includes(term) || p.includes(term) || formatLocalPhone(p).includes(term);
+  });
+  renderOrders(filtered);
+}
+
+function renderOrders(list) {
+  const container = document.getElementById('ordersList');
+  if (!list || list.length === 0) {
+    container.innerHTML = `<div style="text-align:center; padding:50px; color:var(--muted);">لا توجد طلبات لعرضها</div>`;
+    return;
+  }
+
+  const reversedList = [...list].filter(o => o.rowIndex).reverse();
+
+  container.innerHTML = reversedList.map(o => {
+    const isPrep = (o.status || "").includes("تجهيز") || (o.status || "").includes("الإرسال");
+    const deliveryId = safe(o.delivery_order_id);
+    return `
+      <div class="order-card">
+        <div class="card-header">
+          <small class="order-id">#${safe(o.orderId) || '---'}</small>
+          <span class="status-pill ${isPrep ? 'status-prep' : 'status-new'}">${safe(o.status) || 'جديد'}</span>
         </div>
-        <div>
-          <label for="f_price">السعر (₪)</label>
-          <input id="f_price" value="199"/>
-        </div>
-      </div>
 
-      <div style="margin-top:10px;">
-        <label for="f_offer">الأصناف</label>
-        <textarea id="f_offer">عطر MAD - 100ml + هدية</textarea>
-      </div>
+        <div onclick="openEditModal(${o.rowIndex})" style="cursor:pointer;">
+          <span class="customer-name">${safe(o.name) || "—"}</span>
+          <div class="customer-phone"><i class="fa fa-phone"></i> ${formatLocalPhone(o.phone) || "—"}</div>
 
-      <div class="actions">
-        <button class="btn-primary" onclick="fillPreview()">تحديث المعاينة</button>
-        <button class="btn-ok" onclick="downloadPdfLabel()">تحميل PDF</button>
-      </div>
+          <div class="offer-details">${safe(o.offer) || "—"}</div>
 
-      <div class="hint">اسم الملف: <span id="fileNamePreview">MAD-Label-10x10.pdf</span></div>
-    </section>
-
-    <section class="panel">
-      <div id="invoicePreview">
-        <div class="inv-header">
-          <div style="font-size:28px; font-weight:900; letter-spacing:2px;">MAD</div>
-          <div style="font-size:10px; font-weight:700;">PARFUMEUR</div>
-          <div style="font-size:9px; margin-top:4px; display:flex; justify-content:space-between;">
-            <span id="p_date">DATE: 02.03.2026</span>
-            <span id="p_ord">ORD: MAD-00001</span>
+          <div class="meta-line">
+            <span class="meta-tag">📍 ${safe(o.city) || "—"}</span>
+            <span class="meta-tag">₪${safe(o.price) || "—"}</span>
+            <span class="meta-tag">💳 ${safe(o.payment) || "—"}</span>
+            <span class="meta-tag">🚚 ${safe(o.delivery) || "—"}</span>
+            ${deliveryId ? `<span class="meta-tag">🧾 شحنة: ${deliveryId}</span>` : ``}
           </div>
         </div>
 
-        <div class="inv-body" id="p_body">
-          <strong>الاسم:</strong> محمد جلبوني<br>
-          <strong>الهاتف:</strong> 0599123456<br>
-          <strong>المدينة:</strong> أم الفحم<br>
-          <strong>الأصناف:</strong> عطر MAD - 100ml + هدية
+        <div class="actions-grid">
+          <button class="btn btn-wa-ar" onclick="sendMsg(${o.rowIndex}, 'ar')"><i class="fa-brands fa-whatsapp"></i><span>عربي</span></button>
+          <button class="btn btn-wa-he" onclick="sendMsg(${o.rowIndex}, 'he')"><i class="fa-brands fa-whatsapp"></i><span>עברית</span></button>
+          <button class="btn btn-success" onclick="approve(${o.rowIndex})"><i class="fa fa-check"></i><span>اعتماد</span></button>
+          <button class="btn btn-outline" onclick="openEditModal(${o.rowIndex})"><i class="fa fa-edit"></i><span>تعديل</span></button>
         </div>
 
-        <div class="inv-footer">
-          <div style="font-size:8px; text-align:center; flex:1; font-weight:700;">شكرا لثقتكم بنا</div>
-          <div class="total">₪<span id="p_total">199</span></div>
+        <div class="actions-secondary">
+          <button class="btn btn-outline" onclick="openPrintModal(${o.rowIndex}, 'ar')"><i class="fa fa-print"></i><span>وصل ع</span></button>
+          <button class="btn btn-outline" onclick="openPrintModal(${o.rowIndex}, 'he')"><i class="fa fa-print"></i><span>وصل هـ</span></button>
+          <button class="btn btn-outline" onclick="sendToDelivery(${o.rowIndex})"><i class="fa fa-truck"></i><span>شحن</span></button>
         </div>
-      </div>
-    </section>
-  </div>
+      </div>`;
+  }).join('');
+}
 
-  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+async function sendMsg(row, lang) {
+  const o = allOrders.find(x => x.rowIndex == row);
+  if (!o) return;
 
-  <script>
-    function pad2(n) { return String(n).padStart(2, '0'); }
+  const E = {
+    blackHeart: "\u{1F5A4}",
+    diamond: "\u{1F48E}",
+    pin: "\u{1F4CD}",
+    money: "\u{1F4B0}",
+    card: "\u{1F4B3}",
+    truck: "\u{1F69A}",
+    memo: "\u{1F4DD}",
+    phone: "\u{1F4DE}",
+    wave: "\u{1F44B}",
+    box: "\u{1F4E6}",
+    info: "\u{2139}\u{FE0F}",
+    link: "\u{1F517}"
+  };
 
-    function fillPreview() {
-      const name = document.getElementById('f_name').value.trim() || '-';
-      const phone = document.getElementById('f_phone').value.trim() || '-';
-      const city = document.getElementById('f_city').value.trim() || '-';
-      const price = document.getElementById('f_price').value.trim() || '0';
-      const offer = document.getElementById('f_offer').value.trim() || '-';
+  const paymentMethod = safe(o.payment) || (lang === "he" ? "תשלום במעמד המסירה" : "دفع عند الاستلام");
 
-      const now = new Date();
-      const dateText = `${pad2(now.getDate())}.${pad2(now.getMonth() + 1)}.${now.getFullYear()}`;
-      const ord = `MAD-${Date.now().toString().slice(-5)}`;
+  const noteTxt = safe(o.notes)
+    ? (lang === "he" ? `\n${E.memo} הערה: ${safe(o.notes)}` : `\n${E.memo} ملاحظة: ${safe(o.notes)}`)
+    : "";
 
-      document.getElementById('p_date').textContent = `DATE: ${dateText}`;
-      document.getElementById('p_ord').textContent = `ORD: ${ord}`;
-      document.getElementById('p_total').textContent = price;
-      document.getElementById('p_body').innerHTML =
-        `<strong>الاسم:</strong> ${escapeHtml(name)}<br><strong>الهاتف:</strong> ${escapeHtml(phone)}<br><strong>المدينة:</strong> ${escapeHtml(city)}<br><strong>الأصناف:</strong> ${escapeHtml(offer)}`;
+  const deliveryTxt = safe(o.delivery)
+    ? (lang === "he" ? `\n${E.truck} חברת משלוח: ${safe(o.delivery)}` : `\n${E.truck} شركة التوصيل: ${safe(o.delivery)}`)
+    : "";
 
-      document.getElementById('fileNamePreview').textContent = `${ord}_10x10.pdf`;
+  const serviceWaLink = `https://wa.me/${CUSTOMER_SERVICE_PHONE}`;
+  const telStarLink = `tel:${CUSTOMER_SERVICE_STAR}`;
+
+  const contactBlock = (lang === "he")
+    ? `\n${E.phone} שירות לקוחות: ${CUSTOMER_SERVICE_PHONE}\n${E.link} WhatsApp: ${serviceWaLink}\n${E.phone} קו נוסף: ${CUSTOMER_SERVICE_STAR}\n${E.link} חיוג: ${telStarLink}`
+    : `\n${E.phone} خدمة العملاء: ${CUSTOMER_SERVICE_PHONE}\n${E.link} واتساب مباشر: ${serviceWaLink}\n${E.phone} رقم إضافي: ${CUSTOMER_SERVICE_STAR}\n${E.link} اتصال: ${telStarLink}`;
+
+  const supportLine = (lang === "he")
+    ? `\n${E.info} לשינוי ההזמנה או להוספת הערות לחברת המשלוחים – אפשר לפנות אלינו.`
+    : `\n${E.info} لتعديل الطلب أو إضافة ملاحظات لشركة التوصيل يمكن التواصل معنا.`;
+
+  const msg = (lang === "ar")
+    ? `أهلاً بك ${safe(o.name)} في MAD Parfumeur ${E.blackHeart}
+يسعدنا تأكيد طلبك المميز!
+${E.diamond} العرض: ${safe(o.offer)}
+${E.pin} العنوان: ${safe(o.city)}
+${E.money} السعر: ${safe(o.price)} ₪
+${E.card} الدفع: ${paymentMethod}${deliveryTxt}${noteTxt}${contactBlock}${supportLine}`
+    : `שלום ${safe(o.name)} ${E.wave}, תודה שהזמנת מ-MAD Parfumeur
+${E.box} המוצר: ${safe(o.offer)}
+${E.pin} כתובת: ${safe(o.city)}
+${E.money} מחיר: ${safe(o.price)} ₪
+${E.card} תשלום: ${paymentMethod}${deliveryTxt}${noteTxt}${contactBlock}${supportLine}`;
+
+  const wa = `https://wa.me/${normalizePhoneForLink(o.phone)}?text=${encodeURIComponent(msg)}`;
+  window.open(wa, "_blank");
+}
+
+async function approve(row) {
+  showLoading(true);
+  const o = allOrders.find(x => x.rowIndex == row);
+  if (!o) { showLoading(false); return; }
+
+  const p = new URLSearchParams({
+    action: "updateOrder", key: DASH_KEY, row: row,
+    offer: safe(o.offer), name: safe(o.name), phone: safe(o.phone),
+    city: safe(o.city), notes: safe(o.notes),
+    delivery: safe(o.delivery), payment: safe(o.payment), price: safe(o.price),
+    address: safe(o.address || ""),
+    status: "بانتظار الإرسال للتجهيز"
+  });
+
+  try {
+    const res = await fetch(`${SCRIPT_URL}?${p.toString()}`);
+    const data = await res.json();
+    if (data.result === "SUCCESS") {
+      showToast("تم الاعتماد بنجاح ✨");
+      load();
+    } else {
+      showToast(data.message || "فشل التحديث");
+      showLoading(false);
     }
+  } catch (e) {
+    showToast("فشل التحديث");
+    showLoading(false);
+  }
+}
 
-    function escapeHtml(str) {
-      return str
-        .replaceAll('&', '&amp;')
-        .replaceAll('<', '&lt;')
-        .replaceAll('>', '&gt;')
-        .replaceAll('"', '&quot;')
-        .replaceAll("'", '&#39;');
+async function sendToDelivery(row) {
+  showLoading(true);
+  try {
+    const res = await fetch(`${SCRIPT_URL}?action=sendToDelivery&key=${encodeURIComponent(DASH_KEY)}&row=${row}&_=${Date.now()}`);
+    const data = await res.json();
+
+    if (data.result === "SUCCESS") {
+      showToast(data.delivery_order_id ? `تم الإرسال ✅ رقم: ${data.delivery_order_id}` : "تم الإرسال ✅");
+      load();
+    } else {
+      showToast(data.message || "فشل الإرسال");
+      showLoading(false);
     }
+  } catch (e) {
+    showToast("فشل الإرسال");
+    showLoading(false);
+  }
+}
 
-    async function downloadPdfLabel() {
-      fillPreview();
+function openAddModal() {
+  editingRow = null;
+  document.getElementById('modalTitle').textContent = "إضافة طلب جديد";
+  document.getElementById('smartSection').style.display = 'block';
+  document.getElementById('smartInput').value = "";
+  document.getElementById('f_name').value = "";
+  document.getElementById('f_phone').value = "";
+  document.getElementById('f_offer').value = "";
+  document.getElementById('f_price').value = "";
+  document.getElementById('f_city').value = "";
+  document.getElementById('f_address').value = "";
+  document.getElementById('f_notes').value = "";
+  document.getElementById('f_payment').value = "دفع عند الاستلام";
+  document.getElementById('f_delivery').value = "";
+  document.getElementById('orderModal').classList.add('show');
+}
 
-      const el = document.getElementById('invoicePreview');
-      const ordText = document.getElementById('p_ord').textContent.replace('ORD: ', '').trim() || 'MAD-Label';
-      const fileName = `${ordText}_10x10.pdf`;
+function openEditModal(row) {
+  const o = allOrders.find(x => x.rowIndex == row);
+  if (!o) return;
 
-      const { jsPDF } = window.jspdf;
-      const canvas = await html2canvas(el, {
-        scale: 3,
-        backgroundColor: '#ffffff',
-        useCORS: true
-      });
+  editingRow = row;
+  document.getElementById('modalTitle').textContent = "تعديل تفاصيل الطلب";
+  document.getElementById('smartSection').style.display = 'none';
 
-      const img = canvas.toDataURL('image/png');
-      const pdf = new jsPDF({
-        orientation: 'portrait',
-        unit: 'mm',
-        format: [100, 100]
-      });
+  document.getElementById('f_name').value = safe(o.name);
+  document.getElementById('f_phone').value = formatLocalPhone(o.phone);
+  document.getElementById('f_offer').value = safe(o.offer);
+  document.getElementById('f_price').value = safe(o.price);
+  document.getElementById('f_payment').value = safe(o.payment) || "دفع عند الاستلام";
+  document.getElementById('f_city').value = safe(o.city);
+  document.getElementById('f_address').value = safe(o.address || "");
+  document.getElementById('f_notes').value = safe(o.notes);
+  document.getElementById('f_delivery').value = safe(o.delivery);
 
-      pdf.addImage(img, 'PNG', 0, 0, 100, 100);
-      pdf.save(fileName);
+  document.getElementById('orderModal').classList.add('show');
+}
+
+async function saveOrder() {
+  const isAdd = (editingRow === null);
+  showLoading(true);
+
+  const payload = {
+    action: isAdd ? "addOrder" : "updateOrder",
+    key: DASH_KEY,
+    row: isAdd ? "" : editingRow,
+    name: safe(document.getElementById('f_name').value),
+    phone: safe(document.getElementById('f_phone').value),
+    offer: safe(document.getElementById('f_offer').value),
+    price: safe(document.getElementById('f_price').value),
+    city: safe(document.getElementById('f_city').value),
+    address: safe(document.getElementById('f_address').value),
+    notes: safe(document.getElementById('f_notes').value),
+    payment: safe(document.getElementById('f_payment').value),
+    delivery: safe(document.getElementById('f_delivery').value),
+    status: "NEW"
+  };
+
+  try {
+    const res = await fetch(`${SCRIPT_URL}?` + new URLSearchParams(payload).toString());
+    const data = await res.json();
+
+    if (data.result === "SUCCESS") {
+      showToast(isAdd ? "تمت إضافة الطلب بنجاح ✨" : "تم الحفظ بنجاح ✨");
+      closeModal('orderModal');
+      load();
+    } else {
+      showToast(data.message || "فشل الحفظ");
+      showLoading(false);
     }
+  } catch (e) {
+    showToast("فشل الحفظ");
+    showLoading(false);
+  }
+}
 
-    fillPreview();
-  </script>
+function openPrintModal(row, lang) {
+  const o = allOrders.find(x => x.rowIndex == row);
+  if (!o) return;
+
+  const now = new Date();
+  document.getElementById('p_date').textContent = `DATE: ${now.getDate()}.${now.getMonth() + 1}.${now.getFullYear()}`;
+  document.getElementById('p_ord').textContent = "ORD: " + (safe(o.orderId) || "MAD-00000");
+  document.getElementById('p_total').textContent = safe(o.price) || "0";
+  document.getElementById('p_qr').src = `https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=https://wa.me/${normalizePhoneForLink(o.phone)}`;
+  document.getElementById('p_footer_phone').textContent = formatLocalPhone(o.phone);
+
+  const c = document.getElementById('p_content_lang');
+  c.style.direction = "rtl";
+  c.innerHTML = (lang === 'ar')
+    ? `<strong>الاسم:</strong> ${safe(o.name)}<br><strong>الهاتف:</strong> ${formatLocalPhone(o.phone)}<br><strong>المدينة:</strong> ${safe(o.city)}<br><strong>العنوان:</strong> ${safe(o.address || "")}<br><strong>التوصيل:</strong> ${safe(o.delivery)}<br><strong>الدفع:</strong> ${safe(o.payment)}<br><strong>الأصناف:</strong> ${safe(o.offer)}`
+    : `<strong>לכבוד:</strong> ${safe(o.name)}<br><strong>טלפון:</strong> ${formatLocalPhone(o.phone)}<br><strong>עיר:</strong> ${safe(o.city)}<br><strong>כתובת:</strong> ${safe(o.address || "")}<br><strong>משלוח:</strong> ${safe(o.delivery)}<br><strong>תשלום:</strong> ${safe(o.payment)}<br><strong>פריטים:</strong> ${safe(o.offer)}`;
+
+  document.getElementById('printModal').classList.add('show');
+}
+
+async function downloadPdfLabel() {
+  const el = document.getElementById("invoicePreview");
+  if (!el) return;
+
+  showLoading(true);
+  try {
+    const { jsPDF } = window.jspdf;
+    const canvas = await html2canvas(el, {
+      scale: 3,
+      backgroundColor: "#ffffff",
+      useCORS: true
+    });
+
+    const img = canvas.toDataURL("image/png");
+    const pdf = new jsPDF({
+      orientation: "portrait",
+      unit: "mm",
+      format: [100, 100]
+    });
+
+    pdf.addImage(img, "PNG", 0, 0, 100, 100);
+    const ord = (document.getElementById("p_ord").textContent || "MAD-Label").replace(/[^\w\-]+/g, "_");
+    pdf.save(`${ord}_10x10.pdf`);
+    showToast("تم تحميل PDF ✅");
+  } catch (e) {
+    showToast("فشل تحميل PDF");
+  }
+  showLoading(false);
+}
+
+function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+
+window.onload = load;
+</script>
 </body>
 </html>
+```
