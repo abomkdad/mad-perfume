@@ -1,3 +1,4 @@
+```html
 <!doctype html>
 <html lang="ar" dir="rtl">
 <head>
@@ -93,7 +94,20 @@
     }
     input:focus, textarea:focus { border-color: var(--primary); background: rgba(0,0,0,0.4); }
 
-    .invoice-box { background: white; color: black; width: 98mm; height: 98mm; padding: 8mm; box-sizing: border-box; display: flex; flex-direction: column; position: relative; border-radius: 2px; }
+    /* تم التعديل إلى 10cm × 10cm */
+    .invoice-box {
+      background: white;
+      color: black;
+      width: 10cm;
+      height: 10cm;
+      padding: 8mm;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      border-radius: 2px;
+      overflow: hidden;
+    }
     .inv-header { text-align: center; border-bottom: 2px solid #000; padding-bottom: 8px; margin-bottom: 10px; }
     .inv-footer { border-top: 2px solid #000; padding-top: 8px; display: flex; justify-content: space-between; align-items: flex-end; }
 
@@ -103,11 +117,37 @@
     @keyframes spin { to { transform: rotate(360deg); } }
 
     @media print {
-      body * { visibility: hidden; }
-      #invoicePreview, #invoicePreview * { visibility: visible; }
-      #invoicePreview { position: fixed; left: 0; top: 0; width: 98mm; height: 98mm; border: none; padding: 8mm; margin: 0; }
+      @page {
+        size: 10cm 10cm;
+        margin: 0;
+      }
+
+      html, body {
+        width: 10cm;
+        height: 10cm;
+        margin: 0 !important;
+        padding: 0 !important;
+        overflow: hidden !important;
+      }
+
+      body * { visibility: hidden !important; }
+
+      #invoicePreview, #invoicePreview * { visibility: visible !important; }
+
+      #invoicePreview {
+        position: fixed !important;
+        inset: 0 !important;
+        width: 10cm !important;
+        height: 10cm !important;
+        border: none !important;
+        padding: 8mm !important;
+        margin: 0 !important;
+        box-shadow: none !important;
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+      }
+
       .no-print { display: none !important; }
-      @page { size: 98mm 98mm; margin: 0; }
     }
   </style>
 </head>
@@ -180,10 +220,7 @@
     <label>شركة التوصيل</label>
     <select id="f_delivery">
       <option value="">-- اختر شركة الشحن --</option>
-      <!-- ✅ API موجود فقط لهاي -->
       <option value="High Express - أم الفحم">High Express - أم الفحم</option>
-
-      <!-- باقي الشركات بدون API -->
       <option value="Lama (050-5102019)">Lama (050-5102019)</option>
       <option value="Marwah (052-7035370)">Marwah (052-7035370)</option>
       <option value="Areen (052-5118966)">Areen (052-5118966)</option>
@@ -554,3 +591,4 @@ window.onload = load;
 </script>
 </body>
 </html>
+```
