@@ -142,11 +142,17 @@
       </h4>
       <textarea id="smartInput" oninput="autoAnalyze()" placeholder="الصق نص الطلب من الواتساب هنا... وسيتم توزيعه تلقائياً." class="w-full h-24 p-3 mb-3 bg-black/30 border border-brand-500/20 rounded-2xl text-white text-[16px] outline-none focus:border-brand-500 resize-none transition-all"></textarea>
       
-      <!-- Gemini AI Integration Button -->
-      <button onclick="analyzeWithGemini()" class="w-full bg-gradient-to-r from-indigo-600 via-purple-600 to-brand-600 text-white font-bold py-3 rounded-xl text-[14px] flex items-center justify-center gap-2 active:scale-95 transition-all shadow-lg animate-gradient-x border border-white/10">
-        <i class="fa fa-sparkles"></i> استخراج عميق بالذكاء الاصطناعي ✨
-      </button>
-      <p class="text-[10px] text-slate-400 text-center mt-2 font-semibold">استخدم هذا الزر إذا كان النص معقداً أو غير مرتب</p>
+      <!-- Gemini AI Integration Buttons -->
+      <div class="flex gap-2">
+        <button onclick="analyzeWithGemini()" class="flex-1 bg-gradient-to-r from-indigo-600 via-purple-600 to-brand-600 text-white font-bold py-3 rounded-xl text-[14px] flex items-center justify-center gap-2 active:scale-95 transition-all shadow-lg animate-gradient-x border border-white/10">
+          <i class="fa fa-sparkles"></i> استخراج عميق بالذكاء الاصطناعي ✨
+        </button>
+        <button onclick="document.getElementById('pdfUpload').click()" title="تحليل طلب من ملف PDF" class="w-14 bg-red-500/20 text-red-400 hover:bg-red-500/40 border border-red-500/40 rounded-xl flex items-center justify-center active:scale-95 transition-all shadow-lg">
+          <i class="fa fa-file-pdf text-xl"></i>
+        </button>
+        <input type="file" id="pdfUpload" accept="application/pdf" class="hidden" onchange="handlePdfUpload(event)">
+      </div>
+      <p class="text-[10px] text-slate-400 text-center mt-2 font-semibold">استخدم هذه الأزرار للنصوص المعقدة أو لرفع فواتير PDF (بجميع اللغات)</p>
     </div>
 
     <!-- Form Fields -->
@@ -359,10 +365,21 @@
     };
 
     // --- Gemini API Implementation (Direct HTML Fetch) ---
-    async function callGeminiAPI(prompt, isJson = false) {
+    async function callGeminiAPI(prompt, isJson = false, base64File = null, mimeType = "application/pdf") {
       const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+      
+      const parts = [{ text: prompt }];
+      if (base64File) {
+        parts.push({
+          inlineData: {
+            mimeType: mimeType,
+            data: base64File
+          }
+        });
+      }
+
       const payload = {
-        contents: [{ parts: [{ text: prompt }] }],
+        contents: [{ parts: parts }],
       };
       
       if (isJson) {
@@ -390,6 +407,77 @@
       }
     }
 
+    // دالة مساعدة لمعالجة نتيجة JSON الواردة من Gemini وتوزيعها على الحقول
+    function processGeminiResult(result) {
+      let cleanResult = result.trim();
+      const bt = String.fromCharCode(96, 96, 96); // رمز ` المكرر 3 مرات
+      if (cleanResult.startsWith(bt)) {
+          cleanResult = cleanResult.replace(new RegExp('^' + bt + '(?:json)?\\n?'), '');
+          cleanResult = cleanResult.replace(new RegExp('\\n?' + bt + '$'), '');
+      }
+
+      const parsedData = JSON.parse(cleanResult);
+
+      if(parsedData.name) document.getElementById('f_name').value = parsedData.name;
+      if(parsedData.phone) document.getElementById('f_phone').value = formatLocalPhone(parsedData.phone);
+      if(parsedData.price) document.getElementById('f_price').value = parsedData.price;
+      if(parsedData.city) document.getElementById('f_city').value = parsedData.city;
+      if(parsedData.address) document.getElementById('f_address').value = parsedData.address;
+      if(parsedData.offer) document.getElementById('f_offer').value = parsedData.offer;
+      if(parsedData.notes) document.getElementById('f_notes').value = parsedData.notes;
+
+      ['f_name', 'f_phone', 'f_price', 'f_city', 'f_address', 'f_offer', 'f_notes'].forEach(flashField);
+      showToast("اكتمل التحليل بالذكاء الاصطناعي بنجاح ✨", 'ai');
+      document.getElementById('f_name').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    async function handlePdfUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      if (file.type !== 'application/pdf') {
+        showToast("الرجاء رفع ملف PDF فقط", "error");
+        event.target.value = '';
+        return;
+      }
+
+      showLoading(true, "جاري قراءة وتحليل ملف الـ PDF ✨...");
+
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        const base64Data = e.target.result.split(',')[1];
+        
+        const prompt = `أنت مساعد ذكي لمتجر عطور. قم بقراءة ملف الـ PDF المرفق (قد يكون باللغة العبرية، العربية، أو الإنجليزية).
+        استخرج البيانات التالية بدقة بصيغة JSON حصراً، باستخدام المفاتيح التالية:
+        - "name": اسم الزبون.
+        - "phone": رقم الهاتف.
+        - "price": السعر الإجمالي (رقم فقط بدون عملة).
+        - "city": اسم المدينة أو البلدة (يفضل ترجمته للعربية إن أمكن).
+        - "address": العنوان التفصيلي إن وجد.
+        - "offer": المنتجات المطلوبة بالتفصيل.
+        - "notes": أي ملاحظات إضافية.
+        إذا لم تجد حقلاً، اتركه فارغاً ("").`;
+
+        try {
+          const result = await callGeminiAPI(prompt, true, base64Data, "application/pdf");
+          processGeminiResult(result);
+        } catch (error) {
+          console.error("Gemini PDF Error:", error);
+          showToast("تعذر تحليل ملف الـ PDF، تأكد من وضوح الملف.", 'error');
+        } finally {
+          showLoading(false);
+          event.target.value = ''; // Reset input
+        }
+      };
+      
+      reader.onerror = () => {
+        showToast("حدث خطأ أثناء قراءة الملف", "error");
+        showLoading(false);
+      };
+      
+      reader.readAsDataURL(file);
+    }
+
     async function analyzeWithGemini() {
       const rawText = document.getElementById('smartInput').value;
       if (!rawText.trim()) return showToast("الرجاء لصق النص أولاً ليقوم الذكاء الاصطناعي بتحليله", 'error');
@@ -408,28 +496,7 @@
 
       try {
         const result = await callGeminiAPI(prompt, true);
-        
-        // تنظيف الاستجابة بشكل آمن يمنع توقف الكود
-        let cleanResult = result.trim();
-        const bt = String.fromCharCode(96, 96, 96); // رمز ` المكرر 3 مرات
-        if (cleanResult.startsWith(bt)) {
-            cleanResult = cleanResult.replace(new RegExp('^' + bt + '(?:json)?\\n?'), '');
-            cleanResult = cleanResult.replace(new RegExp('\\n?' + bt + '$'), '');
-        }
-
-        const parsedData = JSON.parse(cleanResult);
-
-        if(parsedData.name) document.getElementById('f_name').value = parsedData.name;
-        if(parsedData.phone) document.getElementById('f_phone').value = formatLocalPhone(parsedData.phone);
-        if(parsedData.price) document.getElementById('f_price').value = parsedData.price;
-        if(parsedData.city) document.getElementById('f_city').value = parsedData.city;
-        if(parsedData.address) document.getElementById('f_address').value = parsedData.address;
-        if(parsedData.offer) document.getElementById('f_offer').value = parsedData.offer;
-        if(parsedData.notes) document.getElementById('f_notes').value = parsedData.notes;
-
-        ['f_name', 'f_phone', 'f_price', 'f_city', 'f_address', 'f_offer', 'f_notes'].forEach(flashField);
-        showToast("اكتمل التحليل بالذكاء الاصطناعي بنجاح ✨", 'ai');
-        document.getElementById('f_name').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        processGeminiResult(result);
       } catch (error) {
         console.error("Gemini Error:", error);
         showToast("تعذر تحليل النص عبر الذكاء الاصطناعي، تأكد من النص.", 'error');
@@ -660,6 +727,10 @@
 
       if (!name || !phone) return showToast("الرجاء إدخال الاسم ورقم الهاتف قبل الطباعة!", 'error');
 
+      if (delivery.includes("High Express")) {
+        return showToast("طلبات هي اكسبرس يجب إدخالها عبر الزر البرتقالي المخصص ولا تُطبع يدوياً!", "error");
+      }
+
       const now = new Date();
       document.getElementById('p_date').textContent = `DATE: ${String(now.getDate()).padStart(2,'0')}.${String(now.getMonth() + 1).padStart(2,'0')}.${now.getFullYear()}`;
       document.getElementById('p_total').textContent = price;
@@ -694,8 +765,13 @@
     const saveOrder = async (mode) => {
       const name = document.getElementById('f_name').value.trim();
       const phone = document.getElementById('f_phone').value.trim();
+      const deliveryVal = document.getElementById('f_delivery').value;
 
       if (!name || !phone) return showToast("الرجاء إدخال الاسم ورقم الهاتف على الأقل!", 'error');
+
+      if (mode === 'normal' && deliveryVal.includes("High Express")) {
+        return showToast("الرجاء استخدام الزر البرتقالي (دخل الطلب هي اكسبرس) لحفظ وإرسال هذا الطلب!", 'error');
+      }
 
       if (mode === 'high_express') document.getElementById('f_delivery').value = "High Express - أم الفحم";
 
