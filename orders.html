@@ -1,4 +1,3 @@
-```html
 <!doctype html>
 <html lang="ar" dir="rtl">
 <head>
@@ -83,18 +82,28 @@
       display: none; align-items: center; justify-content: center; z-index: 2000; padding: 20px;
     }
     .modal-overlay.show { display: flex; }
-    .modal-content { background: var(--card); width: 100%; max-width: 450px; padding: 24px; border-radius: 32px; border: 1px solid var(--border); overflow-y: auto; max-height: 90vh; }
+    .modal-content {
+      background: var(--card); width: 100%; max-width: 450px; padding: 24px;
+      border-radius: 32px; border: 1px solid var(--border); overflow-y: auto; max-height: 90vh;
+    }
 
-    .smart-box { background: rgba(59, 130, 246, 0.1); border: 1px dashed var(--primary); padding: 15px; border-radius: 16px; margin-bottom: 20px; }
-    .smart-box h4 { margin: 0 0 10px 0; font-size: 14px; color: var(--primary); display: flex; align-items: center; gap: 8px; }
+    .smart-box {
+      background: rgba(59, 130, 246, 0.1); border: 1px dashed var(--primary);
+      padding: 15px; border-radius: 16px; margin-bottom: 20px;
+    }
+    .smart-box h4 {
+      margin: 0 0 10px 0; font-size: 14px; color: var(--primary);
+      display: flex; align-items: center; gap: 8px;
+    }
 
     input, select, textarea {
-      width: 100%; padding: 12px; margin-bottom: 12px; border-radius: 12px; border: 1px solid var(--border);
-      background: rgba(0,0,0,0.2); color: white; outline: none; font-size: 15px; box-sizing: border-box;
+      width: 100%; padding: 12px; margin-bottom: 12px; border-radius: 12px;
+      border: 1px solid var(--border); background: rgba(0,0,0,0.2); color: white;
+      outline: none; font-size: 15px; box-sizing: border-box;
     }
     input:focus, textarea:focus { border-color: var(--primary); background: rgba(0,0,0,0.4); }
 
-    /* تم التعديل إلى 10cm × 10cm */
+    /* 10cm x 10cm label */
     .invoice-box {
       background: white;
       color: black;
@@ -108,19 +117,27 @@
       border-radius: 2px;
       overflow: hidden;
     }
+
     .inv-header { text-align: center; border-bottom: 2px solid #000; padding-bottom: 8px; margin-bottom: 10px; }
     .inv-footer { border-top: 2px solid #000; padding-top: 8px; display: flex; justify-content: space-between; align-items: flex-end; }
 
-    #toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: #10b981; color: white; padding: 14px 28px; border-radius: 50px; font-weight: 700; z-index: 3000; display: none; box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
-    #loadingOverlay { position: fixed; inset: 0; background: rgba(6, 9, 20, 0.7); z-index: 4000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
-    .spinner { width: 44px; height: 44px; border: 4px solid rgba(59, 130, 246, 0.1); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s infinite; }
+    #toast {
+      position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+      background: #10b981; color: white; padding: 14px 28px; border-radius: 50px; font-weight: 700;
+      z-index: 3000; display: none; box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+    }
+    #loadingOverlay {
+      position: fixed; inset: 0; background: rgba(6, 9, 20, 0.7); z-index: 4000;
+      display: none; align-items: center; justify-content: center; backdrop-filter: blur(4px);
+    }
+    .spinner {
+      width: 44px; height: 44px; border: 4px solid rgba(59, 130, 246, 0.1);
+      border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s infinite;
+    }
     @keyframes spin { to { transform: rotate(360deg); } }
 
     @media print {
-      @page {
-        size: 10cm 10cm;
-        margin: 0;
-      }
+      @page { size: 10cm 10cm; margin: 0; }
 
       html, body {
         width: 10cm;
@@ -131,7 +148,6 @@
       }
 
       body * { visibility: hidden !important; }
-
       #invoicePreview, #invoicePreview * { visibility: visible !important; }
 
       #invoicePreview {
@@ -182,6 +198,7 @@
     <div style="position: absolute; bottom: -75px; left: 0; right: 0; display: flex; gap: 12px; justify-content: center;" class="no-print">
       <button class="btn btn-outline" onclick="closeModal('printModal')" style="flex-direction:row; padding:10px 20px;">إلغاء</button>
       <button class="btn btn-primary" onclick="window.print()" style="flex-direction:row; padding:10px 20px;"><i class="fa fa-print"></i> طباعة الوصل</button>
+      <button class="btn btn-success" onclick="downloadPdfLabel()" style="flex-direction:row; padding:10px 20px;"><i class="fa fa-file-pdf"></i> تحميل PDF</button>
     </div>
   </div>
 </div>
@@ -249,8 +266,10 @@
 
 <div class="container" id="ordersList"></div>
 
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+
 <script>
-/** ✅ رابط السكربت الجديد */
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxaA4Wc7cEyU6gx-MzuA_C8psZPuWCLmIJ9TPjnqX_RGG4SDQR0Jeeqcnf85Q65NdlK/exec";
 const DASH_KEY = "12345678";
 
@@ -262,17 +281,18 @@ let editingRow = null;
 
 function showLoading(s) { document.getElementById('loadingOverlay').style.display = s ? 'flex' : 'none'; }
 function showToast(m) { const t = document.getElementById('toast'); t.textContent = m; t.style.display = 'block'; setTimeout(() => t.style.display = 'none', 2500); }
-const safe = (v) => (v === undefined || v === null || String(v).toLowerCase()==="undefined" || String(v).toLowerCase()==="null") ? "" : String(v).trim();
+const safe = (v) => (v === undefined || v === null || String(v).toLowerCase() === "undefined" || String(v).toLowerCase() === "null") ? "" : String(v).trim();
 
 function formatLocalPhone(p) {
-  if(!p) return "";
+  if (!p) return "";
   let d = String(p).replace(/\D/g, "");
   if (d.startsWith("972")) d = "0" + d.substring(3);
   if (!d.startsWith("0") && d.length === 9) d = "0" + d;
   return d;
 }
+
 function normalizePhoneForLink(p) {
-  let d = String(p||"").replace(/\D/g, "");
+  let d = String(p || "").replace(/\D/g, "");
   if (d.startsWith("0")) d = "972" + d.substring(1);
   if (!d.startsWith("972") && d.length === 9) d = "972" + d;
   return d;
@@ -280,23 +300,23 @@ function normalizePhoneForLink(p) {
 
 function analyzeText() {
   const raw = document.getElementById('smartInput').value;
-  if(!raw.trim()) return showToast("الصق نصاً أولاً");
+  if (!raw.trim()) return showToast("الصق نصاً أولاً");
 
   const phoneMatch = raw.match(/(?:05|972|5)\d{8,11}/);
-  if(phoneMatch) document.getElementById('f_phone').value = formatLocalPhone(phoneMatch[0]);
+  if (phoneMatch) document.getElementById('f_phone').value = formatLocalPhone(phoneMatch[0]);
 
   const priceMatch = raw.match(/(\d{2,4})\s*(?:₪|shekel|ILS|السعر)/i) || raw.match(/(?:₪|السعر|Price)\s*:?\s*(\d{2,4})/i);
-  if(priceMatch) document.getElementById('f_price').value = priceMatch[1];
+  if (priceMatch) document.getElementById('f_price').value = priceMatch[1];
 
   const nameMatch = raw.match(/(?:الاسم|Name)\s*:?\s*([^\n|]+)/i);
-  if(nameMatch) document.getElementById('f_name').value = nameMatch[1].trim();
+  if (nameMatch) document.getElementById('f_name').value = nameMatch[1].trim();
   else {
     const firstLine = raw.split('\n')[0].trim();
-    if(firstLine.length < 30) document.getElementById('f_name').value = firstLine;
+    if (firstLine.length < 30) document.getElementById('f_name').value = firstLine;
   }
 
   const cityMatch = raw.match(/(?:المدينة|city|عنوان|من)\s*:?\s*([^\n|]+)/i);
-  if(cityMatch) document.getElementById('f_city').value = cityMatch[1].trim();
+  if (cityMatch) document.getElementById('f_city').value = cityMatch[1].trim();
 
   document.getElementById('f_offer').value = raw.substring(0, 100).trim();
   showToast("تم تحليل البيانات بنجاح ⚡");
@@ -312,7 +332,7 @@ async function load() {
 
     allOrders = Array.isArray(data) ? data : [];
     renderOrders(allOrders);
-  } catch(e) {
+  } catch (e) {
     showToast("خطأ في جلب البيانات");
     document.getElementById('ordersList').innerHTML =
       `<div style="text-align:center; padding:50px; color:var(--muted);">تعذّر تحميل الطلبات</div>`;
@@ -380,10 +400,9 @@ function renderOrders(list) {
   }).join('');
 }
 
-/** ✅ WhatsApp Message */
 async function sendMsg(row, lang) {
   const o = allOrders.find(x => x.rowIndex == row);
-  if(!o) return;
+  if (!o) return;
 
   const E = {
     blackHeart: "\u{1F5A4}",
@@ -438,11 +457,10 @@ ${E.card} תשלום: ${paymentMethod}${deliveryTxt}${noteTxt}${contactBlock}${s
   window.open(wa, "_blank");
 }
 
-/** ✅ اعتماد */
 async function approve(row) {
   showLoading(true);
   const o = allOrders.find(x => x.rowIndex == row);
-  if(!o) { showLoading(false); return; }
+  if (!o) { showLoading(false); return; }
 
   const p = new URLSearchParams({
     action: "updateOrder", key: DASH_KEY, row: row,
@@ -456,34 +474,33 @@ async function approve(row) {
   try {
     const res = await fetch(`${SCRIPT_URL}?${p.toString()}`);
     const data = await res.json();
-    if(data.result === "SUCCESS") {
+    if (data.result === "SUCCESS") {
       showToast("تم الاعتماد بنجاح ✨");
       load();
     } else {
       showToast(data.message || "فشل التحديث");
       showLoading(false);
     }
-  } catch(e) {
+  } catch (e) {
     showToast("فشل التحديث");
     showLoading(false);
   }
 }
 
-/** ✅ شحن (High Express فقط) */
-async function sendToDelivery(row){
+async function sendToDelivery(row) {
   showLoading(true);
-  try{
+  try {
     const res = await fetch(`${SCRIPT_URL}?action=sendToDelivery&key=${encodeURIComponent(DASH_KEY)}&row=${row}&_=${Date.now()}`);
     const data = await res.json();
 
-    if(data.result === "SUCCESS"){
+    if (data.result === "SUCCESS") {
       showToast(data.delivery_order_id ? `تم الإرسال ✅ رقم: ${data.delivery_order_id}` : "تم الإرسال ✅");
       load();
     } else {
       showToast(data.message || "فشل الإرسال");
       showLoading(false);
     }
-  }catch(e){
+  } catch (e) {
     showToast("فشل الإرسال");
     showLoading(false);
   }
@@ -508,7 +525,7 @@ function openAddModal() {
 
 function openEditModal(row) {
   const o = allOrders.find(x => x.rowIndex == row);
-  if(!o) return;
+  if (!o) return;
 
   editingRow = row;
   document.getElementById('modalTitle').textContent = "تعديل تفاصيل الطلب";
@@ -551,7 +568,7 @@ async function saveOrder() {
     const res = await fetch(`${SCRIPT_URL}?` + new URLSearchParams(payload).toString());
     const data = await res.json();
 
-    if(data.result === "SUCCESS") {
+    if (data.result === "SUCCESS") {
       showToast(isAdd ? "تمت إضافة الطلب بنجاح ✨" : "تم الحفظ بنجاح ✨");
       closeModal('orderModal');
       load();
@@ -559,7 +576,7 @@ async function saveOrder() {
       showToast(data.message || "فشل الحفظ");
       showLoading(false);
     }
-  } catch(e) {
+  } catch (e) {
     showToast("فشل الحفظ");
     showLoading(false);
   }
@@ -570,19 +587,49 @@ function openPrintModal(row, lang) {
   if (!o) return;
 
   const now = new Date();
-  document.getElementById('p_date').textContent = `DATE: ${now.getDate()}.${now.getMonth()+1}.${now.getFullYear()}`;
+  document.getElementById('p_date').textContent = `DATE: ${now.getDate()}.${now.getMonth() + 1}.${now.getFullYear()}`;
   document.getElementById('p_ord').textContent = "ORD: " + (safe(o.orderId) || "MAD-00000");
   document.getElementById('p_total').textContent = safe(o.price) || "0";
   document.getElementById('p_qr').src = `https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=https://wa.me/${normalizePhoneForLink(o.phone)}`;
   document.getElementById('p_footer_phone').textContent = formatLocalPhone(o.phone);
 
   const c = document.getElementById('p_content_lang');
-  c.style.direction = (lang === 'he') ? "rtl" : "rtl";
+  c.style.direction = "rtl";
   c.innerHTML = (lang === 'ar')
     ? `<strong>الاسم:</strong> ${safe(o.name)}<br><strong>الهاتف:</strong> ${formatLocalPhone(o.phone)}<br><strong>المدينة:</strong> ${safe(o.city)}<br><strong>العنوان:</strong> ${safe(o.address || "")}<br><strong>التوصيل:</strong> ${safe(o.delivery)}<br><strong>الدفع:</strong> ${safe(o.payment)}<br><strong>الأصناف:</strong> ${safe(o.offer)}`
     : `<strong>לכבוד:</strong> ${safe(o.name)}<br><strong>טלפון:</strong> ${formatLocalPhone(o.phone)}<br><strong>עיר:</strong> ${safe(o.city)}<br><strong>כתובת:</strong> ${safe(o.address || "")}<br><strong>משלוח:</strong> ${safe(o.delivery)}<br><strong>תשלום:</strong> ${safe(o.payment)}<br><strong>פריטים:</strong> ${safe(o.offer)}`;
 
   document.getElementById('printModal').classList.add('show');
+}
+
+async function downloadPdfLabel() {
+  const el = document.getElementById("invoicePreview");
+  if (!el) return;
+
+  showLoading(true);
+  try {
+    const { jsPDF } = window.jspdf;
+    const canvas = await html2canvas(el, {
+      scale: 3,
+      backgroundColor: "#ffffff",
+      useCORS: true
+    });
+
+    const img = canvas.toDataURL("image/png");
+    const pdf = new jsPDF({
+      orientation: "portrait",
+      unit: "mm",
+      format: [100, 100]
+    });
+
+    pdf.addImage(img, "PNG", 0, 0, 100, 100);
+    const ord = (document.getElementById("p_ord").textContent || "MAD-Label").replace(/[^\w\-]+/g, "_");
+    pdf.save(`${ord}_10x10.pdf`);
+    showToast("تم تحميل PDF ✅");
+  } catch (e) {
+    showToast("فشل تحميل PDF");
+  }
+  showLoading(false);
 }
 
 function closeModal(id) { document.getElementById(id).classList.remove('show'); }
