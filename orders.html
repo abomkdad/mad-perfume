@@ -3,98 +3,51 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MAD Manager PRO v9.1 - Sheet Compatible</title>
-
-  <!-- Scripts -->
+  <title>MAD Manager - New Columns</title>
   <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Almarai:wght@300;400;700;800&display=swap');
-    body { font-family: 'Almarai', sans-serif; background-color: #020617; }
-    .no-scrollbar::-webkit-scrollbar { display: none; }
-    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-    @keyframes bounce-subtle { 0%,100%{transform:translate(-50%,0)} 50%{transform:translate(-50%,-10px)} }
-    .animate-toast { animation: bounce-subtle 2s infinite ease-in-out; }
-  </style>
-
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: { slate: { 950:'#020617', 900:'#0f172a', 800:'#1e293b' } }
-        }
-      }
-    }
-  </script>
 </head>
-
-<body>
+<body class="bg-slate-950">
   <div id="root"></div>
 
   <script type="text/babel">
-    const { useState, useEffect, useMemo } = React;
+    const { useEffect, useMemo, useState } = React;
 
-    // ✅ نفس سكربت Google Apps Script عندك
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxFkUV6jCQLbfhHoC5QHGV_--D1-Ss_ktXSPZ-UzPIfaC05THGr4qn7ytHbDJ9W6JjBow/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzXDBGY0PTODQR0CW2btQtBHRsqbUfrl3nYx2GTNKmF4LN_8itoWGTS7KDwfU7DL5GS3w/exec";
     const SECRET_KEY = "12345678";
 
-    // ✅ حالات الطلب (مطابقة لوصفك)
-    const PAYMENT_STATUSES = [
-      "NEW",
-      "بانتظار الإرسال للتجهيز",
-      "READY ✅",
-      "WA Sent",
-      "direct",
-      "צרו קשר איתי",
-      "بالطريق (Olivery)",
-      "تم التسليم"
-    ];
-
-    const App = () => {
+    function App() {
       const [orders, setOrders] = useState([]);
       const [loading, setLoading] = useState(false);
-      const [searchTerm, setSearchTerm] = useState("");
-      const [activeTab, setActiveTab] = useState("All");
-      const [isModalOpen, setIsModalOpen] = useState(false);
-      const [aiInput, setAiInput] = useState("");
-      const [parsingAi, setParsingAi] = useState(false);
-      const [currentOrder, setCurrentOrder] = useState(null);
-      const [toast, setToast] = useState({ show: false, message: "", type: "success" });
+      const [search, setSearch] = useState("");
+      const [open, setOpen] = useState(false);
+      const [current, setCurrent] = useState(null);
+      const [aiText, setAiText] = useState("");
 
-      // ✅ مطابقة لأعمدتك الحالية
-      // orderId, name(رموز منتجات), phone, city, address, price(نص), payment(حالة), offer(لغة/مندوب), notes, status(إضافي)
-      const [formData, setFormData] = useState({
+      const [form, setForm] = useState({
+        date: "",
         orderId: "",
+        offer: "",
         name: "",
         phone: "",
-        city: "",
         address: "",
         price: "",
-        payment: "NEW",
-        offer: "ar",
-        notes: "",
-        status: ""
+        Status: "NEW"
       });
 
-      const showNotify = (message, type = "success") => {
-        setToast({ show: true, message: String(message), type });
-        setTimeout(() => setToast({ show: false, message: "", type: "success" }), 4000);
-      };
+      const toast = (msg) => alert(msg);
 
       const fetchData = async () => {
         setLoading(true);
         try {
-          const response = await fetch(`${SCRIPT_URL}?action=get&key=${encodeURIComponent(SECRET_KEY)}&t=${Date.now()}`);
-          const data = await response.json();
-          if (Array.isArray(data)) setOrders(data.filter(o => o && o.rowIndex));
-          else if (data && data.result === "ERROR") showNotify(data.message || "فشل جلب البيانات", "error");
-          else showNotify("رد غير متوقع من السيرفر", "error");
-        } catch (e) {
-          showNotify("خطأ في الاتصال بالبيانات", "error");
+          const r = await fetch(`${SCRIPT_URL}?action=get&key=${encodeURIComponent(SECRET_KEY)}&t=${Date.now()}`);
+          const j = await r.json();
+          if (Array.isArray(j)) setOrders(j);
+          else toast(j.message || "Fetch error");
+        } catch {
+          toast("Connection error");
         } finally {
           setLoading(false);
         }
@@ -102,533 +55,192 @@
 
       useEffect(() => { fetchData(); }, []);
 
-      const extractNumber = (txt) => {
-        const m = String(txt || "").match(/(\d+(?:\.\d+)?)/);
-        return m ? parseFloat(m[1]) : 0;
-      };
-
-      const stats = useMemo(() => {
-        const total = orders.length;
-
-        const pending = orders.filter(o => {
-          const s = String(o.payment || "").trim().toLowerCase();
-          return !s || s === "new" || s.includes("بانتظار");
-        }).length;
-
-        const shipping = orders.filter(o => String(o.payment || "").includes("بالطريق") || o.delivery_order_id).length;
-
-        const revenue = orders.reduce((acc, curr) => acc + extractNumber(curr.price), 0);
-
-        return { total, pending, shipping, revenue };
-      }, [orders]);
-
-      const filteredOrders = useMemo(() => {
-        const search = searchTerm.toLowerCase().trim();
-
+      const filtered = useMemo(() => {
+        const s = search.toLowerCase().trim();
         return orders.filter(o => {
-          const id = String(o.orderId || "").toLowerCase();
-          const phone = String(o.phone || "");
-          const name = String(o.name || "").toLowerCase(); // رموز المنتجات
-          const pay = String(o.payment || "").toLowerCase();
-
-          const matchesSearch = id.includes(search) || phone.includes(search) || name.includes(search) || pay.includes(search);
-          if (!matchesSearch) return false;
-
-          const p = String(o.payment || "");
-
-          if (activeTab === "All") return true;
-          if (activeTab === "New") return !p || p === "NEW" || p.includes("بانتظار");
-          if (activeTab === "Shipping") return p.includes("بالطريق") || !!o.delivery_order_id;
-          if (activeTab === "Done") return p.includes("تم");
-          return true;
+          return String(o.orderId || "").toLowerCase().includes(s) ||
+                 String(o.name || "").toLowerCase().includes(s) ||
+                 String(o.offer || "").toLowerCase().includes(s) ||
+                 String(o.phone || "").includes(s) ||
+                 String(o.Status || "").toLowerCase().includes(s);
         }).reverse();
-      }, [orders, searchTerm, activeTab]);
+      }, [orders, search]);
 
-      const openModal = (order = null) => {
-        if (order) {
-          setCurrentOrder(order);
-          setFormData({
-            orderId: order.orderId || "",
-            name: order.name || "",
-            phone: order.phone || "",
-            city: order.city || "",
-            address: order.address || "",
-            price: order.price || "",
-            payment: order.payment || "NEW",
-            offer: order.offer || "ar",
-            notes: order.notes || "",
-            status: order.status || ""
+      const openModal = (o = null) => {
+        if (o) {
+          setCurrent(o);
+          setForm({
+            date: o.date || "",
+            orderId: o.orderId || "",
+            offer: o.offer || "",
+            name: o.name || "",
+            phone: o.phone || "",
+            address: o.address || "",
+            price: o.price || "",
+            Status: o.Status || "NEW"
           });
         } else {
-          setCurrentOrder(null);
-          setFormData({
-            orderId: "",
-            name: "",
-            phone: "",
-            city: "",
-            address: "",
-            price: "",
-            payment: "NEW",
-            offer: "ar",
-            notes: "",
-            status: ""
-          });
+          setCurrent(null);
+          setForm({ date:"", orderId:"", offer:"", name:"", phone:"", address:"", price:"", Status:"NEW" });
         }
-        setAiInput("");
-        setIsModalOpen(true);
+        setAiText("");
+        setOpen(true);
       };
 
-      const handleAiParse = async () => {
-        if (!aiInput.trim()) return showNotify("يرجى لصق نص أولاً", "error");
-        setParsingAi(true);
-
-        try {
-          const response = await fetch(SCRIPT_URL, {
-            method: "POST",
-            mode: "cors",
-            headers: { "Content-Type": "text/plain;charset=utf-8" },
-            body: JSON.stringify({ action: "analyze", text: aiInput, key: SECRET_KEY })
-          });
-
-          const res = await response.json();
-          if (res.result === "SUCCESS") {
-            const d = res.data || {};
-            setFormData(prev => ({
-              ...prev,
-              orderId: d.orderId || prev.orderId,
-              phone: d.phone || prev.phone,
-              city: d.city || prev.city,
-              address: d.address || prev.address,
-              name: d.name || prev.name,
-              price: d.price || prev.price,
-              payment: d.payment || prev.payment,
-              offer: d.offer || prev.offer,
-              notes: d.notes || prev.notes,
-              status: d.status || prev.status
-            }));
-            showNotify("تم التحليل بالذكاء ✨");
-          } else {
-            showNotify(res.message || "فشل تحليل AI", "error");
-          }
-        } catch (e) {
-          showNotify("فشل تحليل AI", "error");
-        } finally {
-          setParsingAi(false);
-        }
-      };
-
-      const handleSubmit = async () => {
+      const saveOrder = async () => {
         setLoading(true);
-
-        const payload = {
-          ...formData,
-          action: currentOrder ? "updateOrder" : "addOrder",
-          row: currentOrder ? currentOrder.rowIndex : undefined,
-          key: SECRET_KEY
-        };
-
         try {
-          const response = await fetch(SCRIPT_URL, {
+          const payload = {
+            ...form,
+            action: current ? "updateOrder" : "addOrder",
+            row: current ? current.rowIndex : undefined,
+            key: SECRET_KEY
+          };
+          const r = await fetch(SCRIPT_URL, {
             method: "POST",
-            mode: "cors",
             headers: { "Content-Type": "text/plain;charset=utf-8" },
             body: JSON.stringify(payload)
           });
-
-          const res = await response.json();
-          if (res.result === "SUCCESS") {
-            showNotify("تم الحفظ بنجاح");
-            setIsModalOpen(false);
+          const j = await r.json();
+          if (j.result === "SUCCESS") {
+            toast("تم الحفظ");
+            setOpen(false);
             fetchData();
-          } else {
-            showNotify(res.message || "فشل الحفظ", "error");
-          }
-        } catch (e) {
-          showNotify("فشل الحفظ", "error");
+          } else toast(j.message || "Save failed");
+        } catch {
+          toast("Save failed");
         } finally {
           setLoading(false);
         }
       };
 
-      const handleWhatsApp = (order, lang) => {
-        let phone = String(order.phone || "").replace(/\D/g, "");
-        if (!phone) return showNotify("رقم الهاتف غير موجود", "error");
-
-        const msg = lang === "ar"
-          ? `أهلاً، طلبك من MAD قيد المعالجة.`
-          : `שלום, ההזמנה שלך מ-MAD בטיפול.`;
-
-        window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, "_blank");
-      };
-
-      const shipWithOlivery = async (order) => {
+      const analyze = async () => {
+        if (!aiText.trim()) return toast("الصق نص");
         setLoading(true);
         try {
-          const response = await fetch(SCRIPT_URL, {
+          const r = await fetch(SCRIPT_URL, {
             method: "POST",
-            mode: "cors",
             headers: { "Content-Type": "text/plain;charset=utf-8" },
-            body: JSON.stringify({ action: "sendToDelivery", row: order.rowIndex, key: SECRET_KEY })
+            body: JSON.stringify({ action: "analyze", text: aiText, key: SECRET_KEY })
           });
-          const data = await response.json();
+          const j = await r.json();
+          if (j.result === "SUCCESS") {
+            const d = j.data || {};
+            setForm(prev => ({
+              ...prev,
+              date: d.date || prev.date,
+              orderId: d.orderId || prev.orderId,
+              offer: d.offer || prev.offer,
+              name: d.name || prev.name,
+              phone: d.phone || prev.phone,
+              address: d.address || prev.address,
+              price: d.price || prev.price,
+              Status: d.Status || prev.Status
+            }));
+            toast("تم التحليل");
+          } else toast(j.message || "Analyze failed");
+        } catch {
+          toast("Analyze failed");
+        } finally {
+          setLoading(false);
+        }
+      };
 
-          if (data.result === "SUCCESS") {
-            showNotify(`✅ تم إرسال الطلب للشحن! رقم: ${data.delivery_order_id || ""}`);
+      const ship = async (o) => {
+        setLoading(true);
+        try {
+          const r = await fetch(SCRIPT_URL, {
+            method: "POST",
+            headers: { "Content-Type": "text/plain;charset=utf-8" },
+            body: JSON.stringify({ action: "sendToDelivery", row: o.rowIndex, key: SECRET_KEY })
+          });
+          const j = await r.json();
+          if (j.result === "SUCCESS") {
+            toast("تم الشحن، رقم: " + (j.delivery_order_id || ""));
             fetchData();
-            return;
+          } else {
+            toast(j.message || "Shipping failed");
           }
-          throw new Error(data.message || "فشل الشحن");
-        } catch (e) {
-          // fallback GET (إذا المتصفح منع قراءة الرد)
-          const params = new URLSearchParams({ action: "sendToDelivery", row: order.rowIndex, key: SECRET_KEY, t: Date.now() });
-          window.open(`${SCRIPT_URL}?${params.toString()}`, "_blank");
-          showNotify("تم فتح رابط الشحن لتأكيد الطلب", "info");
+        } catch {
+          toast("Shipping failed");
         } finally {
           setLoading(false);
         }
       };
 
       return (
-        <div className="min-h-screen text-slate-100 pb-24 selection:bg-blue-500/30">
+        <div className="max-w-5xl mx-auto p-4 text-white">
+          <div className="flex gap-2 mb-4">
+            <input
+              className="flex-1 p-3 rounded bg-slate-800"
+              placeholder="بحث..."
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+            />
+            <button className="px-4 py-3 bg-blue-600 rounded" onClick={fetchData}>تحديث</button>
+            <button className="px-4 py-3 bg-emerald-600 rounded" onClick={() => openModal()}>طلب جديد</button>
+          </div>
 
-          {/* Toast */}
-          {toast.show && (
-            <div className={`fixed bottom-24 left-1/2 -translate-x-1/2 z-[60] px-6 py-3 rounded-full shadow-2xl flex items-center gap-3 animate-toast border ${
-              toast.type === "error" ? "bg-red-600 border-red-400" :
-              toast.type === "info" ? "bg-blue-600 border-blue-400" :
-              "bg-emerald-600 border-emerald-400"
-            }`}>
-              <i className={`fas ${toast.type === "error" ? "fa-times" : "fa-check"}`}></i>
-              <span className="font-bold whitespace-nowrap">{toast.message}</span>
-            </div>
-          )}
+          {loading && <div className="mb-4 text-amber-400">...جاري المعالجة</div>}
 
-          {/* Loader */}
-          {loading && (
-            <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-[100] flex flex-col items-center justify-center">
-              <div className="w-12 h-12 border-4 border-blue-500/20 border-t-blue-500 rounded-full animate-spin"></div>
-              <p className="mt-4 font-black text-blue-400 tracking-widest uppercase">MAD Loading...</p>
-            </div>
-          )}
-
-          {/* Header */}
-          <header className="sticky top-0 z-50 bg-slate-900/80 backdrop-blur-xl border-b border-white/5 px-4 py-4 lg:py-6 shadow-2xl">
-            <div className="max-w-5xl mx-auto">
-              <div className="flex items-center justify-between mb-6">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-700 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/20">
-                    <i className="fas fa-box text-white text-xl"></i>
-                  </div>
-                  <div>
-                    <h1 className="text-xl font-black tracking-tighter">MAD <span className="text-blue-500">MANAGER</span></h1>
-                    <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">v9.1 - Sheet Compatible</p>
-                  </div>
+          <div className="grid gap-3">
+            {filtered.map(o => (
+              <div key={o.rowIndex} className="bg-slate-900 border border-slate-700 rounded p-4">
+                <div className="flex justify-between mb-2">
+                  <div>REF: {o.orderId || "N/A"}</div>
+                  <div>{o.Status || "NEW"}</div>
                 </div>
+                <div className="text-sm text-slate-300">الاسم: {o.name || "-"}</div>
+                <div className="text-sm text-slate-300">العرض: {o.offer || "-"}</div>
+                <div className="text-sm text-slate-300">الهاتف: {o.phone || "-"}</div>
+                <div className="text-sm text-slate-300">العنوان: {o.address || "-"}</div>
+                <div className="text-sm text-slate-300">السعر: {o.price || "-"}</div>
+                <div className="mt-3 flex gap-2">
+                  <button className="px-3 py-2 bg-indigo-600 rounded" onClick={() => openModal(o)}>تعديل</button>
+                  <button
+                    className="px-3 py-2 bg-amber-500 text-black rounded disabled:opacity-40"
+                    onClick={() => ship(o)}
+                    disabled={!!o.delivery_order_id}
+                  >
+                    {o.delivery_order_id ? `بوليصة: ${o.delivery_order_id}` : "شحن الآن"}
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {open && (
+            <div className="fixed inset-0 bg-black/70 flex items-center justify-center p-4">
+              <div className="w-full max-w-2xl bg-slate-900 rounded p-4 space-y-3">
+                <textarea
+                  className="w-full h-24 p-2 rounded bg-slate-800"
+                  placeholder="نص للتحليل بالذكاء..."
+                  value={aiText}
+                  onChange={e => setAiText(e.target.value)}
+                />
+                <button className="px-4 py-2 bg-blue-600 rounded" onClick={analyze}>تحليل AI</button>
+
+                <input className="w-full p-2 rounded bg-slate-800" placeholder="date" value={form.date} onChange={e=>setForm({...form,date:e.target.value})}/>
+                <input className="w-full p-2 rounded bg-slate-800" placeholder="orderId" value={form.orderId} onChange={e=>setForm({...form,orderId:e.target.value})}/>
+                <input className="w-full p-2 rounded bg-slate-800" placeholder="offer" value={form.offer} onChange={e=>setForm({...form,offer:e.target.value})}/>
+                <input className="w-full p-2 rounded bg-slate-800" placeholder="name" value={form.name} onChange={e=>setForm({...form,name:e.target.value})}/>
+                <input className="w-full p-2 rounded bg-slate-800" placeholder="phone" value={form.phone} onChange={e=>setForm({...form,phone:e.target.value})}/>
+                <input className="w-full p-2 rounded bg-slate-800" placeholder="address" value={form.address} onChange={e=>setForm({...form,address:e.target.value})}/>
+                <input className="w-full p-2 rounded bg-slate-800" placeholder="price" value={form.price} onChange={e=>setForm({...form,price:e.target.value})}/>
+                <input className="w-full p-2 rounded bg-slate-800" placeholder="Status" value={form.Status} onChange={e=>setForm({...form,Status:e.target.value})}/>
 
                 <div className="flex gap-2">
-                  <button onClick={fetchData} className="p-3 bg-slate-800 hover:bg-slate-700 rounded-xl transition-all border border-white/5 active:scale-95">
-                    <i className={`fas fa-sync-alt ${loading ? "animate-spin text-blue-400" : "text-slate-400"}`}></i>
-                  </button>
-                  <button onClick={() => openModal()} className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-bold flex items-center gap-2 transition-all shadow-lg shadow-blue-600/20 active:scale-95">
-                    <i className="fas fa-plus"></i>
-                    <span className="hidden sm:inline">طلب جديد</span>
-                  </button>
+                  <button className="flex-1 py-2 bg-slate-700 rounded" onClick={()=>setOpen(false)}>إلغاء</button>
+                  <button className="flex-1 py-2 bg-emerald-600 rounded" onClick={saveOrder}>حفظ</button>
                 </div>
-              </div>
-
-              {/* Stats */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
-                <div className="bg-slate-800/50 p-4 rounded-2xl border border-white/5">
-                  <p className="text-slate-500 text-xs font-bold mb-1">إجمالي الطلبات</p>
-                  <p className="text-2xl font-black">{stats.total}</p>
-                </div>
-                <div className="bg-slate-800/50 p-4 rounded-2xl border border-white/5">
-                  <p className="text-blue-400 text-xs font-bold mb-1">بانتظار</p>
-                  <p className="text-2xl font-black">{stats.pending}</p>
-                </div>
-                <div className="bg-slate-800/50 p-4 rounded-2xl border border-white/5">
-                  <p className="text-amber-400 text-xs font-bold mb-1">بالطريق</p>
-                  <p className="text-2xl font-black">{stats.shipping}</p>
-                </div>
-                <div className="bg-slate-800/50 p-4 rounded-2xl border border-white/5">
-                  <p className="text-emerald-400 text-xs font-bold mb-1">إجمالي المبيعات</p>
-                  <p className="text-2xl font-black text-emerald-500">₪{stats.revenue.toLocaleString()}</p>
-                </div>
-              </div>
-
-              {/* Search & Tabs */}
-              <div className="flex flex-col md:flex-row gap-4">
-                <div className="relative flex-1">
-                  <i className="fas fa-search absolute right-4 top-1/2 -translate-y-1/2 text-slate-500"></i>
-                  <input
-                    type="text"
-                    placeholder="ابحث بالمرجع، الهاتف، الرموز أو الحالة..."
-                    className="w-full bg-slate-800/80 border border-white/10 rounded-xl py-3 pr-12 pl-4 text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all text-right"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                  />
-                </div>
-
-                <div className="flex bg-slate-800/80 p-1 rounded-xl border border-white/10 overflow-x-auto no-scrollbar">
-                  {["All","New","Shipping","Done"].map(tab => (
-                    <button
-                      key={tab}
-                      onClick={() => setActiveTab(tab)}
-                      className={`px-4 py-2 rounded-lg text-sm font-bold transition-all whitespace-nowrap ${
-                        activeTab === tab ? "bg-blue-600 text-white shadow-lg" : "text-slate-400 hover:text-white"
-                      }`}
-                    >
-                      {tab === "All" ? "الكل" : tab === "New" ? "جديد/بانتظار" : tab === "Shipping" ? "بالطريق" : "تم"}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </header>
-
-          {/* Orders */}
-          <main className="max-w-5xl mx-auto px-4 mt-8">
-            <div className="grid gap-4">
-              {filteredOrders.length ? filteredOrders.map((order, idx) => (
-                <div key={order.rowIndex || idx} className="bg-slate-900 border border-white/5 rounded-3xl p-5 hover:border-blue-500/30 transition-all group">
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="flex items-center gap-3">
-                      <span className="text-[10px] bg-slate-800 px-2 py-1 rounded text-slate-400 font-bold tracking-widest uppercase">
-                        REF: {String(order.orderId || "N/A")}
-                      </span>
-
-                      <span className={`text-[10px] font-black px-2 py-1 rounded-full uppercase ${
-                        String(order.payment || "").includes("بالطريق") ? "bg-amber-500/10 text-amber-500" :
-                        String(order.payment || "").includes("تم") ? "bg-emerald-500/10 text-emerald-500" :
-                        "bg-blue-500/10 text-blue-500"
-                      }`}>
-                        {String(order.payment || "NEW")}
-                      </span>
-                    </div>
-
-                    <button onClick={() => openModal(order)} className="text-slate-500 hover:text-white p-2">
-                      <i className="fas fa-ellipsis-v"></i>
-                    </button>
-                  </div>
-
-                  <div className="flex flex-col md:flex-row md:items-center gap-6">
-                    <div className="flex-1 cursor-pointer" onClick={() => openModal(order)}>
-                      <h3 className="text-lg font-black mb-2 group-hover:text-blue-400 transition-colors">
-                        {String(order.name || "— رموز/أصناف غير محددة —")}
-                      </h3>
-
-                      <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-slate-400">
-                        <div className="flex items-center gap-2"><i className="fas fa-phone text-blue-500 text-xs"></i> {String(order.phone || "---")}</div>
-                        <div className="flex items-center gap-2"><i className="fas fa-map-marker-alt text-blue-500 text-xs"></i> {String(order.city || "")} {order.address ? ` - ${String(order.address)}` : ""}</div>
-                      </div>
-
-                      {(order.notes || order.offer || order.status) && (
-                        <div className="mt-4 bg-slate-800/50 border-r-4 border-blue-600 p-3 rounded-lg text-slate-300 text-sm leading-relaxed whitespace-pre-wrap">
-                          {order.offer ? `Offer: ${order.offer}\n` : ""}
-                          {order.notes ? `Notes: ${order.notes}\n` : ""}
-                          {order.status ? `Status(extra): ${order.status}` : ""}
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="flex flex-col gap-3 min-w-[160px]">
-                      <div className="flex items-center justify-between text-sm font-black bg-slate-800 p-3 rounded-xl border border-white/5">
-                        <span className="text-slate-500 text-xs">price:</span>
-                        <span className="text-blue-400 text-right">{String(order.price || "—")}</span>
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-2">
-                        <button onClick={() => handleWhatsApp(order, "ar")} className="flex flex-col items-center justify-center gap-1 p-2 bg-emerald-600/10 hover:bg-emerald-600 text-emerald-500 hover:text-white rounded-xl transition-all border border-emerald-500/20">
-                          <i className="fab fa-whatsapp text-lg"></i><span className="text-[10px] font-bold">عربي</span>
-                        </button>
-                        <button onClick={() => handleWhatsApp(order, "he")} className="flex flex-col items-center justify-center gap-1 p-2 bg-indigo-600/10 hover:bg-indigo-600 text-indigo-400 hover:text-white rounded-xl transition-all border border-indigo-500/20">
-                          <i className="fab fa-whatsapp text-lg"></i><span className="text-[10px] font-bold">Heb</span>
-                        </button>
-                      </div>
-
-                      <button
-                        onClick={() => shipWithOlivery(order)}
-                        disabled={!!order.delivery_order_id}
-                        className={`flex items-center justify-center gap-2 p-3 rounded-xl font-bold transition-all ${
-                          order.delivery_order_id
-                            ? "bg-slate-800 text-emerald-500 border border-emerald-500/30 cursor-default"
-                            : "bg-amber-500 hover:bg-amber-400 text-slate-900 shadow-lg shadow-amber-500/20 active:scale-95"
-                        }`}
-                      >
-                        <i className="fas fa-truck"></i>
-                        <span className="text-xs uppercase">
-                          {order.delivery_order_id ? `بوليصة: ${order.delivery_order_id}` : "شحن الآن"}
-                        </span>
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              )) : (
-                <div className="flex flex-col items-center justify-center py-20 opacity-20">
-                  <i className="fas fa-search text-6xl mb-4"></i>
-                  <p className="text-xl font-bold">لا يوجد نتائج لعرضها</p>
-                </div>
-              )}
-            </div>
-          </main>
-
-          {/* FAB */}
-          <button onClick={() => openModal()} className="fixed bottom-6 right-6 w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center shadow-2xl shadow-blue-500/40 text-white z-40 active:scale-90 transition-transform lg:hidden">
-            <i className="fas fa-plus text-2xl"></i>
-          </button>
-
-          {/* Modal */}
-          {isModalOpen && (
-            <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/90 backdrop-blur-sm overflow-y-auto">
-              <div className="bg-slate-900 w-full max-w-2xl rounded-[2.5rem] border border-white/10 shadow-2xl overflow-hidden">
-                <div className="px-8 py-6 border-b border-white/5 flex items-center justify-between bg-slate-900/50 sticky top-0 backdrop-blur-lg">
-                  <h2 className="text-2xl font-black">{currentOrder ? "تعديل الطلب" : "إضافة طلب جديد"}</h2>
-                  <button onClick={() => setIsModalOpen(false)} className="p-2 hover:bg-slate-800 rounded-full transition-colors text-slate-400">
-                    <i className="fas fa-times text-xl"></i>
-                  </button>
-                </div>
-
-                <div className="p-8 space-y-6 max-h-[75vh] overflow-y-auto text-right">
-
-                  {/* AI Parser */}
-                  <div className="bg-blue-600/5 border border-blue-500/30 rounded-3xl p-6">
-                    <div className="flex items-center gap-2 mb-4">
-                      <i className="fas fa-robot text-blue-400"></i>
-                      <span className="font-black text-blue-400 text-sm uppercase tracking-widest">Gemini AI Parser</span>
-                    </div>
-                    <textarea
-                      placeholder="الصق نص الطلب هنا..."
-                      className="w-full bg-slate-950/50 border border-white/10 rounded-2xl p-4 text-sm text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/50 h-32 transition-all text-right"
-                      value={aiInput}
-                      onChange={(e) => setAiInput(e.target.value)}
-                    />
-                    <button
-                      onClick={handleAiParse}
-                      disabled={parsingAi}
-                      className="mt-4 w-full bg-blue-600 hover:bg-blue-500 text-white p-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-all active:scale-95 disabled:opacity-50"
-                    >
-                      <i className={`fas ${parsingAi ? "fa-sync-alt fa-spin" : "fa-magic"}`}></i>
-                      تحليل البيانات بالذكاء الاصطناعي
-                    </button>
-                  </div>
-
-                  {/* Form */}
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <div className="space-y-1">
-                      <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 px-1">orderId (Ref)</label>
-                      <input className="w-full bg-slate-800/50 border border-white/10 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-blue-500/50 text-right font-mono"
-                        placeholder="MAD-00001"
-                        value={formData.orderId}
-                        onChange={(e) => setFormData({ ...formData, orderId: e.target.value })}
-                      />
-                    </div>
-
-                    <div className="space-y-1">
-                      <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 px-1">phone</label>
-                      <input type="tel" className="w-full bg-slate-800/50 border border-white/10 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-blue-500/50 text-right"
-                        placeholder="0599..."
-                        value={formData.phone}
-                        onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                      />
-                    </div>
-                  </div>
-
-                  <div className="space-y-1">
-                    <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 px-1">name (رموز المنتجات)</label>
-                    <textarea className="w-full bg-slate-800/50 border border-white/10 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-blue-500/50 h-20 text-right"
-                      placeholder="W183- X102- P104 ..."
-                      value={formData.name}
-                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    />
-                  </div>
-
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <div className="space-y-1">
-                      <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 px-1">city</label>
-                      <input className="w-full bg-slate-800/50 border border-white/10 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-blue-500/50 text-right"
-                        placeholder="المدينة"
-                        value={formData.city}
-                        onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                      />
-                    </div>
-
-                    <div className="space-y-1">
-                      <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 px-1">address</label>
-                      <input className="w-full bg-slate-800/50 border border-white/10 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-blue-500/50 text-right"
-                        placeholder="العنوان بالتفصيل"
-                        value={formData.address}
-                        onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                      />
-                    </div>
-                  </div>
-
-                  <div className="space-y-1">
-                    <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 px-1">price (نص السعر + الدفع)</label>
-                    <input className="w-full bg-slate-800/50 border border-white/10 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-blue-500/50 text-right"
-                      placeholder="مثال: 300 نقداً - Hi Express"
-                      value={formData.price}
-                      onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-                    />
-                  </div>
-
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <div className="space-y-1">
-                      <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 px-1">payment (حالة الطلب)</label>
-                      <select className="w-full bg-slate-800/50 border border-white/10 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-blue-500/50 text-right appearance-none"
-                        value={formData.payment}
-                        onChange={(e) => setFormData({ ...formData, payment: e.target.value })}
-                      >
-                        {PAYMENT_STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
-                      </select>
-                    </div>
-
-                    <div className="space-y-1">
-                      <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 px-1">offer (لغة/مندوب)</label>
-                      <input className="w-full bg-slate-800/50 border border-white/10 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-blue-500/50 text-right"
-                        placeholder="ar / he / اسم مندوب"
-                        value={formData.offer}
-                        onChange={(e) => setFormData({ ...formData, offer: e.target.value })}
-                      />
-                    </div>
-                  </div>
-
-                  <div className="space-y-1">
-                    <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 px-1">notes</label>
-                    <textarea className="w-full bg-slate-800/50 border border-white/10 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-blue-500/50 h-20 text-right"
-                      placeholder="ملاحظات إضافية"
-                      value={formData.notes}
-                      onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                    />
-                  </div>
-
-                  <div className="space-y-1">
-                    <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 px-1">status (إضافي)</label>
-                    <input className="w-full bg-slate-800/50 border border-white/10 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-blue-500/50 text-right"
-                      placeholder="مثال: 500 أو رقم..."
-                      value={formData.status}
-                      onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                    />
-                  </div>
-
-                </div>
-
-                <div className="p-8 bg-slate-900 border-t border-white/5 flex gap-4">
-                  <button onClick={() => setIsModalOpen(false)} className="flex-1 bg-slate-800 hover:bg-slate-700 p-4 rounded-2xl font-bold transition-all text-sm uppercase">إلغاء</button>
-                  <button onClick={handleSubmit} className="flex-[2] bg-blue-600 hover:bg-blue-500 p-4 rounded-2xl font-black text-white flex items-center justify-center gap-2 shadow-xl shadow-blue-600/20 transition-all active:scale-95 text-sm uppercase">
-                    <i className="fas fa-check-circle"></i>
-                    {currentOrder ? "تحديث البيانات" : "حفظ الطلب الجديد"}
-                  </button>
-                </div>
-
               </div>
             </div>
           )}
         </div>
       );
-    };
+    }
 
-    const root = ReactDOM.createRoot(document.getElementById("root"));
-    root.render(<App />);
+    ReactDOM.createRoot(document.getElementById("root")).render(<App />);
   </script>
 </body>
 </html>
