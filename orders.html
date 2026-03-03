@@ -1,115 +1,557 @@
 <!doctype html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>MAD → Olivery</title>
-  <style>
-    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial; margin:20px; max-width:900px}
-    .card{border:1px solid #ddd; border-radius:12px; padding:16px; margin-bottom:16px}
-    input,textarea,select,button{width:100%; padding:10px; border-radius:10px; border:1px solid #ccc; font-size:14px}
-    button{cursor:pointer}
-    .row{display:grid; grid-template-columns:1fr 1fr; gap:10px}
-    pre{background:#111; color:#eee; padding:12px; border-radius:12px; overflow:auto}
-    .hint{color:#666; font-size:13px}
-  </style>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"/>
+    <title>MAD Manager v4.8 PRO</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <style>
+        :root {
+            --bg: #070b14;
+            --card: #111827;
+            --card-hover: #1f2937;
+            --primary: #3b82f6;
+            --primary-glow: rgba(59, 130, 246, 0.5);
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --muted: #94a3b8;
+            --border: rgba(255, 255, 255, 0.08);
+            --grad: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+            background: var(--bg);
+            color: #f8fafc;
+            padding-bottom: 20px;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Header Styles */
+        .header {
+            background: rgba(11, 17, 33, 0.9);
+            backdrop-filter: blur(15px);
+            padding: 15px 20px;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 1px solid var(--border);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+
+        .logo {
+            font-weight: 900;
+            font-size: 22px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .logo span { color: var(--primary); }
+
+        .search-container {
+            margin-top: 15px;
+            position: relative;
+        }
+
+        .search-container input {
+            width: 100%;
+            padding: 12px 45px 12px 15px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+            font-size: 15px;
+            transition: 0.3s;
+        }
+
+        .search-container i {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--muted);
+        }
+
+        /* Main Container */
+        .container {
+            padding: 16px;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        /* Order Card */
+        .order-card {
+            background: var(--card);
+            border-radius: 20px;
+            padding: 18px;
+            margin-bottom: 20px;
+            border: 1px solid var(--border);
+            transition: 0.2s;
+            position: relative;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .status-pill {
+            font-size: 10px;
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-weight: 800;
+        }
+
+        .status-new { background: rgba(59, 130, 246, 0.15); color: #60a5fa; }
+        .status-pending { background: rgba(245, 158, 11, 0.15); color: #fbbf24; }
+        .status-done { background: rgba(16, 185, 129, 0.15); color: #34d399; }
+
+        .customer-name { font-size: 18px; font-weight: 800; color: #fff; display: block; margin-bottom: 5px; }
+        
+        .info-row { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 14px; margin-bottom: 4px; }
+        .info-row i { color: var(--primary); width: 14px; }
+
+        .offer-box {
+            background: rgba(59, 130, 246, 0.08);
+            border-right: 4px solid var(--primary);
+            padding: 12px;
+            border-radius: 8px;
+            margin: 12px 0;
+            color: #d1d5db;
+            font-weight: 600;
+        }
+
+        .meta-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+        .tag { background: rgba(255, 255, 255, 0.05); padding: 4px 10px; border-radius: 6px; font-size: 12px; color: #cbd5e1; }
+
+        /* Buttons */
+        .actions-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 15px; }
+        .secondary-actions { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 8px; }
+
+        .btn {
+            border: none; border-radius: 12px; padding: 10px 5px; font-size: 11px; font-weight: 700;
+            cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            gap: 5px; transition: 0.2s; color: white;
+        }
+
+        .btn i { font-size: 16px; }
+        .btn-blue { background: var(--grad); }
+        .btn-green { background: #10b981; }
+        .btn-orange { background: #f59e0b; }
+        .btn-purple { background: #8b5cf6; }
+        .btn-outline { background: rgba(255,255,255,0.05); border: 1px solid var(--border); }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed; inset: 0; background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(10px);
+            display: none; align-items: center; justify-content: center; z-index: 2000; padding: 15px;
+        }
+        .modal-overlay.show { display: flex; }
+        .modal-content {
+            background: var(--card); width: 100%; max-width: 500px; padding: 25px; border-radius: 24px;
+            border: 1px solid var(--border); max-height: 90vh; overflow-y: auto;
+        }
+
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 5px; }
+        
+        input, select, textarea {
+            width: 100%; padding: 12px; background: rgba(0,0,0,0.2); border: 1px solid var(--border);
+            border-radius: 10px; color: white; outline: none; font-size: 15px;
+        }
+
+        .ai-box {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(37, 99, 235, 0.1) 100%);
+            border: 1px dashed var(--primary); padding: 15px; border-radius: 15px; margin-bottom: 20px;
+        }
+
+        #toast {
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+            padding: 12px 25px; border-radius: 50px; font-weight: bold; display: none; z-index: 5000;
+        }
+
+        #loader {
+            position: fixed; inset: 0; background: rgba(7, 11, 20, 0.8); z-index: 6000;
+            display: none; align-items: center; justify-content: center; backdrop-filter: blur(5px);
+        }
+        .spinner {
+            width: 40px; height: 40px; border: 3px solid rgba(59, 130, 246, 0.2);
+            border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        @media (max-width: 480px) {
+            .btn span { display: none; }
+            .btn i { font-size: 18px; }
+        }
+    </style>
 </head>
 <body>
-  <h2>إرسال طلب إلى Olivery</h2>
 
-  <div class="card">
-    <div class="row">
-      <div>
-        <label>الاسم</label>
-        <input id="name" placeholder="مثال: محمد" />
-      </div>
-      <div>
-        <label>الهاتف</label>
-        <input id="phone" placeholder="مثال: 9725..." />
-      </div>
+<div id="loader"><div class="spinner"></div></div>
+<div id="toast">✅ تمت العملية</div>
+
+<div class="header">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+        <div class="logo">MAD <span>MANAGER</span> <small style="opacity: 0.5; font-size: 10px;">v4.8</small></div>
+        <div style="display: flex; gap: 8px;">
+            <button class="btn btn-outline" style="width: 40px; height: 40px;" onclick="fetchData()"><i class="fa fa-sync-alt"></i></button>
+            <button class="btn btn-blue" style="width: 40px; height: 40px;" onclick="openAddModal()"><i class="fa fa-plus"></i></button>
+        </div>
     </div>
-
-    <div class="row" style="margin-top:10px">
-      <div>
-        <label>المدينة / المنطقة</label>
-        <input id="city" placeholder="مثال: سلفيت / تل أبيب ..." />
-      </div>
-      <div>
-        <label>السعر</label>
-        <input id="price" placeholder="مثال: 350" />
-      </div>
+    <div class="search-container">
+        <i class="fa fa-search"></i>
+        <input type="text" id="searchInp" placeholder="ابحث باسم العميل أو رقم الهاتف..." oninput="handleSearch()">
     </div>
+</div>
 
-    <div style="margin-top:10px">
-      <label>العنوان</label>
-      <input id="address" placeholder="العنوان بالتفصيل" />
+<div class="container" id="ordersContainer"></div>
+
+<!-- Order Modal -->
+<div class="modal-overlay" id="orderModal">
+    <div class="modal-content">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h3 id="modalTitle" style="margin:0;">طلب جديد</h3>
+            <button class="btn btn-outline" style="width:30px; height:30px;" onclick="closeModal('orderModal')"><i class="fa fa-times"></i></button>
+        </div>
+
+        <div class="ai-box" id="aiSection">
+            <div style="color: var(--primary); font-weight: bold; font-size: 14px; margin-bottom: 10px;">
+                <i class="fa fa-robot"></i> المحلل الذكي + PDF
+            </div>
+            <textarea id="rawInput" placeholder="الصق نص الطلب هنا لتحليله..." style="height: 70px; font-size: 13px; margin-bottom: 10px;"></textarea>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px;">
+                <button class="btn btn-outline" style="flex-direction: row; height: 35px;" onclick="smartParseLocal()"><i class="fa fa-bolt"></i> تحليل سريع</button>
+                <button class="btn btn-blue" style="flex-direction: row; height: 35px;" onclick="smartParseAI()"><i class="fa fa-magic"></i> ذكاء اصطناعي</button>
+            </div>
+            <button class="btn btn-outline" style="width: 100%; flex-direction: row; height: 35px; border-style: solid;" onclick="document.getElementById('pdfInp').click()">
+                <i class="fa fa-file-pdf" style="color: var(--danger);"></i> رفع وقراءة ملف PDF
+            </button>
+            <input type="file" id="pdfInp" accept="application/pdf" hidden onchange="handlePDF(event)">
+        </div>
+
+        <div class="form-group"><label>الاسم الكامل</label><input type="text" id="f_name"></div>
+        <div class="form-group"><label>رقم الهاتف</label><input type="tel" id="f_phone"></div>
+        <div class="form-group"><label>الأصناف</label><textarea id="f_offer" rows="2"></textarea></div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <div class="form-group"><label>السعر (₪)</label><input type="number" id="f_price"></div>
+            <div class="form-group">
+                <label>طريقة الدفع</label>
+                <select id="f_payment">
+                    <option value="دفع عند الاستلام">دفع عند الاستلام</option>
+                    <option value="مدفوع مسبقاً">مدفوع مسبقاً</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-group"><label>المدينة</label><input type="text" id="f_city"></div>
+        <div class="form-group"><label>العنوان</label><input type="text" id="f_address"></div>
+
+        <div class="form-group">
+            <label>شركة الشحن</label>
+            <select id="f_delivery">
+                <option value="">-- اختر --</option>
+                <option value="High Express - أم الفحم">High Express - أم الفحم</option>
+                <option value="Lama Logistics">Lama Logistics</option>
+                <option value="Marwah">Marwah</option>
+            </select>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px;">
+            <button class="btn btn-outline" style="height: 45px; flex-direction: row;" onclick="closeModal('orderModal')">إلغاء</button>
+            <button class="btn btn-blue" style="height: 45px; flex-direction: row;" onclick="submitOrder()">حفظ الطلب <i class="fa fa-save"></i></button>
+        </div>
     </div>
-
-    <div class="row" style="margin-top:10px">
-      <div>
-        <label>Reference / Order ID (اختياري)</label>
-        <input id="ref" placeholder="MAD-12345" />
-      </div>
-      <div>
-        <label>Paid</label>
-        <select id="paid">
-          <option value="false">false</option>
-          <option value="true">true</option>
-        </select>
-      </div>
-    </div>
-
-    <div style="margin-top:10px">
-      <label>ملاحظات</label>
-      <textarea id="notes" rows="3" placeholder="ملاحظات للطلب"></textarea>
-    </div>
-
-    <div class="row" style="margin-top:10px">
-      <button onclick="sendOrder()">إرسال الطلب</button>
-      <button onclick="testOlivery()">فحص الاتصال (status)</button>
-    </div>
-
-    <p class="hint">ملاحظة: إذا Olivery رجّع HTML/500 رح تشوفه في RAW.</p>
-  </div>
-
-  <div class="card">
-    <h3>النتيجة</h3>
-    <pre id="out">{}</pre>
-  </div>
+</div>
 
 <script>
-  function $(id){ return document.getElementById(id); }
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxR05-74zGsy7o3R9bdizecDEEjbaFrzr0h8SiFx-FjEYceNGlTnOOEEC1RnRW3-z9ppg/exec";
+    const API_KEY = "12345678";
+    
+    let ordersData = [];
+    let currentEditRow = null;
 
-  async function post(action, payload) {
-    const res = await fetch(location.href, {
-      method: "POST",
-      headers: {"Content-Type":"application/json"},
-      body: JSON.stringify({ action, ...payload })
-    });
-    const txt = await res.text();
-    try { return JSON.parse(txt); } catch(e) { return {result:"ERROR", message:"Response not JSON", raw: txt}; }
-  }
+    function showLoader(v) { document.getElementById('loader').style.display = v ? 'flex' : 'none'; }
+    
+    function toast(msg, type='success') {
+        const t = document.getElementById('toast');
+        t.textContent = msg;
+        t.style.background = type === 'success' ? 'var(--success)' : 'var(--danger)';
+        t.style.display = 'block';
+        setTimeout(() => t.style.display = 'none', 3000);
+    }
 
-  async function sendOrder(){
-    const payload = {
-      customer_name: $("name").value,
-      customer_mobile: $("phone").value,
-      customer_area: $("city").value,
-      customer_address: $("address").value,
-      cost: $("price").value,
-      reference_id: $("ref").value,
-      note: $("notes").value,
-      paid: $("paid").value === "true"
-    };
+    async function apiReq(params, method = 'POST') {
+        const options = {
+            method: method,
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // Apps Script handles text/plain POST better
+            body: JSON.stringify({ ...params, key: API_KEY })
+        };
+        
+        try {
+            const res = await fetch(SCRIPT_URL, options);
+            return await res.json();
+        } catch (e) {
+            console.error("API Error:", e);
+            throw e;
+        }
+    }
 
-    const out = await post("create_order", { payload });
-    $("out").textContent = JSON.stringify(out, null, 2);
-  }
+    async function fetchData() {
+        showLoader(true);
+        try {
+            // Use GET for simple fetch
+            const res = await fetch(`${SCRIPT_URL}?action=get&key=${API_KEY}`);
+            const data = await res.json();
+            ordersData = Array.isArray(data) ? data : [];
+            renderOrders(ordersData);
+        } catch (e) { toast("فشل في جلب البيانات", "danger"); }
+        showLoader(false);
+    }
 
-  async function testOlivery(){
-    const out = await post("test_olivery", {});
-    $("out").textContent = JSON.stringify(out, null, 2);
-  }
+    function renderOrders(list) {
+        const container = document.getElementById('ordersContainer');
+        if (!list || !list.length) {
+            container.innerHTML = `<div style="text-align:center; padding:50px; color:var(--muted);">لا توجد طلبات</div>`;
+            return;
+        }
+
+        const items = [...list].filter(x => x.rowIndex).reverse();
+        container.innerHTML = items.map(o => {
+            const status = (o.status || 'NEW').toUpperCase();
+            const sClass = status.includes('تجهيز') ? 'status-pending' : (status.includes('تم') ? 'status-done' : 'status-new');
+            
+            return `
+                <div class="order-card">
+                    <div class="card-header">
+                        <span style="color:var(--muted); font-size:12px;">#${o.orderId || '---'}</span>
+                        <span class="status-pill ${sClass}">${o.status || 'جديد'}</span>
+                    </div>
+                    <div onclick="openEditModal(${o.rowIndex})" style="cursor:pointer">
+                        <span class="customer-name">${o.name || 'بدون اسم'}</span>
+                        <div class="info-row"><i class="fa fa-phone"></i> ${o.phone || '---'}</div>
+                        <div class="info-row"><i class="fa fa-map-marker-alt"></i> ${o.city || '---'}</div>
+                        <div class="offer-box">${o.offer || 'بدون أصناف'}</div>
+                        <div class="meta-tags">
+                            <span class="tag">₪${o.price || 0}</span>
+                            <span class="tag">${o.payment || 'كاش'}</span>
+                            <span class="tag">${o.delivery || 'شحن'}</span>
+                        </div>
+                    </div>
+                    <div class="actions-grid">
+                        <button class="btn btn-orange" onclick="sendWA(${o.rowIndex}, 'ar')"><i class="fab fa-whatsapp"></i><span>عربي</span></button>
+                        <button class="btn btn-purple" onclick="sendWA(${o.rowIndex}, 'he')"><i class="fab fa-whatsapp"></i><span>Heb</span></button>
+                        <button class="btn btn-green" onclick="updateStatus(${o.rowIndex}, 'بانتظار الإرسال للتجهيز')"><i class="fa fa-check"></i><span>اعتماد</span></button>
+                        <button class="btn btn-outline" onclick="openEditModal(${o.rowIndex})"><i class="fa fa-edit"></i><span>تعديل</span></button>
+                    </div>
+                    <div class="secondary-actions">
+                        <button class="btn btn-outline" onclick="downloadPDF(${o.rowIndex}, 'ar')"><i class="fa fa-file-pdf"></i><span>عربي</span></button>
+                        <button class="btn btn-outline" onclick="downloadPDF(${o.rowIndex}, 'he')"><i class="fa fa-file-pdf"></i><span>Heb</span></button>
+                        <button class="btn btn-blue" onclick="sendDelivery(${o.rowIndex})"><i class="fa fa-paper-plane"></i><span>شحن</span></button>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    function handleSearch() {
+        const term = document.getElementById('searchInp').value.toLowerCase();
+        const filtered = ordersData.filter(o => 
+            (o.name || "").toLowerCase().includes(term) || 
+            (o.phone || "").includes(term) ||
+            (o.city || "").toLowerCase().includes(term)
+        );
+        renderOrders(filtered);
+    }
+
+    // --- PDF & AI Logic ---
+    async function handlePDF(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        // Check file size (Apps Script limit is around 50MB, but let's keep it safe for base64)
+        if (file.size > 2 * 1024 * 1024) {
+            toast("حجم الملف كبير جداً (أقصى حد 2MB)", "danger");
+            e.target.value = '';
+            return;
+        }
+
+        showLoader(true);
+        try {
+            const base64 = await fileToBase64(file);
+            const res = await apiReq({ action: 'analyzePDF', fileBase64: base64 });
+            if (res.result === 'SUCCESS') {
+                fillForm(res.data);
+                toast("تمت قراءة الـ PDF بنجاح ✨");
+            } else {
+                toast(res.message || "فشل تحليل الـ PDF", "danger");
+            }
+        } catch (err) {
+            toast("خطأ أثناء قراءة الملف", "danger");
+        }
+        showLoader(false);
+        e.target.value = ''; // Reset
+    }
+
+    function smartParseLocal() {
+        const txt = document.getElementById('rawInput').value.trim();
+        if (!txt) return toast("أدخل نصاً أولاً", "danger");
+
+        const phone = txt.match(/(05\d{8}|9725\d{8})/);
+        const price = txt.match(/(\d{2,4})\s*(₪|شيكل|ILS)/i);
+        
+        if (phone) document.getElementById('f_phone').value = phone[0];
+        if (price) document.getElementById('f_price').value = price[1];
+
+        const lines = txt.split('\n').filter(l => l.trim().length > 2);
+        if (lines[0]) document.getElementById('f_name').value = lines[0].trim();
+        
+        document.getElementById('f_offer').value = txt.substring(0, 100);
+        toast("تم التحليل السريع ✅");
+    }
+
+    async function smartParseAI() {
+        const txt = document.getElementById('rawInput').value.trim();
+        if (!txt) return toast("أدخل نصاً أولاً", "danger");
+        showLoader(true);
+        try {
+            const res = await apiReq({ action: 'analyze', text: txt });
+            if (res.result === 'SUCCESS') fillForm(res.data);
+        } catch (e) { smartParseLocal(); }
+        showLoader(false);
+    }
+
+    function fillForm(d) {
+        if (!d) return;
+        if (d.name) document.getElementById('f_name').value = d.name;
+        if (d.phone) document.getElementById('f_phone').value = d.phone;
+        if (d.city) document.getElementById('f_city').value = d.city;
+        if (d.price) document.getElementById('f_price').value = d.price;
+        if (d.offer) document.getElementById('f_offer').value = d.offer;
+        if (d.address) document.getElementById('f_address').value = d.address;
+    }
+
+    function fileToBase64(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => resolve(reader.result.split(',')[1]);
+            reader.onerror = error => reject(error);
+        });
+    }
+
+    // --- Order Actions ---
+    function openAddModal() {
+        currentEditRow = null;
+        document.getElementById('modalTitle').textContent = "إضافة طلب جديد";
+        document.getElementById('aiSection').style.display = "block";
+        ['f_name','f_phone','f_offer','f_price','f_city','f_address'].forEach(id => document.getElementById(id).value = "");
+        document.getElementById('orderModal').classList.add('show');
+    }
+
+    function openEditModal(row) {
+        const o = ordersData.find(x => x.rowIndex == row);
+        if (!o) return;
+        currentEditRow = row;
+        document.getElementById('modalTitle').textContent = "تعديل طلب #" + (o.orderId || '');
+        document.getElementById('aiSection').style.display = "none";
+        
+        document.getElementById('f_name').value = o.name || "";
+        document.getElementById('f_phone').value = o.phone || "";
+        document.getElementById('f_offer').value = o.offer || "";
+        document.getElementById('f_price').value = o.price || "";
+        document.getElementById('f_city').value = o.city || "";
+        document.getElementById('f_address').value = o.address || "";
+        document.getElementById('f_payment').value = o.payment || "دفع عند الاستلام";
+        document.getElementById('f_delivery').value = o.delivery || "";
+
+        document.getElementById('orderModal').classList.add('show');
+    }
+
+    function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+
+    async function submitOrder() {
+        const name = document.getElementById('f_name').value.trim();
+        if (!name) return toast("الاسم مطلوب", "danger");
+
+        showLoader(true);
+        const isEdit = currentEditRow !== null;
+        const payload = {
+            action: isEdit ? 'updateOrder' : 'addOrder',
+            row: currentEditRow,
+            name,
+            phone: document.getElementById('f_phone').value,
+            offer: document.getElementById('f_offer').value,
+            price: document.getElementById('f_price').value,
+            city: document.getElementById('f_city').value,
+            address: document.getElementById('f_address').value,
+            payment: document.getElementById('f_payment').value,
+            delivery: document.getElementById('f_delivery').value,
+            status: isEdit ? undefined : 'جديد'
+        };
+
+        try {
+            const res = await apiReq(payload);
+            if (res.result === 'SUCCESS') {
+                toast("تم الحفظ بنجاح");
+                closeModal('orderModal');
+                fetchData();
+            }
+        } catch (e) { toast("خطأ في الحفظ", "danger"); }
+        showLoader(false);
+    }
+
+    async function updateStatus(row, status) {
+        showLoader(true);
+        try {
+            const res = await apiReq({ action: 'updateStatus', row, status });
+            if (res.result === 'SUCCESS') { toast("تم التحديث"); fetchData(); }
+        } catch (e) { toast("فشل التحديث", "danger"); }
+        showLoader(false);
+    }
+
+    function sendWA(row, lang) {
+        const o = ordersData.find(x => x.rowIndex == row);
+        if (!o) return;
+        const msg = lang === 'ar' ? `أهلاً ${o.name}، تم استلام طلبك.` : `שלום ${o.name}, ההזמנה התקבלה.`;
+        window.open(`https://wa.me/${String(o.phone).replace(/\D/g,'')}?text=${encodeURIComponent(msg)}`, '_blank');
+    }
+
+    async function downloadPDF(row, lang) {
+        showLoader(true);
+        try {
+            const res = await apiReq({ action: 'pdfReceipt', row, lang });
+            if (res.result === 'SUCCESS') {
+                const link = document.createElement('a');
+                link.href = `data:application/pdf;base64,${res.pdfBase64}`;
+                link.download = `Receipt_${row}.pdf`;
+                link.click();
+            }
+        } catch (e) { toast("خطأ في ملف PDF", "danger"); }
+        showLoader(false);
+    }
+
+    async function sendDelivery(row) {
+        showLoader(true);
+        try {
+            const res = await apiReq({ action: 'sendToDelivery', row });
+            if (res.result === 'SUCCESS') { toast("تم الإرسال لشركة الشحن"); fetchData(); }
+            else toast(res.message || "فشل الشحن", "danger");
+        } catch (e) { toast("خطأ في النظام", "danger"); }
+        showLoader(false);
+    }
+
+    window.onload = fetchData;
 </script>
 </body>
 </html>
