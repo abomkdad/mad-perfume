@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=0"/>
-  <title>MAD Manager v4.6 FINAL</title>
+  <title>MAD Manager v4.6 FINAL (FIXED)</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
   <style>
@@ -46,6 +46,8 @@
     input:focus,textarea:focus,select:focus{border-color:var(--primary);background:rgba(0,0,0,.35)}
 
     #toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:#10b981;color:#fff;padding:14px 28px;border-radius:50px;font-weight:900;z-index:3000;display:none;box-shadow:0 10px 20px rgba(0,0,0,.3)}
+    #toast.error{background:#ef4444}
+    #toast.warn{background:#f59e0b}
     #loadingOverlay{position:fixed;inset:0;background:rgba(6,9,20,.72);z-index:4000;display:none;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
     .spinner{width:44px;height:44px;border:4px solid rgba(59,130,246,.12);border-top-color:var(--primary);border-radius:50%;animation:spin .8s infinite}
     @keyframes spin{to{transform:rotate(360deg)}}
@@ -57,7 +59,7 @@
 <div id="toast">✅ تمت العملية</div>
 
 <!-- Order Modal -->
-<div class="modal-overlay" id="orderModal">
+<div class="modal-overlay" id="orderModal" aria-hidden="true">
   <div class="modal-content">
     <h3 id="modalTitle" style="margin-top:0;">إضافة طلب جديد</h3>
 
@@ -86,12 +88,12 @@
       </div>
     </div>
 
-    <label>الاسم الكامل</label><input type="text" id="f_name">
-    <label>رقم الهاتف</label><input type="tel" id="f_phone">
+    <label>الاسم الكامل</label><input type="text" id="f_name" autocomplete="name">
+    <label>رقم الهاتف</label><input type="tel" id="f_phone" inputmode="tel" autocomplete="tel">
     <label>الأصناف المطلوبة</label><textarea id="f_offer" rows="2"></textarea>
 
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-      <div><label>السعر (₪)</label><input type="number" id="f_price"></div>
+      <div><label>السعر (₪)</label><input type="number" id="f_price" inputmode="numeric"></div>
       <div>
         <label>طريقة الدفع</label>
         <select id="f_payment">
@@ -102,8 +104,8 @@
       </div>
     </div>
 
-    <label>المدينة</label><input type="text" id="f_city">
-    <label>العنوان التفصيلي</label><input type="text" id="f_address">
+    <label>المدينة</label><input type="text" id="f_city" autocomplete="address-level2">
+    <label>العنوان التفصيلي</label><input type="text" id="f_address" autocomplete="street-address">
     <label>ملاحظات إضافية</label><textarea id="f_notes" rows="2"></textarea>
 
     <label>شركة التوصيل</label>
@@ -127,8 +129,8 @@
   <div class="header-top" style="display:flex;justify-content:space-between;align-items:center;">
     <div class="logo" style="font-weight:900;font-size:20px;">MAD <span>MANAGER</span></div>
     <div style="display:flex;gap:10px;">
-      <button class="btn btn-outline" onclick="load()" style="width:40px;height:40px;"><i class="fa fa-sync"></i></button>
-      <button class="btn btn-primary" onclick="openAddModal()" style="width:40px;height:40px;"><i class="fa fa-plus"></i></button>
+      <button class="btn btn-outline" onclick="load(true)" style="width:40px;height:40px;" title="تحديث"><i class="fa fa-sync"></i></button>
+      <button class="btn btn-primary" onclick="openAddModal()" style="width:40px;height:40px;" title="إضافة"><i class="fa fa-plus"></i></button>
     </div>
   </div>
   <div style="margin-top:10px;">
@@ -139,19 +141,47 @@
 <div class="container" id="ordersList"></div>
 
 <script>
-// ✅ رابط السكربت (اللي أرسلته أنت)
+/* ===========================
+   CONFIG
+=========================== */
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxR05-74zGsy7o3R9bdizecDEEjbaFrzr0h8SiFx-FjEYceNGlTnOOEEC1RnRW3-z9ppg/exec";
-const DASH_KEY = "12345678";
+const DASH_KEY   = "12345678";
 
 const CUSTOMER_SERVICE_PHONE = "972524033442";
 const CUSTOMER_SERVICE_STAR  = "*9935";
 
+/* ===========================
+   STATE
+=========================== */
 let allOrders = [];
 let editingRow = null;
 
+/* ===========================
+   UI HELPERS
+=========================== */
 function showLoading(s){ document.getElementById('loadingOverlay').style.display = s ? 'flex' : 'none'; }
-function showToast(m){ const t=document.getElementById('toast'); t.textContent=m; t.style.display='block'; setTimeout(()=>t.style.display='none',2500); }
+
+function showToast(message, type='success'){
+  const t=document.getElementById('toast');
+  t.classList.remove('error','warn');
+  if(type==='error') t.classList.add('error');
+  if(type==='warn')  t.classList.add('warn');
+  t.textContent = message;
+  t.style.display='block';
+  setTimeout(()=>t.style.display='none',2600);
+}
+
 const safe = (v)=> (v===undefined||v===null||String(v).toLowerCase()==='undefined'||String(v).toLowerCase()==='null') ? '' : String(v).trim();
+
+function escHTML(str){
+  const s = safe(str);
+  return s
+    .replaceAll('&','&amp;')
+    .replaceAll('<','&lt;')
+    .replaceAll('>','&gt;')
+    .replaceAll('"','&quot;')
+    .replaceAll("'","&#039;");
+}
 
 function formatLocalPhone(p){
   if(!p) return '';
@@ -162,11 +192,62 @@ function formatLocalPhone(p){
 }
 function normalizePhoneForLink(p){
   let d=String(p||'').replace(/[^0-9]/g,'');
+  if(!d) return '';
   if(d.startsWith('0')) d='972'+d.substring(1);
   if(!d.startsWith('972') && d.length===9) d='972'+d;
   return d;
 }
 
+/* ===========================
+   NETWORK HELPERS (FIXED)
+=========================== */
+async function fetchJSON(url, options={}){
+  const res = await fetch(url, options);
+  const text = await res.text();
+  let json = null;
+
+  try{ json = text ? JSON.parse(text) : null; }catch(_e){ /* not json */ }
+
+  if(!res.ok){
+    const msg = (json && (json.message||json.error)) ? (json.message||json.error) : `HTTP ${res.status}`;
+    throw new Error(msg);
+  }
+  return (json!==null) ? json : text;
+}
+
+async function callAPI_GET(params){
+  const url = `${SCRIPT_URL}?${new URLSearchParams(params).toString()}`;
+  return await fetchJSON(url);
+}
+
+async function callAPI_POST_JSON(body){
+  return await fetchJSON(SCRIPT_URL, {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify(body)
+  });
+}
+
+// محاولة POST أولاً (لتجنب طول الرابط) ثم fallback إلى GET إذا السيرفر لا يدعم POST لهذا action
+async function callAction(action, payload={}, preferPost=true){
+  const base = { action, key: DASH_KEY, ...payload };
+
+  if(preferPost){
+    try{
+      const r = await callAPI_POST_JSON(base);
+      return r;
+    }catch(e){
+      // fallback GET
+      return await callAPI_GET(base);
+    }
+  }else{
+    return await callAPI_GET(base);
+  }
+}
+
+/* ===========================
+   AI FILLERS
+=========================== */
 function fillFromAI(d){
   if(!d) return;
   if(d.name)    document.getElementById('f_name').value = d.name;
@@ -180,46 +261,52 @@ function fillFromAI(d){
 
 function analyzeTextLocal(){
   const raw=document.getElementById('smartInput').value;
-  if(!raw.trim()) return showToast('الصق نصاً أولاً');
+  if(!raw.trim()) return showToast('الصق نصاً أولاً','warn');
 
-  const phoneMatch = raw.match(/(?:05|972|5)[0-9]{8,11}/);
+  // phone (05xxxxxxxx or 9725xxxxxxxx or 5xxxxxxxx)
+  const phoneMatch = raw.match(/(?:\b05\d{8}\b|\b9725\d{8}\b|\b5\d{8}\b)/);
   if(phoneMatch) document.getElementById('f_phone').value = formatLocalPhone(phoneMatch[0]);
 
-  const priceMatch = raw.match(/([0-9]{2,4})\s*(?:₪|shekel|ILS|السعر)/i) || raw.match(/(?:₪|السعر|Price)\s*:?\s*([0-9]{2,4})/i);
+  // price
+  const priceMatch =
+    raw.match(/(?:₪|السعر|Price)\s*:?\s*([0-9]{2,6})/i) ||
+    raw.match(/([0-9]{2,6})\s*(?:₪|shekel|ILS)\b/i);
   if(priceMatch) document.getElementById('f_price').value = priceMatch[1];
 
+  // name
   const nameMatch = raw.match(/(?:الاسم|Name)\s*:?\s*([^\n|]+)/i);
   if(nameMatch) document.getElementById('f_name').value = nameMatch[1].trim();
   else {
     const firstLine = raw.split('\n')[0].trim();
-    if(firstLine.length < 30) document.getElementById('f_name').value = firstLine;
+    if(firstLine && firstLine.length < 40) document.getElementById('f_name').value = firstLine;
   }
 
+  // city
   const cityMatch = raw.match(/(?:المدينة|city|عنوان|من)\s*:?\s*([^\n|]+)/i);
   if(cityMatch) document.getElementById('f_city').value = cityMatch[1].trim();
 
-  if(!document.getElementById('f_offer').value.trim()) document.getElementById('f_offer').value = raw.substring(0,160).trim();
+  // offer fallback
+  if(!document.getElementById('f_offer').value.trim()) document.getElementById('f_offer').value = raw.substring(0,180).trim();
+
   showToast('تم تحليل سريع ✅');
 }
 
-// ✅ AI عبر POST (أفضل وأثبت)
 async function analyzeTextAI(){
   const raw=document.getElementById('smartInput').value;
-  if(!raw.trim()) return showToast('الصق نصاً أولاً');
+  if(!raw.trim()) return showToast('الصق نصاً أولاً','warn');
+
   showLoading(true);
   try{
-    const res = await fetch(SCRIPT_URL, {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ action:'analyze', key:DASH_KEY, text: raw })
-    });
-    const data = await res.json();
-    if(data.result !== 'SUCCESS') throw new Error(data.message || 'AI ERROR');
-    fillFromAI(data.data);
-    showToast('تم التحليل بالذكاء ✨');
+    const data = await callAction('analyze', { text: raw }, true);
+    if(data && data.result === 'SUCCESS'){
+      fillFromAI(data.data);
+      showToast('تم التحليل بالذكاء ✨');
+    }else{
+      throw new Error((data && data.message) ? data.message : 'AI ERROR');
+    }
   }catch(e){
     analyzeTextLocal();
-    showToast('الذكاء فشل، تم تعبئة سريع ✅');
+    showToast('الذكاء فشل، تم تعبئة سريع ✅','warn');
   }
   showLoading(false);
 }
@@ -227,20 +314,31 @@ async function analyzeTextAI(){
 async function analyzePdfAI(ev){
   const file = ev.target.files && ev.target.files[0];
   if(!file) return;
+
+  // حماية من ملفات ضخمة (غالباً Apps Script يرفض/يتأخر)
+  const maxMB = 8;
+  if(file.size > maxMB * 1024 * 1024){
+    showToast(`الملف كبير جداً (أكثر من ${maxMB}MB)`, 'warn');
+    ev.target.value='';
+    return;
+  }
+
   showLoading(true);
   try{
     const base64 = await fileToBase64(file);
-    const res = await fetch(SCRIPT_URL, {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ action:'analyzePDF', key:DASH_KEY, fileBase64: base64, text: document.getElementById('smartInput').value || '' })
-    });
-    const data = await res.json();
-    if(data.result !== 'SUCCESS') throw new Error(data.message || 'AI PDF ERROR');
-    fillFromAI(data.data);
-    showToast('تمت قراءة PDF ✨');
+    const data = await callAction('analyzePDF', {
+      fileBase64: base64,
+      text: document.getElementById('smartInput').value || ''
+    }, true);
+
+    if(data && data.result === 'SUCCESS'){
+      fillFromAI(data.data);
+      showToast('تمت قراءة PDF ✨');
+    }else{
+      throw new Error((data && data.message) ? data.message : 'AI PDF ERROR');
+    }
   }catch(e){
-    showToast('فشل قراءة PDF');
+    showToast('فشل قراءة PDF','error');
   }
   showLoading(false);
   ev.target.value='';
@@ -258,103 +356,149 @@ function fileToBase64(file){
   });
 }
 
-async function load(){
-  showLoading(true);
+/* ===========================
+   LOAD + RENDER (FIXED SORT + SAFE HTML)
+=========================== */
+async function load(silent=false){
+  if(!silent) showLoading(true);
   try{
-    const res = await fetch(`${SCRIPT_URL}?action=get&key=${encodeURIComponent(DASH_KEY)}&_=${Date.now()}`);
-    const data = await res.json();
-    if(data && data.result === 'ERROR') throw new Error(data.message||'ERROR');
-    allOrders = Array.isArray(data) ? data : [];
+    const data = await callAction('get', { _: Date.now() }, false);
+
+    // دعم أكثر من شكل استجابة
+    if(Array.isArray(data)) allOrders = data;
+    else if(data && Array.isArray(data.data)) allOrders = data.data;
+    else if(data && data.result === 'ERROR') throw new Error(data.message || 'ERROR');
+    else allOrders = [];
+
     renderOrders(allOrders);
   }catch(e){
-    showToast('خطأ في جلب البيانات');
-    document.getElementById('ordersList').innerHTML = `<div style="text-align:center;padding:50px;color:var(--muted);">تعذّر تحميل الطلبات</div>`;
+    showToast('خطأ في جلب البيانات','error');
+    document.getElementById('ordersList').innerHTML =
+      `<div style="text-align:center;padding:50px;color:var(--muted);">تعذّر تحميل الطلبات</div>`;
   }
-  showLoading(false);
+  if(!silent) showLoading(false);
 }
 
 function filterOrders(){
-  const term=document.getElementById('searchInput').value.toLowerCase();
+  const term = safe(document.getElementById('searchInput').value).toLowerCase();
+  if(!term){
+    renderOrders(allOrders);
+    return;
+  }
+
   const filtered = allOrders.filter(o=>{
-    const n=safe(o.name).toLowerCase();
-    const p=safe(o.phone);
-    return n.includes(term) || p.includes(term) || formatLocalPhone(p).includes(term);
+    const n = safe(o.name).toLowerCase();
+    const pRaw = safe(o.phone);
+    const pLocal = formatLocalPhone(pRaw);
+    return n.includes(term) || pRaw.includes(term) || pLocal.includes(term);
   });
+
   renderOrders(filtered);
+}
+
+function sortByRowDesc(list){
+  const arr = [...(list||[])];
+  arr.sort((a,b)=>{
+    const ai = Number(a && a.rowIndex);
+    const bi = Number(b && b.rowIndex);
+    const aOk = Number.isFinite(ai);
+    const bOk = Number.isFinite(bi);
+    if(aOk && bOk) return bi - ai;
+    if(aOk && !bOk) return -1;
+    if(!aOk && bOk) return 1;
+    return 0;
+  });
+  return arr;
 }
 
 function renderOrders(list){
   const container=document.getElementById('ordersList');
-  if(!list||list.length===0){
+  if(!list || list.length===0){
     container.innerHTML = `<div style="text-align:center;padding:50px;color:var(--muted);">لا توجد طلبات</div>`;
     return;
   }
 
-  const latestFirst=[...list].filter(o=>o.rowIndex).reverse();
+  const latestFirst = sortByRowDesc(list);
 
   container.innerHTML = latestFirst.map(o=>{
-    const isPrep=(o.status||'').includes('تجهيز')||(o.status||'').includes('الإرسال');
+    const row = Number(o.rowIndex);
+    const rowAttr = Number.isFinite(row) ? row : null;
+
+    const statusTxt = safe(o.status) || 'جديد';
+    const isPrep = statusTxt.includes('تجهيز') || statusTxt.includes('الإرسال') || statusTxt.includes('بانتظار');
+
     const deliveryId = safe(o.delivery_order_id || o.deliveryId || '');
+
+    const name = escHTML(o.name) || '—';
+    const phone = escHTML(formatLocalPhone(o.phone)) || '—';
+    const offer = escHTML(o.offer) || '—';
+    const city  = escHTML(o.city) || '—';
+    const price = escHTML(o.price) || '—';
+    const payment = escHTML(o.payment) || '—';
+    const delivery = escHTML(o.delivery) || '—';
+    const orderId = escHTML(o.orderId) || '---';
+    const statusShown = escHTML(statusTxt);
+
+    const openEdit = rowAttr!==null ? `openEditModal(${rowAttr})` : `showToast('لا يمكن تعديل هذا السطر','warn')`;
+
     return `
       <div class="order-card">
         <div class="card-header">
-          <small class="order-id">#${safe(o.orderId)||'---'}</small>
-          <span class="status-pill ${isPrep?'status-prep':'status-new'}">${safe(o.status)||'جديد'}</span>
+          <small class="order-id">#${orderId}</small>
+          <span class="status-pill ${isPrep?'status-prep':'status-new'}">${statusShown}</span>
         </div>
 
-        <div onclick="openEditModal(${o.rowIndex})" style="cursor:pointer;">
-          <span class="customer-name">${safe(o.name)||'—'}</span>
-          <div class="customer-phone"><i class="fa fa-phone"></i> ${formatLocalPhone(o.phone)||'—'}</div>
-          <div class="offer-details">${safe(o.offer)||'—'}</div>
+        <div onclick="${openEdit}" style="cursor:pointer;">
+          <span class="customer-name">${name}</span>
+          <div class="customer-phone"><i class="fa fa-phone"></i> ${phone}</div>
+          <div class="offer-details">${offer}</div>
 
           <div class="meta-line">
-            <span class="meta-tag">📍 ${safe(o.city)||'—'}</span>
-            <span class="meta-tag">₪${safe(o.price)||'—'}</span>
-            <span class="meta-tag">💳 ${safe(o.payment)||'—'}</span>
-            <span class="meta-tag">🚚 ${safe(o.delivery)||'—'}</span>
-            ${deliveryId ? `<span class="meta-tag">🧾 شحنة: ${deliveryId}</span>` : ``}
+            <span class="meta-tag">📍 ${city}</span>
+            <span class="meta-tag">₪${price}</span>
+            <span class="meta-tag">💳 ${payment}</span>
+            <span class="meta-tag">🚚 ${delivery}</span>
+            ${deliveryId ? `<span class="meta-tag">🧾 شحنة: ${escHTML(deliveryId)}</span>` : ``}
           </div>
         </div>
 
         <div class="actions-grid">
-          <button class="btn btn-wa-ar" onclick="sendMsg(${o.rowIndex},'ar')"><i class="fa-brands fa-whatsapp"></i><span>عربي</span></button>
-          <button class="btn btn-wa-he" onclick="sendMsg(${o.rowIndex},'he')"><i class="fa-brands fa-whatsapp"></i><span>עברית</span></button>
-          <button class="btn btn-success" onclick="approve(${o.rowIndex})"><i class="fa fa-check"></i><span>اعتماد</span></button>
-          <button class="btn btn-outline" onclick="openEditModal(${o.rowIndex})"><i class="fa fa-edit"></i><span>تعديل</span></button>
+          <button class="btn btn-wa-ar" onclick="sendMsg(${rowAttr!==null?rowAttr:-1},'ar')"><i class="fa-brands fa-whatsapp"></i><span>عربي</span></button>
+          <button class="btn btn-wa-he" onclick="sendMsg(${rowAttr!==null?rowAttr:-1},'he')"><i class="fa-brands fa-whatsapp"></i><span>עברית</span></button>
+          <button class="btn btn-success" onclick="approve(${rowAttr!==null?rowAttr:-1})"><i class="fa fa-check"></i><span>اعتماد</span></button>
+          <button class="btn btn-outline" onclick="${openEdit}"><i class="fa fa-edit"></i><span>تعديل</span></button>
         </div>
 
         <div class="actions-secondary">
-          <button class="btn btn-outline" onclick="downloadReceipt(${o.rowIndex},'ar')"><i class="fa fa-file-pdf" style="color:#ef4444"></i><span>PDF ع</span></button>
-          <button class="btn btn-outline" onclick="downloadReceipt(${o.rowIndex},'he')"><i class="fa fa-file-pdf" style="color:#ef4444"></i><span>PDF هـ</span></button>
-          <button class="btn btn-outline" onclick="sendToDelivery(${o.rowIndex})"><i class="fa fa-truck"></i><span>شحن</span></button>
+          <button class="btn btn-outline" onclick="downloadReceipt(${rowAttr!==null?rowAttr:-1},'ar')"><i class="fa fa-file-pdf" style="color:#ef4444"></i><span>PDF ع</span></button>
+          <button class="btn btn-outline" onclick="downloadReceipt(${rowAttr!==null?rowAttr:-1},'he')"><i class="fa fa-file-pdf" style="color:#ef4444"></i><span>PDF هـ</span></button>
+          <button class="btn btn-outline" onclick="sendToDelivery(${rowAttr!==null?rowAttr:-1})"><i class="fa fa-truck"></i><span>شحن</span></button>
         </div>
       </div>`;
   }).join('');
 }
 
-// ✅ PDF من السيرفر (10×10 + عربي/عبري مضبوط)
+/* ===========================
+   PDF RECEIPT
+=========================== */
 async function downloadReceipt(row, lang){
+  if(row===-1) return showToast('سطر غير صالح','warn');
   showLoading(true);
   try{
-    const res = await fetch(SCRIPT_URL, {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ action:'pdfReceipt', key:DASH_KEY, row: row, lang: lang })
-    });
-    const data = await res.json();
-    if(data.result !== 'SUCCESS') throw new Error(data.message || 'PDF ERROR');
+    const data = await callAction('pdfReceipt', { row: row, lang: lang }, true);
+    if(!data || data.result !== 'SUCCESS') throw new Error((data && data.message) ? data.message : 'PDF ERROR');
 
     const blob = base64ToBlob(data.pdfBase64, 'application/pdf');
     downloadBlob(blob, data.filename || `receipt_${row}_${lang}.pdf`);
     showToast('تم تنزيل PDF ✅');
   }catch(e){
-    showToast('فشل تنزيل PDF');
+    showToast('فشل تنزيل PDF','error');
   }
   showLoading(false);
 }
 
 function base64ToBlob(base64, mime){
-  const bytes = atob(base64);
+  const bytes = atob(String(base64||''));
   const arr = new Uint8Array(bytes.length);
   for(let i=0;i<bytes.length;i++) arr[i]=bytes.charCodeAt(i);
   return new Blob([arr], {type:mime});
@@ -369,9 +513,13 @@ function downloadBlob(blob, filename){
   setTimeout(()=>URL.revokeObjectURL(url), 1500);
 }
 
+/* ===========================
+   WHATSAPP + ACTIONS (FIXED)
+=========================== */
 async function sendMsg(row, lang){
-  const o = allOrders.find(x=>x.rowIndex==row);
-  if(!o) return;
+  if(row===-1) return showToast('سطر غير صالح','warn');
+  const o = allOrders.find(x=>String(x.rowIndex)==String(row));
+  if(!o) return showToast('الطلب غير موجود','warn');
 
   const paymentMethod = safe(o.payment) || (lang==='he' ? 'תשלום במעמד המסירה' : 'دفع عند الاستلام');
 
@@ -383,44 +531,72 @@ async function sendMsg(row, lang){
     : `\n📞 خدمة العملاء: ${CUSTOMER_SERVICE_PHONE}\n🔗 واتساب مباشر: ${serviceWaLink}\n📞 رقم إضافي: ${CUSTOMER_SERVICE_STAR}\n🔗 اتصال: ${telStarLink}`;
 
   const msg = (lang==='ar')
-    ? `أهلاً بك ${safe(o.name)} في MAD Parfumeur 🖤\nالعرض: ${safe(o.offer)}\nالعنوان: ${safe(o.city)}\nالسعر: ${safe(o.price)} ₪\nالدفع: ${paymentMethod}${contactBlock}`
-    : `שלום ${safe(o.name)} 👋\nמוצר: ${safe(o.offer)}\nעיר: ${safe(o.city)}\nמחיר: ${safe(o.price)} ₪\nתשלום: ${paymentMethod}${contactBlock}`;
+    ? `أهلاً بك ${safe(o.name)} في MAD Parfumeur 🖤\nالعرض: ${safe(o.offer)}\nالمدينة: ${safe(o.city)}\nالعنوان: ${safe(o.address||'')}\nالسعر: ${safe(o.price)} ₪\nالدفع: ${paymentMethod}${contactBlock}`
+    : `שלום ${safe(o.name)} 👋\nמוצר: ${safe(o.offer)}\nעיר: ${safe(o.city)}\nכתובת: ${safe(o.address||'')}\nמחיר: ${safe(o.price)} ₪\nתשלום: ${paymentMethod}${contactBlock}`;
 
-  const wa = `https://wa.me/${normalizePhoneForLink(o.phone)}?text=${encodeURIComponent(msg)}`;
+  const phone = normalizePhoneForLink(o.phone);
+  if(!phone) return showToast('رقم الهاتف غير صحيح','warn');
+
+  const wa = `https://wa.me/${phone}?text=${encodeURIComponent(msg)}`;
   window.open(wa,'_blank');
 }
 
 async function approve(row){
+  if(row===-1) return showToast('سطر غير صالح','warn');
   showLoading(true);
-  const o=allOrders.find(x=>x.rowIndex==row);
-  if(!o){showLoading(false);return;}
 
-  const p=new URLSearchParams({
-    action:'updateOrder', key:DASH_KEY, row:row,
-    offer:safe(o.offer), name:safe(o.name), phone:safe(o.phone),
-    city:safe(o.city), address:safe(o.address||''), notes:safe(o.notes||''),
-    delivery:safe(o.delivery), payment:safe(o.payment), price:safe(o.price),
-    status:'بانتظار الإرسال للتجهيز'
-  });
+  const o = allOrders.find(x=>String(x.rowIndex)==String(row));
+  if(!o){ showLoading(false); return showToast('الطلب غير موجود','warn'); }
 
   try{
-    const res=await fetch(`${SCRIPT_URL}?${p.toString()}`);
-    const data=await res.json();
-    if(data.result==='SUCCESS'){ showToast('تم الاعتماد ✨'); load(); }
-    else{ showToast(data.message||'فشل'); showLoading(false); }
-  }catch(e){ showToast('فشل'); showLoading(false); }
+    const data = await callAction('updateOrder', {
+      row: row,
+      offer: safe(o.offer),
+      name: safe(o.name),
+      phone: safe(o.phone),
+      city: safe(o.city),
+      address: safe(o.address||''),
+      notes: safe(o.notes||''),
+      delivery: safe(o.delivery),
+      payment: safe(o.payment),
+      price: safe(o.price),
+      status: 'بانتظار الإرسال للتجهيز'
+    }, true);
+
+    if(data && data.result==='SUCCESS'){
+      showToast('تم الاعتماد ✨');
+      await load(true);
+      renderOrders(allOrders);
+    }else{
+      showToast((data && data.message) ? data.message : 'فشل','error');
+    }
+  }catch(e){
+    showToast('فشل','error');
+  }
+  showLoading(false);
 }
 
 async function sendToDelivery(row){
+  if(row===-1) return showToast('سطر غير صالح','warn');
   showLoading(true);
   try{
-    const res=await fetch(`${SCRIPT_URL}?action=sendToDelivery&key=${encodeURIComponent(DASH_KEY)}&row=${row}&_=${Date.now()}`);
-    const data=await res.json();
-    if(data.result==='SUCCESS'){ showToast(data.delivery_order_id ? `تم الإرسال ✅ رقم: ${data.delivery_order_id}` : 'تم الإرسال ✅'); load(); }
-    else{ showToast(data.message||'فشل الإرسال'); showLoading(false); }
-  }catch(e){ showToast('فشل الإرسال'); showLoading(false); }
+    const data = await callAction('sendToDelivery', { row: row, _: Date.now() }, false);
+    if(data && data.result==='SUCCESS'){
+      showToast(data.delivery_order_id ? `تم الإرسال ✅ رقم: ${data.delivery_order_id}` : 'تم الإرسال ✅');
+      await load(true);
+      renderOrders(allOrders);
+    }else{
+      showToast((data && data.message) ? data.message : 'فشل الإرسال','error');
+    }
+  }catch(e){
+    showToast('فشل الإرسال','error');
+  }
+  showLoading(false);
 }
 
+/* ===========================
+   MODAL + SAVE (FIXED STATUS)
+=========================== */
 function openAddModal(){
   editingRow=null;
   document.getElementById('modalTitle').textContent='إضافة طلب جديد';
@@ -430,11 +606,13 @@ function openAddModal(){
   document.getElementById('f_payment').value='دفع عند الاستلام';
   document.getElementById('f_delivery').value='';
   document.getElementById('orderModal').classList.add('show');
+  document.getElementById('orderModal').setAttribute('aria-hidden','false');
 }
 
 function openEditModal(row){
-  const o=allOrders.find(x=>x.rowIndex==row);
-  if(!o) return;
+  const o = allOrders.find(x=>String(x.rowIndex)==String(row));
+  if(!o) return showToast('الطلب غير موجود','warn');
+
   editingRow=row;
   document.getElementById('modalTitle').textContent='تعديل تفاصيل الطلب';
   document.getElementById('smartSection').style.display='none';
@@ -450,15 +628,17 @@ function openEditModal(row){
   document.getElementById('f_delivery').value=safe(o.delivery||'');
 
   document.getElementById('orderModal').classList.add('show');
+  document.getElementById('orderModal').setAttribute('aria-hidden','false');
 }
 
 async function saveOrder(){
-  const isAdd=(editingRow===null);
+  const isAdd = (editingRow===null);
   showLoading(true);
 
-  const payload={
-    action: isAdd ? 'addOrder' : 'updateOrder',
-    key: DASH_KEY,
+  const existing = !isAdd ? allOrders.find(x=>String(x.rowIndex)==String(editingRow)) : null;
+  const keepStatus = safe(existing && existing.status) || 'NEW';
+
+  const payload = {
     row: isAdd ? '' : editingRow,
     name: safe(document.getElementById('f_name').value),
     phone: safe(document.getElementById('f_phone').value),
@@ -469,29 +649,48 @@ async function saveOrder(){
     notes: safe(document.getElementById('f_notes').value),
     payment: safe(document.getElementById('f_payment').value),
     delivery: safe(document.getElementById('f_delivery').value),
-    status: 'NEW'
+    // ✅ مهم: عند التعديل لا ترجع الحالة NEW بالغلط
+    status: isAdd ? 'NEW' : keepStatus
   };
 
   try{
-    const res=await fetch(`${SCRIPT_URL}?` + new URLSearchParams(payload).toString());
-    const data=await res.json();
-    if(data.result==='SUCCESS'){
+    const data = await callAction(isAdd ? 'addOrder' : 'updateOrder', payload, true);
+
+    if(data && data.result==='SUCCESS'){
       showToast(isAdd ? 'تمت إضافة الطلب ✨' : 'تم الحفظ ✨');
       closeModal('orderModal');
-      load();
+      await load(true);
+      renderOrders(allOrders);
     }else{
-      showToast(data.message||'فشل الحفظ');
-      showLoading(false);
+      showToast((data && data.message) ? data.message : 'فشل الحفظ','error');
     }
   }catch(e){
-    showToast('فشل الحفظ');
-    showLoading(false);
+    showToast('فشل الحفظ','error');
   }
+
+  showLoading(false);
 }
 
-function closeModal(id){ document.getElementById(id).classList.remove('show'); }
+function closeModal(id){
+  const el = document.getElementById(id);
+  el.classList.remove('show');
+  el.setAttribute('aria-hidden','true');
+}
 
-window.onload=load;
+/* ===========================
+   UX IMPROVEMENTS
+=========================== */
+document.getElementById('orderModal').addEventListener('click', (e)=>{
+  // اغلاق عند الضغط خارج المحتوى
+  if(e.target && e.target.id === 'orderModal') closeModal('orderModal');
+});
+
+document.addEventListener('keydown', (e)=>{
+  if(e.key === 'Escape') closeModal('orderModal');
+});
+
+// تحميل أولي
+window.onload = () => load(false);
 </script>
 </body>
 </html>
