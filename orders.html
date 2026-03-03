@@ -307,6 +307,7 @@
 
 <script>
     // --- Configuration ---
+    // تأكد أن هذا المفتاح يطابق الـ API_KEY في كود السكربت (Apps Script)
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxx4u-YyhivmCjAt_36eBSyqjYeyBu5SqjpKdsCcBRdwNLPTMIULSno_mUZjr3VlfTR7g/exec";
     const SECRET_KEY = "12345678";
     
@@ -348,6 +349,8 @@
             if (Array.isArray(data)) {
                 ordersData = data;
                 renderOrders(ordersData);
+            } else if (data.result === "ERROR") {
+                showNotify(data.message, "danger");
             }
         } catch (e) {
             showNotify("خطأ في الاتصال بالسكربت", "danger");
@@ -423,8 +426,12 @@
                 if(d.address) document.getElementById('f_addr').value = d.address;
                 if(d.orderId) document.getElementById('f_ref').value = d.orderId;
                 showNotify("تم التحليل بذكاء Gemini ✨");
+            } else {
+                showNotify(res.message, "danger");
             }
-        } catch (e) { showNotify("فشل تحليل AI", "danger"); }
+        } catch (e) { 
+            showNotify("فشل تحليل AI", "danger"); 
+        }
         toggleGlobalLoader(false);
     }
 
@@ -478,7 +485,9 @@
             if (data.result === 'SUCCESS') {
                 showNotify(`✅ تم الشحن! بوليصة: ${data.delivery_order_id}`);
                 fetchData();
-            } else throw new Error();
+            } else {
+                throw new Error(data.message);
+            }
         } catch (e) {
             showNotify(`⚠️ المتصفح منع الربط.<br><a href="${directUrl}" target="_blank" class="olivery-trigger">تنشيط شحن Hi Express الآن 🚀</a>`, "warning");
         }
