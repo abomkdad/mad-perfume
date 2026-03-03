@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"/>
-    <title>MAD Manager v4.8 PRO</title>
+    <title>MAD Manager v6.1 PRO (Delivery FIX)</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
     <style>
@@ -22,7 +22,7 @@
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        
+
         body {
             margin: 0;
             font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
@@ -33,7 +33,6 @@
             overflow-x: hidden;
         }
 
-        /* Header Styles */
         .header {
             background: rgba(11, 17, 33, 0.9);
             backdrop-filter: blur(15px);
@@ -79,14 +78,12 @@
             color: var(--muted);
         }
 
-        /* Main Container */
         .container {
             padding: 16px;
             max-width: 700px;
             margin: 0 auto;
         }
 
-        /* Order Card */
         .order-card {
             background: var(--card);
             border-radius: 20px;
@@ -114,9 +111,10 @@
         .status-new { background: rgba(59, 130, 246, 0.15); color: #60a5fa; }
         .status-pending { background: rgba(245, 158, 11, 0.15); color: #fbbf24; }
         .status-done { background: rgba(16, 185, 129, 0.15); color: #34d399; }
+        .status-delivery { background: rgba(139, 92, 246, 0.15); color: #a78bfa; }
 
         .customer-name { font-size: 18px; font-weight: 800; color: #fff; display: block; margin-bottom: 5px; }
-        
+
         .info-row { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 14px; margin-bottom: 4px; }
         .info-row i { color: var(--primary); width: 14px; }
 
@@ -128,12 +126,12 @@
             margin: 12px 0;
             color: #d1d5db;
             font-weight: 600;
+            word-break: break-word;
         }
 
         .meta-tags { display: flex; flex-wrap: wrap; gap: 8px; }
         .tag { background: rgba(255, 255, 255, 0.05); padding: 4px 10px; border-radius: 6px; font-size: 12px; color: #cbd5e1; }
 
-        /* Buttons */
         .actions-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 15px; }
         .secondary-actions { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 8px; }
 
@@ -141,16 +139,15 @@
             border: none; border-radius: 12px; padding: 10px 5px; font-size: 11px; font-weight: 700;
             cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center;
             gap: 5px; transition: 0.2s; color: white;
+            background: rgba(255,255,255,0.05); border: 1px solid var(--border);
         }
 
         .btn i { font-size: 16px; }
-        .btn-blue { background: var(--grad); }
-        .btn-green { background: #10b981; }
-        .btn-orange { background: #f59e0b; }
-        .btn-purple { background: #8b5cf6; }
-        .btn-outline { background: rgba(255,255,255,0.05); border: 1px solid var(--border); }
+        .btn-blue { background: var(--grad); border: none; }
+        .btn-green { background: #10b981; border: none; }
+        .btn-orange { background: #f59e0b; border: none; }
+        .btn-purple { background: #8b5cf6; border: none; }
 
-        /* Modal */
         .modal-overlay {
             position: fixed; inset: 0; background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(10px);
             display: none; align-items: center; justify-content: center; z-index: 2000; padding: 15px;
@@ -163,7 +160,7 @@
 
         .form-group { margin-bottom: 15px; }
         .form-group label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 5px; }
-        
+
         input, select, textarea {
             width: 100%; padding: 12px; background: rgba(0,0,0,0.2); border: 1px solid var(--border);
             border-radius: 10px; color: white; outline: none; font-size: 15px;
@@ -177,6 +174,7 @@
         #toast {
             position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
             padding: 12px 25px; border-radius: 50px; font-weight: bold; display: none; z-index: 5000;
+            text-align: center; max-width: 92%; word-break: break-word; box-shadow: 0 10px 40px rgba(0,0,0,0.6);
         }
 
         #loader {
@@ -202,9 +200,9 @@
 
 <div class="header">
     <div style="display: flex; justify-content: space-between; align-items: center;">
-        <div class="logo">MAD <span>MANAGER</span> <small style="opacity: 0.5; font-size: 10px;">v4.8</small></div>
+        <div class="logo">MAD <span>MANAGER</span> <small style="opacity: 0.5; font-size: 10px;">v6.1</small></div>
         <div style="display: flex; gap: 8px;">
-            <button class="btn btn-outline" style="width: 40px; height: 40px;" onclick="fetchData()"><i class="fa fa-sync-alt"></i></button>
+            <button class="btn" style="width: 40px; height: 40px;" onclick="fetchData()"><i class="fa fa-sync-alt"></i></button>
             <button class="btn btn-blue" style="width: 40px; height: 40px;" onclick="openAddModal()"><i class="fa fa-plus"></i></button>
         </div>
     </div>
@@ -216,25 +214,25 @@
 
 <div class="container" id="ordersContainer"></div>
 
-<!-- Order Modal -->
+<!-- Modal -->
 <div class="modal-overlay" id="orderModal">
     <div class="modal-content">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
             <h3 id="modalTitle" style="margin:0;">طلب جديد</h3>
-            <button class="btn btn-outline" style="width:30px; height:30px;" onclick="closeModal('orderModal')"><i class="fa fa-times"></i></button>
+            <button class="btn" style="width:30px; height:30px; border:none;" onclick="closeModal('orderModal')"><i class="fa fa-times"></i></button>
         </div>
 
         <div class="ai-box" id="aiSection">
             <div style="color: var(--primary); font-weight: bold; font-size: 14px; margin-bottom: 10px;">
-                <i class="fa fa-robot"></i> المحلل الذكي + PDF
+                <i class="fa fa-robot"></i> المحلل الذكي + Olivery PDF
             </div>
-            <textarea id="rawInput" placeholder="الصق نص الطلب هنا لتحليله..." style="height: 70px; font-size: 13px; margin-bottom: 10px;"></textarea>
+            <textarea id="rawInput" placeholder="الصق نص الطلب هنا..." style="height: 70px; font-size: 13px; margin-bottom: 10px;"></textarea>
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px;">
-                <button class="btn btn-outline" style="flex-direction: row; height: 35px;" onclick="smartParseLocal()"><i class="fa fa-bolt"></i> تحليل سريع</button>
+                <button class="btn" style="flex-direction: row; height: 35px;" onclick="smartParseLocal()"><i class="fa fa-bolt"></i> تحليل سريع</button>
                 <button class="btn btn-blue" style="flex-direction: row; height: 35px;" onclick="smartParseAI()"><i class="fa fa-magic"></i> ذكاء اصطناعي</button>
             </div>
-            <button class="btn btn-outline" style="width: 100%; flex-direction: row; height: 35px; border-style: solid;" onclick="document.getElementById('pdfInp').click()">
-                <i class="fa fa-file-pdf" style="color: var(--danger);"></i> رفع وقراءة ملف PDF
+            <button class="btn" style="width: 100%; flex-direction: row; height: 35px; border-style: solid;" onclick="document.getElementById('pdfInp').click()">
+                <i class="fa fa-file-pdf" style="color: var(--danger);"></i> قراءة PDF شحن (Hi Express)
             </button>
             <input type="file" id="pdfInp" accept="application/pdf" hidden onchange="handlePDF(event)">
         </div>
@@ -246,7 +244,7 @@
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
             <div class="form-group"><label>السعر (₪)</label><input type="number" id="f_price"></div>
             <div class="form-group">
-                <label>طريقة الدفع</label>
+                <label>الدفع</label>
                 <select id="f_payment">
                     <option value="دفع عند الاستلام">دفع عند الاستلام</option>
                     <option value="مدفوع مسبقاً">مدفوع مسبقاً</option>
@@ -260,15 +258,15 @@
         <div class="form-group">
             <label>شركة الشحن</label>
             <select id="f_delivery">
-                <option value="">-- اختر --</option>
-                <option value="High Express - أم الفحم">High Express - أم الفحم</option>
+                <option value="Hi Express">Hi Express (النظام المعتمد ✨)</option>
                 <option value="Lama Logistics">Lama Logistics</option>
                 <option value="Marwah">Marwah</option>
+                <option value="Pickup">Pickup</option>
             </select>
         </div>
 
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px;">
-            <button class="btn btn-outline" style="height: 45px; flex-direction: row;" onclick="closeModal('orderModal')">إلغاء</button>
+            <button class="btn" style="height: 45px; flex-direction: row;" onclick="closeModal('orderModal')">إلغاء</button>
             <button class="btn btn-blue" style="height: 45px; flex-direction: row;" onclick="submitOrder()">حفظ الطلب <i class="fa fa-save"></i></button>
         </div>
     </div>
@@ -277,87 +275,142 @@
 <script>
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxR05-74zGsy7o3R9bdizecDEEjbaFrzr0h8SiFx-FjEYceNGlTnOOEEC1RnRW3-z9ppg/exec";
     const API_KEY = "12345678";
-    
+
     let ordersData = [];
     let currentEditRow = null;
 
     function showLoader(v) { document.getElementById('loader').style.display = v ? 'flex' : 'none'; }
-    
-    function toast(msg, type='success') {
+
+    function toast(msg, type='success', html=false) {
         const t = document.getElementById('toast');
-        t.textContent = msg;
-        t.style.background = type === 'success' ? 'var(--success)' : 'var(--danger)';
+        t.style.background = type === 'success' ? 'var(--success)' : (type === 'warning' ? 'var(--warning)' : 'var(--danger)');
         t.style.display = 'block';
-        setTimeout(() => t.style.display = 'none', 3000);
+        if(html) t.innerHTML = msg; else t.textContent = msg;
+        clearTimeout(window.__toastTimer);
+        window.__toastTimer = setTimeout(() => t.style.display = 'none', type === 'warning' ? 9000 : 4000);
     }
 
-    async function apiReq(params, method = 'POST') {
-        const options = {
-            method: method,
-            headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // Apps Script handles text/plain POST better
+    const safe = (v)=> (v===undefined||v===null||String(v).toLowerCase()==='undefined'||String(v).toLowerCase()==='null') ? '' : String(v).trim();
+    function escHTML(str){
+        const s = safe(str);
+        return s.replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'","&#039;");
+    }
+
+    function normalizePhoneForWA(p){
+        let d = String(p||'').replace(/\D/g,'');
+        if(!d) return '';
+        if(d.startsWith('0')) d = '972' + d.substring(1);
+        if(!d.startsWith('972') && d.length===9) d = '972' + d;
+        return d;
+    }
+
+    // ========= API =========
+    async function apiPost(params) {
+        // تركنا text/plain لتجنب preflight (أكثر توافقاً مع Apps Script)
+        const res = await fetch(SCRIPT_URL, {
+            method: 'POST',
+            mode: 'cors',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
             body: JSON.stringify({ ...params, key: API_KEY })
-        };
-        
-        try {
-            const res = await fetch(SCRIPT_URL, options);
-            return await res.json();
-        } catch (e) {
-            console.error("API Error:", e);
-            throw e;
-        }
+        });
+        const text = await res.text();
+        try { return JSON.parse(text); }
+        catch { return { result:'ERROR', message:'السيرفر لم يرجّع JSON صحيح' , raw:text}; }
+    }
+
+    async function apiGet(params){
+        const url = `${SCRIPT_URL}?` + new URLSearchParams({ ...params, key: API_KEY, _: Date.now() }).toString();
+        const res = await fetch(url, { method:'GET' });
+        const text = await res.text();
+        try { return JSON.parse(text); }
+        catch { return { result:'ERROR', message:'السيرفر لم يرجّع JSON صحيح', raw:text }; }
+    }
+
+    // إرسال GET بدون CORS قراءة (تجاوز) عبر iframe مخفي
+    function sendViaHiddenIframe(url){
+        const ifr = document.createElement('iframe');
+        ifr.style.display = 'none';
+        ifr.src = url;
+        document.body.appendChild(ifr);
+        setTimeout(()=>{ try{ ifr.remove(); }catch(e){} }, 10000);
     }
 
     async function fetchData() {
         showLoader(true);
         try {
-            // Use GET for simple fetch
-            const res = await fetch(`${SCRIPT_URL}?action=get&key=${API_KEY}`);
-            const data = await res.json();
-            ordersData = Array.isArray(data) ? data : [];
-            renderOrders(ordersData);
-        } catch (e) { toast("فشل في جلب البيانات", "danger"); }
+            const data = await apiGet({ action:'get', cache_bust: Date.now() });
+            if (Array.isArray(data)) {
+                ordersData = data;
+                renderOrders(ordersData);
+            } else if (data && data.result === 'ERROR') {
+                toast(data.message || "خطأ في قاعدة البيانات", "danger");
+            } else if (data && Array.isArray(data.data)) {
+                ordersData = data.data;
+                renderOrders(ordersData);
+            } else {
+                ordersData = [];
+                renderOrders(ordersData);
+            }
+        } catch (e) {
+            console.error("Fetch Error:", e);
+            toast("تعذر جلب البيانات. تأكد من نشر السكربت كـ Anyone.", "danger");
+        }
         showLoader(false);
     }
 
     function renderOrders(list) {
         const container = document.getElementById('ordersContainer');
         if (!list || !list.length) {
-            container.innerHTML = `<div style="text-align:center; padding:50px; color:var(--muted);">لا توجد طلبات</div>`;
+            container.innerHTML = `<div style="text-align:center; padding:50px; color:var(--muted); font-size:14px;">لا توجد طلبات مسجلة حالياً</div>`;
             return;
         }
 
-        const items = [...list].filter(x => x.rowIndex).reverse();
+        const items = [...list].filter(x => x && x.rowIndex !== undefined && x.rowIndex !== null)
+            .sort((a,b)=> Number(b.rowIndex) - Number(a.rowIndex));
+
         container.innerHTML = items.map(o => {
-            const status = (o.status || 'NEW').toUpperCase();
-            const sClass = status.includes('تجهيز') ? 'status-pending' : (status.includes('تم') ? 'status-done' : 'status-new');
-            
+            const statusTxt = safe(o.status) || 'جديد';
+            const statusStr = statusTxt.toUpperCase();
+            const deliveryStr = safe(o.delivery).toLowerCase();
+            const waybill = safe(o.delivery_order_id || o.deliveryId || '');
+
+            let sClass = 'status-new';
+            if (statusStr.includes('تجهيز') || statusStr.includes('إرسال') || statusStr.includes('بانتظار')) sClass = 'status-pending';
+            if (statusStr.includes('تم')) sClass = 'status-done';
+            if (statusStr.includes('بالطريق') || statusStr.includes('DELIVERY')) sClass = 'status-delivery';
+
+            const isHi = deliveryStr.includes('hi') || deliveryStr.includes('express');
+
             return `
                 <div class="order-card">
                     <div class="card-header">
-                        <span style="color:var(--muted); font-size:12px;">#${o.orderId || '---'}</span>
-                        <span class="status-pill ${sClass}">${o.status || 'جديد'}</span>
+                        <span style="color:var(--muted); font-size:12px;">#${escHTML(o.orderId || '---')}</span>
+                        <span class="status-pill ${sClass}">${escHTML(statusTxt)}</span>
                     </div>
-                    <div onclick="openEditModal(${o.rowIndex})" style="cursor:pointer">
-                        <span class="customer-name">${o.name || 'بدون اسم'}</span>
-                        <div class="info-row"><i class="fa fa-phone"></i> ${o.phone || '---'}</div>
-                        <div class="info-row"><i class="fa fa-map-marker-alt"></i> ${o.city || '---'}</div>
-                        <div class="offer-box">${o.offer || 'بدون أصناف'}</div>
+                    <div onclick="openEditModal(${Number(o.rowIndex)})" style="cursor:pointer">
+                        <span class="customer-name">${escHTML(o.name || 'بدون اسم')}</span>
+                        <div class="info-row"><i class="fa fa-phone"></i> ${escHTML(o.phone || '---')}</div>
+                        <div class="info-row"><i class="fa fa-map-marker-alt"></i> ${escHTML(o.city || '---')}</div>
+                        <div class="offer-box">${escHTML(o.offer || 'بدون أصناف')}</div>
                         <div class="meta-tags">
-                            <span class="tag">₪${o.price || 0}</span>
-                            <span class="tag">${o.payment || 'كاش'}</span>
-                            <span class="tag">${o.delivery || 'شحن'}</span>
+                            <span class="tag">₪${escHTML(o.price || 0)}</span>
+                            <span class="tag">${escHTML(o.payment || 'كاش')}</span>
+                            <span class="tag" style="${isHi ? 'color:var(--primary); font-weight:bold;' : ''}">
+                                <i class="fa fa-truck-fast"></i> ${escHTML(o.delivery || 'غير محدد')}
+                            </span>
+                            ${waybill ? `<span class="tag" style="color:var(--success); border: 1px solid var(--success); font-weight: bold;">📦 ${escHTML(waybill)}</span>` : ''}
                         </div>
                     </div>
                     <div class="actions-grid">
-                        <button class="btn btn-orange" onclick="sendWA(${o.rowIndex}, 'ar')"><i class="fab fa-whatsapp"></i><span>عربي</span></button>
-                        <button class="btn btn-purple" onclick="sendWA(${o.rowIndex}, 'he')"><i class="fab fa-whatsapp"></i><span>Heb</span></button>
-                        <button class="btn btn-green" onclick="updateStatus(${o.rowIndex}, 'بانتظار الإرسال للتجهيز')"><i class="fa fa-check"></i><span>اعتماد</span></button>
-                        <button class="btn btn-outline" onclick="openEditModal(${o.rowIndex})"><i class="fa fa-edit"></i><span>تعديل</span></button>
+                        <button class="btn btn-orange" onclick="sendWA(${Number(o.rowIndex)}, 'ar')"><i class="fab fa-whatsapp"></i><span>عربي</span></button>
+                        <button class="btn btn-purple" onclick="sendWA(${Number(o.rowIndex)}, 'he')"><i class="fab fa-whatsapp"></i><span>Heb</span></button>
+                        <button class="btn btn-green" onclick="updateStatus(${Number(o.rowIndex)}, 'بانتظار الإرسال للتجهيز')"><i class="fa fa-check"></i><span>اعتماد</span></button>
+                        <button class="btn" onclick="openEditModal(${Number(o.rowIndex)})"><i class="fa fa-edit"></i><span>تعديل</span></button>
                     </div>
                     <div class="secondary-actions">
-                        <button class="btn btn-outline" onclick="downloadPDF(${o.rowIndex}, 'ar')"><i class="fa fa-file-pdf"></i><span>عربي</span></button>
-                        <button class="btn btn-outline" onclick="downloadPDF(${o.rowIndex}, 'he')"><i class="fa fa-file-pdf"></i><span>Heb</span></button>
-                        <button class="btn btn-blue" onclick="sendDelivery(${o.rowIndex})"><i class="fa fa-paper-plane"></i><span>شحن</span></button>
+                        <button class="btn" onclick="downloadPDF(${Number(o.rowIndex)}, 'ar')"><i class="fa fa-file-pdf"></i><span>PDF ع</span></button>
+                        <button class="btn" onclick="downloadPDF(${Number(o.rowIndex)}, 'he')"><i class="fa fa-file-pdf"></i><span>PDF هـ</span></button>
+                        <button class="btn btn-blue" onclick="triggerDelivery(${Number(o.rowIndex)})"><i class="fa fa-paper-plane"></i><span>شحن Hi ✨</span></button>
                     </div>
                 </div>
             `;
@@ -365,68 +418,61 @@
     }
 
     function handleSearch() {
-        const term = document.getElementById('searchInp').value.toLowerCase();
-        const filtered = ordersData.filter(o => 
-            (o.name || "").toLowerCase().includes(term) || 
-            (o.phone || "").includes(term) ||
-            (o.city || "").toLowerCase().includes(term)
+        const term = String(document.getElementById('searchInp').value || "").toLowerCase();
+        const filtered = ordersData.filter(o =>
+            String(o.name || "").toLowerCase().includes(term) ||
+            String(o.phone || "").includes(term) ||
+            String(o.city || "").toLowerCase().includes(term)
         );
         renderOrders(filtered);
     }
 
-    // --- PDF & AI Logic ---
     async function handlePDF(e) {
         const file = e.target.files[0];
         if (!file) return;
 
-        // Check file size (Apps Script limit is around 50MB, but let's keep it safe for base64)
-        if (file.size > 2 * 1024 * 1024) {
-            toast("حجم الملف كبير جداً (أقصى حد 2MB)", "danger");
-            e.target.value = '';
+        // حماية من ملفات ضخمة
+        const maxMB = 8;
+        if(file.size > maxMB * 1024 * 1024){
+            toast(`الملف كبير جداً (أكثر من ${maxMB}MB)`, "warning");
+            e.target.value='';
             return;
         }
 
         showLoader(true);
         try {
             const base64 = await fileToBase64(file);
-            const res = await apiReq({ action: 'analyzePDF', fileBase64: base64 });
+            const res = await apiPost({ action: 'analyzePDF', fileBase64: base64 });
             if (res.result === 'SUCCESS') {
                 fillForm(res.data);
-                toast("تمت قراءة الـ PDF بنجاح ✨");
-            } else {
-                toast(res.message || "فشل تحليل الـ PDF", "danger");
-            }
-        } catch (err) {
-            toast("خطأ أثناء قراءة الملف", "danger");
-        }
+                toast("تم تحليل بيانات الشحن ✨");
+            } else { toast(res.message || "فشل التحليل", "danger"); }
+        } catch (err) { toast("خطأ في قراءة الملف", "danger"); }
         showLoader(false);
-        e.target.value = ''; // Reset
+        e.target.value = '';
     }
 
     function smartParseLocal() {
-        const txt = document.getElementById('rawInput').value.trim();
+        const txt = String(document.getElementById('rawInput').value || "").trim();
         if (!txt) return toast("أدخل نصاً أولاً", "danger");
-
-        const phone = txt.match(/(05\d{8}|9725\d{8})/);
-        const price = txt.match(/(\d{2,4})\s*(₪|شيكل|ILS)/i);
-        
+        const phone = txt.match(/(05\d{8}|9725\d{8}|5\d{8})/);
+        const price = txt.match(/(\d{2,6})\s*(₪|شيكل|ILS)/i);
         if (phone) document.getElementById('f_phone').value = phone[0];
         if (price) document.getElementById('f_price').value = price[1];
-
         const lines = txt.split('\n').filter(l => l.trim().length > 2);
         if (lines[0]) document.getElementById('f_name').value = lines[0].trim();
-        
-        document.getElementById('f_offer').value = txt.substring(0, 100);
+        document.getElementById('f_offer').value = txt.substring(0, 160);
         toast("تم التحليل السريع ✅");
     }
 
     async function smartParseAI() {
-        const txt = document.getElementById('rawInput').value.trim();
+        const txt = String(document.getElementById('rawInput').value || "").trim();
         if (!txt) return toast("أدخل نصاً أولاً", "danger");
         showLoader(true);
         try {
-            const res = await apiReq({ action: 'analyze', text: txt });
+            const res = await apiPost({ action: 'analyze', text: txt });
             if (res.result === 'SUCCESS') fillForm(res.data);
+            else smartParseLocal();
         } catch (e) { smartParseLocal(); }
         showLoader(false);
     }
@@ -436,7 +482,7 @@
         if (d.name) document.getElementById('f_name').value = d.name;
         if (d.phone) document.getElementById('f_phone').value = d.phone;
         if (d.city) document.getElementById('f_city').value = d.city;
-        if (d.price) document.getElementById('f_price').value = d.price;
+        if (d.price!==undefined && d.price!==null) document.getElementById('f_price').value = d.price;
         if (d.offer) document.getElementById('f_offer').value = d.offer;
         if (d.address) document.getElementById('f_address').value = d.address;
     }
@@ -445,27 +491,27 @@
         return new Promise((resolve, reject) => {
             const reader = new FileReader();
             reader.readAsDataURL(file);
-            reader.onload = () => resolve(reader.result.split(',')[1]);
+            reader.onload = () => resolve(String(reader.result||'').split(',')[1] || '');
             reader.onerror = error => reject(error);
         });
     }
 
-    // --- Order Actions ---
     function openAddModal() {
         currentEditRow = null;
         document.getElementById('modalTitle').textContent = "إضافة طلب جديد";
         document.getElementById('aiSection').style.display = "block";
         ['f_name','f_phone','f_offer','f_price','f_city','f_address'].forEach(id => document.getElementById(id).value = "");
+        document.getElementById('f_payment').value = "دفع عند الاستلام";
+        document.getElementById('f_delivery').value = "Hi Express";
         document.getElementById('orderModal').classList.add('show');
     }
 
     function openEditModal(row) {
-        const o = ordersData.find(x => x.rowIndex == row);
+        const o = ordersData.find(x => String(x.rowIndex) == String(row));
         if (!o) return;
         currentEditRow = row;
         document.getElementById('modalTitle').textContent = "تعديل طلب #" + (o.orderId || '');
         document.getElementById('aiSection').style.display = "none";
-        
         document.getElementById('f_name').value = o.name || "";
         document.getElementById('f_phone').value = o.phone || "";
         document.getElementById('f_offer').value = o.offer || "";
@@ -473,22 +519,23 @@
         document.getElementById('f_city').value = o.city || "";
         document.getElementById('f_address').value = o.address || "";
         document.getElementById('f_payment').value = o.payment || "دفع عند الاستلام";
-        document.getElementById('f_delivery').value = o.delivery || "";
-
+        document.getElementById('f_delivery').value = o.delivery || "Hi Express";
         document.getElementById('orderModal').classList.add('show');
     }
 
     function closeModal(id) { document.getElementById(id).classList.remove('show'); }
 
     async function submitOrder() {
-        const name = document.getElementById('f_name').value.trim();
+        const name = String(document.getElementById('f_name').value || "").trim();
         if (!name) return toast("الاسم مطلوب", "danger");
 
-        showLoader(true);
-        const isEdit = currentEditRow !== null;
+        const isEdit = (currentEditRow !== null);
+        const existing = isEdit ? ordersData.find(x => String(x.rowIndex) == String(currentEditRow)) : null;
+        const keepStatus = safe(existing && existing.status) || 'NEW';
+
         const payload = {
             action: isEdit ? 'updateOrder' : 'addOrder',
-            row: currentEditRow,
+            row: isEdit ? currentEditRow : '',
             name,
             phone: document.getElementById('f_phone').value,
             offer: document.getElementById('f_offer').value,
@@ -497,57 +544,112 @@
             address: document.getElementById('f_address').value,
             payment: document.getElementById('f_payment').value,
             delivery: document.getElementById('f_delivery').value,
-            status: isEdit ? undefined : 'جديد'
+            status: isEdit ? keepStatus : 'NEW'
         };
 
+        showLoader(true);
         try {
-            const res = await apiReq(payload);
+            const res = await apiPost(payload);
             if (res.result === 'SUCCESS') {
-                toast("تم الحفظ بنجاح");
+                toast("تم حفظ الطلب في الجدول بنجاح");
                 closeModal('orderModal');
                 fetchData();
+            } else {
+                toast(res.message || "فشل الحفظ", "danger");
             }
-        } catch (e) { toast("خطأ في الحفظ", "danger"); }
+        } catch (e) {
+            toast("خطأ في الاتصال بالسيرفر", "danger");
+        }
         showLoader(false);
     }
 
     async function updateStatus(row, status) {
         showLoader(true);
         try {
-            const res = await apiReq({ action: 'updateStatus', row, status });
-            if (res.result === 'SUCCESS') { toast("تم التحديث"); fetchData(); }
-        } catch (e) { toast("فشل التحديث", "danger"); }
+            // بعض السكربتات تستخدم updateOrder بدل updateStatus
+            let res = await apiPost({ action: 'updateStatus', row, status });
+            if (res && res.result !== 'SUCCESS') {
+                res = await apiPost({ action: 'updateOrder', row, status });
+            }
+            if (res.result === 'SUCCESS') { toast("تم اعتماد الحالة"); fetchData(); }
+            else toast(res.message || "فشل التحديث", "danger");
+        } catch (e) {
+            toast("فشل التحديث", "danger");
+        }
         showLoader(false);
     }
 
     function sendWA(row, lang) {
-        const o = ordersData.find(x => x.rowIndex == row);
+        const o = ordersData.find(x => String(x.rowIndex) == String(row));
         if (!o) return;
-        const msg = lang === 'ar' ? `أهلاً ${o.name}، تم استلام طلبك.` : `שלום ${o.name}, ההזמנה התקבלה.`;
-        window.open(`https://wa.me/${String(o.phone).replace(/\D/g,'')}?text=${encodeURIComponent(msg)}`, '_blank');
+
+        const waPhone = normalizePhoneForWA(o.phone);
+        if(!waPhone) return toast("رقم الهاتف غير صالح", "warning");
+
+        const msg = lang === 'ar'
+            ? `أهلاً ${safe(o.name)} 👋\nطلبك من MAD Parfumeur.\nالعرض: ${safe(o.offer)}\nالمدينة: ${safe(o.city)}\nالسعر: ${safe(o.price)} ₪`
+            : `שלום ${safe(o.name)} 👋\nההזמנה שלך מ-MAD Parfumeur.\nמוצר: ${safe(o.offer)}\nעיר: ${safe(o.city)}\nמחיר: ${safe(o.price)} ₪`;
+
+        window.open(`https://wa.me/${waPhone}?text=${encodeURIComponent(msg)}`, '_blank');
     }
 
     async function downloadPDF(row, lang) {
         showLoader(true);
         try {
-            const res = await apiReq({ action: 'pdfReceipt', row, lang });
+            const res = await apiPost({ action: 'pdfReceipt', row, lang });
             if (res.result === 'SUCCESS') {
                 const link = document.createElement('a');
                 link.href = `data:application/pdf;base64,${res.pdfBase64}`;
-                link.download = `Receipt_${row}.pdf`;
+                link.download = `MAD_Receipt_${row}_${lang}.pdf`;
                 link.click();
+                toast("تم تنزيل PDF ✅");
+            } else {
+                toast(res.message || "خطأ في ملف PDF", "danger");
             }
-        } catch (e) { toast("خطأ في ملف PDF", "danger"); }
+        } catch (e) {
+            toast("خطأ في ملف PDF", "danger");
+        }
         showLoader(false);
     }
 
-    async function sendDelivery(row) {
+    /**
+     * ✅ FIXED: إرسال لشركة التوصيل
+     * - يحاول GET (الأكثر توافقاً مع سكربت Apps Script)
+     * - إذا CORS يمنع القراءة: يرسل عبر iframe مخفي (بدون فتح نافذة)
+     */
+    async function triggerDelivery(row) {
+        const o = ordersData.find(x => String(x.rowIndex) == String(row));
+        if (!o) return toast("الطلب غير موجود", "danger");
+
         showLoader(true);
+
+        const deliveryCompany = safe(o.delivery) || "Hi Express";
+        const directLink = `${SCRIPT_URL}?action=sendToDelivery&row=${encodeURIComponent(row)}&delivery=${encodeURIComponent(deliveryCompany)}&key=${encodeURIComponent(API_KEY)}&_=${Date.now()}`;
+
         try {
-            const res = await apiReq({ action: 'sendToDelivery', row });
-            if (res.result === 'SUCCESS') { toast("تم الإرسال لشركة الشحن"); fetchData(); }
-            else toast(res.message || "فشل الشحن", "danger");
-        } catch (e) { toast("خطأ في النظام", "danger"); }
+            // 1) محاولة GET (تنفّذ doGet غالباً)
+            const res = await apiGet({ action:'sendToDelivery', row, delivery: deliveryCompany });
+
+            if (res && res.result === 'SUCCESS') {
+                const id = res.delivery_order_id ? `رقم الشحنة: ${res.delivery_order_id}` : '';
+                toast(`تم الإرسال بنجاح ✨ ${id}`);
+                await fetchData();
+            } else {
+                const msg = (res && res.message) ? res.message : "لم يتم الإرسال";
+                // 2) إذا في خطأ منطقي من السيرفر، اعرض رابط يدوي
+                toast(`تنبيه من السيرفر: ${escHTML(msg)}<br><a href="${directLink}" target="_blank" style="color:#fff;text-decoration:underline;font-weight:900;">فتح رابط الإرسال 🚀</a>`, "warning", true);
+            }
+        } catch (e) {
+            // 3) إذا CORS/Network منع القراءة: أرسل عبر iframe مخفي (بدون نافذة)
+            try {
+                sendViaHiddenIframe(directLink);
+                toast("تم إرسال الطلب (تجاوز CORS) ✅ سيتم تحديث القائمة بعد لحظات…", "warning");
+                setTimeout(()=>fetchData(), 1800);
+            } catch (e2) {
+                toast(`تعذر الإرسال. افتح الرابط:<br><a href="${directLink}" target="_blank" style="color:#fff;text-decoration:underline;font-weight:900;">إرسال الآن 🚀</a>`, "warning", true);
+            }
+        }
+
         showLoader(false);
     }
 
