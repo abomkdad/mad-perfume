@@ -5,13 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"/>
   <title>إضافة طلب سريع - MAD Manager</title>
   
-  <!-- Fonts & Icons -->
+  <!-- الخطوط والأيقونات -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
-  <!-- Tailwind CSS -->
+  <!-- إطار عمل Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   
   <script>
@@ -47,6 +47,7 @@
     
     input, textarea, select { font-size: 16px !important; }
 
+    /* إعدادات الطباعة */
     @media print {
       @page { size: 10cm 10cm; margin: 0; }
       body * { visibility: hidden !important; }
@@ -58,24 +59,25 @@
         width: 10cm !important;
         height: 10cm !important;
         background: white !important;
+        padding: 5mm;
       }
     }
   </style>
 </head>
 <body class="antialiased selection:bg-brand-500">
 
-  <!-- Loading Overlay -->
+  <!-- شاشة التحميل -->
   <div id="loadingOverlay" class="fixed inset-0 bg-brand-950/90 backdrop-blur-md z-[4000] hidden items-center justify-center flex-col gap-4">
     <div class="w-14 h-14 border-4 border-brand-500/20 border-t-brand-500 rounded-full animate-spin"></div>
     <p id="loadingText" class="text-white font-bold">جاري العمل...</p>
   </div>
 
-  <!-- Toast -->
+  <!-- الإشعارات -->
   <div id="toast" class="fixed top-4 left-1/2 -translate-x-1/2 bg-emerald-500 text-white px-6 py-4 rounded-2xl font-bold text-[16px] shadow-2xl z-[3000] transition-all duration-300 -translate-y-20 opacity-0 pointer-events-none flex items-center gap-3 w-[90%] max-w-[400px]">
-    <i class="fa fa-check-circle text-xl"></i> <span id="toastMsg">تمت العملية بنجاح</span>
+    <i class="fa fa-check-circle text-xl" id="toastIcon"></i> <span id="toastMsg">تمت العملية بنجاح</span>
   </div>
 
-  <!-- Header -->
+  <!-- الهيدر -->
   <header class="sticky top-0 z-[100] bg-brand-950/90 backdrop-blur-xl border-b border-white/5 p-4 shadow-lg shadow-black/20">
     <div class="flex items-center gap-3">
       <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-400 to-brand-600 flex items-center justify-center shadow-lg">
@@ -87,21 +89,26 @@
 
   <main class="p-4 max-w-md mx-auto">
     
-    <!-- Smart Analyzer Box -->
-    <div class="bg-brand-500/10 border border-brand-500/30 p-4 rounded-3xl mb-6 shadow-inner overflow-hidden">
+    <!-- صندوق المحلل الذكي -->
+    <div class="bg-brand-500/10 border border-brand-500/30 p-4 rounded-3xl mb-6 shadow-inner overflow-hidden relative">
       <h4 class="m-0 mb-3 text-[15px] font-bold text-brand-400 flex items-center gap-2">
-        <i class="fa fa-robot"></i> المحلل الذكي
+        <i class="fa fa-robot"></i> المحلل الذكي (يتم عبر السيرفر)
       </h4>
-      <textarea id="smartInput" oninput="autoAnalyze()" placeholder="الصق نص الطلب هنا..." class="w-full h-24 p-3 mb-3 bg-black/30 border border-brand-500/20 rounded-2xl text-white text-[16px] outline-none focus:border-brand-500 resize-none transition-all"></textarea>
+      <textarea id="smartInput" oninput="autoAnalyze()" placeholder="الصق نص الطلب من الواتساب هنا..." class="w-full h-24 p-3 mb-3 bg-black/30 border border-brand-500/20 rounded-2xl text-white text-[16px] outline-none focus:border-brand-500 resize-none transition-all"></textarea>
       
       <div class="flex gap-2">
         <button onclick="analyzeWithGemini()" class="flex-1 bg-gradient-to-r from-indigo-600 to-brand-600 text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2 active:scale-95 shadow-lg">
           استخراج بالذكاء ✨
         </button>
+        <!-- زر رفع PDF للتحليل عبر السيرفر -->
+        <button onclick="document.getElementById('pdfUpload').click()" class="w-14 bg-red-500/20 text-red-400 border border-red-500/40 rounded-xl flex items-center justify-center active:scale-95 shadow-lg">
+          <i class="fa fa-file-pdf text-xl"></i>
+        </button>
+        <input type="file" id="pdfUpload" accept="application/pdf" class="hidden" onchange="handlePdfUpload(event)">
       </div>
     </div>
 
-    <!-- Form Fields -->
+    <!-- نموذج البيانات -->
     <div class="bg-card p-5 rounded-3xl border border-white/5 shadow-xl">
       <label class="label-text">الاسم الكامل</label>
       <input type="text" id="f_name" class="input-field" placeholder="اسم الزبون">
@@ -130,20 +137,27 @@
         <option value="Pickup">Pickup</option>
       </select>
 
-      <label class="label-text">ملاحظات</label>
+      <label class="label-text">ملاحظات (اختياري)</label>
       <textarea id="f_notes" rows="2" class="input-field resize-none mb-0"></textarea>
     </div>
 
-    <!-- Previous Orders Section -->
+    <!-- قائمة الطلبات السابقة -->
     <div class="mt-8 mb-4">
-      <h3 class="text-white font-black text-lg mb-4 flex items-center gap-2">
-        <i class="fa fa-list text-brand-400"></i> آخر الطلبات
-      </h3>
-      <div id="ordersList" class="flex flex-col gap-3"></div>
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-white font-black text-lg flex items-center gap-2">
+          <i class="fa fa-list text-brand-400"></i> آخر الطلبات
+        </h3>
+        <button onclick="loadOrders()" class="w-8 h-8 rounded-xl bg-slate-800 text-slate-400 flex items-center justify-center active:scale-95 border border-slate-700">
+          <i class="fa fa-sync-alt text-xs"></i>
+        </button>
+      </div>
+      <div id="ordersList" class="flex flex-col gap-3">
+        <p class="text-center text-slate-500 py-4">جاري التحميل...</p>
+      </div>
     </div>
   </main>
 
-  <!-- Sticky Bottom Actions -->
+  <!-- الأزرار السفلية العائمة -->
   <div class="fixed bottom-0 left-0 right-0 bg-brand-950/95 backdrop-blur-xl border-t border-white/10 p-4 z-50">
     <div class="max-w-md mx-auto flex flex-col gap-3">
       <button onclick="saveOrder('high_express')" class="w-full bg-orange-500 text-black font-black py-4 rounded-2xl text-[18px] flex items-center justify-center gap-2 shadow-lg active:scale-95">
@@ -154,20 +168,46 @@
         <button onclick="saveOrder('normal')" class="w-full bg-slate-800 text-white font-bold py-3.5 rounded-2xl border border-slate-700 active:scale-95">
           حفظ فقط
         </button>
-        <button onclick="window.print()" class="w-full bg-slate-800 text-white font-bold py-3.5 rounded-2xl border border-slate-700 active:scale-95">
-          <i class="fa fa-print text-emerald-400 me-2"></i>طباعة
+        <button onclick="printCurrentOrder()" class="w-full bg-slate-800 text-white font-bold py-3.5 rounded-2xl border border-slate-700 active:scale-95 flex items-center justify-center gap-2">
+          <i class="fa fa-print text-emerald-400"></i>طباعة
         </button>
       </div>
     </div>
   </div>
 
+  <!-- قالب الطباعة المخفي -->
+  <div id="printSection" class="hidden">
+    <div class="text-center border-b-2 border-black pb-2 mb-3">
+      <h1 class="m-0 text-3xl tracking-[4px] font-black leading-none">MAD</h1>
+      <div class="text-[11px] font-extrabold mt-1">PARFUMEUR</div>
+      <div class="text-[10px] font-black mt-2 pt-1 border-t border-gray-200 flex justify-between">
+        <span id="p_date">00.00.0000</span>
+        <span>ORD: NEW</span>
+      </div>
+    </div>
+    <div id="p_content" class="text-xs leading-relaxed font-semibold text-right" dir="rtl"></div>
+    <div class="border-t-2 border-black pt-2 mt-2 flex justify-between items-end">
+      <div class="text-center">
+        <img id="p_qr" src="" class="w-12 h-12 border border-black mx-auto bg-gray-50" alt="QR">
+      </div>
+      <div class="text-left">
+        <div class="text-[11px] font-bold">TOTAL:</div>
+        <div class="text-2xl font-black mt-1">₪<span id="p_total">0</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- الأكواد البرمجية (الجافاسكربت) -->
   <script>
-    // ⚠️ استبدل هذا الرابط برابط الـ Web App الخاص بك بعد نشره من جوجل سكربت
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxaA4Wc7cEyU6gx-MzuA_C8psZPuWCLmIJ9TPjnqX_RGG4SDQR0Jeeqcnf85Q65NdlK/exec";
+    // ⚠️⚠️⚠️ هام جداً: ضع الرابط الذي نسخته من جوجل سكربت هنا (بدلاً من الرابط الوهمي)
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwjd0SuMXpNDoUCddoYHQyFn6VJ9nJNRjzyE5DVSl2oWw3NlbTxp282RPl-dz8qeuHNiw/exec";
+    
+    // مفتاح الأمان (يجب أن يتطابق مع السكربت)
     const DASH_KEY = "12345678";
 
     let analyzeTimeout;
 
+    // دوال المساعدة للواجهة
     function showLoading(s, text = "جاري العمل...") {
       document.getElementById('loadingText').textContent = text;
       document.getElementById('loadingOverlay').style.display = s ? 'flex' : 'none';
@@ -176,84 +216,153 @@
     function showToast(m, type = 'success') {
       const t = document.getElementById('toast');
       document.getElementById('toastMsg').textContent = m;
-      t.className = `fixed top-4 left-1/2 -translate-x-1/2 px-6 py-4 rounded-2xl font-bold z-[3000] transition-all duration-300 flex items-center gap-3 w-[90%] max-w-[400px] ${
+      const icon = document.getElementById('toastIcon');
+      
+      t.className = `fixed top-4 left-1/2 -translate-x-1/2 px-6 py-4 rounded-2xl font-bold text-[16px] shadow-2xl z-[3000] transition-all duration-300 flex items-center gap-3 w-[90%] max-w-[400px] ${
         type === 'error' ? 'bg-red-500 text-white' : 'bg-emerald-500 text-white'
       }`;
+      icon.className = type === 'error' ? 'fa fa-exclamation-triangle text-xl' : 'fa fa-check-circle text-xl';
+      
       t.classList.remove('-translate-y-20', 'opacity-0');
       setTimeout(() => t.classList.add('-translate-y-20', 'opacity-0'), 3000);
     }
 
+    function esc(str) { 
+      if (!str) return ""; 
+      const div = document.createElement('div'); 
+      div.appendChild(document.createTextNode(str)); 
+      return div.innerHTML; 
+    }
+
+    // التحليل السريع للهاتف أثناء الكتابة
     function autoAnalyze() {
       clearTimeout(analyzeTimeout);
       analyzeTimeout = setTimeout(() => {
         const val = document.getElementById('smartInput').value;
         const phoneMatch = val.match(/(?:05|972)\d{8,9}/);
         if (phoneMatch && !document.getElementById('f_phone').value) {
-          document.getElementById('f_phone').value = phoneMatch[0];
+          let p = phoneMatch[0];
+          if(p.startsWith("972")) p = "0" + p.substring(3);
+          document.getElementById('f_phone').value = p;
         }
       }, 500);
     }
 
+    // التحليل الذكي عبر السيرفر
     async function analyzeWithGemini() {
       const text = document.getElementById('smartInput').value;
-      if (!text) return showToast("الصق نصاً أولاً", "error");
+      if (!text) return showToast("الرجاء لصق نص الطلب أولاً", "error");
       
-      showLoading(true, "المساعد الذكي يحلل النص...");
+      showLoading(true, "يتم التحليل عبر السيرفر الآمن...");
       try {
+        // نرسل النص للسيرفر، والسيرفر هو من يتحدث مع Gemini
         const res = await fetch(`${SCRIPT_URL}?action=analyze&key=${DASH_KEY}&text=${encodeURIComponent(text)}`);
         const data = await res.json();
         
-        if (data.result === "SUCCESS") {
+        if (data.result === "SUCCESS" && data.data) {
           const d = data.data;
           if(d.name) document.getElementById('f_name').value = d.name;
-          if(d.phone) document.getElementById('f_phone').value = d.phone;
+          if(d.phone) {
+             let p = d.phone.replace(/\D/g, "");
+             if(p.startsWith("972")) p = "0" + p.substring(3);
+             document.getElementById('f_phone').value = p;
+          }
           if(d.price) document.getElementById('f_price').value = d.price;
           if(d.city) document.getElementById('f_city').value = d.city;
           if(d.offer) document.getElementById('f_offer').value = d.offer;
-          showToast("تم استخراج البيانات ✨");
+          
+          showToast("تم استخراج البيانات بنجاح ✨");
         } else {
-          throw new Error(data.message || "خطأ غير معروف");
+          throw new Error(data.message || "حدث خطأ غير معروف");
         }
       } catch (e) {
-        showToast("فشل التحليل الذكي: " + e.message, "error");
+        showToast("فشل التحليل: " + e.message, "error");
       } finally {
         showLoading(false);
       }
     }
 
+    // تحليل ملف PDF عبر السيرفر
+    async function handlePdfUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      
+      showLoading(true, "جاري رفع وقراءة ملف الـ PDF...");
+      const reader = new FileReader();
+      reader.onload = async () => {
+        const base64 = reader.result.split(',')[1];
+        try {
+          const payload = {
+            action: "analyzePDF",
+            key: DASH_KEY,
+            fileBase64: base64,
+            prompt: "استخرج بيانات الطلب من هذا الملف بصيغة JSON: name, phone, price, city, offer"
+          };
+          
+          const res = await fetch(SCRIPT_URL, {
+            method: 'POST',
+            body: JSON.stringify(payload)
+          });
+          const data = await res.json();
+          
+          if (data.result === "SUCCESS" && data.data) {
+            const d = data.data;
+            if(d.name) document.getElementById('f_name').value = d.name;
+            if(d.phone) document.getElementById('f_phone').value = d.phone;
+            if(d.price) document.getElementById('f_price').value = d.price;
+            if(d.city) document.getElementById('f_city').value = d.city;
+            if(d.offer) document.getElementById('f_offer').value = d.offer;
+            showToast("تم التحليل من الملف ✨");
+          } else {
+             throw new Error(data.message);
+          }
+        } catch (e) {
+          showToast("خطأ في قراءة الملف: " + e.message, "error");
+        } finally {
+          showLoading(false);
+          event.target.value = '';
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+
+    // حفظ الطلب في الإكسل (وإرساله للشحن إذا تم الاختيار)
     async function saveOrder(mode) {
       const name = document.getElementById('f_name').value;
-      if (!name) return showToast("أدخل اسم الزبون على الأقل", "error");
+      const phone = document.getElementById('f_phone').value;
+      if (!name || !phone) return showToast("الاسم ورقم الهاتف مطلوبان!", "error");
       
-      showLoading(true, "جاري حفظ الطلب...");
+      showLoading(true, "جاري إرسال الطلب...");
       const delivery = (mode === 'high_express') ? "High Express - أم الفحم" : document.getElementById('f_delivery').value;
       
+      // نحدد الأمر (إضافة عادية أم إضافة + إرسال للشحن)
+      const actionType = (mode === 'high_express') ? "sendToDelivery" : "addOrder";
+
       const params = new URLSearchParams({
-        action: "addOrder",
+        action: actionType,
         key: DASH_KEY,
         name: name,
-        phone: document.getElementById('f_phone').value,
+        phone: phone,
         offer: document.getElementById('f_offer').value,
         price: document.getElementById('f_price').value,
         city: document.getElementById('f_city').value,
         notes: document.getElementById('f_notes').value,
-        delivery: delivery,
-        payment: "دفع عند الاستلام",
-        status: "NEW"
+        delivery: delivery
       });
 
       try {
         const res = await fetch(`${SCRIPT_URL}?${params.toString()}`);
         const data = await res.json();
+        
         if (data.result === "SUCCESS") {
-          showToast("تم الحفظ بنجاح 🚀");
+          showToast("تم إدخال الطلب بنجاح 🚀");
           clearForm();
           loadOrders();
         } else {
-          showToast("فشل الحفظ: " + data.message, "error");
+          showToast("تعذر الحفظ: " + data.message, "error");
         }
       } catch (e) {
-        showToast("خطأ في الاتصال بالبيانات", "error");
+        showToast("خطأ في الاتصال بالإنترنت أو السيرفر", "error");
       } finally {
         showLoading(false);
       }
@@ -267,28 +376,77 @@
       document.getElementById('f_delivery').value = "";
     }
 
+    // تحميل آخر الطلبات للعرض
     async function loadOrders() {
       const list = document.getElementById('ordersList');
+      if (!list) return;
+      
       list.innerHTML = "<p class='text-center opacity-50 py-4'>جاري تحميل الطلبات...</p>";
       try {
         const res = await fetch(`${SCRIPT_URL}?action=get&key=${DASH_KEY}`);
         const data = await res.json();
-        if (Array.isArray(data)) {
-          list.innerHTML = data.reverse().slice(0, 10).map(o => `
-            <div class="bg-card p-4 rounded-2xl border border-white/5 shadow-lg">
-              <div class="flex justify-between items-start mb-1">
-                <span class="font-bold text-white">${o.name || "بدون اسم"}</span>
-                <span class="text-[10px] bg-brand-500/20 text-brand-400 px-2 py-1 rounded-full">${o.status || 'جديد'}</span>
+        
+        if (Array.isArray(data) && data.length > 0) {
+          list.innerHTML = data.slice(0, 10).map(o => `
+            <div class="bg-card p-4 rounded-2xl border border-white/5 shadow-lg relative overflow-hidden">
+              <div class="flex justify-between items-start mb-2">
+                <span class="font-bold text-white text-[15px]">${esc(o.name) || "بدون اسم"}</span>
+                <span class="text-[10px] bg-brand-500/20 text-brand-400 px-2 py-1 rounded-full font-bold">${esc(o.status)}</span>
               </div>
-              <div class="text-xs text-slate-400">${o.city || "—"} | ${o.price || 0}₪</div>
+              <div class="text-slate-400 text-xs mb-1" dir="ltr"><i class="fa fa-phone text-[10px]"></i> ${esc(o.phone)}</div>
+              <div class="text-brand-200 text-xs bg-brand-900/20 p-2 rounded-lg border-r-2 border-brand-500 truncate mb-2">${esc(o.offer) || "بدون تفاصيل"}</div>
+              <div class="flex gap-4 text-[10px] font-bold text-slate-300">
+                <span>📍 ${esc(o.city)}</span>
+                <span class="text-emerald-400">₪${esc(o.price) || 0}</span>
+              </div>
             </div>
           `).join('');
+        } else {
+          list.innerHTML = "<p class='text-center opacity-50 py-4'>لا توجد طلبات سابقة</p>";
         }
       } catch(e) {
-        list.innerHTML = "";
+        list.innerHTML = "<p class='text-center text-red-400 py-4'>فشل الاتصال بالسيرفر</p>";
       }
     }
 
+    // طباعة وصل مصغر للطلب الحالي
+    async function printCurrentOrder() {
+      const name = document.getElementById('f_name').value.trim();
+      const phone = document.getElementById('f_phone').value.trim();
+      if (!name || !phone) return showToast("الرجاء إدخال الاسم والهاتف للطباعة!", 'error');
+      
+      if (document.getElementById('f_delivery').value.includes("High Express")) {
+        return showToast("طلبات هي اكسبرس لا تُطبع يدوياً!", "error");
+      }
+
+      document.getElementById('p_date').textContent = new Date().toLocaleDateString();
+      document.getElementById('p_total').textContent = document.getElementById('f_price').value || "0";
+      
+      document.getElementById('p_content').innerHTML = `
+        <div style="margin-bottom: 4px;"><b>الاسم:</b> ${esc(name)}</div>
+        <div style="margin-bottom: 4px;"><b>الهاتف:</b> <span dir="ltr">${esc(phone)}</span></div>
+        <div style="margin-bottom: 4px;"><b>المدينة:</b> ${esc(document.getElementById('f_city').value)}</div>
+        <div style="margin-top: 8px; padding-top: 8px; border-top: 1px dashed black;"><b>الأصناف:</b><br>${esc(document.getElementById('f_offer').value)}</div>
+      `;
+
+      showLoading(true, "تجهيز الطباعة...");
+      const qrImg = document.getElementById('p_qr');
+      // تنظيف رقم الهاتف لرابط الواتساب
+      let cleanPhone = phone.replace(/\D/g, "");
+      if (cleanPhone.startsWith("0")) cleanPhone = "972" + cleanPhone.substring(1);
+      
+      qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=https://wa.me/${cleanPhone}`;
+      
+      await new Promise(r => {
+        qrImg.onload = r;
+        qrImg.onerror = r;
+      });
+      
+      showLoading(false);
+      window.print();
+    }
+
+    // تحميل الطلبات عند بدء تشغيل الصفحة
     window.onload = loadOrders;
   </script>
 </body>
