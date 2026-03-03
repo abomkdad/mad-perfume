@@ -4,14 +4,14 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"/>
   <title>إضافة طلب سريع - MAD Manager</title>
-  
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  
+
   <script src="https://cdn.tailwindcss.com"></script>
-  
+
   <script>
     tailwind.config = {
       theme: {
@@ -38,6 +38,7 @@
     }
   </style>
 </head>
+
 <body class="antialiased selection:bg-brand-500">
 
   <!-- شاشة التحميل -->
@@ -59,10 +60,12 @@
   </header>
 
   <main class="p-4 max-w-md mx-auto">
+
     <!-- المحلل الذكي -->
     <div class="bg-brand-500/10 border border-brand-500/30 p-4 rounded-3xl mb-6 shadow-inner">
       <h4 class="m-0 mb-3 text-[15px] font-bold text-brand-400 flex items-center gap-2"><i class="fa fa-robot"></i> المحلل الذكي</h4>
       <textarea id="smartInput" oninput="autoAnalyze()" placeholder="الصق نص الطلب هنا..." class="w-full h-24 p-3 mb-3 bg-black/30 border border-brand-500/20 rounded-2xl text-white text-[16px] outline-none focus:border-brand-500 resize-none"></textarea>
+
       <div class="flex gap-2">
         <button onclick="analyzeWithGemini()" class="flex-1 bg-gradient-to-r from-indigo-600 to-brand-600 text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2 active:scale-95 shadow-lg">استخراج بالذكاء ✨</button>
         <button onclick="document.getElementById('pdfUpload').click()" class="w-14 bg-red-500/20 text-red-400 border border-red-500/40 rounded-xl flex items-center justify-center active:scale-95"><i class="fa fa-file-pdf text-xl"></i></button>
@@ -74,10 +77,10 @@
     <div class="bg-card p-5 rounded-3xl border border-white/5 shadow-xl">
       <label class="label-text">الاسم الكامل</label>
       <input type="text" id="f_name" class="input-field" placeholder="اسم الزبون">
-      
+
       <label class="label-text">رقم الهاتف</label>
       <input type="tel" id="f_phone" class="input-field" dir="ltr" placeholder="05X-XXXXXXX">
-      
+
       <label class="label-text">الأصناف</label>
       <textarea id="f_offer" rows="2" class="input-field resize-none"></textarea>
 
@@ -105,6 +108,7 @@
       </div>
       <div id="ordersList" class="flex flex-col gap-3"><p class="text-center text-slate-500 py-4">جاري التحميل...</p></div>
     </div>
+
   </main>
 
   <div class="fixed bottom-0 left-0 right-0 bg-brand-950/95 backdrop-blur-xl border-t border-white/10 p-4 z-50">
@@ -131,10 +135,10 @@
   </div>
 
   <script>
-    // 🚨 ضع رابط السيرفر الجديد هنا بين علامتي التنصيص
-    const SCRIPT_URL = "ضع_الرابط_الجديد_هنا";
-    
+    // ✅ رابط السكربت
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyTAHgS2qXyxTMqdltenWMfa3VIqSVJORSVQbtrT_Xq_XZdBpOCu6eJaHjVwj2AMAvbdA/exec";
     const DASH_KEY = "12345678";
+
     let analyzeTimeout;
 
     function showLoading(s, text = "جاري العمل...") {
@@ -151,7 +155,12 @@
       setTimeout(() => t.classList.add('-translate-y-20', 'opacity-0'), 3000);
     }
 
-    function esc(str) { if (!str) return ""; const div = document.createElement('div'); div.appendChild(document.createTextNode(str)); return div.innerHTML; }
+    function esc(str) {
+      if (!str) return "";
+      const div = document.createElement('div');
+      div.appendChild(document.createTextNode(str));
+      return div.innerHTML;
+    }
 
     function autoAnalyze() {
       clearTimeout(analyzeTimeout);
@@ -160,14 +169,13 @@
         const phoneMatch = val.match(/(?:05|972)\d{8,9}/);
         if (phoneMatch && !document.getElementById('f_phone').value) {
           let p = phoneMatch[0];
-          if(p.startsWith("972")) p = "0" + p.substring(3);
+          if (p.startsWith("972")) p = "0" + p.substring(3);
           document.getElementById('f_phone').value = p;
         }
       }, 500);
     }
 
     async function analyzeWithGemini() {
-      if(SCRIPT_URL === "https://script.google.com/macros/s/AKfycbyTAHgS2qXyxTMqdltenWMfa3VIqSVJORSVQbtrT_Xq_XZdBpOCu6eJaHjVwj2AMAvbdA/exec") return showToast("لم تقم بوضع الرابط الجديد في ملف HTML!", "error");
       const text = document.getElementById('smartInput').value;
       if (!text) return showToast("الرجاء لصق نص الطلب", "error");
       showLoading(true, "يتم التحليل عبر السيرفر...");
@@ -176,54 +184,117 @@
         const data = await res.json();
         if (data.result === "SUCCESS" && data.data) {
           const d = data.data;
-          if(d.name) document.getElementById('f_name').value = d.name;
-          if(d.phone) { let p = d.phone.replace(/\D/g, ""); if(p.startsWith("972")) p = "0" + p.substring(3); document.getElementById('f_phone').value = p; }
-          if(d.price) document.getElementById('f_price').value = d.price;
-          if(d.city) document.getElementById('f_city').value = d.city;
-          if(d.offer) document.getElementById('f_offer').value = d.offer;
+          if (d.name) document.getElementById('f_name').value = d.name;
+          if (d.phone) {
+            let p = String(d.phone).replace(/\D/g, "");
+            if (p.startsWith("972")) p = "0" + p.substring(3);
+            document.getElementById('f_phone').value = p;
+          }
+          if (d.price !== undefined && d.price !== null) document.getElementById('f_price').value = d.price;
+          if (d.city) document.getElementById('f_city').value = d.city;
+          if (d.offer) document.getElementById('f_offer').value = d.offer;
           showToast("تم التحليل بنجاح ✨");
-        } else { throw new Error(data.message); }
-      } catch (e) { showToast("فشل التحليل: " + e.message, "error"); } finally { showLoading(false); }
+        } else {
+          throw new Error(data.message || "فشل غير معروف");
+        }
+      } catch (e) {
+        showToast("فشل التحليل: " + e.message, "error");
+      } finally {
+        showLoading(false);
+      }
     }
 
     async function handlePdfUpload(event) {
-      if(SCRIPT_URL === "ضع_الرابط_الجديد_هنا") return showToast("لم تقم بوضع الرابط الجديد!", "error");
       const file = event.target.files[0];
       if (!file) return;
       showLoading(true, "قراءة الملف...");
       const reader = new FileReader();
       reader.onload = async () => {
         try {
-          const res = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: "analyzePDF", key: DASH_KEY, fileBase64: reader.result.split(',')[1] }) });
+          const res = await fetch(SCRIPT_URL, {
+            method: 'POST',
+            body: JSON.stringify({
+              action: "analyzePDF",
+              key: DASH_KEY,
+              fileBase64: reader.result.split(',')[1],
+              text: document.getElementById('smartInput').value || "" // اختياري
+            })
+          });
           const data = await res.json();
           if (data.result === "SUCCESS" && data.data) {
             const d = data.data;
-            if(d.name) document.getElementById('f_name').value = d.name;
-            if(d.phone) document.getElementById('f_phone').value = d.phone;
-            if(d.price) document.getElementById('f_price').value = d.price;
-            if(d.city) document.getElementById('f_city').value = d.city;
-            if(d.offer) document.getElementById('f_offer').value = d.offer;
+            if (d.name) document.getElementById('f_name').value = d.name;
+            if (d.phone) {
+              let p = String(d.phone).replace(/\D/g, "");
+              if (p.startsWith("972")) p = "0" + p.substring(3);
+              document.getElementById('f_phone').value = p;
+            }
+            if (d.price !== undefined && d.price !== null) document.getElementById('f_price').value = d.price;
+            if (d.city) document.getElementById('f_city').value = d.city;
+            if (d.offer) document.getElementById('f_offer').value = d.offer;
             showToast("تم التحليل ✨");
-          } else { throw new Error(data.message); }
-        } catch (e) { showToast("خطأ: " + e.message, "error"); } finally { showLoading(false); event.target.value = ''; }
+          } else {
+            throw new Error(data.message || "فشل غير معروف");
+          }
+        } catch (e) {
+          showToast("خطأ: " + e.message, "error");
+        } finally {
+          showLoading(false);
+          event.target.value = '';
+        }
       };
       reader.readAsDataURL(file);
     }
 
+    function getFormData_() {
+      return {
+        name: document.getElementById('f_name').value.trim(),
+        phone: document.getElementById('f_phone').value.trim(),
+        offer: document.getElementById('f_offer').value.trim(),
+        price: document.getElementById('f_price').value.trim(),
+        city: document.getElementById('f_city').value.trim(),
+        notes: document.getElementById('f_notes').value.trim(),
+        delivery: document.getElementById('f_delivery').value
+      };
+    }
+
     async function saveOrder(mode) {
-      if(SCRIPT_URL === "ضع_الرابط_الجديد_هنا") return showToast("لم تقم بوضع الرابط الجديد!", "error");
-      const name = document.getElementById('f_name').value;
-      const phone = document.getElementById('f_phone').value;
-      if (!name || !phone) return showToast("الاسم والهاتف مطلوبان!", "error");
+      const d = getFormData_();
+      if (!d.name || !d.phone) return showToast("الاسم والهاتف مطلوبان!", "error");
+
       showLoading(true, "إرسال الطلب...");
-      const delivery = (mode === 'high_express') ? "High Express - أم الفحم" : document.getElementById('f_delivery').value;
-      const params = new URLSearchParams({ action: (mode === 'high_express') ? "sendToDelivery" : "addOrder", key: DASH_KEY, name: name, phone: phone, offer: document.getElementById('f_offer').value, price: document.getElementById('f_price').value, city: document.getElementById('f_city').value, notes: document.getElementById('f_notes').value, delivery: delivery });
+
+      // ✅ الإصلاح الأساسي: high_express الآن يرسل بيانات الفورم مباشرة (بدون row)
+      const action = (mode === 'high_express') ? "sendToDelivery" : "addOrder";
+      const delivery = (mode === 'high_express') ? "High Express - أم الفحم" : d.delivery;
+
+      const params = new URLSearchParams({
+        action,
+        key: DASH_KEY,
+        name: d.name,
+        phone: d.phone,
+        offer: d.offer,
+        price: d.price,
+        city: d.city,
+        notes: d.notes,
+        delivery
+      });
+
       try {
         const res = await fetch(`${SCRIPT_URL}?${params.toString()}`);
         const data = await res.json();
-        if (data.result === "SUCCESS") { showToast("تم الإدخال بنجاح 🚀"); clearForm(); loadOrders(); }
-        else { showToast("تعذر الحفظ: " + data.message, "error"); }
-      } catch (e) { showToast("خطأ في الاتصال", "error"); } finally { showLoading(false); }
+        if (data.result === "SUCCESS") {
+          showToast("تم الإدخال بنجاح 🚀");
+          clearForm();
+          loadOrders();
+        } else {
+          showToast("تعذر الحفظ: " + (data.message || "خطأ غير معروف"), "error");
+        }
+      } catch (e) {
+        showToast("خطأ في الاتصال", "error");
+      } finally {
+        showLoading(false);
+      }
     }
 
     function clearForm() {
@@ -232,39 +303,67 @@
     }
 
     async function loadOrders() {
-      if(SCRIPT_URL === "ضع_الرابط_الجديد_هنا") return;
       const list = document.getElementById('ordersList');
       list.innerHTML = "<p class='text-center opacity-50 py-4'>جاري تحميل الطلبات...</p>";
       try {
         const res = await fetch(`${SCRIPT_URL}?action=get&key=${DASH_KEY}`);
         const data = await res.json();
+
         if (Array.isArray(data) && data.length > 0) {
           list.innerHTML = data.slice(0, 10).map(o => `
             <div class="bg-card p-4 rounded-2xl border border-white/5 shadow-lg relative overflow-hidden">
-              <div class="flex justify-between items-start mb-2"><span class="font-bold text-white text-[15px]">${esc(o.name) || "بدون اسم"}</span><span class="text-[10px] bg-brand-500/20 text-brand-400 px-2 py-1 rounded-full font-bold">${esc(o.status)}</span></div>
-              <div class="text-slate-400 text-xs mb-1" dir="ltr"><i class="fa fa-phone text-[10px]"></i> ${esc(o.phone)}</div>
-              <div class="text-brand-200 text-xs bg-brand-900/20 p-2 rounded-lg border-r-2 border-brand-500 truncate mb-2">${esc(o.offer) || "بدون تفاصيل"}</div>
-              <div class="flex gap-4 text-[10px] font-bold text-slate-300"><span>📍 ${esc(o.city)}</span><span class="text-emerald-400">₪${esc(o.price) || 0}</span></div>
+              <div class="flex justify-between items-start mb-2">
+                <span class="font-bold text-white text-[15px]">${esc(o.name) || "بدون اسم"}</span>
+                <span class="text-[10px] bg-brand-500/20 text-brand-400 px-2 py-1 rounded-full font-bold">${esc(o.status || "")}</span>
+              </div>
+
+              <div class="text-slate-400 text-xs mb-1" dir="ltr"><i class="fa fa-phone text-[10px]"></i> ${esc(o.phone || "")}</div>
+
+              <div class="text-brand-200 text-xs bg-brand-900/20 p-2 rounded-lg border-r-2 border-brand-500 truncate mb-2">
+                ${esc(o.offer) || "بدون تفاصيل"}
+              </div>
+
+              <div class="flex gap-4 text-[10px] font-bold text-slate-300">
+                <span>📍 ${esc(o.city || "")}</span>
+                <span class="text-emerald-400">₪${esc(o.price || 0)}</span>
+              </div>
             </div>
           `).join('');
-        } else { list.innerHTML = "<p class='text-center opacity-50 py-4'>لا توجد طلبات</p>"; }
-      } catch(e) { list.innerHTML = "<p class='text-center text-red-400 py-4'>فشل الاتصال بالسيرفر</p>"; }
+        } else {
+          list.innerHTML = "<p class='text-center opacity-50 py-4'>لا توجد طلبات</p>";
+        }
+      } catch (e) {
+        list.innerHTML = "<p class='text-center text-red-400 py-4'>فشل الاتصال بالسيرفر</p>";
+      }
     }
 
     async function printCurrentOrder() {
       const name = document.getElementById('f_name').value.trim();
       const phone = document.getElementById('f_phone').value.trim();
       if (!name || !phone) return showToast("الرجاء إدخال الاسم والهاتف!", 'error');
-      if (document.getElementById('f_delivery').value.includes("High Express")) return showToast("طلبات هي اكسبرس لا تُطبع يدوياً!", "error");
+
+      // ✅ بدل includes على value الفاضي: تحقق من اختيار التوصيل
+      const deliveryVal = document.getElementById('f_delivery').value || "";
+      if (deliveryVal.includes("High Express")) return showToast("طلبات هي اكسبرس لا تُطبع يدوياً!", "error");
+
       document.getElementById('p_date').textContent = new Date().toLocaleDateString();
       document.getElementById('p_total').textContent = document.getElementById('f_price').value || "0";
-      document.getElementById('p_content').innerHTML = `<div style="margin-bottom: 4px;"><b>الاسم:</b> ${esc(name)}</div><div style="margin-bottom: 4px;"><b>الهاتف:</b> <span dir="ltr">${esc(phone)}</span></div><div style="margin-bottom: 4px;"><b>المدينة:</b> ${esc(document.getElementById('f_city').value)}</div><div style="margin-top: 8px; padding-top: 8px; border-top: 1px dashed black;"><b>الأصناف:</b><br>${esc(document.getElementById('f_offer').value)}</div>`;
+      document.getElementById('p_content').innerHTML =
+        `<div style="margin-bottom: 4px;"><b>الاسم:</b> ${esc(name)}</div>
+         <div style="margin-bottom: 4px;"><b>الهاتف:</b> <span dir="ltr">${esc(phone)}</span></div>
+         <div style="margin-bottom: 4px;"><b>المدينة:</b> ${esc(document.getElementById('f_city').value)}</div>
+         <div style="margin-top: 8px; padding-top: 8px; border-top: 1px dashed black;"><b>الأصناف:</b><br>${esc(document.getElementById('f_offer').value)}</div>`;
+
       showLoading(true, "تجهيز الطباعة...");
-      let cleanPhone = phone.replace(/\D/g, ""); if (cleanPhone.startsWith("0")) cleanPhone = "972" + cleanPhone.substring(1);
+      let cleanPhone = phone.replace(/\D/g, "");
+      if (cleanPhone.startsWith("0")) cleanPhone = "972" + cleanPhone.substring(1);
+
       const qrImg = document.getElementById('p_qr');
       qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=https://wa.me/${cleanPhone}`;
       await new Promise(r => { qrImg.onload = r; qrImg.onerror = r; });
-      showLoading(false); window.print();
+
+      showLoading(false);
+      window.print();
     }
 
     window.onload = loadOrders;
