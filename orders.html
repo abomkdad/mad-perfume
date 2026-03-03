@@ -2,371 +2,672 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"/>
-  <title>إضافة طلب سريع - MAD Manager</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=0"/>
+  <title>MAD Manager v4.6 AI + PDF 10x10</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- ✅ jsPDF (لتنزيل PDF تلقائي) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
-  <script src="https://cdn.tailwindcss.com"></script>
-
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: { sans: ['Cairo', 'sans-serif'] },
-          colors: { brand: { 500: '#3b82f6', 600: '#2563eb', 950: '#0a0f1e' }, card: '#161b2c' }
-        }
-      }
+  <style>
+    :root {
+      --bg: #0a0f1e;
+      --card: #161b2c;
+      --primary: #3b82f6;
+      --success: #10b981;
+      --ready: #f59e0b;
+      --hebrew: #8b5cf6;
+      --danger: #ef4444;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --border: rgba(255,255,255,0.08);
+      --grad: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
     }
-  </script>
 
-  <style type="text/tailwindcss">
-    @layer components {
-      .input-field { @apply w-full p-3.5 mb-4 bg-slate-800/80 border border-slate-700 rounded-2xl text-white outline-none focus:border-brand-500 transition-all text-[16px] placeholder-slate-500; }
-      .label-text { @apply block text-slate-400 text-sm font-bold mb-1.5 ms-2; }
+    body {
+      margin: 0; font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+      background: var(--bg); color: var(--text); padding-bottom: 90px;
+      line-height: 1.5;
     }
-    body { background-color: theme('colors.brand.950'); color: theme('colors.slate.100'); padding-bottom: 180px; -webkit-tap-highlight-color: transparent; }
-    input, textarea, select { font-size: 16px !important; }
-    @media print {
-      @page { size: 10cm 10cm; margin: 0; }
-      body * { visibility: hidden !important; }
-      #printSection, #printSection * { visibility: visible !important; color: black !important; }
-      #printSection { display: block !important; position: fixed !important; inset: 0 !important; width: 10cm !important; height: 10cm !important; background: white !important; padding: 5mm; }
+
+    .header {
+      background: rgba(16, 21, 36, 0.85); backdrop-filter: blur(12px);
+      padding: 12px 16px; position: sticky; top: 0; z-index: 100;
+      border-bottom: 1px solid var(--border);
     }
+
+    .container { padding: 16px; max-width: 600px; margin: 0 auto; }
+
+    .order-card {
+      background: var(--card); border-radius: 24px; padding: 20px;
+      margin-bottom: 20px; border: 1px solid var(--border);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+      transition: transform 0.2s;
+    }
+
+    .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+    .order-id { font-family: monospace; color: var(--muted); background: rgba(255,255,255,0.05); padding: 2px 8px; border-radius: 6px; font-size: 13px; }
+
+    .status-pill { font-size: 11px; padding: 4px 12px; border-radius: 20px; font-weight: 700; text-transform: uppercase; }
+    .status-new { background: rgba(59, 130, 246, 0.1); color: #60a5fa; }
+    .status-prep { background: rgba(16, 185, 129, 0.1); color: #34d399; }
+
+    .customer-name { font-size: 19px; font-weight: 800; display: block; margin-bottom: 4px; }
+    .customer-phone { color: var(--muted); font-size: 14px; display: flex; align-items: center; gap: 6px; }
+
+    .offer-details {
+      margin: 12px 0; padding: 12px; background: rgba(59, 130, 246, 0.05);
+      border-radius: 12px; color: #93c5fd; font-weight: 600; border-right: 3px solid var(--primary);
+      font-size: 14px;
+      word-break: break-word;
+    }
+
+    .meta-line { display: flex; flex-wrap: wrap; gap: 10px; font-size: 12px; color: var(--muted); margin-top: 8px; }
+    .meta-tag { background: rgba(255,255,255,0.05); padding: 2px 8px; border-radius: 6px; }
+
+    .actions-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 20px; }
+    .actions-secondary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 8px; }
+
+    .btn {
+      padding: 10px 4px; border-radius: 14px; border: none; font-weight: 700;
+      cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center;
+      font-size: 10px; transition: 0.2s; gap: 6px; text-decoration: none;
+    }
+    .btn i { font-size: 18px; }
+    .btn-primary { background: var(--grad); color: white; }
+    .btn-success { background: #059669; color: white; }
+    .btn-wa-ar { background: #d97706; color: white; }
+    .btn-wa-he { background: #7c3aed; color: white; }
+    .btn-outline { background: rgba(255,255,255,0.03); color: white; border: 1px solid var(--border); }
+
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px);
+      display: none; align-items: center; justify-content: center; z-index: 2000; padding: 20px;
+    }
+    .modal-overlay.show { display: flex; }
+    .modal-content { background: var(--card); width: 100%; max-width: 450px; padding: 24px; border-radius: 32px; border: 1px solid var(--border); overflow-y: auto; max-height: 90vh; }
+
+    .smart-box { background: rgba(59, 130, 246, 0.1); border: 1px dashed var(--primary); padding: 15px; border-radius: 16px; margin-bottom: 20px; }
+    .smart-box h4 { margin: 0 0 10px 0; font-size: 14px; color: var(--primary); display: flex; align-items: center; gap: 8px; }
+
+    input, select, textarea {
+      width: 100%; padding: 12px; margin-bottom: 12px; border-radius: 12px; border: 1px solid var(--border);
+      background: rgba(0,0,0,0.2); color: white; outline: none; font-size: 15px; box-sizing: border-box;
+    }
+    input:focus, textarea:focus { border-color: var(--primary); background: rgba(0,0,0,0.4); }
+
+    #toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: #10b981; color: white; padding: 14px 28px; border-radius: 50px; font-weight: 700; z-index: 3000; display: none; box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
+    #loadingOverlay { position: fixed; inset: 0; background: rgba(6, 9, 20, 0.7); z-index: 4000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
+    .spinner { width: 44px; height: 44px; border: 4px solid rgba(59, 130, 246, 0.1); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
   </style>
 </head>
+<body>
 
-<body class="antialiased selection:bg-brand-500">
+<div id="loadingOverlay"><div class="spinner"></div></div>
+<div id="toast">✅ تمت العملية</div>
 
-  <!-- شاشة التحميل -->
-  <div id="loadingOverlay" class="fixed inset-0 bg-brand-950/90 backdrop-blur-md z-[4000] hidden items-center justify-center flex-col gap-4">
-    <div class="w-14 h-14 border-4 border-brand-500/20 border-t-brand-500 rounded-full animate-spin"></div>
-    <p id="loadingText" class="text-white font-bold">جاري العمل...</p>
-  </div>
+<!-- Order Modal (Add/Edit) -->
+<div class="modal-overlay" id="orderModal">
+  <div class="modal-content">
+    <h3 id="modalTitle" style="margin-top:0;">إضافة طلب جديد</h3>
 
-  <!-- الإشعارات -->
-  <div id="toast" class="fixed top-4 left-1/2 -translate-x-1/2 bg-emerald-500 text-white px-6 py-4 rounded-2xl font-bold text-[16px] shadow-2xl z-[3000] transition-all duration-300 -translate-y-20 opacity-0 pointer-events-none flex items-center gap-3 w-[90%] max-w-[400px]">
-    <i class="fa fa-check-circle text-xl" id="toastIcon"></i> <span id="toastMsg">نجاح</span>
-  </div>
+    <div class="smart-box" id="smartSection">
+      <h4><i class="fa fa-magic"></i> المحلل الذكي للبيانات</h4>
+      <textarea id="smartInput" placeholder="الصق نص الطلب هنا ثم اضغط تحليل..." style="height: 90px; margin-bottom: 8px; font-size: 13px;"></textarea>
 
-  <header class="sticky top-0 z-[100] bg-brand-950/90 backdrop-blur-xl border-b border-white/5 p-4 shadow-lg shadow-black/20">
-    <div class="flex items-center gap-3">
-      <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-400 to-brand-600 flex items-center justify-center shadow-lg"><i class="fa fa-bolt text-white text-lg"></i></div>
-      <h1 class="font-black text-xl text-white">إضافة طلب سريع</h1>
-    </div>
-  </header>
-
-  <main class="p-4 max-w-md mx-auto">
-
-    <!-- المحلل الذكي -->
-    <div class="bg-brand-500/10 border border-brand-500/30 p-4 rounded-3xl mb-6 shadow-inner">
-      <h4 class="m-0 mb-3 text-[15px] font-bold text-brand-400 flex items-center gap-2"><i class="fa fa-robot"></i> المحلل الذكي</h4>
-      <textarea id="smartInput" oninput="autoAnalyze()" placeholder="الصق نص الطلب هنا..." class="w-full h-24 p-3 mb-3 bg-black/30 border border-brand-500/20 rounded-2xl text-white text-[16px] outline-none focus:border-brand-500 resize-none"></textarea>
-
-      <div class="flex gap-2">
-        <button onclick="analyzeWithGemini()" class="flex-1 bg-gradient-to-r from-indigo-600 to-brand-600 text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2 active:scale-95 shadow-lg">استخراج بالذكاء ✨</button>
-        <button onclick="document.getElementById('pdfUpload').click()" class="w-14 bg-red-500/20 text-red-400 border border-red-500/40 rounded-xl flex items-center justify-center active:scale-95"><i class="fa fa-file-pdf text-xl"></i></button>
-        <input type="file" id="pdfUpload" accept="application/pdf" class="hidden" onchange="handlePdfUpload(event)">
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+        <button class="btn btn-outline" onclick="analyzeTextLocal()" style="width: 100%; flex-direction: row; height: 38px; font-size: 13px;">
+          <i class="fa fa-bolt"></i> تحليل سريع
+        </button>
+        <button class="btn btn-primary" onclick="analyzeTextAI()" style="width: 100%; flex-direction: row; height: 38px; font-size: 13px;">
+          <i class="fa fa-robot"></i> تحليل بالذكاء ✨
+        </button>
+      </div>
+      <div style="font-size:11px; color:var(--muted); margin-top:8px;">
+        ✅ الذكاء يعبّي: الاسم / الهاتف / المدينة / السعر / الأصناف
       </div>
     </div>
 
-    <!-- النموذج -->
-    <div class="bg-card p-5 rounded-3xl border border-white/5 shadow-xl">
-      <label class="label-text">الاسم الكامل</label>
-      <input type="text" id="f_name" class="input-field" placeholder="اسم الزبون">
+    <label>الاسم الكامل</label><input type="text" id="f_name">
+    <label>رقم الهاتف</label><input type="tel" id="f_phone">
+    <label>الأصناف المطلوبة</label><textarea id="f_offer" rows="2"></textarea>
 
-      <label class="label-text">رقم الهاتف</label>
-      <input type="tel" id="f_phone" class="input-field" dir="ltr" placeholder="05X-XXXXXXX">
-
-      <label class="label-text">الأصناف</label>
-      <textarea id="f_offer" rows="2" class="input-field resize-none"></textarea>
-
-      <div class="grid grid-cols-2 gap-3">
-        <div><label class="label-text">السعر (₪)</label><input type="number" id="f_price" class="input-field" placeholder="0"></div>
-        <div><label class="label-text">المدينة</label><input type="text" id="f_city" class="input-field" placeholder="المدينة"></div>
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+      <div><label>السعر (₪)</label><input type="number" id="f_price"></div>
+      <div>
+        <label>طريقة الدفع</label>
+        <select id="f_payment">
+          <option value="دفع عند الاستلام">دفع عند الاستلام</option>
+          <option value="شراء من الموقع - مدفوع">شراء من الموقع - مدفوع</option>
+          <option value="شراء عبر الرابط">شراء عبر الرابط</option>
+        </select>
       </div>
-
-      <label class="label-text">شركة التوصيل</label>
-      <select id="f_delivery" class="input-field appearance-none">
-        <option value="">-- اختر الشركة --</option>
-        <option value="High Express - أم الفحم">High Express - أم الفحم</option>
-        <option value="Pickup">Pickup</option>
-      </select>
-
-      <label class="label-text">ملاحظات (اختياري)</label>
-      <textarea id="f_notes" rows="2" class="input-field resize-none mb-0"></textarea>
     </div>
 
-    <!-- الطلبات السابقة -->
-    <div class="mt-8 mb-4">
-      <div class="flex justify-between items-center mb-4">
-        <h3 class="text-white font-black text-lg flex items-center gap-2"><i class="fa fa-list text-brand-400"></i> آخر الطلبات</h3>
-        <button onclick="loadOrders()" class="w-8 h-8 rounded-xl bg-slate-800 text-slate-400 flex items-center justify-center active:scale-95 border border-slate-700"><i class="fa fa-sync-alt text-xs"></i></button>
-      </div>
-      <div id="ordersList" class="flex flex-col gap-3"><p class="text-center text-slate-500 py-4">جاري التحميل...</p></div>
-    </div>
+    <label>المدينة</label><input type="text" id="f_city">
+    <label>العنوان التفصيلي</label><input type="text" id="f_address">
+    <label>ملاحظات إضافية</label><textarea id="f_notes" rows="2"></textarea>
 
-  </main>
+    <label>شركة التوصيل</label>
+    <select id="f_delivery">
+      <option value="">-- اختر شركة الشحن --</option>
+      <option value="High Express - أم الفحم">High Express - أم الفحم</option>
+      <option value="Lama (050-5102019)">Lama (050-5102019)</option>
+      <option value="Marwah (052-7035370)">Marwah (052-7035370)</option>
+      <option value="Areen (052-5118966)">Areen (052-5118966)</option>
+      <option value="Pickup">Pickup</option>
+    </select>
 
-  <div class="fixed bottom-0 left-0 right-0 bg-brand-950/95 backdrop-blur-xl border-t border-white/10 p-4 z-50">
-    <div class="max-w-md mx-auto flex flex-col gap-3">
-      <button onclick="saveOrder('high_express')" class="w-full bg-orange-500 text-black font-black py-4 rounded-2xl text-[18px] flex items-center justify-center gap-2 shadow-lg active:scale-95">دخل الطلب هي اكسبرس 🚀</button>
-      <div class="grid grid-cols-2 gap-3">
-        <button onclick="saveOrder('normal')" class="w-full bg-slate-800 text-white font-bold py-3.5 rounded-2xl border border-slate-700 active:scale-95">حفظ فقط</button>
-        <button onclick="printCurrentOrder()" class="w-full bg-slate-800 text-white font-bold py-3.5 rounded-2xl border border-slate-700 active:scale-95 flex items-center justify-center gap-2"><i class="fa fa-print text-emerald-400"></i>طباعة</button>
-      </div>
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:10px;">
+      <button class="btn btn-outline" onclick="closeModal('orderModal')">إلغاء</button>
+      <button class="btn btn-primary" onclick="saveOrder()" id="saveBtn">حفظ الطلب ✨</button>
     </div>
   </div>
+</div>
 
-  <div id="printSection" class="hidden">
-    <div class="text-center border-b-2 border-black pb-2 mb-3">
-      <h1 class="m-0 text-3xl tracking-[4px] font-black leading-none">MAD</h1>
-      <div class="text-[11px] font-extrabold mt-1">PARFUMEUR</div>
-      <div class="text-[10px] font-black mt-2 pt-1 border-t border-gray-200 flex justify-between"><span id="p_date">00.00.0000</span><span>ORD: NEW</span></div>
-    </div>
-    <div id="p_content" class="text-xs leading-relaxed font-semibold text-right" dir="rtl"></div>
-    <div class="border-t-2 border-black pt-2 mt-2 flex justify-between items-end">
-      <div class="text-center"><img id="p_qr" src="" class="w-12 h-12 border border-black mx-auto bg-gray-50" alt="QR"></div>
-      <div class="text-left"><div class="text-[11px] font-bold">TOTAL:</div><div class="text-2xl font-black mt-1">₪<span id="p_total">0</span></div></div>
+<div class="header">
+  <div class="header-top" style="display:flex; justify-content:space-between; align-items:center;">
+    <div class="logo" style="font-weight:900; font-size:20px;">MAD <span>MANAGER</span></div>
+    <div style="display:flex; gap:10px;">
+      <button class="btn btn-outline" onclick="load()" style="width:40px; height:40px;"><i class="fa fa-sync"></i></button>
+      <button class="btn btn-primary" onclick="openAddModal()" style="width:40px; height:40px;"><i class="fa fa-plus"></i></button>
     </div>
   </div>
+  <div style="margin-top:10px;">
+    <input type="text" id="searchInput" placeholder="بحث باسم العميل أو رقم الهاتف..." oninput="filterOrders()" style="margin-bottom:0; background:rgba(255,255,255,0.05);">
+  </div>
+</div>
 
-  <script>
-    // ✅ رابط السكربت
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxhPdvoHVpFsYKdZdrLL2h4NdkCiDB45iOK854cnS3H0yMDfskjq5eQJJiIw3JxJVKnnA/exec";
-    const DASH_KEY = "12345678";
+<div class="container" id="ordersList"></div>
 
-    let analyzeTimeout;
+<script>
+/** ✅ رابط السكربت */
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxaA4Wc7cEyU6gx-MzuA_C8psZPuWCLmIJ9TPjnqX_RGG4SDQR0Jeeqcnf85Q65NdlK/exec";
+const DASH_KEY = "12345678";
 
-    function showLoading(s, text = "جاري العمل...") {
-      document.getElementById('loadingText').textContent = text;
-      document.getElementById('loadingOverlay').style.display = s ? 'flex' : 'none';
-    }
+const CUSTOMER_SERVICE_PHONE = "972524033442";
+const CUSTOMER_SERVICE_STAR = "*9935";
 
-    function showToast(m, type = 'success') {
-      const t = document.getElementById('toast');
-      document.getElementById('toastMsg').textContent = m;
-      document.getElementById('toastIcon').className = type === 'error' ? 'fa fa-exclamation-triangle text-xl' : 'fa fa-check-circle text-xl';
-      t.className = `fixed top-4 left-1/2 -translate-x-1/2 px-6 py-4 rounded-2xl font-bold text-[16px] shadow-2xl z-[3000] transition-all duration-300 flex items-center gap-3 w-[90%] max-w-[400px] ${type === 'error' ? 'bg-red-500 text-white' : 'bg-emerald-500 text-white'}`;
-      t.classList.remove('-translate-y-20', 'opacity-0');
-      setTimeout(() => t.classList.add('-translate-y-20', 'opacity-0'), 3000);
-    }
+let allOrders = [];
+let editingRow = null;
 
-    function esc(str) {
-      if (!str) return "";
-      const div = document.createElement('div');
-      div.appendChild(document.createTextNode(str));
-      return div.innerHTML;
-    }
+function showLoading(s) { document.getElementById('loadingOverlay').style.display = s ? 'flex' : 'none'; }
+function showToast(m) { const t = document.getElementById('toast'); t.textContent = m; t.style.display = 'block'; setTimeout(() => t.style.display = 'none', 2500); }
+const safe = (v) => (v === undefined || v === null || String(v).toLowerCase()==="undefined" || String(v).toLowerCase()==="null") ? "" : String(v).trim();
 
-    function autoAnalyze() {
-      clearTimeout(analyzeTimeout);
-      analyzeTimeout = setTimeout(() => {
-        const val = document.getElementById('smartInput').value;
-        const phoneMatch = val.match(/(?:05|972)\d{8,9}/);
-        if (phoneMatch && !document.getElementById('f_phone').value) {
-          let p = phoneMatch[0];
-          if (p.startsWith("972")) p = "0" + p.substring(3);
-          document.getElementById('f_phone').value = p;
-        }
-      }, 500);
-    }
+function formatLocalPhone(p) {
+  if(!p) return "";
+  let d = String(p).replace(/\D/g, "");
+  if (d.startsWith("972")) d = "0" + d.substring(3);
+  if (!d.startsWith("0") && d.length === 9) d = "0" + d;
+  return d;
+}
+function normalizePhoneForLink(p) {
+  let d = String(p||"").replace(/\D/g, "");
+  if (d.startsWith("0")) d = "972" + d.substring(1);
+  if (!d.startsWith("972") && d.length === 9) d = "972" + d;
+  return d;
+}
 
-    async function analyzeWithGemini() {
-      const text = document.getElementById('smartInput').value;
-      if (!text) return showToast("الرجاء لصق نص الطلب", "error");
-      showLoading(true, "يتم التحليل عبر السيرفر...");
-      try {
-        const res = await fetch(`${SCRIPT_URL}?action=analyze&key=${DASH_KEY}&text=${encodeURIComponent(text)}`);
-        const data = await res.json();
-        if (data.result === "SUCCESS" && data.data) {
-          const d = data.data;
-          if (d.name) document.getElementById('f_name').value = d.name;
-          if (d.phone) {
-            let p = String(d.phone).replace(/\D/g, "");
-            if (p.startsWith("972")) p = "0" + p.substring(3);
-            document.getElementById('f_phone').value = p;
-          }
-          if (d.price !== undefined && d.price !== null) document.getElementById('f_price').value = d.price;
-          if (d.city) document.getElementById('f_city').value = d.city;
-          if (d.offer) document.getElementById('f_offer').value = d.offer;
-          showToast("تم التحليل بنجاح ✨");
-        } else {
-          throw new Error(data.message || "فشل غير معروف");
-        }
-      } catch (e) {
-        showToast("فشل التحليل: " + e.message, "error");
-      } finally {
-        showLoading(false);
-      }
-    }
+/** ✅ تحليل سريع محلي */
+function analyzeTextLocal() {
+  const raw = document.getElementById('smartInput').value;
+  if(!raw.trim()) return showToast("الصق نصاً أولاً");
 
-    async function handlePdfUpload(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-      showLoading(true, "قراءة الملف...");
-      const reader = new FileReader();
-      reader.onload = async () => {
-        try {
-          const res = await fetch(SCRIPT_URL, {
-            method: 'POST',
-            body: JSON.stringify({
-              action: "analyzePDF",
-              key: DASH_KEY,
-              fileBase64: reader.result.split(',')[1],
-              text: document.getElementById('smartInput').value || "" // اختياري
-            })
-          });
-          const data = await res.json();
-          if (data.result === "SUCCESS" && data.data) {
-            const d = data.data;
-            if (d.name) document.getElementById('f_name').value = d.name;
-            if (d.phone) {
-              let p = String(d.phone).replace(/\D/g, "");
-              if (p.startsWith("972")) p = "0" + p.substring(3);
-              document.getElementById('f_phone').value = p;
-            }
-            if (d.price !== undefined && d.price !== null) document.getElementById('f_price').value = d.price;
-            if (d.city) document.getElementById('f_city').value = d.city;
-            if (d.offer) document.getElementById('f_offer').value = d.offer;
-            showToast("تم التحليل ✨");
-          } else {
-            throw new Error(data.message || "فشل غير معروف");
-          }
-        } catch (e) {
-          showToast("خطأ: " + e.message, "error");
-        } finally {
-          showLoading(false);
-          event.target.value = '';
-        }
-      };
-      reader.readAsDataURL(file);
-    }
+  const phoneMatch = raw.match(/(?:05|972|5)\d{8,11}/);
+  if(phoneMatch) document.getElementById('f_phone').value = formatLocalPhone(phoneMatch[0]);
 
-    function getFormData_() {
-      return {
-        name: document.getElementById('f_name').value.trim(),
-        phone: document.getElementById('f_phone').value.trim(),
-        offer: document.getElementById('f_offer').value.trim(),
-        price: document.getElementById('f_price').value.trim(),
-        city: document.getElementById('f_city').value.trim(),
-        notes: document.getElementById('f_notes').value.trim(),
-        delivery: document.getElementById('f_delivery').value
-      };
-    }
+  const priceMatch = raw.match(/(\d{2,4})\s*(?:₪|shekel|ILS|السعر)/i) || raw.match(/(?:₪|السعر|Price)\s*:?\s*(\d{2,4})/i);
+  if(priceMatch) document.getElementById('f_price').value = priceMatch[1];
 
-    async function saveOrder(mode) {
-      const d = getFormData_();
-      if (!d.name || !d.phone) return showToast("الاسم والهاتف مطلوبان!", "error");
+  const nameMatch = raw.match(/(?:الاسم|Name)\s*:?\s*([^\n|]+)/i);
+  if(nameMatch) document.getElementById('f_name').value = nameMatch[1].trim();
+  else {
+    const firstLine = raw.split('\n')[0].trim();
+    if(firstLine.length < 30) document.getElementById('f_name').value = firstLine;
+  }
 
-      showLoading(true, "إرسال الطلب...");
+  const cityMatch = raw.match(/(?:المدينة|city|عنوان|من)\s*:?\s*([^\n|]+)/i);
+  if(cityMatch) document.getElementById('f_city').value = cityMatch[1].trim();
 
-      // ✅ الإصلاح الأساسي: high_express الآن يرسل بيانات الفورم مباشرة (بدون row)
-      const action = (mode === 'high_express') ? "sendToDelivery" : "addOrder";
-      const delivery = (mode === 'high_express') ? "High Express - أم الفحم" : d.delivery;
+  document.getElementById('f_offer').value = raw.substring(0, 130).trim();
+  showToast("تم تحليل سريع ✅");
+}
 
-      const params = new URLSearchParams({
-        action,
-        key: DASH_KEY,
-        name: d.name,
-        phone: d.phone,
-        offer: d.offer,
-        price: d.price,
-        city: d.city,
-        notes: d.notes,
-        delivery
-      });
+/** ✅ تحليل ذكاء صناعي عبر السيرفر (Gemini) */
+async function analyzeTextAI(){
+  const raw = document.getElementById('smartInput').value;
+  if(!raw.trim()) return showToast("الصق نصاً أولاً");
 
-      try {
-        const res = await fetch(`${SCRIPT_URL}?${params.toString()}`);
-        const data = await res.json();
-        if (data.result === "SUCCESS") {
-          showToast("تم الإدخال بنجاح 🚀");
-          clearForm();
-          loadOrders();
-        } else {
-          showToast("تعذر الحفظ: " + (data.message || "خطأ غير معروف"), "error");
-        }
-      } catch (e) {
-        showToast("خطأ في الاتصال", "error");
-      } finally {
-        showLoading(false);
-      }
-    }
+  showLoading(true);
+  try{
+    const url = `${SCRIPT_URL}?action=analyze&key=${encodeURIComponent(DASH_KEY)}&text=${encodeURIComponent(raw)}&_=${Date.now()}`;
+    const res = await fetch(url);
+    const data = await res.json();
 
-    function clearForm() {
-      document.getElementById('smartInput').value = "";
-      ['f_name', 'f_phone', 'f_offer', 'f_price', 'f_city', 'f_notes', 'f_delivery'].forEach(id => document.getElementById(id).value = "");
-    }
+    if(data.result !== "SUCCESS") throw new Error(data.message || "AI ERROR");
 
-    async function loadOrders() {
-      const list = document.getElementById('ordersList');
-      list.innerHTML = "<p class='text-center opacity-50 py-4'>جاري تحميل الطلبات...</p>";
-      try {
-        const res = await fetch(`${SCRIPT_URL}?action=get&key=${DASH_KEY}`);
-        const data = await res.json();
+    const d = data.data || {};
 
-        if (Array.isArray(data) && data.length > 0) {
-          list.innerHTML = data.slice(0, 10).map(o => `
-            <div class="bg-card p-4 rounded-2xl border border-white/5 shadow-lg relative overflow-hidden">
-              <div class="flex justify-between items-start mb-2">
-                <span class="font-bold text-white text-[15px]">${esc(o.name) || "بدون اسم"}</span>
-                <span class="text-[10px] bg-brand-500/20 text-brand-400 px-2 py-1 rounded-full font-bold">${esc(o.status || "")}</span>
-              </div>
+    if (d.name) document.getElementById('f_name').value = d.name;
+    if (d.phone) document.getElementById('f_phone').value = formatLocalPhone(d.phone);
+    if (d.city) document.getElementById('f_city').value = d.city;
+    if (d.price !== undefined && d.price !== null && String(d.price).trim() !== "") document.getElementById('f_price').value = d.price;
+    if (d.offer) document.getElementById('f_offer').value = d.offer;
 
-              <div class="text-slate-400 text-xs mb-1" dir="ltr"><i class="fa fa-phone text-[10px]"></i> ${esc(o.phone || "")}</div>
+    showToast("تم التحليل بالذكاء ✨");
+  }catch(e){
+    showToast("فشل التحليل: " + (e.message || "ERROR"));
+  }
+  showLoading(false);
+}
 
-              <div class="text-brand-200 text-xs bg-brand-900/20 p-2 rounded-lg border-r-2 border-brand-500 truncate mb-2">
-                ${esc(o.offer) || "بدون تفاصيل"}
-              </div>
+async function load() {
+  showLoading(true);
+  try {
+    const res = await fetch(`${SCRIPT_URL}?action=get&key=${encodeURIComponent(DASH_KEY)}&_=${Date.now()}`);
+    const data = await res.json();
+    if (data && data.result === "ERROR") throw new Error(data.message || "ERROR");
+    allOrders = Array.isArray(data) ? data : [];
+    renderOrders(allOrders);
+  } catch(e) {
+    showToast("خطأ في جلب البيانات");
+    document.getElementById('ordersList').innerHTML =
+      `<div style="text-align:center; padding:50px; color:var(--muted);">تعذّر تحميل الطلبات</div>`;
+  }
+  showLoading(false);
+}
 
-              <div class="flex gap-4 text-[10px] font-bold text-slate-300">
-                <span>📍 ${esc(o.city || "")}</span>
-                <span class="text-emerald-400">₪${esc(o.price || 0)}</span>
-              </div>
-            </div>
-          `).join('');
-        } else {
-          list.innerHTML = "<p class='text-center opacity-50 py-4'>لا توجد طلبات</p>";
-        }
-      } catch (e) {
-        list.innerHTML = "<p class='text-center text-red-400 py-4'>فشل الاتصال بالسيرفر</p>";
-      }
-    }
+function filterOrders() {
+  const term = document.getElementById('searchInput').value.toLowerCase();
+  const filtered = allOrders.filter(o => {
+    const n = safe(o.name).toLowerCase();
+    const p = safe(o.phone);
+    return n.includes(term) || p.includes(term) || formatLocalPhone(p).includes(term);
+  });
+  renderOrders(filtered);
+}
 
-    async function printCurrentOrder() {
-      const name = document.getElementById('f_name').value.trim();
-      const phone = document.getElementById('f_phone').value.trim();
-      if (!name || !phone) return showToast("الرجاء إدخال الاسم والهاتف!", 'error');
+function renderOrders(list) {
+  const container = document.getElementById('ordersList');
+  if (!list || list.length === 0) {
+    container.innerHTML = `<div style="text-align:center; padding:50px; color:var(--muted);">لا توجد طلبات لعرضها</div>`;
+    return;
+  }
 
-      // ✅ بدل includes على value الفاضي: تحقق من اختيار التوصيل
-      const deliveryVal = document.getElementById('f_delivery').value || "";
-      if (deliveryVal.includes("High Express")) return showToast("طلبات هي اكسبرس لا تُطبع يدوياً!", "error");
+  const latestFirst = [...list].filter(o => o.rowIndex).reverse(); // ✅ الأحدث فوق
 
-      document.getElementById('p_date').textContent = new Date().toLocaleDateString();
-      document.getElementById('p_total').textContent = document.getElementById('f_price').value || "0";
-      document.getElementById('p_content').innerHTML =
-        `<div style="margin-bottom: 4px;"><b>الاسم:</b> ${esc(name)}</div>
-         <div style="margin-bottom: 4px;"><b>الهاتف:</b> <span dir="ltr">${esc(phone)}</span></div>
-         <div style="margin-bottom: 4px;"><b>المدينة:</b> ${esc(document.getElementById('f_city').value)}</div>
-         <div style="margin-top: 8px; padding-top: 8px; border-top: 1px dashed black;"><b>الأصناف:</b><br>${esc(document.getElementById('f_offer').value)}</div>`;
+  container.innerHTML = latestFirst.map(o => {
+    const isPrep = (o.status || "").includes("تجهيز") || (o.status || "").includes("الإرسال");
+    const deliveryId = safe(o.delivery_order_id || o.deliveryId || "");
+    return `
+      <div class="order-card">
+        <div class="card-header">
+          <small class="order-id">#${safe(o.orderId) || '---'}</small>
+          <span class="status-pill ${isPrep ? 'status-prep' : 'status-new'}">${safe(o.status) || 'جديد'}</span>
+        </div>
 
-      showLoading(true, "تجهيز الطباعة...");
-      let cleanPhone = phone.replace(/\D/g, "");
-      if (cleanPhone.startsWith("0")) cleanPhone = "972" + cleanPhone.substring(1);
+        <div onclick="openEditModal(${o.rowIndex})" style="cursor:pointer;">
+          <span class="customer-name">${safe(o.name) || "—"}</span>
+          <div class="customer-phone"><i class="fa fa-phone"></i> ${formatLocalPhone(o.phone) || "—"}</div>
 
-      const qrImg = document.getElementById('p_qr');
-      qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=https://wa.me/${cleanPhone}`;
-      await new Promise(r => { qrImg.onload = r; qrImg.onerror = r; });
+          <div class="offer-details">${safe(o.offer) || "—"}</div>
 
+          <div class="meta-line">
+            <span class="meta-tag">📍 ${safe(o.city) || "—"}</span>
+            <span class="meta-tag">₪${safe(o.price) || "—"}</span>
+            <span class="meta-tag">💳 ${safe(o.payment) || "—"}</span>
+            <span class="meta-tag">🚚 ${safe(o.delivery) || "—"}</span>
+            ${deliveryId ? `<span class="meta-tag">🧾 شحنة: ${deliveryId}</span>` : ``}
+          </div>
+        </div>
+
+        <div class="actions-grid">
+          <button class="btn btn-wa-ar" onclick="sendMsg(${o.rowIndex}, 'ar')"><i class="fa-brands fa-whatsapp"></i><span>عربي</span></button>
+          <button class="btn btn-wa-he" onclick="sendMsg(${o.rowIndex}, 'he')"><i class="fa-brands fa-whatsapp"></i><span>עברית</span></button>
+          <button class="btn btn-success" onclick="approve(${o.rowIndex})"><i class="fa fa-check"></i><span>اعتماد</span></button>
+          <button class="btn btn-outline" onclick="openEditModal(${o.rowIndex})"><i class="fa fa-edit"></i><span>تعديل</span></button>
+        </div>
+
+        <div class="actions-secondary">
+          <!-- ✅ بدل الطباعة: تنزيل PDF 10×10 تلقائي -->
+          <button class="btn btn-outline" onclick="downloadOrderPDF(${o.rowIndex}, 'ar')"><i class="fa fa-file-pdf"></i><span>PDF ع</span></button>
+          <button class="btn btn-outline" onclick="downloadOrderPDF(${o.rowIndex}, 'he')"><i class="fa fa-file-pdf"></i><span>PDF هـ</span></button>
+          <button class="btn btn-outline" onclick="sendToDelivery(${o.rowIndex})"><i class="fa fa-truck"></i><span>شحن</span></button>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+/** ✅ WhatsApp */
+async function sendMsg(row, lang) {
+  const o = allOrders.find(x => x.rowIndex == row);
+  if(!o) return;
+
+  const E = {
+    blackHeart: "\u{1F5A4}",
+    diamond: "\u{1F48E}",
+    pin: "\u{1F4CD}",
+    money: "\u{1F4B0}",
+    card: "\u{1F4B3}",
+    truck: "\u{1F69A}",
+    memo: "\u{1F4DD}",
+    phone: "\u{1F4DE}",
+    wave: "\u{1F44B}",
+    box: "\u{1F4E6}",
+    info: "\u{2139}\u{FE0F}",
+    link: "\u{1F517}"
+  };
+
+  const paymentMethod = safe(o.payment) || (lang === "he" ? "תשלום במעמד המסירה" : "دفع عند الاستلام");
+
+  const noteTxt = safe(o.notes)
+    ? (lang === "he" ? `\n${E.memo} הערה: ${safe(o.notes)}` : `\n${E.memo} ملاحظة: ${safe(o.notes)}`)
+    : "";
+
+  const deliveryTxt = safe(o.delivery)
+    ? (lang === "he" ? `\n${E.truck} חברת משלוח: ${safe(o.delivery)}` : `\n${E.truck} شركة التوصيل: ${safe(o.delivery)}`)
+    : "";
+
+  const serviceWaLink = `https://wa.me/${CUSTOMER_SERVICE_PHONE}`;
+  const telStarLink = `tel:${CUSTOMER_SERVICE_STAR}`;
+
+  const contactBlock = (lang === "he")
+    ? `\n${E.phone} שירות לקוחות: ${CUSTOMER_SERVICE_PHONE}\n${E.link} WhatsApp: ${serviceWaLink}\n${E.phone} קו נוסף: ${CUSTOMER_SERVICE_STAR}\n${E.link} חיוג: ${telStarLink}`
+    : `\n${E.phone} خدمة العملاء: ${CUSTOMER_SERVICE_PHONE}\n${E.link} واتساب مباشر: ${serviceWaLink}\n${E.phone} رقم إضافي: ${CUSTOMER_SERVICE_STAR}\n${E.link} اتصال: ${telStarLink}`;
+
+  const supportLine = (lang === "he")
+    ? `\n${E.info} לשינוי ההזמנה או להוספת הערות לחברת המשלוחים – אפשר לפנות אלינו.`
+    : `\n${E.info} لتعديل الطلب أو إضافة ملاحظات لشركة التوصيل يمكن التواصل معنا.`;
+
+  const msg = (lang === "ar")
+    ? `أهلاً بك ${safe(o.name)} في MAD Parfumeur ${E.blackHeart}
+يسعدنا تأكيد طلبك المميز!
+${E.diamond} العرض: ${safe(o.offer)}
+${E.pin} العنوان: ${safe(o.city)}
+${E.money} السعر: ${safe(o.price)} ₪
+${E.card} الدفع: ${paymentMethod}${deliveryTxt}${noteTxt}${contactBlock}${supportLine}`
+    : `שלום ${safe(o.name)} ${E.wave}, תודה שהזמנת מ-MAD Parfumeur
+${E.box} המוצר: ${safe(o.offer)}
+${E.pin} כתובת: ${safe(o.city)}
+${E.money} מחיר: ${safe(o.price)} ₪
+${E.card} תשלום: ${paymentMethod}${deliveryTxt}${noteTxt}${contactBlock}${supportLine}`;
+
+  const wa = `https://wa.me/${normalizePhoneForLink(o.phone)}?text=${encodeURIComponent(msg)}`;
+  window.open(wa, "_blank");
+}
+
+/** ✅ اعتماد */
+async function approve(row) {
+  showLoading(true);
+  const o = allOrders.find(x => x.rowIndex == row);
+  if(!o) { showLoading(false); return; }
+
+  const p = new URLSearchParams({
+    action: "updateOrder", key: DASH_KEY, row: row,
+    offer: safe(o.offer), name: safe(o.name), phone: safe(o.phone),
+    city: safe(o.city), notes: safe(o.notes),
+    delivery: safe(o.delivery), payment: safe(o.payment), price: safe(o.price),
+    address: safe(o.address || ""),
+    status: "بانتظار الإرسال للتجهيز"
+  });
+
+  try {
+    const res = await fetch(`${SCRIPT_URL}?${p.toString()}`);
+    const data = await res.json();
+    if(data.result === "SUCCESS") {
+      showToast("تم الاعتماد بنجاح ✨");
+      load();
+    } else {
+      showToast(data.message || "فشل التحديث");
       showLoading(false);
-      window.print();
+    }
+  } catch(e) {
+    showToast("فشل التحديث");
+    showLoading(false);
+  }
+}
+
+/** ✅ شحن */
+async function sendToDelivery(row){
+  showLoading(true);
+  try{
+    const res = await fetch(`${SCRIPT_URL}?action=sendToDelivery&key=${encodeURIComponent(DASH_KEY)}&row=${row}&_=${Date.now()}`);
+    const data = await res.json();
+
+    if(data.result === "SUCCESS"){
+      showToast(data.delivery_order_id ? `تم الإرسال ✅ رقم: ${data.delivery_order_id}` : "تم الإرسال ✅");
+      load();
+    } else {
+      showToast(data.message || "فشل الإرسال");
+      showLoading(false);
+    }
+  }catch(e){
+    showToast("فشل الإرسال");
+    showLoading(false);
+  }
+}
+
+function openAddModal() {
+  editingRow = null;
+  document.getElementById('modalTitle').textContent = "إضافة طلب جديد";
+  document.getElementById('smartSection').style.display = 'block';
+  document.getElementById('smartInput').value = "";
+  document.getElementById('f_name').value = "";
+  document.getElementById('f_phone').value = "";
+  document.getElementById('f_offer').value = "";
+  document.getElementById('f_price').value = "";
+  document.getElementById('f_city').value = "";
+  document.getElementById('f_address').value = "";
+  document.getElementById('f_notes').value = "";
+  document.getElementById('f_payment').value = "دفع عند الاستلام";
+  document.getElementById('f_delivery').value = "";
+  document.getElementById('orderModal').classList.add('show');
+}
+
+function openEditModal(row) {
+  const o = allOrders.find(x => x.rowIndex == row);
+  if(!o) return;
+
+  editingRow = row;
+  document.getElementById('modalTitle').textContent = "تعديل تفاصيل الطلب";
+  document.getElementById('smartSection').style.display = 'none';
+
+  document.getElementById('f_name').value = safe(o.name);
+  document.getElementById('f_phone').value = formatLocalPhone(o.phone);
+  document.getElementById('f_offer').value = safe(o.offer);
+  document.getElementById('f_price').value = safe(o.price);
+  document.getElementById('f_payment').value = safe(o.payment) || "دفع عند الاستلام";
+  document.getElementById('f_city').value = safe(o.city);
+  document.getElementById('f_address').value = safe(o.address || "");
+  document.getElementById('f_notes').value = safe(o.notes);
+  document.getElementById('f_delivery').value = safe(o.delivery);
+
+  document.getElementById('orderModal').classList.add('show');
+}
+
+async function saveOrder() {
+  const isAdd = (editingRow === null);
+  showLoading(true);
+
+  const payload = {
+    action: isAdd ? "addOrder" : "updateOrder",
+    key: DASH_KEY,
+    row: isAdd ? "" : editingRow,
+    name: safe(document.getElementById('f_name').value),
+    phone: safe(document.getElementById('f_phone').value),
+    offer: safe(document.getElementById('f_offer').value),
+    price: safe(document.getElementById('f_price').value),
+    city: safe(document.getElementById('f_city').value),
+    address: safe(document.getElementById('f_address').value),
+    notes: safe(document.getElementById('f_notes').value),
+    payment: safe(document.getElementById('f_payment').value),
+    delivery: safe(document.getElementById('f_delivery').value),
+    status: "NEW"
+  };
+
+  try {
+    const res = await fetch(`${SCRIPT_URL}?` + new URLSearchParams(payload).toString());
+    const data = await res.json();
+
+    if(data.result === "SUCCESS") {
+      showToast(isAdd ? "تمت إضافة الطلب بنجاح ✨" : "تم الحفظ بنجاح ✨");
+      closeModal('orderModal');
+      load();
+    } else {
+      showToast(data.message || "فشل الحفظ");
+      showLoading(false);
+    }
+  } catch(e) {
+    showToast("فشل الحفظ");
+    showLoading(false);
+  }
+}
+
+function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+
+/** -------------------------
+ * ✅ PDF 10cm x 10cm (100mm x 100mm) + تحميل تلقائي
+ * ------------------------- */
+async function downloadOrderPDF(row, lang){
+  const o = allOrders.find(x => x.rowIndex == row);
+  if(!o) return;
+
+  showLoading(true);
+  try{
+    const { jsPDF } = window.jspdf;
+
+    // ✅ حجم الورقة 100mm x 100mm = 10cm x 10cm
+    const doc = new jsPDF({ unit: "mm", format: [100, 100], compress: true });
+
+    // Fonts: jsPDF default (لا يدعم عربي كامل بدون خط مخصص)
+    // لذلك نخلي الوصل عربي/عبري كنص بسيط + تنسيق واضح.
+    // إذا بدك عربي مضبوط 100% بخط Cairo داخل PDF، بعمل لك نسخة بخط Base64.
+
+    // Header
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(22);
+    doc.text("MAD", 50, 16, { align: "center" });
+
+    doc.setFontSize(9);
+    doc.setFont("helvetica", "bold");
+    doc.text("PARFUMEUR", 50, 22, { align: "center" });
+
+    doc.setDrawColor(0);
+    doc.setLineWidth(0.6);
+    doc.line(8, 26, 92, 26);
+
+    const date = new Date();
+    const dateStr = `${String(date.getDate()).padStart(2,"0")}.${String(date.getMonth()+1).padStart(2,"0")}.${date.getFullYear()}`;
+    const ord = safe(o.orderId) || "MAD-00000";
+
+    doc.setFontSize(8);
+    doc.setFont("helvetica", "bold");
+    doc.text(`DATE: ${dateStr}`, 8, 31);
+    doc.text(`ORD: ${ord}`, 92, 31, { align: "right" });
+
+    // Body box
+    doc.setLineWidth(0.2);
+    doc.roundedRect(8, 34, 84, 42, 3, 3);
+
+    doc.setFontSize(9);
+    doc.setFont("helvetica", "bold");
+
+    const name = safe(o.name);
+    const phone = formatLocalPhone(o.phone);
+    const city = safe(o.city);
+    const address = safe(o.address || "");
+    const delivery = safe(o.delivery);
+    const payment = safe(o.payment);
+    const offer = safe(o.offer);
+    const notes = safe(o.notes);
+
+    // Simple bilingual labels (PDF default font)
+    const lines = (lang === "he") ? [
+      `Name: ${name}`,
+      `Phone: ${phone}`,
+      `City: ${city}`,
+      `Addr: ${address}`,
+      `Delivery: ${delivery}`,
+      `Pay: ${payment}`,
+      `Items: ${offer}`,
+      notes ? `Note: ${notes}` : ""
+    ] : [
+      `Name: ${name}`,
+      `Phone: ${phone}`,
+      `City: ${city}`,
+      `Addr: ${address}`,
+      `Delivery: ${delivery}`,
+      `Pay: ${payment}`,
+      `Items: ${offer}`,
+      notes ? `Note: ${notes}` : ""
+    ].filter(Boolean);
+
+    // Wrap text داخل الصندوق
+    const wrapped = [];
+    lines.forEach(l => {
+      const w = doc.splitTextToSize(l, 80);
+      wrapped.push(...w);
+    });
+
+    let y = 40;
+    wrapped.slice(0, 10).forEach(t => { // حد أعلى عشان ما يخرج عن الورقة
+      doc.text(t, 10, y);
+      y += 4.3;
+    });
+
+    // Total
+    doc.setLineWidth(0.6);
+    doc.line(8, 79, 92, 79);
+
+    doc.setFontSize(9);
+    doc.setFont("helvetica", "bold");
+    doc.text("TOTAL:", 68, 85);
+    doc.setFontSize(18);
+    doc.text(`₪${safe(o.price) || "0"}`, 92, 86, { align: "right" });
+
+    // QR (WhatsApp link)
+    const waLink = `https://wa.me/${normalizePhoneForLink(o.phone)}`;
+    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=${encodeURIComponent(waLink)}`;
+    const qrDataUrl = await fetchAsDataURL(qrUrl);
+    if(qrDataUrl){
+      doc.addImage(qrDataUrl, "PNG", 8, 82, 14, 14);
     }
 
-    window.onload = loadOrders;
-  </script>
+    // Footer hint
+    doc.setFontSize(7);
+    doc.setFont("helvetica", "bold");
+    doc.text("Send photo & get a gift 🎁", 50, 96, { align: "center" });
+
+    // ✅ تنزيل تلقائي
+    const fileName = `${ord}_${lang}.pdf`;
+    doc.save(fileName);
+
+    showToast("تم تنزيل PDF ✅");
+  }catch(e){
+    showToast("فشل إنشاء PDF");
+  }
+  showLoading(false);
+}
+
+/** fetch image as dataURL */
+async function fetchAsDataURL(url){
+  try{
+    const r = await fetch(url);
+    const b = await r.blob();
+    return await new Promise((resolve) => {
+      const fr = new FileReader();
+      fr.onload = () => resolve(fr.result);
+      fr.onerror = () => resolve("");
+      fr.readAsDataURL(b);
+    });
+  }catch(e){
+    return "";
+  }
+}
+
+window.onload = load;
+</script>
 </body>
 </html>
