@@ -1,620 +1,526 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MAD Manager PRO v9.0</title>
-    
-    <!-- Scripts -->
-    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MAD Manager PRO v10.0</title>
 
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Almarai:wght@300;400;700;800&display=swap');
-        
-        body {
-            font-family: 'Almarai', sans-serif;
-            background-color: #020617;
-        }
-        
-        .no-scrollbar::-webkit-scrollbar {
-            display: none;
-        }
-        .no-scrollbar {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-        }
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-        @keyframes bounce-subtle {
-            0%, 100% { transform: translate(-50%, 0); }
-            50% { transform: translate(-50%, -10px); }
-        }
-        .animate-toast {
-            animation: bounce-subtle 2s infinite ease-in-out;
-        }
-    </style>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Almarai:wght@300;400;700;800&display=swap');
+    body { font-family: 'Almarai', sans-serif; background:#020617; }
+    .no-scrollbar::-webkit-scrollbar { display:none; }
+    .no-scrollbar { -ms-overflow-style:none; scrollbar-width:none; }
+    @keyframes bounce-subtle {0%,100%{transform:translate(-50%,0)}50%{transform:translate(-50%,-10px)}}
+    .animate-toast { animation:bounce-subtle 2s infinite ease-in-out; }
+  </style>
 
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        slate: {
-                            950: '#020617',
-                            900: '#0f172a',
-                            800: '#1e293b',
-                        }
-                    }
-                }
-            }
-        }
-    </script>
+  <script>
+    tailwind.config = {
+      theme: { extend: { colors: { slate: { 950:'#020617',900:'#0f172a',800:'#1e293b' } } } }
+    }
+  </script>
 </head>
 <body>
-    <div id="root"></div>
+  <div id="root"></div>
 
-    <script type="text/babel">
-        const { useState, useEffect, useMemo } = React;
+  <script type="text/babel">
+    const { useEffect, useMemo, useState } = React;
 
-        // --- Configuration ---
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxx4u-YyhivmCjAt_36eBSyqjYeyBu5SqjpKdsCcBRdwNLPTMIULSno_mUZjr3VlfTR7g/exec";
-        const SECRET_KEY = "12345678";
+    // ✅ غيّر هذا لرابط الـ Deploy الجديد
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwL-rityG02dO4q3LAmwjWa-rQhHv1qNOXlSyOR2yZv6rM9bfTXz1EiTETTn3_69pPHCA/exec";
+    const SECRET_KEY = "12345678";
 
-        const App = () => {
-            const [orders, setOrders] = useState([]);
-            const [loading, setLoading] = useState(false);
-            const [searchTerm, setSearchTerm] = useState('');
-            const [activeTab, setActiveTab] = useState('All');
-            const [isModalOpen, setIsModalOpen] = useState(false);
-            const [aiInput, setAiInput] = useState('');
-            const [parsingAi, setParsingAi] = useState(false);
-            const [currentOrder, setCurrentOrder] = useState(null);
-            const [toast, setToast] = useState({ show: false, message: '', type: 'success' });
+    function App(){
+      const [orders, setOrders] = useState([]);
+      const [loading, setLoading] = useState(false);
+      const [searchTerm, setSearchTerm] = useState("");
+      const [activeTab, setActiveTab] = useState("All");
 
-            const [formData, setFormData] = useState({
-                orderId: '',
-                name: '',
-                phone: '',
-                offer: '',
-                price: '',
-                city: '',
-                address: '',
-                payment: 'دفع عند الاستلام',
-                delivery: 'Hi Express'
-            });
+      const [toast, setToast] = useState({ show:false, message:"", type:"success" });
 
-            const showNotify = (message, type = 'success') => {
-                setToast({ show: true, message: String(message), type });
-                setTimeout(() => setToast({ show: false, message: '', type: 'success' }), 4000);
-            };
+      const [isModalOpen, setIsModalOpen] = useState(false);
+      const [currentOrder, setCurrentOrder] = useState(null);
 
-            const fetchData = async () => {
-                setLoading(true);
-                try {
-                    const response = await fetch(`${SCRIPT_URL}?action=get&key=${SECRET_KEY}&t=${Date.now()}`);
-                    const data = await response.json();
-                    if (Array.isArray(data)) {
-                        setOrders(data.filter(o => o && o.rowIndex));
-                    } else if (data.result === "ERROR") {
-                        showNotify(data.message, "error");
-                    }
-                } catch (e) {
-                    showNotify("خطأ في الاتصال بالبيانات", "error");
-                } finally {
-                    setLoading(false);
-                }
-            };
+      const [aiInput, setAiInput] = useState("");
+      const [parsingAi, setParsingAi] = useState(false);
 
-            useEffect(() => {
-                fetchData();
-            }, []);
+      const [formData, setFormData] = useState({
+        orderId: "",
+        name: "",
+        phone: "",
+        city: "",
+        address: "",
+        price: "",
+        payment: "دفع عند الاستلام",
+        offer: "",
+        notes: "",
+        delivery: "Hi Express"
+      });
 
-            const stats = useMemo(() => {
-                const total = orders.length;
-                const pending = orders.filter(o => {
-                    const s = String(o.status || '').trim();
-                    return !s || s === 'جديد';
-                }).length;
-                const shipping = orders.filter(o => String(o.status || '').includes('بالطريق')).length;
-                const revenue = orders.reduce((acc, curr) => acc + (parseFloat(curr.price) || 0), 0);
-                return { total, pending, shipping, revenue };
-            }, [orders]);
+      const notify = (message, type="success") => {
+        setToast({ show:true, message:String(message), type });
+        setTimeout(() => setToast({ show:false, message:"", type:"success" }), 4500);
+      };
 
-            const filteredOrders = useMemo(() => {
-                const search = searchTerm.toLowerCase();
-                return orders.filter(o => {
-                    const name = String(o.name || '').toLowerCase();
-                    const phone = String(o.phone || '');
-                    const orderId = String(o.orderId || '');
-                    const status = String(o.status || '');
+      const fetchData = async () => {
+        setLoading(true);
+        try{
+          const res = await fetch(`${SCRIPT_URL}?action=get&key=${SECRET_KEY}&t=${Date.now()}`);
+          const data = await res.json();
+          if(Array.isArray(data)) setOrders(data.filter(o => o && o.rowIndex));
+          else if(data.result === "ERROR") notify(data.message, "error");
+        }catch(e){
+          notify("خطأ في الاتصال بالبيانات", "error");
+        }finally{
+          setLoading(false);
+        }
+      };
 
-                    const matchesSearch = name.includes(search) || phone.includes(search) || orderId.includes(search);
-                    if (!matchesSearch) return false;
+      useEffect(() => { fetchData(); }, []);
 
-                    if (activeTab === 'All') return true;
-                    if (activeTab === 'New') return !status || status === 'جديد';
-                    if (activeTab === 'Shipping') return status.includes('بالطريق');
-                    if (activeTab === 'Done') return status.includes('تم');
-                    return true;
-                }).reverse();
-            }, [orders, searchTerm, activeTab]);
+      const stats = useMemo(() => {
+        const total = orders.length;
+        const pending = orders.filter(o => {
+          const s = String(o.status || "").trim();
+          return (!s || s === "جديد");
+        }).length;
+        const shipping = orders.filter(o => String(o.status || "").includes("بالطريق")).length;
+        const revenue = orders.reduce((acc, o) => acc + (parseFloat(o.price) || 0), 0);
+        return { total, pending, shipping, revenue };
+      }, [orders]);
 
-            const openModal = (order = null) => {
-                if (order) {
-                    setCurrentOrder(order);
-                    setFormData({
-                        orderId: order.orderId || '',
-                        name: order.name || '',
-                        phone: order.phone || '',
-                        offer: order.offer || '',
-                        price: order.price || '',
-                        city: order.city || '',
-                        address: order.address || '',
-                        payment: order.payment || 'دفع عند الاستلام',
-                        delivery: order.delivery || 'Hi Express'
-                    });
-                } else {
-                    setCurrentOrder(null);
-                    setFormData({
-                        orderId: '', name: '', phone: '', offer: '', price: '', 
-                        city: '', address: '', payment: 'دفع عند الاستلام', delivery: 'Hi Express'
-                    });
-                }
-                setAiInput('');
-                setIsModalOpen(true);
-            };
+      const filteredOrders = useMemo(() => {
+        const s = searchTerm.toLowerCase();
+        return orders.filter(o => {
+          const name = String(o.name || "").toLowerCase();
+          const phone = String(o.phone || "");
+          const orderId = String(o.orderId || "");
+          const status = String(o.status || "");
 
-            const handleAiParse = async () => {
-                if (!aiInput.trim()) return showNotify("يرجى لصق نص أولاً", "error");
-                setParsingAi(true);
-                try {
-                    const response = await fetch(SCRIPT_URL, {
-                        method: 'POST',
-                        mode: 'cors',
-                        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                        body: JSON.stringify({ action: 'analyze', text: aiInput, key: SECRET_KEY })
-                    });
-                    const res = await response.json();
-                    if (res.result === 'SUCCESS') {
-                        const d = res.data;
-                        setFormData(prev => ({
-                            ...prev,
-                            name: d.name || prev.name,
-                            phone: d.phone || prev.phone,
-                            city: d.city || prev.city,
-                            price: d.price || prev.price,
-                            offer: d.offer || prev.offer,
-                            address: d.address || prev.address,
-                            orderId: d.orderId || prev.orderId
-                        }));
-                        showNotify("تم التحليل بذكاء Gemini ✨");
-                    } else {
-                        showNotify(res.message, "error");
-                    }
-                } catch (e) {
-                    showNotify("فشل تحليل AI", "error");
-                } finally {
-                    setParsingAi(false);
-                }
-            };
+          const matches = name.includes(s) || phone.includes(s) || orderId.includes(s);
+          if(!matches) return false;
 
-            const handleSubmit = async () => {
-                setLoading(true);
-                const payload = {
-                    ...formData,
-                    action: currentOrder ? 'updateOrder' : 'addOrder',
-                    row: currentOrder ? currentOrder.rowIndex : undefined,
-                    status: currentOrder ? undefined : 'جديد',
-                    key: SECRET_KEY
-                };
+          if(activeTab === "All") return true;
+          if(activeTab === "New") return (!status || status === "جديد");
+          if(activeTab === "Shipping") return status.includes("بالطريق");
+          if(activeTab === "Done") return status.includes("تم");
+          return true;
+        }).reverse();
+      }, [orders, searchTerm, activeTab]);
 
-                try {
-                    const response = await fetch(SCRIPT_URL, {
-                        method: 'POST',
-                        mode: 'cors',
-                        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                        body: JSON.stringify(payload)
-                    });
-                    const res = await response.json();
-                    if (res.result === 'SUCCESS') {
-                        showNotify("تم الحفظ بنجاح");
-                        setIsModalOpen(false);
-                        fetchData();
-                    } else {
-                        showNotify(res.message || "فشل الحفظ", "error");
-                    }
-                } catch (e) {
-                    showNotify("فشل الحفظ", "error");
-                } finally {
-                    setLoading(false);
-                }
-            };
+      const openModal = (order=null) => {
+        if(order){
+          setCurrentOrder(order);
+          setFormData({
+            orderId: order.orderId || "",
+            name: order.name || "",
+            phone: order.phone || "",
+            city: order.city || "",
+            address: order.address || "",
+            price: order.price || "",
+            payment: order.payment || "دفع عند الاستلام",
+            offer: order.offer || "",
+            notes: order.notes || "",
+            delivery: order.delivery || "Hi Express"
+          });
+        }else{
+          setCurrentOrder(null);
+          setFormData({
+            orderId:"", name:"", phone:"", city:"", address:"",
+            price:"", payment:"دفع عند الاستلام", offer:"", notes:"",
+            delivery:"Hi Express"
+          });
+        }
+        setAiInput("");
+        setIsModalOpen(true);
+      };
 
-            const handleWhatsApp = (order, lang) => {
-                const msg = lang === 'ar' 
-                    ? `أهلاً ${order.name}، طلبك من MAD جاهز وسيتم شحنه قريباً.` 
-                    : `שלום ${order.name}, ההזמנה שלך מ-MAD מוכנה ותשלח בקרוב.`;
-                let phone = String(order.phone || '').replace(/\D/g, '');
-                if (phone.startsWith('0')) phone = '972' + phone.substring(1);
-                window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, '_blank');
-            };
-
-            const shipWithOlivery = async (order) => {
-                setLoading(true);
-                const params = new URLSearchParams({ 
-                    action: 'sendToDelivery', 
-                    row: order.rowIndex, 
-                    key: SECRET_KEY, 
-                    delivery: "Hi Express" 
-                });
-                const directUrl = `${SCRIPT_URL}?${params.toString()}`;
-
-                try {
-                    const response = await fetch(directUrl);
-                    const data = await response.json();
-                    if (data.result === 'SUCCESS') {
-                        showNotify(`✅ تم الشحن! بوليصة: ${data.delivery_order_id}`);
-                        fetchData();
-                    } else {
-                        throw new Error(data.message);
-                    }
-                } catch (e) {
-                    window.open(directUrl, '_blank');
-                    showNotify("تم فتح رابط الشحن في نافذة جديدة", "info");
-                } finally {
-                    setLoading(false);
-                }
-            };
-
-            return (
-                <div className="min-h-screen text-slate-100 pb-24 selection:bg-blue-500/30">
-                    
-                    {/* Toast Notification */}
-                    {toast.show && (
-                        <div className={`fixed bottom-24 left-1/2 -translate-x-1/2 z-[60] px-6 py-3 rounded-full shadow-2xl flex items-center gap-3 animate-toast border ${
-                            toast.type === 'error' ? 'bg-red-600 border-red-400' : 
-                            toast.type === 'info' ? 'bg-blue-600 border-blue-400' : 
-                            'bg-emerald-600 border-emerald-400'
-                        }`}>
-                            <i className={`fas ${toast.type === 'error' ? 'fa-times' : 'fa-check'}`}></i>
-                            <span className="font-bold whitespace-nowrap">{toast.message}</span>
-                        </div>
-                    )}
-
-                    {/* Loader Overlay */}
-                    {loading && (
-                        <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-[100] flex flex-col items-center justify-center">
-                            <div className="w-12 h-12 border-4 border-blue-500/20 border-t-blue-500 rounded-full animate-spin"></div>
-                            <p className="mt-4 font-black text-blue-400 tracking-widest uppercase">MAD Loading...</p>
-                        </div>
-                    )}
-
-                    {/* Header */}
-                    <header className="sticky top-0 z-50 bg-slate-900/80 backdrop-blur-xl border-b border-white/5 px-4 py-4 lg:py-6 shadow-2xl">
-                        <div className="max-w-5xl mx-auto">
-                            <div className="flex items-center justify-between mb-6">
-                                <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-700 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/20">
-                                        <i className="fas fa-box text-white text-xl"></i>
-                                    </div>
-                                    <div>
-                                        <h1 className="text-xl font-black tracking-tighter">MAD <span className="text-blue-500">MANAGER</span></h1>
-                                        <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Version 9.0 PRO</p>
-                                    </div>
-                                </div>
-                                <div className="flex gap-2">
-                                    <button onClick={fetchData} className="p-3 bg-slate-800 hover:bg-slate-700 rounded-xl transition-all border border-white/5 active:scale-95">
-                                        <i className={`fas fa-sync-alt ${loading ? 'animate-spin text-blue-400' : 'text-slate-400'}`}></i>
-                                    </button>
-                                    <button onClick={() => openModal()} className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-bold flex items-center gap-2 transition-all shadow-lg shadow-blue-600/20 active:scale-95">
-                                        <i className="fas fa-plus"></i>
-                                        <span className="hidden sm:inline">طلب جديد</span>
-                                    </button>
-                                </div>
-                            </div>
-
-                            {/* Stats */}
-                            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
-                                <div className="bg-slate-800/50 p-4 rounded-2xl border border-white/5">
-                                    <p className="text-slate-500 text-xs font-bold mb-1">إجمالي الطلبات</p>
-                                    <p className="text-2xl font-black">{stats.total}</p>
-                                </div>
-                                <div className="bg-slate-800/50 p-4 rounded-2xl border border-white/5">
-                                    <p className="text-blue-400 text-xs font-bold mb-1">بانتظار التجهيز</p>
-                                    <p className="text-2xl font-black">{stats.pending}</p>
-                                </div>
-                                <div className="bg-slate-800/50 p-4 rounded-2xl border border-white/5">
-                                    <p className="text-amber-400 text-xs font-bold mb-1">بالطريق</p>
-                                    <p className="text-2xl font-black">{stats.shipping}</p>
-                                </div>
-                                <div className="bg-slate-800/50 p-4 rounded-2xl border border-white/5">
-                                    <p className="text-emerald-400 text-xs font-bold mb-1">إجمالي المبيعات</p>
-                                    <p className="text-2xl font-black text-emerald-500">₪{stats.revenue.toLocaleString()}</p>
-                                </div>
-                            </div>
-
-                            {/* Search & Tabs */}
-                            <div className="flex flex-col md:flex-row gap-4">
-                                <div className="relative flex-1">
-                                    <i className="fas fa-search absolute right-4 top-1/2 -translate-y-1/2 text-slate-500"></i>
-                                    <input 
-                                        type="text" 
-                                        placeholder="ابحث بالاسم، الهاتف أو المرجع..."
-                                        className="w-full bg-slate-800/80 border border-white/10 rounded-xl py-3 pr-12 pl-4 text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all text-right"
-                                        value={searchTerm}
-                                        onChange={(e) => setSearchTerm(e.target.value)}
-                                    />
-                                </div>
-                                <div className="flex bg-slate-800/80 p-1 rounded-xl border border-white/10 overflow-x-auto no-scrollbar">
-                                    {['All', 'New', 'Shipping', 'Done'].map(tab => (
-                                        <button
-                                            key={tab}
-                                            onClick={() => setActiveTab(tab)}
-                                            className={`px-4 py-2 rounded-lg text-sm font-bold transition-all whitespace-nowrap ${
-                                                activeTab === tab ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-400 hover:text-white'
-                                            }`}
-                                        >
-                                            {tab === 'All' ? 'الكل' : tab === 'New' ? 'جديد' : tab === 'Shipping' ? 'بالطريق' : 'تم التسليم'}
-                                        </button>
-                                    ))}
-                                </div>
-                            </div>
-                        </div>
-                    </header>
-
-                    {/* Orders List */}
-                    <main className="max-w-5xl mx-auto px-4 mt-8">
-                        <div className="grid gap-4">
-                            {filteredOrders.length > 0 ? (
-                                filteredOrders.map((order, idx) => (
-                                    <div 
-                                        key={order.rowIndex || idx} 
-                                        className="bg-slate-900 border border-white/5 rounded-3xl p-5 hover:border-blue-500/30 transition-all group"
-                                    >
-                                        <div className="flex items-start justify-between mb-4">
-                                            <div className="flex items-center gap-3">
-                                                <span className="text-[10px] bg-slate-800 px-2 py-1 rounded text-slate-400 font-bold tracking-widest uppercase">
-                                                    REF: {String(order.orderId || 'N/A')}
-                                                </span>
-                                                <span className={`text-[10px] font-black px-2 py-1 rounded-full uppercase ${
-                                                    String(order.status || '').includes('بالطريق') ? 'bg-amber-500/10 text-amber-500' :
-                                                    String(order.status || '').includes('تم') ? 'bg-emerald-500/10 text-emerald-500' :
-                                                    'bg-blue-500/10 text-blue-500'
-                                                }`}>
-                                                    {String(order.status || 'جديد')}
-                                                </span>
-                                            </div>
-                                            <button onClick={() => openModal(order)} className="text-slate-500 hover:text-white p-2">
-                                                <i className="fas fa-ellipsis-v"></i>
-                                            </button>
-                                        </div>
-
-                                        <div className="flex flex-col md:flex-row md:items-center gap-6">
-                                            <div className="flex-1 cursor-pointer" onClick={() => openModal(order)}>
-                                                <h3 className="text-xl font-bold mb-2 group-hover:text-blue-400 transition-colors">{String(order.name || 'مشتري مجهول')}</h3>
-                                                <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-slate-400">
-                                                    <div className="flex items-center gap-2"><i className="fas fa-phone text-blue-500 text-xs"></i> {String(order.phone || '---')}</div>
-                                                    <div className="flex items-center gap-2"><i className="fas fa-map-marker-alt text-blue-500 text-xs"></i> {String(order.city || '')} {order.address && ` - ${String(order.address)}`}</div>
-                                                </div>
-                                                <div className="mt-4 bg-slate-800/50 border-r-4 border-blue-600 p-3 rounded-lg text-slate-300 text-sm leading-relaxed whitespace-pre-wrap">
-                                                    {String(order.offer || 'لا توجد أصناف')}
-                                                </div>
-                                            </div>
-
-                                            <div className="flex flex-col gap-3 min-w-[140px]">
-                                                <div className="flex items-center justify-between text-lg font-black bg-slate-800 p-3 rounded-xl border border-white/5">
-                                                    <span className="text-slate-500 text-xs">المبلغ:</span>
-                                                    <span className="text-blue-500">₪{order.price || 0}</span>
-                                                </div>
-                                                <div className="grid grid-cols-2 gap-2">
-                                                    <button 
-                                                        onClick={() => handleWhatsApp(order, 'ar')}
-                                                        className="flex flex-col items-center justify-center gap-1 p-2 bg-emerald-600/10 hover:bg-emerald-600 text-emerald-500 hover:text-white rounded-xl transition-all border border-emerald-500/20"
-                                                    >
-                                                        <i className="fab fa-whatsapp text-lg"></i>
-                                                        <span className="text-[10px] font-bold">عربي</span>
-                                                    </button>
-                                                    <button 
-                                                        onClick={() => handleWhatsApp(order, 'he')}
-                                                        className="flex flex-col items-center justify-center gap-1 p-2 bg-indigo-600/10 hover:bg-indigo-600 text-indigo-400 hover:text-white rounded-xl transition-all border border-indigo-500/20"
-                                                    >
-                                                        <i className="fab fa-whatsapp text-lg"></i>
-                                                        <span className="text-[10px] font-bold">Heb</span>
-                                                    </button>
-                                                </div>
-                                                <button 
-                                                    onClick={() => shipWithOlivery(order)}
-                                                    disabled={!!order.delivery_order_id}
-                                                    className={`flex items-center justify-center gap-2 p-3 rounded-xl font-bold transition-all ${
-                                                        order.delivery_order_id 
-                                                        ? 'bg-slate-800 text-emerald-500 border border-emerald-500/30 cursor-default'
-                                                        : 'bg-amber-500 hover:bg-amber-400 text-slate-900 shadow-lg shadow-amber-500/20 active:scale-95'
-                                                    }`}
-                                                >
-                                                    <i className="fas fa-truck"></i>
-                                                    <span className="text-xs uppercase">{order.delivery_order_id ? `بوليصة: ${order.delivery_order_id}` : 'شحن الآن'}</span>
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                ))
-                            ) : (
-                                <div className="flex flex-col items-center justify-center py-20 opacity-20">
-                                    <i className="fas fa-search text-6xl mb-4"></i>
-                                    <p className="text-xl font-bold">لا يوجد نتائج لعرضها</p>
-                                </div>
-                            )}
-                        </div>
-                    </main>
-
-                    {/* FAB */}
-                    <button 
-                        onClick={() => openModal()}
-                        className="fixed bottom-6 right-6 w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center shadow-2xl shadow-blue-500/40 text-white z-40 active:scale-90 transition-transform lg:hidden"
-                    >
-                        <i className="fas fa-plus text-2xl"></i>
-                    </button>
-
-                    {/* Modal */}
-                    {isModalOpen && (
-                        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/90 backdrop-blur-sm overflow-y-auto">
-                            <div className="bg-slate-900 w-full max-w-2xl rounded-[2.5rem] border border-white/10 shadow-2xl overflow-hidden">
-                                <div className="px-8 py-6 border-b border-white/5 flex items-center justify-between bg-slate-900/50 sticky top-0 backdrop-blur-lg">
-                                    <h2 className="text-2xl font-black">{currentOrder ? 'تعديل الطلب' : 'إضافة طلب جديد'}</h2>
-                                    <button onClick={() => setIsModalOpen(false)} className="p-2 hover:bg-slate-800 rounded-full transition-colors text-slate-400">
-                                        <i className="fas fa-times text-xl"></i>
-                                    </button>
-                                </div>
-
-                                <div className="p-8 space-y-6 max-h-[75vh] overflow-y-auto text-right">
-                                    {/* AI Parser */}
-                                    <div className="bg-blue-600/5 border border-blue-500/30 rounded-3xl p-6 relative group overflow-hidden">
-                                        <div className="flex items-center gap-2 mb-4">
-                                            <i className="fas fa-robot text-blue-400"></i>
-                                            <span className="font-black text-blue-400 text-sm uppercase tracking-widest text-right">Gemini AI Parser</span>
-                                        </div>
-                                        <textarea 
-                                            placeholder="الصق نص الطلب هنا..."
-                                            className="w-full bg-slate-950/50 border border-white/10 rounded-2xl p-4 text-sm text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/50 h-32 transition-all text-right"
-                                            value={aiInput}
-                                            onChange={(e) => setAiInput(e.target.value)}
-                                        />
-                                        <button 
-                                            onClick={handleAiParse}
-                                            disabled={parsingAi}
-                                            className="mt-4 w-full bg-blue-600 hover:bg-blue-500 text-white p-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-all active:scale-95 disabled:opacity-50"
-                                        >
-                                            <i className={`fas ${parsingAi ? 'fa-sync-alt fa-spin' : 'fa-magic'}`}></i>
-                                            تحليل البيانات بالذكاء الاصطناعي
-                                        </button>
-                                    </div>
-
-                                    {/* Form */}
-                                    <div className="grid md:grid-cols-2 gap-4">
-                                        <div className="space-y-1">
-                                            <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 px-1">رقم المرجع (Ref)</label>
-                                            <input 
-                                                className="w-full bg-slate-800/50 border border-white/10 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-blue-500/50 text-right"
-                                                placeholder="مثال: #1234"
-                                                value={formData.orderId}
-                                                onChange={(e) => setFormData({...formData, orderId: e.target.value})}
-                                            />
-                                        </div>
-                                        <div className="space-y-1">
-                                            <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 px-1">اسم العميل</label>
-                                            <input 
-                                                className="w-full bg-slate-800/50 border border-white/10 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-blue-500/50 text-right"
-                                                placeholder="الاسم الكامل"
-                                                value={formData.name}
-                                                onChange={(e) => setFormData({...formData, name: e.target.value})}
-                                            />
-                                        </div>
-                                    </div>
-
-                                    <div className="space-y-1">
-                                        <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 px-1">رقم الهاتف</label>
-                                        <input 
-                                            type="tel"
-                                            className="w-full bg-slate-800/50 border border-white/10 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-blue-500/50 text-right"
-                                            placeholder="05x-xxxxxxx"
-                                            value={formData.phone}
-                                            onChange={(e) => setFormData({...formData, phone: e.target.value})}
-                                        />
-                                    </div>
-
-                                    <div className="space-y-1">
-                                        <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 px-1">الأصناف المطلوبة</label>
-                                        <textarea 
-                                            className="w-full bg-slate-800/50 border border-white/10 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-blue-500/50 h-24 text-right"
-                                            placeholder="تفاصيل العطور أو العروض..."
-                                            value={formData.offer}
-                                            onChange={(e) => setFormData({...formData, offer: e.target.value})}
-                                        />
-                                    </div>
-
-                                    <div className="grid md:grid-cols-2 gap-4">
-                                        <div className="space-y-1">
-                                            <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 px-1">السعر (₪)</label>
-                                            <input 
-                                                type="number"
-                                                className="w-full bg-slate-800/50 border border-white/10 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-blue-500/50 font-bold text-blue-400 text-right"
-                                                placeholder="0.00"
-                                                value={formData.price}
-                                                onChange={(e) => setFormData({...formData, price: e.target.value})}
-                                            />
-                                        </div>
-                                        <div className="space-y-1">
-                                            <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 px-1">طريقة الدفع</label>
-                                            <select 
-                                                className="w-full bg-slate-800/50 border border-white/10 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-blue-500/50 text-right appearance-none"
-                                                value={formData.payment}
-                                                onChange={(e) => setFormData({...formData, payment: e.target.value})}
-                                            >
-                                                <option>دفع عند الاستلام</option>
-                                                <option>مدفوع مسبقاً</option>
-                                                <option>رابط دفع</option>
-                                            </select>
-                                        </div>
-                                    </div>
-
-                                    <div className="grid md:grid-cols-2 gap-4">
-                                        <div className="space-y-1">
-                                            <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 px-1">المدينة</label>
-                                            <input 
-                                                className="w-full bg-slate-800/50 border border-white/10 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-blue-500/50 text-right"
-                                                placeholder="اسم المدينة"
-                                                value={formData.city}
-                                                onChange={(e) => setFormData({...formData, city: e.target.value})}
-                                            />
-                                        </div>
-                                        <div className="space-y-1">
-                                            <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 px-1">شركة الشحن</label>
-                                            <select 
-                                                className="w-full bg-slate-800/50 border border-white/10 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-blue-500/50 text-right appearance-none"
-                                                value={formData.delivery}
-                                                onChange={(e) => setFormData({...formData, delivery: e.target.value})}
-                                            >
-                                                <option value="Hi Express">Hi Express (Olivery)</option>
-                                                <option value="Pickup">Pickup</option>
-                                            </select>
-                                        </div>
-                                    </div>
-
-                                    <div className="space-y-1">
-                                        <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 px-1">العنوان بالتفصيل</label>
-                                        <input 
-                                            className="w-full bg-slate-800/50 border border-white/10 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-blue-500/50 text-right"
-                                            placeholder="الشارع، رقم المنزل، ملاحظات الشحن..."
-                                            value={formData.address}
-                                            onChange={(e) => setFormData({...formData, address: e.target.value})}
-                                        />
-                                    </div>
-                                </div>
-
-                                <div className="p-8 bg-slate-900 border-t border-white/5 flex gap-4">
-                                    <button onClick={() => setIsModalOpen(false)} className="flex-1 bg-slate-800 hover:bg-slate-700 p-4 rounded-2xl font-bold transition-all">
-                                        إلغاء
-                                    </button>
-                                    <button 
-                                        onClick={handleSubmit} 
-                                        className="flex-[2] bg-blue-600 hover:bg-blue-500 p-4 rounded-2xl font-black text-white flex items-center justify-center gap-2 shadow-xl shadow-blue-600/20 transition-all active:scale-95"
-                                    >
-                                        <i className="fas fa-check-circle"></i>
-                                        {currentOrder ? 'تحديث البيانات' : 'حفظ الطلب الجديد'}
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    )}
-                </div>
-            );
+      const saveOrder = async () => {
+        setLoading(true);
+        const payload = {
+          ...formData,
+          action: currentOrder ? "updateOrder" : "addOrder",
+          row: currentOrder ? currentOrder.rowIndex : undefined,
+          status: currentOrder ? undefined : "جديد",
+          key: SECRET_KEY
         };
+        try{
+          const res = await fetch(SCRIPT_URL, {
+            method:"POST",
+            mode:"cors",
+            headers:{ "Content-Type":"text/plain;charset=utf-8" },
+            body: JSON.stringify(payload)
+          });
+          const data = await res.json();
+          if(data.result === "SUCCESS"){
+            notify("تم الحفظ بنجاح");
+            setIsModalOpen(false);
+            fetchData();
+          }else{
+            notify(data.message || "فشل الحفظ", "error");
+          }
+        }catch(e){
+          notify("فشل الحفظ", "error");
+        }finally{
+          setLoading(false);
+        }
+      };
 
-        const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<App />);
-    </script>
+      const handleAiParse = async () => {
+        if(!aiInput.trim()) return notify("الصق نص الطلب أولاً", "error");
+        setParsingAi(true);
+        try{
+          const res = await fetch(SCRIPT_URL, {
+            method:"POST",
+            mode:"cors",
+            headers:{ "Content-Type":"text/plain;charset=utf-8" },
+            body: JSON.stringify({ action:"analyze", text: aiInput, key: SECRET_KEY })
+          });
+          const data = await res.json();
+          if(data.result === "SUCCESS"){
+            const d = data.data || {};
+            setFormData(prev => ({
+              ...prev,
+              name: d.name || prev.name,
+              phone: d.phone || prev.phone,
+              city: d.city || prev.city,
+              address: d.address || prev.address,
+              price: d.price || prev.price,
+              offer: d.offer || prev.offer,
+              notes: d.notes || prev.notes,
+              orderId: d.orderId || prev.orderId
+            }));
+            notify("تم التحليل بواسطة Gemini ✨");
+          }else{
+            notify(data.message || "فشل التحليل", "error");
+          }
+        }catch(e){
+          notify("فشل تحليل AI", "error");
+        }finally{
+          setParsingAi(false);
+        }
+      };
+
+      const whatsappMsg = (order, lang) => {
+        const msg = (lang === "ar")
+          ? `أهلاً ${order.name}، طلبك من MAD جاهز وسيتم شحنه قريباً.`
+          : `שלום ${order.name}, ההזמנה שלך מ-MAD מוכנה ותשלח בקרוב.`;
+        let phone = String(order.phone || "").replace(/\D/g, "");
+        if(phone.startsWith("0")) phone = "972" + phone.slice(1);
+        window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, "_blank");
+      };
+
+      const shipNow = async (order) => {
+        setLoading(true);
+        const payload = { action:"sendToDelivery", row: order.rowIndex, key: SECRET_KEY, delivery: order.delivery || "Hi Express" };
+        const fallbackUrl = `${SCRIPT_URL}?action=sendToDelivery&row=${encodeURIComponent(order.rowIndex)}&key=${encodeURIComponent(SECRET_KEY)}`;
+
+        try{
+          const res = await fetch(SCRIPT_URL, {
+            method:"POST",
+            mode:"cors",
+            headers:{ "Content-Type":"text/plain;charset=utf-8" },
+            body: JSON.stringify(payload)
+          });
+          const data = await res.json();
+          if(data.result === "SUCCESS"){
+            notify(`✅ تم الشحن! بوليصة: ${data.delivery_order_id}`);
+            fetchData();
+          }else{
+            notify(`❌ فشل الشحن: ${data.message || "راجع notes في الشيت"}`, "error");
+          }
+        }catch(e){
+          window.open(fallbackUrl, "_blank");
+          notify("تم فتح رابط الشحن (Fallback)", "info");
+        }finally{
+          setLoading(false);
+        }
+      };
+
+      return (
+        <div className="min-h-screen text-slate-100 pb-24">
+          {toast.show && (
+            <div className={`fixed bottom-24 left-1/2 -translate-x-1/2 z-[60] px-6 py-3 rounded-full shadow-2xl flex items-center gap-3 animate-toast border ${
+              toast.type === 'error' ? 'bg-red-600 border-red-400' :
+              toast.type === 'info' ? 'bg-blue-600 border-blue-400' :
+              'bg-emerald-600 border-emerald-400'
+            }`}>
+              <i className={`fas ${toast.type === 'error' ? 'fa-times' : 'fa-check'}`}></i>
+              <span className="font-bold whitespace-nowrap">{toast.message}</span>
+            </div>
+          )}
+
+          {loading && (
+            <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-[100] flex flex-col items-center justify-center">
+              <div className="w-12 h-12 border-4 border-blue-500/20 border-t-blue-500 rounded-full animate-spin"></div>
+              <p className="mt-4 font-black text-blue-400 tracking-widest uppercase">MAD Loading...</p>
+            </div>
+          )}
+
+          <header className="sticky top-0 z-50 bg-slate-900/80 backdrop-blur-xl border-b border-white/5 px-4 py-4 shadow-2xl">
+            <div className="max-w-5xl mx-auto">
+              <div className="flex items-center justify-between mb-5">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-700 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/20">
+                    <i className="fas fa-box text-white text-xl"></i>
+                  </div>
+                  <div>
+                    <h1 className="text-xl font-black tracking-tighter">MAD <span className="text-blue-500">MANAGER</span></h1>
+                    <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Version 10.0</p>
+                  </div>
+                </div>
+
+                <div className="flex gap-2">
+                  <button onClick={fetchData} className="p-3 bg-slate-800 hover:bg-slate-700 rounded-xl transition-all border border-white/5 active:scale-95">
+                    <i className={`fas fa-sync-alt ${loading ? 'animate-spin text-blue-400' : 'text-slate-400'}`}></i>
+                  </button>
+                  <button onClick={() => openModal()} className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-bold flex items-center gap-2 transition-all shadow-lg shadow-blue-600/20 active:scale-95">
+                    <i className="fas fa-plus"></i>
+                    <span className="hidden sm:inline">طلب جديد</span>
+                  </button>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5">
+                <div className="bg-slate-800/50 p-4 rounded-2xl border border-white/5">
+                  <p className="text-slate-500 text-xs font-bold mb-1">إجمالي الطلبات</p>
+                  <p className="text-2xl font-black">{stats.total}</p>
+                </div>
+                <div className="bg-slate-800/50 p-4 rounded-2xl border border-white/5">
+                  <p className="text-blue-400 text-xs font-bold mb-1">بانتظار التجهيز</p>
+                  <p className="text-2xl font-black">{stats.pending}</p>
+                </div>
+                <div className="bg-slate-800/50 p-4 rounded-2xl border border-white/5">
+                  <p className="text-amber-400 text-xs font-bold mb-1">بالطريق</p>
+                  <p className="text-2xl font-black">{stats.shipping}</p>
+                </div>
+                <div className="bg-slate-800/50 p-4 rounded-2xl border border-white/5">
+                  <p className="text-emerald-400 text-xs font-bold mb-1">إجمالي المبيعات</p>
+                  <p className="text-2xl font-black text-emerald-500">₪{stats.revenue.toLocaleString()}</p>
+                </div>
+              </div>
+
+              <div className="flex flex-col md:flex-row gap-4">
+                <div className="relative flex-1">
+                  <i className="fas fa-search absolute right-4 top-1/2 -translate-y-1/2 text-slate-500"></i>
+                  <input
+                    className="w-full bg-slate-800/80 border border-white/10 rounded-xl py-3 pr-12 pl-4 text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all text-right"
+                    placeholder="ابحث بالاسم، الهاتف أو المرجع..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                  />
+                </div>
+                <div className="flex bg-slate-800/80 p-1 rounded-xl border border-white/10 overflow-x-auto no-scrollbar">
+                  {["All","New","Shipping","Done"].map(tab => (
+                    <button
+                      key={tab}
+                      onClick={() => setActiveTab(tab)}
+                      className={`px-4 py-2 rounded-lg text-sm font-bold transition-all whitespace-nowrap ${
+                        activeTab === tab ? "bg-blue-600 text-white shadow-lg" : "text-slate-400 hover:text-white"
+                      }`}
+                    >
+                      {tab === "All" ? "الكل" : tab === "New" ? "جديد" : tab === "Shipping" ? "بالطريق" : "تم التسليم"}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </header>
+
+          <main className="max-w-5xl mx-auto px-4 mt-8">
+            <div className="grid gap-4">
+              {filteredOrders.length ? filteredOrders.map((order, idx) => (
+                <div key={order.rowIndex || idx} className="bg-slate-900 border border-white/5 rounded-3xl p-5 hover:border-blue-500/30 transition-all group">
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="flex items-center gap-3">
+                      <span className="text-[10px] bg-slate-800 px-2 py-1 rounded text-slate-400 font-bold tracking-widest uppercase">
+                        REF: {String(order.orderId || "N/A")}
+                      </span>
+                      <span className={`text-[10px] font-black px-2 py-1 rounded-full uppercase ${
+                        String(order.status || "").includes("بالطريق") ? "bg-amber-500/10 text-amber-500" :
+                        String(order.status || "").includes("تم") ? "bg-emerald-500/10 text-emerald-500" :
+                        "bg-blue-500/10 text-blue-500"
+                      }`}>
+                        {String(order.status || "جديد")}
+                      </span>
+                    </div>
+                    <button onClick={() => openModal(order)} className="text-slate-500 hover:text-white p-2">
+                      <i className="fas fa-ellipsis-v"></i>
+                    </button>
+                  </div>
+
+                  <div className="flex flex-col md:flex-row md:items-center gap-6">
+                    <div className="flex-1 cursor-pointer" onClick={() => openModal(order)}>
+                      <h3 className="text-xl font-bold mb-2 group-hover:text-blue-400 transition-colors">{String(order.name || "مشتري مجهول")}</h3>
+                      <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-slate-400">
+                        <div className="flex items-center gap-2"><i className="fas fa-phone text-blue-500 text-xs"></i> {String(order.phone || "---")}</div>
+                        <div className="flex items-center gap-2"><i className="fas fa-map-marker-alt text-blue-500 text-xs"></i> {String(order.city || "")} {order.address && ` - ${String(order.address)}`}</div>
+                      </div>
+                      <div className="mt-4 bg-slate-800/50 border-r-4 border-blue-600 p-3 rounded-lg text-slate-300 text-sm leading-relaxed whitespace-pre-wrap">
+                        {String(order.offer || "لا توجد أصناف")}
+                      </div>
+                    </div>
+
+                    <div className="flex flex-col gap-3 min-w-[160px]">
+                      <div className="flex items-center justify-between text-lg font-black bg-slate-800 p-3 rounded-xl border border-white/5">
+                        <span className="text-slate-500 text-xs">المبلغ:</span>
+                        <span className="text-blue-500">₪{order.price || 0}</span>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-2">
+                        <button onClick={() => whatsappMsg(order, "ar")} className="flex flex-col items-center justify-center gap-1 p-2 bg-emerald-600/10 hover:bg-emerald-600 text-emerald-500 hover:text-white rounded-xl transition-all border border-emerald-500/20">
+                          <i className="fab fa-whatsapp text-lg"></i>
+                          <span className="text-[10px] font-bold">عربي</span>
+                        </button>
+                        <button onClick={() => whatsappMsg(order, "he")} className="flex flex-col items-center justify-center gap-1 p-2 bg-indigo-600/10 hover:bg-indigo-600 text-indigo-400 hover:text-white rounded-xl transition-all border border-indigo-500/20">
+                          <i className="fab fa-whatsapp text-lg"></i>
+                          <span className="text-[10px] font-bold">Heb</span>
+                        </button>
+                      </div>
+
+                      <button
+                        onClick={() => shipNow(order)}
+                        disabled={!!order.delivery_order_id}
+                        className={`flex items-center justify-center gap-2 p-3 rounded-xl font-bold transition-all ${
+                          order.delivery_order_id
+                            ? "bg-slate-800 text-emerald-500 border border-emerald-500/30 cursor-default"
+                            : "bg-amber-500 hover:bg-amber-400 text-slate-900 shadow-lg shadow-amber-500/20 active:scale-95"
+                        }`}
+                      >
+                        <i className="fas fa-truck"></i>
+                        <span className="text-xs uppercase">
+                          {order.delivery_order_id ? `بوليصة: ${order.delivery_order_id}` : "شحن الآن"}
+                        </span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )) : (
+                <div className="flex flex-col items-center justify-center py-20 opacity-20">
+                  <i className="fas fa-search text-6xl mb-4"></i>
+                  <p className="text-xl font-bold">لا يوجد نتائج لعرضها</p>
+                </div>
+              )}
+            </div>
+          </main>
+
+          {isModalOpen && (
+            <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/90 backdrop-blur-sm overflow-y-auto">
+              <div className="bg-slate-900 w-full max-w-2xl rounded-[2.5rem] border border-white/10 shadow-2xl overflow-hidden">
+                <div className="px-8 py-6 border-b border-white/5 flex items-center justify-between bg-slate-900/50 sticky top-0 backdrop-blur-lg">
+                  <h2 className="text-2xl font-black">{currentOrder ? "تعديل الطلب" : "إضافة طلب جديد"}</h2>
+                  <button onClick={() => setIsModalOpen(false)} className="p-2 hover:bg-slate-800 rounded-full transition-colors text-slate-400">
+                    <i className="fas fa-times text-xl"></i>
+                  </button>
+                </div>
+
+                <div className="p-8 space-y-6 max-h-[75vh] overflow-y-auto text-right">
+                  <div className="bg-blue-600/5 border border-blue-500/30 rounded-3xl p-6">
+                    <div className="flex items-center gap-2 mb-4">
+                      <i className="fas fa-robot text-blue-400"></i>
+                      <span className="font-black text-blue-400 text-sm uppercase tracking-widest">Gemini AI Parser</span>
+                    </div>
+                    <textarea
+                      className="w-full bg-slate-950/50 border border-white/10 rounded-2xl p-4 text-sm text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/50 h-28 transition-all text-right"
+                      placeholder="الصق نص الطلب هنا..."
+                      value={aiInput}
+                      onChange={(e) => setAiInput(e.target.value)}
+                    />
+                    <button
+                      onClick={handleAiParse}
+                      disabled={parsingAi}
+                      className="mt-4 w-full bg-blue-600 hover:bg-blue-500 text-white p-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-all active:scale-95 disabled:opacity-50"
+                    >
+                      <i className={`fas ${parsingAi ? "fa-sync-alt fa-spin" : "fa-magic"}`}></i>
+                      تحليل البيانات بالذكاء الاصطناعي
+                    </button>
+                  </div>
+
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 px-1">رقم المرجع</label>
+                      <input className="w-full bg-slate-800/50 border border-white/10 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-blue-500/50 text-right"
+                        value={formData.orderId} onChange={(e)=>setFormData({...formData, orderId:e.target.value})}/>
+                    </div>
+                    <div>
+                      <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 px-1">اسم العميل</label>
+                      <input className="w-full bg-slate-800/50 border border-white/10 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-blue-500/50 text-right"
+                        value={formData.name} onChange={(e)=>setFormData({...formData, name:e.target.value})}/>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 px-1">رقم الهاتف</label>
+                    <input type="tel" className="w-full bg-slate-800/50 border border-white/10 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-blue-500/50 text-right"
+                      value={formData.phone} onChange={(e)=>setFormData({...formData, phone:e.target.value})}/>
+                  </div>
+
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 px-1">المدينة</label>
+                      <input className="w-full bg-slate-800/50 border border-white/10 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-blue-500/50 text-right"
+                        value={formData.city} onChange={(e)=>setFormData({...formData, city:e.target.value})}/>
+                    </div>
+                    <div>
+                      <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 px-1">العنوان</label>
+                      <input className="w-full bg-slate-800/50 border border-white/10 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-blue-500/50 text-right"
+                        value={formData.address} onChange={(e)=>setFormData({...formData, address:e.target.value})}/>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 px-1">الأصناف المطلوبة</label>
+                    <textarea className="w-full bg-slate-800/50 border border-white/10 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-blue-500/50 h-20 text-right"
+                      value={formData.offer} onChange={(e)=>setFormData({...formData, offer:e.target.value})}/>
+                  </div>
+
+                  <div>
+                    <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 px-1">ملاحظات</label>
+                    <textarea className="w-full bg-slate-800/50 border border-white/10 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-blue-500/50 h-20 text-right"
+                      value={formData.notes} onChange={(e)=>setFormData({...formData, notes:e.target.value})}/>
+                  </div>
+
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 px-1">السعر ₪</label>
+                      <input type="number" className="w-full bg-slate-800/50 border border-white/10 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-blue-500/50 font-bold text-blue-400 text-right"
+                        value={formData.price} onChange={(e)=>setFormData({...formData, price:e.target.value})}/>
+                    </div>
+                    <div>
+                      <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 px-1">طريقة الدفع</label>
+                      <select className="w-full bg-slate-800/50 border border-white/10 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-blue-500/50 text-right"
+                        value={formData.payment} onChange={(e)=>setFormData({...formData, payment:e.target.value})}>
+                        <option>دفع عند الاستلام</option>
+                        <option>مدفوع مسبقاً</option>
+                        <option>رابط دفع</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="p-8 bg-slate-900 border-t border-white/5 flex gap-4">
+                  <button onClick={() => setIsModalOpen(false)} className="flex-1 bg-slate-800 hover:bg-slate-700 p-4 rounded-2xl font-bold transition-all">
+                    إلغاء
+                  </button>
+                  <button onClick={saveOrder} className="flex-[2] bg-blue-600 hover:bg-blue-500 p-4 rounded-2xl font-black text-white flex items-center justify-center gap-2 shadow-xl shadow-blue-600/20 transition-all active:scale-95">
+                    <i className="fas fa-check-circle"></i>
+                    {currentOrder ? "تحديث البيانات" : "حفظ الطلب الجديد"}
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+  </script>
 </body>
 </html>
