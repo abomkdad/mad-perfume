@@ -1,193 +1,115 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MAD Orders</title>
-  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>MAD → Olivery</title>
+  <style>
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial; margin:20px; max-width:900px}
+    .card{border:1px solid #ddd; border-radius:12px; padding:16px; margin-bottom:16px}
+    input,textarea,select,button{width:100%; padding:10px; border-radius:10px; border:1px solid #ccc; font-size:14px}
+    button{cursor:pointer}
+    .row{display:grid; grid-template-columns:1fr 1fr; gap:10px}
+    pre{background:#111; color:#eee; padding:12px; border-radius:12px; overflow:auto}
+    .hint{color:#666; font-size:13px}
+  </style>
 </head>
-<body class="bg-slate-950 text-white">
-  <div id="root"></div>
+<body>
+  <h2>إرسال طلب إلى Olivery</h2>
 
-  <script type="text/babel">
-    const { useEffect, useMemo, useState } = React;
+  <div class="card">
+    <div class="row">
+      <div>
+        <label>الاسم</label>
+        <input id="name" placeholder="مثال: محمد" />
+      </div>
+      <div>
+        <label>الهاتف</label>
+        <input id="phone" placeholder="مثال: 9725..." />
+      </div>
+    </div>
 
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwL-rityG02dO4q3LAmwjWa-rQhHv1qNOXlSyOR2yZv6rM9bfTXz1EiTETTn3_69pPHCA/exec";
-    const KEY = "12345678";
+    <div class="row" style="margin-top:10px">
+      <div>
+        <label>المدينة / المنطقة</label>
+        <input id="city" placeholder="مثال: سلفيت / تل أبيب ..." />
+      </div>
+      <div>
+        <label>السعر</label>
+        <input id="price" placeholder="مثال: 350" />
+      </div>
+    </div>
 
-    function App(){
-      const [orders, setOrders] = useState([]);
-      const [loading, setLoading] = useState(false);
-      const [q, setQ] = useState("");
-      const [modal, setModal] = useState(false);
-      const [current, setCurrent] = useState(null);
+    <div style="margin-top:10px">
+      <label>العنوان</label>
+      <input id="address" placeholder="العنوان بالتفصيل" />
+    </div>
 
-      const [form, setForm] = useState({
-        orderId:"", name:"", phone:"", city:"", address:"",
-        price:"", payment:"دفع عند الاستلام",
-        offer:"", notes:"", delivery:"Hi Express"
-      });
+    <div class="row" style="margin-top:10px">
+      <div>
+        <label>Reference / Order ID (اختياري)</label>
+        <input id="ref" placeholder="MAD-12345" />
+      </div>
+      <div>
+        <label>Paid</label>
+        <select id="paid">
+          <option value="false">false</option>
+          <option value="true">true</option>
+        </select>
+      </div>
+    </div>
 
-      const fetchOrders = async () => {
-        setLoading(true);
-        try{
-          const res = await fetch(`${SCRIPT_URL}?action=get&key=${KEY}&t=${Date.now()}`);
-          const data = await res.json();
-          setOrders(Array.isArray(data) ? data : []);
-        } finally {
-          setLoading(false);
-        }
-      };
+    <div style="margin-top:10px">
+      <label>ملاحظات</label>
+      <textarea id="notes" rows="3" placeholder="ملاحظات للطلب"></textarea>
+    </div>
 
-      useEffect(() => { fetchOrders(); }, []);
+    <div class="row" style="margin-top:10px">
+      <button onclick="sendOrder()">إرسال الطلب</button>
+      <button onclick="testOlivery()">فحص الاتصال (status)</button>
+    </div>
 
-      const filtered = useMemo(() => {
-        const s = q.toLowerCase();
-        return orders.filter(o =>
-          String(o.name||"").toLowerCase().includes(s) ||
-          String(o.phone||"").includes(s) ||
-          String(o.orderId||"").includes(s)
-        ).reverse();
-      }, [orders, q]);
+    <p class="hint">ملاحظة: إذا Olivery رجّع HTML/500 رح تشوفه في RAW.</p>
+  </div>
 
-      const open = (o=null) => {
-        setCurrent(o);
-        if(o){
-          setForm({
-            orderId:o.orderId||"", name:o.name||"", phone:o.phone||"",
-            city:o.city||"", address:o.address||"", price:o.price||"",
-            payment:o.payment||"دفع عند الاستلام", offer:o.offer||"",
-            notes:o.notes||"", delivery:o.delivery||"Hi Express"
-          });
-        } else {
-          setForm({
-            orderId:"", name:"", phone:"", city:"", address:"",
-            price:"", payment:"دفع عند الاستلام",
-            offer:"", notes:"", delivery:"Hi Express"
-          });
-        }
-        setModal(true);
-      };
+  <div class="card">
+    <h3>النتيجة</h3>
+    <pre id="out">{}</pre>
+  </div>
 
-      const save = async () => {
-        setLoading(true);
-        const payload = {
-          ...form,
-          action: current ? "updateOrder" : "addOrder",
-          row: current ? current.rowIndex : undefined,
-          status: current ? undefined : "جديد",
-          key: KEY
-        };
+<script>
+  function $(id){ return document.getElementById(id); }
 
-        try{
-          const res = await fetch(SCRIPT_URL, {
-            method:"POST",
-            headers:{ "Content-Type":"text/plain;charset=utf-8" },
-            body: JSON.stringify(payload)
-          });
-          const data = await res.json();
-          alert(JSON.stringify(data,null,2));
-          setModal(false);
-          fetchOrders();
-        } finally {
-          setLoading(false);
-        }
-      };
+  async function post(action, payload) {
+    const res = await fetch(location.href, {
+      method: "POST",
+      headers: {"Content-Type":"application/json"},
+      body: JSON.stringify({ action, ...payload })
+    });
+    const txt = await res.text();
+    try { return JSON.parse(txt); } catch(e) { return {result:"ERROR", message:"Response not JSON", raw: txt}; }
+  }
 
-      const ship = async (o) => {
-        setLoading(true);
-        try{
-          const res = await fetch(SCRIPT_URL, {
-            method:"POST",
-            headers:{ "Content-Type":"text/plain;charset=utf-8" },
-            body: JSON.stringify({ action:"sendToDelivery", row:o.rowIndex, key:KEY })
-          });
-          const data = await res.json();
-          alert(JSON.stringify(data,null,2));
-          fetchOrders();
-        } finally {
-          setLoading(false);
-        }
-      };
+  async function sendOrder(){
+    const payload = {
+      customer_name: $("name").value,
+      customer_mobile: $("phone").value,
+      customer_area: $("city").value,
+      customer_address: $("address").value,
+      cost: $("price").value,
+      reference_id: $("ref").value,
+      note: $("notes").value,
+      paid: $("paid").value === "true"
+    };
 
-      return (
-        <div className="max-w-4xl mx-auto p-4">
-          <div className="flex gap-2 mb-4">
-            <input className="flex-1 bg-slate-900 p-3 rounded-xl" placeholder="بحث..." value={q} onChange={e=>setQ(e.target.value)} />
-            <button className="bg-blue-600 px-4 rounded-xl" onClick={fetchOrders}>تحديث</button>
-            <button className="bg-emerald-600 px-4 rounded-xl" onClick={()=>open(null)}>طلب جديد</button>
-          </div>
+    const out = await post("create_order", { payload });
+    $("out").textContent = JSON.stringify(out, null, 2);
+  }
 
-          {loading && <div className="mb-3 text-blue-400">Loading...</div>}
-
-          <div className="grid gap-3">
-            {filtered.map(o=>(
-              <div key={o.rowIndex} className="bg-slate-900 p-4 rounded-2xl border border-white/10">
-                <div className="flex justify-between items-center gap-3">
-                  <div className="min-w-0">
-                    <div className="font-bold truncate">{o.name} — {o.phone}</div>
-                    <div className="text-sm text-slate-400 truncate">{o.city} — {o.address}</div>
-                    <div className="text-sm mt-2 whitespace-pre-wrap">{o.offer}</div>
-                    <div className="text-xs text-slate-500 mt-2">Status: {o.status || "جديد"}</div>
-                  </div>
-
-                  <div className="flex flex-col gap-2">
-                    <button className="bg-slate-800 px-4 py-2 rounded-xl" onClick={()=>open(o)}>تعديل</button>
-                    <button
-                      className={`px-4 py-2 rounded-xl font-bold ${o.delivery_order_id ? "bg-emerald-700" : "bg-amber-500 text-slate-900"}`}
-                      disabled={!!o.delivery_order_id}
-                      onClick={()=>ship(o)}
-                    >
-                      {o.delivery_order_id ? `بوليصة: ${o.delivery_order_id}` : "شحن الآن"}
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {modal && (
-            <div className="fixed inset-0 bg-black/70 flex items-center justify-center p-4">
-              <div className="bg-slate-900 w-full max-w-xl rounded-2xl p-5 border border-white/10">
-                <div className="flex justify-between items-center mb-4">
-                  <div className="font-black text-lg">{current ? "تعديل طلب" : "طلب جديد"}</div>
-                  <button className="bg-slate-800 px-3 py-1 rounded-xl" onClick={()=>setModal(false)}>إغلاق</button>
-                </div>
-
-                <div className="grid grid-cols-2 gap-3">
-                  <input className="bg-slate-800 p-3 rounded-xl" placeholder="orderId" value={form.orderId} onChange={e=>setForm({...form, orderId:e.target.value})}/>
-                  <input className="bg-slate-800 p-3 rounded-xl" placeholder="name" value={form.name} onChange={e=>setForm({...form, name:e.target.value})}/>
-                  <input className="bg-slate-800 p-3 rounded-xl" placeholder="phone" value={form.phone} onChange={e=>setForm({...form, phone:e.target.value})}/>
-                  <input className="bg-slate-800 p-3 rounded-xl" placeholder="city" value={form.city} onChange={e=>setForm({...form, city:e.target.value})}/>
-                </div>
-
-                <input className="bg-slate-800 p-3 rounded-xl w-full mt-3" placeholder="address" value={form.address} onChange={e=>setForm({...form, address:e.target.value})}/>
-                <textarea className="bg-slate-800 p-3 rounded-xl w-full mt-3" placeholder="offer" value={form.offer} onChange={e=>setForm({...form, offer:e.target.value})}></textarea>
-                <textarea className="bg-slate-800 p-3 rounded-xl w-full mt-3" placeholder="notes" value={form.notes} onChange={e=>setForm({...form, notes:e.target.value})}></textarea>
-
-                <div className="grid grid-cols-2 gap-3 mt-3">
-                  <input type="number" className="bg-slate-800 p-3 rounded-xl" placeholder="price" value={form.price} onChange={e=>setForm({...form, price:e.target.value})}/>
-                  <select className="bg-slate-800 p-3 rounded-xl" value={form.payment} onChange={e=>setForm({...form, payment:e.target.value})}>
-                    <option>دفع عند الاستلام</option>
-                    <option>مدفوع مسبقاً</option>
-                    <option>رابط دفع</option>
-                  </select>
-                </div>
-
-                <button className="bg-blue-600 w-full mt-4 py-3 rounded-xl font-black" onClick={save}>
-                  حفظ
-                </button>
-              </div>
-            </div>
-          )}
-        </div>
-      );
-    }
-
-    ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
-  </script>
+  async function testOlivery(){
+    const out = await post("test_olivery", {});
+    $("out").textContent = JSON.stringify(out, null, 2);
+  }
+</script>
 </body>
 </html>
