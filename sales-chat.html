@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>دردشة المبيعات | MAD Perfume</title>
+  <meta name="description" content="تواصل مباشر مع موظف المبيعات عبر دردشة MAD Perfume" />
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@500;700;900&display=swap');
+
+    :root {
+      --bg: #fdf7ec;
+      --bg-soft: #fffdf8;
+      --surface: #ffffff;
+      --ink: #1f2937;
+      --muted: #6b7280;
+      --line: #eadfca;
+      --brand: #b7791f;
+      --brand-strong: #8b5e18;
+      --accent: #14532d;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: 'Cairo', sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(900px 360px at 100% -20%, #ffe8b7 0%, transparent 60%),
+        radial-gradient(900px 360px at 0% 120%, #d9f99d 0%, transparent 58%),
+        linear-gradient(180deg, var(--bg), var(--bg-soft));
+      display: grid;
+      place-items: center;
+      padding: 20px;
+    }
+
+    .panel {
+      width: min(760px, 100%);
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      padding: clamp(20px, 4vw, 34px);
+      box-shadow: 0 18px 40px rgba(36, 23, 8, 0.12);
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 12px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--brand-strong);
+      background: #fff4db;
+      border: 1px solid #f3dfb0;
+    }
+
+    h1 {
+      margin: 14px 0 10px;
+      font-size: clamp(26px, 4vw, 38px);
+      line-height: 1.2;
+      font-weight: 900;
+      color: #111827;
+    }
+
+    p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.9;
+      font-size: clamp(15px, 2.6vw, 17px);
+      font-weight: 700;
+    }
+
+    .actions {
+      margin-top: 24px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .btn {
+      border: 0;
+      border-radius: 14px;
+      padding: 12px 18px;
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 900;
+      text-decoration: none;
+      cursor: pointer;
+      transition: transform .12s ease, box-shadow .18s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+    }
+
+    .btn-primary {
+      color: #fff;
+      background: linear-gradient(135deg, #c6862f 0%, #8b5e18 100%);
+      box-shadow: 0 10px 22px rgba(139, 94, 24, 0.24);
+    }
+
+    .btn-secondary {
+      color: var(--accent);
+      background: #f0fdf4;
+      border: 1px solid #c7eecf;
+    }
+
+    .hint {
+      margin-top: 18px;
+      padding: 14px;
+      border-radius: 14px;
+      border: 1px dashed #d8c39b;
+      background: #fffbf1;
+      color: #7a5a28;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    @media (max-width: 640px) {
+      .panel { border-radius: 22px; }
+      .actions { flex-direction: column; }
+      .btn { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <main class="panel">
+    <span class="badge">مركز المبيعات</span>
+    <h1>تواصل مباشرة مع موظف المبيعات</h1>
+    <p>
+      أهلًا بك. هذه الصفحة مخصصة للدردشة الفورية مع فريق المبيعات لمتابعة الأسعار، العروض، وحالة الطلبات.
+      اضغط زر الدردشة أو فقاعة الشات التي تظهر أسفل الصفحة.
+    </p>
+
+    <div class="actions">
+      <button class="btn btn-primary" type="button" onclick="openSalesChat()">افتح الدردشة الآن</button>
+      <a class="btn btn-secondary" href="https://wa.me/9725558106988" target="_blank" rel="noopener">واتساب المبيعات</a>
+    </div>
+
+    <div class="hint" id="chatHint">
+      إذا لم تُفتح النافذة مباشرة، اضغط على أيقونة الدردشة العائمة أسفل يمين الشاشة.
+    </div>
+  </main>
+
+  <script>
+    function openSalesChat() {
+      const maybeApis = [
+        window.__respondWidget,
+        window.respond,
+        window.respondio
+      ];
+
+      for (const api of maybeApis) {
+        if (!api) continue;
+        if (typeof api.open === 'function') {
+          api.open();
+          return;
+        }
+        if (typeof api.toggle === 'function') {
+          api.toggle();
+          return;
+        }
+      }
+
+      const hint = document.getElementById('chatHint');
+      if (hint) {
+        hint.textContent = 'تم تحميل صفحة الدردشة. اضغط على فقاعة الشات أسفل الصفحة للبدء.';
+      }
+    }
+  </script>
+
+  <!-- This site is converting visitors into subscribers and customers with https://respond.io -->
+  <script id="respondio__widget" src="https://cdn.respond.io/webchat/widget/widget.js?cId=7df11f0c81a76b774961209256f2f0e"></script>
+  <!-- https://respond.io -->
+</body>
+</html>
