@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>دردشة المبيعات | MAD Perfume</title>
-  <meta name="description" content="تواصل مباشر مع موظف المبيعات عبر دردشة MAD Perfume" />
+  <meta id="metaDescription" name="description" content="تواصل مباشر مع موظف المبيعات عبر دردشة MAD Perfume" />
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@500;700;900&display=swap');
 
@@ -132,16 +132,16 @@
 </head>
 <body>
   <main class="panel">
-    <span class="badge">مركز المبيعات</span>
-    <h1>تواصل مباشرة مع موظف المبيعات</h1>
-    <p>
+    <span class="badge" id="badgeText">مركز المبيعات</span>
+    <h1 id="pageTitle">تواصل مباشرة مع موظف المبيعات</h1>
+    <p id="pageDescription">
       أهلًا بك. هذه الصفحة مخصصة للدردشة الفورية مع فريق المبيعات لمتابعة الأسعار، العروض، وحالة الطلبات.
       اضغط زر الدردشة أو فقاعة الشات التي تظهر أسفل الصفحة.
     </p>
 
     <div class="actions">
-      <button class="btn btn-primary" type="button" onclick="openSalesChat()">افتح الدردشة الآن</button>
-      <a class="btn btn-secondary" href="https://wa.me/9725558106988" target="_blank" rel="noopener">واتساب المبيعات</a>
+      <button class="btn btn-primary" type="button" onclick="openSalesChat()" id="openChatBtn">افتح الدردشة الآن</button>
+      <a class="btn btn-secondary" href="https://wa.me/15558106988" target="_blank" rel="noopener" id="waBtn">واتساب المبيعات</a>
     </div>
 
     <div class="hint" id="chatHint">
@@ -150,6 +150,85 @@
   </main>
 
   <script>
+    const I18N = {
+      ar: {
+        htmlLang: 'ar',
+        dir: 'rtl',
+        docTitle: 'دردشة المبيعات | MAD Perfume',
+        metaDescription: 'تواصل مباشر مع موظف المبيعات عبر دردشة MAD Perfume',
+        badge: 'مركز المبيعات',
+        title: 'تواصل مباشرة مع موظف المبيعات',
+        description: 'أهلًا بك. هذه الصفحة مخصصة للدردشة الفورية مع فريق المبيعات لمتابعة الأسعار، العروض، وحالة الطلبات. اضغط زر الدردشة أو فقاعة الشات التي تظهر أسفل الصفحة.',
+        openBtn: 'افتح الدردشة الآن',
+        waBtn: 'واتساب المبيعات',
+        hint: 'إذا لم تُفتح النافذة مباشرة، اضغط على أيقونة الدردشة العائمة أسفل يمين الشاشة.',
+        fallbackHint: 'تم تحميل صفحة الدردشة. اضغط على فقاعة الشات أسفل الصفحة للبدء.'
+      },
+      he: {
+        htmlLang: 'he',
+        dir: 'rtl',
+        docTitle: 'צ׳אט מכירות | MAD Perfume',
+        metaDescription: 'צ׳אט ישיר עם נציג המכירות של MAD Perfume',
+        badge: 'מרכז מכירות',
+        title: 'דברו ישירות עם נציג המכירות',
+        description: 'ברוכים הבאים. דף זה מיועד לצ׳אט מיידי עם צוות המכירות עבור מחירים, מבצעים ומעקב הזמנות. לחצו על כפתור הצ׳אט או על בועת הצ׳אט שמופיעה בתחתית הדף.',
+        openBtn: 'פתח צ׳אט עכשיו',
+        waBtn: 'וואטסאפ מכירות',
+        hint: 'אם החלון לא נפתח מיד, לחצו על בועת הצ׳אט הצפה בתחתית המסך.',
+        fallbackHint: 'הצ׳אט נטען. לחצו על בועת הצ׳אט בתחתית הדף כדי להתחיל.'
+      },
+      en: {
+        htmlLang: 'en',
+        dir: 'ltr',
+        docTitle: 'Sales Chat | MAD Perfume',
+        metaDescription: 'Direct chat with MAD Perfume sales representative',
+        badge: 'Sales Center',
+        title: 'Chat directly with a sales representative',
+        description: 'Welcome. This page is for real-time chat with our sales team for prices, offers, and order updates. Tap the chat button or the floating chat bubble below.',
+        openBtn: 'Open Chat Now',
+        waBtn: 'Sales WhatsApp',
+        hint: 'If the window does not open immediately, tap the floating chat bubble at the bottom of the screen.',
+        fallbackHint: 'The chat is loaded. Tap the floating chat bubble below to start.'
+      }
+    };
+
+    let activeLocale = I18N.ar;
+
+    function detectLanguage() {
+      const override = new URLSearchParams(window.location.search).get('lang');
+      const normalizedOverride = String(override || '').toLowerCase();
+      if (normalizedOverride && I18N[normalizedOverride]) return normalizedOverride;
+
+      const candidates = Array.isArray(navigator.languages) && navigator.languages.length
+        ? navigator.languages
+        : [navigator.language || 'ar'];
+
+      for (const raw of candidates) {
+        const code = String(raw || '').toLowerCase();
+        if (code.startsWith('ar')) return 'ar';
+        if (code.startsWith('he') || code.startsWith('iw')) return 'he';
+        if (code.startsWith('en')) return 'en';
+      }
+      return 'ar';
+    }
+
+    function applyLanguage(langCode) {
+      activeLocale = I18N[langCode] || I18N.ar;
+      document.documentElement.lang = activeLocale.htmlLang;
+      document.documentElement.dir = activeLocale.dir;
+      document.title = activeLocale.docTitle;
+
+      const meta = document.getElementById('metaDescription');
+      if (meta) meta.setAttribute('content', activeLocale.metaDescription);
+
+      document.getElementById('badgeText').textContent = activeLocale.badge;
+      document.getElementById('pageTitle').textContent = activeLocale.title;
+      document.getElementById('pageDescription').textContent = activeLocale.description;
+      document.getElementById('openChatBtn').textContent = activeLocale.openBtn;
+      document.getElementById('waBtn').textContent = activeLocale.waBtn;
+      document.getElementById('chatHint').textContent = activeLocale.hint;
+    }
+
     function openSalesChat() {
       const maybeApis = [
         window.__respondWidget,
@@ -171,9 +250,11 @@
 
       const hint = document.getElementById('chatHint');
       if (hint) {
-        hint.textContent = 'تم تحميل صفحة الدردشة. اضغط على فقاعة الشات أسفل الصفحة للبدء.';
+        hint.textContent = activeLocale.fallbackHint;
       }
     }
+
+    applyLanguage(detectLanguage());
   </script>
 
   <!-- This site is converting visitors into subscribers and customers with https://respond.io -->
