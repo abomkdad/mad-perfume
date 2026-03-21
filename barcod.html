@@ -106,7 +106,894 @@
     lucide.createIcons();
     
     // 🟢 رابط الـ API الخاص بك
-    const API_URL = "https://script.google.com/macros/s/AKfycbyG7BwpbicVf-1oer8B8n_m2q45MkEl75GgbVmjKBzElRmHK_AKJCzFul1CrTpcbHU/exec";
+    const API_URL = "<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MAD PRINT - الموظف</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
+  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap');
+    body { font-family: 'Tajawal', sans-serif; background: #0f172a; color: #f8fafc; }
+    .modal-active { display: flex !important; }
+
+    .toast { position: fixed; top: 18px; left: 50%; transform: translateX(-50%); z-index: 99999; min-width: 260px; max-width: 90vw; padding: 14px 18px; border-radius: 14px; color: #fff; font-weight: 900; font-size: 14px; box-shadow: 0 20px 40px -20px rgba(0,0,0,.5); display: none; text-align: center; }
+    .toast.show { display: block; }
+    .toast.success { background: linear-gradient(90deg, #059669, #10b981); }
+    .toast.error { background: linear-gradient(90deg, #dc2626, #ef4444); }
+    .busy-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.7); z-index: 9999; display: none; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
+    .busy-overlay.show { display: flex; }
+
+    .field { width: 100%; min-height: 48px; border-radius: 14px; border: 1px solid #334155; background: #0f172a; color: #f8fafc; padding: 10px 14px; font-size: 14px; font-weight: 700; outline: none; transition: all .2s ease; }
+    .field:focus { border-color: #3b82f6; background: #1e293b; box-shadow: 0 0 0 4px rgba(59,130,246,.15); }
+
+    .product-badge { display: inline-block; padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 900; margin-top: 4px; }
+    .gender-women { background: rgba(190, 24, 93, 0.2); color: #f472b6; border: 1px solid rgba(244, 114, 182, 0.3); }
+    .gender-men { background: rgba(29, 78, 216, 0.2); color: #60a5fa; border: 1px solid rgba(96, 165, 250, 0.3); }
+    .gender-unisex { background: rgba(180, 83, 9, 0.2); color: #fbbf24; border: 1px solid rgba(251, 191, 36, 0.3); }
+
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: #1e293b; }
+    ::-webkit-scrollbar-thumb { background: #475569; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #64748b; }
+
+    #reader video {
+      border-radius: 16px;
+      object-fit: cover;
+      width: 100% !important;
+      height: 100% !important;
+    }
+    #reader { border: none !important; }
+  </style>
+</head>
+<body class="text-slate-200 pb-10 relative">
+  <div id="toastBox" class="toast"></div>
+  <div id="busyOverlay" class="busy-overlay"><div class="bg-slate-800 p-6 rounded-3xl shadow-2xl flex flex-col items-center border border-slate-700"><i data-lucide="loader-2" class="w-10 h-10 text-blue-500 animate-spin mb-3"></i><b class="text-white font-black text-center" id="busyText">جاري المعالجة...</b></div></div>
+
+  <div id="cameraModal" class="fixed inset-0 bg-slate-950/95 z-[4000] hidden flex-col items-center justify-center p-4 backdrop-blur-lg">
+    <div class="w-full max-w-md bg-slate-800 rounded-3xl overflow-hidden border border-slate-700 shadow-2xl">
+      <div class="p-4 flex justify-between items-center border-b border-slate-700 bg-slate-900/50">
+         <h3 class="text-white font-black text-lg flex items-center gap-2"><i data-lucide="camera" class="w-5 h-5 text-blue-400"></i> كاميرا الباركود</h3>
+         <button onclick="closeCameraScanner()" class="text-slate-400 hover:text-rose-500 transition bg-slate-800 rounded-full p-2"><i data-lucide="x" class="w-6 h-6"></i></button>
+      </div>
+      <div id="reader" class="w-full min-h-[300px] bg-black relative"></div>
+      <div class="p-4 text-center text-slate-400 text-sm font-bold bg-slate-900/50 border-t border-slate-700">
+         وجه الكاميرا نحو الباركود ليتم التقاطه تلقائياً 📦
+      </div>
+    </div>
+  </div>
+
+  <div id="returnsModal" class="fixed inset-0 bg-slate-950/90 z-[3000] hidden items-center justify-center p-4 backdrop-blur-md">
+    <div class="bg-slate-800 w-full max-w-xl rounded-3xl shadow-2xl border border-slate-700 overflow-hidden flex flex-col max-h-[90vh]">
+      <div class="flex justify-between items-center p-5 border-b border-slate-700 bg-slate-800">
+        <div class="flex items-center gap-3">
+          <div class="w-12 h-12 rounded-2xl bg-rose-900/30 flex items-center justify-center text-rose-500 border border-rose-800/50">
+            <i data-lucide="package-x" class="w-6 h-6"></i>
+          </div>
+          <div>
+             <h2 class="text-xl font-black text-white">إرجاع طلقة</h2>
+             <div class="text-xs text-slate-400 font-bold mt-1">استخدم الكاميرا أو المسدس للإرجاع التلقائي</div>
+          </div>
+        </div>
+        <button onclick="closeReturnsModal()" class="w-10 h-10 flex items-center justify-center rounded-full bg-slate-700 text-slate-400 hover:bg-rose-600 hover:text-white transition shadow-sm">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div class="p-6 overflow-y-auto flex flex-col gap-5">
+
+        <div>
+          <h4 class="text-sm font-black text-rose-400 mb-2 flex items-center gap-1">
+            <i data-lucide="alert-circle" class="w-4 h-4"></i> 1. اختر سبب الإرجاع (إجباري):
+          </h4>
+          <select id="returnReasonSelect" class="field !min-h-[50px] !border-rose-500/50 focus:!border-rose-500" onchange="checkCustomReason()">
+            <option value="">-- اضغط لاختيار السبب --</option>
+            <option value="العميل لا يرد على الهاتف">العميل لا يرد على الهاتف 📵</option>
+            <option value="رفض الاستلام / غيّر رأيه">رفض الاستلام / غيّر رأيه ❌</option>
+            <option value="العنوان خاطئ או غیر מכתמל">العنوان خاطئ أو غير مكتمل 📍</option>
+            <option value="تأخير في التوصيل">تأخير في التوصيل ⏳</option>
+            <option value="OTHER">سبب آخر (كتابة يدوية) ✍️</option>
+          </select>
+          <div id="customReasonBox" class="hidden mt-3">
+            <input type="text" id="customReasonInput" class="field" placeholder="اكتب سبب الإرجاع التفصيلي...">
+          </div>
+        </div>
+
+        <div class="pt-4 border-t border-slate-700">
+          <h4 class="text-sm font-black text-slate-300 mb-3 flex items-center gap-1">
+            <i data-lucide="scan-line" class="w-4 h-4"></i> 2. امسح الباركود:
+          </h4>
+          <div class="flex items-stretch gap-2">
+            <div class="relative flex-1">
+              <input type="text" id="returnBarcodeInp" class="field !text-2xl !tracking-widest font-mono !min-h-[70px] !border-4 !border-slate-600 focus:!border-blue-500 pl-12 text-center shadow-inner" placeholder="مسدس أو هاتف..." dir="ltr" onkeypress="handleAutoReturn(event)">
+              <i data-lucide="barcode" class="absolute left-4 top-6 w-6 h-6 text-slate-500"></i>
+            </div>
+            <button onclick="startCameraScanner()" class="bg-blue-600 hover:bg-blue-500 text-white min-h-[70px] px-6 rounded-xl font-black shadow-lg shadow-blue-900/30 flex flex-col items-center justify-center transition-colors border border-blue-500">
+              <i data-lucide="camera" class="w-7 h-7 mb-1"></i>
+              <span class="text-[11px]">كاميرا</span>
+            </button>
+          </div>
+        </div>
+
+        <div id="returnStatusBox" class="text-center font-black text-lg h-14 mt-2 flex items-center justify-center bg-slate-900/50 rounded-xl border border-slate-700/50 transition-colors">
+          <span class="text-slate-500 text-sm">حدد السبب أعلاه لتبدأ المسح...</span>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <div class="max-w-4xl mx-auto p-4 space-y-4">
+    <div class="bg-slate-800 rounded-3xl border border-slate-700 p-4 flex flex-col md:flex-row items-center justify-between gap-4 sticky top-2 z-20 shadow-md">
+      <h1 class="text-2xl font-black text-white flex items-center gap-2">
+        <i data-lucide="package-search" class="w-6 h-6 text-blue-500"></i> MAD PRINT - التجهيز
+      </h1>
+      <div class="flex items-center gap-2 w-full md:w-auto">
+        <button type="button" onclick="openReturnsModal()" class="bg-rose-900/30 text-rose-400 border border-rose-800/50 px-4 py-3 rounded-2xl font-black hover:bg-rose-900/50 transition-colors shadow-lg flex items-center gap-2">
+          <i data-lucide="package-x" class="w-5 h-5"></i> الرواجع
+        </button>
+
+        <select id="prepEmployee" class="bg-slate-700 border border-slate-600 text-white rounded-2xl px-3 py-3 font-black text-sm outline-none focus:ring-2 focus:ring-blue-500 flex-1 md:flex-none">
+          <option value="">اسمك...</option>
+          <option value="عبير">عبير</option>
+          <option value="الاء">الاء</option>
+          <option value="ليلى">ليلى</option>
+          <option value="مهى">مهى</option>
+        </select>
+        <button id="refreshBtn" onclick="loadCatalogAndOrders()" class="bg-blue-600 text-white px-5 py-3 rounded-2xl font-black hover:bg-blue-500 transition-colors shadow-lg shadow-blue-900/50 flex items-center gap-2">
+          <i data-lucide="refresh-cw" class="w-4 h-4"></i> تحديث
+        </button>
+      </div>
+    </div>
+
+    <div class="bg-slate-800 rounded-2xl border border-slate-700 p-3 shadow-sm">
+      <div class="flex flex-wrap items-center gap-2">
+        <label class="inline-flex items-center gap-2 text-sm font-black text-slate-300">
+          <input id="selectAllOrders" type="checkbox" onchange="toggleSelectAll(this.checked)" class="w-4 h-4 rounded text-blue-500 bg-slate-700 border-slate-600 focus:ring-blue-500 focus:ring-offset-slate-800 cursor-pointer">
+          تحديد الكل
+        </label>
+
+        <label class="inline-flex items-center gap-2 text-sm font-black text-indigo-400 bg-indigo-900/40 border border-indigo-700/50 rounded-xl px-3 py-2 mr-2 cursor-pointer hover:bg-indigo-800/50 transition-colors">
+          <input id="showPreviousOrders" type="checkbox" onchange="render()" class="rounded text-indigo-500 bg-slate-700 border-slate-600 focus:ring-indigo-500 focus:ring-offset-slate-800 cursor-pointer">
+          إظهار الطلبات السابقة
+        </label>
+
+        <button id="print10Btn" onclick="printTenOrders()" class="bg-blue-600 text-white shadow-lg shadow-blue-900/30 rounded-xl px-4 py-2 text-sm font-black hover:bg-blue-500 transition-colors">🖨️ طباعة 10 طلبات</button>
+        <button id="printSelectedBtn" onclick="printSelected()" class="bg-slate-700 border border-slate-600 text-slate-200 rounded-xl px-3 py-2 text-sm font-black hover:bg-slate-600 transition-colors">🖨️ طباعة المحدد</button>
+        <button id="printAllBtn" onclick="printAllOrders()" class="bg-slate-700 border border-slate-600 text-slate-200 rounded-xl px-3 py-2 text-sm font-black hover:bg-slate-600 transition-colors">🖨️ طباعة الكل</button>
+        <button id="editSelectedBtn" onclick="editSelectedOrder()" class="bg-amber-600 text-white rounded-xl px-3 py-2 text-sm font-black hover:bg-amber-500 transition-colors shadow-lg shadow-amber-900/30">✏️ تعديل</button>
+      </div>
+
+      <div class="mt-3 relative">
+        <input id="employeeSearch" oninput="handleEmployeeSearchInput()" placeholder="بحث: الاسم، الهاتف، المدينة، العنوان، رقم الطلب..." class="w-full bg-slate-900 border border-slate-700 text-white placeholder-slate-500 rounded-xl px-3 py-2.5 text-sm font-bold focus:ring-2 focus:ring-blue-500 outline-none transition-shadow pl-10">
+        <i data-lucide="search" class="absolute right-3 top-3 w-5 h-5 text-slate-500"></i>
+      </div>
+    </div>
+
+    <div id="list" class="space-y-4"></div>
+  </div>
+
+  <div id="editModal" class="fixed inset-0 bg-slate-950/80 z-50 hidden items-center justify-center p-4 backdrop-blur-sm">
+    <div class="bg-slate-800 rounded-2xl shadow-2xl border border-slate-700 w-full max-w-lg flex flex-col max-h-[90vh] overflow-hidden">
+      <div class="p-4 border-b border-slate-700 bg-slate-800 flex justify-between items-center">
+        <h2 class="text-xl font-black text-white">✏️ تعديل الطلب قبل الطباعة</h2>
+        <button onclick="closeEditModal()" class="text-slate-400 hover:text-rose-500 font-bold text-2xl transition-colors">&times;</button>
+      </div>
+      <div class="p-5 space-y-4 overflow-y-auto">
+        <input type="hidden" id="editRowIndex">
+        <div><label class="block text-sm text-slate-300 font-black mb-1">اسم العميل</label><input type="text" id="editName" class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl px-3 py-2 font-bold outline-none focus:border-blue-500"></div>
+        <div class="grid grid-cols-2 gap-3">
+          <div><label class="block text-sm text-slate-300 font-black mb-1">رقم الهاتف</label><input type="text" id="editPhone" dir="ltr" class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl px-3 py-2 font-bold text-right outline-none focus:border-blue-500"></div>
+          <div><label class="block text-sm text-slate-300 font-black mb-1">السعر المطبوع</label><input type="text" id="editPrice" class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl px-3 py-2 font-bold outline-none focus:border-blue-500"></div>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div><label class="block text-sm text-slate-300 font-black mb-1">المدينة</label><input type="text" id="editArea" class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl px-3 py-2 font-bold outline-none focus:border-blue-500"></div>
+          <div><label class="block text-sm text-slate-300 font-black mb-1">العنوان التفصيلي</label><input type="text" id="editAddress" class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl px-3 py-2 font-bold outline-none focus:border-blue-500"></div>
+        </div>
+        <div><label class="block text-sm text-slate-300 font-black mb-1">المنتجات / التفاصيل</label><textarea id="editProducts" rows="4" class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl px-3 py-2 font-bold outline-none focus:border-blue-500"></textarea></div>
+      </div>
+      <div class="p-4 border-t border-slate-700 bg-slate-800 flex gap-3">
+        <button onclick="saveOrderEdit()" class="flex-1 bg-amber-600 hover:bg-amber-500 text-white rounded-xl py-3 font-black shadow-lg shadow-amber-900/20 transition-colors">حفظ التعديلات</button>
+        <button onclick="closeEditModal()" class="flex-1 bg-slate-700 hover:bg-slate-600 text-slate-200 border border-slate-600 rounded-xl py-3 font-black transition-colors">إلغاء</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="imageModal" class="fixed inset-0 bg-slate-950/90 z-[9999] hidden flex-col items-center justify-center p-4 backdrop-blur-md cursor-pointer transition-opacity" onclick="closeImageModal()">
+    <div class="relative w-full max-w-4xl flex items-center justify-center pointer-events-none">
+      <button onclick="closeImageModal()" class="absolute -top-12 right-0 text-white/70 hover:text-rose-500 font-black text-5xl transition-colors pointer-events-auto drop-shadow-md">&times;</button>
+      <img id="largeImage" src="" class="max-w-full max-h-[85vh] rounded-3xl shadow-[0_0_50px_-10px_rgba(0,0,0,0.8)] border-[6px] border-slate-800 object-contain pointer-events-auto cursor-default">
+    </div>
+  </div>
+
+  <script>
+    let orders = [];
+    let productsCatalog = [];
+    let selectedRows = new Set();
+    let employeeSearchQuery = '';
+    let processingRows = new Set();
+    let isBulkPrinting = false;
+
+    function safeCreateIcons() { try { lucide.createIcons(); } catch (e) {} }
+
+    // ==========================================
+    // 📸 نظام كاميرا الموبايل لمسح الباركود
+    // ==========================================
+    let html5QrCode = null;
+    let scannerOpening = false;
+
+    function isIos_() {
+      return /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+             (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    }
+
+    function setVideoAttrs_() {
+      try {
+        const video = document.querySelector('#reader video');
+        if (video) {
+          video.setAttribute('playsinline', 'true');
+          video.setAttribute('webkit-playsinline', 'true');
+          video.muted = true;
+          video.autoplay = true;
+        }
+      } catch (e) {}
+    }
+
+    async function requestCameraPermission_() {
+      if (!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia)) {
+        throw new Error('CAMERA_API_NOT_SUPPORTED');
+      }
+      const tempStream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } },
+        audio: false
+      });
+      tempStream.getTracks().forEach(track => track.stop());
+      return true;
+    }
+
+    async function getBestCameraId_() {
+      const cameras = await Html5Qrcode.getCameras();
+      if (!cameras || !cameras.length) throw new Error('NO_CAMERAS_FOUND');
+
+      const normalized = cameras.map(cam => ({ id: cam.id, label: String(cam.label || '').toLowerCase() }));
+      const backCam = normalized.find(c => /back|rear|environment|خلف|خلفية/.test(c.label)) || normalized.find(c => /wide|ultra/.test(c.label)) || normalized[normalized.length - 1] || normalized[0];
+      return backCam.id;
+    }
+
+    async function startCameraScanner() {
+      if (scannerOpening) return;
+      scannerOpening = true;
+
+      const cameraModal = document.getElementById('cameraModal');
+      cameraModal.classList.remove('hidden');
+      cameraModal.classList.add('flex');
+
+      try {
+        if (!window.isSecureContext) throw new Error('NOT_SECURE_CONTEXT');
+        if (!html5QrCode) html5QrCode = new Html5Qrcode("reader");
+
+        await requestCameraPermission_();
+        const cameraId = await getBestCameraId_();
+
+        const config = {
+          fps: isIos_() ? 8 : 10,
+          qrbox: { width: 250, height: 100 },
+          aspectRatio: 1.7778,
+          rememberLastUsedCamera: true,
+          experimentalFeatures: { useBarCodeDetectorIfSupported: true }
+        };
+
+        await html5QrCode.start(cameraId, config, onScanSuccess, function () {});
+
+        setTimeout(setVideoAttrs_, 150);
+        setTimeout(setVideoAttrs_, 500);
+      } catch (err) {
+        console.error('Camera start error:', err);
+        let msg = 'لم نتمكن من الوصول للكاميرا، تأكد من إعطاء الصلاحية';
+        const code = String(err && err.message ? err.message : err);
+        if (code.includes('NOT_SECURE_CONTEXT')) msg = 'يجب فتح الصفحة من رابط آمن HTTPS داخل Safari';
+        else if (code.includes('CAMERA_API_NOT_SUPPORTED')) msg = 'هذا المتصفح لا يدعم تشغيل الكاميرا';
+        else if (code.includes('NO_CAMERAS_FOUND')) msg = 'لم يتم العثور على كاميرا في الجهاز';
+        else if (code.includes('NotAllowedError') || code.includes('Permission denied')) msg = 'تم رفض إذن الكاميرا. افتح الصفحة في Safari وأعطِ سماح للكاميرا';
+        else if (code.includes('NotReadableError') || code.includes('TrackStartError')) msg = 'الكاميرا مشغولة في تطبيق آخر. أغلق أي تطبيق يستخدم الكاميرا ثم أعد المحاولة';
+        else if (code.includes('OverconstrainedError')) msg = 'تعذر تشغيل الكاميرا الخلفية. جرّب مرة أخرى';
+
+        showToast(msg, 'error');
+        await closeCameraScanner();
+      } finally {
+        scannerOpening = false;
+      }
+    }
+
+    function onScanSuccess(decodedText, decodedResult) {
+      closeCameraScanner();
+      document.getElementById('returnBarcodeInp').value = decodedText;
+      handleAutoReturn({ key: 'Enter', preventDefault: function(){} });
+    }
+
+    async function closeCameraScanner() {
+      const cameraModal = document.getElementById('cameraModal');
+      cameraModal.classList.add('hidden');
+      cameraModal.classList.remove('flex');
+
+      try {
+        if (html5QrCode) {
+          const state = html5QrCode.getState ? html5QrCode.getState() : null;
+          if (state === Html5QrcodeScannerState.SCANNING || state === Html5QrcodeScannerState.PAUSED) {
+            await html5QrCode.stop();
+          }
+          try { await html5QrCode.clear(); } catch (e) {}
+        }
+      } catch (err) { console.log('Camera stop error', err); }
+
+      const reader = document.getElementById('reader');
+      if (reader) reader.innerHTML = '';
+      const inp = document.getElementById('returnBarcodeInp');
+      if (inp) inp.focus();
+    }
+
+
+    // ==========================================
+    // 📦 نظام الإرجاع السريع بالمسدس (التلقائي)
+    // ==========================================
+
+    function autoFocusReturnInput(e) {
+      const modal = document.getElementById('returnsModal');
+      const camModal = document.getElementById('cameraModal');
+
+      if (camModal && !camModal.classList.contains('hidden')) return;
+      if (modal && !modal.classList.contains('hidden')) {
+         if (e && e.target && (e.target.tagName === 'SELECT' || e.target.tagName === 'INPUT' || e.target.tagName === 'OPTION' || e.target.tagName === 'BUTTON')) return;
+         const inp = document.getElementById('returnBarcodeInp');
+         if (inp) inp.focus();
+      }
+    }
+    document.addEventListener('click', autoFocusReturnInput);
+
+    function openReturnsModal() {
+      document.getElementById('returnsModal').classList.remove('hidden');
+      document.getElementById('returnsModal').classList.add('flex');
+      document.getElementById('returnBarcodeInp').value = '';
+      document.getElementById('returnStatusBox').innerHTML = '<span class="text-slate-500 text-sm">حدد السبب أعلاه لتبدأ المسح بالكاميرا أو المسدس...</span>';
+      document.getElementById('returnStatusBox').className = 'text-center font-black text-lg h-14 mt-2 flex items-center justify-center bg-slate-900/50 rounded-xl border border-slate-700/50 transition-colors';
+      setTimeout(() => document.getElementById('returnReasonSelect').focus(), 100);
+    }
+
+    function closeReturnsModal() {
+      closeCameraScanner();
+      document.getElementById('returnsModal').classList.add('hidden');
+      document.getElementById('returnsModal').classList.remove('flex');
+    }
+
+    function checkCustomReason() {
+      const val = document.getElementById('returnReasonSelect').value;
+      const customBox = document.getElementById('customReasonBox');
+      if (val === 'OTHER') {
+        customBox.classList.remove('hidden');
+        document.getElementById('customReasonInput').focus();
+      } else {
+        customBox.classList.add('hidden');
+        document.getElementById('returnBarcodeInp').focus();
+      }
+    }
+
+    function handleAutoReturn(e) {
+      if (e.key === 'Enter') {
+        if(e.preventDefault) e.preventDefault();
+        const inputVal = document.getElementById('returnBarcodeInp').value.trim();
+        document.getElementById('returnBarcodeInp').value = '';
+        if (!inputVal) return;
+
+        let reason = document.getElementById('returnReasonSelect').value;
+        if (reason === 'OTHER') reason = document.getElementById('customReasonInput').value.trim();
+
+        const statusBox = document.getElementById('returnStatusBox');
+
+        if (!reason) {
+            statusBox.className = 'text-center font-black text-lg h-14 mt-2 flex items-center justify-center bg-rose-900/30 rounded-xl border border-rose-500 transition-colors';
+            statusBox.innerHTML = `<span class="text-rose-400">❌ يرجى اختيار سبب الإرجاع من القائمة أولاً!</span>`;
+            return;
+        }
+
+        const cleanPhone = inputVal.replace(/\D/g, '');
+        const targetOrder = orders.slice().reverse().find(o => {
+          const seq = String(o.delivery_sequen || '').replace(/^'/, '').trim();
+          const dId = String(o.delivery_order_id || '').replace(/^'/, '').trim();
+          const mId = String(o.orderId || '').trim();
+          const phoneStr = String(o.phone || '').replace(/\D/g, '');
+          return seq === inputVal || dId === inputVal || mId === inputVal || (cleanPhone.length >= 9 && phoneStr.includes(cleanPhone));
+        });
+
+        if (!targetOrder) {
+          statusBox.className = 'text-center font-black text-lg h-14 mt-2 flex items-center justify-center bg-rose-900/30 rounded-xl border border-rose-500 transition-colors';
+          statusBox.innerHTML = `<span class="text-rose-400">❌ لم يتم العثور على: ${inputVal}</span>`;
+          return;
+        }
+
+        if (String(targetOrder.Status || '').trim().toUpperCase() === 'RETURNED_TO_MANAGER') {
+          statusBox.className = 'text-center font-black text-lg h-14 mt-2 flex items-center justify-center bg-amber-900/30 rounded-xl border border-amber-500 transition-colors';
+          statusBox.innerHTML = `<span class="text-amber-400">⚠️ الطلب مُعاد مسبقاً: ${escapeHtml_(targetOrder.name)}</span>`;
+          return;
+        }
+
+        const backendId = String(targetOrder.delivery_sequen || targetOrder.orderId).replace(/^'/, '').trim();
+        const orderName = escapeHtml_(targetOrder.name || 'العميل');
+
+        statusBox.className = 'text-center font-black text-lg h-14 mt-2 flex items-center justify-center bg-blue-900/30 rounded-xl border border-blue-500 transition-colors';
+        statusBox.innerHTML = `<span class="text-blue-400">⏳ جاري إرجاع طلب: ${orderName}...</span>`;
+
+        google.script.run.withSuccessHandler(res => {
+          if (res && res.success) {
+            statusBox.className = 'text-center font-black text-lg h-14 mt-2 flex items-center justify-center bg-emerald-900/30 rounded-xl border border-emerald-500 transition-colors scale-105';
+            statusBox.innerHTML = `<span class="text-emerald-400">✅ تم الإرجاع: ${orderName} 📦</span>`;
+
+            targetOrder.Status = 'RETURNED_TO_MANAGER';
+            targetOrder.return_reason = reason;
+            render();
+
+            setTimeout(() => { statusBox.classList.remove('scale-105'); }, 200);
+          } else {
+            statusBox.className = 'text-center font-black text-lg h-14 mt-2 flex items-center justify-center bg-rose-900/30 rounded-xl border border-rose-500 transition-colors';
+            statusBox.innerHTML = `<span class="text-rose-400">❌ فشل الإرجاع: ${orderName}</span>`;
+          }
+        }).withFailureHandler(err => {
+          statusBox.className = 'text-center font-black text-lg h-14 mt-2 flex items-center justify-center bg-rose-900/30 rounded-xl border border-rose-500 transition-colors';
+          statusBox.innerHTML = `<span class="text-rose-400">❌ خطأ بالاتصال بالخادم</span>`;
+        }).api_processSingleReturn(backendId, reason);
+      }
+    }
+
+
+    // ==========================================
+    // 🚚 دوال التجهيز (باقي الشاشة)
+    // ==========================================
+
+    function openImageModal(src) {
+      if (!src || src.includes('placeholder')) return;
+      document.getElementById('largeImage').src = src;
+      const modal = document.getElementById('imageModal');
+      modal.classList.remove('hidden'); modal.classList.add('flex');
+    }
+    function closeImageModal() {
+      const modal = document.getElementById('imageModal');
+      modal.classList.add('hidden'); modal.classList.remove('flex');
+      setTimeout(() => { document.getElementById('largeImage').src = ''; }, 300);
+    }
+
+    function showToast(message, type = 'success') {
+      const box = document.getElementById('toastBox'); box.className = `toast show ${type}`; box.innerHTML = message;
+      clearTimeout(box._timer); box._timer = setTimeout(() => box.classList.remove('show'), 4000);
+    }
+    function setBusy(v, text = 'جاري المعالجة...') {
+      document.getElementById('busyText').innerText = text; const overlay = document.getElementById('busyOverlay');
+      if (v) overlay.classList.add('show'); else overlay.classList.remove('show');
+    }
+
+    window.onload = function() { boot(); };
+
+    function boot() {
+      const list = document.getElementById('list');
+      if (!(window.google && google.script && google.script.run)) { list.innerHTML = '<div class="bg-rose-900/30 text-rose-400 border border-rose-800 rounded-2xl p-6 text-center font-black">خطأ: افتح الصفحة من رابط Web App</div>'; return; }
+      safeCreateIcons();
+      loadCatalogAndOrders();
+    }
+
+    function loadCatalogAndOrders() {
+      const list = document.getElementById('list');
+      list.innerHTML = '<div class="bg-slate-800 rounded-2xl border border-slate-700 p-6 text-center text-slate-400 font-black animate-pulse flex flex-col items-center gap-3"><i data-lucide="loader-2" class="w-8 h-8 text-blue-500 animate-spin"></i> جاري تحميل القاموس والطلبات...</div>';
+      safeCreateIcons();
+
+      google.script.run.withSuccessHandler(function(catalogData) {
+        productsCatalog = catalogData || [];
+        loadOrders();
+      }).withFailureHandler(function(err) {
+        loadOrders();
+      }).api_getProducts();
+    }
+
+    function loadOrders() {
+      google.script.run.withSuccessHandler(function(data) {
+        orders = deduplicateOrders(Array.isArray(data) ? data : []);
+        syncSelectedRows_(); updateSelectAllCheckbox_(); render();
+      }).withFailureHandler(function(err) { document.getElementById('list').innerHTML = `<div class="bg-rose-900/30 text-rose-400 border border-rose-800 rounded-2xl p-6 text-center font-black">فشل التحميل</div>`; }).api_getOrders();
+    }
+
+    function deduplicateOrders(data) {
+      const uniqueOrders = []; const seenOrderIds = new Set();
+      for (const order of data) {
+        const uniqueKey = order.orderId ? String(order.orderId).trim() : `row_${order.rowIndex}`;
+        if (!seenOrderIds.has(uniqueKey)) { seenOrderIds.add(uniqueKey); uniqueOrders.push(order); }
+      } return uniqueOrders;
+    }
+
+    function normalizePhoneDisplay(raw) {
+      const d = String(raw || '').replace(/\D/g, ''); if (!d) return '-';
+      if (d.startsWith('05') && d.length >= 10) return d.slice(0, 10);
+      if (d.startsWith('5') && d.length >= 9) return ('0' + d).slice(0, 10);
+      if (d.startsWith('972') && d.length >= 12) return ('0' + d.slice(3)).slice(0, 10); return d;
+    }
+    function normalizePhoneForWhatsApp(raw) {
+      const d = String(raw || '').replace(/\D/g, ''); if (!d) return '';
+      if (d.startsWith('05') && d.length >= 10) return '972' + d.slice(1, 10);
+      if (d.startsWith('5') && d.length >= 9) return '972' + d.slice(0, 9);
+      if (d.startsWith('972') && d.length >= 12) return d.slice(0, 12); return '';
+    }
+
+    function normalizeSearchText_(value) { const map = { '٠':'0','١':'1','٢':'2','٣':'3','٤':'4','٥':'5','٦':'6','٧':'7','٨':'8','٩':'9' }; return String(value || '').replace(/[٠-٩]/g, d => map[d] || d).toLowerCase().replace(/[^\u0600-\u06FF\u0590-\u05FFa-z0-9\s-]/g, ' ').replace(/\s+/g, ' ').trim(); }
+    function getOrderSearchBlob_(o) { return normalizeSearchText_([o.orderId, o.name, o.phone, o.customer_area, o.address, o.offer, o.prep_notes, o.employee_name].join(' | ')); }
+    function handleEmployeeSearchInput() { employeeSearchQuery = String((document.getElementById('employeeSearch').value || '')).trim(); render(); }
+    function shouldShowPreviousOrders_() { return !!document.getElementById('showPreviousOrders')?.checked; }
+
+    function getEmployeeVisibleOrders_() {
+      const all = Array.isArray(orders) ? orders : []; const includePrevious = shouldShowPreviousOrders_();
+      return all.filter(o => { const status = String(o.Status || '').trim().toUpperCase(); const isAreen = String(o.prep_notes || '').trim() === 'Areen'; if (isAreen) return false; return includePrevious ? (status === 'SENT_TO_PREP' || status === 'READY') : status === 'SENT_TO_PREP'; });
+    }
+    function getEmployeeFilteredOrders_() {
+      const all = getEmployeeVisibleOrders_(); const query = normalizeSearchText_(employeeSearchQuery); if (!query) return all;
+      const tokens = query.split(' ').filter(Boolean); return all.filter(o => { const haystack = getOrderSearchBlob_(o); return tokens.every(t => haystack.indexOf(t) !== -1); });
+    }
+    function getBarcodeForOrder(o) { const deliveryRaw = String(o.prep_notes || '').trim(); if (deliveryRaw.toLowerCase() === 'hi express') { return String(o.delivery_sequen || o.delivery_order_id || '').trim().replace(/[^0-9A-Za-z-]/g, ''); } return String(o.delivery_sequen || o.orderId || '').trim(); }
+    function autoEnsureExpressBarcode(rowIndex) { return new Promise((resolve, reject) => { google.script.run.withSuccessHandler(res => resolve(res || {})).withFailureHandler(err => reject(err)).api_sendToExpress(rowIndex); }); }
+    function syncSelectedRows_() { const valid = new Set(getEmployeeVisibleOrders_().map(o => Number(o.rowIndex))); selectedRows.forEach(r => { if (!valid.has(Number(r))) selectedRows.delete(Number(r)); }); }
+    function updateSelectAllCheckbox_() { const cb = document.getElementById('selectAllOrders'); if (!cb) return; const filtered = getEmployeeFilteredOrders_(); if (!filtered.length) { cb.checked = false; cb.indeterminate = false; return; } const visibleIds = filtered.map(o => Number(o.rowIndex)); const selectedCount = visibleIds.filter(id => selectedRows.has(id)).length; cb.checked = selectedCount === visibleIds.length; cb.indeterminate = selectedCount > 0 && selectedCount < visibleIds.length; }
+    function toggleOrderSelection(rowIndex, checked) { const n = Number(rowIndex); if (!n) return; if (checked) selectedRows.add(n); else selectedRows.delete(n); updateSelectAllCheckbox_(); render(); }
+    function toggleSelectAll(checked) { const filtered = getEmployeeFilteredOrders_(); if (checked) { filtered.forEach(o => selectedRows.add(Number(o.rowIndex))); } else { filtered.forEach(o => selectedRows.delete(Number(o.rowIndex))); } render(); updateSelectAllCheckbox_(); }
+    function getTargetRows_(mode) { if (mode === 'all') { return getEmployeeFilteredOrders_().map(o => Number(o.rowIndex)).filter(Boolean); } return Array.from(selectedRows).map(v => Number(v)).filter(Boolean); }
+    function escapeHtml_(v) { return String(v || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;'); }
+    function requirePrepEmployee_() { const prepEmployee = String(document.getElementById('prepEmployee').value || '').trim(); if (!prepEmployee) { alert('يجب اختيار اسم موظف التجهيز أولاً من أعلى الشاشة'); return ''; } return prepEmployee; }
+    function setGlobalBusyState_(busy) { const ids = ['refreshBtn', 'print10Btn', 'printSelectedBtn', 'printAllBtn', 'editSelectedBtn', 'prepEmployee', 'selectAllOrders', 'employeeSearch', 'showPreviousOrders']; ids.forEach(id => { const el = document.getElementById(id); if (!el) return; el.disabled = !!busy; if (busy) el.classList.add('opacity-60', 'cursor-not-allowed'); else el.classList.remove('opacity-60', 'cursor-not-allowed'); }); }
+    function removeOrderFromList_(rowIndex) { const n = Number(rowIndex); orders = (orders || []).filter(o => Number(o.rowIndex) !== n); selectedRows.delete(n); processingRows.delete(n); updateSelectAllCheckbox_(); render(); }
+
+    function editSelectedOrder() { const selected = Array.from(selectedRows); if (selected.length !== 1) { alert('تحديد طلب واحد فقط للتعديل.'); return; } const rowIndex = selected[0]; const order = orders.find(x => Number(x.rowIndex) === Number(rowIndex)); if (!order) return; document.getElementById('editRowIndex').value = rowIndex; document.getElementById('editName').value = order.name || ''; document.getElementById('editPhone').value = order.phone || ''; document.getElementById('editArea').value = order.customer_area || ''; document.getElementById('editAddress').value = order.address || ''; document.getElementById('editPrice').value = order.price || ''; document.getElementById('editProducts').value = order.offer || order.details || order.products || ''; document.getElementById('editModal').classList.remove('hidden'); document.getElementById('editModal').classList.add('modal-active'); }
+    function closeEditModal() { document.getElementById('editModal').classList.add('hidden'); document.getElementById('editModal').classList.remove('modal-active'); }
+    function saveOrderEdit() { const rowIndex = Number(document.getElementById('editRowIndex').value); const orderIndex = orders.findIndex(x => Number(x.rowIndex) === rowIndex); if (orderIndex === -1) return; orders[orderIndex].name = document.getElementById('editName').value; orders[orderIndex].phone = document.getElementById('editPhone').value; orders[orderIndex].customer_area = document.getElementById('editArea').value; orders[orderIndex].address = document.getElementById('editAddress').value; orders[orderIndex].price = document.getElementById('editPrice').value; const newProducts = document.getElementById('editProducts').value; if (orders[orderIndex].offer !== undefined) orders[orderIndex].offer = newProducts; else if (orders[orderIndex].details !== undefined) orders[orderIndex].details = newProducts; else orders[orderIndex].products = newProducts; closeEditModal(); render(); showToast('تم الحفظ', 'success'); }
+
+    function deleteOrder(rowIndex) { if (!confirm('حذف نهائي؟')) return; setBusy(true, 'جاري الحذف...'); google.script.run.withSuccessHandler(res => { setBusy(false); if (res && res.success) { showToast('تم الحذف', 'success'); removeOrderFromList_(rowIndex); } else { showToast(res.error, 'error'); } }).withFailureHandler(() => { setBusy(false); showToast('فشل الاتصال', 'error'); }).api_deleteOrder(rowIndex); }
+    function sendManualSms(rowIndex) { const btn = document.getElementById('smsBtn_' + rowIndex); if (btn) { btn.disabled = true; btn.innerText = 'جاري...'; } setBusy(true, 'جاري إرسال SMS...'); google.script.run.withSuccessHandler(res => { setBusy(false); if (res && res.success) { showToast('تم الإرسال', 'success'); if (btn) { btn.innerText = 'تم الإرسال ✅'; btn.classList.replace('bg-purple-900/30', 'bg-emerald-900/30'); btn.classList.replace('text-purple-400', 'text-emerald-400'); btn.classList.replace('border-purple-700/50', 'border-emerald-700/50'); } } else { showToast(res.error, 'error'); if (btn) { btn.disabled = false; btn.innerText = 'SMS 💬'; } } }).withFailureHandler(() => { setBusy(false); showToast('خطأ بالاتصال', 'error'); if (btn) { btn.disabled = false; btn.innerText = 'SMS 💬'; } }).api_sendActiveTrailSMS(rowIndex); }
+
+    function render() {
+      const list = document.getElementById('list');
+      const visibleOrders = getEmployeeVisibleOrders_();
+      if (!visibleOrders.length) { list.innerHTML = '<div class="bg-slate-800 rounded-2xl border border-slate-700 p-6 text-center text-slate-400 font-black">لا توجد طلبات للعرض</div>'; updateSelectAllCheckbox_(); safeCreateIcons(); return; }
+      const filteredOrders = getEmployeeFilteredOrders_();
+      if (!filteredOrders.length) { list.innerHTML = '<div class="bg-slate-800 rounded-2xl border border-slate-700 p-6 text-center text-slate-400 font-black">لا توجد نتائج مطابقة للبحث</div>'; updateSelectAllCheckbox_(); safeCreateIcons(); return; }
+
+      list.innerHTML = filteredOrders.map(function(o) {
+        const rowNumber = Number(o.rowIndex); const isSelected = selectedRows.has(rowNumber); const isProcessing = processingRows.has(rowNumber); const status = String(o.Status || '').trim().toUpperCase(); const isReady = status === 'READY';
+
+        let rawOfferText = String(o.offer || '').trim();
+        let fullRawText = String(o.raw_request_text || o.offer || '').trim();
+        if (!rawOfferText) rawOfferText = fullRawText;
+
+        let productsCardsHtml = '';
+
+        if (rawOfferText && productsCatalog.length > 0) {
+            let foundProducts = [];
+            let mutableOfferText = fullRawText;
+            let searchContext = fullRawText.toLowerCase();
+
+            const skuMap = {};
+            productsCatalog.forEach(p => {
+                const s = String(p.sku).trim().toUpperCase();
+                if (s.length < 2) return;
+                if (!skuMap[s]) skuMap[s] = { hasMist: false, hasPerfume: false, hasMen: false, hasWomen: false };
+                const cat = String(p.category || p.gender || '');
+                if (/גוף|body|mist|שיער|hair/i.test(cat)) skuMap[s].hasMist = true;
+                else skuMap[s].hasPerfume = true;
+                if (/נשים|women|אישה/i.test(cat)) skuMap[s].hasWomen = true;
+                if (/גברים|men|גבר/i.test(cat)) skuMap[s].hasMen = true;
+            });
+
+            let sortedCatalog = [...productsCatalog].sort((a, b) => {
+                let lenDiff = String(b.sku || '').length - String(a.sku || '').length;
+                if (lenDiff !== 0) return lenDiff;
+                let aCat = String(a.category || a.gender || '');
+                let bCat = String(b.category || b.gender || '');
+                let aIsMist = /גוף|body|mist|שיער|hair/i.test(aCat);
+                let bIsMist = /גוף|body|mist|שיער|hair/i.test(bCat);
+                if (aIsMist && !bIsMist) return -1;
+                if (!aIsMist && bIsMist) return 1;
+                return 0;
+            });
+
+            sortedCatalog.forEach(p => {
+                const skuRaw = String(p.sku).trim();
+                const skuUpper = skuRaw.toUpperCase();
+                if (skuRaw.length < 2) return;
+
+                let patternBody;
+                if (/^[a-zA-Z0-9]+$/.test(skuRaw)) {
+                    let withSpaces = skuRaw.replace(/([a-zA-Z])([0-9])/g, '$1 $2').replace(/([0-9])([a-zA-Z])/g, '$1 $2');
+                    patternBody = withSpaces.split(/\s+/).map(w => w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('[\\s\\.\\-\\_]*');
+                } else {
+                    patternBody = skuRaw.split(/\s+/).map(w => w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('[\\s\\.\\-\\_]+');
+                }
+
+                const smartRegex = new RegExp(`(^|[^a-zA-Z0-9א-תأ-ي])(${patternBody})(?=[^a-zA-Z0-9א-תأ-ي]|$)`, 'gi');
+
+                if (smartRegex.test(mutableOfferText)) {
+                    let shouldMatch = true;
+                    const catStr = String(p.category || p.gender || '').trim();
+                    const isCatBody = /גוף|body|mist/i.test(catStr);
+                    const isCatHair = /שיער|hair/i.test(catStr);
+                    const isCatWomen = /נשים|women|אישה|לאישה|نسائي/i.test(catStr);
+                    const isCatMen = /גברים|men|גבר|לגבר|رجالي/i.test(catStr);
+
+                    const textHasBody = /גוף|body|mist|جسم|בדי/i.test(searchContext);
+                    const textHasHair = /שיער|hair|شعر/i.test(searchContext);
+                    const textHasWomen = /נשים|women|אישה|לאישה|نسائي/i.test(searchContext);
+                    const textHasMen = /גברים|men|גבר|לגבר|رجالي/i.test(searchContext);
+
+                    if (skuMap[skuUpper].hasMist && skuMap[skuUpper].hasPerfume) {
+                        if (isCatBody && !textHasBody) shouldMatch = false;
+                        if (isCatHair && !textHasHair) shouldMatch = false;
+                    }
+
+                    if (shouldMatch && skuMap[skuUpper].hasMen && skuMap[skuUpper].hasWomen) {
+                        if (isCatWomen && textHasMen && !textHasWomen) shouldMatch = false;
+                        if (isCatMen && textHasWomen && !textHasMen) shouldMatch = false;
+                    }
+
+                    if (shouldMatch) {
+                        mutableOfferText = mutableOfferText.replace(smartRegex, '$1 @@@ ');
+
+                        let genderClass = 'gender-unisex';
+                        if (isCatWomen) genderClass = 'gender-women';
+                        else if (isCatMen) genderClass = 'gender-men';
+
+                        let badgeText = escapeHtml_(catStr || 'عطر');
+
+                        foundProducts.push(`
+                            <div class="flex items-center gap-3 p-2 bg-slate-900 border border-slate-600 rounded-xl shadow-md mb-2 relative overflow-hidden">
+                                <img src="${escapeHtml_(p.image)}" onclick="openImageModal(this.src)" class="w-16 h-16 object-cover rounded-lg border border-slate-700 cursor-pointer hover:opacity-80 hover:ring-2 hover:ring-blue-500 transition-all z-10" alt="عطر" onerror="this.src='https://via.placeholder.com/64/334155/94a3b8?text=عطر'">
+                                <div class="flex-1 z-10">
+                                    <div class="text-lg font-black text-white leading-tight" dir="ltr">${escapeHtml_(p.sku)}</div>
+                                    <div class="product-badge ${genderClass}">${badgeText}</div>
+                                </div>
+                            </div>
+                        `);
+                    }
+                }
+            });
+
+            if (foundProducts.length > 0) {
+                productsCardsHtml = `
+                    <div class="mt-3 bg-slate-800 p-3 border-2 border-blue-500/50 rounded-xl shadow-inner">
+                        <div class="text-sm font-black text-blue-400 mb-3 flex items-center gap-2">
+                            <i data-lucide="list-checks" class="w-5 h-5"></i>
+                            المنتجات المطلوبة (${foundProducts.length}):
+                        </div>
+                        ${foundProducts.join('')}
+                        <div class="mt-2 pt-2 border-t border-slate-700">
+                            <div class="text-[11px] font-bold text-slate-400 mb-1">النص الأصلي للطلب:</div>
+                            <div class="text-[13px] font-bold text-slate-300 whitespace-pre-wrap" dir="ltr">${escapeHtml_(rawOfferText)}</div>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        if (!productsCardsHtml) {
+            productsCardsHtml = `
+                <div class="mt-3 bg-slate-900 p-4 rounded-xl border-2 border-amber-600/50 shadow-inner">
+                    <div class="text-sm font-black text-amber-400 mb-2 flex items-center gap-2">
+                        <i data-lucide="alert-circle" class="w-5 h-5"></i>
+                        المنتجات المطلوبة:
+                    </div>
+                    <div class="text-base font-black text-white whitespace-pre-wrap" dir="ltr">${escapeHtml_(rawOfferText || 'لا يوجد تفاصيل منتجات')}</div>
+                </div>
+            `;
+        }
+
+        const isReturned = (String(o.Status || '').trim().toUpperCase() === 'RETURNED_TO_MANAGER');
+        const returnHtml = isReturned ? `<div class="mt-2 bg-rose-900/30 p-2 rounded-lg border border-rose-500 text-rose-400 font-black text-sm text-center">الطلب مُعاد: ${escapeHtml_(o.return_reason || 'بدون سبب')}</div>` : '';
+
+        return `
+          <div class="bg-slate-800 rounded-2xl border ${isSelected ? 'border-blue-500 bg-blue-900/20 ring-1 ring-blue-500' : 'border-slate-700'} ${isReturned ? '!border-rose-500 bg-rose-900/10' : ''} p-4 shadow-sm space-y-2 transition-all ${isProcessing ? 'opacity-70 scale-[0.98]' : ''}">
+            <div class="flex items-start justify-between gap-2">
+              <div>
+                <div class="font-black text-lg text-white">${escapeHtml_(o.name || '-')}</div>
+                <div class="text-sm font-bold text-slate-400" dir="ltr">${escapeHtml_(normalizePhoneDisplay(o.phone || '-'))}</div>
+              </div>
+              <div class="flex flex-col items-end gap-2">
+                <label class="inline-flex items-center gap-2 text-sm font-black text-slate-300 bg-slate-700 px-3 py-1.5 rounded-lg cursor-pointer hover:bg-slate-600 transition-colors border border-slate-600">
+                  <input type="checkbox" class="w-4 h-4 text-blue-500 bg-slate-800 border-slate-600 rounded focus:ring-blue-500 focus:ring-offset-slate-800 cursor-pointer" ${isSelected ? 'checked' : ''} ${isProcessing || isBulkPrinting ? 'disabled' : ''} onchange="toggleOrderSelection(${o.rowIndex}, this.checked)">
+                  تحديد
+                </label>
+                <div class="text-sm font-black bg-amber-900/30 text-amber-400 px-3 py-1 rounded-lg border border-amber-700/50 shadow-sm">${escapeHtml_(o.price || 0)} ₪</div>
+              </div>
+            </div>
+
+            <div class="space-y-1 mt-2">
+              <div class="text-sm text-slate-300"><span class="font-black text-slate-400">رقم الطلب:</span> ${escapeHtml_(o.orderId || '-')}</div>
+              <div class="text-sm text-slate-300"><span class="font-black text-slate-400">المدينة:</span> ${escapeHtml_(o.customer_area || '-')}</div>
+              <div class="text-sm text-slate-300"><span class="font-black text-slate-400">العنوان:</span> ${escapeHtml_(o.address || '-')}</div>
+              
+              ${productsCardsHtml}
+              ${returnHtml}
+              
+              <div class="text-xs text-slate-400 pt-2 flex gap-4 border-t border-slate-700 mt-2">
+                <span><span class="font-bold">الشركة:</span> <span class="text-white px-2 py-0.5 rounded shadow-sm ${String(o.prep_notes || '').toLowerCase().includes('areen') ? 'bg-purple-600' : 'bg-blue-600'}">${escapeHtml_(o.prep_notes || 'Hi Express')}</span></span>
+                <span><span class="font-bold">الباركود:</span> ${escapeHtml_(o.delivery_sequen || o.delivery_order_id || '-')}</span>
+              </div>
+            </div>
+
+            <div class="flex justify-between items-center pt-1 pb-1">
+              <span class="text-[11px] text-indigo-400 font-black bg-indigo-900/30 border border-indigo-700/50 px-2 py-1 rounded-lg">المقاول: ${escapeHtml_(o.employee_name || '-')}</span>
+              ${isReady ? '<div class="text-[11px] font-black text-emerald-400 bg-emerald-900/30 border border-emerald-700/50 rounded-lg px-2 py-1 inline-block shadow-sm flex items-center gap-1"><i data-lucide="check-circle" class="w-3 h-3"></i> جاهز مسبقًا</div>' : ''}
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-2 pt-2 border-t border-slate-700">
+              <div class="flex gap-2">
+                <button onclick="markReady(${o.rowIndex})" ${isReady || isProcessing || isBulkPrinting || isReturned ? 'disabled' : ''} class="flex-1 bg-emerald-600 text-white py-2.5 rounded-xl font-black text-sm ${isReady || isProcessing || isBulkPrinting || isReturned ? 'opacity-60 cursor-not-allowed' : 'hover:bg-emerald-500'} shadow-sm transition-colors flex justify-center items-center gap-1.5">
+                  <i data-lucide="check-square" class="w-4 h-4"></i> ${isReady ? 'الطلب جاهز' : 'تحديد كـ جاهز'}
+                </button>
+                <button onclick="deleteOrder(${o.rowIndex})" ${isProcessing || isBulkPrinting ? 'disabled' : ''} class="w-12 flex items-center justify-center bg-rose-900/30 text-rose-500 border border-rose-700/50 rounded-xl font-black text-lg ${isProcessing || isBulkPrinting ? 'opacity-60 cursor-not-allowed' : 'hover:bg-rose-900/50'} transition-colors" title="حذف الطلب">
+                  <i data-lucide="trash-2" class="w-5 h-5"></i>
+                </button>
+              </div>
+              
+              <button onclick="printLabel(${o.rowIndex})" ${isProcessing || isBulkPrinting || isReturned ? 'disabled' : ''} class="md:col-span-2 w-full bg-slate-700 text-white border border-slate-600 py-3 rounded-xl font-black text-base ${isProcessing || isBulkPrinting || isReturned ? 'opacity-60 cursor-not-allowed' : 'hover:bg-slate-600'} shadow-md transition-transform active:scale-95 flex justify-center items-center gap-2">
+                <i data-lucide="printer" class="w-5 h-5"></i> ${isProcessing ? 'جاري الطباعة...' : (isReady ? 'إعادة طباعة طلب سابق' : 'طباعة الملصق')}
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      updateSelectAllCheckbox_();
+      safeCreateIcons();
+    }
+
+    function setOrderReadyAsync(rowIndex, prepEmployee) { return new Promise((resolve, reject) => { google.script.run.withSuccessHandler(res => resolve(res || {})).withFailureHandler(err => reject(err)).api_setOrderReady(rowIndex, prepEmployee); }); }
+
+    async function markReady(rowIndex) {
+      const prepEmployee = requirePrepEmployee_(); if (!prepEmployee) return;
+      const order = orders.find(x => Number(x.rowIndex) === Number(rowIndex)); if (!order) return;
+      if (String(order.Status || '').trim().toUpperCase() === 'READY') { alert('هذا الطلب جاهز مسبقًا'); return; }
+      if (!confirm('تحويل الطلب إلى جاهز؟ (سيختفي من الشاشة)')) return;
+      try { const res = await setOrderReadyAsync(rowIndex, prepEmployee); if (!res || !res.success) { alert(res.error || 'فشل التحديث'); return; } loadCatalogAndOrders(); } catch (err) { alert('خطأ'); }
+    }
+
+    function escLabel_(v) { return String(v || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;'); }
+    function shortLabelText_(v, max) { const s = String(v || '').trim(); if (!max || s.length <= max) return s; return s.slice(0, max - 1) + '…'; }
+    function formatProductsText_(value) { return String(value || '').trim().replace(/\s*\|\s*/g, '\n').replace(/\s*،\s*/g, '،\n').replace(/\s*,\s*/g, ',\n').replace(/\s*\/\s*/g, ' /\n').replace(/\s*\+\s*/g, ' + ').replace(/\n{3,}/g, '\n\n').trim() || '-'; }
+
+    async function buildLabelModel_(o, rowIndex) {
+      const branchName = shortLabelText_(String(o.prep_notes || 'Hi Express').trim(), 24);
+      const isHiExpress = String(o.prep_notes || '').trim().toLowerCase() === 'hi express';
+      let barcodeValue = String(getBarcodeForOrder(o) || '').trim();
+
+      if (isHiExpress && !barcodeValue) {
+        const autoRes = await autoEnsureExpressBarcode(rowIndex);
+        if (autoRes && autoRes.success) {
+          if (autoRes.deliveryOrderId) o.delivery_order_id = String(autoRes.deliveryOrderId);
+          if (autoRes.sequence) o.delivery_sequen = String(autoRes.sequence);
+          barcodeValue = String(getBarcodeForOrder(o) || '').trim();
+        }
+      }
+      if (!barcodeValue) barcodeValue = String(o.orderId || '7000000000').trim();
+
+      return {
+        branchName: branchName, barcodeValue: barcodeValue, customerName: shortLabelText_(String(o.name || '').trim(), 24), customerPhone: String(normalizePhoneDisplay(o.phone || '') || '').trim(), destination: shortLabelText_(`${String(o.customer_area || '').trim()} ${String(o.address || '').trim()}`.trim(), 70), details: formatProductsText_(String(o.offer || o.details || o.products || '').trim()), amount: String(o.price || '').trim(), orderId: String(o.orderId || '').trim()
+      };
+    }
+
+    function buildLabelHtml_(m) {
+      return `
+  <div style="width:10cm; height:10cm; background:#fff; color:#000; border:2px solid #000; box-sizing:border-box; font-family:Arial,Helvetica,sans-serif; padding:6px; display:flex; flex-direction:column; gap:4px; overflow:hidden;">
+    <div style="text-align:center; flex:0 0 auto;">
+      <img src="https://www.mad-parfumeur.com/assets/hero/lg.png" alt="MAD Logo" style="max-width:90px; max-height:24px; object-fit:contain; margin:0 auto;">
+      <div style="text-align:center;font-size:9px;font-weight:800;letter-spacing:2px;margin-top:1px;">MAD PERFUME</div>
+    </div>
+    <div style="background:#000;color:#fff;text-align:center;font-size:13px;font-weight:800;padding:4px 6px;border-radius:4px;line-height:1.1;flex:0 0 auto;">${escLabel_(m.branchName)}</div>
+    <div style="border:1px solid #000;padding:3px 4px 2px;border-radius:4px;flex:0 0 auto; text-align:center;">
+      <svg class="barcode" jsbarcode-value="${escLabel_(m.barcodeValue)}" jsbarcode-textmargin="0" jsbarcode-fontoptions="bold" jsbarcode-height="40" jsbarcode-width="2" style="max-width: 100%; max-height: 40px;"></svg>
+      <div style="text-align:center;font-size:10px;font-weight:700;letter-spacing:0.8px;line-height:1;margin-top:1px;">${escLabel_(m.barcodeValue)}</div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;flex:0 0 auto;">
+      <div style="border:1px solid #000;padding:4px 5px;border-radius:4px;overflow:hidden;">
+        <div style="font-size:9px;font-weight:700;color:#444;margin-bottom:2px;">לקוח / العميل</div>
+        <div style="font-size:11px;font-weight:800;line-height:1.15;max-height:26px;overflow:hidden;word-break:break-word;">${escLabel_(m.customerName)}</div>
+        <div style="font-size:10px;font-weight:700;line-height:1.1;margin-top:2px;">${escLabel_(m.customerPhone)}</div>
+      </div>
+      <div style="border:1px solid #000;padding:4px 5px;border-radius:4px;overflow:hidden;">
+        <div style="font-size:9px;font-weight:700;color:#444;margin-bottom:2px;">יעד / الوجهة</div>
+        <div style="font-size:11px;font-weight:800;line-height:1.15;max-height:38px;overflow:hidden;word-break:break-word;">${escLabel_(m.destination)}</div>
+      </div>
+    </div>
+    <div style="border:1px solid #000;padding:4px 5px;border-radius:4px;flex:1 1 auto;min-height:0;display:flex;flex-direction:column;overflow:hidden;">
+      <div style="font-size:9px;font-weight:700;color:#444;margin-bottom:3px;flex:0 0 auto;">פרטים / تفاصيل / المنتجات</div>
+      <div style="font-size:10px;font-weight:800;line-height:1.15;white-space:pre-wrap;word-break:break-word;overflow:hidden;flex:1 1 auto;">${escLabel_(m.details)}</div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr auto;gap:4px;align-items:stretch;flex:0 0 auto;">
+      <div style="border:1px solid #000;padding:4px 6px;border-radius:4px;overflow:hidden;">
+        <div style="font-size:9px;font-weight:700;color:#444;">רقم الطلب</div>
+        <div style="font-size:11px;font-weight:900;line-height:1.1;letter-spacing:0.4px;">${escLabel_(m.orderId || '-')}</div>
+      </div>
+      <div style="border:2px solid #000;padding:4px 8px;border-radius:4px;display:flex;align-items:center;justify-content:space-between;gap:8px;min-width:94px;">
+        <div style="font-size:10px;font-weight:700;">סכום / المبلغ</div>
+        <div style="font-size:13px;font-weight:900;white-space:nowrap;">${m.amount ? ('₪ ' + escLabel_(m.amount)) : '₪'}</div>
+      </div>
+    </div>
+  </div>`;
+    }
+
+    function openPrintWindowForPages_(pages) {
+      const win = window.open('', '_blank');
+      if (!win) { alert('الرجاء السماح بفتح نافذة الطباعة (Pop-up)'); return null; }
+      const htmlPages = pages.map(p => `<section class="label-page">${p}</section>`).join('');
+      win.document.write(`<html><head><title>MAD Labels</title><script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"><\/script><style>@page { size: 10cm 10cm; margin: 0; } html, body { margin: 0; padding: 0; background: #fff; } .label-page { width: 10cm; height: 10cm; page-break-after: always; display: flex; justify-content: center; align-items: center;} .label-page:last-child { page-break-after: auto; }</style></head><body>${htmlPages}<script>window.onload = function() { try { JsBarcode(".barcode").init(); } catch (e) { console.error(e); } setTimeout(function() { window.focus(); window.print(); window.close(); }, 500); };<\/script></body></html>`);
+      win.document.close(); return win;
+    }
+
+    function printTenOrders() {
+      const prepEmployee = requirePrepEmployee_(); if (!prepEmployee || isBulkPrinting) return;
+      const filtered = getEmployeeFilteredOrders_(); if (!filtered.length) return;
+      const ordersToPrint = filtered.slice(0, 10);
+      if (!confirm(`سيتم طباعة ${ordersToPrint.length} طلبات. هل أنت متأكد؟`)) return;
+      selectedRows.clear(); ordersToPrint.forEach(o => selectedRows.add(Number(o.rowIndex))); updateSelectAllCheckbox_(); render();
+      printBulk_('selected');
+    }
+
+    async function printLabel(rowIndex) {
+      const prepEmployee = requirePrepEmployee_(); if (!prepEmployee) return;
+      const rowNumber = Number(rowIndex); if (processingRows.has(rowNumber) || isBulkPrinting) return;
+      const o = orders.find(x => Number(x.rowIndex) === rowNumber); if (!o) return;
+      const isReady = String(o.Status || '').trim().toUpperCase() === 'READY';
+      processingRows.add(rowNumber); render();
+
+      try {
+        const model = await buildLabelModel_(o, rowIndex); const page = buildLabelHtml_(model); const win = openPrintWindowForPages_([page]);
+        if (!win) { processingRows.delete(rowNumber); render(); return; }
+        if (isReady) { setTimeout(() => { processingRows.delete(rowNumber); render(); }, 1000); return; }
+        setTimeout(async () => {
+          try { const res = await setOrderReadyAsync(rowNumber, prepEmployee); if (!res || !res.success) throw new Error(); removeOrderFromList_(rowNumber); showToast('تم التجهيز بنجاح'); } 
+          catch (e) { processingRows.delete(rowNumber); render(); alert('فشل التحديث'); }
+        }, 1000);
+      } catch (e) { processingRows.delete(rowNumber); render(); alert('فشل الطباعة'); }
+    }
+
+    function printSelected() { printBulk_('selected'); }
+    function printAllOrders() { printBulk_('all'); }
+
+    async function printBulk_(mode) {
+      const prepEmployee = requirePrepEmployee_(); if (!prepEmployee || isBulkPrinting) return;
+      const targetRows = getTargetRows_(mode); if (!targetRows.length) return;
+      isBulkPrinting = true; targetRows.forEach(r => processingRows.add(Number(r))); setGlobalBusyState_(true); render();
+
+      const pages = []; const printedRowsToReady = []; const printedReadyRows = [];
+      try {
+        for (let i = 0; i < targetRows.length; i++) {
+          const rowIndex = Number(targetRows[i]); const o = orders.find(x => Number(x.rowIndex) === rowIndex);
+          if (!o) { processingRows.delete(rowIndex); continue; }
+          const status = String(o.Status || '').trim().toUpperCase();
+          try {
+            const model = await buildLabelModel_(o, rowIndex); pages.push(buildLabelHtml_(model));
+            if (status === 'READY') printedReadyRows.push(rowIndex); else printedRowsToReady.push(rowIndex);
+          } catch (e) { processingRows.delete(rowIndex); }
+        }
+        if (!pages.length) { throw new Error(); }
+        const win = openPrintWindowForPages_(pages);
+        if (!win) { throw new Error(); }
+
+        setTimeout(async () => {
+          for (let i = 0; i < printedRowsToReady.length; i++) {
+            const r = Number(printedRowsToReady[i]);
+            try { const res = await setOrderReadyAsync(r, prepEmployee); if (res && res.success) removeOrderFromList_(r); else processingRows.delete(r); } catch (_) { processingRows.delete(r); }
+          }
+          printedReadyRows.forEach(r => processingRows.delete(Number(r)));
+          isBulkPrinting = false; setGlobalBusyState_(false); selectedRows.clear(); render();
+        }, 1200);
+      } catch (e) { isBulkPrinting = false; setGlobalBusyState_(false); targetRows.forEach(r => processingRows.delete(Number(r))); render(); alert('حدث خطأ'); }
+    }
+  </script>
+</body>
+</html>";
     
     let scanner = null;
 
