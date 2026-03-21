@@ -23,14 +23,18 @@
 </head>
 <body class="pb-10 flex flex-col items-center">
 
-  <div class="w-full max-w-md p-5 space-y-6 mt-4">
+  <div class="w-full bg-slate-900 p-4 border-b border-slate-800 shadow-md">
+    <div class="max-w-md mx-auto relative">
+      <input type="text" id="apiUrl" class="w-full bg-slate-800 border border-slate-700 text-slate-400 text-xs rounded-lg p-2.5 outline-none focus:border-blue-500" placeholder="ضع رابط Apps Script Web App هنا...">
+      <i data-lucide="link" class="absolute left-3 top-2.5 w-4 h-4 text-slate-500"></i>
+    </div>
+  </div>
+
+  <div class="w-full max-w-md p-5 space-y-6 mt-2">
     
     <div class="text-center">
-      <div class="w-16 h-16 bg-rose-900/30 text-rose-500 rounded-2xl flex items-center justify-center mx-auto mb-3 border border-rose-500/50 shadow-lg">
-        <i data-lucide="package-x" class="w-8 h-8"></i>
-      </div>
       <h1 class="text-3xl font-black text-white mb-2">إرجاع طلقة 🚀</h1>
-      <p class="text-slate-400 font-bold text-sm">امسح باركود الطلب لإرجاعه فوراً للمخزن</p>
+      <p class="text-slate-400 font-bold text-sm">اختر السبب، ثم افتح الكاميرا لمسح الطلبات</p>
     </div>
 
     <div class="bg-slate-800 p-4 rounded-2xl border border-slate-700 shadow-sm">
@@ -51,7 +55,8 @@
 
     <div id="cameraBox" class="hidden flex-col gap-3 bg-slate-800 p-3 rounded-3xl border border-slate-700 shadow-2xl">
       <div id="reader" class="w-full bg-black rounded-2xl overflow-hidden relative"></div>
-      <button onclick="stopScanner()" class="w-full bg-slate-700 text-white py-4 rounded-xl font-black hover:bg-slate-600 transition-colors">إيقاف الكاميرا ❌</button>
+      <p class="text-center text-xs text-slate-400 font-bold px-2">أبعد الجوال قليلاً عن الباركود لتعمل الكاميرا "فوكس" بشكل صحيح 📦</p>
+      <button onclick="stopScanner()" class="w-full bg-slate-700 text-white py-4 rounded-xl font-black hover:bg-slate-600 transition-colors mt-1">إيقاف الكاميرا ❌</button>
     </div>
 
     <div id="loadingBox" class="hidden flex-col items-center justify-center py-10 bg-slate-800 rounded-2xl border border-slate-700">
@@ -59,7 +64,8 @@
       <div class="text-blue-400 font-black text-lg" id="loadingText">جاري معالجة الطلب...</div>
     </div>
 
-    <div id="resultBox" class="hidden rounded-2xl p-5 border text-center font-black text-lg shadow-lg transition-all duration-300"></div>
+    <div id="resultBox" class="hidden rounded-2xl p-5 border text-center font-black text-lg shadow-lg transition-all duration-300">
+      </div>
 
     <div class="pt-6 border-t border-slate-800">
       <label class="block text-slate-500 font-bold mb-2 text-sm text-center">أو أدخل رقم الطلب/الهاتف يدوياً:</label>
@@ -75,8 +81,11 @@
     lucide.createIcons();
     let html5QrCode = null;
 
-    // 🟢 الرابط المدمج مباشرة (الخاص بك)
-    const API_URL = "https://script.google.com/macros/s/AKfycbyG7BwpbicVf-1oer8B8n_m2q45MkEl75GgbVmjKBzElRmHK_AKJCzFul1CrTpcbHU/exec";
+    // استرجاع رابط الـ API
+    document.addEventListener('DOMContentLoaded', () => {
+      const savedUrl = localStorage.getItem('mad_api_url');
+      if (savedUrl) document.getElementById('apiUrl').value = savedUrl;
+    });
 
     function toggleCustomReason() {
       const val = document.getElementById('reasonSelect').value;
@@ -91,17 +100,6 @@
       return r;
     }
 
-    // تجهيز كاميرا الآيفون والأندرويد
-    function isIos_() { return /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1); }
-    
-    async function getBestCameraId_() {
-      const cameras = await Html5Qrcode.getCameras();
-      if (!cameras || !cameras.length) throw new Error('NO_CAMERAS');
-      const normalized = cameras.map(cam => ({ id: cam.id, label: String(cam.label || '').toLowerCase() }));
-      const backCam = normalized.find(c => /back|rear|environment|خلف/.test(c.label)) || normalized[normalized.length - 1];
-      return backCam.id;
-    }
-
     async function startScanner() {
       const reason = getReason();
       if (!reason) { alert("⚠️ يرجى اختيار سبب الإرجاع أولاً!"); return; }
@@ -113,13 +111,32 @@
 
       if (!html5QrCode) html5QrCode = new Html5Qrcode("reader");
 
+      // إعدادات إجبارية للآيفون والأندرويد لاستخدام الفوكس المستمر والعدسة الخلفية الأساسية
+      const config = {
+        fps: 10,
+        qrbox: { width: 250, height: 100 },
+        aspectRatio: 1.7778,
+        videoConstraints: {
+          facingMode: "environment",
+          advanced: [{ focusMode: "continuous" }] // إجبار التلفون على عمل فوكس
+        }
+      };
+
       try {
-        const cameraId = await getBestCameraId_();
-        const config = { fps: isIos_() ? 8 : 10, qrbox: { width: 250, height: 150 }, aspectRatio: 1.7778 };
-        await html5QrCode.start(cameraId, config, onScanSuccess, function(){});
+        await html5QrCode.start({ facingMode: "environment" }, config, onScanSuccess, function(){});
+        
+        // إصلاح إضافي لمشكلة تعليق الفيديو في سفاري
+        setTimeout(() => {
+          const video = document.querySelector('#reader video');
+          if (video) {
+            video.setAttribute('playsinline', 'true');
+            video.play().catch(e => console.log(e));
+          }
+        }, 500);
+
       } catch (err) {
         stopScanner();
-        showResult(false, "تعذر فتح الكاميرا. تأكد من إعطاء الصلاحية في المتصفح.");
+        showResult(false, "تعذر فتح الكاميرا. الرجاء التأكد من إعطاء الصلاحية للكاميرا.");
       }
     }
 
@@ -130,7 +147,10 @@
 
     async function stopScanner() {
       if (html5QrCode && html5QrCode.isScanning) {
-        try { await html5QrCode.stop(); html5QrCode.clear(); } catch(e) {}
+        try {
+          await html5QrCode.stop();
+          html5QrCode.clear();
+        } catch(e) {}
       }
       document.getElementById('cameraBox').classList.add('hidden');
       document.getElementById('cameraBox').classList.remove('flex');
@@ -148,10 +168,14 @@
       const reason = getReason();
       if (!reason) { alert("⚠️ يرجى اختيار سبب الإرجاع أولاً!"); return; }
 
-      showLoader("جاري إرجاع الطلب للمخزن...");
+      const apiUrl = document.getElementById('apiUrl').value.trim();
+      if (!apiUrl) { alert("الرجاء إدخال رابط API في أعلى الصفحة"); return; }
+      localStorage.setItem('mad_api_url', apiUrl);
+
+      showLoader("جاري إرجاع الطلب...");
 
       try {
-        const response = await fetch(API_URL, {
+        const response = await fetch(apiUrl, {
           method: 'POST',
           headers: { 'Content-Type': 'text/plain;charset=utf-8' },
           body: JSON.stringify({ action: "return", barcode: barcode, reason: reason })
