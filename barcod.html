@@ -14,26 +14,36 @@
     .field { width: 100%; min-height: 50px; border-radius: 12px; border: 2px solid #334155; background: #1e293b; color: #f8fafc; padding: 10px 14px; font-weight: 700; outline: none; transition: 0.2s; }
     .field:focus { border-color: #f43f5e; box-shadow: 0 0 0 4px rgba(244,63,94,0.1); }
     
-    #reader video { border-radius: 16px; object-fit: cover; width: 100% !important; max-height: 400px; }
-    #reader { border: none !important; }
+    /* إخفاء الواجهة القديمة للمكتبة بالكامل */
+    #reader svg { display: none !important; }
+    #reader { border: none !important; width: 100%; height: 100%; }
+    #reader video { object-fit: cover; width: 100% !important; height: 100% !important; min-height: 350px; }
     
+    /* حركة خط الليزر الأحمر */
+    @keyframes laser-scan {
+      0% { top: 0%; }
+      100% { top: 100%; }
+    }
+    .animate-laser {
+      animation: laser-scan 1.5s infinite alternate ease-in-out;
+    }
+
     .loader { border: 4px solid rgba(255,255,255,0.1); border-left-color: #3b82f6; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
   </style>
 </head>
 <body class="pb-10 flex flex-col items-center">
 
-  <div class="w-full max-w-md p-5 space-y-6 mt-4">
+  <div class="w-full max-w-md p-5 space-y-6 mt-2">
     
     <div class="text-center">
       <div class="w-16 h-16 bg-rose-900/30 text-rose-500 rounded-2xl flex items-center justify-center mx-auto mb-3 border border-rose-500/50 shadow-lg">
         <i data-lucide="package-x" class="w-8 h-8"></i>
       </div>
       <h1 class="text-3xl font-black text-white mb-2">إرجاع طلقة 🚀</h1>
-      <p class="text-slate-400 font-bold text-sm">امسح باركود الطلب لإرجاعه فوراً للمخزن</p>
     </div>
 
-    <div class="bg-slate-800 p-4 rounded-2xl border border-slate-700 shadow-sm">
+    <div class="bg-slate-800 p-4 rounded-2xl border border-slate-700 shadow-sm" id="reasonContainer">
       <label class="block text-rose-400 font-black mb-2 flex items-center gap-1.5"><i data-lucide="alert-circle" class="w-4 h-4"></i> سبب الإرجاع (إجباري):</label>
       <select id="reasonSelect" class="field !border-slate-600 focus:!border-rose-500" onchange="toggleCustomReason()">
         <option value="">-- اضغط لاختيار السبب --</option>
@@ -46,17 +56,41 @@
     </div>
 
     <button id="startScanBtn" onclick="startScanner()" class="w-full bg-blue-600 hover:bg-blue-500 text-white py-5 rounded-2xl font-black text-xl flex items-center justify-center gap-3 shadow-lg shadow-blue-900/50 transition-transform active:scale-95">
-      <i data-lucide="camera" class="w-7 h-7"></i> افتح الكاميرا
+      <i data-lucide="scan-line" class="w-7 h-7"></i> فتح المسدس (الكاميرا)
     </button>
 
-    <div id="cameraBox" class="hidden flex-col gap-3 bg-slate-800 p-3 rounded-3xl border border-slate-700 shadow-2xl">
-      <div id="reader" class="w-full bg-black rounded-2xl overflow-hidden relative"></div>
+    <div id="cameraBox" class="hidden flex-col gap-4">
       
-      <div class="text-center text-xs text-blue-300 font-bold bg-blue-900/20 p-2 rounded-xl border border-blue-900/50 mt-1">
-        وجه المستطيل على الباركود 📏
+      <div class="relative w-full rounded-2xl overflow-hidden bg-black border-2 border-slate-700 shadow-2xl min-h-[350px]">
+        
+        <div id="reader" class="absolute inset-0"></div>
+        
+        <div class="absolute inset-0 z-20 flex items-center justify-center pointer-events-none">
+          <div class="relative w-[85%] h-[120px] border-2 border-[#3b82f6] rounded-md" style="box-shadow: 0 0 0 9999px rgba(0,0,0,0.6);">
+            <div class="absolute left-0 w-full h-[2px] bg-[#ef4444] shadow-[0_0_12px_3px_rgba(239,68,68,0.9)] animate-laser z-30"></div>
+          </div>
+        </div>
+
       </div>
 
-      <button onclick="stopScanner()" class="w-full bg-slate-700 text-white py-4 rounded-xl font-black hover:bg-slate-600 transition-colors mt-1">إيقاف الكاميرا ❌</button>
+      <div class="flex flex-col gap-3">
+        <button onclick="stopScanner()" class="w-full bg-[#ef4444] hover:bg-red-600 text-white py-3.5 rounded-xl font-black text-lg shadow-md transition-colors flex justify-center items-center gap-2">
+          إيقاف المسح <i data-lucide="x-circle" class="w-5 h-5"></i>
+        </button>
+        <button onclick="showManualInput()" class="w-full bg-[#b45309] hover:bg-amber-700 text-white py-3.5 rounded-xl font-black text-lg shadow-md transition-colors flex justify-center items-center gap-2">
+          إضافة باركود يدوي <i data-lucide="keyboard" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+    </div>
+
+    <div id="manualBox" class="hidden flex-col gap-3 bg-slate-800 p-4 rounded-2xl border border-slate-700 mt-4">
+      <label class="block text-slate-300 font-bold text-sm">أدخل رقم الهاتف أو الباركود:</label>
+      <div class="flex gap-2">
+        <input type="text" id="manualInp" class="field !min-h-[50px] font-mono text-center tracking-widest text-lg" dir="ltr" placeholder="...">
+        <button onclick="handleManualSubmit()" class="bg-blue-600 hover:bg-blue-500 px-5 rounded-xl font-black text-white"><i data-lucide="send" class="w-5 h-5"></i></button>
+      </div>
+      <button onclick="hideManualInput()" class="text-sm text-slate-400 font-bold mt-2 hover:text-white">إلغاء</button>
     </div>
 
     <div id="loadingBox" class="hidden flex-col items-center justify-center py-10 bg-slate-800 rounded-2xl border border-slate-700">
@@ -65,14 +99,6 @@
     </div>
 
     <div id="resultBox" class="hidden rounded-2xl p-5 border text-center font-black text-lg shadow-lg transition-all duration-300"></div>
-
-    <div class="pt-6 border-t border-slate-800">
-      <label class="block text-slate-500 font-bold mb-2 text-sm text-center">أو أدخل رقم الطلب/الهاتف يدوياً:</label>
-      <div class="flex gap-2">
-        <input type="text" id="manualInp" class="field !min-h-[50px] font-mono text-center tracking-widest text-lg" dir="ltr" placeholder="رقم الهاتف...">
-        <button onclick="handleManualSubmit()" class="bg-slate-700 hover:bg-slate-600 px-5 rounded-xl font-black text-white"><i data-lucide="send" class="w-5 h-5"></i></button>
-      </div>
-    </div>
 
   </div>
 
@@ -97,15 +123,30 @@
       return r;
     }
 
+    function showManualInput() {
+      stopScanner();
+      document.getElementById('manualBox').classList.remove('hidden');
+      document.getElementById('manualBox').classList.add('flex');
+    }
+
+    function hideManualInput() {
+      document.getElementById('manualBox').classList.add('hidden');
+      document.getElementById('manualBox').classList.remove('flex');
+      document.getElementById('startScanBtn').classList.remove('hidden');
+    }
+
     // ==========================================
-    // 🟢 تشغيل الكاميرا بالطريقة البسيطة والمضمونة للآيفون
+    // 🟢 تشغيل الكاميرا (سريعة جداً FPS: 20)
     // ==========================================
     function startScanner() {
       const reason = getReason();
       if (!reason) { alert("⚠️ يرجى اختيار سبب الإرجاع أولاً!"); return; }
 
       document.getElementById('resultBox').classList.add('hidden');
+      document.getElementById('manualBox').classList.add('hidden');
       document.getElementById('startScanBtn').classList.add('hidden');
+      document.getElementById('reasonContainer').classList.add('hidden');
+      
       document.getElementById('cameraBox').classList.remove('hidden');
       document.getElementById('cameraBox').classList.add('flex');
 
@@ -113,19 +154,23 @@
         scanner = new Html5Qrcode("reader");
       }
 
-      // استخدمنا طريقتك اللي اشتغلت معك 100%، بس خلينا مربع المسح مستطيل عريض (280 عرض، 120 ارتفاع)
+      // استخدمنا طريقتك + رفعنا الـ fps لـ 20 لسرعة الصاروخ
       scanner.start(
         { facingMode: { exact: "environment" } },
-        { fps: 10, qrbox: { width: 280, height: 120 } },
+        { 
+          fps: 20, 
+          // المربع الوهمي للمكتبة عشان يركز المعالج على النص فقط (مخفي بالـ CSS)
+          qrbox: { width: 300, height: 120 } 
+        },
         (decodedText) => {
           onScanSuccess(decodedText);
         },
         (errorMessage) => {
-          // نتجاهل رسائل الخطأ أثناء المسح المستمر
+          // يتم التجاهل للحفاظ على الأداء
         }
       ).catch(err => {
         stopScanner();
-        showResult(false, "تعذر فتح الكاميرا الخلفية: " + err);
+        showResult(false, "تعذر فتح الكاميرا: " + err);
       });
     }
 
@@ -142,6 +187,7 @@
       }
       document.getElementById('cameraBox').classList.add('hidden');
       document.getElementById('cameraBox').classList.remove('flex');
+      document.getElementById('reasonContainer').classList.remove('hidden');
       document.getElementById('startScanBtn').classList.remove('hidden');
     }
 
@@ -153,6 +199,7 @@
       const val = document.getElementById('manualInp').value.trim();
       if (!val) return;
       document.getElementById('manualInp').value = '';
+      hideManualInput();
       processReturn(val);
     }
 
@@ -197,17 +244,23 @@
     function hideLoader() {
       document.getElementById('loadingBox').classList.add('hidden');
       document.getElementById('loadingBox').classList.remove('flex');
+      document.getElementById('reasonContainer').classList.remove('hidden');
+      document.getElementById('startScanBtn').classList.remove('hidden');
     }
 
     function showResult(isSuccess, text) {
       const box = document.getElementById('resultBox');
       box.innerText = text;
       if (isSuccess) {
-        box.className = "bg-emerald-900/30 border border-emerald-500 text-emerald-400 rounded-2xl p-6 text-center font-black text-xl shadow-lg";
+        box.className = "mt-4 bg-emerald-900/30 border border-emerald-500 text-emerald-400 rounded-2xl p-6 text-center font-black text-xl shadow-lg";
       } else {
-        box.className = "bg-rose-900/30 border border-rose-500 text-rose-400 rounded-2xl p-6 text-center font-black text-xl shadow-lg";
+        box.className = "mt-4 bg-rose-900/30 border border-rose-500 text-rose-400 rounded-2xl p-6 text-center font-black text-xl shadow-lg";
       }
       box.classList.remove('hidden');
+      
+      // إظهار الأزرار الأساسية مجدداً بعد النتيجة
+      document.getElementById('reasonContainer').classList.remove('hidden');
+      document.getElementById('startScanBtn').classList.remove('hidden');
     }
   </script>
 </body>
