@@ -3,125 +3,26 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>قارئ باركود iPhone</title>
+  <title>قارئ باركود</title>
   <script src="https://unpkg.com/html5-qrcode"></script>
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #111;
-      color: #fff;
-      text-align: center;
-      padding: 20px;
-    }
-
-    h1 {
-      font-size: 24px;
-      margin-bottom: 10px;
-    }
-
-    p {
-      color: #ccc;
-      margin-bottom: 20px;
-    }
-
-    #reader {
-      width: 100%;
-      max-width: 420px;
-      margin: 0 auto;
-      border-radius: 14px;
-      overflow: hidden;
-      background: #000;
-      box-shadow: 0 0 20px rgba(255,255,255,0.08);
-    }
-
-    .result-box {
-      margin-top: 20px;
-      background: #1c1c1c;
-      padding: 15px;
-      border-radius: 12px;
-      max-width: 420px;
-      margin-left: auto;
-      margin-right: auto;
-      word-break: break-word;
-    }
-
-    .label {
-      color: #aaa;
-      font-size: 14px;
-      margin-bottom: 8px;
-    }
-
-    .value {
-      font-size: 18px;
-      color: #00e676;
-      font-weight: bold;
-    }
-
-    button {
-      margin-top: 15px;
-      padding: 12px 20px;
-      border: none;
-      border-radius: 10px;
-      background: #00c853;
-      color: white;
-      font-size: 16px;
-      cursor: pointer;
-    }
-
-    button:hover {
-      background: #00b248;
-    }
-  </style>
 </head>
 <body>
-
-  <h1>قارئ الباركود</h1>
-  <p>افتح الصفحة من iPhone واسمح للكاميرا</p>
-
-  <div id="reader"></div>
-
-  <div class="result-box">
-    <div class="label">نتيجة القراءة:</div>
-    <div class="value" id="result">لم يتم قراءة أي باركود بعد</div>
-    <button onclick="copyResult()">نسخ النتيجة</button>
-  </div>
+  <div id="reader" style="width:100%;max-width:400px;margin:auto;"></div>
+  <div id="result">لا توجد نتيجة</div>
 
   <script>
-    let lastResult = "";
+    const scanner = new Html5Qrcode("reader");
 
-    function onScanSuccess(decodedText, decodedResult) {
-      if (decodedText !== lastResult) {
-        lastResult = decodedText;
+    scanner.start(
+      { facingMode: { exact: "environment" } },
+      { fps: 10, qrbox: 250 },
+      (decodedText) => {
         document.getElementById("result").textContent = decodedText;
-        if (navigator.vibrate) navigator.vibrate(200);
-      }
-    }
-
-    function onScanFailure(error) {
-      // تجاهل الأخطاء المتكررة أثناء البحث
-    }
-
-    const html5QrCodeScanner = new Html5QrcodeScanner(
-      "reader",
-      {
-        fps: 10,
-        qrbox: { width: 250, height: 120 },
-        rememberLastUsedCamera: true,
-        supportedScanTypes: [Html5QrcodeScanType.SCAN_TYPE_CAMERA]
       },
-      false
-    );
-
-    html5QrCodeScanner.render(onScanSuccess, onScanFailure);
-
-    function copyResult() {
-      const text = document.getElementById("result").textContent;
-      navigator.clipboard.writeText(text).then(() => {
-        alert("تم نسخ النتيجة");
-      });
-    }
+      () => {}
+    ).catch(err => {
+      document.getElementById("result").textContent = "تعذر فتح الكاميرا الخلفية: " + err;
+    });
   </script>
-
 </body>
 </html>
