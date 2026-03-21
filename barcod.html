@@ -2,615 +2,126 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>10 طرق لقراءة الباركود</title>
-
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
-  <script src="https://unpkg.com/@zxing/library@latest"></script>
-
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>قارئ باركود iPhone</title>
+  <script src="https://unpkg.com/html5-qrcode"></script>
   <style>
-    body { background: #0f172a; color: #f8fafc; font-family: Arial, sans-serif; }
-    video, img, canvas {
-      width: 100%;
-      max-height: 320px;
-      background: #000;
-      border-radius: 16px;
-      object-fit: cover;
-    }
-    #html5Reader video {
-      width: 100% !important;
-      max-height: 320px !important;
-      object-fit: cover !important;
-      border-radius: 16px;
-    }
-    #html5Reader { border: none !important; }
-    .hidden-force { display: none !important; }
-    .btn {
-      background: #2563eb;
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #111;
       color: #fff;
-      padding: 12px 14px;
-      border-radius: 12px;
-      font-weight: 700;
-      width: 100%;
+      text-align: center;
+      padding: 20px;
     }
-    .btn:hover { background: #1d4ed8; }
-    .btn-stop { background: #475569; }
-    .btn-stop:hover { background: #334155; }
-    .box {
-      background: #1e293b;
-      border: 1px solid #334155;
-      border-radius: 16px;
-      padding: 14px;
+
+    h1 {
+      font-size: 24px;
+      margin-bottom: 10px;
     }
-    textarea {
+
+    p {
+      color: #ccc;
+      margin-bottom: 20px;
+    }
+
+    #reader {
       width: 100%;
-      min-height: 110px;
-      background: #020617;
-      color: #e2e8f0;
-      border: 1px solid #334155;
+      max-width: 420px;
+      margin: 0 auto;
+      border-radius: 14px;
+      overflow: hidden;
+      background: #000;
+      box-shadow: 0 0 20px rgba(255,255,255,0.08);
+    }
+
+    .result-box {
+      margin-top: 20px;
+      background: #1c1c1c;
+      padding: 15px;
       border-radius: 12px;
-      padding: 12px;
-      font-family: monospace;
+      max-width: 420px;
+      margin-left: auto;
+      margin-right: auto;
+      word-break: break-word;
+    }
+
+    .label {
+      color: #aaa;
+      font-size: 14px;
+      margin-bottom: 8px;
+    }
+
+    .value {
+      font-size: 18px;
+      color: #00e676;
+      font-weight: bold;
+    }
+
+    button {
+      margin-top: 15px;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 10px;
+      background: #00c853;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #00b248;
     }
   </style>
 </head>
-<body class="p-4">
-  <div class="max-w-3xl mx-auto space-y-4">
-    <div class="box">
-      <h1 class="text-2xl font-black mb-2">اختبار 10 طرق لقراءة الباركود</h1>
-      <p class="text-slate-400 text-sm">
-        جرّب كل طريقة لوحدها. إذا نجحت طريقة، ستظهر النتيجة في الأعلى.
-      </p>
-    </div>
+<body>
 
-    <div class="box">
-      <div class="font-black mb-2">النتيجة:</div>
-      <textarea id="resultBox" readonly></textarea>
-      <div class="grid grid-cols-2 gap-2 mt-3">
-        <button class="btn btn-stop" onclick="clearResult()">مسح النتيجة</button>
-        <button class="btn btn-stop" onclick="stopAll()">إيقاف الكل</button>
-      </div>
-    </div>
+  <h1>قارئ الباركود</h1>
+  <p>افتح الصفحة من iPhone واسمح للكاميرا</p>
 
-    <!-- 1 -->
-    <div class="box space-y-3">
-      <h2 class="text-lg font-black">1) BarcodeDetector لايف - الوضع الافتراضي</h2>
-      <div class="grid grid-cols-2 gap-2">
-        <button class="btn" onclick="startNative1()">تشغيل</button>
-        <button class="btn btn-stop" onclick="stopNative()">إيقاف</button>
-      </div>
-      <video id="nativeVideo" playsinline muted autoplay class="hidden-force"></video>
-    </div>
+  <div id="reader"></div>
 
-    <!-- 2 -->
-    <div class="box space-y-3">
-      <h2 class="text-lg font-black">2) BarcodeDetector لايف - مع Canvas تكبير</h2>
-      <div class="grid grid-cols-2 gap-2">
-        <button class="btn" onclick="startNative2()">تشغيل</button>
-        <button class="btn btn-stop" onclick="stopNative()">إيقاف</button>
-      </div>
-    </div>
-
-    <!-- 3 -->
-    <div class="box space-y-3">
-      <h2 class="text-lg font-black">3) html5-qrcode - الكاميرا الخلفية</h2>
-      <div class="grid grid-cols-2 gap-2">
-        <button class="btn" onclick="startHtml5Method1()">تشغيل</button>
-        <button class="btn btn-stop" onclick="stopHtml5()">إيقاف</button>
-      </div>
-      <div id="html5Reader" class="hidden-force bg-black rounded-2xl overflow-hidden min-h-[250px]"></div>
-    </div>
-
-    <!-- 4 -->
-    <div class="box space-y-3">
-      <h2 class="text-lg font-black">4) html5-qrcode - صندوق مسح عريض</h2>
-      <div class="grid grid-cols-2 gap-2">
-        <button class="btn" onclick="startHtml5Method2()">تشغيل</button>
-        <button class="btn btn-stop" onclick="stopHtml5()">إيقاف</button>
-      </div>
-    </div>
-
-    <!-- 5 -->
-    <div class="box space-y-3">
-      <h2 class="text-lg font-black">5) ZXing لايف - MultiFormatReader</h2>
-      <div class="grid grid-cols-2 gap-2">
-        <button class="btn" onclick="startZxing1()">تشغيل</button>
-        <button class="btn btn-stop" onclick="stopZxing()">إيقاف</button>
-      </div>
-      <video id="zxingVideo" playsinline muted autoplay class="hidden-force"></video>
-    </div>
-
-    <!-- 6 -->
-    <div class="box space-y-3">
-      <h2 class="text-lg font-black">6) ZXing لايف - تكرار مع hints مخصصة</h2>
-      <div class="grid grid-cols-2 gap-2">
-        <button class="btn" onclick="startZxing2()">تشغيل</button>
-        <button class="btn btn-stop" onclick="stopZxing()">إيقاف</button>
-      </div>
-    </div>
-
-    <!-- 7 -->
-    <div class="box space-y-3">
-      <h2 class="text-lg font-black">7) صورة + BarcodeDetector</h2>
-      <input id="imageInput1" type="file" accept="image/*" capture="environment" class="block w-full text-sm bg-slate-900 border border-slate-700 rounded-xl p-3" />
-      <img id="preview1" class="hidden-force border border-slate-700" alt="preview" />
-    </div>
-
-    <!-- 8 -->
-    <div class="box space-y-3">
-      <h2 class="text-lg font-black">8) صورة + ZXing</h2>
-      <input id="imageInput2" type="file" accept="image/*" capture="environment" class="block w-full text-sm bg-slate-900 border border-slate-700 rounded-xl p-3" />
-      <img id="preview2" class="hidden-force border border-slate-700" alt="preview" />
-    </div>
-
-    <!-- 9 -->
-    <div class="box space-y-3">
-      <h2 class="text-lg font-black">9) صورة + ZXing بعد Grayscale / Contrast</h2>
-      <input id="imageInput3" type="file" accept="image/*" capture="environment" class="block w-full text-sm bg-slate-900 border border-slate-700 rounded-xl p-3" />
-      <img id="preview3" class="hidden-force border border-slate-700" alt="preview" />
-    </div>
-
-    <!-- 10 -->
-    <div class="box space-y-3">
-      <h2 class="text-lg font-black">10) إدخال يدوي</h2>
-      <div class="flex gap-2">
-        <input id="manualInput" type="text" dir="ltr" class="flex-1 bg-slate-900 border border-slate-700 rounded-xl p-3 font-mono text-center" placeholder="اكتب الباركود هنا" />
-        <button class="btn w-auto px-6" onclick="submitManual()">إرسال</button>
-      </div>
-    </div>
+  <div class="result-box">
+    <div class="label">نتيجة القراءة:</div>
+    <div class="value" id="result">لم يتم قراءة أي باركود بعد</div>
+    <button onclick="copyResult()">نسخ النتيجة</button>
   </div>
 
-  <canvas id="workCanvas" class="hidden-force"></canvas>
-
   <script>
-    const resultBox = document.getElementById('resultBox');
-    const workCanvas = document.getElementById('workCanvas');
-    const workCtx = workCanvas.getContext('2d', { willReadFrequently: true });
+    let lastResult = "";
 
-    let nativeStream = null;
-    let nativeLoop = false;
-    let nativeMode = 1;
-    let nativeDetector = null;
-
-    let html5Scanner = null;
-    let html5Running = false;
-
-    let zxingReader = null;
-    let zxingControls = null;
-
-    function logResult(method, value) {
-      resultBox.value =
-        "الطريقة: " + method + "\n" +
-        "القيمة: " + value + "\n" +
-        "الوقت: " + new Date().toLocaleTimeString();
+    function onScanSuccess(decodedText, decodedResult) {
+      if (decodedText !== lastResult) {
+        lastResult = decodedText;
+        document.getElementById("result").textContent = decodedText;
+        if (navigator.vibrate) navigator.vibrate(200);
+      }
     }
 
-    function logError(method, error) {
-      resultBox.value =
-        "الطريقة: " + method + "\n" +
-        "الخطأ: " + error + "\n" +
-        "الوقت: " + new Date().toLocaleTimeString();
+    function onScanFailure(error) {
+      // تجاهل الأخطاء المتكررة أثناء البحث
     }
 
-    function clearResult() {
-      resultBox.value = "";
-    }
+    const html5QrCodeScanner = new Html5QrcodeScanner(
+      "reader",
+      {
+        fps: 10,
+        qrbox: { width: 250, height: 120 },
+        rememberLastUsedCamera: true,
+        supportedScanTypes: [Html5QrcodeScanType.SCAN_TYPE_CAMERA]
+      },
+      false
+    );
 
-    function normalizeCode(v) {
-      return String(v || "").trim();
-    }
+    html5QrCodeScanner.render(onScanSuccess, onScanFailure);
 
-    async function stopAll() {
-      await stopNative();
-      await stopHtml5();
-      await stopZxing();
-    }
-
-    async function getRearStream() {
-      return await navigator.mediaDevices.getUserMedia({
-        video: {
-          facingMode: { ideal: "environment" },
-          width: { ideal: 1280 },
-          height: { ideal: 720 }
-        },
-        audio: false
+    function copyResult() {
+      const text = document.getElementById("result").textContent;
+      navigator.clipboard.writeText(text).then(() => {
+        alert("تم نسخ النتيجة");
       });
     }
-
-    async function getRearHtml5CameraId() {
-      const cams = await Html5Qrcode.getCameras();
-      if (!cams || !cams.length) throw new Error("لم يتم العثور على كاميرا");
-      const normalized = cams.map(c => ({ id: c.id, label: String(c.label || "").toLowerCase() }));
-      const rear =
-        normalized.find(c => /back|rear|environment|wide|ultra/.test(c.label)) ||
-        normalized[normalized.length - 1] ||
-        normalized[0];
-      return rear.id;
-    }
-
-    function supportedNativeFormats() {
-      return [
-        'code_128', 'code_39', 'code_93', 'codabar',
-        'ean_13', 'ean_8', 'itf', 'upc_a', 'upc_e'
-      ];
-    }
-
-    // -------- 1 + 2 Native BarcodeDetector --------
-    async function startNativeCommon(mode) {
-      await stopAll();
-      if (!('BarcodeDetector' in window)) {
-        logError("BarcodeDetector", "المتصفح لا يدعم BarcodeDetector");
-        return;
-      }
-
-      try {
-        nativeMode = mode;
-        nativeDetector = new BarcodeDetector({ formats: supportedNativeFormats() });
-
-        const video = document.getElementById('nativeVideo');
-        video.classList.remove('hidden-force');
-
-        nativeStream = await getRearStream();
-        video.srcObject = nativeStream;
-        video.setAttribute('playsinline', 'true');
-        video.setAttribute('webkit-playsinline', 'true');
-        await video.play();
-
-        nativeLoop = true;
-        nativeDetectLoop();
-      } catch (e) {
-        logError("BarcodeDetector", e.message || e);
-      }
-    }
-
-    function startNative1() { startNativeCommon(1); }
-    function startNative2() { startNativeCommon(2); }
-
-    async function nativeDetectLoop() {
-      const video = document.getElementById('nativeVideo');
-
-      while (nativeLoop) {
-        try {
-          if (video.readyState >= 2) {
-            let target = video;
-
-            if (nativeMode === 2) {
-              const vw = video.videoWidth || 1280;
-              const vh = video.videoHeight || 720;
-              workCanvas.width = vw * 1.2;
-              workCanvas.height = vh * 1.2;
-              workCtx.filter = "grayscale(100%) contrast(180%)";
-              workCtx.drawImage(video, 0, 0, workCanvas.width, workCanvas.height);
-              target = workCanvas;
-            }
-
-            const found = await nativeDetector.detect(target);
-            if (found && found.length && found[0].rawValue) {
-              const raw = normalizeCode(found[0].rawValue);
-              if (raw) {
-                logResult(nativeMode === 1 ? "1) BarcodeDetector لايف" : "2) BarcodeDetector + Canvas", raw);
-                await stopNative();
-                break;
-              }
-            }
-          }
-        } catch (e) {
-          logError(nativeMode === 1 ? "1) BarcodeDetector" : "2) BarcodeDetector + Canvas", e.message || e);
-          await stopNative();
-          break;
-        }
-        await new Promise(r => setTimeout(r, 150));
-      }
-    }
-
-    async function stopNative() {
-      nativeLoop = false;
-      const video = document.getElementById('nativeVideo');
-      try {
-        if (nativeStream) {
-          nativeStream.getTracks().forEach(t => t.stop());
-          nativeStream = null;
-        }
-      } catch (e) {}
-      video.pause();
-      video.srcObject = null;
-      video.classList.add('hidden-force');
-    }
-
-    // -------- 3 + 4 html5-qrcode --------
-    const HTML5_FORMATS = [
-      Html5QrcodeSupportedFormats.CODE_128,
-      Html5QrcodeSupportedFormats.CODE_39,
-      Html5QrcodeSupportedFormats.CODE_93,
-      Html5QrcodeSupportedFormats.CODABAR,
-      Html5QrcodeSupportedFormats.EAN_13,
-      Html5QrcodeSupportedFormats.EAN_8,
-      Html5QrcodeSupportedFormats.ITF,
-      Html5QrcodeSupportedFormats.UPC_A,
-      Html5QrcodeSupportedFormats.UPC_E
-    ];
-
-    async function startHtml5Common(mode) {
-      await stopAll();
-      const reader = document.getElementById('html5Reader');
-      reader.classList.remove('hidden-force');
-
-      try {
-        html5Scanner = new Html5Qrcode("html5Reader");
-        const cameraId = await getRearHtml5CameraId();
-
-        const config = mode === 1
-          ? {
-              fps: 12,
-              aspectRatio: 1.7778,
-              qrbox: { width: 260, height: 120 },
-              formatsToSupport: HTML5_FORMATS,
-              disableFlip: true,
-              experimentalFeatures: { useBarCodeDetectorIfSupported: true }
-            }
-          : {
-              fps: 14,
-              aspectRatio: 1.7778,
-              qrbox: (w, h) => ({
-                width: Math.floor(w * 0.88),
-                height: Math.min(150, Math.floor(h * 0.30))
-              }),
-              formatsToSupport: HTML5_FORMATS,
-              disableFlip: true,
-              experimentalFeatures: { useBarCodeDetectorIfSupported: true }
-            };
-
-        await html5Scanner.start(
-          cameraId,
-          config,
-          async (decodedText) => {
-            const raw = normalizeCode(decodedText);
-            if (!raw) return;
-            logResult(mode === 1 ? "3) html5-qrcode" : "4) html5-qrcode عريض", raw);
-            await stopHtml5();
-          },
-          () => {}
-        );
-
-        html5Running = true;
-
-        setTimeout(() => {
-          const video = document.querySelector('#html5Reader video');
-          if (video) {
-            video.setAttribute('playsinline', 'true');
-            video.setAttribute('webkit-playsinline', 'true');
-            video.play().catch(() => {});
-          }
-        }, 350);
-      } catch (e) {
-        logError(mode === 1 ? "3) html5-qrcode" : "4) html5-qrcode عريض", e.message || e);
-        await stopHtml5();
-      }
-    }
-
-    function startHtml5Method1() { startHtml5Common(1); }
-    function startHtml5Method2() { startHtml5Common(2); }
-
-    async function stopHtml5() {
-      try {
-        if (html5Scanner && html5Running) {
-          await html5Scanner.stop();
-          try { await html5Scanner.clear(); } catch (e) {}
-        }
-      } catch (e) {}
-      html5Running = false;
-      document.getElementById('html5Reader').innerHTML = '';
-      document.getElementById('html5Reader').classList.add('hidden-force');
-      html5Scanner = null;
-    }
-
-    // -------- 5 + 6 ZXing live --------
-    function zxingFormats(mode) {
-      if (mode === 1) {
-        return [
-          ZXing.BarcodeFormat.CODE_128,
-          ZXing.BarcodeFormat.CODE_39,
-          ZXing.BarcodeFormat.CODE_93,
-          ZXing.BarcodeFormat.CODABAR,
-          ZXing.BarcodeFormat.EAN_13,
-          ZXing.BarcodeFormat.EAN_8,
-          ZXing.BarcodeFormat.ITF,
-          ZXing.BarcodeFormat.UPC_A,
-          ZXing.BarcodeFormat.UPC_E
-        ];
-      }
-      return [
-        ZXing.BarcodeFormat.CODE_128,
-        ZXing.BarcodeFormat.CODE_39,
-        ZXing.BarcodeFormat.EAN_13,
-        ZXing.BarcodeFormat.EAN_8
-      ];
-    }
-
-    async function startZxingCommon(mode) {
-      await stopAll();
-
-      try {
-        const video = document.getElementById('zxingVideo');
-        video.classList.remove('hidden-force');
-
-        zxingReader = new ZXing.BrowserMultiFormatReader();
-
-        const hints = new Map();
-        hints.set(ZXing.DecodeHintType.POSSIBLE_FORMATS, zxingFormats(mode));
-        zxingReader.hints = hints;
-
-        const devices = await ZXing.BrowserCodeReader.listVideoInputDevices();
-        if (!devices.length) throw new Error("لم يتم العثور على كاميرات");
-
-        const normalized = devices.map(d => ({
-          id: d.deviceId,
-          label: String(d.label || '').toLowerCase()
-        }));
-
-        const rear =
-          normalized.find(c => /back|rear|environment|wide|ultra/.test(c.label)) ||
-          normalized[normalized.length - 1] ||
-          normalized[0];
-
-        zxingControls = await zxingReader.decodeFromVideoDevice(
-          rear.id,
-          'zxingVideo',
-          (result) => {
-            if (result) {
-              const raw = normalizeCode(result.getText());
-              if (raw) {
-                logResult(mode === 1 ? "5) ZXing لايف" : "6) ZXing hints خاصة", raw);
-                stopZxing();
-              }
-            }
-          }
-        );
-      } catch (e) {
-        logError(mode === 1 ? "5) ZXing لايف" : "6) ZXing hints خاصة", e.message || e);
-        await stopZxing();
-      }
-    }
-
-    function startZxing1() { startZxingCommon(1); }
-    function startZxing2() { startZxingCommon(2); }
-
-    async function stopZxing() {
-      try {
-        if (zxingControls && typeof zxingControls.stop === 'function') {
-          zxingControls.stop();
-        }
-      } catch (e) {}
-      zxingControls = null;
-
-      try {
-        if (zxingReader && typeof zxingReader.reset === 'function') {
-          zxingReader.reset();
-        }
-      } catch (e) {}
-      zxingReader = null;
-
-      const video = document.getElementById('zxingVideo');
-      video.pause();
-      video.srcObject = null;
-      video.classList.add('hidden-force');
-    }
-
-    // -------- 7 image + BarcodeDetector --------
-    document.getElementById('imageInput1').addEventListener('change', async function() {
-      const file = this.files && this.files[0];
-      if (!file) return;
-      await stopAll();
-
-      const url = URL.createObjectURL(file);
-      const img = document.getElementById('preview1');
-      img.src = url;
-      img.classList.remove('hidden-force');
-
-      try {
-        if (!('BarcodeDetector' in window)) {
-          throw new Error("المتصفح لا يدعم BarcodeDetector");
-        }
-
-        const image = new Image();
-        image.src = url;
-        await new Promise((res, rej) => { image.onload = res; image.onerror = rej; });
-
-        const detector = new BarcodeDetector({ formats: supportedNativeFormats() });
-        const found = await detector.detect(image);
-
-        if (found && found.length && found[0].rawValue) {
-          logResult("7) صورة + BarcodeDetector", normalizeCode(found[0].rawValue));
-        } else {
-          logError("7) صورة + BarcodeDetector", "لم يتم العثور على باركود");
-        }
-      } catch (e) {
-        logError("7) صورة + BarcodeDetector", e.message || e);
-      }
-    });
-
-    // -------- 8 image + ZXing --------
-    document.getElementById('imageInput2').addEventListener('change', async function() {
-      const file = this.files && this.files[0];
-      if (!file) return;
-      await stopAll();
-
-      const url = URL.createObjectURL(file);
-      const img = document.getElementById('preview2');
-      img.src = url;
-      img.classList.remove('hidden-force');
-
-      try {
-        const image = new Image();
-        image.src = url;
-        await new Promise((res, rej) => { image.onload = res; image.onerror = rej; });
-
-        workCanvas.width = image.naturalWidth;
-        workCanvas.height = image.naturalHeight;
-        workCtx.filter = "none";
-        workCtx.drawImage(image, 0, 0);
-
-        const reader = new ZXing.MultiFormatReader();
-        const luminanceSource = new ZXing.HTMLCanvasElementLuminanceSource(workCanvas);
-        const binaryBitmap = new ZXing.BinaryBitmap(new ZXing.HybridBinarizer(luminanceSource));
-        const result = reader.decode(binaryBitmap);
-
-        if (result && result.getText()) {
-          logResult("8) صورة + ZXing", normalizeCode(result.getText()));
-        } else {
-          logError("8) صورة + ZXing", "لم يتم العثور على باركود");
-        }
-      } catch (e) {
-        logError("8) صورة + ZXing", e.message || e);
-      }
-    });
-
-    // -------- 9 image + ZXing processed --------
-    document.getElementById('imageInput3').addEventListener('change', async function() {
-      const file = this.files && this.files[0];
-      if (!file) return;
-      await stopAll();
-
-      const url = URL.createObjectURL(file);
-      const img = document.getElementById('preview3');
-      img.src = url;
-      img.classList.remove('hidden-force');
-
-      try {
-        const image = new Image();
-        image.src = url;
-        await new Promise((res, rej) => { image.onload = res; image.onerror = rej; });
-
-        workCanvas.width = image.naturalWidth * 1.4;
-        workCanvas.height = image.naturalHeight * 1.4;
-        workCtx.filter = "grayscale(100%) contrast(220%) brightness(115%)";
-        workCtx.drawImage(image, 0, 0, workCanvas.width, workCanvas.height);
-
-        const reader = new ZXing.MultiFormatReader();
-        const luminanceSource = new ZXing.HTMLCanvasElementLuminanceSource(workCanvas);
-        const binaryBitmap = new ZXing.BinaryBitmap(new ZXing.HybridBinarizer(luminanceSource));
-        const result = reader.decode(binaryBitmap);
-
-        if (result && result.getText()) {
-          logResult("9) صورة + ZXing معالجة", normalizeCode(result.getText()));
-        } else {
-          logError("9) صورة + ZXing معالجة", "لم يتم العثور على باركود");
-        }
-      } catch (e) {
-        logError("9) صورة + ZXing معالجة", e.message || e);
-      }
-    });
-
-    // -------- 10 manual --------
-    function submitManual() {
-      const v = normalizeCode(document.getElementById('manualInput').value);
-      if (!v) {
-        logError("10) إدخال يدوي", "أدخل قيمة أولًا");
-        return;
-      }
-      logResult("10) إدخال يدوي", v);
-    }
   </script>
+
 </body>
 </html>
