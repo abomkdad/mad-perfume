@@ -30,7 +30,7 @@
         <i data-lucide="package-x" class="w-8 h-8"></i>
       </div>
       <h1 class="text-3xl font-black text-white mb-2">إرجاع طلقة 🚀</h1>
-      <p class="text-slate-400 font-bold text-sm">أبعد الجوال قليلاً عن الكرتونة ليقرأ الباركود بسرعة</p>
+      <p class="text-slate-400 font-bold text-sm">امسح باركود الطلب لإرجاعه فوراً للمخزن</p>
     </div>
 
     <div class="bg-slate-800 p-4 rounded-2xl border border-slate-700 shadow-sm">
@@ -51,6 +51,11 @@
 
     <div id="cameraBox" class="hidden flex-col gap-3 bg-slate-800 p-3 rounded-3xl border border-slate-700 shadow-2xl">
       <div id="reader" class="w-full bg-black rounded-2xl overflow-hidden relative"></div>
+      
+      <div class="text-center text-xs text-blue-300 font-bold bg-blue-900/20 p-2 rounded-xl border border-blue-900/50 mt-1">
+        وجه المستطيل على الباركود 📏
+      </div>
+
       <button onclick="stopScanner()" class="w-full bg-slate-700 text-white py-4 rounded-xl font-black hover:bg-slate-600 transition-colors mt-1">إيقاف الكاميرا ❌</button>
     </div>
 
@@ -93,7 +98,7 @@
     }
 
     // ==========================================
-    // 🟢 تشغيل الكاميرا (محدثة لدعم الدقة العالية Full HD)
+    // 🟢 تشغيل الكاميرا بالطريقة البسيطة والمضمونة للآيفون
     // ==========================================
     function startScanner() {
       const reason = getReason();
@@ -108,33 +113,19 @@
         scanner = new Html5Qrcode("reader");
       }
 
-      // إعدادات المسح (FPS أعلى ومستطيل مريح)
-      const config = { 
-        fps: 15, 
-        qrbox: { width: 280, height: 120 }
-      };
-
-      // 1. المحاولة الأولى: نطلب دقة Full HD عشان الموظف يلقط من بعيد (يحل مشكلة الغباش بالآيفون)
+      // استخدمنا طريقتك اللي اشتغلت معك 100%، بس خلينا مربع المسح مستطيل عريض (280 عرض، 120 ارتفاع)
       scanner.start(
-        { 
-          facingMode: { exact: "environment" },
-          width: { ideal: 1920 },
-          height: { ideal: 1080 }
+        { facingMode: { exact: "environment" } },
+        { fps: 10, qrbox: { width: 280, height: 120 } },
+        (decodedText) => {
+          onScanSuccess(decodedText);
         },
-        config,
-        (decodedText) => { onScanSuccess(decodedText); },
-        (errorMessage) => { /* تجاهل الأخطاء العابرة أثناء المسح */ }
+        (errorMessage) => {
+          // نتجاهل رسائل الخطأ أثناء المسح المستمر
+        }
       ).catch(err => {
-        // 2. المحاولة الثانية (Fallback): إذا التلفون رفض الدقة العالية، نرجع للطريقة العادية فوراً
-        scanner.start(
-          { facingMode: { exact: "environment" } },
-          config,
-          (decodedText) => { onScanSuccess(decodedText); },
-          (errorMessage) => {}
-        ).catch(fallbackErr => {
-          stopScanner();
-          showResult(false, "تعذر فتح الكاميرا: " + fallbackErr);
-        });
+        stopScanner();
+        showResult(false, "تعذر فتح الكاميرا الخلفية: " + err);
       });
     }
 
