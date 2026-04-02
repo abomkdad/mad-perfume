@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>كتالوج MAD</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f7f7f7;
+      margin: 0;
+      padding: 20px;
+      color: #222;
+      line-height: 1.8;
+    }
+    .wrap {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 25px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+    }
+    .card {
+      background: #fff;
+      border-radius: 16px;
+      padding: 16px;
+      box-shadow: 0 4px 18px rgba(0,0,0,0.08);
+      border: 1px solid #e5e5e5;
+    }
+    .card img {
+      width: 100%;
+      height: 280px;
+      object-fit: cover;
+      border-radius: 12px;
+      background: #fafafa;
+      margin-bottom: 12px;
+    }
+    .title {
+      font-size: 20px;
+      font-weight: bold;
+      margin-bottom: 8px;
+    }
+    .code {
+      font-size: 14px;
+      color: #666;
+      margin-bottom: 8px;
+    }
+    .price {
+      font-size: 18px;
+      font-weight: bold;
+      color: #0a7a2f;
+      margin-bottom: 10px;
+    }
+    .section {
+      margin-top: 10px;
+      font-size: 14px;
+    }
+    .label {
+      font-weight: bold;
+      display: inline-block;
+      margin-bottom: 4px;
+    }
+    .loading, .error {
+      text-align: center;
+      font-size: 18px;
+      margin-top: 40px;
+    }
+    .error {
+      color: red;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>كتالوج MAD Perfume</h1>
+    <div id="status" class="loading">جاري تحميل البيانات...</div>
+    <div id="catalog" class="grid" style="display:none;"></div>
+  </div>
+
+  <script>
+    async function loadCatalog() {
+      const status = document.getElementById("status");
+      const catalog = document.getElementById("catalog");
+
+      try {
+        const res = await fetch("https://www.mad-parfumeur.com/catalog.json");
+        if (!res.ok) throw new Error("فشل تحميل الملف");
+
+        const data = await res.json();
+
+        if (!Array.isArray(data) || !data.length) {
+          throw new Error("البيانات فارغة أو ليست بصيغة صحيحة");
+        }
+
+        catalog.innerHTML = data.map(item => `
+          <div class="card">
+            <img src="${item.IMAGE_LINK || ''}" alt="${item.ORIGINAL_HE || item.ORIGINAL_AR || item['PRODUCT CODE'] || ''}">
+            <div class="title">${item.ORIGINAL_HE || item.ORIGINAL_AR || item['PRODUCT CODE'] || 'بدون اسم'}</div>
+            <div class="code">الكود: ${item['PRODUCT CODE'] || ''}</div>
+            <div class="price">السعر: ${item.PRICE || ''} ₪</div>
+
+            <div class="section">
+              <div class="label">الوصف:</div>
+              <div>${item.DESC_HE || item.DESC_AR || ''}</div>
+            </div>
+
+            <div class="section">
+              <div class="label">النوتات:</div>
+              <div>${item.PYRAMID_HE || item.PYRAMID_AR || ''}</div>
+            </div>
+
+            <div class="section">
+              <div class="label">أفضل وقت:</div>
+              <div>${item.BEST_TIME_HE || item.BEST_TIME_AR || ''}</div>
+            </div>
+          </div>
+        `).join("");
+
+        status.style.display = "none";
+        catalog.style.display = "grid";
+      } catch (err) {
+        status.className = "error";
+        status.textContent = "خطأ: " + err.message;
+      }
+    }
+
+    loadCatalog();
+  </script>
+</body>
+</html>
