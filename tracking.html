@@ -2,243 +2,73 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="utf-8" />
-  <meta
-    name="viewport"
-    content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no"
-  />
-  <title>MAD Parfumeur | تتبع الطلبات</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no" />
+  <title>MAD Parfumeur | מעקב הזמנות</title>
   <meta name="description" content="تتبع طلبك من MAD Parfumeur" />
+  <meta name="theme-color" content="#0f172a" />
   
   <link rel="icon" href="https://www.mad-parfumeur.com/assets/hero/lg.png" type="image/png">
 
   <style>
-    :root{
-      --bg:#0f172a;
-      --bg2:#111827;
-      --card:#1e293b;
-      --line:#334155;
-      --txt:#f8fafc;
-      --muted:#94a3b8;
-      --brand:#3b82f6; 
-      --header-h:64px;
-      --safe-top: env(safe-area-inset-top, 0px);
-      --safe-bottom: env(safe-area-inset-bottom, 0px);
-    }
-
-    *{
-      box-sizing:border-box;
-      -webkit-tap-highlight-color:transparent;
-    }
-
-    html, body{
-      margin:0;
-      padding:0;
-      width:100%;
-      height:100%;
-      overflow:hidden;
-      background:var(--bg);
-      color:var(--txt);
+    body, html {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: #0f172a; /* نفس لون خلفية التتبع لدمج مثالي */
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      overscroll-behavior:none;
     }
 
-    body{
-      position:fixed;
-      inset:0;
-      touch-action:manipulation;
+    /* الإطار يملأ الشاشة بالكامل بدون أي حواف */
+    iframe {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border: none;
+      z-index: 1;
     }
 
-    .app{
-      position:fixed;
-      inset:0;
-      width:100%;
-      height:100dvh;
-      height:100vh;
-      overflow:hidden;
-      background:linear-gradient(180deg, #0f172a, #1e293b);
+    /* زر الخطة البديلة الشفاف أسفل الشاشة */
+    .fallback-btn {
+      position: absolute;
+      bottom: env(safe-area-inset-bottom, 20px);
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 10;
+      background: rgba(30, 41, 59, 0.85);
+      color: #94a3b8;
+      padding: 8px 16px;
+      border-radius: 20px;
+      text-decoration: none;
+      font-size: 11px;
+      font-weight: bold;
+      border: 1px solid rgba(51, 65, 85, 0.5);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+      white-space: nowrap;
+      transition: all 0.2s;
     }
 
-    .top{
-      position:absolute;
-      top:0;
-      right:0;
-      left:0;
-      height:calc(var(--header-h) + var(--safe-top));
-      padding: calc(var(--safe-top) + 10px) 14px 10px 14px;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:10px;
-      border-bottom:1px solid var(--line);
-      background:rgba(15, 23, 42, 0.95);
-      backdrop-filter:blur(10px);
-      -webkit-backdrop-filter:blur(10px);
-      z-index:10;
-    }
-
-    .title{
-      font-weight:900;
-      font-size:16px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      letter-spacing: 0.5px;
-    }
-
-    .title img {
-      height: 28px;
-      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
-    }
-
-    .actions{
-      display:flex;
-      gap:8px;
-      flex-shrink:0;
-    }
-
-    .btn{
-      appearance:none;
-      border:1px solid var(--line);
-      background:rgba(30, 41, 59, 0.8);
-      color:var(--txt);
-      padding:8px 12px;
-      border-radius:10px;
-      cursor:pointer;
-      text-decoration:none;
-      font-size:13px;
-      font-weight:700;
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      white-space:nowrap;
-      transition:transform .12s ease;
-    }
-
-    .btn:active{
-      transform:scale(.95);
-    }
-
-    .btn.primary{
-      background:var(--brand);
-      color:#fff;
-      border-color:#2563eb;
-    }
-
-    .main{
-      position:absolute;
-      top:calc(var(--header-h) + var(--safe-top));
-      right:0;
-      left:0;
-      bottom:0;
-      padding:12px 12px calc(12px + var(--safe-bottom));
-      overflow:hidden;
-    }
-
-    .frame-shell{
-      position:relative;
-      width:100%;
-      height:100%;
-      border:1px solid var(--line);
-      border-radius:16px;
-      overflow:hidden;
-      background:var(--bg);
-      box-shadow:0 10px 25px rgba(0,0,0,0.4);
-    }
-
-    iframe{
-      display:block;
-      width:100%;
-      height:100%;
-      border:0;
-      background:transparent;
-    }
-
-    .note{
-      position:absolute;
-      right:50%;
-      transform:translateX(50%);
-      bottom:calc(15px + var(--safe-bottom));
-      z-index:11;
-      font-size:11px;
-      font-weight:bold;
-      color:var(--txt);
-      background:rgba(30, 41, 59, 0.85);
-      padding:8px 14px;
-      border:1px solid rgba(51, 65, 85, 0.8);
-      border-radius:20px;
-      backdrop-filter:blur(8px);
-      -webkit-backdrop-filter:blur(8px);
-      pointer-events:none;
-      white-space:nowrap;
-      box-shadow:0 4px 10px rgba(0,0,0,0.3);
-    }
-
-    @media (max-width:640px){
-      :root{ --header-h:60px; }
-      .top{ padding: calc(var(--safe-top) + 8px) 10px 8px 10px; }
-      .btn{ padding:8px 10px; font-size:12px; }
-      .main{ padding:8px 8px calc(8px + var(--safe-bottom)); }
-      .frame-shell{ border-radius:12px; }
+    .fallback-btn:active {
+      transform: translateX(-50%) scale(0.95);
+      background: rgba(30, 41, 59, 1);
     }
   </style>
 </head>
 <body>
-  <div class="app">
-    <header class="top">
-      <div class="title">
-        <img src="https://www.mad-parfumeur.com/assets/hero/lg.png" alt="MAD Logo">
-        <span>تتبع الطلبية</span>
-      </div>
 
-      <div class="actions">
-        <a
-          class="btn"
-          href="https://script.google.com/macros/s/AKfycbyF-nYl9dSSIJx6lVPrJRC8km0HbOYf7deD_oYQLIkIn5IBw4UBMSBbDhcGrySC38Bp/exec?page=tracking"
-          target="_blank"
-          rel="noopener"
-        >
-          فتح مباشر
-        </a>
+  <iframe 
+    src="https://script.google.com/macros/s/AKfycbyF-nYl9dSSIJx6lVPrJRC8km0HbOYf7deD_oYQLIkIn5IBw4UBMSBbDhcGrySC38Bp/exec?page=tracking" 
+    allow="clipboard-read; clipboard-write">
+  </iframe>
 
-        <button class="btn primary" type="button" onclick="reloadFrame()">
-          تحديث
-        </button>
-      </div>
-    </header>
+  <a href="https://script.google.com/macros/s/AKfycbyF-nYl9dSSIJx6lVPrJRC8km0HbOYf7deD_oYQLIkIn5IBw4UBMSBbDhcGrySC38Bp/exec?page=tracking" target="_blank" class="fallback-btn">
+    إذا لم تظهر الصفحة، اضغط هنا للفتح المباشر 👆
+  </a>
 
-    <main class="main">
-      <div class="frame-shell">
-        <iframe
-          id="appFrame"
-          title="MAD Order Tracking"
-          src="https://script.google.com/macros/s/AKfycbyF-nYl9dSSIJx6lVPrJRC8km0HbOYf7deD_oYQLIkIn5IBw4UBMSBbDhcGrySC38Bp/exec?page=tracking"
-          loading="eager"
-          referrerpolicy="no-referrer"
-          allow="clipboard-read; clipboard-write">
-        </iframe>
-      </div>
-
-      <div class="note">إذا لم تظهر الصفحة، اضغط على زر "فتح مباشر" 👆</div>
-    </main>
-  </div>
-
-  <script>
-    function reloadFrame() {
-      const f = document.getElementById('appFrame');
-      const currentSrc = f.src;
-      f.src = 'about:blank';
-      setTimeout(() => {
-        f.src = currentSrc;
-      }, 50);
-    }
-
-    function setAppHeight() {
-      document.documentElement.style.setProperty('--app-height', window.innerHeight + 'px');
-    }
-
-    setAppHeight();
-    window.addEventListener('resize', setAppHeight);
-    window.addEventListener('orientationchange', setAppHeight);
-  </script>
 </body>
 </html>
