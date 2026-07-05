@@ -1448,12 +1448,22 @@
 
     function trackTikTokProductEvent(eventName, product, quantity = 1) {
       if (!product) return;
+      const contentId = pcode(product);
+      const price = pprice(product);
       trackTikTokEvent(eventName, {
         content_type: "product",
-        content_ids: [pcode(product)],
+        content_id: contentId,
+        content_ids: [contentId],
+        content_name: pname(product),
+        contents: [{
+          content_id: contentId,
+          content_name: pname(product),
+          quantity,
+          price
+        }],
         quantity,
         currency: "ILS",
-        value: pprice(product) * quantity,
+        value: price * quantity,
         description: pname(product)
       });
     }
