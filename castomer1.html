@@ -701,12 +701,20 @@
     const DELIVERY_FEE = 50;
     const OFFER_CATEGORY = "__offers__";
 
-    const preferred = [
-      qs.get("lang"),
-      ...(Array.isArray(navigator.languages) ? navigator.languages : []),
-      navigator.language
-    ].filter(Boolean).map((value) => String(value).toLowerCase());
-    const locale = preferred.some((value) => value.startsWith("he")) ? "he" : "ar";
+    function detectDeviceLocale() {
+      const languages = [
+        ...(Array.isArray(navigator.languages) ? navigator.languages : []),
+        navigator.language,
+        navigator.userLanguage
+      ].filter(Boolean).map((value) => String(value).toLowerCase());
+      for (const value of languages) {
+        if (value.startsWith("ar")) return "ar";
+        if (value.startsWith("he") || value.startsWith("iw")) return "he";
+      }
+      return "ar";
+    }
+
+    const locale = detectDeviceLocale();
     const rtl = true;
     document.documentElement.lang = locale;
     document.documentElement.dir = rtl ? "rtl" : "ltr";
