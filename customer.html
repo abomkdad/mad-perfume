@@ -1640,11 +1640,17 @@
     function productSearchText(product) {
       return `${product.name} ${product.code} ${product.category}`.toLowerCase();
     }
+    function productStoreId(product) {
+      const explicit = safe(product.storeId || product.productId || product.product_id).trim();
+      if (/^\d+$/.test(explicit)) return explicit;
+      const match = safe(`${product.link} ${product.id}`).match(/product\.show\.(\d+)/i);
+      return match ? match[1] : "";
+    }
     function productPageKey(product) {
-      return safe(product.code || product.id).trim();
+      return productStoreId(product) || safe(product.code || product.id).trim();
     }
     function preservedUrlParams(url) {
-      const langParam = (qs.get("lang") || "").trim();
+      const langParam = (qs.get("lang") || locale || "").trim();
       const waParam = (qs.get("wa") || "").trim();
       if (langParam) url.searchParams.set("lang", langParam);
       if (waParam) url.searchParams.set("wa", waParam);
@@ -1673,6 +1679,7 @@
       return products.find((product) => {
         const keys = [
           productPageKey(product),
+          productStoreId(product),
           product.code,
           product.id,
           product.link
@@ -2212,7 +2219,16 @@
     }
     function renderInstantCatalog() {
       const cached = readCachedCatalog();
-      const fallback = cached.length ? cached : (FALLBACK_CATALOG[locale] || []);
+      const requestedKey = requestedProductKey();
+      const fallbackCatalog = requestedKey
+        ? [
+            ...(FALLBACK_CATALOG[locale] || []),
+            ...Object.keys(FALLBACK_CATALOG)
+              .filter((catalogLocale) => catalogLocale !== locale)
+              .flatMap((catalogLocale) => FALLBACK_CATALOG[catalogLocale] || [])
+          ]
+        : (FALLBACK_CATALOG[locale] || []);
+      const fallback = requestedKey ? fallbackCatalog : (cached.length ? cached : fallbackCatalog);
       if (!fallback.length) return false;
       setProducts(fallback);
       return renderCurrentProducts();
@@ -2232,6 +2248,7 @@
         setProducts(freshProducts);
         saveCachedCatalog(products);
         if (!renderCurrentProducts()) {
+          if (renderedInstantly) return;
           document.body.classList.remove("product-view");
           els.status.hidden = false;
           els.status.textContent = pt("productNotFound");
