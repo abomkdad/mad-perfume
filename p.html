@@ -25,7 +25,7 @@
       var forcedLang = (qs.get("lang") || "").trim().toLowerCase();
       var lang = forcedLang === "he" || forcedLang === "iw" ? "he" : forcedLang === "ar" ? "ar" : detectLang();
       document.documentElement.lang = lang;
-      document.documentElement.dir = lang === "he" ? "rtl" : "rtl";
+      document.documentElement.dir = "rtl";
 
       function detectLang() {
         var langs = (navigator.languages || [navigator.language || ""]).join(" ").toLowerCase();
@@ -106,7 +106,7 @@
       function writeCache(map) {
         try { sessionStorage.setItem("madProductIdMap", JSON.stringify(map)); } catch (e) {}
       }
-      async function resolveCode(id) {
+      async function resolveProduct(id) {
         var map = readCache();
         if (!map) {
           var response = await fetch("customer.html?v=20260706", { cache: "force-cache" });
@@ -114,14 +114,18 @@
           map = makeMap(extractCatalog(html));
           writeCache(map);
         }
-        return (map[lang] && map[lang][id]) || (map.he && map.he[id]) || (map.ar && map.ar[id]) || "";
+        if (map[lang] && map[lang][id]) return { code: map[lang][id], locale: lang };
+        if (map.he && map.he[id]) return { code: map.he[id], locale: "he" };
+        if (map.ar && map.ar[id]) return { code: map.ar[id], locale: "ar" };
+        return { code: "", locale: lang };
       }
       async function main() {
         if (!raw) return openCustomer("");
         var id = productId(raw);
         showFallback(raw);
-        var code = await resolveCode(id);
-        openCustomer(code || raw);
+        var product = await resolveProduct(id);
+        lang = product.locale || lang;
+        openCustomer(product.code || raw);
       }
       main().catch(function () { openCustomer(raw); });
     }());
