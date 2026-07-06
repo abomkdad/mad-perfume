@@ -19,12 +19,21 @@
   <script>
     (function () {
       var path = location.pathname.replace(/^\/+|\/+$/g, "");
-      var match = path.match(/^(?:product|p)\/(\d+)$/i) || path.match(/^(\d+)$/);
-      if (!match) return;
-      var id = match[1];
+      var match = path.match(/^(ar|he|iw)\/(?:product|p)\/(\d+)$/i);
+      var lang = "";
+      var id = "";
+      if (match) {
+        lang = match[1].toLowerCase() === "iw" ? "he" : match[1].toLowerCase();
+        id = match[2];
+      } else {
+        match = path.match(/^(?:product|p)\/(\d+)$/i) || path.match(/^(\d+)$/);
+        if (!match) return;
+        id = match[1];
+      }
       var params = new URLSearchParams(location.search);
       params.set("id", id);
-      if (!params.has("v")) params.set("v", "20260706d");
+      if (lang) params.set("lang", lang);
+      if (!params.has("v")) params.set("v", "20260706e");
       var target = "/p.html?" + params.toString();
       document.getElementById("link").href = target;
       location.replace(target);
