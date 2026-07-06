@@ -1,10 +1,8 @@
 name: Fix customer numeric product links
 
 on:
-  push:
-    paths:
-      - '.github/workflows/fix-customer-numeric-product.yml'
-  workflow_dispatch:
+  - push
+  - workflow_dispatch
 
 permissions:
   contents: write
@@ -15,8 +13,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Patch customer.html
-        shell: python
+        shell: bash
         run: |
+          python3 <<'PY'
           from pathlib import Path
 
           path = Path('customer.html')
@@ -127,8 +126,9 @@ jobs:
           else:
               path.write_text(text, encoding='utf-8')
               print('customer.html patched')
+          PY
 
-      - name: Commit patch and remove temporary workflow
+      - name: Commit patch and remove workflow
         shell: bash
         run: |
           rm -f .github/workflows/fix-customer-numeric-product.yml
