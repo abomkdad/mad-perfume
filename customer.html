@@ -1642,10 +1642,24 @@
     function productPageKey(product) {
       return safe(product.code || product.id).trim();
     }
+    function preservedUrlParams(url) {
+      const langParam = (qs.get("lang") || "").trim();
+      const waParam = (qs.get("wa") || "").trim();
+      if (langParam) url.searchParams.set("lang", langParam);
+      if (waParam) url.searchParams.set("wa", waParam);
+    }
+    function catalogPageUrl() {
+      const url = new URL(location.href);
+      url.search = "";
+      url.hash = "";
+      preservedUrlParams(url);
+      return url.toString();
+    }
     function productPageUrl(product) {
       const url = new URL(location.href);
       url.search = "";
       url.hash = "";
+      preservedUrlParams(url);
       url.searchParams.set("p", productPageKey(product));
       return url.toString();
     }
@@ -1785,7 +1799,7 @@
       els.cartBar.hidden = true;
       page.hidden = false;
       page.innerHTML = `
-        <a class="product-back" href="${escapeHtml(location.pathname)}">${escapeHtml(pt("back"))}</a>
+        <a class="product-back" href="${escapeHtml(catalogPageUrl())}">${escapeHtml(pt("back"))}</a>
         <section class="product-hero">
           <img src="${escapeHtml(product.image)}" alt="${escapeHtml(product.name)}">
           <span class="product-cta-strip">${escapeHtml(landing.tapHint)}</span>
