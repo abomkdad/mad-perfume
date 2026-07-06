@@ -4,10 +4,10 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   <title>MAD Perfume | كتالوج الطلب السريع</title>
-  <meta name="description" content="كتالوج MAD Perfume للطلب السريع عبر واتساب مع سلة ونموذج بيانات الزبون.">
+  <meta name="description" content="كتالوج MAD Perfume للطلب السريع مع حفظ الطلب مباشرة في نظام الطلبات.">
   <meta name="theme-color" content="#121c31">
-  <meta property="og:title" content="MAD Perfume | اطلب عطرك عبر واتساب">
-  <meta property="og:description" content="اختر المنتجات، املأ بيانات التوصيل، وأرسل الطلب كاملا عبر واتساب.">
+  <meta property="og:title" content="MAD Perfume | اطلب عطرك مباشرة">
+  <meta property="og:description" content="اختر المنتج، املأ الاسم والهاتف والمدينة، وثبّت الطلب مباشرة.">
   <meta property="og:type" content="website">
   <meta property="og:image" content="https://www.mad-parfumeur.com/assets/hero/logo2.webp">
   <script>
@@ -469,6 +469,11 @@
     }
     .order-error[hidden] {
       display: none !important;
+    }
+    .order-error.success {
+      background: rgba(22, 163, 74, .14);
+      color: #bbf7d0;
+      border: 1px solid rgba(34, 197, 94, .28);
     }
     .cart-items {
       flex: 1;
@@ -1154,9 +1159,6 @@
       body.product-view .product-lead button[type="submit"] {
         grid-column: 1 / -1;
       }
-      body.product-view .product-lead label:nth-of-type(4) {
-        grid-column: 1 / -1;
-      }
       body.product-view .product-lead .order-input {
         min-height: 52px;
       }
@@ -1249,7 +1251,7 @@
       </div>
       <form id="orderForm" class="order-form" novalidate hidden>
         <h3 id="orderFormTitle">بيانات التوصيل</h3>
-        <p id="orderFormHint" class="order-hint">اكتب التفاصيل مرة واحدة، وسنرسل الطلب كامل على واتساب.</p>
+        <p id="orderFormHint" class="order-hint">اكتب الاسم، رقم الهاتف والمدينة فقط، وسيتم تثبيت الطلب مباشرة.</p>
         <label class="order-field" for="customerName">
           <span id="customerNameLabel">الاسم</span>
           <input id="customerName" class="order-input" name="name" autocomplete="name" required>
@@ -1259,10 +1261,10 @@
           <input id="customerPhone" class="order-input" name="phone" type="tel" inputmode="tel" autocomplete="tel" required>
         </label>
         <label class="order-field" for="customerAddress">
-          <span id="customerAddressLabel">العنوان</span>
-          <textarea id="customerAddress" class="order-input" name="address" autocomplete="street-address" required></textarea>
+          <span id="customerAddressLabel">المدينة</span>
+          <input id="customerAddress" class="order-input" name="city" autocomplete="address-level2" required>
         </label>
-        <p id="orderFormError" class="order-error" hidden>املأ الاسم ورقم الهاتف والعنوان قبل إرسال الطلب.</p>
+        <p id="orderFormError" class="order-error" hidden>املأ الاسم ورقم الهاتف والمدينة قبل تثبيت الطلب.</p>
       </form>
       <div id="cartItems" class="cart-items"></div>
       <div id="cartCosts" class="cart-costs" hidden></div>
@@ -1277,6 +1279,7 @@
     const qs = new URLSearchParams(location.search);
     const WA_NUMBER = (qs.get("wa") || "972524033442").replace(/\D+/g, "");
     const CATALOG_URL = "https://script.google.com/macros/s/AKfycbyOedaaojoXQ6UNdzelH4YP0IUVuROnJydls8OBRsF4djuUtPrybSF_8zzyS2I5KD5pNQ/exec";
+    const ORDER_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbzd4FSy5fKZ5B3LF4ogDerw25K16oikiNv0j-4QPZGE4CzbvZFiw5vFIQpE09w486ldCA/exec";
     const FREE_DELIVERY_MIN = 500;
     const DELIVERY_FEE = 50;
     const OFFER_CATEGORY = "__offers__";
@@ -1314,7 +1317,7 @@
         cartTitle: "سلة المشتريات",
         close: "إغلاق",
         clear: "تفريغ",
-        send: "إرسال الطلب",
+        send: "تثبيت الطلب",
         add: "أضف",
         added: "بالسلة",
         buy: "اطلب",
@@ -1331,19 +1334,22 @@
         deliveryNote: "رسوم التوصيل 50 شيكل لكل طلب أقل من 500 شيكل.",
         finalTotal: "المجموع النهائي",
         orderFormTitle: "بيانات التوصيل",
-        orderFormHint: "اكتب التفاصيل مرة واحدة، وسنرسل الطلب كامل على واتساب.",
+        orderFormHint: "اكتب الاسم، رقم الهاتف والمدينة فقط. الطلب يصل مباشرة لنظام الطلبات.",
         customerName: "الاسم",
         customerPhone: "رقم الهاتف",
-        customerAddress: "العنوان",
+        customerAddress: "المدينة",
         customerNamePlaceholder: "اسمك الكامل",
         customerPhonePlaceholder: "رقم الهاتف",
-        customerAddressPlaceholder: "البلد، الشارع، رقم البيت",
-        orderFormError: "املأ الاسم ورقم الهاتف والعنوان قبل إرسال الطلب.",
+        customerAddressPlaceholder: "اكتب المدينة فقط",
+        orderFormError: "املأ الاسم ورقم الهاتف والمدينة قبل تثبيت الطلب.",
         customerDetailsTitle: "بيانات الزبون",
         orderDetailsTitle: "تفاصيل الطلب",
         cartEmptyTitle: "السلة فارغة",
-        cartEmptyHint: "أضف المنتجات ثم راجع الكمية والمجموع قبل الإرسال عبر واتساب.",
+        cartEmptyHint: "أضف المنتجات ثم راجع الكمية والمجموع قبل تثبيت الطلب.",
         cartGreeting: "مرحبا، أرغب بتنفيذ الطلب التالي:",
+        orderSending: "جاري تثبيت الطلب...",
+        orderSaved: "تم استلام طلبك بنجاح. سنتواصل معك قريبا لتأكيده.",
+        orderSaveError: "تعذر تثبيت الطلب. تأكد من الاتصال وحاول مرة أخرى.",
         consultGreeting: "مرحبا، أريد مساعدة باختيار عطر من MAD Perfume."
       },
       he: {
@@ -1356,7 +1362,7 @@
         cartTitle: "עגלת קניות",
         close: "סגירה",
         clear: "נקה",
-        send: "שליחת הזמנה",
+        send: "אישור הזמנה",
         add: "הוסף",
         added: "בעגלה",
         buy: "הזמן",
@@ -1373,19 +1379,22 @@
         deliveryNote: "משלוח ₪50 לכל הזמנה מתחת ל-₪500.",
         finalTotal: "סה\"כ לתשלום",
         orderFormTitle: "פרטי משלוח",
-        orderFormHint: "ממלאים פרטים פעם אחת ושולחים את כל ההזמנה בוואטסאפ.",
+        orderFormHint: "ממלאים שם, טלפון ועיר בלבד. ההזמנה נשמרת במערכת ההזמנות.",
         customerName: "שם",
         customerPhone: "טלפון",
-        customerAddress: "כתובת",
+        customerAddress: "עיר",
         customerNamePlaceholder: "שם מלא",
         customerPhonePlaceholder: "מספר טלפון",
-        customerAddressPlaceholder: "עיר, רחוב, מספר בית",
-        orderFormError: "נא למלא שם, טלפון וכתובת לפני שליחת ההזמנה.",
+        customerAddressPlaceholder: "עיר בלבד",
+        orderFormError: "נא למלא שם, טלפון ועיר לפני אישור ההזמנה.",
         customerDetailsTitle: "פרטי לקוח",
         orderDetailsTitle: "פרטי ההזמנה",
         cartEmptyTitle: "העגלה ריקה",
-        cartEmptyHint: "הוסיפו מוצרים, בדקו כמות וסכום, ואז שלחו את ההזמנה בוואטסאפ.",
+        cartEmptyHint: "הוסיפו מוצרים, בדקו כמות וסכום, ואז אשרו את ההזמנה.",
         cartGreeting: "שלום, אני רוצה לבצע את ההזמנה הבאה:",
+        orderSending: "שומר את ההזמנה...",
+        orderSaved: "ההזמנה התקבלה בהצלחה. ניצור קשר בקרוב לאישור.",
+        orderSaveError: "לא ניתן לשמור את ההזמנה. בדקו את החיבור ונסו שוב.",
         consultGreeting: "שלום, אשמח לעזרה בבחירת בושם מ-MAD Perfume."
       }
     };
@@ -1395,24 +1404,24 @@
         back: "العودة للكتالوج",
         details: "التفاصيل",
         heroEyebrow: "صفحة المنتج الرسمية",
-        mainCta: "اطلب الآن عبر واتساب",
+        mainCta: "اطلب الآن",
         addToCart: "أضف للسلة",
         whyTitle: "لماذا هذا المنتج؟",
         benefitsTitle: "ماذا يميز عطور MAD؟",
         orderTitle: "اترك بياناتك للطلب",
-        orderHint: "املأ التفاصيل وسنفتح واتساب برسالة جاهزة فيها المنتج وبيانات التوصيل.",
+        orderHint: "املأ الاسم ورقم الهاتف والمدينة فقط، وسيتم تثبيت الطلب مباشرة في النظام.",
         name: "الاسم",
         phone: "رقم الهاتف المحمول",
         city: "المدينة",
-        address: "العنوان الكامل",
+        address: "المدينة",
         namePlaceholder: "اسمك الكامل",
         phonePlaceholder: "رقم الهاتف",
         cityPlaceholder: "المدينة",
-        addressPlaceholder: "العنوان الكامل",
+        addressPlaceholder: "المدينة",
         cashConfirm: "سأدفع للمندوب نقدا عند وصوله وأنا أوافق",
         cashConfirmMessage: "الزبون وافق على الدفع للمندوب نقدا عند وصول الطلب.",
-        formError: "املأ الاسم ورقم الهاتف والمدينة والعنوان، ووافق على الدفع نقدا قبل الإرسال.",
-        submit: "إرسال الطلب على واتساب",
+        formError: "املأ الاسم ورقم الهاتف والمدينة قبل تثبيت الطلب.",
+        submit: "تثبيت الطلب",
         faqTitle: "أسئلة شائعة",
         deliveryTitle: "التوصيل والدفع",
         deliveryText: "التوصيل مع مندوب حتى البيت. التوصيل حتى 5 أيام عمل، والدفع للمندوب نقدا.",
@@ -1421,11 +1430,11 @@
         benefit1: "رائحة فاخرة قريبة من الإحساس الأصلي وبسعر أوضح.",
         benefit2: "تركيبة سهلة الاستخدام وليست زيتا خاما.",
         benefit3: "مناسب للاستخدام اليومي ويترك انطباعا نظيفا وواضحا.",
-        benefit4: "اطلب بسهولة عبر واتساب مع تفاصيل المنتج كاملة.",
+        benefit4: "اطلب بسهولة وسيصل الطلب مباشرة إلى نظام المتابعة.",
         faq1q: "هل المنتج زيت؟",
         faq1a: "لا، المنتج عطر جاهز للاستخدام حسب نوع المنتج الظاهر في الكتالوج.",
         faq2q: "كيف أطلب؟",
-        faq2a: "املأ الاسم والهاتف والعنوان، ثم اضغط إرسال الطلب وسيتم فتح واتساب برسالة جاهزة.",
+        faq2a: "املأ الاسم ورقم الهاتف والمدينة، ثم اضغط تثبيت الطلب.",
         faq3q: "كم رسوم التوصيل؟",
         faq3a: "50 شيكل لكل طلب أقل من 500 شيكل، ومجاني للطلبات من 500 شيكل فما فوق.",
         customerDetails: "بيانات الزبون",
@@ -1436,24 +1445,24 @@
         back: "חזרה לקטלוג",
         details: "פרטים",
         heroEyebrow: "עמוד המוצר הרשמי",
-        mainCta: "להזמנה בוואטסאפ",
+        mainCta: "להזמנה עכשיו",
         addToCart: "הוסף לעגלה",
         whyTitle: "למה לבחור במוצר הזה?",
         benefitsTitle: "מה מייחד את בשמי MAD?",
         orderTitle: "השאירו פרטים להזמנה",
-        orderHint: "ממלאים פרטים ווואטסאפ ייפתח עם הודעה מוכנה הכוללת את המוצר ופרטי המשלוח.",
+        orderHint: "ממלאים שם, טלפון ועיר בלבד, וההזמנה נשמרת ישירות במערכת.",
         name: "שם",
         phone: "טלפון נייד",
         city: "עיר",
-        address: "כתובת מלאה",
+        address: "עיר",
         namePlaceholder: "שם מלא",
         phonePlaceholder: "טלפון נייד",
         cityPlaceholder: "עיר",
-        addressPlaceholder: "כתובת מלאה",
+        addressPlaceholder: "עיר",
         cashConfirm: "אני אשלם לשליח במזומן כשהוא מגיע, אני מאשר",
         cashConfirmMessage: "הלקוח אישר תשלום לשליח במזומן כשהוא מגיע.",
-        formError: "נא למלא שם, טלפון, עיר וכתובת, ולאשר תשלום במזומן לפני השליחה.",
-        submit: "שליחת הזמנה בוואטסאפ",
+        formError: "נא למלא שם, טלפון ועיר לפני אישור ההזמנה.",
+        submit: "אישור הזמנה",
         faqTitle: "שאלות נפוצות",
         deliveryTitle: "משלוח ותשלום",
         deliveryText: "משלוח עם שליח עד הבית. משלוח עד 5 ימי עסקים, והתשלום לשליח במזומן.",
@@ -1462,11 +1471,11 @@
         benefit1: "ריח יוקרתי עם תחושה קרובה למקור ובמחיר ברור יותר.",
         benefit2: "מוצר מוכן לשימוש, לא שמן גולמי.",
         benefit3: "מתאים לשימוש יומי ומשאיר רושם נקי וברור.",
-        benefit4: "מזמינים בקלות בוואטסאפ עם כל פרטי המוצר.",
+        benefit4: "מזמינים בקלות וההזמנה נכנסת ישירות למערכת המעקב.",
         faq1q: "האם זה שמן?",
         faq1a: "לא, זה מוצר מוכן לשימוש לפי סוג המוצר שמופיע בקטלוג.",
         faq2q: "איך מזמינים?",
-        faq2a: "ממלאים שם, טלפון וכתובת, ואז לוחצים שליחה ונפתחת הודעת וואטסאפ מוכנה.",
+        faq2a: "ממלאים שם, טלפון ועיר, ואז לוחצים אישור הזמנה.",
         faq3q: "כמה עולה משלוח?",
         faq3a: "₪50 לכל הזמנה מתחת ל-₪500, וחינם להזמנות מ-₪500 ומעלה.",
         customerDetails: "פרטי לקוח",
@@ -1687,29 +1696,143 @@
         return keys.includes(wanted);
       }) || products.find((product) => productSearchText(product).includes(wanted));
     }
-    function productOrderMessage(product, customer = null) {
-      const lines = [
-        pt("greeting"),
-        "",
-        `${pt("productDetails")}:`,
-        `${t("code")}: ${product.code}`,
-        `${product.name}`,
-        `${t("total")}: ${money(product.price)}`,
+    function normalizePhone(value) {
+      return safe(value).replace(/[^\d+]/g, "").trim();
+    }
+    function trackingParam(name) {
+      return safe(qs.get(name)).trim();
+    }
+    function orderItemsSummary(items) {
+      return items.map((item) => {
+        const product = item.product;
+        const label = `[${product.code}] ${product.name}`;
+        return item.qty > 1 ? `${label} x${item.qty}` : label;
+      }).join(", ");
+    }
+    function deliverySummaryText(subtotal) {
+      const fee = deliveryFee(subtotal);
+      if (locale === "he") return fee ? `משלוח: ${money(fee)}` : "משלוח חינם";
+      return fee ? `التوصيل: ${money(fee)}` : "التوصيل مجاني";
+    }
+    function buildOrderPayload({ customer, items, subtotal, fee, total, source }) {
+      const orderId = `MAD-${Date.now()}-${Math.floor(10 + Math.random() * 90)}`;
+      const offer = orderItemsSummary(items);
+      const phone = normalizePhone(customer.phone);
+      const rawLines = locale === "he" ? [
+        `שם - ${customer.name}`,
+        `מספר פלאפון - ${phone}`,
+        `עיר - ${customer.city}`,
+        `החבילה שהזמנת - ${offer}`,
+        `מחיר מוצרים - ${money(subtotal)}`,
+        `משלוח - ${fee ? money(fee) : "חינם"}`,
+        `סה\"כ - ${money(total)}`,
+        "דרך התשלום - מזומן לשליח",
+        `קישור - ${location.href}`
+      ] : [
+        `الاسم: ${customer.name}`,
+        `الهاتف: ${phone}`,
+        `المدينة: ${customer.city}`,
+        `الطلب: ${offer}`,
+        `سعر المنتجات: ${money(subtotal)}`,
+        `التوصيل: ${fee ? money(fee) : "مجاني"}`,
+        `السعر النهائي: ${money(total)}`,
+        "طريقة الدفع: نقدا للمندوب",
+        `الرابط: ${location.href}`
       ];
-      if (customer) {
-        lines.push("");
-        lines.push(`${pt("customerDetails")}:`);
-        lines.push(`${pt("name")}: ${customer.name}`);
-        lines.push(`${pt("phone")}: ${customer.phone}`);
-        if (customer.city) lines.push(`${pt("city")}: ${customer.city}`);
-        lines.push(`${pt("address")}: ${customer.address}`);
-        if (customer.cashConfirm) lines.push(pt("cashConfirmMessage"));
+      return {
+        action: "saveOrder",
+        source: "website",
+        source_label: "الموقع 🌐",
+        date: new Date().toISOString(),
+        orderId,
+        offer,
+        name: customer.name,
+        phone,
+        city: customer.city,
+        address: customer.city,
+        price: total,
+        subtotal,
+        delivery_fee: fee,
+        delivery: fee ? money(fee) : "FREE",
+        delivery_note: deliverySummaryText(subtotal),
+        status: "NEW",
+        raw_request_text: rawLines.join("\n"),
+        source_lang: locale.toUpperCase(),
+        page_url: location.href,
+        page_title: document.title,
+        source_page: source,
+        ttclid: trackingParam("ttclid"),
+        utm_source: trackingParam("utm_source"),
+        utm_campaign: trackingParam("utm_campaign"),
+        utm_medium: trackingParam("utm_medium"),
+        utm_id: trackingParam("utm_id"),
+        items: items.map((item) => ({
+          code: item.product.code,
+          name: item.product.name,
+          product_id: productStoreId(item.product),
+          link: item.product.link,
+          qty: item.qty,
+          unit_price: item.product.price,
+          line_total: item.product.price * item.qty
+        }))
+      };
+    }
+    async function postOrderPayload(payload) {
+      await fetch(ORDER_WEBAPP_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify(payload),
+        keepalive: true
+      });
+      return true;
+    }
+    function setSubmitButtonState(button, isSaving, label) {
+      if (!button) return;
+      if (isSaving) {
+        button.dataset.originalText = button.textContent;
+        button.textContent = label;
+        button.disabled = true;
+      } else {
+        button.textContent = button.dataset.originalText || button.textContent;
+        button.disabled = false;
       }
-      if (product.image) {
-        lines.push("");
-        lines.push(product.image);
+    }
+    async function submitWebsiteOrder({ customer, items, submitButton, errorEl, successEl, source, onSuccess }) {
+      const subtotal = items.reduce((sum, item) => sum + item.product.price * item.qty, 0);
+      const fee = deliveryFee(subtotal);
+      const total = subtotal + fee;
+      const payload = buildOrderPayload({ customer, items, subtotal, fee, total, source });
+      if (errorEl) {
+        errorEl.hidden = true;
+        errorEl.classList.remove("success");
       }
-      return lines.join("\n");
+      if (successEl) successEl.hidden = true;
+      setSubmitButtonState(submitButton, true, t("orderSending"));
+      try {
+        await postOrderPayload(payload);
+        trackEvent("SubmitForm", {
+          content_type: "product",
+          content_name: payload.offer,
+          currency: "ILS",
+          value: payload.price
+        });
+        trackEvent("Contact", { currency: "ILS", value: payload.price });
+        if (successEl) {
+          successEl.textContent = t("orderSaved");
+          successEl.classList.add("success");
+          successEl.hidden = false;
+        }
+        if (typeof onSuccess === "function") onSuccess(payload);
+      } catch (error) {
+        console.warn(error);
+        if (errorEl) {
+          errorEl.textContent = t("orderSaveError");
+          errorEl.hidden = false;
+        }
+      } finally {
+        setSubmitButtonState(submitButton, false);
+      }
     }
     function ensureProductPage() {
       let page = document.getElementById("productPage");
@@ -1841,15 +1964,8 @@
               <span>${escapeHtml(pt("city"))}</span>
               <input id="productCustomerCity" class="order-input" autocomplete="address-level2" required placeholder="${escapeHtml(pt("cityPlaceholder"))}">
             </label>
-            <label class="order-field">
-              <span>${escapeHtml(pt("address"))}</span>
-              <textarea id="productCustomerAddress" class="order-input" autocomplete="street-address" required placeholder="${escapeHtml(pt("addressPlaceholder"))}"></textarea>
-            </label>
-            <div class="product-payment-note">${escapeHtml(landing.paymentNote)}</div>
-            <label class="product-consent">
-              <input id="productCashConfirm" type="checkbox" required>
-              <span>${escapeHtml(pt("cashConfirm"))}</span>
-            </label>
+            <div class="product-payment-note">${escapeHtml(deliverySummaryText(product.price))}</div>
+            <p id="productFormSuccess" class="order-error success" hidden>${escapeHtml(t("orderSaved"))}</p>
             <p id="productFormError" class="order-error" hidden>${escapeHtml(pt("formError"))}</p>
             <button class="btn wa product-main-cta" type="submit">${escapeHtml(pt("submit"))}</button>
           </form>
@@ -1893,22 +2009,31 @@
         setTimeout(() => page.querySelector("#productCustomerName").focus(), 220);
       };
       page.querySelectorAll("[data-focus-lead]").forEach((link) => link.addEventListener("click", focusLeadForm));
-      form.addEventListener("submit", (event) => {
+      form.addEventListener("submit", async (event) => {
         event.preventDefault();
         const name = safe(page.querySelector("#productCustomerName").value).trim();
         const phone = safe(page.querySelector("#productCustomerPhone").value).trim();
         const city = safe(page.querySelector("#productCustomerCity").value).trim();
-        const address = safe(page.querySelector("#productCustomerAddress").value).trim().replace(/\s*\n+\s*/g, ", ");
-        const cashConfirm = page.querySelector("#productCashConfirm").checked;
-        const missing = !name || !phone || !city || !address || !cashConfirm;
-        page.querySelector("#productFormError").hidden = !missing;
+        const missing = !name || !phone || !city;
+        const errorEl = page.querySelector("#productFormError");
+        const successEl = page.querySelector("#productFormSuccess");
+        errorEl.textContent = pt("formError");
+        errorEl.classList.remove("success");
+        errorEl.hidden = !missing;
+        successEl.hidden = true;
         page.querySelectorAll(".product-lead .order-input").forEach((field) => {
           field.classList.toggle("invalid", !safe(field.value).trim());
         });
-        page.querySelector(".product-consent").classList.toggle("invalid", !cashConfirm);
         if (missing) return;
-        trackEvent("Contact");
-        window.open(waUrl(productOrderMessage(product, { name, phone, city, address, cashConfirm })), "_blank", "noopener");
+        await submitWebsiteOrder({
+          customer: { name, phone, city },
+          items: [{ product, qty: 1 }],
+          submitButton: form.querySelector('button[type="submit"]'),
+          errorEl,
+          successEl,
+          source: "product",
+          onSuccess: () => form.reset()
+        });
       });
     }
     function cartCount() {
@@ -1935,7 +2060,7 @@
       return {
         name: safe(els.customerName.value).trim(),
         phone: safe(els.customerPhone.value).trim(),
-        address: safe(els.customerAddress.value).trim().replace(/\s*\n+\s*/g, ", ")
+        city: safe(els.customerAddress.value).trim()
       };
     }
     function focusFirstMissingOrderField() {
@@ -1945,6 +2070,8 @@
       setTimeout(() => target.focus(), 180);
     }
     function validateOrderForm(shouldFocus = false) {
+      els.orderFormError.classList.remove("success");
+      els.orderFormError.textContent = t("orderFormError");
       let firstMissing = null;
       for (const field of orderFields()) {
         const missing = !safe(field.value).trim();
@@ -2061,36 +2188,33 @@
         </div>
       `;
     }
-    function sendCartToWhatsApp() {
+    async function submitCartOrder() {
       if (cart.size === 0) return;
       if (!validateOrderForm(true)) return;
       const customer = customerDetails();
-      const lines = [
-        t("cartGreeting"),
-        "",
-        `${t("customerDetailsTitle")}:`,
-        `${t("customerName")}: ${customer.name}`,
-        `${t("customerPhone")}: ${customer.phone}`,
-        `${t("customerAddress")}: ${customer.address}`,
-        "",
-        `${t("orderDetailsTitle")}:`
-      ];
-      let index = 1;
-      for (const item of cart.values()) {
-        const lineTotal = item.product.price * item.qty;
-        lines.push(`${index}. ${item.product.name}`);
-        lines.push(`   ${t("code")}: ${item.product.code} | ${t("qty")}: ${item.qty} | ${t("total")}: ${money(lineTotal)}`);
-        index += 1;
-      }
-      const subtotal = cartSubtotal();
-      const fee = deliveryFee(subtotal);
-      lines.push("");
-      lines.push(`${t("subtotal")}: ${money(subtotal)}`);
-      lines.push(`${t("delivery")}: ${fee ? money(fee) : t("deliveryFree")}`);
-      lines.push(`${t("finalTotal")}: ${money(subtotal + fee)}`);
-      lines.push(`${cartCount()} ${t("items")}`);
-      trackEvent("Contact");
-      window.open(waUrl(lines.join("\n")), "_blank", "noopener");
+      const items = [...cart.values()].map((item) => ({ product: item.product, qty: item.qty }));
+      const savedTotal = grandTotal();
+      await submitWebsiteOrder({
+        customer,
+        items,
+        submitButton: els.sendCart,
+        errorEl: els.orderFormError,
+        successEl: els.orderFormError,
+        source: "cart",
+        onSuccess: () => {
+          cart.clear();
+          renderCart();
+          updateAddButtons();
+          els.cartItems.innerHTML = `
+            <div class="cart-empty">
+              <strong>${escapeHtml(t("orderSaved"))}</strong>
+              <span>${escapeHtml(t("finalTotal"))}: ${escapeHtml(money(savedTotal))}</span>
+            </div>
+          `;
+          els.cartPanelSummary.textContent = t("orderSaved");
+          els.cartPanelTotal.textContent = money(savedTotal);
+        }
+      });
     }
     function renderCategoryTabs() {
       const categories = sortedCategories(products.map(productCategory));
@@ -2330,14 +2454,16 @@
       renderCart();
       updateAddButtons();
     });
-    els.sendCart.addEventListener("click", sendCartToWhatsApp);
+    els.sendCart.addEventListener("click", submitCartOrder);
     els.orderForm.addEventListener("submit", (event) => {
       event.preventDefault();
-      sendCartToWhatsApp();
+      submitCartOrder();
     });
     for (const field of orderFields()) {
       field.addEventListener("input", () => {
         field.classList.remove("invalid");
+        els.orderFormError.classList.remove("success");
+        els.orderFormError.textContent = t("orderFormError");
         if (orderFields().every((item) => safe(item.value).trim())) els.orderFormError.hidden = true;
       });
     }
