@@ -5,38 +5,20 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>MAD Perfume</title>
   <meta name="robots" content="noindex">
-  <style>
-    html,body{margin:0;min-height:100%;background:#121a2b;color:#fff;font-family:system-ui,-apple-system,"Segoe UI",Arial,sans-serif}
-    body{display:grid;place-items:center;text-align:center;padding:20px}
-    a{color:#25d366;font-weight:800}
-  </style>
+  <style>html,body{margin:0;min-height:100%;background:#121a2b;color:#fff;font-family:system-ui,-apple-system,"Segoe UI",Arial,sans-serif}body{display:grid;place-items:center;text-align:center;padding:20px}a{color:#25d366;font-weight:800}</style>
 </head>
 <body>
-  <main>
-    <p id="msg">سيتم فتح صفحة المنتج خلال لحظات.</p>
-    <a id="link" href="/customer.html">فتح الكتالوج</a>
-  </main>
+  <div id="mad-product-route">يتم فتح صفحة المنتج...</div>
   <script>
-    (function () {
-      var path = location.pathname.replace(/^\/+|\/+$/g, "");
-      var match = path.match(/^(ar|he|iw)\/(?:product|p)\/(\d+)$/i);
-      var lang = "";
-      var id = "";
-      if (match) {
-        lang = match[1].toLowerCase() === "iw" ? "he" : match[1].toLowerCase();
-        id = match[2];
-      } else {
-        match = path.match(/^(?:product|p)\/(\d+)$/i) || path.match(/^(\d+)$/);
-        if (!match) return;
-        id = match[1];
-      }
-      var params = new URLSearchParams(location.search);
-      params.set("id", id);
-      if (lang) params.set("lang", lang);
-      if (!params.has("v")) params.set("v", "20260706e");
-      var target = "/p.html?" + params.toString();
-      document.getElementById("link").href = target;
-      location.replace(target);
+    (function(){
+      var path=location.pathname.replace(/^\/+|\/+$/g,"");
+      var m=path.match(/^(ar|he|iw)\/(?:product|p)\/(\d+)$/i);
+      var m2=path.match(/^(?:product|p)\/(\d+)$/i)||path.match(/^(\d+)$/);
+      var el=document.getElementById("mad-product-route");
+      if(m){el.dataset.lang=m[1].toLowerCase()==="iw"?"he":m[1].toLowerCase();el.dataset.id=m[2];}
+      else if(m2){el.dataset.id=m2[1];}
+      else{document.body.innerHTML='<main><p>لم نجد الصفحة.</p><a href="/customer.html">فتح الكتالوج</a></main>';return;}
+      var s=document.createElement("script");s.src="/assets/product-route.js?v=20260706f";document.body.appendChild(s);
     }());
   </script>
 </body>
