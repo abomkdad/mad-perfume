@@ -1298,6 +1298,53 @@
       }
     }
 
+    html, body {
+      width: 100%;
+      max-width: 100%;
+      overflow-x: hidden;
+    }
+    body:not(.product-view) .wrap {
+      width: 100%;
+      max-width: 520px;
+      overflow-x: hidden;
+    }
+    body:not(.product-view) .top {
+      margin: 0 0 10px;
+    }
+    body:not(.product-view) .top-main {
+      min-width: 0;
+    }
+    body:not(.product-view) .title {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    body:not(.product-view) .grid,
+    body:not(.product-view) .card {
+      min-width: 0;
+    }
+    .sales-hero {
+      margin: 12px 0 10px;
+      border: 1px solid rgba(183,121,31,.2);
+      border-radius: 14px;
+      padding: 13px 12px;
+      background: linear-gradient(180deg, #fff7e6 0%, #ffffff 100%);
+      box-shadow: 0 12px 28px rgba(15, 23, 42, .08);
+      display: grid;
+      gap: 10px;
+    }
+    .sales-hero h2 { margin: 0; color: #7c4a03; font-size: 20px; line-height: 1.18; font-weight: 950; }
+    .sales-hero p { margin: 0; color: #475467; font-size: 13px; line-height: 1.45; font-weight: 800; }
+    .sales-offer { border-radius: 12px; padding: 10px 11px; background: #172033; color: #ffffff; font-size: 16px; line-height: 1.25; font-weight: 950; text-align: center; }
+    .sales-trust { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px; }
+    .sales-trust span { min-height: 34px; border: 1px solid rgba(15,23,42,.1); border-radius: 10px; padding: 7px 8px; background: #ffffff; color: #243047; display: flex; align-items: center; justify-content: center; text-align: center; font-size: 12px; font-weight: 900; }
+    .sales-hero .btn { min-height: 44px; border-radius: 12px; font-size: 14px; }
+    .card .btn.wa.add-btn { background: linear-gradient(180deg, #25d366 0%, #159447 100%); border-color: rgba(37,211,102,.85); }
+    .card .details-btn.btn.alt { background: #f8fafc; color: #334155; }
+    .product-reviews { display: grid; gap: 8px; margin: 0; padding: 0; }
+    .product-reviews li { border: 2px solid #24b7f2; padding: 12px; color: #111827; background: #ffffff; text-align: center; font-size: 14px; line-height: 1.5; font-weight: 850; list-style: none; }
+    .product-reviews strong { display: block; color: #17aeea; margin-bottom: 4px; font-size: 18px; line-height: 1.2; }
     /* Light catalog theme */
     :root {
       --bg: #f4f7fb;
@@ -1607,6 +1654,21 @@
         add: "أضف",
         added: "بالسلة",
         buy: "اطلب",
+        orderNow: "اطلب الآن",
+        heroTitle: "عروض MAD الأكثر طلبا",
+        heroSubtitle: "اختر العرض، املأ الاسم والهاتف والمدينة فقط، والطلب يصل مباشرة للنظام.",
+        heroOffer: "3 عطور بـ ₪350 أو 5 عطور بـ ₪500",
+        heroDelivery: "توصيل حتى 5 أيام عمل",
+        heroPayment: "الدفع نقدا أو بفيزا للمندوب",
+        heroCta: "شاهد العروض",
+        trustCustomers: "+100,000 زبون",
+        trustBranches: "أكثر من 40 فرع",
+        trustService: "خدمة *9935",
+        trustPayment: "دفع عند الاستلام",
+        reviewsTitle: "ماذا يقول زبائننا؟",
+        review1: "طلب سريع وواضح، والرائحة ممتازة وثابتة.",
+        review2: "الدفع عند الاستلام مريح، وخدمة الزبائن تجاوب بسرعة.",
+        review3: "العروض مفهومة والسعر أوضح من شراء عطر واحد غالي.",
         all: "الكل",
         offers: "العروض",
         items: "منتجات",
@@ -1655,6 +1717,21 @@
         add: "הוסף",
         added: "בעגלה",
         buy: "הזמן",
+        orderNow: "להזמנה עכשיו",
+        heroTitle: "המבצעים המבוקשים של MAD",
+        heroSubtitle: "בוחרים מבצע, משאירים שם טלפון ועיר בלבד, וההזמנה נכנסת ישירות למערכת.",
+        heroOffer: "3 בשמים ב-₪350 או 5 בשמים ב-₪500",
+        heroDelivery: "משלוח עד 5 ימי עסקים",
+        heroPayment: "תשלום במזומן או בוויזה לשליח",
+        heroCta: "לצפייה במבצעים",
+        trustCustomers: "+100,000 לקוחות",
+        trustBranches: "יותר מ-40 סניפים",
+        trustService: "שירות *9935",
+        trustPayment: "תשלום בקבלה",
+        reviewsTitle: "מה הלקוחות אומרים?",
+        review1: "הזמנה קלה וברורה, והריח איכותי ונשאר טוב.",
+        review2: "נוח לשלם לשליח, ושירות הלקוחות עונה מהר.",
+        review3: "המבצע ברור והמחיר משתלם יותר מבושם יקר אחד.",
         all: "הכל",
         offers: "מבצעים",
         items: "פריטים",
@@ -2229,6 +2306,14 @@
     function renderProductPage(product) {
       const page = ensureProductPage();
       const landing = productLandingCopy();
+      trackEvent("ViewContent", {
+        content_type: "product",
+        content_id: product.code,
+        content_ids: [product.code],
+        content_name: product.name,
+        currency: "ILS",
+        value: product.price
+      });
       document.body.classList.add("product-view");
       document.title = `${product.name} | MAD Perfume`;
       els.status.hidden = true;
@@ -2288,6 +2373,14 @@
         <section class="product-section">
           <h2>${escapeHtml(landing.customerTitle)}</h2>
           <div class="product-proof">${escapeHtml(landing.customerText)}</div>
+        </section>
+        <section class="product-section">
+          <h2>${escapeHtml(t("reviewsTitle"))}</h2>
+          <ul class="product-reviews">
+            <li><strong>★★★★★</strong>${escapeHtml(t("review1"))}</li>
+            <li><strong>★★★★★</strong>${escapeHtml(t("review2"))}</li>
+            <li><strong>★★★★★</strong>${escapeHtml(t("review3"))}</li>
+          </ul>
         </section>
         <section class="product-section">
           <h2>${escapeHtml(pt("deliveryTitle"))}</h2>
@@ -2387,8 +2480,17 @@
       if (firstMissing && shouldFocus) focusFirstMissingOrderField();
       return !firstMissing;
     }
-    function openCartPanel(focusDetails = false) {
+    function openCartPanel(focusDetails = false, source = "cart") {
       els.cartPanel.hidden = false;
+      if (cartCount() > 0) {
+        trackEvent("InitiateCheckout", {
+          event_source: source,
+          content_type: "product",
+          num_items: cartCount(),
+          currency: "ILS",
+          value: grandTotal()
+        });
+      }
       if (focusDetails) focusFirstMissingOrderField();
     }
     function addToCart(productId) {
@@ -2408,6 +2510,7 @@
       });
       renderCart();
       updateAddButtons();
+      openCartPanel(true, "add_to_cart");
     }
     function updateQty(productId, delta) {
       const item = cart.get(productId);
@@ -2535,6 +2638,36 @@
       }
       els.categoryTabs.innerHTML = tabs.join("");
     }
+    function offerItemCount(product) {
+      const text = (safe(product.code) + " " + safe(product.name)).toUpperCase();
+      const codes = text.match(/\b[A-Z]{1,5}\d{2,4}\b/g) || [];
+      return new Set(codes).size || 1;
+    }
+    function effectiveProductPrice(product) {
+      const base = Number(product.price) > 0 ? Number(product.price) : 100;
+      if (productCategory(product) === OFFER_CATEGORY) {
+        const count = offerItemCount(product);
+        if (count >= 5) return 500;
+        if (count >= 3) return 350;
+      }
+      return base;
+    }
+    function catalogHeroHtml() {
+      return [
+        "<section class=\"sales-hero\" aria-label=\"" + escapeHtml(t("heroTitle")) + "\">",
+        "<h2>" + escapeHtml(t("heroTitle")) + "</h2>",
+        "<p>" + escapeHtml(t("heroSubtitle")) + "</p>",
+        "<div class=\"sales-offer\">" + escapeHtml(t("heroOffer")) + "</div>",
+        "<div class=\"sales-trust\">",
+        "<span>" + escapeHtml(t("trustCustomers")) + "</span>",
+        "<span>" + escapeHtml(t("trustBranches")) + "</span>",
+        "<span>" + escapeHtml(t("trustService")) + "</span>",
+        "<span>" + escapeHtml(t("trustPayment")) + "</span>",
+        "</div>",
+        "<button class=\"btn wa\" type=\"button\" data-scroll-offers>" + escapeHtml(t("heroCta")) + "</button>",
+        "</section>"
+      ].join("");
+    }
     function renderProducts() {
       const query = safe(els.search.value).trim().toLowerCase();
       const filtered = products.filter((product) => {
@@ -2555,7 +2688,7 @@
         if (!grouped.has(category)) grouped.set(category, []);
         grouped.get(category).push(product);
       }
-      els.content.innerHTML = sortedCategories([...grouped.keys()]).map((category) => {
+      els.content.innerHTML = catalogHeroHtml() + sortedCategories([...grouped.keys()]).map((category) => {
         const list = grouped.get(category) || [];
         const cards = list.map((product) => {
           const qty = cart.get(product.id)?.qty || 0;
@@ -2568,8 +2701,8 @@
                 <p class="code">MAD - ${escapeHtml(t("code"))}: ${escapeHtml(product.code)}</p>
                 <p class="price">${escapeHtml(money(product.price))}</p>
                 <div class="btn-row">
-                  <button class="btn alt add-btn" data-id="${escapeHtml(product.id)}" type="button">${escapeHtml(qty ? `${t("added")} (${qty})` : t("add"))}</button>
-                  <a class="btn wa details-btn" href="${escapeHtml(productPageUrl(product))}">${escapeHtml(pt("details"))}</a>
+                  <button class="btn wa add-btn" data-id="${escapeHtml(product.id)}" type="button">${escapeHtml(qty ? `${t("added")} (${qty})` : t("orderNow"))}</button>
+                  <a class="btn alt details-btn" href="${escapeHtml(productPageUrl(product))}">${escapeHtml(pt("details"))}</a>
                 </div>
               </div>
             </article>
@@ -2599,7 +2732,10 @@
       };
     }
     function setProducts(nextProducts) {
-      products = nextProducts.map(normalizeProduct).filter((product) => product.code && product.image);
+      products = nextProducts
+        .map(normalizeProduct)
+        .filter((product) => product.code && product.image)
+        .map((product) => ({ ...product, price: effectiveProductPrice(product) }));
     }
     function renderCurrentProducts() {
       const productKey = requestedProductKey();
@@ -2725,6 +2861,14 @@
       renderProducts();
     });
     els.content.addEventListener("click", (event) => {
+      const scrollOffers = event.target.closest("[data-scroll-offers]");
+      if (scrollOffers) {
+        event.preventDefault();
+        const firstSection = els.content.querySelector(".section");
+        if (firstSection) firstSection.scrollIntoView({ block: "start", behavior: "smooth" });
+        trackEvent("ViewContent", { event_source: "catalog_offer_banner" });
+        return;
+      }
       const addButton = event.target.closest(".add-btn");
       if (addButton) {
         addToCart(safe(addButton.getAttribute("data-id")));
@@ -2738,7 +2882,7 @@
       }
     });
     els.search.addEventListener("input", renderProducts);
-    els.openCart.addEventListener("click", () => openCartPanel());
+    els.openCart.addEventListener("click", () => openCartPanel(false, "cart_bar"));
     els.closeCart.addEventListener("click", () => {
       els.cartPanel.hidden = true;
     });
