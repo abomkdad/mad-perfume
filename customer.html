@@ -742,11 +742,21 @@
       padding: 10px;
       background: rgba(18,28,49,.96);
       display: flex;
+      flex-wrap: wrap;
       gap: 8px;
     }
     .cart-actions .btn {
       flex: 1;
       margin: 0;
+    }
+    .cart-actions .continue-shopping {
+      flex-basis: 100%;
+      min-height: 46px;
+      background: linear-gradient(180deg, #25d366 0%, #159447 100%);
+      border-color: rgba(37,211,102,.9);
+      color: #ffffff;
+      font-size: 14px;
+      box-shadow: 0 12px 24px rgba(22, 163, 74, .2);
     }
     .cart-actions .btn[disabled] {
       opacity: .55;
@@ -1642,6 +1652,7 @@
       <div id="cartItems" class="cart-items"></div>
       <div id="cartCosts" class="cart-costs" hidden></div>
       <footer class="cart-actions">
+        <button id="continueShopping" class="btn wa continue-shopping" type="button">Continue shopping</button>
         <button id="clearCart" class="btn alt" type="button">تفريغ</button>
         <button id="sendCart" class="btn wa" type="button">إرسال الطلب</button>
       </footer>
@@ -1694,6 +1705,7 @@
         cartCta: "عرض السلة",
         cartTitle: "سلة المشتريات",
         close: "إغلاق",
+        continueShopping: "تابع التسوق وأضف منتجات أخرى",
         clear: "تفريغ",
         send: "تثبيت الطلب",
         add: "أضف",
@@ -1758,6 +1770,7 @@
         cartCta: "הצג עגלה",
         cartTitle: "עגלת קניות",
         close: "סגירה",
+        continueShopping: "להמשיך לקנות ולהוסיף עוד מוצרים",
         clear: "נקה",
         send: "אישור הזמנה",
         add: "הוסף",
@@ -1991,12 +2004,14 @@
       orderFormError: document.getElementById("orderFormError"),
       cartItems: document.getElementById("cartItems"),
       cartCosts: document.getElementById("cartCosts"),
+      continueShopping: document.getElementById("continueShopping"),
       clearCart: document.getElementById("clearCart"),
       sendCart: document.getElementById("sendCart")
     };
 
     let products = [];
     let selectedCategory = OFFER_CATEGORY;
+    let cartAutoOpened = false;
     const cart = new Map();
     const safe = (value) => (value ?? "").toString();
     const escapeHtml = (value) => safe(value).replace(/[&<>"']/g, (ch) => ({
@@ -2558,7 +2573,10 @@
       });
       renderCart();
       updateAddButtons();
-      openCartPanel(true, "add_to_cart");
+      if (!cartAutoOpened) {
+        cartAutoOpened = true;
+        openCartPanel(false, "add_to_cart");
+      }
     }
     function updateQty(productId, delta) {
       const item = cart.get(productId);
@@ -2889,6 +2907,7 @@
       els.openCart.textContent = t("cartCta");
       els.cartTitle.textContent = t("cartTitle");
       els.closeCart.textContent = t("close");
+      els.continueShopping.textContent = t("continueShopping");
       els.clearCart.textContent = t("clear");
       els.sendCart.textContent = t("send");
       els.orderFormTitle.textContent = t("orderFormTitle");
@@ -2936,6 +2955,11 @@
     els.openCart.addEventListener("click", () => openCartPanel(false, "cart_bar"));
     els.closeCart.addEventListener("click", () => {
       els.cartPanel.hidden = true;
+    });
+    els.continueShopping.addEventListener("click", () => {
+      els.cartPanel.hidden = true;
+      const firstSection = els.content.querySelector(".section");
+      if (firstSection) firstSection.scrollIntoView({ block: "start", behavior: "smooth" });
     });
     els.cartPanel.addEventListener("click", (event) => {
       if (event.target === els.cartPanel) els.cartPanel.hidden = true;
