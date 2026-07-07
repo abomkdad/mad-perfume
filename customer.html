@@ -204,6 +204,50 @@
       scroll-snap-type: x proximity;
     }
     .cat-tabs::-webkit-scrollbar { display: none; }
+    .cat-hint {
+      min-height: 24px;
+      width: max-content;
+      max-width: 100%;
+      margin: 7px auto 0;
+      border: 1px solid rgba(37, 99, 235, .22);
+      border-radius: 999px;
+      padding: 5px 12px;
+      background: rgba(37, 99, 235, .08);
+      color: #2563eb;
+      font-size: 12px;
+      line-height: 1.15;
+      font-weight: 950;
+      text-align: center;
+      pointer-events: none;
+      animation: categoryHintPulse 1.45s ease-in-out infinite;
+    }
+    .cat-hint::before,
+    .cat-hint::after {
+      content: "‹‹";
+      display: inline-block;
+      color: #16a34a;
+      font-weight: 950;
+      animation: categoryHintSlide 1.45s ease-in-out infinite;
+    }
+    .cat-hint::before { margin-inline-end: 6px; }
+    .cat-hint::after { margin-inline-start: 6px; }
+    .cat-hint.is-used {
+      opacity: .18;
+      animation: none;
+    }
+    .cat-hint.is-used::before,
+    .cat-hint.is-used::after {
+      animation: none;
+    }
+    @keyframes categoryHintPulse {
+      0%, 100% { opacity: .55; transform: translateX(0); }
+      50% { opacity: 1; transform: translateX(-6px); }
+    }
+    @keyframes categoryHintSlide {
+      0%, 100% { transform: translateX(0); }
+      50% { transform: translateX(-4px); }
+    }
+
     .cat-tab {
       flex: 0 0 auto;
       min-height: 40px;
@@ -1554,6 +1598,7 @@
       </div>
       <input id="search" class="search" type="search" placeholder="ابحث بالكود أو الاسم">
       <div id="categoryTabs" class="cat-tabs"></div>
+      <div id="categoryHint" class="cat-hint" aria-hidden="true">اسحب التصنيفات لرؤية المزيد</div>
     </header>
     <div id="status" class="status" hidden></div>
     <div id="content"></div>
@@ -1661,6 +1706,7 @@
         heroDelivery: "توصيل حتى 5 أيام عمل",
         heroPayment: "الدفع نقدا أو بفيزا للمندوب",
         heroCta: "شاهد العروض",
+        categoryHint: "اسحب التصنيفات لرؤية المزيد",
         trustCustomers: "+100,000 زبون",
         trustBranches: "أكثر من 40 فرع",
         trustService: "خدمة *9935",
@@ -1724,6 +1770,7 @@
         heroDelivery: "משלוח עד 5 ימי עסקים",
         heroPayment: "תשלום במזומן או בוויזה לשליח",
         heroCta: "לצפייה במבצעים",
+        categoryHint: "החליקו את הקטגוריות לעוד אפשרויות",
         trustCustomers: "+100,000 לקוחות",
         trustBranches: "יותר מ-40 סניפים",
         trustService: "שירות *9935",
@@ -1920,6 +1967,7 @@
       floatingWaHint: document.getElementById("floatingWaHint"),
       search: document.getElementById("search"),
       categoryTabs: document.getElementById("categoryTabs"),
+      categoryHint: document.getElementById("categoryHint"),
       status: document.getElementById("status"),
       content: document.getElementById("content"),
       cartBar: document.getElementById("cartBar"),
@@ -2831,6 +2879,7 @@
       document.title = t("title");
       els.title.textContent = t("title");
       els.search.placeholder = t("search");
+      els.categoryHint.textContent = t("categoryHint");
       els.headerWa.textContent = "WhatsApp";
       els.headerWa.href = waUrl(t("consultGreeting"));
       els.floatingWaText.textContent = t("agentWa");
@@ -2853,6 +2902,8 @@
       els.orderFormError.textContent = t("orderFormError");
     }
 
+    els.categoryTabs.addEventListener("scroll", () => els.categoryHint.classList.add("is-used"), { once: true });
+    els.categoryTabs.addEventListener("pointerdown", () => els.categoryHint.classList.add("is-used"), { once: true });
     els.categoryTabs.addEventListener("click", (event) => {
       const button = event.target.closest(".cat-tab");
       if (!button) return;
