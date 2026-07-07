@@ -112,6 +112,73 @@
       justify-content: center;
       white-space: nowrap;
     }
+
+    .floating-wa {
+      position: fixed;
+      left: 12px;
+      right: 12px;
+      bottom: 76px;
+      z-index: 65;
+      max-width: 520px;
+      min-height: 58px;
+      margin: 0 auto;
+      border: 1px solid rgba(66,217,122,.92);
+      border-radius: 14px;
+      padding: 10px 14px;
+      background: linear-gradient(180deg, #25d366 0%, #159447 100%);
+      color: #ffffff;
+      text-decoration: none;
+      box-shadow: 0 14px 34px rgba(0,0,0,.38), 0 0 0 0 rgba(37,211,102,.28);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      animation: floatingWaPulse 1.8s ease-in-out infinite;
+    }
+    .floating-wa::before {
+      content: "WA";
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: #ffffff;
+      color: #159447;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 950;
+      flex: 0 0 auto;
+    }
+    .floating-wa span,
+    .floating-wa small {
+      display: block;
+      line-height: 1.15;
+      text-align: start;
+    }
+    .floating-wa span {
+      font-size: 15px;
+      font-weight: 950;
+    }
+    .floating-wa small {
+      margin-top: 2px;
+      color: rgba(255,255,255,.86);
+      font-size: 11px;
+      font-weight: 850;
+    }
+    .floating-wa:focus-visible {
+      outline: 3px solid rgba(255,216,137,.88);
+      outline-offset: 3px;
+    }
+    @keyframes floatingWaPulse {
+      0%, 100% { box-shadow: 0 14px 34px rgba(0,0,0,.38), 0 0 0 0 rgba(37,211,102,.28); filter: brightness(1); }
+      50% { box-shadow: 0 14px 34px rgba(0,0,0,.38), 0 0 0 8px rgba(37,211,102,.12); filter: brightness(1.08); }
+    }
+    body.product-view .floating-wa {
+      bottom: 14px;
+    }
+    body.product-view .product-page {
+      padding-bottom: 82px;
+    }
     .search {
       width: 100%;
       border: 1px solid rgba(255,255,255,.2);
@@ -1071,6 +1138,9 @@
       min-width: 136px;
       border-radius: 5px;
     }
+    body.product-view .product-page {
+      padding-bottom: 82px;
+    }
     @media (min-width: 760px) {
       body.product-view {
         padding: 24px 18px;
@@ -1284,6 +1354,11 @@
     </section>
   </div>
 
+  <a id="floatingWa" class="floating-wa" href="#" target="_blank" rel="noopener">
+    <span id="floatingWaText">طلب عبر مندوب</span>
+    <small id="floatingWaHint">واتساب مباشر</small>
+  </a>
+
   <script>
     const qs = new URLSearchParams(location.search);
     const WA_NUMBER = (qs.get("wa") || "972524033442").replace(/\D+/g, "");
@@ -1359,7 +1434,10 @@
         orderSending: "جاري تثبيت الطلب...",
         orderSaved: "تم استلام طلبك بنجاح. سنتواصل معك قريبا لتأكيده.",
         orderSaveError: "تعذر تثبيت الطلب. تأكد من الاتصال وحاول مرة أخرى.",
-        consultGreeting: "مرحبا، أريد مساعدة باختيار عطر من MAD Perfume."
+        consultGreeting: "مرحبا، أريد مساعدة باختيار عطر من MAD Perfume.",
+        agentWa: "طلب عبر مندوب",
+        agentWaHint: "واتساب مباشر",
+        agentGreeting: "مرحبا، أريد الطلب عبر مندوب من MAD Perfume."
       },
       he: {
         title: "קטלוג הבשמים של MAD",
@@ -1404,7 +1482,10 @@
         orderSending: "שומר את ההזמנה...",
         orderSaved: "ההזמנה התקבלה בהצלחה. ניצור קשר בקרוב לאישור.",
         orderSaveError: "לא ניתן לשמור את ההזמנה. בדקו את החיבור ונסו שוב.",
-        consultGreeting: "שלום, אשמח לעזרה בבחירת בושם מ-MAD Perfume."
+        consultGreeting: "שלום, אשמח לעזרה בבחירת בושם מ-MAD Perfume.",
+        agentWa: "הזמנה דרך נציג",
+        agentWaHint: "וואטסאפ ישיר",
+        agentGreeting: "שלום, אני רוצה להזמין דרך נציג של MAD Perfume."
       }
     };
     const t = (key) => copy[locale][key] || copy.ar[key] || key;
@@ -1555,6 +1636,9 @@
     const els = {
       title: document.getElementById("title"),
       headerWa: document.getElementById("headerWa"),
+      floatingWa: document.getElementById("floatingWa"),
+      floatingWaText: document.getElementById("floatingWaText"),
+      floatingWaHint: document.getElementById("floatingWaHint"),
       search: document.getElementById("search"),
       categoryTabs: document.getElementById("categoryTabs"),
       status: document.getElementById("status"),
@@ -1826,7 +1910,13 @@
           currency: "ILS",
           value: payload.price
         });
-        trackEvent("Contact", { currency: "ILS", value: payload.price });
+        trackEvent("Contact", {
+          event_source: "order_form",
+          order_source: source,
+          currency: "ILS",
+          value: payload.price,
+          content_name: payload.offer
+        });
         if (successEl) {
           successEl.textContent = t("orderSaved");
           successEl.classList.add("success");
@@ -2405,6 +2495,10 @@
       els.search.placeholder = t("search");
       els.headerWa.textContent = "WhatsApp";
       els.headerWa.href = waUrl(t("consultGreeting"));
+      els.floatingWaText.textContent = t("agentWa");
+      els.floatingWaHint.textContent = t("agentWaHint");
+      els.floatingWa.href = waUrl(t("agentGreeting"));
+      els.floatingWa.setAttribute("aria-label", t("agentWa") + " - " + t("agentWaHint"));
       els.openCart.textContent = t("cartCta");
       els.cartTitle.textContent = t("cartTitle");
       els.closeCart.textContent = t("close");
@@ -2480,7 +2574,14 @@
         if (orderFields().every((item) => safe(item.value).trim())) els.orderFormError.hidden = true;
       });
     }
-    els.headerWa.addEventListener("click", () => trackEvent("Contact"));
+    els.headerWa.addEventListener("click", () => trackEvent("Contact", {
+      event_source: "header_whatsapp",
+      phone: WA_NUMBER
+    }));
+    els.floatingWa.addEventListener("click", () => trackEvent("Contact", {
+      event_source: "floating_whatsapp",
+      phone: WA_NUMBER
+    }));
 
     applyText();
     renderCart();
