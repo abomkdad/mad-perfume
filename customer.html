@@ -2380,6 +2380,7 @@
         customerPhonePlaceholder: "رقم الهاتف",
         customerAddressPlaceholder: "اكتب المدينة فقط",
         orderFormError: "املأ الاسم ورقم الهاتف والمدينة قبل تثبيت الطلب.",
+        orderPhoneError: "أدخل رقم هاتف صحيح قبل تثبيت الطلب.",
         customerDetailsTitle: "بيانات الزبون",
         orderDetailsTitle: "تفاصيل الطلب",
         cartEmptyTitle: "السلة فارغة",
@@ -2450,6 +2451,7 @@
         customerPhonePlaceholder: "מספר טלפון",
         customerAddressPlaceholder: "עיר בלבד",
         orderFormError: "נא למלא שם, טלפון ועיר לפני אישור ההזמנה.",
+        orderPhoneError: "נא להזין מספר טלפון תקין לפני אישור ההזמנה.",
         customerDetailsTitle: "פרטי לקוח",
         orderDetailsTitle: "פרטי ההזמנה",
         cartEmptyTitle: "העגלה ריקה",
@@ -2487,6 +2489,7 @@
         cashConfirm: "سأدفع للمندوب نقدا أو بفيزا عند وصوله وأنا أوافق",
         cashConfirmMessage: "الزبون وافق على الدفع للمندوب نقدا أو بفيزا عند وصول الطلب.",
         formError: "املأ الاسم ورقم الهاتف والمدينة قبل تثبيت الطلب.",
+        phoneError: "أدخل رقم هاتف صحيح قبل تثبيت الطلب.",
         submit: "تثبيت الطلب الآن",
         faqTitle: "أسئلة شائعة",
         deliveryTitle: "التوصيل والدفع",
@@ -2528,6 +2531,7 @@
         cashConfirm: "אני אשלם לשליח במזומן או בוויזה כשהוא מגיע, אני מאשר",
         cashConfirmMessage: "הלקוח אישר תשלום לשליח במזומן או בוויזה כשהוא מגיע.",
         formError: "נא למלא שם, טלפון ועיר לפני אישור ההזמנה.",
+        phoneError: "נא להזין מספר טלפון תקין לפני אישור ההזמנה.",
         submit: "אישור הזמנה עכשיו",
         faqTitle: "שאלות נפוצות",
         deliveryTitle: "משלוח ותשלום",
@@ -2845,7 +2849,15 @@
       }) || products.find((product) => productSearchText(product).includes(wanted));
     }
     function normalizePhone(value) {
-      return safe(value).replace(/[^\d+]/g, "").trim();
+      const digits = safe(value).replace(/\D/g, "");
+      if (/^05\d{8}$/.test(digits)) return digits;
+      if (/^5\d{8}$/.test(digits)) return "0" + digits;
+      if (/^9725\d{8}$/.test(digits) || /^9705\d{8}$/.test(digits)) return "0" + digits.slice(3);
+      if (/^009725\d{8}$/.test(digits) || /^009705\d{8}$/.test(digits)) return "0" + digits.slice(5);
+      return digits;
+    }
+    function isValidPhone(value) {
+      return /^05\d{8}$/.test(normalizePhone(value));
     }
     function trackingParam(name) {
       return safe(qs.get(name)).trim();
@@ -2989,7 +3001,16 @@
       const subtotal = items.reduce((sum, item) => sum + item.product.price * item.qty, 0);
       const fee = deliveryFee(subtotal);
       const total = subtotal + fee;
-      const payload = buildOrderPayload({ customer, items, subtotal, fee, total, source });
+      if (!isValidPhone(customer.phone)) {
+        if (errorEl) {
+          errorEl.textContent = source === "product" ? pt("phoneError") : t("orderPhoneError");
+          errorEl.classList.remove("success");
+          errorEl.hidden = false;
+        }
+        return false;
+      }
+      const cleanCustomer = { ...customer, phone: normalizePhone(customer.phone), city: safe(customer.city).trim() };
+      const payload = buildOrderPayload({ customer: cleanCustomer, items, subtotal, fee, total, source });
       if (errorEl) {
         errorEl.hidden = true;
         errorEl.classList.remove("success");
@@ -3233,16 +3254,18 @@
         const phone = safe(page.querySelector("#productCustomerPhone").value).trim();
         const city = safe(page.querySelector("#productCustomerCity").value).trim();
         const missing = !name || !phone || !city;
+        const invalidPhone = !!phone && !isValidPhone(phone);
         const errorEl = page.querySelector("#productFormError");
         const successEl = page.querySelector("#productFormSuccess");
-        errorEl.textContent = pt("formError");
+        errorEl.textContent = invalidPhone ? pt("phoneError") : pt("formError");
         errorEl.classList.remove("success");
-        errorEl.hidden = !missing;
+        errorEl.hidden = !(missing || invalidPhone);
         successEl.hidden = true;
         page.querySelectorAll(".product-lead .order-input").forEach((field) => {
-          field.classList.toggle("invalid", !safe(field.value).trim());
+          const isPhoneField = field.id === "productCustomerPhone";
+          field.classList.toggle("invalid", !safe(field.value).trim() || (isPhoneField && invalidPhone));
         });
-        if (missing) return;
+        if (missing || invalidPhone) return;
         await submitWebsiteOrder({
           customer: { name, phone, city },
           items: [{ product, qty: 1 }],
@@ -3296,9 +3319,18 @@
         field.classList.toggle("invalid", missing);
         if (missing && !firstMissing) firstMissing = field;
       }
-      els.orderFormError.hidden = !firstMissing;
+      const invalidPhone = !firstMissing && !isValidPhone(els.customerPhone.value);
+      if (invalidPhone) {
+        els.customerPhone.classList.add("invalid");
+        els.orderFormError.textContent = t("orderPhoneError");
+      }
+      els.orderFormError.hidden = !firstMissing && !invalidPhone;
       if (firstMissing && shouldFocus) focusFirstMissingOrderField();
-      return !firstMissing;
+      if (invalidPhone && shouldFocus) {
+        els.orderForm.scrollIntoView({ block: "start", behavior: "smooth" });
+        setTimeout(() => els.customerPhone.focus(), 180);
+      }
+      return !firstMissing && !invalidPhone;
     }
     function openCartPanel(focusDetails = false, source = "cart") {
       els.cartPanel.hidden = false;
@@ -3754,7 +3786,7 @@
         field.classList.remove("invalid");
         els.orderFormError.classList.remove("success");
         els.orderFormError.textContent = t("orderFormError");
-        if (orderFields().every((item) => safe(item.value).trim())) els.orderFormError.hidden = true;
+        if (orderFields().every((item) => safe(item.value).trim()) && isValidPhone(els.customerPhone.value)) els.orderFormError.hidden = true;
       });
     }
     els.headerWa.addEventListener("click", () => trackEvent("Contact", {
