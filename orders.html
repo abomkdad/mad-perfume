@@ -1,274 +1,157 @@
 <!doctype html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="utf-8" />
-  <meta
-    name="viewport"
-    content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no"
-  />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>MAD PRINT</title>
-  <meta name="description" content="MAD Print Manager" />
-
   <style>
-    :root{
-      --bg:#0f172a;
-      --bg2:#111827;
-      --card:#111827;
-      --line:#1f2937;
-      --txt:#e5e7eb;
-      --muted:#94a3b8;
-      --brand:#22c55e;
-      --header-h:64px;
-      --safe-top: env(safe-area-inset-top, 0px);
-      --safe-bottom: env(safe-area-inset-bottom, 0px);
-      --radius:14px;
+    :root {
+      --bg: #0f172a;
+      --bg2: #111827;
+      --card: rgba(15, 23, 42, 0.82);
+      --line: rgba(148, 163, 184, 0.2);
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --accent: #22c55e;
     }
 
-    *{
-      box-sizing:border-box;
-      -webkit-tap-highlight-color:transparent;
+    * {
+      box-sizing: border-box;
     }
 
     html,
-    body{
-      margin:0;
-      padding:0;
-      width:100%;
-      height:100%;
-      overflow:hidden;
-      background:linear-gradient(180deg,#0b1220,#111827);
-      color:var(--txt);
-      font-family:Arial,sans-serif;
-      overscroll-behavior:none;
+    body {
+      margin: 0;
+      min-height: 100%;
+      background:
+        radial-gradient(circle at top right, rgba(34, 197, 94, 0.14), transparent 26%),
+        linear-gradient(180deg, var(--bg) 0%, var(--bg2) 100%);
+      color: var(--text);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     }
 
-    body{
-      position:fixed;
-      inset:0;
-      touch-action:manipulation;
+    body {
+      display: grid;
+      place-items: center;
+      padding: 24px;
     }
 
-    .app{
-      position:fixed;
-      inset:0;
-      width:100%;
-      height:100dvh;
-      height:100vh;
-      overflow:hidden;
-      background:linear-gradient(180deg,#0b1220,#111827);
+    .status {
+      width: min(430px, 100%);
+      padding: 28px 24px;
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      background: var(--card);
+      box-shadow: 0 24px 60px rgba(2, 6, 23, 0.32);
+      text-align: center;
+      backdrop-filter: blur(16px);
     }
 
-    .top{
-      position:absolute;
-      top:0;
-      right:0;
-      left:0;
-      height:calc(var(--header-h) + var(--safe-top));
-      padding:
-        calc(var(--safe-top) + 10px)
-        14px
-        10px
-        14px;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:10px;
-      border-bottom:1px solid var(--line);
-      background:rgba(17,24,39,.96);
-      backdrop-filter:blur(10px);
-      -webkit-backdrop-filter:blur(10px);
-      z-index:10;
+    .spinner {
+      width: 54px;
+      height: 54px;
+      margin: 0 auto 18px;
+      border-radius: 999px;
+      border: 4px solid rgba(148, 163, 184, 0.2);
+      border-top-color: var(--accent);
+      animation: spin 1s linear infinite;
     }
 
-    .title{
-      font-weight:900;
-      letter-spacing:.5px;
-      font-size:18px;
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
+    h1 {
+      margin: 0 0 10px;
+      font-size: 24px;
+      font-weight: 800;
     }
 
-    .actions{
-      display:flex;
-      gap:8px;
-      flex-shrink:0;
+    p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.8;
+      font-size: 15px;
     }
 
-    .btn{
-      appearance:none;
-      border:1px solid #334155;
-      background:#0b1220;
-      color:#e5e7eb;
-      padding:10px 14px;
-      border-radius:12px;
-      cursor:pointer;
-      text-decoration:none;
-      font-size:13px;
-      font-weight:700;
-      line-height:1;
-      min-height:40px;
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      white-space:nowrap;
-      transition:transform .12s ease, opacity .12s ease, background .12s ease;
+    .error {
+      color: #fca5a5;
+      white-space: pre-wrap;
     }
 
-    .btn:active{
-      transform:scale(.98);
-    }
-
-    .btn.primary{
-      background:var(--brand);
-      color:#052e16;
-      border-color:#16a34a;
-    }
-
-    .main{
-      position:absolute;
-      top:calc(var(--header-h) + var(--safe-top));
-      right:0;
-      left:0;
-      bottom:0;
-      padding:12px 12px calc(12px + var(--safe-bottom));
-      overflow:hidden;
-    }
-
-    .frame-shell{
-      position:relative;
-      width:100%;
-      height:100%;
-      border:1px solid #334155;
-      border-radius:16px;
-      overflow:hidden;
-      background:#fff;
-      box-shadow:0 12px 30px rgba(0,0,0,.28);
-    }
-
-    iframe{
-      display:block;
-      width:100%;
-      height:100%;
-      border:0;
-      background:#fff;
-    }
-
-    .note{
-      position:absolute;
-      right:50%;
-      transform:translateX(50%);
-      bottom:calc(8px + var(--safe-bottom));
-      z-index:11;
-      font-size:12px;
-      color:var(--muted);
-      background:rgba(15,23,42,.72);
-      padding:6px 10px;
-      border:1px solid rgba(51,65,85,.7);
-      border-radius:999px;
-      backdrop-filter:blur(8px);
-      -webkit-backdrop-filter:blur(8px);
-      pointer-events:none;
-    }
-
-    @media (max-width:640px){
-      :root{
-        --header-h:60px;
-      }
-
-      .top{
-        padding:
-          calc(var(--safe-top) + 8px)
-          10px
-          8px
-          10px;
-      }
-
-      .title{
-        font-size:16px;
-      }
-
-      .actions{
-        gap:6px;
-      }
-
-      .btn{
-        padding:9px 11px;
-        font-size:12px;
-        min-height:38px;
-        border-radius:10px;
-      }
-
-      .main{
-        padding:8px 8px calc(8px + var(--safe-bottom));
-      }
-
-      .frame-shell{
-        border-radius:12px;
-      }
-
-      .note{
-        font-size:11px;
-        max-width:calc(100% - 20px);
-        text-align:center;
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
       }
     }
   </style>
 </head>
 <body>
-  <div class="app">
-    <header class="top">
-      <div class="title">MAD PRINT</div>
-
-      <div class="actions">
-        <a
-          class="btn"
-          href="https://script.google.com/macros/s/AKfycbxlqJMKgKqUC8CHVQ50qA1FwTk76wLFKEvFSrACGgUeqXx-hj9chwXFVtdrCTtXvomvqg/exec"
-          target="_blank"
-          rel="noopener"
-        >
-          فتح مباشر
-        </a>
-
-        <button class="btn primary" type="button" onclick="reloadFrame()">
-          تحديث
-        </button>
-      </div>
-    </header>
-
-    <main class="main">
-      <div class="frame-shell">
-        <iframe
-          id="appFrame"
-          title="MAD Print Manager"
-          src="https://script.google.com/macros/s/AKfycbxlqJMKgKqUC8CHVQ50qA1FwTk76wLFKEvFSrACGgUeqXx-hj9chwXFVtdrCTtXvomvqg/exec"
-          loading="eager"
-          referrerpolicy="no-referrer"
-          allow="clipboard-read; clipboard-write">
-        </iframe>
-      </div>
-
-      <div class="note">إذا لم يظهر داخل الإطار، استخدم زر "فتح مباشر"</div>
-    </main>
-  </div>
+  <main class="status" id="statusBox">
+    <div class="spinner" aria-hidden="true"></div>
+    <h1>جاري فتح لوحة الطلبات</h1>
+    <p>يتم الآن تحميل نسخة الطلبات من نفس الدومين...</p>
+  </main>
 
   <script>
-    function reloadFrame() {
-      const f = document.getElementById('appFrame');
-      const currentSrc = f.src;
-      f.src = 'about:blank';
-      setTimeout(() => {
-        f.src = currentSrc;
-      }, 60);
+    const ORDERS_PAYLOAD_RPC_URL = 'https://script.google.com/macros/s/AKfycbxZ66FgMUIMTfbKjLP7Dh6ikuG9RHvuMmNeOCjhjnFh3_fF0v7Lypthw0uBK_Kk2Cy8/exec';
+    const ORDERS_PAYLOAD_PARTS = [1, 2, 3, 4, 5, 6, 7, 8];
+
+    bootstrapOrdersPage().catch((error) => {
+      const box = document.getElementById('statusBox');
+      box.innerHTML = `
+        <h1>تعذر فتح الصفحة</h1>
+        <p class="error">${escapeHtml(String((error && error.message) || error || 'Unknown error'))}</p>
+      `;
+    });
+
+    async function bootstrapOrdersPage() {
+      const payloadParts = await Promise.all(
+        ORDERS_PAYLOAD_PARTS.map(async (partNumber) => {
+          const url = new URL(ORDERS_PAYLOAD_RPC_URL);
+          url.searchParams.set('action', 'rpc');
+          url.searchParams.set('method', 'api_getOrdersPayloadPart');
+          url.searchParams.set('args', JSON.stringify([partNumber]));
+
+          const response = await fetch(url.toString(), {
+            method: 'GET',
+            mode: 'cors',
+            redirect: 'follow',
+            cache: 'no-store'
+          });
+
+          let data = null;
+          try {
+            data = await response.json();
+          } catch (_) {
+            throw new Error(`تعذر قراءة الجزء ${partNumber}`);
+          }
+
+          if (!response.ok || !data || data.success !== true) {
+            throw new Error((data && data.error) || `فشل تحميل الجزء ${partNumber}`);
+          }
+
+          return String(data.result || '');
+        })
+      );
+
+      const payload = payloadParts.join('');
+      const binary = atob(payload);
+      const bytes = new Uint8Array(binary.length);
+      for (let i = 0; i < binary.length; i += 1) {
+        bytes[i] = binary.charCodeAt(i);
+      }
+
+      const html = new TextDecoder().decode(bytes);
+      document.open();
+      document.write(html);
+      document.close();
     }
 
-    function setAppHeight() {
-      document.documentElement.style.setProperty('--app-height', window.innerHeight + 'px');
+    function escapeHtml(value) {
+      return String(value || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
     }
-
-    setAppHeight();
-    window.addEventListener('resize', setAppHeight);
-    window.addEventListener('orientationchange', setAppHeight);
   </script>
 </body>
 </html>
