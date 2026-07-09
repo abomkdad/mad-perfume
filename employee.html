@@ -6,9 +6,13 @@
   <title>MAD PRINT - الموظف</title>
   <style>
     :root {
-      --page-bg: #0f172a;
-      --frame-border: rgba(148, 163, 184, 0.18);
-      --frame-shadow: 0 18px 50px rgba(2, 6, 23, 0.28);
+      --bg: #0f172a;
+      --bg2: #111827;
+      --card: rgba(15, 23, 42, 0.82);
+      --line: rgba(148, 163, 184, 0.2);
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --accent: #3b82f6;
     }
 
     * {
@@ -20,44 +24,134 @@
       margin: 0;
       min-height: 100%;
       background:
-        radial-gradient(circle at top right, rgba(37, 99, 235, 0.12), transparent 28%),
-        linear-gradient(180deg, #0f172a 0%, #111827 100%);
-      overflow: hidden;
+        radial-gradient(circle at top right, rgba(59, 130, 246, 0.18), transparent 28%),
+        linear-gradient(180deg, var(--bg) 0%, var(--bg2) 100%);
+      color: var(--text);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     }
 
     body {
-      font-family: "Tajawal", system-ui, sans-serif;
-      padding: 8px;
+      display: grid;
+      place-items: center;
+      padding: 24px;
     }
 
-    .frame-shell {
-      width: 100%;
-      height: calc(100vh - 16px);
-      border: 0.5px solid var(--frame-border);
-      border-radius: 16px;
-      overflow: hidden;
-      background: var(--page-bg);
-      box-shadow: var(--frame-shadow);
+    .status {
+      width: min(420px, 100%);
+      padding: 28px 24px;
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      background: var(--card);
+      box-shadow: 0 24px 60px rgba(2, 6, 23, 0.32);
+      text-align: center;
+      backdrop-filter: blur(16px);
     }
 
-    iframe {
-      width: 100%;
-      height: 100%;
-      border: 0;
-      display: block;
-      background: var(--page-bg);
+    .spinner {
+      width: 54px;
+      height: 54px;
+      margin: 0 auto 18px;
+      border-radius: 999px;
+      border: 4px solid rgba(148, 163, 184, 0.2);
+      border-top-color: var(--accent);
+      animation: spin 1s linear infinite;
+    }
+
+    h1 {
+      margin: 0 0 10px;
+      font-size: 24px;
+      font-weight: 800;
+    }
+
+    p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.8;
+      font-size: 15px;
+    }
+
+    .error {
+      color: #fca5a5;
+      white-space: pre-wrap;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
     }
   </style>
 </head>
 <body>
-  <div class="frame-shell">
-    <iframe
-      src="https://script.google.com/macros/s/AKfycbyvhHKQzApxh2mi0mCLYIAPRTITLarleyuoaH6hVlXw3wxIl7plO4x4uEqEJCz61MgvZg/exec?page=employee"
-      title="MAD PRINT Employee"
-      loading="eager"
-      referrerpolicy="no-referrer"
-      allow="fullscreen; clipboard-read; clipboard-write">
-    </iframe>
-  </div>
+  <main class="status" id="statusBox">
+    <div class="spinner" aria-hidden="true"></div>
+    <h1>جاري فتح لوحة الموظف</h1>
+    <p>يتم الآن تحميل النسخة المحلية على نفس الدومين...</p>
+  </main>
+
+  <script>
+    const EMPLOYEE_PAYLOAD_RPC_URL = 'https://script.google.com/macros/s/AKfycbxZ66FgMUIMTfbKjLP7Dh6ikuG9RHvuMmNeOCjhjnFh3_fF0v7Lypthw0uBK_Kk2Cy8/exec';
+    const EMPLOYEE_PAYLOAD_PARTS = [1, 2, 3, 4, 5];
+
+    bootstrapEmployeePage().catch((error) => {
+      const box = document.getElementById('statusBox');
+      box.innerHTML = `
+        <h1>تعذر فتح الصفحة</h1>
+        <p class="error">${escapeHtml(String((error && error.message) || error || 'Unknown error'))}</p>
+      `;
+    });
+
+    async function bootstrapEmployeePage() {
+      const payloadParts = await Promise.all(
+        EMPLOYEE_PAYLOAD_PARTS.map(async (partNumber) => {
+          const url = new URL(EMPLOYEE_PAYLOAD_RPC_URL);
+          url.searchParams.set('action', 'rpc');
+          url.searchParams.set('method', 'api_getEmployeePayloadPart');
+          url.searchParams.set('args', JSON.stringify([partNumber]));
+
+          const response = await fetch(url.toString(), {
+            method: 'GET',
+            mode: 'cors',
+            redirect: 'follow',
+            cache: 'no-store'
+          });
+
+          let data = null;
+          try {
+            data = await response.json();
+          } catch (_) {
+            throw new Error(`تعذر قراءة الجزء ${partNumber}`);
+          }
+
+          if (!response.ok || !data || data.success !== true) {
+            throw new Error((data && data.error) || `فشل تحميل الجزء ${partNumber}`);
+          }
+
+          return String(data.result || '');
+        })
+      );
+
+      const payload = payloadParts.join('');
+      const binary = atob(payload);
+      const bytes = new Uint8Array(binary.length);
+      for (let i = 0; i < binary.length; i += 1) {
+        bytes[i] = binary.charCodeAt(i);
+      }
+
+      const html = new TextDecoder().decode(bytes);
+      document.open();
+      document.write(html);
+      document.close();
+    }
+
+    function escapeHtml(value) {
+      return String(value || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+  </script>
 </body>
 </html>
