@@ -153,7 +153,11 @@
         'if(!patchSearch()){var tries=0;var timer=setInterval(function(){tries+=1;if(patchSearch()||tries>40)clearInterval(timer)},250)}' +
         '})();</scr' + 'ipt>';
       const source = String(html || '');
-      return /<\/body>/i.test(source) ? source.replace(/<\/body>/i, patch + '</body>') : source + patch;
+      const bodyCloseIndex = source.toLowerCase().lastIndexOf('</body>');
+      if (bodyCloseIndex >= 0) {
+        return source.slice(0, bodyCloseIndex) + patch + source.slice(bodyCloseIndex);
+      }
+      return source + patch;
     }
 
     function escapeHtml(value) {
