@@ -2375,6 +2375,8 @@
     const ORDER_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbzd4FSy5fKZ5B3LF4ogDerw25K16oikiNv0j-4QPZGE4CzbvZFiw5vFIQpE09w486ldCA/exec";
     const FREE_DELIVERY_MIN = 500;
     const DELIVERY_FEE = 50;
+    const ORDER_DUPLICATE_WINDOW_MS = 10 * 60 * 1000;
+    const RECENT_ORDER_KEY = "madRecentOrderSubmission";
     const OFFER_CATEGORY = "__offers__";
     const REVIEW_VIDEOS = {
       ar: [
@@ -3058,11 +3060,16 @@
         phone,
         city: customer.city,
         address: customer.city,
-        price: total,
+        price: subtotal,
+        product_total: subtotal,
         subtotal,
         delivery_fee: fee,
+        delivery_fee_amount: fee,
         delivery: fee ? money(fee) : "FREE",
         delivery_note: deliverySummaryText(subtotal),
+        total,
+        final_total: total,
+        grand_total: total,
         status: "NEW",
         raw_request_text: rawLines.join("\n"),
         source_lang: locale.toUpperCase(),
@@ -3090,10 +3097,66 @@
         method: "POST",
         mode: "no-cors",
         headers: { "Content-Type": "text/plain;charset=utf-8" },
-        body: JSON.stringify(payload),
-        keepalive: true
+        body: JSON.stringify(payload)
       });
       return true;
+    }
+    function simpleHash(text) {
+      let hash = 0;
+      for (let index = 0; index < text.length; index += 1) {
+        hash = ((hash << 5) - hash + text.charCodeAt(index)) | 0;
+      }
+      return Math.abs(hash).toString(36);
+    }
+    function orderFingerprint(payload) {
+      const itemText = (payload.items || [])
+        .map((item) => [
+          safe(item.product_id || item.code),
+          Number(item.qty || 0),
+          Number(item.unit_price || 0),
+          Number(item.line_total || 0)
+        ].join(":"))
+        .sort()
+        .join("|");
+      return `mad-order-${simpleHash([
+        normalizePhone(payload.phone),
+        safe(payload.city).trim().toLowerCase(),
+        itemText,
+        Number(payload.subtotal || 0),
+        Number(payload.delivery_fee || 0),
+        Number(payload.final_total || payload.total || 0)
+      ].join("||"))}`;
+    }
+    function readRecentOrder(fingerprint) {
+      try {
+        const record = JSON.parse(localStorage.getItem(RECENT_ORDER_KEY) || "null");
+        if (!record || record.fingerprint !== fingerprint) return null;
+        if (Date.now() - Number(record.savedAt || 0) > ORDER_DUPLICATE_WINDOW_MS) return null;
+        return record;
+      } catch (error) {
+        console.warn(error);
+        return null;
+      }
+    }
+    function rememberRecentOrder(payload) {
+      try {
+        localStorage.setItem(RECENT_ORDER_KEY, JSON.stringify({
+          fingerprint: payload.idempotency_key,
+          orderId: payload.orderId,
+          savedAt: Date.now(),
+          total: payload.final_total || payload.total || payload.price
+        }));
+      } catch (error) {
+        console.warn(error);
+      }
+    }
+    function forgetRecentOrder(fingerprint) {
+      try {
+        const record = JSON.parse(localStorage.getItem(RECENT_ORDER_KEY) || "null");
+        if (record && record.fingerprint === fingerprint) localStorage.removeItem(RECENT_ORDER_KEY);
+      } catch (error) {
+        console.warn(error);
+      }
     }
     function setSubmitButtonState(button, isSaving, label) {
       if (!button) return;
@@ -3176,6 +3239,25 @@
       }
       const cleanCustomer = { ...customer, phone: normalizePhone(customer.phone), city: safe(customer.city).trim() };
       const payload = buildOrderPayload({ customer: cleanCustomer, items, subtotal, fee, total, source });
+      payload.idempotency_key = orderFingerprint(payload);
+      payload.duplicate_window_ms = ORDER_DUPLICATE_WINDOW_MS;
+      const recentOrder = readRecentOrder(payload.idempotency_key);
+      if (recentOrder) {
+        if (successEl) {
+          successEl.textContent = t("orderSaved");
+          successEl.classList.add("success");
+          successEl.hidden = false;
+        }
+        if (typeof onSuccess === "function") {
+          onSuccess({
+            ...payload,
+            orderId: recentOrder.orderId || payload.orderId,
+            duplicate_prevented: true
+          });
+        }
+        showOrderStatus("success");
+        return true;
+      }
       if (errorEl) {
         errorEl.hidden = true;
         errorEl.classList.remove("success");
@@ -3185,7 +3267,9 @@
       showOrderStatus("saving");
       setSubmitButtonState(submitButton, true, t("orderSending"));
       try {
+        rememberRecentOrder(payload);
         await postOrderPayload(payload);
+        const orderValue = payload.final_total || payload.total || payload.price;
         trackEvent("SubmitForm", {
           content_type: "product",
           content_ids: payload.items.map((item) => item.code).filter(Boolean),
@@ -3193,13 +3277,13 @@
           event_id: payload.orderId,
           num_items: payload.items.reduce((sum, item) => sum + Number(item.qty || 0), 0),
           currency: "ILS",
-          value: payload.price
+          value: orderValue
         });
         trackEvent("Contact", {
           event_source: "order_form",
           order_source: source,
           currency: "ILS",
-          value: payload.price,
+          value: orderValue,
           content_name: payload.offer
         });
         if (successEl) {
@@ -3212,6 +3296,7 @@
         return true;
       } catch (error) {
         console.warn(error);
+        forgetRecentOrder(payload.idempotency_key);
         showOrderStatus("error");
         if (errorEl) {
           errorEl.textContent = t("orderSaveError");
