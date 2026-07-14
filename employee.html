@@ -138,10 +138,22 @@
         bytes[i] = binary.charCodeAt(i);
       }
 
-      const html = new TextDecoder().decode(bytes);
+      const html = injectEmployeePhoneSearchPatch(new TextDecoder().decode(bytes));
       document.open();
       document.write(html);
       document.close();
+    }
+
+    function injectEmployeePhoneSearchPatch(html) {
+      const patch = '<scr' + 'ipt id="mad-phone-employee-patch-20260714">(function(){' +
+        'function digits(value){return String(value||"").replace(/[\\u0660-\\u0669]/g,function(ch){return String(ch.charCodeAt(0)-0x0660)}).replace(/[\\u06f0-\\u06f9]/g,function(ch){return String(ch.charCodeAt(0)-0x06f0)}).replace(/\\D/g,"")}' +
+        'function forSheet(value){var raw=String(value||"").trim();if(!raw)return"";if(raw.charAt(0)==="*")return raw.replace(/\\s+/g,"");var d=digits(raw);if(!d)return"";while(d.indexOf("00")===0)d=d.slice(2);if(d.indexOf("972")===0)d=d.slice(3);while(d.charAt(0)==="0")d=d.slice(1);return d}' +
+        'function variants(value){var raw=String(value||"").trim();var base=forSheet(raw);var direct=digits(raw);var out=[];function add(x){x=String(x||"").trim().toLowerCase();if(x&&out.indexOf(x)<0)out.push(x)}add(raw);add(direct);add(base);if(base&&base.charAt(0)==="5"){add("0"+base);add("972"+base);add("+972"+base);add("00972"+base)}return out}' +
+        'function patchSearch(){if(window.__madPhoneSearchPatched20260714)return true;if(typeof window.getOrderSearchBlob_!=="function")return false;var old=window.getOrderSearchBlob_;window.getOrderSearchBlob_=function(order){var blob=String(old.apply(this,arguments)||"");try{[order&&order.phone,order&&order.customer_phone,order&&order.customerPhone,order&&order.tel,order&&order.mobile].forEach(function(v){variants(v).forEach(function(x){blob+=" "+x})})}catch(e){}return blob};window.__madPhoneSearchPatched20260714=true;window.madPhoneForSheet=forSheet;return true}' +
+        'if(!patchSearch()){var tries=0;var timer=setInterval(function(){tries+=1;if(patchSearch()||tries>40)clearInterval(timer)},250)}' +
+        '})();</scr' + 'ipt>';
+      const source = String(html || '');
+      return /<\/body>/i.test(source) ? source.replace(/<\/body>/i, patch + '</body>') : source + patch;
     }
 
     function escapeHtml(value) {
