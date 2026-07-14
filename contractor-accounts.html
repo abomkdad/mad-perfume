@@ -204,7 +204,7 @@
         <button id="loadBtn" type="button">عرض الحساب</button>
         <button id="excelBtn" class="green" type="button" disabled>تنزيل Excel</button>
       </div>
-      <div class="note">الحساب يعرض الكميات فقط بدون أسعار: عدد المنتجات، الأصناف، الأكواد، المجموعات، والرواجع لكل مقاول.</div>
+      <div class="note">الحساب يعرض الكميات والأصناف، ويحسب للمقاول 5% من توتال المبيعات بعد خصم الرواجع.</div>
     </section>
 
     <section class="card stats">
@@ -215,6 +215,8 @@
       <div class="stat good"><b id="sSoldProducts">0</b><span>منتجات مباعة</span></div>
       <div class="stat bad"><b id="sReturnedProducts">0</b><span>منتجات راجعة</span></div>
       <div class="stat"><b id="sNetProducts">0</b><span>صافي المنتجات</span></div>
+      <div class="stat good"><b id="sSalesTotal">₪0</b><span>توتال المبيعات</span></div>
+      <div class="stat"><b id="sCommission">₪0</b><span>للمقاول 5%</span></div>
     </section>
 
     <div class="tabs">
@@ -263,6 +265,23 @@
         return String(value == null ? '' : value).replace(/[&<>"']/g, function (ch) {
           return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' })[ch];
         });
+      }
+      function money(value) {
+        var n = Number(value || 0);
+        if (!isFinite(n)) n = 0;
+        var rounded = Math.round(n * 100) / 100;
+        return '₪' + rounded.toLocaleString('en-US', {
+          minimumFractionDigits: rounded % 1 ? 2 : 0,
+          maximumFractionDigits: 2
+        });
+      }
+      function contractorSalesTotal(summary) {
+        var s = summary || {};
+        if (s.netSales != null) return Number(s.netSales || 0);
+        return Number(s.grossSales || 0) - Number(s.returnedValue || 0);
+      }
+      function contractorCommission(summary) {
+        return contractorSalesTotal(summary) * 0.05;
       }
       function setLoading(text) {
         content.innerHTML = '<div class="empty">' + escapeHtml(text || 'جاري التحميل') + '</div>';
@@ -318,6 +337,8 @@
         document.getElementById('sSoldProducts').textContent = s.soldProducts || 0;
         document.getElementById('sReturnedProducts').textContent = s.returnedProducts || 0;
         document.getElementById('sNetProducts').textContent = s.netProducts || 0;
+        document.getElementById('sSalesTotal').textContent = money(contractorSalesTotal(s));
+        document.getElementById('sCommission').textContent = money(contractorCommission(s));
       }
       function renderTab() {
         if (!report) return;
@@ -463,7 +484,10 @@
             { 'البند': 'عدد الأصناف', 'العدد': (report.productSummary || []).length },
             { 'البند': 'منتجات مباعة', 'العدد': s.soldProducts || 0 },
             { 'البند': 'منتجات راجعة', 'العدد': s.returnedProducts || 0 },
-            { 'البند': 'صافي المنتجات', 'العدد': s.netProducts || 0 }
+            { 'البند': 'صافي المنتجات', 'العدد': s.netProducts || 0 },
+            { 'البند': 'توتال المبيعات بعد الرواجع', 'العدد': contractorSalesTotal(s) },
+            { 'البند': 'نسبة المقاول', 'العدد': '5%' },
+            { 'البند': 'عمولة المقاول', 'العدد': contractorCommission(s) }
           ]), 'ملخص');
           XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(plainOrders(report.orders)), 'كل الطلبات');
           XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(plainOrders(report.soldOrders)), 'طلبات مباعة');
