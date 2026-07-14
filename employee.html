@@ -138,11 +138,18 @@
         bytes[i] = binary.charCodeAt(i);
       }
 
-      const html = new TextDecoder().decode(bytes);
+      const html = patchEmployeePayload(new TextDecoder().decode(bytes));
       document.open();
       document.write(html);
       document.close();
       installEmployeePhoneSearchPatch();
+    }
+
+    function patchEmployeePayload(html) {
+      return String(html || '').replace(
+        'return!Number.isFinite(e)||e<=0?50:Math.min(50,Math.floor(e))',
+        'return!Number.isFinite(e)||e<=0?50:Math.min(1000,Math.floor(e))'
+      );
     }
 
     function installEmployeePhoneSearchPatch() {
