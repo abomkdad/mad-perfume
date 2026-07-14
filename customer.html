@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="utf-8">
@@ -2206,6 +2206,101 @@
         flex-basis: 220px;
       }
     }
+    .order-status-overlay[hidden] {
+      display: none !important;
+    }
+    .order-status-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 22px;
+      background: rgba(17, 24, 39, .64);
+      backdrop-filter: blur(8px);
+    }
+    .order-status-card {
+      width: min(100%, 380px);
+      border: 1px solid rgba(181,138,43,.32);
+      border-radius: 8px;
+      background: #ffffff;
+      color: #111827;
+      text-align: center;
+      box-shadow: 0 22px 60px rgba(17,24,39,.32);
+      overflow: hidden;
+    }
+    .order-status-card::before {
+      content: "";
+      display: block;
+      height: 6px;
+      background: linear-gradient(90deg, #b58a2b, #f4dfaa, #116149);
+    }
+    .order-status-body {
+      padding: 28px 20px 22px;
+    }
+    .order-status-icon {
+      display: grid;
+      place-items: center;
+      width: 62px;
+      height: 62px;
+      margin: 0 auto 14px;
+      border-radius: 50%;
+      background: #fff7e5;
+      color: #8a6418;
+      font-size: 28px;
+      font-weight: 950;
+    }
+    .order-status-overlay.is-saving .order-status-icon::before {
+      content: "";
+      width: 34px;
+      height: 34px;
+      border: 4px solid rgba(138,100,24,.18);
+      border-top-color: #8a6418;
+      border-radius: 50%;
+      animation: orderStatusSpin .8s linear infinite;
+    }
+    .order-status-overlay.is-success .order-status-icon {
+      background: #e9f8ef;
+      color: #116149;
+    }
+    .order-status-overlay.is-error .order-status-icon {
+      background: #fff0f0;
+      color: #b42318;
+    }
+    .order-status-title {
+      margin: 0 0 8px;
+      color: #111827;
+      font-size: 22px;
+      line-height: 1.3;
+      font-weight: 950;
+    }
+    .order-status-text {
+      margin: 0;
+      color: #56616f;
+      font-size: 15px;
+      line-height: 1.7;
+      font-weight: 750;
+    }
+    .order-status-close {
+      display: none;
+      width: calc(100% - 40px);
+      min-height: 48px;
+      margin: 0 20px 20px;
+      border: 0;
+      border-radius: 8px;
+      background: linear-gradient(180deg, #1b7a59 0%, #116149 100%);
+      color: #ffffff;
+      font-weight: 950;
+      cursor: pointer;
+    }
+    .order-status-overlay.is-success .order-status-close,
+    .order-status-overlay.is-error .order-status-close {
+      display: block;
+    }
+    @keyframes orderStatusSpin {
+      to { transform: rotate(360deg); }
+    }
   </style>
 </head>
 <body>
@@ -2389,6 +2484,13 @@
         orderSending: "جاري تثبيت الطلب...",
         orderSaved: "تم استلام طلبك بنجاح. سنتواصل معك قريبا لتأكيده.",
         orderSaveError: "تعذر تثبيت الطلب. تأكد من الاتصال وحاول مرة أخرى.",
+        orderWaitTitle: "يتم تثبيت طلبك",
+        orderWaitText: "انتظر قليلا، لا تغلق الصفحة ولا تضغط مرة أخرى.",
+        orderSuccessTitle: "تم تثبيت الطلب بنجاح",
+        orderSuccessText: "وصل الطلب إلى النظام. سنتواصل معك قريبا للتأكيد.",
+        orderFailedTitle: "لم يتم تثبيت الطلب",
+        orderFailedText: "حدث خطأ في الاتصال. حاول مرة أخرى.",
+        orderClose: "حسنًا",
         consultGreeting: "مرحبا، أريد مساعدة باختيار عطر من MAD Perfume.",
         agentWa: "طلب عبر مندوب",
         agentWaHint: "واتساب مباشر",
@@ -2460,6 +2562,13 @@
         orderSending: "שומר את ההזמנה...",
         orderSaved: "ההזמנה התקבלה בהצלחה. ניצור קשר בקרוב לאישור.",
         orderSaveError: "לא ניתן לשמור את ההזמנה. בדקו את החיבור ונסו שוב.",
+        orderWaitTitle: "מאשרים את ההזמנה",
+        orderWaitText: "נא להמתין, לא לסגור את הדף ולא ללחוץ שוב.",
+        orderSuccessTitle: "ההזמנה אושרה בהצלחה",
+        orderSuccessText: "ההזמנה נכנסה למערכת. ניצור קשר בקרוב לאישור.",
+        orderFailedTitle: "ההזמנה לא נשמרה",
+        orderFailedText: "הייתה בעיית חיבור. נסו שוב.",
+        orderClose: "בסדר",
         consultGreeting: "שלום, אשמח לעזרה בבחירת בושם מ-MAD Perfume.",
         agentWa: "הזמנה דרך נציג",
         agentWaHint: "וואטסאפ ישיר",
@@ -2653,6 +2762,7 @@
     let products = [];
     let selectedCategory = OFFER_CATEGORY;
     let cartAutoOpened = false;
+    let isSubmittingOrder = false;
     const cart = new Map();
     const safe = (value) => (value ?? "").toString();
     const escapeHtml = (value) => safe(value).replace(/[&<>"']/g, (ch) => ({
@@ -2997,7 +3107,63 @@
         button.disabled = false;
       }
     }
+    function ensureOrderStatusOverlay() {
+      let overlay = document.getElementById("orderStatusOverlay");
+      if (overlay) return overlay;
+      overlay = document.createElement("div");
+      overlay.id = "orderStatusOverlay";
+      overlay.className = "order-status-overlay";
+      overlay.hidden = true;
+      overlay.setAttribute("role", "status");
+      overlay.setAttribute("aria-live", "assertive");
+      overlay.innerHTML = `
+        <div class="order-status-card" role="dialog" aria-modal="true" aria-labelledby="orderStatusTitle">
+          <div class="order-status-body">
+            <div class="order-status-icon" id="orderStatusIcon" aria-hidden="true"></div>
+            <h2 class="order-status-title" id="orderStatusTitle"></h2>
+            <p class="order-status-text" id="orderStatusText"></p>
+          </div>
+          <button class="order-status-close" id="orderStatusClose" type="button"></button>
+        </div>
+      `;
+      document.body.appendChild(overlay);
+      overlay.querySelector("#orderStatusClose").addEventListener("click", () => {
+        overlay.hidden = true;
+      });
+      return overlay;
+    }
+    function showOrderStatus(state) {
+      const overlay = ensureOrderStatusOverlay();
+      const title = overlay.querySelector("#orderStatusTitle");
+      const text = overlay.querySelector("#orderStatusText");
+      const icon = overlay.querySelector("#orderStatusIcon");
+      const close = overlay.querySelector("#orderStatusClose");
+      overlay.className = `order-status-overlay is-${state}`;
+      overlay.hidden = false;
+      close.textContent = t("orderClose");
+      if (state === "saving") {
+        title.textContent = t("orderWaitTitle");
+        text.textContent = t("orderWaitText");
+        icon.textContent = "";
+      } else if (state === "success") {
+        title.textContent = t("orderSuccessTitle");
+        text.textContent = t("orderSuccessText");
+        icon.textContent = "✓";
+      } else {
+        title.textContent = t("orderFailedTitle");
+        text.textContent = t("orderFailedText");
+        icon.textContent = "!";
+      }
+    }
+    function hideOrderStatus() {
+      const overlay = document.getElementById("orderStatusOverlay");
+      if (overlay) overlay.hidden = true;
+    }
     async function submitWebsiteOrder({ customer, items, submitButton, errorEl, successEl, source, onSuccess }) {
+      if (isSubmittingOrder) {
+        showOrderStatus("saving");
+        return false;
+      }
       const subtotal = items.reduce((sum, item) => sum + item.product.price * item.qty, 0);
       const fee = deliveryFee(subtotal);
       const total = subtotal + fee;
@@ -3016,6 +3182,8 @@
         errorEl.classList.remove("success");
       }
       if (successEl) successEl.hidden = true;
+      isSubmittingOrder = true;
+      showOrderStatus("saving");
       setSubmitButtonState(submitButton, true, t("orderSending"));
       try {
         await postOrderPayload(payload);
@@ -3041,14 +3209,20 @@
           successEl.hidden = false;
         }
         if (typeof onSuccess === "function") onSuccess(payload);
+        showOrderStatus("success");
+        return true;
       } catch (error) {
         console.warn(error);
+        showOrderStatus("error");
         if (errorEl) {
           errorEl.textContent = t("orderSaveError");
           errorEl.hidden = false;
         }
+        return false;
       } finally {
+        isSubmittingOrder = false;
         setSubmitButtonState(submitButton, false);
+        if (source === "cart" && cart.size === 0 && submitButton) submitButton.disabled = true;
       }
     }
     function ensureProductPage() {
@@ -3804,4 +3978,5 @@
   </script>
 </body>
 </html>
+
 
