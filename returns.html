@@ -1,0 +1,542 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>MAD Returns | مسح الرواجع</title>
+  <meta name="theme-color" content="#eef4f8">
+  <style>
+    :root {
+      --bg: #eef4f8;
+      --card: #ffffff;
+      --ink: #102033;
+      --muted: #66758a;
+      --line: #d8e2ee;
+      --green: #17bf63;
+      --blue: #2563eb;
+      --red: #dc2626;
+      --gold: #b98224;
+      --shadow: 0 18px 50px rgba(16, 32, 51, .12);
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; min-height: 100%; background: var(--bg); color: var(--ink); font-family: Arial, Tahoma, sans-serif; }
+    body { padding: env(safe-area-inset-top) 10px env(safe-area-inset-bottom); }
+    .app { width: min(560px, 100%); margin: 0 auto; padding: 12px 0 24px; }
+    .top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px;
+      background: #122033;
+      color: #fff;
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+    }
+    .top h1 { margin: 0; font-size: clamp(22px, 6vw, 34px); line-height: 1.15; }
+    .top small { display: block; margin-top: 4px; color: #b8c7db; font-weight: 800; }
+    .count {
+      min-width: 66px;
+      height: 58px;
+      display: grid;
+      place-items: center;
+      border-radius: 14px;
+      background: #fff;
+      color: var(--green);
+      font-size: 30px;
+      font-weight: 900;
+    }
+    .card {
+      margin-top: 12px;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(16, 32, 51, .08);
+      padding: 14px;
+    }
+    label {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 900;
+    }
+    select, input, button {
+      width: 100%;
+      border-radius: 13px;
+      font: inherit;
+      font-weight: 900;
+    }
+    select, input {
+      height: 54px;
+      border: 1px solid var(--line);
+      background: #f9fbfd;
+      color: var(--ink);
+      padding: 0 14px;
+    }
+    input { direction: ltr; text-align: center; font-size: 23px; letter-spacing: 0; }
+    button {
+      height: 62px;
+      border: 0;
+      margin-top: 10px;
+      background: var(--green);
+      color: #fff;
+      font-size: 21px;
+      cursor: pointer;
+      box-shadow: 0 12px 24px rgba(23, 191, 99, .22);
+    }
+    button.secondary { background: #334155; box-shadow: none; }
+    button.blue { background: var(--blue); box-shadow: 0 12px 24px rgba(37, 99, 235, .20); }
+    button:disabled { opacity: .6; cursor: wait; }
+    .reader-wrap {
+      position: relative;
+      overflow: hidden;
+      border-radius: 16px;
+      background: #07101f;
+      min-height: 320px;
+      border: 2px solid #122033;
+    }
+    #reader {
+      min-height: 320px;
+      direction: ltr;
+      color: #fff;
+    }
+    #reader video {
+      width: 100% !important;
+      min-height: 320px;
+      object-fit: cover;
+    }
+    .guide {
+      pointer-events: none;
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+    }
+    .guide::before {
+      content: "";
+      width: min(82%, 380px);
+      height: 118px;
+      border: 3px solid rgba(23, 191, 99, .95);
+      border-radius: 14px;
+      box-shadow: 0 0 0 999px rgba(0, 0, 0, .28), 0 0 24px rgba(23, 191, 99, .55);
+    }
+    .scan-line {
+      position: absolute;
+      width: min(74%, 330px);
+      height: 3px;
+      background: #22c55e;
+      border-radius: 999px;
+      box-shadow: 0 0 18px rgba(34, 197, 94, .9);
+      animation: scan 1.35s ease-in-out infinite;
+    }
+    @keyframes scan {
+      0%, 100% { transform: translateY(-54px); }
+      50% { transform: translateY(54px); }
+    }
+    .status {
+      min-height: 118px;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      border: 2px dashed #cad7e5;
+      background: #f8fbfe;
+    }
+    .status strong { display: block; margin-bottom: 7px; font-size: clamp(26px, 8vw, 44px); }
+    .status p { margin: 0; color: var(--muted); font-weight: 800; line-height: 1.45; }
+    .status.ok { border-color: rgba(23,191,99,.45); background: #ecfdf3; }
+    .status.ok strong { color: #0f9f4e; }
+    .status.err { border-color: rgba(220,38,38,.45); background: #fff1f2; }
+    .status.err strong { color: var(--red); }
+    .status.warn { border-color: rgba(185,130,36,.45); background: #fff8e8; }
+    .status.warn strong { color: var(--gold); }
+    .order { display: none; }
+    .order.show { display: block; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
+    .field {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 10px;
+      background: #f9fbfd;
+      min-height: 66px;
+    }
+    .field span { display: block; margin-bottom: 5px; color: var(--muted); font-size: 12px; font-weight: 900; }
+    .field b { font-size: 16px; overflow-wrap: anywhere; }
+    .field.wide { grid-column: 1 / -1; }
+    .history {
+      display: grid;
+      gap: 8px;
+      max-height: 220px;
+      overflow: auto;
+    }
+    .history-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #f9fbfd;
+      font-weight: 900;
+    }
+    .history-row span { color: var(--muted); text-align: left; }
+    .hint { color: var(--muted); font-size: 13px; font-weight: 800; line-height: 1.55; text-align: center; }
+    @media (max-width: 420px) {
+      body { padding-inline: 7px; }
+      .top, .card { border-radius: 14px; }
+      .grid { grid-template-columns: 1fr; }
+      .field.wide { grid-column: auto; }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header class="top">
+      <div>
+        <h1>رواجع MAD</h1>
+        <small>مسح باركود مباشر بالكاميرا</small>
+      </div>
+      <div class="count" id="counter">0</div>
+    </header>
+
+    <section class="card">
+      <label for="reason">سبب الترجيع</label>
+      <select id="reason">
+        <option value="مرتجع من السائق">مرتجع من السائق</option>
+        <option value="رفض استلام">رفض استلام</option>
+        <option value="الزبون غير متاح">الزبون غير متاح</option>
+        <option value="عنوان غير صحيح">عنوان غير صحيح</option>
+        <option value="مرتجع للمدير">مرتجع للمدير</option>
+      </select>
+      <button id="startBtn" type="button">ابدأ المسح</button>
+      <button id="stopBtn" class="secondary" type="button" disabled>إيقاف الكاميرا</button>
+      <p class="hint">وجّه الكاميرا نحو الباركود داخل الإطار الأخضر. عند القراءة سيتم تثبيت المرتجع مباشرة.</p>
+    </section>
+
+    <section class="card">
+      <div class="reader-wrap">
+        <div id="reader"></div>
+        <div class="guide"><div class="scan-line"></div></div>
+      </div>
+    </section>
+
+    <section class="card status" id="statusBox">
+      <div>
+        <strong>جاهز</strong>
+        <p>اضغط ابدأ المسح وافتح صلاحية الكاميرا</p>
+      </div>
+    </section>
+
+    <section class="card order" id="orderBox">
+      <div class="grid">
+        <div class="field"><span>رقم الطلب</span><b id="oOrder">-</b></div>
+        <div class="field"><span>الحالة</span><b id="oStatus">-</b></div>
+        <div class="field"><span>الاسم</span><b id="oName">-</b></div>
+        <div class="field"><span>الهاتف</span><b id="oPhone">-</b></div>
+        <div class="field"><span>المدينة</span><b id="oCity">-</b></div>
+        <div class="field"><span>السعر</span><b id="oPrice">-</b></div>
+        <div class="field wide"><span>الطلب</span><b id="oOffer">-</b></div>
+      </div>
+    </section>
+
+    <section class="card">
+      <label for="manualCode">إدخال يدوي عند الحاجة</label>
+      <input id="manualCode" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="امسح أو الصق الباركود">
+      <button id="manualBtn" class="blue" type="button">تسجيل يدوي</button>
+    </section>
+
+    <section class="card">
+      <label>آخر العمليات</label>
+      <div class="history" id="history"></div>
+    </section>
+  </main>
+
+  <script>
+    (function () {
+      var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzd4FSy5fKZ5B3LF4ogDerw25K16oikiNv0j-4QPZGE4CzbvZFiw5vFIQpE09w486ldCA/exec';
+      var ZXING_URLS = [
+        'https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js',
+        'https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js'
+      ];
+      var reason = document.getElementById('reason');
+      var startBtn = document.getElementById('startBtn');
+      var stopBtn = document.getElementById('stopBtn');
+      var statusBox = document.getElementById('statusBox');
+      var orderBox = document.getElementById('orderBox');
+      var historyBox = document.getElementById('history');
+      var counter = document.getElementById('counter');
+      var manualCode = document.getElementById('manualCode');
+      var manualBtn = document.getElementById('manualBtn');
+      var scanner = null;
+      var running = false;
+      var busy = false;
+      var lastCode = '';
+      var lastAt = 0;
+      var count = 0;
+
+      function clean(value) {
+        var code = String(value || '').trim();
+        code = code.split(/\r?\n/).filter(Boolean).pop() || code;
+        var urlMatch = code.match(/[?&](?:barcode|bar|code|id)=([^&]+)/i);
+        if (urlMatch && urlMatch[1]) code = decodeURIComponent(urlMatch[1]);
+        return String(code || '').replace(/^["'`]+|["'`]+$/g, '').replace(/\s+/g, '').replace(/^'/, '').trim();
+      }
+
+      function setStatus(kind, title, text) {
+        statusBox.className = 'card status ' + (kind || '');
+        statusBox.innerHTML = '<div><strong>' + title + '</strong><p>' + (text || '') + '</p></div>';
+      }
+
+      function setOrder(order) {
+        if (!order) {
+          orderBox.className = 'card order';
+          return;
+        }
+        orderBox.className = 'card order show';
+        document.getElementById('oOrder').textContent = order.orderId || '-';
+        document.getElementById('oStatus').textContent = order.status || '-';
+        document.getElementById('oName').textContent = order.name || '-';
+        document.getElementById('oPhone').textContent = order.phone || '-';
+        document.getElementById('oCity').textContent = order.customer_area || '-';
+        document.getElementById('oPrice').textContent = order.price || '-';
+        document.getElementById('oOffer').textContent = order.offer || '-';
+      }
+
+      function addHistory(kind, code, text) {
+        var row = document.createElement('div');
+        row.className = 'history-row';
+        row.innerHTML = '<b>' + code + '</b><span>' + text + '</span>';
+        historyBox.prepend(row);
+        while (historyBox.children.length > 14) historyBox.removeChild(historyBox.lastChild);
+      }
+
+      function vibrate(pattern) {
+        if (navigator.vibrate) navigator.vibrate(pattern);
+      }
+
+      function beep(ok) {
+        try {
+          var ctx = new (window.AudioContext || window.webkitAudioContext)();
+          var osc = ctx.createOscillator();
+          var gain = ctx.createGain();
+          osc.frequency.value = ok ? 880 : 220;
+          gain.gain.value = 0.06;
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start();
+          setTimeout(function () { osc.stop(); ctx.close(); }, ok ? 90 : 180);
+        } catch (err) {}
+      }
+
+      function loadScript(url) {
+        return new Promise(function (resolve, reject) {
+          var script = document.createElement('script');
+          script.src = url;
+          script.async = true;
+          script.onload = resolve;
+          script.onerror = reject;
+          document.head.appendChild(script);
+        });
+      }
+
+      async function loadScannerLib() {
+        if (window.Html5Qrcode) return;
+        var lastError = null;
+        for (var i = 0; i < ZXING_URLS.length; i++) {
+          try {
+            await loadScript(ZXING_URLS[i]);
+            if (window.Html5Qrcode) return;
+          } catch (err) {
+            lastError = err;
+          }
+        }
+        throw lastError || new Error('تعذر تحميل قارئ الباركود');
+      }
+
+      function jsonp(api, payload) {
+        return new Promise(function (resolve, reject) {
+          var callback = '__madReturnsCb_' + Date.now() + '_' + Math.floor(Math.random() * 100000);
+          var script = document.createElement('script');
+          var timer = setTimeout(function () {
+            cleanup();
+            reject(new Error('انتهت مهلة الاتصال'));
+          }, 18000);
+
+          function cleanup() {
+            clearTimeout(timer);
+            try { delete window[callback]; } catch (err) { window[callback] = undefined; }
+            if (script.parentNode) script.parentNode.removeChild(script);
+          }
+
+          window[callback] = function (res) {
+            cleanup();
+            resolve(res);
+          };
+          script.onerror = function () {
+            cleanup();
+            reject(new Error('تعذر الاتصال بالنظام'));
+          };
+          script.src = SCRIPT_URL
+            + '?api=' + encodeURIComponent(api)
+            + '&callback=' + encodeURIComponent(callback)
+            + '&payload=' + encodeURIComponent(JSON.stringify(payload || {}))
+            + '&_=' + Date.now();
+          document.head.appendChild(script);
+        });
+      }
+
+      function pauseScanner() {
+        if (scanner && running && typeof scanner.pause === 'function') {
+          try { scanner.pause(true); } catch (err) {}
+        }
+      }
+
+      function resumeScannerSoon() {
+        setTimeout(function () {
+          if (scanner && running && typeof scanner.resume === 'function') {
+            try { scanner.resume(); } catch (err) {}
+          }
+        }, 1200);
+      }
+
+      async function submitCode(rawCode) {
+        var code = clean(rawCode);
+        if (!code || busy) return;
+        var now = Date.now();
+        if (code === lastCode && now - lastAt < 10000) return;
+        lastCode = code;
+        lastAt = now;
+        busy = true;
+        pauseScanner();
+        startBtn.disabled = true;
+        manualBtn.disabled = true;
+        setStatus('', 'جاري التثبيت', code);
+
+        try {
+          var res = await jsonp('returnMark', { barcode: code, reason: reason.value });
+          if (res && res.success && res.found) {
+            setOrder(res.order);
+            if (res.already) {
+              setStatus('warn', 'مُعاد سابقًا', (res.order && res.order.name) || code);
+              addHistory('warn', code, 'مُعاد سابقًا');
+              vibrate([160]);
+              beep(false);
+            } else {
+              count += 1;
+              counter.textContent = count;
+              setStatus('ok', 'تم تسجيل المرتجع', (res.order && res.order.name) || code);
+              addHistory('ok', code, 'تم تسجيل المرتجع');
+              vibrate([70, 40, 70]);
+              beep(true);
+            }
+          } else {
+            setOrder(null);
+            setStatus('err', 'غير موجود', (res && (res.error || res.message)) || code);
+            addHistory('err', code, 'غير موجود');
+            vibrate([260, 80, 260]);
+            beep(false);
+          }
+        } catch (err) {
+          setOrder(null);
+          setStatus('err', 'خطأ اتصال', err && err.message ? err.message : String(err));
+          addHistory('err', code, 'خطأ اتصال');
+          vibrate([260, 80, 260]);
+          beep(false);
+        } finally {
+          busy = false;
+          startBtn.disabled = running;
+          manualBtn.disabled = false;
+          manualCode.value = '';
+          resumeScannerSoon();
+        }
+      }
+
+      async function startScanner() {
+        if (running || busy) return;
+        if (!window.isSecureContext) {
+          setStatus('err', 'الكاميرا تحتاج رابط آمن', 'افتح الصفحة من https://www.mad-parfumeur.com/returns.html');
+          return;
+        }
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+          setStatus('err', 'المتصفح لا يدعم الكاميرا', 'افتح الصفحة من Chrome أو Safari على الهاتف');
+          return;
+        }
+
+        startBtn.disabled = true;
+        setStatus('', 'فتح الكاميرا', 'اسمح للكاميرا ثم وجّهها نحو الباركود');
+
+        try {
+          await loadScannerLib();
+          var formats = [];
+          if (window.Html5QrcodeSupportedFormats) {
+            formats = [
+              Html5QrcodeSupportedFormats.CODE_128,
+              Html5QrcodeSupportedFormats.CODE_39,
+              Html5QrcodeSupportedFormats.EAN_13,
+              Html5QrcodeSupportedFormats.EAN_8,
+              Html5QrcodeSupportedFormats.UPC_A,
+              Html5QrcodeSupportedFormats.UPC_E,
+              Html5QrcodeSupportedFormats.ITF,
+              Html5QrcodeSupportedFormats.CODABAR,
+              Html5QrcodeSupportedFormats.QR_CODE
+            ].filter(function (item) { return item !== undefined && item !== null; });
+          }
+          scanner = new Html5Qrcode('reader', {
+            formatsToSupport: formats,
+            useBarCodeDetectorIfSupported: true,
+            verbose: false
+          });
+          await scanner.start(
+            { facingMode: 'environment' },
+            {
+              fps: 14,
+              qrbox: function (width, height) {
+                return { width: Math.min(width * 0.82, 420), height: Math.min(height * 0.34, 150) };
+              },
+              aspectRatio: 1.777
+            },
+            function (decodedText) { submitCode(decodedText); },
+            function () {}
+          );
+          running = true;
+          stopBtn.disabled = false;
+          setStatus('', 'الكاميرا تعمل', 'مرّر الباركود داخل الإطار الأخضر');
+        } catch (err) {
+          running = false;
+          startBtn.disabled = false;
+          stopBtn.disabled = true;
+          var msg = err && err.message ? err.message : String(err);
+          if (/notallowed|permission|denied/i.test(msg)) {
+            msg = 'تم رفض صلاحية الكاميرا. افتح إعدادات الموقع واسمح بالكاميرا أو افتح من Chrome/Safari.';
+          }
+          setStatus('err', 'تعذر فتح الكاميرا', msg);
+        }
+      }
+
+      async function stopScanner() {
+        if (!scanner) return;
+        stopBtn.disabled = true;
+        try {
+          await scanner.stop();
+          await scanner.clear();
+        } catch (err) {}
+        scanner = null;
+        running = false;
+        startBtn.disabled = false;
+        setStatus('', 'تم إيقاف الكاميرا', 'اضغط ابدأ المسح عند الحاجة');
+      }
+
+      startBtn.addEventListener('click', startScanner);
+      stopBtn.addEventListener('click', stopScanner);
+      manualBtn.addEventListener('click', function () { submitCode(manualCode.value); });
+      manualCode.addEventListener('keydown', function (event) {
+        if (event.key === 'Enter') {
+          event.preventDefault();
+          submitCode(manualCode.value);
+        }
+      });
+      window.addEventListener('pagehide', stopScanner);
+    })();
+  </script>
+</body>
+</html>
