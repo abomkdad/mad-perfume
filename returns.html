@@ -13,99 +13,74 @@
       --muted: #66758a;
       --line: #d8e2ee;
       --green: #17bf63;
+      --green-dark: #0f9f4e;
       --blue: #2563eb;
       --red: #dc2626;
       --gold: #b98224;
-      --shadow: 0 18px 50px rgba(16, 32, 51, .12);
+      --shadow: 0 16px 44px rgba(16, 32, 51, .12);
     }
     * { box-sizing: border-box; }
-    html, body { margin: 0; min-height: 100%; background: var(--bg); color: var(--ink); font-family: Arial, Tahoma, sans-serif; }
-    body { padding: env(safe-area-inset-top) 10px env(safe-area-inset-bottom); }
-    .app { width: min(560px, 100%); margin: 0 auto; padding: 12px 0 24px; }
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: Arial, Tahoma, sans-serif;
+    }
+    body { padding: env(safe-area-inset-top) 8px env(safe-area-inset-bottom); }
+    .app { width: min(560px, 100%); margin: 0 auto; padding: 8px 0 18px; }
     .top {
-      display: flex;
+      display: grid;
+      grid-template-columns: 1fr auto;
       align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      padding: 14px;
+      gap: 10px;
+      padding: 10px 12px;
       background: #122033;
       color: #fff;
-      border-radius: 16px;
+      border-radius: 15px;
       box-shadow: var(--shadow);
     }
-    .top h1 { margin: 0; font-size: clamp(22px, 6vw, 34px); line-height: 1.15; }
-    .top small { display: block; margin-top: 4px; color: #b8c7db; font-weight: 800; }
+    .top h1 { margin: 0; font-size: clamp(22px, 6vw, 31px); line-height: 1.1; }
+    .top small { display: block; margin-top: 2px; color: #b8c7db; font-size: 12px; font-weight: 900; }
     .count {
-      min-width: 66px;
-      height: 58px;
+      min-width: 64px;
+      height: 56px;
       display: grid;
       place-items: center;
-      border-radius: 14px;
+      border-radius: 13px;
       background: #fff;
       color: var(--green);
       font-size: 30px;
       font-weight: 900;
     }
     .card {
-      margin-top: 12px;
+      margin-top: 10px;
       background: var(--card);
       border: 1px solid var(--line);
-      border-radius: 16px;
-      box-shadow: 0 10px 30px rgba(16, 32, 51, .08);
-      padding: 14px;
+      border-radius: 15px;
+      box-shadow: 0 8px 24px rgba(16, 32, 51, .08);
+      padding: 12px;
     }
-    label {
-      display: block;
-      margin-bottom: 8px;
-      color: var(--muted);
-      font-size: 14px;
-      font-weight: 900;
-    }
-    select, input, button {
-      width: 100%;
-      border-radius: 13px;
-      font: inherit;
-      font-weight: 900;
-    }
-    select, input {
-      height: 54px;
-      border: 1px solid var(--line);
-      background: #f9fbfd;
-      color: var(--ink);
-      padding: 0 14px;
-    }
-    input { direction: ltr; text-align: center; font-size: 23px; letter-spacing: 0; }
-    button {
-      height: 62px;
-      border: 0;
-      margin-top: 10px;
-      background: var(--green);
-      color: #fff;
-      font-size: 21px;
-      cursor: pointer;
-      box-shadow: 0 12px 24px rgba(23, 191, 99, .22);
-    }
-    button.secondary { background: #334155; box-shadow: none; }
-    button.blue { background: var(--blue); box-shadow: 0 12px 24px rgba(37, 99, 235, .20); }
-    button:disabled { opacity: .6; cursor: wait; }
+    .scanner-card { padding: 8px; }
     .reader-wrap {
       position: relative;
       overflow: hidden;
-      border-radius: 16px;
+      border-radius: 14px;
       background: #07101f;
-      min-height: 320px;
+      min-height: clamp(300px, 62vh, 520px);
       border: 2px solid #122033;
     }
     #reader {
-      min-height: 320px;
+      min-height: clamp(300px, 62vh, 520px);
       direction: ltr;
       color: #fff;
     }
     #reader video {
       width: 100% !important;
-      min-height: 320px;
+      min-height: clamp(300px, 62vh, 520px);
       object-fit: cover;
     }
+    #reader > div:first-child { border: 0 !important; }
     .guide {
       pointer-events: none;
       position: absolute;
@@ -115,77 +90,194 @@
     }
     .guide::before {
       content: "";
-      width: min(82%, 380px);
-      height: 118px;
-      border: 3px solid rgba(23, 191, 99, .95);
+      width: min(86%, 420px);
+      height: 126px;
+      border: 3px solid rgba(23, 191, 99, .98);
       border-radius: 14px;
-      box-shadow: 0 0 0 999px rgba(0, 0, 0, .28), 0 0 24px rgba(23, 191, 99, .55);
+      box-shadow: 0 0 0 999px rgba(0, 0, 0, .22), 0 0 26px rgba(23, 191, 99, .58);
     }
     .scan-line {
       position: absolute;
-      width: min(74%, 330px);
+      width: min(78%, 360px);
       height: 3px;
       background: #22c55e;
       border-radius: 999px;
-      box-shadow: 0 0 18px rgba(34, 197, 94, .9);
-      animation: scan 1.35s ease-in-out infinite;
+      box-shadow: 0 0 18px rgba(34, 197, 94, .95);
+      animation: scan 1.25s ease-in-out infinite;
     }
     @keyframes scan {
-      0%, 100% { transform: translateY(-54px); }
-      50% { transform: translateY(54px); }
+      0%, 100% { transform: translateY(-58px); }
+      50% { transform: translateY(58px); }
     }
+    .camera-badge {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      right: 10px;
+      z-index: 2;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 10px;
+      border-radius: 999px;
+      background: rgba(5, 12, 24, .72);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 900;
+      backdrop-filter: blur(10px);
+    }
+    .live-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      background: #94a3b8;
+      box-shadow: 0 0 0 0 rgba(34, 197, 94, .6);
+    }
+    .live-dot.on {
+      background: #22c55e;
+      animation: pulse 1.1s infinite;
+    }
+    @keyframes pulse {
+      70% { box-shadow: 0 0 0 10px rgba(34, 197, 94, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+    }
+    .actions {
+      display: grid;
+      grid-template-columns: 1fr 116px;
+      gap: 8px;
+      margin-top: 8px;
+    }
+    button, select, input {
+      width: 100%;
+      border-radius: 13px;
+      font: inherit;
+      font-weight: 900;
+    }
+    button {
+      height: 58px;
+      border: 0;
+      background: var(--green);
+      color: #fff;
+      font-size: 20px;
+      cursor: pointer;
+      box-shadow: 0 12px 24px rgba(23, 191, 99, .20);
+    }
+    button.secondary { background: #334155; box-shadow: none; font-size: 16px; }
+    button.blue { background: var(--blue); box-shadow: 0 12px 24px rgba(37, 99, 235, .18); }
+    button.return-btn { background: var(--green); }
+    button:disabled { opacity: .62; cursor: wait; }
     .status {
-      min-height: 118px;
+      min-height: 96px;
       display: grid;
       place-items: center;
       text-align: center;
       border: 2px dashed #cad7e5;
       background: #f8fbfe;
     }
-    .status strong { display: block; margin-bottom: 7px; font-size: clamp(26px, 8vw, 44px); }
-    .status p { margin: 0; color: var(--muted); font-weight: 800; line-height: 1.45; }
+    .status strong { display: block; margin-bottom: 5px; font-size: clamp(25px, 7.6vw, 42px); }
+    .status p { margin: 0; color: var(--muted); font-weight: 800; line-height: 1.35; }
     .status.ok { border-color: rgba(23,191,99,.45); background: #ecfdf3; }
-    .status.ok strong { color: #0f9f4e; }
+    .status.ok strong { color: var(--green-dark); }
     .status.err { border-color: rgba(220,38,38,.45); background: #fff1f2; }
     .status.err strong { color: var(--red); }
     .status.warn { border-color: rgba(185,130,36,.45); background: #fff8e8; }
     .status.warn strong { color: var(--gold); }
+    .quick {
+      display: grid;
+      grid-template-columns: 1fr 132px;
+      gap: 8px;
+      align-items: end;
+    }
+    .gun-note {
+      margin: 10px 0 0;
+      padding: 10px;
+      border: 1px solid #c9f2d9;
+      border-radius: 12px;
+      background: #ecfdf3;
+      color: #0f7a3d;
+      font-size: 13px;
+      font-weight: 900;
+      line-height: 1.45;
+      text-align: center;
+    }
+    .gun-note b { display: block; font-size: 15px; }
+    .gun-note span { display: block; color: #246845; }
+    label {
+      display: block;
+      margin-bottom: 7px;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 900;
+    }
+    select, input {
+      height: 52px;
+      border: 1px solid var(--line);
+      background: #f9fbfd;
+      color: var(--ink);
+      padding: 0 12px;
+    }
+    input {
+      direction: ltr;
+      text-align: center;
+      font-size: 22px;
+      letter-spacing: 0;
+    }
+    .reason-row {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 6px;
+    }
+    .reason-row select { height: 48px; font-size: 14px; }
+    .hint {
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+      line-height: 1.45;
+      text-align: center;
+    }
     .order { display: none; }
     .order.show { display: block; }
-    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
     .field {
       border: 1px solid var(--line);
       border-radius: 12px;
-      padding: 10px;
+      padding: 9px;
       background: #f9fbfd;
-      min-height: 66px;
+      min-height: 58px;
     }
-    .field span { display: block; margin-bottom: 5px; color: var(--muted); font-size: 12px; font-weight: 900; }
-    .field b { font-size: 16px; overflow-wrap: anywhere; }
+    .field span { display: block; margin-bottom: 4px; color: var(--muted); font-size: 11px; font-weight: 900; }
+    .field b { font-size: 15px; overflow-wrap: anywhere; }
     .field.wide { grid-column: 1 / -1; }
     .history {
       display: grid;
-      gap: 8px;
-      max-height: 220px;
+      gap: 7px;
+      max-height: 185px;
       overflow: auto;
     }
     .history-row {
       display: flex;
       justify-content: space-between;
       gap: 8px;
-      padding: 10px;
+      padding: 9px;
       border: 1px solid var(--line);
       border-radius: 12px;
       background: #f9fbfd;
       font-weight: 900;
     }
     .history-row span { color: var(--muted); text-align: left; }
-    .hint { color: var(--muted); font-size: 13px; font-weight: 800; line-height: 1.55; text-align: center; }
     @media (max-width: 420px) {
-      body { padding-inline: 7px; }
-      .top, .card { border-radius: 14px; }
+      body { padding-inline: 6px; }
+      .top, .card { border-radius: 13px; }
+      .scanner-card { padding: 6px; }
+      .actions { grid-template-columns: 1fr 94px; }
+      .quick { grid-template-columns: 1fr 104px; }
+      button { font-size: 18px; }
+      button.secondary { font-size: 14px; }
       .grid { grid-template-columns: 1fr; }
       .field.wide { grid-column: auto; }
+      .reader-wrap, #reader, #reader video { min-height: 58vh; }
     }
   </style>
 </head>
@@ -194,36 +286,52 @@
     <header class="top">
       <div>
         <h1>رواجع MAD</h1>
-        <small>مسح باركود مباشر بالكاميرا</small>
+        <small>مسح سريع للرواجع المتعددة</small>
       </div>
       <div class="count" id="counter">0</div>
     </header>
 
-    <section class="card">
-      <label for="reason">سبب الترجيع</label>
-      <select id="reason">
-        <option value="مرتجع من السائق">مرتجع من السائق</option>
-        <option value="رفض استلام">رفض استلام</option>
-        <option value="الزبون غير متاح">الزبون غير متاح</option>
-        <option value="عنوان غير صحيح">عنوان غير صحيح</option>
-        <option value="مرتجع للمدير">مرتجع للمدير</option>
-      </select>
-      <button id="startBtn" type="button">ابدأ المسح</button>
-      <button id="stopBtn" class="secondary" type="button" disabled>إيقاف الكاميرا</button>
-      <p class="hint">وجّه الكاميرا نحو الباركود داخل الإطار الأخضر. عند القراءة سيتم تثبيت المرتجع مباشرة.</p>
-    </section>
-
-    <section class="card">
+    <section class="card scanner-card">
       <div class="reader-wrap">
         <div id="reader"></div>
+        <div class="camera-badge">
+          <span>ضع الباركود داخل الإطار</span>
+          <span class="live-dot" id="liveDot"></span>
+        </div>
         <div class="guide"><div class="scan-line"></div></div>
       </div>
+      <div class="actions">
+        <button id="startBtn" type="button">تشغيل الكاميرا</button>
+        <button id="stopBtn" class="secondary" type="button" disabled>إيقاف</button>
+      </div>
+      <p class="hint">بعد أول تشغيل تبقى الكاميرا تعمل، وكل باركود يتم إرجاعه تلقائيًا.</p>
     </section>
 
     <section class="card status" id="statusBox">
       <div>
         <strong>جاهز</strong>
-        <p>اضغط ابدأ المسح وافتح صلاحية الكاميرا</p>
+        <p>اضغط تشغيل الكاميرا واسمح بالصلاحية</p>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="quick">
+        <div>
+          <label for="manualCode">باركود يدوي</label>
+          <input id="manualCode" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="الصق أو امسح الباركود">
+        </div>
+        <button id="manualBtn" class="return-btn" type="button">إرجاع</button>
+      </div>
+      <p class="gun-note"><b>الفرد جاهز دائمًا</b><span>امسح الباركود من أي مكان في الصفحة وسيتم الإرجاع تلقائيًا.</span></p>
+      <div class="reason-row">
+        <label for="reason">سبب الترجيع</label>
+        <select id="reason">
+          <option value="مرتجع من السائق">مرتجع من السائق</option>
+          <option value="رفض استلام">رفض استلام</option>
+          <option value="الزبون غير متاح">الزبون غير متاح</option>
+          <option value="عنوان غير صحيح">عنوان غير صحيح</option>
+          <option value="مرتجع للمدير">مرتجع للمدير</option>
+        </select>
       </div>
     </section>
 
@@ -237,12 +345,6 @@
         <div class="field"><span>السعر</span><b id="oPrice">-</b></div>
         <div class="field wide"><span>الطلب</span><b id="oOffer">-</b></div>
       </div>
-    </section>
-
-    <section class="card">
-      <label for="manualCode">إدخال يدوي عند الحاجة</label>
-      <input id="manualCode" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="امسح أو الصق الباركود">
-      <button id="manualBtn" class="blue" type="button">تسجيل يدوي</button>
     </section>
 
     <section class="card">
@@ -261,6 +363,7 @@
       var reason = document.getElementById('reason');
       var startBtn = document.getElementById('startBtn');
       var stopBtn = document.getElementById('stopBtn');
+      var liveDot = document.getElementById('liveDot');
       var statusBox = document.getElementById('statusBox');
       var orderBox = document.getElementById('orderBox');
       var historyBox = document.getElementById('history');
@@ -273,6 +376,9 @@
       var lastCode = '';
       var lastAt = 0;
       var count = 0;
+      var gunBuffer = '';
+      var gunTimer = null;
+      var manualTimer = null;
 
       function clean(value) {
         var code = String(value || '').trim();
@@ -396,21 +502,42 @@
           if (scanner && running && typeof scanner.resume === 'function') {
             try { scanner.resume(); } catch (err) {}
           }
-        }, 1200);
+        }, 850);
+      }
+
+      function focusPageSoon() {
+        setTimeout(function () {
+          if (document.activeElement !== manualCode) {
+            try { document.body.focus({ preventScroll: true }); } catch (err) { document.body.focus(); }
+          }
+        }, 120);
+      }
+
+      function flushGunBuffer() {
+        clearTimeout(gunTimer);
+        var code = clean(gunBuffer);
+        gunBuffer = '';
+        if (code.length >= 5) submitCode(code);
+      }
+
+      function queueManualSubmit(delay) {
+        clearTimeout(manualTimer);
+        var code = clean(manualCode.value);
+        if (code.length >= 5) manualTimer = setTimeout(function () { submitCode(manualCode.value); }, delay || 180);
       }
 
       async function submitCode(rawCode) {
         var code = clean(rawCode);
         if (!code || busy) return;
         var now = Date.now();
-        if (code === lastCode && now - lastAt < 10000) return;
+        if (code === lastCode && now - lastAt < 9000) return;
         lastCode = code;
         lastAt = now;
         busy = true;
         pauseScanner();
         startBtn.disabled = true;
         manualBtn.disabled = true;
-        setStatus('', 'جاري التثبيت', code);
+        setStatus('', 'جاري الإرجاع', code);
 
         try {
           var res = await jsonp('returnMark', { barcode: code, reason: reason.value });
@@ -424,8 +551,8 @@
             } else {
               count += 1;
               counter.textContent = count;
-              setStatus('ok', 'تم تسجيل المرتجع', (res.order && res.order.name) || code);
-              addHistory('ok', code, 'تم تسجيل المرتجع');
+              setStatus('ok', 'تم الإرجاع', (res.order && res.order.name) || code);
+              addHistory('ok', code, 'تم الإرجاع');
               vibrate([70, 40, 70]);
               beep(true);
             }
@@ -447,6 +574,7 @@
           startBtn.disabled = running;
           manualBtn.disabled = false;
           manualCode.value = '';
+          focusPageSoon();
           resumeScannerSoon();
         }
       }
@@ -463,7 +591,7 @@
         }
 
         startBtn.disabled = true;
-        setStatus('', 'فتح الكاميرا', 'اسمح للكاميرا ثم وجّهها نحو الباركود');
+        setStatus('', 'فتح الكاميرا', 'اسمح للكاميرا ثم مرّر الباركود');
 
         try {
           await loadScannerLib();
@@ -489,9 +617,9 @@
           await scanner.start(
             { facingMode: 'environment' },
             {
-              fps: 14,
+              fps: 16,
               qrbox: function (width, height) {
-                return { width: Math.min(width * 0.82, 420), height: Math.min(height * 0.34, 150) };
+                return { width: Math.min(width * 0.86, 440), height: Math.min(height * 0.28, 145) };
               },
               aspectRatio: 1.777
             },
@@ -499,11 +627,15 @@
             function () {}
           );
           running = true;
+          liveDot.className = 'live-dot on';
+          startBtn.textContent = 'الكاميرا تعمل';
           stopBtn.disabled = false;
-          setStatus('', 'الكاميرا تعمل', 'مرّر الباركود داخل الإطار الأخضر');
+          setStatus('', 'جاهز للمسح', 'مرّر الباركود داخل الإطار الأخضر');
         } catch (err) {
           running = false;
+          liveDot.className = 'live-dot';
           startBtn.disabled = false;
+          startBtn.textContent = 'تشغيل الكاميرا';
           stopBtn.disabled = true;
           var msg = err && err.message ? err.message : String(err);
           if (/notallowed|permission|denied/i.test(msg)) {
@@ -522,19 +654,45 @@
         } catch (err) {}
         scanner = null;
         running = false;
+        liveDot.className = 'live-dot';
         startBtn.disabled = false;
-        setStatus('', 'تم إيقاف الكاميرا', 'اضغط ابدأ المسح عند الحاجة');
+        startBtn.textContent = 'تشغيل الكاميرا';
+        setStatus('', 'تم إيقاف الكاميرا', 'اضغط تشغيل عند الحاجة');
       }
 
       startBtn.addEventListener('click', startScanner);
       stopBtn.addEventListener('click', stopScanner);
       manualBtn.addEventListener('click', function () { submitCode(manualCode.value); });
+      manualCode.addEventListener('input', function () { queueManualSubmit(180); });
+      manualCode.addEventListener('paste', function () { setTimeout(function () { queueManualSubmit(80); }, 20); });
       manualCode.addEventListener('keydown', function (event) {
         if (event.key === 'Enter') {
           event.preventDefault();
+          clearTimeout(manualTimer);
           submitCode(manualCode.value);
         }
       });
+      document.addEventListener('keydown', function (event) {
+        if (event.defaultPrevented || event.ctrlKey || event.altKey || event.metaKey || busy) return;
+        var target = event.target;
+        var tag = target && target.tagName ? String(target.tagName).toUpperCase() : '';
+        if (target === manualCode || tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+        if (event.key === 'Enter') {
+          if (gunBuffer) {
+            event.preventDefault();
+            flushGunBuffer();
+          }
+          return;
+        }
+        if (!event.key || event.key.length !== 1) return;
+        gunBuffer += event.key;
+        if (gunBuffer.length > 90) gunBuffer = gunBuffer.slice(-90);
+        clearTimeout(gunTimer);
+        gunTimer = setTimeout(flushGunBuffer, 190);
+        event.preventDefault();
+      });
+      document.body.setAttribute('tabindex', '-1');
+      focusPageSoon();
       window.addEventListener('pagehide', stopScanner);
     })();
   </script>
