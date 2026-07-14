@@ -94,7 +94,7 @@
     button:disabled { opacity: .6; cursor: wait; }
     .stats {
       display: grid;
-      grid-template-columns: repeat(6, 1fr);
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
       gap: 8px;
     }
     .stat {
@@ -179,7 +179,7 @@
     <header class="top">
       <div>
         <h1>حسابات المقاولين</h1>
-        <small>مبيعات، رواجع، منتجات، ومجموعات حسب الفترة</small>
+        <small>كميات، رواجع، منتجات، ومجموعات حسب الفترة</small>
       </div>
     </header>
 
@@ -204,25 +204,23 @@
         <button id="loadBtn" type="button">عرض الحساب</button>
         <button id="excelBtn" class="green" type="button" disabled>تنزيل Excel</button>
       </div>
-      <div class="note">الحساب يعتمد على الطلبات التي يظهر فيها اسم المقاول في شركة التوصيل أو الموظف. الرواجع تُخصم من الصافي وتظهر بتفصيل منفصل.</div>
+      <div class="note">الحساب يعرض الكميات فقط بدون أسعار: عدد المنتجات، الأصناف، الأكواد، المجموعات، والرواجع لكل مقاول.</div>
     </section>
 
     <section class="card stats">
       <div class="stat"><b id="sOrders">0</b><span>كل الطلبات</span></div>
       <div class="stat good"><b id="sSold">0</b><span>طلبات مباعة</span></div>
       <div class="stat bad"><b id="sReturns">0</b><span>طلبات راجعة</span></div>
-      <div class="stat good"><b id="sGross">₪0</b><span>مبيعات</span></div>
-      <div class="stat bad"><b id="sReturnValue">₪0</b><span>قيمة الرواجع</span></div>
-      <div class="stat"><b id="sNet">₪0</b><span>الصافي</span></div>
+      <div class="stat"><b id="sKinds">0</b><span>عدد الأصناف</span></div>
       <div class="stat good"><b id="sSoldProducts">0</b><span>منتجات مباعة</span></div>
       <div class="stat bad"><b id="sReturnedProducts">0</b><span>منتجات راجعة</span></div>
       <div class="stat"><b id="sNetProducts">0</b><span>صافي المنتجات</span></div>
     </section>
 
     <div class="tabs">
-      <button class="tab active" data-tab="orders" type="button">كل المبيعات</button>
-      <button class="tab" data-tab="products" type="button">حسب الكود</button>
+      <button class="tab active" data-tab="products" type="button">حسب الكود</button>
       <button class="tab" data-tab="groups" type="button">حسب المجموعة</button>
+      <button class="tab" data-tab="orders" type="button">كل الطلبات</button>
       <button class="tab" data-tab="returns" type="button">الرواجع</button>
       <button class="tab" data-tab="statuses" type="button">الحالات</button>
     </div>
@@ -245,7 +243,7 @@
       var loadBtn = document.getElementById('loadBtn');
       var excelBtn = document.getElementById('excelBtn');
       var content = document.getElementById('content');
-      var activeTab = 'orders';
+      var activeTab = 'products';
       var report = null;
       var xlsxReady = false;
 
@@ -265,9 +263,6 @@
         return String(value == null ? '' : value).replace(/[&<>"']/g, function (ch) {
           return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' })[ch];
         });
-      }
-      function money(value) {
-        return '₪' + Math.round(Number(value || 0)).toLocaleString('en-US');
       }
       function setLoading(text) {
         content.innerHTML = '<div class="empty">' + escapeHtml(text || 'جاري التحميل') + '</div>';
@@ -319,9 +314,7 @@
         document.getElementById('sOrders').textContent = s.totalOrders || 0;
         document.getElementById('sSold').textContent = s.soldOrders || 0;
         document.getElementById('sReturns').textContent = s.returnedOrders || 0;
-        document.getElementById('sGross').textContent = money(s.grossSales || 0);
-        document.getElementById('sReturnValue').textContent = money(s.returnedValue || 0);
-        document.getElementById('sNet').textContent = money(s.netSales || 0);
+        document.getElementById('sKinds').textContent = (report.productSummary || []).length;
         document.getElementById('sSoldProducts').textContent = s.soldProducts || 0;
         document.getElementById('sReturnedProducts').textContent = s.returnedProducts || 0;
         document.getElementById('sNetProducts').textContent = s.netProducts || 0;
@@ -357,7 +350,6 @@
           content.innerHTML = table([
             { label: 'الحالة', value: function(r) { return escapeHtml(r.status); } },
             { label: 'عدد الطلبات', key: 'orders', num: true },
-            { label: 'قيمة', value: function(r) { return money(r.value); }, num: true },
             { label: 'عدد المنتجات', key: 'products', num: true }
           ], report.statusSummary || []);
           return;
@@ -371,7 +363,6 @@
           { label: 'الزبون', value: function(r) { return escapeHtml(r.name); } },
           { label: 'الهاتف', value: function(r) { return escapeHtml(r.phone); } },
           { label: 'المدينة', value: function(r) { return escapeHtml(r.customer_area); } },
-          { label: 'السعر', value: function(r) { return money(r.price); }, num: true },
           { label: 'الحالة', value: function(r) { return '<span class="status ' + (r.returned ? 'returned' : 'sold') + '">' + escapeHtml(r.Status) + '</span>'; } },
           { label: 'المقاول/الموظف', value: function(r) { return escapeHtml(r.contractor_names || r.delivery_company || r.employee_name); } },
           { label: 'المجموعة', value: function(r) { return escapeHtml(r.group); } },
@@ -430,7 +421,6 @@
             'الزبون': o.name,
             'الهاتف': o.phone,
             'المدينة': o.customer_area,
-            'السعر': o.price,
             'الحالة': o.Status,
             'المقاول/الموظف': o.contractor_names,
             'المجموعة': o.group,
@@ -453,7 +443,7 @@
       }
       function plainStatuses(rows) {
         return (rows || []).map(function(r) {
-          return { 'الحالة': r.status, 'عدد الطلبات': r.orders, 'القيمة': r.value, 'عدد المنتجات': r.products };
+          return { 'الحالة': r.status, 'عدد الطلبات': r.orders, 'عدد المنتجات': r.products };
         });
       }
       async function downloadExcel() {
@@ -464,27 +454,25 @@
           var s = report.summary || {};
           var wb = XLSX.utils.book_new();
           XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet([
-            { 'البند': 'المقاول', 'القيمة': report.contractor || 'الجميع' },
-            { 'البند': 'من تاريخ', 'القيمة': fromDate.value },
-            { 'البند': 'إلى تاريخ', 'القيمة': toDate.value },
-            { 'البند': 'كل الطلبات', 'القيمة': s.totalOrders || 0 },
-            { 'البند': 'طلبات مباعة', 'القيمة': s.soldOrders || 0 },
-            { 'البند': 'طلبات راجعة', 'القيمة': s.returnedOrders || 0 },
-            { 'البند': 'مبيعات', 'القيمة': s.grossSales || 0 },
-            { 'البند': 'قيمة الرواجع', 'القيمة': s.returnedValue || 0 },
-            { 'البند': 'الصافي', 'القيمة': s.netSales || 0 },
-            { 'البند': 'منتجات مباعة', 'القيمة': s.soldProducts || 0 },
-            { 'البند': 'منتجات راجعة', 'القيمة': s.returnedProducts || 0 },
-            { 'البند': 'صافي المنتجات', 'القيمة': s.netProducts || 0 }
+            { 'البند': 'المقاول', 'العدد': report.contractor || 'الجميع' },
+            { 'البند': 'من تاريخ', 'العدد': fromDate.value },
+            { 'البند': 'إلى تاريخ', 'العدد': toDate.value },
+            { 'البند': 'كل الطلبات', 'العدد': s.totalOrders || 0 },
+            { 'البند': 'طلبات مباعة', 'العدد': s.soldOrders || 0 },
+            { 'البند': 'طلبات راجعة', 'العدد': s.returnedOrders || 0 },
+            { 'البند': 'عدد الأصناف', 'العدد': (report.productSummary || []).length },
+            { 'البند': 'منتجات مباعة', 'العدد': s.soldProducts || 0 },
+            { 'البند': 'منتجات راجعة', 'العدد': s.returnedProducts || 0 },
+            { 'البند': 'صافي المنتجات', 'العدد': s.netProducts || 0 }
           ]), 'ملخص');
           XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(plainOrders(report.orders)), 'كل الطلبات');
-          XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(plainOrders(report.soldOrders)), 'مبيعات');
+          XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(plainOrders(report.soldOrders)), 'طلبات مباعة');
           XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(plainOrders(report.returnedOrders)), 'رواجع');
           XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(plainProducts(report.productSummary)), 'حسب الكود');
           XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(plainGroups(report.groupSummary)), 'حسب المجموعة');
           XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(plainStatuses(report.statusSummary)), 'الحالات');
           var name = (report.contractor || 'all').replace(/[\\/:*?"<>|]+/g, '-');
-          XLSX.writeFile(wb, 'MAD-account-' + name + '-' + fromDate.value + '-' + toDate.value + '.xlsx');
+          XLSX.writeFile(wb, 'MAD-products-' + name + '-' + fromDate.value + '-' + toDate.value + '.xlsx');
         } catch (err) {
           alert('تعذر إنشاء Excel: ' + (err && err.message ? err.message : String(err)));
         } finally {
