@@ -1,0 +1,442 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>MAD | متابعة التواصل</title>
+  <meta name="theme-color" content="#eef4f8">
+  <style>
+    :root {
+      --bg: #eef4f8;
+      --card: #fff;
+      --ink: #102033;
+      --muted: #65758a;
+      --line: #d8e2ee;
+      --green: #16a34a;
+      --blue: #2563eb;
+      --red: #dc2626;
+      --gold: #b98224;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: Arial, Tahoma, sans-serif;
+      padding: env(safe-area-inset-top) 8px env(safe-area-inset-bottom);
+    }
+    .app { width: min(980px, 100%); margin: 0 auto; padding: 10px 0 22px; }
+    .top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      padding: 12px;
+      border-radius: 16px;
+      background: #122033;
+      color: #fff;
+      box-shadow: 0 16px 42px rgba(16,32,51,.14);
+    }
+    h1 { margin: 0; font-size: clamp(22px, 5vw, 34px); line-height: 1.1; }
+    .top small { display: block; margin-top: 4px; color: #b8c7db; font-weight: 900; }
+    .refresh {
+      width: auto;
+      min-width: 94px;
+      height: 48px;
+      padding: 0 14px;
+      border: 0;
+      border-radius: 13px;
+      background: var(--green);
+      color: #fff;
+      font-weight: 900;
+      font-size: 16px;
+    }
+    .card {
+      margin-top: 10px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 15px;
+      background: var(--card);
+      box-shadow: 0 8px 24px rgba(16,32,51,.08);
+    }
+    .filters {
+      display: grid;
+      grid-template-columns: 1fr 150px;
+      gap: 8px;
+    }
+    label { display: block; margin-bottom: 6px; color: var(--muted); font-size: 13px; font-weight: 900; }
+    input, select, button {
+      width: 100%;
+      height: 48px;
+      border-radius: 12px;
+      font: inherit;
+      font-weight: 900;
+    }
+    input, select {
+      border: 1px solid var(--line);
+      background: #f9fbfd;
+      color: var(--ink);
+      padding: 0 12px;
+    }
+    button { border: 0; background: var(--blue); color: #fff; cursor: pointer; }
+    button.green { background: var(--green); }
+    button.dark { background: #334155; }
+    button.gold { background: var(--gold); }
+    button:disabled { opacity: .6; cursor: wait; }
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+    .stat {
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      background: #f9fbfd;
+      text-align: center;
+    }
+    .stat b { display: block; font-size: clamp(26px, 7vw, 42px); color: var(--ink); }
+    .stat span { color: var(--muted); font-size: 12px; font-weight: 900; }
+    .tabs {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 7px;
+      position: sticky;
+      top: 0;
+      z-index: 5;
+      background: var(--bg);
+      padding-top: 8px;
+    }
+    .tab {
+      height: 46px;
+      background: #fff;
+      color: var(--ink);
+      border: 1px solid var(--line);
+    }
+    .tab.active {
+      background: #122033;
+      color: #fff;
+      border-color: #122033;
+    }
+    .list { display: grid; gap: 9px; }
+    .order {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: #fff;
+      padding: 11px;
+    }
+    .order-head {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+      align-items: start;
+    }
+    .name { font-size: 18px; font-weight: 900; }
+    .badge {
+      display: inline-grid;
+      place-items: center;
+      min-height: 30px;
+      padding: 0 10px;
+      border-radius: 999px;
+      background: #e2e8f0;
+      color: #334155;
+      font-size: 12px;
+      font-weight: 900;
+    }
+    .badge.ok { background: #dcfce7; color: #166534; }
+    .badge.no { background: #fee2e2; color: #991b1b; }
+    .meta {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 800;
+    }
+    .meta span { overflow-wrap: anywhere; }
+    .actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 7px;
+      margin-top: 9px;
+    }
+    .actions a {
+      display: grid;
+      place-items: center;
+      height: 48px;
+      border-radius: 12px;
+      background: var(--blue);
+      color: #fff;
+      text-decoration: none;
+      font-weight: 900;
+    }
+    .empty {
+      padding: 24px;
+      text-align: center;
+      color: var(--muted);
+      font-weight: 900;
+      border: 2px dashed var(--line);
+      border-radius: 14px;
+      background: #f9fbfd;
+    }
+    .contractor-row {
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      gap: 8px;
+      align-items: center;
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #f9fbfd;
+      font-weight: 900;
+    }
+    .notice {
+      margin-top: 8px;
+      padding: 10px;
+      border-radius: 12px;
+      background: #fff8e8;
+      color: #8a5a10;
+      font-size: 13px;
+      font-weight: 900;
+      line-height: 1.45;
+      text-align: center;
+    }
+    @media (max-width: 720px) {
+      .app { padding-top: 7px; }
+      .filters, .stats, .meta { grid-template-columns: 1fr 1fr; }
+      .actions { grid-template-columns: 1fr; }
+      .contractor-row { grid-template-columns: 1fr auto; }
+      .contractor-row span:last-child { grid-column: 1 / -1; color: var(--muted); font-size: 12px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header class="top">
+      <div>
+        <h1>متابعة التواصل</h1>
+        <small id="modeLabel">العملاء والمقاولين</small>
+      </div>
+      <button id="refreshBtn" class="refresh" type="button">تحديث</button>
+    </header>
+
+    <section class="card">
+      <div class="filters">
+        <div>
+          <label for="contractorInput">اسم المقاول / المندوب</label>
+          <input id="contractorInput" placeholder="اتركه فارغًا لعرض الجميع">
+        </div>
+        <div>
+          <label for="daysInput">آخر أيام</label>
+          <select id="daysInput">
+            <option value="7">7 أيام</option>
+            <option value="14" selected>14 يوم</option>
+            <option value="30">30 يوم</option>
+            <option value="60">60 يوم</option>
+          </select>
+        </div>
+      </div>
+      <div class="notice">للمقاولين: اضغط “اتصال” ثم بعد المكالمة اضغط “تم التواصل” حتى يظهر في التقرير من اتصل ومتى.</div>
+    </section>
+
+    <section class="card stats">
+      <div class="stat"><b id="sTotal">0</b><span>طلبات نشطة</span></div>
+      <div class="stat"><b id="sContacted">0</b><span>تم التواصل</span></div>
+      <div class="stat"><b id="sNot">0</b><span>لم يتم التواصل</span></div>
+      <div class="stat"><b id="sHuman">0</b><span>اتصال مقاول</span></div>
+    </section>
+
+    <div class="tabs">
+      <button class="tab active" data-tab="not" type="button">لم يتم</button>
+      <button class="tab" data-tab="contacted" type="button">تم التواصل</button>
+      <button class="tab" data-tab="contractors" type="button">المقاولين</button>
+    </div>
+
+    <section class="card">
+      <div id="list" class="list"></div>
+    </section>
+  </main>
+
+  <script>
+    (function () {
+      var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzd4FSy5fKZ5B3LF4ogDerw25K16oikiNv0j-4QPZGE4CzbvZFiw5vFIQpE09w486ldCA/exec';
+      var params = new URLSearchParams(location.search);
+      var contractorInput = document.getElementById('contractorInput');
+      var daysInput = document.getElementById('daysInput');
+      var refreshBtn = document.getElementById('refreshBtn');
+      var list = document.getElementById('list');
+      var modeLabel = document.getElementById('modeLabel');
+      var activeTab = 'not';
+      var data = null;
+
+      contractorInput.value = params.get('contractor') || params.get('c') || '';
+      if (contractorInput.value) modeLabel.textContent = 'وضع المقاول: ' + contractorInput.value;
+
+      function escapeHtml(value) {
+        return String(value == null ? '' : value).replace(/[&<>"']/g, function (ch) {
+          return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' })[ch];
+        });
+      }
+
+      function phoneForTel(phone) {
+        var digits = String(phone || '').replace(/\D/g, '');
+        if (digits.startsWith('972')) return '+' + digits;
+        if (digits.startsWith('05')) return '+972' + digits.slice(1);
+        if (digits.startsWith('5')) return '+972' + digits;
+        return digits ? '+' + digits : '';
+      }
+
+      function jsonp(api, payload) {
+        return new Promise(function (resolve, reject) {
+          var callback = '__madContactCb_' + Date.now() + '_' + Math.floor(Math.random() * 100000);
+          var script = document.createElement('script');
+          var timer = setTimeout(function () {
+            cleanup();
+            reject(new Error('انتهت مهلة الاتصال'));
+          }, 18000);
+          function cleanup() {
+            clearTimeout(timer);
+            try { delete window[callback]; } catch (err) { window[callback] = undefined; }
+            if (script.parentNode) script.parentNode.removeChild(script);
+          }
+          window[callback] = function (res) {
+            cleanup();
+            resolve(res);
+          };
+          script.onerror = function () {
+            cleanup();
+            reject(new Error('تعذر الاتصال بالنظام'));
+          };
+          script.src = SCRIPT_URL
+            + '?api=' + encodeURIComponent(api)
+            + '&callback=' + encodeURIComponent(callback)
+            + '&payload=' + encodeURIComponent(JSON.stringify(payload || {}))
+            + '&_=' + Date.now();
+          document.head.appendChild(script);
+        });
+      }
+
+      function setLoading(text) {
+        list.innerHTML = '<div class="empty">' + escapeHtml(text || 'جاري التحميل') + '</div>';
+      }
+
+      function orderCard(order) {
+        var tel = phoneForTel(order.phone);
+        var contacted = order.contacted;
+        var last = order.last_contact_by ? (order.last_contact_by + ' - ' + (order.last_contact_at || '')) : 'لا يوجد اتصال مقاول';
+        return [
+          '<article class="order" data-row="' + escapeHtml(order.rowIndex) + '">',
+          '<div class="order-head">',
+          '<div><div class="name">' + escapeHtml(order.name || '-') + '</div><div class="badge">' + escapeHtml(order.Status || '-') + '</div></div>',
+          '<span class="badge ' + (contacted ? 'ok' : 'no') + '">' + (contacted ? 'تم' : 'لم يتم') + '</span>',
+          '</div>',
+          '<div class="meta">',
+          '<span>هاتف: ' + escapeHtml(order.phone || '-') + '</span>',
+          '<span>مدينة: ' + escapeHtml(order.customer_area || '-') + '</span>',
+          '<span>مقاول: ' + escapeHtml(order.employee_name || order.delivery_company || '-') + '</span>',
+          '<span>آخر اتصال: ' + escapeHtml(last) + '</span>',
+          '<span>طلب: ' + escapeHtml(order.orderId || '-') + '</span>',
+          '<span>عدد الاتصالات: ' + escapeHtml(order.contact_count || 0) + '</span>',
+          '</div>',
+          '<div class="actions">',
+          '<a href="tel:' + escapeHtml(tel) + '" data-action="call" data-row="' + escapeHtml(order.rowIndex) + '">اتصال</a>',
+          '<button class="green" data-action="contacted" data-row="' + escapeHtml(order.rowIndex) + '" type="button">تم التواصل</button>',
+          '<button class="gold" data-action="noanswer" data-row="' + escapeHtml(order.rowIndex) + '" type="button">لم يرد</button>',
+          '</div>',
+          '</article>'
+        ].join('');
+      }
+
+      function renderContractors() {
+        var rows = (data && data.contractorStats) || [];
+        if (!rows.length) {
+          list.innerHTML = '<div class="empty">لا يوجد اتصالات مقاولين بعد</div>';
+          return;
+        }
+        list.innerHTML = rows.map(function (row) {
+          return '<div class="contractor-row"><b>' + escapeHtml(row.contractor) + '</b><span>' + escapeHtml(row.calls || 0) + ' اتصال</span><span>آخر اتصال: ' + escapeHtml(row.last_contact_at || '-') + '</span></div>';
+        }).join('');
+      }
+
+      function renderList() {
+        if (!data) return;
+        document.getElementById('sTotal').textContent = data.summary.total || 0;
+        document.getElementById('sContacted').textContent = data.summary.contacted || 0;
+        document.getElementById('sNot').textContent = data.summary.notContacted || 0;
+        document.getElementById('sHuman').textContent = data.summary.humanContacted || 0;
+        if (activeTab === 'contractors') {
+          renderContractors();
+          return;
+        }
+        var rows = activeTab === 'contacted' ? data.contacted : data.notContacted;
+        if (!rows || !rows.length) {
+          list.innerHTML = '<div class="empty">' + (activeTab === 'contacted' ? 'لا يوجد عملاء تم التواصل معهم' : 'لا يوجد عملاء بدون تواصل') + '</div>';
+          return;
+        }
+        list.innerHTML = rows.map(orderCard).join('');
+      }
+
+      async function loadReport() {
+        refreshBtn.disabled = true;
+        setLoading('جاري تحديث التقرير');
+        try {
+          var res = await jsonp('contactReport', {
+            days: Number(daysInput.value || 14),
+            contractor: contractorInput.value.trim(),
+            activeOnly: true
+          });
+          if (!res || !res.success) throw new Error((res && (res.error || res.message)) || 'تعذر تحميل التقرير');
+          data = res;
+          renderList();
+        } catch (err) {
+          list.innerHTML = '<div class="empty">' + escapeHtml(err && err.message ? err.message : String(err)) + '</div>';
+        } finally {
+          refreshBtn.disabled = false;
+        }
+      }
+
+      async function logContact(rowIndex, result, method) {
+        var contractor = contractorInput.value.trim() || 'غير محدد';
+        var res = await jsonp('logContact', {
+          rowIndex: Number(rowIndex),
+          contractor: contractor,
+          method: method || 'CALL',
+          result: result
+        });
+        if (!res || !res.success) throw new Error((res && (res.error || res.message)) || 'فشل تسجيل الاتصال');
+        await loadReport();
+      }
+
+      document.querySelector('.tabs').addEventListener('click', function (event) {
+        var btn = event.target.closest('.tab');
+        if (!btn) return;
+        activeTab = btn.dataset.tab;
+        document.querySelectorAll('.tab').forEach(function (item) { item.classList.toggle('active', item === btn); });
+        renderList();
+      });
+
+      list.addEventListener('click', function (event) {
+        var el = event.target.closest('[data-action]');
+        if (!el) return;
+        var row = el.dataset.row;
+        if (el.dataset.action === 'call') {
+          logContact(row, 'تم ضغط اتصال', 'CALL_CLICKED').catch(function () {});
+          return;
+        }
+        event.preventDefault();
+        el.disabled = true;
+        var result = el.dataset.action === 'noanswer' ? 'لم يرد' : 'تم التواصل';
+        logContact(row, result, 'CALL').catch(function (err) {
+          alert(err && err.message ? err.message : String(err));
+        }).finally(function () { el.disabled = false; });
+      });
+
+      refreshBtn.addEventListener('click', loadReport);
+      contractorInput.addEventListener('change', loadReport);
+      daysInput.addEventListener('change', loadReport);
+      loadReport();
+    })();
+  </script>
+</body>
+</html>
