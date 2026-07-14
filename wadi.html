@@ -1,274 +1,185 @@
 <!doctype html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="utf-8" />
-  <meta
-    name="viewport"
-    content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no"
-  />
-  <title>MAD PRINT</title>
-  <meta name="description" content="MAD Print Manager" />
-
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MAD PRINT - الموظف</title>
   <style>
-    :root{
-      --bg:#0f172a;
-      --bg2:#111827;
-      --card:#111827;
-      --line:#1f2937;
-      --txt:#e5e7eb;
-      --muted:#94a3b8;
-      --brand:#22c55e;
-      --header-h:64px;
-      --safe-top: env(safe-area-inset-top, 0px);
-      --safe-bottom: env(safe-area-inset-bottom, 0px);
-      --radius:14px;
+    :root {
+      --bg: #0f172a;
+      --bg2: #111827;
+      --card: rgba(15, 23, 42, 0.82);
+      --line: rgba(148, 163, 184, 0.2);
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --accent: #3b82f6;
     }
 
-    *{
-      box-sizing:border-box;
-      -webkit-tap-highlight-color:transparent;
+    * {
+      box-sizing: border-box;
     }
 
     html,
-    body{
-      margin:0;
-      padding:0;
-      width:100%;
-      height:100%;
-      overflow:hidden;
-      background:linear-gradient(180deg,#0b1220,#111827);
-      color:var(--txt);
-      font-family:Arial,sans-serif;
-      overscroll-behavior:none;
+    body {
+      margin: 0;
+      min-height: 100%;
+      background:
+        radial-gradient(circle at top right, rgba(59, 130, 246, 0.18), transparent 28%),
+        linear-gradient(180deg, var(--bg) 0%, var(--bg2) 100%);
+      color: var(--text);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     }
 
-    body{
-      position:fixed;
-      inset:0;
-      touch-action:manipulation;
+    body {
+      display: grid;
+      place-items: center;
+      padding: 24px;
     }
 
-    .app{
-      position:fixed;
-      inset:0;
-      width:100%;
-      height:100dvh;
-      height:100vh;
-      overflow:hidden;
-      background:linear-gradient(180deg,#0b1220,#111827);
+    .status {
+      width: min(420px, 100%);
+      padding: 28px 24px;
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      background: var(--card);
+      box-shadow: 0 24px 60px rgba(2, 6, 23, 0.32);
+      text-align: center;
+      backdrop-filter: blur(16px);
     }
 
-    .top{
-      position:absolute;
-      top:0;
-      right:0;
-      left:0;
-      height:calc(var(--header-h) + var(--safe-top));
-      padding:
-        calc(var(--safe-top) + 10px)
-        14px
-        10px
-        14px;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:10px;
-      border-bottom:1px solid var(--line);
-      background:rgba(17,24,39,.96);
-      backdrop-filter:blur(10px);
-      -webkit-backdrop-filter:blur(10px);
-      z-index:10;
+    .spinner {
+      width: 54px;
+      height: 54px;
+      margin: 0 auto 18px;
+      border-radius: 999px;
+      border: 4px solid rgba(148, 163, 184, 0.2);
+      border-top-color: var(--accent);
+      animation: spin 1s linear infinite;
     }
 
-    .title{
-      font-weight:900;
-      letter-spacing:.5px;
-      font-size:18px;
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
+    h1 {
+      margin: 0 0 10px;
+      font-size: 24px;
+      font-weight: 800;
     }
 
-    .actions{
-      display:flex;
-      gap:8px;
-      flex-shrink:0;
+    p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.8;
+      font-size: 15px;
     }
 
-    .btn{
-      appearance:none;
-      border:1px solid #334155;
-      background:#0b1220;
-      color:#e5e7eb;
-      padding:10px 14px;
-      border-radius:12px;
-      cursor:pointer;
-      text-decoration:none;
-      font-size:13px;
-      font-weight:700;
-      line-height:1;
-      min-height:40px;
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      white-space:nowrap;
-      transition:transform .12s ease, opacity .12s ease, background .12s ease;
+    .error {
+      color: #fca5a5;
+      white-space: pre-wrap;
     }
 
-    .btn:active{
-      transform:scale(.98);
-    }
-
-    .btn.primary{
-      background:var(--brand);
-      color:#052e16;
-      border-color:#16a34a;
-    }
-
-    .main{
-      position:absolute;
-      top:calc(var(--header-h) + var(--safe-top));
-      right:0;
-      left:0;
-      bottom:0;
-      padding:12px 12px calc(12px + var(--safe-bottom));
-      overflow:hidden;
-    }
-
-    .frame-shell{
-      position:relative;
-      width:100%;
-      height:100%;
-      border:1px solid #334155;
-      border-radius:16px;
-      overflow:hidden;
-      background:#fff;
-      box-shadow:0 12px 30px rgba(0,0,0,.28);
-    }
-
-    iframe{
-      display:block;
-      width:100%;
-      height:100%;
-      border:0;
-      background:#fff;
-    }
-
-    .note{
-      position:absolute;
-      right:50%;
-      transform:translateX(50%);
-      bottom:calc(8px + var(--safe-bottom));
-      z-index:11;
-      font-size:12px;
-      color:var(--muted);
-      background:rgba(15,23,42,.72);
-      padding:6px 10px;
-      border:1px solid rgba(51,65,85,.7);
-      border-radius:999px;
-      backdrop-filter:blur(8px);
-      -webkit-backdrop-filter:blur(8px);
-      pointer-events:none;
-    }
-
-    @media (max-width:640px){
-      :root{
-        --header-h:60px;
-      }
-
-      .top{
-        padding:
-          calc(var(--safe-top) + 8px)
-          10px
-          8px
-          10px;
-      }
-
-      .title{
-        font-size:16px;
-      }
-
-      .actions{
-        gap:6px;
-      }
-
-      .btn{
-        padding:9px 11px;
-        font-size:12px;
-        min-height:38px;
-        border-radius:10px;
-      }
-
-      .main{
-        padding:8px 8px calc(8px + var(--safe-bottom));
-      }
-
-      .frame-shell{
-        border-radius:12px;
-      }
-
-      .note{
-        font-size:11px;
-        max-width:calc(100% - 20px);
-        text-align:center;
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
       }
     }
   </style>
 </head>
 <body>
-  <div class="app">
-    <header class="top">
-      <div class="title">MAD PRINT</div>
-
-      <div class="actions">
-        <a
-          class="btn"
-          href="https://script.google.com/macros/s/AKfycbzjTsIvJcKNWa6o2XwweTazCZAq7aVG5YnKzJSmczVjOtQBDLd6zyv70Z48ED_X1VWBBg/exec?page=employee"
-          target="_blank"
-          rel="noopener"
-        >
-          فتح مباشر
-        </a>
-
-        <button class="btn primary" type="button" onclick="reloadFrame()">
-          تحديث
-        </button>
-      </div>
-    </header>
-
-    <main class="main">
-      <div class="frame-shell">
-        <iframe
-          id="appFrame"
-          title="MAD Print Manager"
-          src="https://script.google.com/macros/s/AKfycbzjTsIvJcKNWa6o2XwweTazCZAq7aVG5YnKzJSmczVjOtQBDLd6zyv70Z48ED_X1VWBBg/exec?page=employee"
-          loading="eager"
-          referrerpolicy="no-referrer"
-          allow="clipboard-read; clipboard-write">
-        </iframe>
-      </div>
-
-      <div class="note">إذا لم يظهر داخل الإطار، استخدم زر "فتح مباشر"</div>
-    </main>
-  </div>
+  <main class="status" id="statusBox">
+    <div class="spinner" aria-hidden="true"></div>
+    <h1>جاري فتح لوحة الموظف</h1>
+    <p>يتم الآن تحميل النسخة المحلية على نفس الدومين...</p>
+  </main>
 
   <script>
-    function reloadFrame() {
-      const f = document.getElementById('appFrame');
-      const currentSrc = f.src;
-      f.src = 'about:blank';
+    const EMPLOYEE_PAYLOAD_RPC_URL = 'https://script.google.com/macros/s/AKfycbxZ66FgMUIMTfbKjLP7Dh6ikuG9RHvuMmNeOCjhjnFh3_fF0v7Lypthw0uBK_Kk2Cy8/exec';
+    const EMPLOYEE_PAYLOAD_PARTS = [1, 2, 3, 4, 5];
+
+    bootstrapEmployeePage().catch((error) => {
+      const box = document.getElementById('statusBox');
+      box.innerHTML = `
+        <h1>تعذر فتح الصفحة</h1>
+        <p class="error">${escapeHtml(String((error && error.message) || error || 'Unknown error'))}</p>
+      `;
+    });
+
+    async function bootstrapEmployeePage() {
+      const payloadParts = await Promise.all(
+        EMPLOYEE_PAYLOAD_PARTS.map(async (partNumber) => {
+          const url = new URL(EMPLOYEE_PAYLOAD_RPC_URL);
+          url.searchParams.set('action', 'rpc');
+          url.searchParams.set('method', 'api_getEmployeePayloadPart');
+          url.searchParams.set('args', JSON.stringify([partNumber]));
+
+          const response = await fetch(url.toString(), {
+            method: 'GET',
+            mode: 'cors',
+            redirect: 'follow',
+            cache: 'no-store'
+          });
+
+          let data = null;
+          try {
+            data = await response.json();
+          } catch (_) {
+            throw new Error(`تعذر قراءة الجزء ${partNumber}`);
+          }
+
+          if (!response.ok || !data || data.success !== true) {
+            throw new Error((data && data.error) || `فشل تحميل الجزء ${partNumber}`);
+          }
+
+          return String(data.result || '');
+        })
+      );
+
+      const payload = payloadParts.join('');
+      const binary = atob(payload);
+      const bytes = new Uint8Array(binary.length);
+      for (let i = 0; i < binary.length; i += 1) {
+        bytes[i] = binary.charCodeAt(i);
+      }
+
+      const html = patchEmployeePayload(new TextDecoder().decode(bytes));
+      document.open();
+      document.write(html);
+      document.close();
+      installEmployeePhoneSearchPatch();
+    }
+
+    function patchEmployeePayload(html) {
+      return String(html || '').replace(
+        'return!Number.isFinite(e)||e<=0?50:Math.min(50,Math.floor(e))',
+        'return!Number.isFinite(e)||e<=0?50:Math.min(1000,Math.floor(e))'
+      );
+    }
+
+    function installEmployeePhoneSearchPatch() {
+      const code = '(function(){' +
+        'function digits(value){return String(value||"").replace(/[\\u0660-\\u0669]/g,function(ch){return String(ch.charCodeAt(0)-0x0660)}).replace(/[\\u06f0-\\u06f9]/g,function(ch){return String(ch.charCodeAt(0)-0x06f0)}).replace(/\\D/g,"")}' +
+        'function forSheet(value){var raw=String(value||"").trim();if(!raw)return"";if(raw.charAt(0)==="*")return raw.replace(/\\s+/g,"");var d=digits(raw);if(!d)return"";while(d.indexOf("00")===0)d=d.slice(2);if(d.indexOf("972")===0)d=d.slice(3);while(d.charAt(0)==="0")d=d.slice(1);return d}' +
+        'function variants(value){var raw=String(value||"").trim();var base=forSheet(raw);var direct=digits(raw);var out=[];function add(x){x=String(x||"").trim().toLowerCase();if(x&&out.indexOf(x)<0)out.push(x)}add(raw);add(direct);add(base);if(base&&base.charAt(0)==="5"){add("0"+base);add("972"+base);add("+972"+base);add("00972"+base)}return out}' +
+        'function patchSearch(){if(window.__madPhoneSearchPatched20260714)return true;if(typeof window.getOrderSearchBlob_!=="function")return false;var old=window.getOrderSearchBlob_;window.getOrderSearchBlob_=function(order){var blob=String(old.apply(this,arguments)||"");try{[order&&order.phone,order&&order.customer_phone,order&&order.customerPhone,order&&order.tel,order&&order.mobile].forEach(function(v){variants(v).forEach(function(x){blob+=" "+x})})}catch(e){}return blob};window.__madPhoneSearchPatched20260714=true;window.madPhoneForSheet=forSheet;return true}' +
+        'var SEARCH_ALL_URL="https://script.google.com/macros/s/AKfycbwVQvV8GY9rNUnfl93ZJ1MkYOrOY4m-zVhYWxLZmwea6uJZvUu74kGrcRulMVnyyKbS/exec";var searchTimer=null,searchSeq=0,baseOrders=null;' +
+        'function currentOrders(){try{return Array.isArray(orders)?orders:[]}catch(e){return[]}}function setOrders(list){try{orders=typeof deduplicateOrders==="function"?deduplicateOrders(list||[]):(list||[])}catch(e){}}function refreshView(){try{if(typeof populateContractors_==="function")populateContractors_();if(typeof syncSelectedRows_==="function")syncSelectedRows_();if(typeof updateSelectAllCheckbox_==="function")updateSelectAllCheckbox_();if(typeof render==="function")render()}catch(e){}}' +
+        'function searchAllSheet(query){return new Promise(function(resolve,reject){var cb="__madEmpSearch_"+Date.now()+"_"+Math.floor(Math.random()*100000);var script=document.createElement("script");var payload=JSON.stringify({query:query,limit:500});var url=SEARCH_ALL_URL+"?api=searchAll&callback="+encodeURIComponent(cb)+"&payload="+encodeURIComponent(payload)+"&v="+Date.now();var timer=setTimeout(function(){cleanup();reject(new Error("timeout"))},30000);function cleanup(){clearTimeout(timer);try{delete window[cb]}catch(e){window[cb]=void 0}if(script.parentNode)script.parentNode.removeChild(script)}window[cb]=function(data){cleanup();if(!data||data.success===false||data.ok===false){reject(new Error(data&&data.error||"search failed"));return}resolve(Array.isArray(data.orders)?data.orders:[])};script.onerror=function(){cleanup();reject(new Error("network"))};script.src=url;document.head.appendChild(script)})}' +
+        'function patchAllSheetSearch(){if(window.__madAllSheetSearchPatched20260714)return true;if(typeof handleEmployeeSearchInput!=="function"||typeof render!=="function"||typeof getEmployeeVisibleOrders_!=="function"||typeof getEmployeeFilteredOrders_!=="function")return false;var oldHandle=handleEmployeeSearchInput,oldVisible=getEmployeeVisibleOrders_,oldFiltered=getEmployeeFilteredOrders_,oldLoad=typeof loadOrders==="function"?loadOrders:null;getEmployeeVisibleOrders_=function(){if(window.__madEmployeeAllSheetSearchActive)return currentOrders();return oldVisible.apply(this,arguments)};getEmployeeFilteredOrders_=function(){if(!window.__madEmployeeAllSheetSearchActive)return oldFiltered.apply(this,arguments);var list=currentOrders();var q=typeof normalizeSearchText_==="function"?normalizeSearchText_(employeeSearchQuery):String(employeeSearchQuery||"").toLowerCase().trim();if(!q)return list;var parts=q.split(" ").filter(Boolean);return list.filter(function(order){var blob=typeof getOrderSearchBlob_==="function"?getOrderSearchBlob_(order):JSON.stringify(order||{}).toLowerCase();return parts.every(function(part){return blob.indexOf(part)>=0})})};if(oldLoad){loadOrders=function(){window.__madEmployeeAllSheetSearchActive=false;baseOrders=null;return oldLoad.apply(this,arguments)}}handleEmployeeSearchInput=function(){var input=document.getElementById("employeeSearch");var query=String(input&&input.value||"").trim();try{employeeSearchQuery=query}catch(e){}clearTimeout(searchTimer);if(query.length<2){window.__madEmployeeAllSheetSearchActive=false;if(!query&&baseOrders){setOrders(baseOrders.slice());baseOrders=null;try{selectedRows.clear()}catch(e){}refreshView();return}return oldHandle.apply(this,arguments)}if(!baseOrders)baseOrders=currentOrders().slice();var seq=++searchSeq;oldHandle.apply(this,arguments);searchTimer=setTimeout(function(){searchAllSheet(query).then(function(rows){if(seq!==searchSeq)return;window.__madEmployeeAllSheetSearchActive=true;setOrders(rows);try{selectedRows.clear()}catch(e){}refreshView()}).catch(function(){if(seq===searchSeq)oldHandle.apply(window,[])})},350)};window.__madAllSheetSearchPatched20260714=true;return true}' +
+        'function patchAll(){var a=patchSearch(),b=patchAllSheetSearch();return a&&b}if(!patchAll()){var tries=0;var timer=setInterval(function(){tries+=1;if(patchAll()||tries>60)clearInterval(timer)},250)}' +
+        '})();';
       setTimeout(() => {
-        f.src = currentSrc;
-      }, 60);
+        const script = document.createElement('script');
+        script.id = 'mad-phone-employee-patch-20260714';
+        script.textContent = code;
+        (document.head || document.documentElement || document.body).appendChild(script);
+      }, 0);
     }
 
-    function setAppHeight() {
-      document.documentElement.style.setProperty('--app-height', window.innerHeight + 'px');
+    function escapeHtml(value) {
+      return String(value || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
     }
-
-    setAppHeight();
-    window.addEventListener('resize', setAppHeight);
-    window.addEventListener('orientationchange', setAppHeight);
   </script>
 </body>
 </html>
