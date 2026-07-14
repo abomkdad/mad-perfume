@@ -55,18 +55,32 @@
       align-items: end;
     }
     label { display: block; margin-bottom: 6px; color: var(--muted); font-size: 13px; font-weight: 900; }
-    input, button {
+    input, select, button {
       width: 100%;
       height: 48px;
       border-radius: 12px;
       font: inherit;
       font-weight: 900;
     }
-    input {
+    input, select {
       border: 1px solid var(--line);
       background: #f9fbfd;
       color: var(--ink);
       padding: 0 12px;
+    }
+    select {
+      appearance: auto;
+      cursor: pointer;
+    }
+    .contractor-field {
+      display: grid;
+      gap: 8px;
+    }
+    .contractor-select {
+      height: 52px;
+      border-color: #b7c7da;
+      background: #fff;
+      color: var(--dark);
     }
     button {
       min-width: 116px;
@@ -175,6 +189,9 @@
           <label for="contractorInput">المقاول</label>
           <input id="contractorInput" list="contractorsList" placeholder="مثال: Marwa / Hi Express / اسم المقاول">
           <datalist id="contractorsList"></datalist>
+          <select id="contractorSelect" class="contractor-select" aria-label="قائمة المقاولين">
+            <option value="">كل المقاولين / اختر مقاول</option>
+          </select>
         </div>
         <div>
           <label for="fromDate">من تاريخ</label>
@@ -221,6 +238,7 @@
       var XLSX_URL = 'https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js';
       var params = new URLSearchParams(location.search);
       var contractorInput = document.getElementById('contractorInput');
+      var contractorSelect = document.getElementById('contractorSelect');
       var contractorsList = document.getElementById('contractorsList');
       var fromDate = document.getElementById('fromDate');
       var toDate = document.getElementById('toDate');
@@ -363,9 +381,24 @@
         ];
       }
       function updateContractorsList(list) {
-        contractorsList.innerHTML = (list || []).slice(0, 200).map(function(name) {
+        var names = [];
+        var seen = {};
+        (list || []).forEach(function(name) {
+          name = String(name || '').trim();
+          if (!name || seen[name]) return;
+          seen[name] = true;
+          names.push(name);
+        });
+        names.sort(function(a, b) { return a.localeCompare(b, 'ar'); });
+        var current = contractorInput.value.trim();
+        if (current && !seen[current]) names.unshift(current);
+        contractorsList.innerHTML = names.slice(0, 200).map(function(name) {
           return '<option value="' + escapeHtml(name) + '"></option>';
         }).join('');
+        contractorSelect.innerHTML = '<option value="">كل المقاولين / اختر مقاول</option>' + names.slice(0, 200).map(function(name) {
+          return '<option value="' + escapeHtml(name) + '">' + escapeHtml(name) + '</option>';
+        }).join('');
+        contractorSelect.value = current && names.indexOf(current) !== -1 ? current : '';
       }
       async function loadReport() {
         loadBtn.disabled = true;
@@ -464,6 +497,15 @@
         activeTab = btn.dataset.tab;
         document.querySelectorAll('.tab').forEach(function(item) { item.classList.toggle('active', item === btn); });
         renderTab();
+      });
+      contractorSelect.addEventListener('change', function() {
+        contractorInput.value = contractorSelect.value;
+        loadReport();
+      });
+      contractorInput.addEventListener('input', function() {
+        if (contractorSelect.value && contractorSelect.value !== contractorInput.value.trim()) {
+          contractorSelect.value = '';
+        }
       });
       loadBtn.addEventListener('click', loadReport);
       excelBtn.addEventListener('click', downloadExcel);
