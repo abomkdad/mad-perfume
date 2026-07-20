@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>MAD BULK</title>
   <script>
-    const PAGE_VERSION = 'bulk-20260721-2';
+    const PAGE_VERSION = 'bulk-20260721-3';
     const APP_URL = 'https://script.google.com/macros/s/AKfycbwVQvV8GY9rNUnfl93ZJ1MkYOrOY4m-zVhYWxLZmwea6uJZvUu74kGrcRulMVnyyKbS/exec';
     (function () {
       var p = new URLSearchParams(location.search);
@@ -319,7 +319,7 @@
     <section class="panel stack">
       <div class="stats">
         <div class="stat"><b id="totalCount">0</b><span>الطلبات</span></div>
-        <div class="stat"><b id="validCount">0</b><span>جاهزة</span></div>
+        <div class="stat"><b id="validCount">0</b><span>جاهزة للحفظ</span></div>
         <div class="stat"><b id="savedCount">0</b><span>محفوظة</span></div>
         <div class="stat"><b id="errorCount">0</b><span>أخطاء</span></div>
       </div>
@@ -612,7 +612,7 @@
     }
     function updateStats() {
       var total = state.orders.length;
-      var valid = state.orders.filter(function (o) { return !o.errors.length; }).length;
+      var valid = state.orders.filter(function (o) { return !o.errors.length && !o.rowIndex && o.status !== 'error'; }).length;
       var saved = state.orders.filter(function (o) { return !!o.rowIndex; }).length;
       var errors = state.orders.filter(function (o) { return o.errors.length || o.status === 'error'; }).length;
       $('totalCount').textContent = total;
@@ -651,7 +651,7 @@
       return '<div class="' + (wide ? 'wide' : '') + '"><label for="' + field + '_' + i + '">' + label + '</label><input id="' + field + '_' + i + '" value="' + esc(value) + '"' + (dir ? ' dir="' + dir + '"' : '') + ' onchange="updateOrderField(' + i + ',&quot;' + field + '&quot;,this.value)"></div>';
     }
     function statusText(o) {
-      if (o.status === 'saving') return 'جاري الحفظ...';
+      if (o.status === 'saving') return 'تم الإرسال، بانتظار تأكيد ظهوره في الشيث...';
       if (o.status === 'saved') return 'تم الحفظ';
       if (o.status === 'sent') return 'تم الحفظ والإرسال';
       if (o.status === 'error') return o.error || 'خطأ';
@@ -714,6 +714,7 @@
     }
     function setOrderStatus(order, status, text, rowIndex) {
       order.status = status;
+      if (status !== 'error') order.error = '';
       if (text) order.error = text;
       if (rowIndex) order.rowIndex = String(rowIndex);
       var i = state.orders.indexOf(order);
@@ -770,6 +771,17 @@
         if (!keepBusy) setBusy(false);
       }
     }
+    async function waitForSavedRows(orders, maxMs, label) {
+      var start = Date.now();
+      var missing = orders.filter(function (o) { return !o.rowIndex && !o.errors.length; });
+      while (missing.length && Date.now() - start < maxMs) {
+        $('stateText').textContent = (label || 'تأكيد الصفوف') + ' - بقي ' + missing.length;
+        await delay(4500);
+        await verifySavedRows(true);
+        missing = orders.filter(function (o) { return !o.rowIndex && !o.errors.length; });
+      }
+      return missing;
+    }
     async function saveAll(sendAfter) {
       if (state.busy) return;
       if (!state.orders.length) analyzeBulk();
@@ -794,9 +806,7 @@
           await delay(180);
         });
         $('stateText').textContent = 'تأكيد الصفوف...';
-        await delay(Math.min(18000, 5000 + valid.length * 260));
-        await verifySavedRows(true);
-        var missing = state.orders.filter(function (o) { return !o.errors.length && !o.rowIndex; });
+        var missing = await waitForSavedRows(valid, Math.min(90000, 18000 + valid.length * 1800), 'تأكيد الحفظ');
         if (missing.length) {
           setBusy(true, 'إعادة محاولة للناقص...');
           await runQueue(missing, 2, async function (order, i) {
@@ -808,8 +818,7 @@
             }
             await delay(350);
           });
-          await delay(Math.min(18000, 6000 + missing.length * 400));
-          await verifySavedRows(true);
+          missing = await waitForSavedRows(missing, Math.min(90000, 18000 + missing.length * 2200), 'تأكيد المحاولة الثانية');
         }
         var stillMissing = state.orders.filter(function (o) { return !o.errors.length && !o.rowIndex; });
         stillMissing.forEach(function (o) { setOrderStatus(o, 'error', 'لم يتم تأكيد حفظ هذا الطلب'); });
