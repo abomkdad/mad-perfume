@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>MAD BULK</title>
   <script>
-    const PAGE_VERSION = 'bulk-20260721-6';
+    const PAGE_VERSION = 'bulk-20260721-7';
     const APP_URL = 'https://script.google.com/macros/s/AKfycbwVQvV8GY9rNUnfl93ZJ1MkYOrOY4m-zVhYWxLZmwea6uJZvUu74kGrcRulMVnyyKbS/exec';
     (function () {
       var p = new URLSearchParams(location.search);
@@ -795,6 +795,20 @@
       }
       return missing;
     }
+    async function saveWave(orders, workers, label) {
+      var done = 0;
+      await runQueue(orders, workers, async function (order) {
+        setOrderStatus(order, 'saving');
+        var result = await saveAttempt(order);
+        done++;
+        $('stateText').textContent = label + ' ' + done + ' من ' + orders.length;
+        if (result.ok && result.res) {
+          var rowIndex = saveResultRowIndex(result.res);
+          if (rowIndex) setOrderStatus(order, 'saved', '', rowIndex);
+        }
+        await delay(140);
+      });
+    }
     async function saveAll(sendAfter) {
       if (state.busy) return;
       if (!state.orders.length) analyzeBulk();
@@ -807,33 +821,15 @@
           toast('كل الطلبات محفوظة أو لا توجد طلبات جاهزة للحفظ', 'success');
           return;
         }
-        $('stateText').textContent = 'حفظ الطلبات...';
-        var done = 0;
-        await runQueue(valid, 5, async function (order) {
-          setOrderStatus(order, 'saving');
-          var result = await saveAttempt(order);
-          done++;
-          $('stateText').textContent = 'حفظ ' + done + ' من ' + valid.length;
-          if (result.ok && result.res) {
-            var rowIndex = saveResultRowIndex(result.res);
-            if (rowIndex) setOrderStatus(order, 'saved', '', rowIndex);
-          }
-          await delay(80);
-        });
-        $('stateText').textContent = 'تأكيد الصفوف...';
-        var missing = await waitForSavedRows(valid, Math.min(45000, 9000 + valid.length * 900), 'تأكيد الحفظ');
-        if (missing.length) {
-          setBusy(true, 'إعادة محاولة للناقص...');
-          await runQueue(missing, 2, async function (order, i) {
-            $('stateText').textContent = 'إعادة حفظ ' + (i + 1) + ' من ' + missing.length;
-            var result = await saveAttempt(order);
-            if (result.ok && result.res) {
-              var rowIndex = saveResultRowIndex(result.res);
-              if (rowIndex) setOrderStatus(order, 'saved', '', rowIndex);
-            }
-            await delay(180);
-          });
-          missing = await waitForSavedRows(missing, Math.min(45000, 10000 + missing.length * 1200), 'تأكيد المحاولة الثانية');
+        var missing = valid;
+        var wave = 0;
+        var workerPlan = [3, 2, 2, 1];
+        while (missing.length && wave < workerPlan.length) {
+          wave++;
+          setBusy(true, wave === 1 ? 'حفظ الطلبات...' : 'إعادة محاولة للمتبقي...');
+          await saveWave(missing, workerPlan[wave - 1], wave === 1 ? 'حفظ' : ('محاولة ' + wave));
+          $('stateText').textContent = 'تأكيد الصفوف...';
+          missing = await waitForSavedRows(missing, Math.min(50000, 10000 + missing.length * 1800), wave === 1 ? 'تأكيد الحفظ' : ('تأكيد محاولة ' + wave));
         }
         var stillMissing = state.orders.filter(function (o) { return !o.errors.length && !o.rowIndex; });
         stillMissing.forEach(function (o) { setOrderStatus(o, 'retry', 'لم يتم تأكيد حفظ هذا الطلب، يمكنك إعادة حفظ المتبقي'); });
