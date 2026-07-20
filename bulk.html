@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>MAD BULK</title>
   <script>
-    const PAGE_VERSION = 'bulk-20260721-1';
+    const PAGE_VERSION = 'bulk-20260721-2';
     const APP_URL = 'https://script.google.com/macros/s/AKfycbwVQvV8GY9rNUnfl93ZJ1MkYOrOY4m-zVhYWxLZmwea6uJZvUu74kGrcRulMVnyyKbS/exec';
     (function () {
       var p = new URLSearchParams(location.search);
@@ -430,6 +430,42 @@
       if (res && (res.success === false || res.ok === false)) throw new Error(res.error || res.message || 'فشل الطلب');
       return res;
     }
+    function fireMutation(action, payload) {
+      return new Promise(function (resolve) {
+        var cb = '__bulkFire_' + Date.now() + '_' + Math.floor(Math.random() * 100000);
+        var url = buildApiUrl(action, payload, {}, cb);
+        if (url.length > 7800) { resolve({ ok: false, error: new Error('النص طويل جدا') }); return; }
+        var script = document.createElement('script');
+        var resolved = false;
+        var earlyTimer = setTimeout(function () {
+          if (!resolved) {
+            resolved = true;
+            resolve({ ok: true, pending: true });
+          }
+        }, 1200);
+        var cleanupTimer = setTimeout(cleanup, 45000);
+        function cleanup() {
+          clearTimeout(earlyTimer);
+          clearTimeout(cleanupTimer);
+          try { delete window[cb]; } catch (e) { window[cb] = void 0; }
+          if (script.parentNode) script.parentNode.removeChild(script);
+        }
+        function finish(ok, data) {
+          cleanup();
+          if (!resolved) {
+            resolved = true;
+            resolve(ok ? { ok: true, res: data } : { ok: false, error: data });
+          }
+        }
+        window[cb] = function (data) { finish(true, data); };
+        script.async = true;
+        script.charset = 'utf-8';
+        script.referrerPolicy = 'no-referrer';
+        script.onerror = function () { finish(false, new Error('تعذر الاتصال بالخادم')); };
+        script.src = url;
+        document.head.appendChild(script);
+      });
+    }
 
     var labelSets = {
       name: ['שם', 'name', 'اسم', 'الاسم', 'اسم العميل', 'customer', 'לקוח'],
@@ -671,8 +707,7 @@
     }
     async function saveAttempt(order, timeoutMs) {
       try {
-        var res = await api('save', order.payload, {}, timeoutMs || 14000);
-        return { ok: true, res: res };
+        return await fireMutation('save', order.payload);
       } catch (err) {
         return { ok: false, error: err };
       }
@@ -747,33 +782,33 @@
       setBusy(true, 'حفظ الطلبات...');
       try {
         var done = 0;
-        await runQueue(valid, 3, async function (order) {
+        await runQueue(valid, 4, async function (order) {
           setOrderStatus(order, 'saving');
-          var result = await saveAttempt(order, 14000);
+          var result = await saveAttempt(order);
           done++;
           $('stateText').textContent = 'حفظ ' + done + ' من ' + valid.length;
           if (result.ok && result.res) {
             var rowIndex = Number(result.res.rowIndex || (result.res.order && result.res.order.rowIndex));
             if (rowIndex) setOrderStatus(order, 'saved', '', rowIndex);
           }
-          await delay(350);
+          await delay(180);
         });
         $('stateText').textContent = 'تأكيد الصفوف...';
-        await delay(4500);
+        await delay(Math.min(18000, 5000 + valid.length * 260));
         await verifySavedRows(true);
         var missing = state.orders.filter(function (o) { return !o.errors.length && !o.rowIndex; });
         if (missing.length) {
           setBusy(true, 'إعادة محاولة للناقص...');
-          await runQueue(missing, 1, async function (order, i) {
+          await runQueue(missing, 2, async function (order, i) {
             $('stateText').textContent = 'إعادة حفظ ' + (i + 1) + ' من ' + missing.length;
-            var result = await saveAttempt(order, 22000);
+            var result = await saveAttempt(order);
             if (result.ok && result.res) {
               var rowIndex = Number(result.res.rowIndex || (result.res.order && result.res.order.rowIndex));
               if (rowIndex) setOrderStatus(order, 'saved', '', rowIndex);
             }
-            await delay(900);
+            await delay(350);
           });
-          await delay(4500);
+          await delay(Math.min(18000, 6000 + missing.length * 400));
           await verifySavedRows(true);
         }
         var stillMissing = state.orders.filter(function (o) { return !o.errors.length && !o.rowIndex; });
