@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>MAD BULK</title>
   <script>
-    const PAGE_VERSION = 'bulk-20260721-4';
+    const PAGE_VERSION = 'bulk-20260721-5';
     const APP_URL = 'https://script.google.com/macros/s/AKfycbwVQvV8GY9rNUnfl93ZJ1MkYOrOY4m-zVhYWxLZmwea6uJZvUu74kGrcRulMVnyyKbS/exec';
     (function () {
       var p = new URLSearchParams(location.search);
@@ -431,7 +431,7 @@
       if (res && (res.success === false || res.ok === false)) throw new Error(res.error || res.message || 'فشل الطلب');
       return res;
     }
-    function fireMutation(action, payload) {
+    function fireMutation(action, payload, onResult) {
       return new Promise(function (resolve) {
         var cb = '__bulkFire_' + Date.now() + '_' + Math.floor(Math.random() * 100000);
         var url = buildApiUrl(action, payload, {}, cb);
@@ -453,6 +453,9 @@
         }
         function finish(ok, data) {
           cleanup();
+          if (ok && onResult) {
+            try { onResult(data); } catch (e) {}
+          }
           if (!resolved) {
             resolved = true;
             resolve(ok ? { ok: true, res: data } : { ok: false, error: data });
@@ -707,9 +710,15 @@
       }
       await Promise.all(Array.from({ length: Math.min(workers, items.length) }, worker));
     }
+    function saveResultRowIndex(res) {
+      return Number(res && (res.rowIndex || (res.order && res.order.rowIndex)));
+    }
     async function saveAttempt(order, timeoutMs) {
       try {
-        return await fireMutation('save', order.payload);
+        return await fireMutation('save', order.payload, function (res) {
+          var rowIndex = saveResultRowIndex(res);
+          if (rowIndex && !order.rowIndex) setOrderStatus(order, 'saved', '', rowIndex);
+        });
       } catch (err) {
         return { ok: false, error: err };
       }
@@ -754,19 +763,21 @@
         }
       });
     }
-    async function verifySavedRows(keepBusy) {
+    async function verifySavedRows(keepBusy, deep) {
       if (!state.orders.length) { toast('لا توجد طلبات للفحص', 'error'); return; }
       if (!keepBusy) setBusy(true, 'فحص الحفظ...');
       try {
         var res = await api('recent', { limit: 250 }, { limit: 250 }, 35000);
         matchRowsFromRecent(state.orders, (res && res.orders) || []);
         var missing = state.orders.filter(function (o) { return !o.rowIndex && !o.errors.length; });
-        await runQueue(missing, 2, async function (order) {
-          try {
-            var found = await api('searchAll', { query: order.payload.phone, limit: 20 }, {}, 35000);
-            matchRowsFromRecent([order], (found && found.orders) || []);
-          } catch (err) {}
-        });
+        if (deep !== false) {
+          await runQueue(missing, 2, async function (order) {
+            try {
+              var found = await api('searchAll', { query: order.payload.phone, limit: 20 }, {}, 35000);
+              matchRowsFromRecent([order], (found && found.orders) || []);
+            } catch (err) {}
+          });
+        }
         render();
         toast('تم الفحص', 'success');
       } finally {
@@ -778,8 +789,8 @@
       var missing = orders.filter(function (o) { return !o.rowIndex && !o.errors.length; });
       while (missing.length && Date.now() - start < maxMs) {
         $('stateText').textContent = (label || 'تأكيد الصفوف') + ' - بقي ' + missing.length;
-        await delay(4500);
-        await verifySavedRows(true);
+        await delay(2200);
+        await verifySavedRows(true, false);
         missing = orders.filter(function (o) { return !o.rowIndex && !o.errors.length; });
       }
       return missing;
@@ -796,31 +807,31 @@
       setBusy(true, 'حفظ الطلبات...');
       try {
         var done = 0;
-        await runQueue(valid, 4, async function (order) {
+        await runQueue(valid, 5, async function (order) {
           setOrderStatus(order, 'saving');
           var result = await saveAttempt(order);
           done++;
           $('stateText').textContent = 'حفظ ' + done + ' من ' + valid.length;
           if (result.ok && result.res) {
-            var rowIndex = Number(result.res.rowIndex || (result.res.order && result.res.order.rowIndex));
+            var rowIndex = saveResultRowIndex(result.res);
             if (rowIndex) setOrderStatus(order, 'saved', '', rowIndex);
           }
-          await delay(180);
+          await delay(80);
         });
         $('stateText').textContent = 'تأكيد الصفوف...';
-        var missing = await waitForSavedRows(valid, Math.min(90000, 18000 + valid.length * 1800), 'تأكيد الحفظ');
+        var missing = await waitForSavedRows(valid, Math.min(45000, 9000 + valid.length * 900), 'تأكيد الحفظ');
         if (missing.length) {
           setBusy(true, 'إعادة محاولة للناقص...');
           await runQueue(missing, 2, async function (order, i) {
             $('stateText').textContent = 'إعادة حفظ ' + (i + 1) + ' من ' + missing.length;
             var result = await saveAttempt(order);
             if (result.ok && result.res) {
-              var rowIndex = Number(result.res.rowIndex || (result.res.order && result.res.order.rowIndex));
+              var rowIndex = saveResultRowIndex(result.res);
               if (rowIndex) setOrderStatus(order, 'saved', '', rowIndex);
             }
-            await delay(350);
+            await delay(180);
           });
-          missing = await waitForSavedRows(missing, Math.min(90000, 18000 + missing.length * 2200), 'تأكيد المحاولة الثانية');
+          missing = await waitForSavedRows(missing, Math.min(45000, 10000 + missing.length * 1200), 'تأكيد المحاولة الثانية');
         }
         var stillMissing = state.orders.filter(function (o) { return !o.errors.length && !o.rowIndex; });
         stillMissing.forEach(function (o) { setOrderStatus(o, 'retry', 'لم يتم تأكيد حفظ هذا الطلب، يمكنك إعادة حفظ المتبقي'); });
