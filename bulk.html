@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>MAD BULK</title>
   <script>
-    const PAGE_VERSION = 'bulk-20260721-5';
+    const PAGE_VERSION = 'bulk-20260721-6';
     const APP_URL = 'https://script.google.com/macros/s/AKfycbwVQvV8GY9rNUnfl93ZJ1MkYOrOY4m-zVhYWxLZmwea6uJZvUu74kGrcRulMVnyyKbS/exec';
     (function () {
       var p = new URLSearchParams(location.search);
@@ -798,14 +798,16 @@
     async function saveAll(sendAfter) {
       if (state.busy) return;
       if (!state.orders.length) analyzeBulk();
-      var valid = state.orders.filter(function (o) { return !o.errors.length && !o.rowIndex; });
-      if (!valid.length) {
-        toast('لا توجد طلبات جاهزة للحفظ', 'error');
-        return;
-      }
       state.lastModeSend = !!sendAfter;
-      setBusy(true, 'حفظ الطلبات...');
+      setBusy(true, 'فحص الموجود قبل الحفظ...');
       try {
+        await verifySavedRows(true, false);
+        var valid = state.orders.filter(function (o) { return !o.errors.length && !o.rowIndex; });
+        if (!valid.length) {
+          toast('كل الطلبات محفوظة أو لا توجد طلبات جاهزة للحفظ', 'success');
+          return;
+        }
+        $('stateText').textContent = 'حفظ الطلبات...';
         var done = 0;
         await runQueue(valid, 5, async function (order) {
           setOrderStatus(order, 'saving');
