@@ -1,0 +1,823 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>MAD BULK</title>
+  <script>
+    const PAGE_VERSION = 'bulk-20260721-1';
+    const APP_URL = 'https://script.google.com/macros/s/AKfycbwVQvV8GY9rNUnfl93ZJ1MkYOrOY4m-zVhYWxLZmwea6uJZvUu74kGrcRulMVnyyKbS/exec';
+    (function () {
+      var p = new URLSearchParams(location.search);
+      var v = p.get('v');
+      if (v && v !== PAGE_VERSION) {
+        p.set('v', PAGE_VERSION);
+        p.set('cache', Date.now());
+        location.replace(location.pathname + '?' + p.toString());
+      }
+    })();
+  </script>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #08101d;
+      --panel: #101b2d;
+      --panel2: #0c1626;
+      --line: #26364f;
+      --text: #f8fafc;
+      --muted: #a8b3c7;
+      --blue: #3b82f6;
+      --green: #22c55e;
+      --orange: #f59e0b;
+      --red: #ef4444;
+      --violet: #8b5cf6;
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+      font-family: Tahoma, Arial, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-size: 16px;
+      line-height: 1.55;
+      letter-spacing: 0;
+    }
+    button, input, select, textarea {
+      font: inherit;
+      letter-spacing: 0;
+    }
+    .top {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      padding: calc(10px + var(--safe-top)) 12px 10px;
+      background: rgba(8, 16, 29, .96);
+      border-bottom: 1px solid var(--line);
+      backdrop-filter: blur(10px);
+    }
+    .top-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      max-width: 980px;
+      margin: 0 auto;
+    }
+    .brand {
+      font-size: 22px;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+    .version {
+      color: var(--muted);
+      font-size: 12px;
+      direction: ltr;
+    }
+    .shell {
+      width: min(980px, 100%);
+      margin: 0 auto;
+      padding: 12px 12px calc(20px + var(--safe-bottom));
+      display: grid;
+      gap: 12px;
+    }
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 12px;
+    }
+    h1, h2 {
+      margin: 0;
+      font-size: 22px;
+      line-height: 1.25;
+    }
+    h2 { font-size: 19px; }
+    .sub {
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 4px;
+    }
+    .stack { display: grid; gap: 10px; }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+    .wide { grid-column: 1 / -1; }
+    label {
+      display: block;
+      color: #dbeafe;
+      font-weight: 800;
+      margin-bottom: 6px;
+    }
+    textarea, input, select {
+      width: 100%;
+      border: 1px solid var(--line);
+      background: #071121;
+      color: var(--text);
+      border-radius: 9px;
+      padding: 11px;
+      outline: none;
+      min-height: 46px;
+    }
+    textarea {
+      min-height: 230px;
+      resize: vertical;
+      direction: rtl;
+    }
+    input[dir="ltr"] { text-align: left; }
+    textarea:focus, input:focus, select:focus {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, .16);
+    }
+    .actions {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+    }
+    button {
+      border: 1px solid transparent;
+      background: var(--blue);
+      color: white;
+      border-radius: 9px;
+      padding: 12px 10px;
+      min-height: 46px;
+      font-weight: 900;
+      cursor: pointer;
+    }
+    button:disabled {
+      opacity: .55;
+      cursor: progress;
+    }
+    .ghost { background: var(--panel2); border-color: var(--line); }
+    .success { background: var(--green); color: #04110a; }
+    .warn { background: var(--orange); color: #160d01; }
+    .danger { background: var(--red); }
+    .violet { background: var(--violet); }
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
+    }
+    .stat {
+      background: var(--panel2);
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      padding: 10px;
+      min-width: 0;
+    }
+    .stat b {
+      display: block;
+      font-size: 22px;
+      line-height: 1.1;
+    }
+    .stat span {
+      color: var(--muted);
+      font-size: 12px;
+    }
+    .bar {
+      overflow: hidden;
+      height: 10px;
+      border-radius: 999px;
+      background: #071121;
+      border: 1px solid var(--line);
+    }
+    .bar > div {
+      height: 100%;
+      width: 0;
+      background: linear-gradient(90deg, var(--green), var(--blue));
+      transition: width .25s ease;
+    }
+    .preview {
+      display: grid;
+      gap: 10px;
+    }
+    .order {
+      background: var(--panel2);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 11px;
+      overflow: hidden;
+    }
+    .order.bad { border-color: rgba(239, 68, 68, .9); }
+    .order.saved { border-color: rgba(34, 197, 94, .9); }
+    .order-head {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 9px;
+    }
+    .order-title {
+      font-weight: 900;
+      min-width: 0;
+      overflow-wrap: anywhere;
+    }
+    .badge {
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 4px 8px;
+      color: var(--muted);
+      font-size: 12px;
+      white-space: nowrap;
+    }
+    .badge.ok { color: #86efac; border-color: rgba(34, 197, 94, .65); }
+    .badge.err { color: #fca5a5; border-color: rgba(239, 68, 68, .65); }
+    .mini-actions {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 7px;
+      margin-top: 8px;
+    }
+    .mini-actions button {
+      min-height: 38px;
+      padding: 8px;
+      font-size: 13px;
+    }
+    .tiny {
+      color: var(--muted);
+      font-size: 12px;
+      overflow-wrap: anywhere;
+    }
+    .toast {
+      position: fixed;
+      right: 12px;
+      left: 12px;
+      bottom: calc(12px + var(--safe-bottom));
+      z-index: 20;
+      display: none;
+      background: #071121;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 13px;
+      box-shadow: 0 18px 50px rgba(0,0,0,.4);
+    }
+    .toast.show { display: block; }
+    @media (max-width: 620px) {
+      .shell { padding-left: 9px; padding-right: 9px; }
+      .top { padding-left: 9px; padding-right: 9px; }
+      .grid, .actions, .stats { grid-template-columns: 1fr 1fr; }
+      .actions .wide-mobile { grid-column: 1 / -1; }
+      h1 { font-size: 21px; }
+      .panel { padding: 10px; }
+      textarea { min-height: 210px; }
+    }
+    @media (max-width: 360px) {
+      .grid, .actions, .stats, .mini-actions { grid-template-columns: 1fr; }
+      .brand { font-size: 19px; }
+    }
+  </style>
+</head>
+<body>
+  <header class="top">
+    <div class="top-row">
+      <div>
+        <div class="brand">MAD BULK</div>
+        <div class="version" id="versionText"></div>
+      </div>
+      <a class="badge" href="orders.html?mobile=1">MAD PRINT</a>
+    </div>
+  </header>
+
+  <main class="shell">
+    <section class="panel stack">
+      <div>
+        <h1>إدخال جماعي</h1>
+        <div class="sub" id="stateText">جاهز</div>
+      </div>
+      <div class="grid">
+        <div>
+          <label for="employee">الموظف / المقاول</label>
+          <select id="employee"></select>
+        </div>
+        <div>
+          <label for="delivery">شركة التوصيل</label>
+          <select id="delivery">
+            <option>Hi Express</option>
+            <option>Marwa</option>
+            <option>Lama</option>
+            <option>Areen</option>
+            <option>Aiat</option>
+            <option>Saeed</option>
+            <option value="Manual">توصيل يدوي</option>
+          </select>
+        </div>
+      </div>
+      <div>
+        <label for="bulkText">رسالة الطلبات</label>
+        <textarea id="bulkText" placeholder="الصق هنا كل الطلبات مرة واحدة"></textarea>
+      </div>
+      <div class="actions">
+        <button type="button" onclick="analyzeBulk()">تحليل الطلبات</button>
+        <button class="ghost" type="button" onclick="pasteFromClipboard()">لصق</button>
+        <button class="danger" type="button" onclick="clearAll()">مسح</button>
+      </div>
+    </section>
+
+    <section class="panel stack">
+      <div class="stats">
+        <div class="stat"><b id="totalCount">0</b><span>الطلبات</span></div>
+        <div class="stat"><b id="validCount">0</b><span>جاهزة</span></div>
+        <div class="stat"><b id="savedCount">0</b><span>محفوظة</span></div>
+        <div class="stat"><b id="errorCount">0</b><span>أخطاء</span></div>
+      </div>
+      <div class="bar"><div id="progressBar"></div></div>
+      <div class="actions">
+        <button class="success wide-mobile" type="button" onclick="saveAll(false)">حفظ فقط</button>
+        <button class="warn wide-mobile" type="button" onclick="saveAll(true)">حفظ وإرسال للتجهيز</button>
+        <button class="ghost" type="button" onclick="verifySavedRows()">فحص الحفظ</button>
+      </div>
+    </section>
+
+    <section class="preview" id="preview"></section>
+  </main>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    var employees = ['المدير', 'שלום', 'مها', 'تسنيم', 'نانسي', 'שי', 'ملاك'];
+    var state = { orders: [], busy: false, savedRows: {}, lastModeSend: false };
+
+    function $(id) { return document.getElementById(id); }
+    function esc(v) {
+      return String(v == null ? '' : v).replace(/[&<>"']/g, function (ch) {
+        return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[ch];
+      });
+    }
+    function toast(msg, type) {
+      var el = $('toast');
+      el.textContent = msg;
+      el.style.borderColor = type === 'error' ? '#ef4444' : type === 'success' ? '#22c55e' : '#26364f';
+      el.classList.add('show');
+      setTimeout(function () { el.classList.remove('show'); }, 3200);
+    }
+    function setBusy(on, text) {
+      state.busy = !!on;
+      $('stateText').textContent = text || (on ? 'جاري المعالجة...' : 'جاهز');
+      Array.from(document.querySelectorAll('button, textarea, input, select')).forEach(function (el) {
+        el.disabled = !!on;
+      });
+    }
+    function delay(ms) { return new Promise(function (resolve) { setTimeout(resolve, ms); }); }
+    function arabicDigits(value) {
+      return String(value || '')
+        .replace(/[\u0660-\u0669]/g, function (ch) { return String(ch.charCodeAt(0) - 0x0660); })
+        .replace(/[\u06f0-\u06f9]/g, function (ch) { return String(ch.charCodeAt(0) - 0x06f0); });
+    }
+    function phoneDigits(value) { return arabicDigits(value).replace(/\D/g, ''); }
+    function phoneForSheet(value) {
+      var raw = String(value || '').trim();
+      if (!raw) return '';
+      if (raw.charAt(0) === '*') return raw.replace(/\s+/g, '');
+      var d = phoneDigits(raw);
+      if (!d) return '';
+      while (d.indexOf('00') === 0) d = d.slice(2);
+      if (d.indexOf('972') === 0) d = d.slice(3);
+      while (d.charAt(0) === '0') d = d.slice(1);
+      return d;
+    }
+    function phoneForCompare(value) { return phoneForSheet(value); }
+    function normalizeDeliveryName(value) {
+      var s = String(value || '').trim().toLowerCase();
+      if (!s) return 'Hi Express';
+      if (s.indexOf('areen') >= 0 || s.indexOf('عرين') >= 0) return 'Areen';
+      if (s.indexOf('marwa') >= 0 || s.indexOf('مروة') >= 0) return 'Marwa';
+      if (s.indexOf('lama') >= 0 || s.indexOf('لما') >= 0) return 'Lama';
+      if (s.indexOf('aiat') >= 0 || s.indexOf('ايات') >= 0) return 'Aiat';
+      if (s.indexOf('saeed') >= 0 || s.indexOf('سعيد') >= 0) return 'Saeed';
+      if (s.indexOf('manual') >= 0 || s.indexOf('يدوي') >= 0) return 'Manual';
+      return value || 'Hi Express';
+    }
+
+    function buildApiUrl(action, payload, extra, cb) {
+      payload = payload || {};
+      extra = extra || {};
+      var qs = 'api=' + encodeURIComponent(action) + '&callback=' + encodeURIComponent(cb) + '&v=' + Date.now();
+      if (Object.keys(payload).length) qs += '&payload=' + encodeURIComponent(JSON.stringify(payload));
+      Object.keys(extra).forEach(function (k) { qs += '&' + encodeURIComponent(k) + '=' + encodeURIComponent(extra[k]); });
+      return APP_URL + '?' + qs;
+    }
+    function jsonpRequest(url, timeoutMs) {
+      return new Promise(function (resolve, reject) {
+        var m = url.match(/[?&]callback=([^&]+)/);
+        var cb = m ? decodeURIComponent(m[1]) : ('__bulkCb_' + Date.now() + '_' + Math.floor(Math.random() * 100000));
+        var script = document.createElement('script');
+        var done = false;
+        var timer = setTimeout(function () { cleanup(); reject(new Error('انتهت مهلة الاتصال')); }, timeoutMs || 30000);
+        function cleanup() {
+          if (done) return;
+          done = true;
+          clearTimeout(timer);
+          try { delete window[cb]; } catch (e) { window[cb] = void 0; }
+          if (script.parentNode) script.parentNode.removeChild(script);
+        }
+        window[cb] = function (data) { cleanup(); resolve(data); };
+        script.async = true;
+        script.charset = 'utf-8';
+        script.referrerPolicy = 'no-referrer';
+        script.onerror = function () { cleanup(); reject(new Error('تعذر الاتصال بالخادم')); };
+        script.src = url;
+        document.head.appendChild(script);
+      });
+    }
+    async function api(action, payload, extra, timeoutMs) {
+      var cb = '__bulkCb_' + Date.now() + '_' + Math.floor(Math.random() * 100000);
+      var url = buildApiUrl(action, payload, extra, cb);
+      if (url.length > 7800) throw new Error('النص طويل جدا');
+      var res = await jsonpRequest(url, timeoutMs || 35000);
+      if (res && (res.success === false || res.ok === false)) throw new Error(res.error || res.message || 'فشل الطلب');
+      return res;
+    }
+
+    var labelSets = {
+      name: ['שם', 'name', 'اسم', 'الاسم', 'اسم العميل', 'customer', 'לקוח'],
+      phone: ['מספר פלאפון', 'טלפון', 'phone', 'mobile', 'tel', 'رقم الهاتف', 'هاتف', 'جوال', 'تلفون'],
+      city: ['עיר', 'city', 'مدينة', 'المدينة', 'منطقة', 'المنطقة', 'area'],
+      address: ['כתובת', 'address', 'عنوان', 'العنوان', 'street'],
+      price: ['מחיר מוצרים', 'סה"כ', 'סהכ', 'total', 'price', 'السعر', 'المجموع', 'اجمالي', 'الإجمالي'],
+      offer: ['החבילה שהזמנת', 'חבילה', 'מוצרים', 'products', 'product', 'items', 'order', 'الطلب', 'المنتجات', 'الحزمة', 'تفاصيل الطلب']
+    };
+    function allLabels() {
+      var labels = [];
+      Object.keys(labelSets).forEach(function (k) { labels = labels.concat(labelSets[k]); });
+      return labels;
+    }
+    function lineStartsWithLabel(line, labels) {
+      var s = String(line || '').trim().toLowerCase();
+      return labels.some(function (label) {
+        return s.indexOf(String(label).toLowerCase()) === 0 && /^[\s\-:：،]*|$/.test(s.slice(String(label).length, String(label).length + 3));
+      });
+    }
+    function stripLabel(line, label) {
+      return String(line || '').trim().slice(String(label).length).replace(/^\s*[-:：،]\s*/, '').trim();
+    }
+    function readField(block, labels) {
+      var lines = String(block || '').split(/\n+/);
+      var stopLabels = allLabels();
+      for (var i = 0; i < lines.length; i++) {
+        var line = lines[i].trim();
+        for (var j = 0; j < labels.length; j++) {
+          var label = labels[j];
+          if (line.toLowerCase().indexOf(String(label).toLowerCase()) === 0) {
+            var parts = [];
+            var first = stripLabel(line, label);
+            if (first) parts.push(first);
+            for (var k = i + 1; k < lines.length; k++) {
+              var next = lines[k].trim();
+              if (!next) break;
+              if (/^(?:order|طلب|الطلب)\s*\d+/i.test(next) || lineStartsWithLabel(next, stopLabels)) break;
+              parts.push(next);
+            }
+            return parts.join(' ').trim();
+          }
+        }
+      }
+      return '';
+    }
+    function normalizeBulkText(text) {
+      return String(text || '')
+        .replace(/\r/g, '')
+        .replace(/[\u200e\u200f]/g, '')
+        .replace(/[ \t]+/g, ' ')
+        .replace(/\s+(?=(?:שם|name|اسم|الاسم|customer|לקוח)\s*[-:：،])/gi, '\n')
+        .replace(/\s+(?=(?:מספר פלאפון|טלפון|phone|mobile|tel|رقم الهاتف|هاتف|جوال|تلفون)\s*[-:：،])/gi, '\n')
+        .replace(/\s+(?=(?:עיר|city|مدينة|المدينة|منطقة|المنطقة)\s*[-:：،])/gi, '\n')
+        .replace(/\s+(?=(?:כתובת|address|عنوان|العنوان)\s*[-:：،])/gi, '\n')
+        .replace(/\s+(?=(?:מחיר מוצרים|סה"כ|total|price|السعر|المجموع)\s*[-:：،])/gi, '\n')
+        .replace(/\s+(?=(?:החבילה שהזמנת|חבילה|products|product|items|الطلب|المنتجات|الحزمة)\s*[-:：،])/gi, '\n');
+    }
+    function hasPhone(text) {
+      return /(?:\+?972|00972|0?5)[\d\s-]{7,}/.test(String(text || ''));
+    }
+    function splitBulkBlocks(text) {
+      var normalized = normalizeBulkText(text);
+      var marker = /^(?:order|طلب|الطلب)\s*(?:\d+|[^\s:.-]+)?\s*[:.\-،]*\s*$/i;
+      var start = /^(?:שם|name|اسم|الاسم|customer|לקוח)\s*[-:：،]/i;
+      var blocks = [];
+      var current = [];
+      normalized.split(/\n+/).forEach(function (line) {
+        var t = line.trim();
+        if (!t) {
+          if (current.length && current.some(Boolean)) {
+            blocks.push(current.join('\n'));
+            current = [];
+          }
+          return;
+        }
+        if (marker.test(t)) {
+          if (current.length && current.some(Boolean)) blocks.push(current.join('\n'));
+          current = [];
+          return;
+        }
+        if (start.test(t) && current.length && hasPhone(current.join(' '))) {
+          blocks.push(current.join('\n'));
+          current = [line];
+          return;
+        }
+        current.push(line);
+      });
+      if (current.length && current.some(Boolean)) blocks.push(current.join('\n'));
+      if (blocks.length <= 1) blocks = normalized.split(/\n\s*\n+/);
+      return blocks.map(function (x) { return x.trim(); }).filter(Boolean);
+    }
+    function cleanPrice(value) {
+      var m = arabicDigits(value).replace(/[^\d.]/g, '');
+      return m || '0';
+    }
+    function noiseLine(line) {
+      return lineStartsWithLabel(line, allLabels()) || /^(?:order|طلب|الطلب)\s*\d+/i.test(String(line || '').trim());
+    }
+    function guessOffer(block) {
+      var lines = String(block || '').split(/\n+/).map(function (x) { return x.trim(); }).filter(Boolean);
+      var picked = lines.filter(function (line) {
+        return !noiseLine(line) && (/\[[A-Za-z]\d{2,}\]/.test(line) || /\b(?:MAD|SKU)[-\s]?\d{4,}\b/i.test(line) || /(عطر|عطور|برفان|בושם|בשמים|מוצר|products?)/i.test(line));
+      });
+      if (picked.length) return picked.slice(0, 4).join('، ');
+      return lines.filter(function (line) { return !noiseLine(line); }).slice(-1)[0] || '';
+    }
+    function parseBlock(block, index) {
+      var delivery = normalizeDeliveryName($('delivery').value);
+      var employee = $('employee').value;
+      var phoneRaw = readField(block, labelSets.phone) || ((String(block).match(/(?:\+?972|00972|0?5)[\d\s-]{7,}/) || [])[0] || '');
+      var payload = {
+        name: readField(block, labelSets.name),
+        phone: phoneForSheet(phoneRaw),
+        city: readField(block, labelSets.city),
+        address: readField(block, labelSets.address),
+        price: cleanPrice(readField(block, labelSets.price)),
+        offer: readField(block, labelSets.offer) || guessOffer(block),
+        delivery: delivery,
+        employee: employee,
+        raw_request_text: block
+      };
+      if (!payload.name) payload.name = 'طلب جماعي ' + (index + 1);
+      return { id: 'o' + index + '_' + Date.now(), index: index, raw: block, payload: payload, errors: validateOrder(payload), status: 'ready', rowIndex: '' };
+    }
+    function validateOrder(payload) {
+      var errors = [];
+      if (!payload.name) errors.push('الاسم');
+      if (!payload.phone) errors.push('الهاتف');
+      if (!payload.city) errors.push('المدينة');
+      if (!payload.address) errors.push('العنوان');
+      if (!payload.offer) errors.push('الطلب');
+      return errors;
+    }
+
+    function analyzeBulk() {
+      if (state.busy) return;
+      var text = $('bulkText').value.trim();
+      if (!text) { toast('الصق الطلبات أولا', 'error'); return; }
+      var blocks = splitBulkBlocks(text);
+      state.orders = blocks.map(parseBlock);
+      render();
+      toast('تم تحليل ' + state.orders.length + ' طلب', state.orders.length ? 'success' : 'error');
+    }
+    function updateStats() {
+      var total = state.orders.length;
+      var valid = state.orders.filter(function (o) { return !o.errors.length; }).length;
+      var saved = state.orders.filter(function (o) { return !!o.rowIndex; }).length;
+      var errors = state.orders.filter(function (o) { return o.errors.length || o.status === 'error'; }).length;
+      $('totalCount').textContent = total;
+      $('validCount').textContent = valid;
+      $('savedCount').textContent = saved;
+      $('errorCount').textContent = errors;
+      $('progressBar').style.width = total ? Math.round((saved / total) * 100) + '%' : '0';
+    }
+    function render() {
+      updateStats();
+      var list = $('preview');
+      if (!state.orders.length) {
+        list.innerHTML = '<section class="panel tiny">لا توجد طلبات محللة</section>';
+        return;
+      }
+      list.innerHTML = state.orders.map(function (o, i) {
+        var p = o.payload;
+        var bad = o.errors.length;
+        var badge = o.rowIndex ? '<span class="badge ok">صف ' + esc(o.rowIndex) + '</span>' : bad ? '<span class="badge err">ناقص: ' + esc(o.errors.join('، ')) + '</span>' : '<span class="badge ok">جاهز</span>';
+        return '<article class="order ' + (bad ? 'bad' : '') + (o.rowIndex ? ' saved' : '') + '" id="card_' + i + '">' +
+          '<div class="order-head"><div class="order-title">طلب ' + (i + 1) + ' - ' + esc(p.name || '-') + '</div>' + badge + '</div>' +
+          '<div class="grid">' +
+          inputHtml(i, 'name', 'الاسم', p.name) +
+          inputHtml(i, 'phone', 'الهاتف', p.phone, 'ltr') +
+          inputHtml(i, 'city', 'المدينة', p.city) +
+          inputHtml(i, 'address', 'العنوان', p.address) +
+          inputHtml(i, 'price', 'السعر', p.price, 'ltr') +
+          inputHtml(i, 'offer', 'الطلب', p.offer, '', true) +
+          '</div>' +
+          '<div class="tiny" id="status_' + i + '">' + esc(statusText(o)) + '</div>' +
+          '<div class="mini-actions"><button class="ghost" type="button" onclick="reparseOne(' + i + ')">إعادة تحليل</button><button class="danger" type="button" onclick="removeOne(' + i + ')">حذف</button></div>' +
+          '</article>';
+      }).join('');
+    }
+    function inputHtml(i, field, label, value, dir, wide) {
+      return '<div class="' + (wide ? 'wide' : '') + '"><label for="' + field + '_' + i + '">' + label + '</label><input id="' + field + '_' + i + '" value="' + esc(value) + '"' + (dir ? ' dir="' + dir + '"' : '') + ' onchange="updateOrderField(' + i + ',&quot;' + field + '&quot;,this.value)"></div>';
+    }
+    function statusText(o) {
+      if (o.status === 'saving') return 'جاري الحفظ...';
+      if (o.status === 'saved') return 'تم الحفظ';
+      if (o.status === 'sent') return 'تم الحفظ والإرسال';
+      if (o.status === 'error') return o.error || 'خطأ';
+      return o.raw.slice(0, 180);
+    }
+    function updateOrderField(i, field, value) {
+      var o = state.orders[i];
+      if (!o) return;
+      o.payload[field] = field === 'phone' ? phoneForSheet(value) : field === 'price' ? cleanPrice(value) : value.trim();
+      o.errors = validateOrder(o.payload);
+      o.rowIndex = '';
+      o.status = 'ready';
+      render();
+    }
+    function reparseOne(i) {
+      var old = state.orders[i];
+      if (!old) return;
+      state.orders[i] = parseBlock(old.raw, i);
+      render();
+    }
+    function removeOne(i) {
+      state.orders.splice(i, 1);
+      state.orders.forEach(function (o, idx) { o.index = idx; });
+      render();
+    }
+    async function pasteFromClipboard() {
+      try {
+        var text = await navigator.clipboard.readText();
+        if (text) $('bulkText').value = text;
+        toast('تم اللصق', 'success');
+      } catch (err) {
+        toast('تعذر اللصق التلقائي', 'error');
+      }
+    }
+    function clearAll() {
+      if (state.busy) return;
+      $('bulkText').value = '';
+      state.orders = [];
+      state.savedRows = {};
+      render();
+      toast('تم المسح');
+    }
+
+    async function runQueue(items, workers, task) {
+      var next = 0;
+      async function worker() {
+        while (next < items.length) {
+          var i = next++;
+          await task(items[i], i);
+        }
+      }
+      await Promise.all(Array.from({ length: Math.min(workers, items.length) }, worker));
+    }
+    async function saveAttempt(order, timeoutMs) {
+      try {
+        var res = await api('save', order.payload, {}, timeoutMs || 14000);
+        return { ok: true, res: res };
+      } catch (err) {
+        return { ok: false, error: err };
+      }
+    }
+    function setOrderStatus(order, status, text, rowIndex) {
+      order.status = status;
+      if (text) order.error = text;
+      if (rowIndex) order.rowIndex = String(rowIndex);
+      var i = state.orders.indexOf(order);
+      if (i >= 0) {
+        var el = $('status_' + i);
+        if (el) el.textContent = statusText(order);
+        var card = $('card_' + i);
+        if (card) {
+          card.classList.toggle('saved', !!order.rowIndex);
+          card.classList.toggle('bad', status === 'error' || order.errors.length > 0);
+        }
+      }
+      updateStats();
+    }
+    function matchRowsFromRecent(orders, rows) {
+      var used = {};
+      rows = (rows || []).slice().sort(function (a, b) { return Number(b.rowIndex) - Number(a.rowIndex); });
+      orders.forEach(function (order) {
+        if (order.rowIndex) return;
+        var phone = phoneForCompare(order.payload.phone);
+        var namePart = String(order.payload.name || '').slice(0, 12);
+        var match = rows.find(function (row) {
+          var rowIndex = Number(row.rowIndex);
+          if (!rowIndex || used[rowIndex]) return false;
+          if (phoneForCompare(row.phone) !== phone) return false;
+          if (namePart && String(row.name || '').indexOf(namePart) < 0) return false;
+          return true;
+        }) || rows.find(function (row) {
+          var rowIndex = Number(row.rowIndex);
+          return rowIndex && !used[rowIndex] && phoneForCompare(row.phone) === phone;
+        });
+        if (match) {
+          used[Number(match.rowIndex)] = true;
+          setOrderStatus(order, order.status === 'sent' ? 'sent' : 'saved', '', match.rowIndex);
+        }
+      });
+    }
+    async function verifySavedRows(keepBusy) {
+      if (!state.orders.length) { toast('لا توجد طلبات للفحص', 'error'); return; }
+      if (!keepBusy) setBusy(true, 'فحص الحفظ...');
+      try {
+        var res = await api('recent', { limit: 250 }, { limit: 250 }, 35000);
+        matchRowsFromRecent(state.orders, (res && res.orders) || []);
+        var missing = state.orders.filter(function (o) { return !o.rowIndex && !o.errors.length; });
+        await runQueue(missing, 2, async function (order) {
+          try {
+            var found = await api('searchAll', { query: order.payload.phone, limit: 20 }, {}, 35000);
+            matchRowsFromRecent([order], (found && found.orders) || []);
+          } catch (err) {}
+        });
+        render();
+        toast('تم الفحص', 'success');
+      } finally {
+        if (!keepBusy) setBusy(false);
+      }
+    }
+    async function saveAll(sendAfter) {
+      if (state.busy) return;
+      if (!state.orders.length) analyzeBulk();
+      var valid = state.orders.filter(function (o) { return !o.errors.length && !o.rowIndex; });
+      if (!valid.length) {
+        toast('لا توجد طلبات جاهزة للحفظ', 'error');
+        return;
+      }
+      state.lastModeSend = !!sendAfter;
+      setBusy(true, 'حفظ الطلبات...');
+      try {
+        var done = 0;
+        await runQueue(valid, 3, async function (order) {
+          setOrderStatus(order, 'saving');
+          var result = await saveAttempt(order, 14000);
+          done++;
+          $('stateText').textContent = 'حفظ ' + done + ' من ' + valid.length;
+          if (result.ok && result.res) {
+            var rowIndex = Number(result.res.rowIndex || (result.res.order && result.res.order.rowIndex));
+            if (rowIndex) setOrderStatus(order, 'saved', '', rowIndex);
+          }
+          await delay(350);
+        });
+        $('stateText').textContent = 'تأكيد الصفوف...';
+        await delay(4500);
+        await verifySavedRows(true);
+        var missing = state.orders.filter(function (o) { return !o.errors.length && !o.rowIndex; });
+        if (missing.length) {
+          setBusy(true, 'إعادة محاولة للناقص...');
+          await runQueue(missing, 1, async function (order, i) {
+            $('stateText').textContent = 'إعادة حفظ ' + (i + 1) + ' من ' + missing.length;
+            var result = await saveAttempt(order, 22000);
+            if (result.ok && result.res) {
+              var rowIndex = Number(result.res.rowIndex || (result.res.order && result.res.order.rowIndex));
+              if (rowIndex) setOrderStatus(order, 'saved', '', rowIndex);
+            }
+            await delay(900);
+          });
+          await delay(4500);
+          await verifySavedRows(true);
+        }
+        var stillMissing = state.orders.filter(function (o) { return !o.errors.length && !o.rowIndex; });
+        stillMissing.forEach(function (o) { setOrderStatus(o, 'error', 'لم يتم تأكيد حفظ هذا الطلب'); });
+        if (sendAfter) await sendSavedRows();
+        render();
+        var saved = state.orders.filter(function (o) { return !!o.rowIndex; }).length;
+        toast('تم حفظ ' + saved + ' من ' + state.orders.length, saved === state.orders.length ? 'success' : 'error');
+      } catch (err) {
+        toast(String(err.message || err), 'error');
+      } finally {
+        setBusy(false);
+      }
+    }
+    async function sendSavedRows() {
+      var toSend = state.orders.filter(function (o) { return o.rowIndex && o.status !== 'sent'; });
+      var sent = 0;
+      await runQueue(toSend, 2, async function (order) {
+        for (var attempt = 1; attempt <= 3; attempt++) {
+          try {
+            $('stateText').textContent = 'إرسال ' + (sent + 1) + ' من ' + toSend.length;
+            await api('sendSingle', { rowIndex: Number(order.rowIndex) }, {}, 35000);
+            sent++;
+            setOrderStatus(order, 'sent');
+            return;
+          } catch (err) {
+            if (/duplicate|already|مكرر|موجود/i.test(String(err.message || err))) {
+              sent++;
+              setOrderStatus(order, 'sent');
+              return;
+            }
+            if (attempt === 3) throw err;
+            await delay(1800 * attempt);
+          }
+        }
+      });
+    }
+
+    function init() {
+      $('versionText').textContent = PAGE_VERSION;
+      $('employee').innerHTML = employees.map(function (e) { return '<option>' + esc(e) + '</option>'; }).join('');
+      render();
+    }
+    window.addEventListener('load', init);
+  </script>
+</body>
+</html>
