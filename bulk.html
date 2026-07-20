@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>MAD BULK</title>
   <script>
-    const PAGE_VERSION = 'bulk-20260721-3';
+    const PAGE_VERSION = 'bulk-20260721-4';
     const APP_URL = 'https://script.google.com/macros/s/AKfycbwVQvV8GY9rNUnfl93ZJ1MkYOrOY4m-zVhYWxLZmwea6uJZvUu74kGrcRulMVnyyKbS/exec';
     (function () {
       var p = new URLSearchParams(location.search);
@@ -327,6 +327,7 @@
       <div class="actions">
         <button class="success wide-mobile" type="button" onclick="saveAll(false)">حفظ فقط</button>
         <button class="warn wide-mobile" type="button" onclick="saveAll(true)">حفظ وإرسال للتجهيز</button>
+        <button class="violet" type="button" onclick="retryRemaining()">إعادة حفظ المتبقي</button>
         <button class="ghost" type="button" onclick="verifySavedRows()">فحص الحفظ</button>
       </div>
     </section>
@@ -612,9 +613,9 @@
     }
     function updateStats() {
       var total = state.orders.length;
-      var valid = state.orders.filter(function (o) { return !o.errors.length && !o.rowIndex && o.status !== 'error'; }).length;
+      var valid = state.orders.filter(function (o) { return !o.errors.length && !o.rowIndex; }).length;
       var saved = state.orders.filter(function (o) { return !!o.rowIndex; }).length;
-      var errors = state.orders.filter(function (o) { return o.errors.length || o.status === 'error'; }).length;
+      var errors = state.orders.filter(function (o) { return o.errors.length; }).length;
       $('totalCount').textContent = total;
       $('validCount').textContent = valid;
       $('savedCount').textContent = saved;
@@ -654,6 +655,7 @@
       if (o.status === 'saving') return 'تم الإرسال، بانتظار تأكيد ظهوره في الشيث...';
       if (o.status === 'saved') return 'تم الحفظ';
       if (o.status === 'sent') return 'تم الحفظ والإرسال';
+      if (o.status === 'retry') return o.error || 'لم يتم تأكيد الحفظ بعد، اضغط إعادة حفظ المتبقي';
       if (o.status === 'error') return o.error || 'خطأ';
       return o.raw.slice(0, 180);
     }
@@ -821,16 +823,21 @@
           missing = await waitForSavedRows(missing, Math.min(90000, 18000 + missing.length * 2200), 'تأكيد المحاولة الثانية');
         }
         var stillMissing = state.orders.filter(function (o) { return !o.errors.length && !o.rowIndex; });
-        stillMissing.forEach(function (o) { setOrderStatus(o, 'error', 'لم يتم تأكيد حفظ هذا الطلب'); });
+        stillMissing.forEach(function (o) { setOrderStatus(o, 'retry', 'لم يتم تأكيد حفظ هذا الطلب، يمكنك إعادة حفظ المتبقي'); });
         if (sendAfter) await sendSavedRows();
         render();
         var saved = state.orders.filter(function (o) { return !!o.rowIndex; }).length;
-        toast('تم حفظ ' + saved + ' من ' + state.orders.length, saved === state.orders.length ? 'success' : 'error');
+        toast('تم حفظ ' + saved + ' من ' + state.orders.length + (stillMissing.length ? ' - بقي ' + stillMissing.length + ' لإعادة المحاولة' : ''), saved === state.orders.length ? 'success' : 'error');
       } catch (err) {
         toast(String(err.message || err), 'error');
       } finally {
         setBusy(false);
       }
+    }
+    async function retryRemaining() {
+      var remaining = state.orders.filter(function (o) { return !o.errors.length && !o.rowIndex; }).length;
+      if (!remaining) { toast('لا توجد طلبات متبقية للحفظ', 'success'); return; }
+      await saveAll(state.lastModeSend);
     }
     async function sendSavedRows() {
       var toSend = state.orders.filter(function (o) { return o.rowIndex && o.status !== 'sent'; });
