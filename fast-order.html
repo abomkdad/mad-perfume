@@ -1180,16 +1180,6 @@
         <div class="offer-grid" id="offerGrid"></div>
       </section>
 
-      <section class="offers-section packages-section" aria-labelledby="packagesTitle">
-        <div class="section-head">
-          <div>
-            <h2 id="packagesTitle" data-i18n="packageTitle">باقات اختيار سريع</h2>
-            <p data-i18n="packageHint">هذه باقات لعدد العطور، وليست عروض منتجات منفصلة.</p>
-          </div>
-        </div>
-        <div class="offer-grid" id="packagesGrid"></div>
-      </section>
-
       <section class="catalog-section" aria-labelledby="catalogTitle">
         <div class="section-head">
           <div>
@@ -1204,6 +1194,16 @@
         <p class="status" id="catalogStatus">جاري تحميل المنتجات...</p>
         <div class="product-grid" id="productGrid"></div>
         <div class="more-row" id="moreRow"></div>
+      </section>
+
+      <section class="offers-section packages-section" aria-labelledby="packagesTitle">
+        <div class="section-head">
+          <div>
+            <h2 id="packagesTitle" data-i18n="packageTitle">باقات اختيار حسب العدد</h2>
+            <p data-i18n="packageHint">لمن يريد تحديد عدد العطور فقط، وليست عروض منتجات منفصلة.</p>
+          </div>
+        </div>
+        <div class="offer-grid" id="packagesGrid"></div>
       </section>
 
       <section class="review-strip" id="reviewStrip" aria-label="reviews"></section>
@@ -1234,8 +1234,8 @@
         trust: ["دفع عند الاستلام", "توصيل حتى 5 أيام عمل", "أكثر من 40 فرعا", "خدمة *9935"],
         offerTitle: "العروض أولا",
         offerHint: "هذه المنتجات مصنفة كعروض داخل الكاتالوغ.",
-        packageTitle: "باقات اختيار سريع",
-        packageHint: "هذه باقات لعدد العطور، وليست عروض منتجات منفصلة.",
+        packageTitle: "باقات اختيار حسب العدد",
+        packageHint: "لمن يريد تحديد عدد العطور فقط، وليست عروض منتجات منفصلة.",
         noRealOffers: "لا توجد عروض فعلية في الكاتالوغ الآن.",
         offer5: "باقة 5 عطور",
         offer5Sub: "اختر 5 عطور من الكاتالوغ أو اكتبها بالواتساب.",
@@ -1331,8 +1331,8 @@
         trust: ["תשלום בעת קבלה", "משלוח עד 5 ימי עסקים", "יותר מ-40 סניפים", "שירות *9935"],
         offerTitle: "המבצעים קודם",
         offerHint: "אלו מוצרים שמסווגים כמבצעים בקטלוג.",
-        packageTitle: "חבילות בחירה מהירה",
-        packageHint: "אלו חבילות לפי מספר בשמים, לא מבצעי מוצר נפרדים.",
+        packageTitle: "חבילות לפי כמות",
+        packageHint: "למי שרוצה לבחור רק מספר בשמים, לא מבצעי מוצר נפרדים.",
         noRealOffers: "אין כרגע מבצעים אמיתיים בקטלוג.",
         offer5: "חבילת 5 בשמים",
         offer5Sub: "בחרו 5 בשמים מהקטלוג או כתבו בוואטסאפ.",
@@ -1916,7 +1916,7 @@
           "<p>" + escapeHtml(offer.description) + "</p>",
           "<strong>" + money(offer.price) + "</strong>",
           "</div>",
-          "<button type=\"button\" data-action=\"add-offer\" data-id=\"" + escapeHtml(offer.id) + "\">" + escapeHtml(text.addOffer) + "</button>",
+          "<button type=\"button\" data-action=\"add-bundle\" data-id=\"" + escapeHtml(offer.id) + "\">" + escapeHtml(text.addOffer) + "</button>",
           "</article>"
         ].join("");
       }).join("");
@@ -2219,11 +2219,11 @@
       const actionButton = event.target.closest("[data-action]");
       if (!actionButton) return;
       const action = actionButton.getAttribute("data-action");
-      if (action === "add-offer") {
+      if (action === "add-bundle") {
         const offer = readyOffers().find(function (item) {
           return item.id === actionButton.getAttribute("data-id");
         });
-        if (offer) addToCart(offer, "ready_offer");
+        if (offer) addToCart(offer, "quick_bundle");
       }
       if (action === "add-product") {
         const product = state.products.find(function (item) {
