@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>MAD BULK</title>
   <script>
-    const PAGE_VERSION = 'bulk-20260721-7';
+    const PAGE_VERSION = 'bulk-20260725-1';
     const APP_URL = 'https://script.google.com/macros/s/AKfycbwVQvV8GY9rNUnfl93ZJ1MkYOrOY4m-zVhYWxLZmwea6uJZvUu74kGrcRulMVnyyKbS/exec';
     (function () {
       var p = new URLSearchParams(location.search);
@@ -476,7 +476,7 @@
       phone: ['מספר פלאפון', 'טלפון', 'phone', 'mobile', 'tel', 'رقم الهاتف', 'هاتف', 'جوال', 'تلفون'],
       city: ['עיר', 'city', 'مدينة', 'المدينة', 'منطقة', 'المنطقة', 'area'],
       address: ['כתובת', 'address', 'عنوان', 'العنوان', 'street'],
-      price: ['מחיר מוצרים', 'סה"כ', 'סהכ', 'total', 'price', 'السعر', 'المجموع', 'اجمالي', 'الإجمالي'],
+      price: ['מחיר מוצרים', 'מחיר מוצר', 'מחיר', 'עלות', 'סכום', 'תשלום', 'סה"כ', 'סהכ', 'total', 'price', 'amount', 'السعر', 'سعر', 'المجموع', 'اجمالي', 'الإجمالي', 'الدفع'],
       offer: ['החבילה שהזמנת', 'חבילה', 'מוצרים', 'products', 'product', 'items', 'order', 'الطلب', 'المنتجات', 'الحزمة', 'تفاصيل الطلب']
     };
     function allLabels() {
@@ -525,7 +525,7 @@
         .replace(/\s+(?=(?:מספר פלאפון|טלפון|phone|mobile|tel|رقم الهاتف|هاتف|جوال|تلفون)\s*[-:：،])/gi, '\n')
         .replace(/\s+(?=(?:עיר|city|مدينة|المدينة|منطقة|المنطقة)\s*[-:：،])/gi, '\n')
         .replace(/\s+(?=(?:כתובת|address|عنوان|العنوان)\s*[-:：،])/gi, '\n')
-        .replace(/\s+(?=(?:מחיר מוצרים|סה"כ|total|price|السعر|المجموع)\s*[-:：،])/gi, '\n')
+        .replace(/\s+(?=(?:מחיר מוצרים|מחיר מוצר|מחיר|עלות|סכום|תשלום|סה"כ|total|price|amount|السعر|سعر|المجموع|الدفع)\s*[-:：،])/gi, '\n')
         .replace(/\s+(?=(?:החבילה שהזמנת|חבילה|products|product|items|الطلب|المنتجات|الحزمة)\s*[-:：،])/gi, '\n');
     }
     function hasPhone(text) {
@@ -566,6 +566,27 @@
       var m = arabicDigits(value).replace(/[^\d.]/g, '');
       return m || '0';
     }
+    function priceNumber(value) {
+      var s = arabicDigits(value).replace(/,/g, '');
+      var m = s.match(/\d+(?:\.\d+)?/);
+      return m ? Number(m[0]) : 0;
+    }
+    function priceForSheet(value) {
+      var n = priceNumber(value);
+      if (!n) return '';
+      if (n > 0 && n < 500) n += 50;
+      return String(Math.round(n * 100) / 100).replace(/\.0+$/, '');
+    }
+    function guessPrice(block) {
+      var lines = String(block || '').split(/\n+/).map(function (x) { return x.trim(); }).filter(Boolean);
+      for (var i = 0; i < lines.length; i++) {
+        if (/(?:₪|ש["״]?ח|شيكل|شاقل|nis|ils)/i.test(lines[i])) {
+          var m = arabicDigits(lines[i]).replace(/,/g, '').match(/\d+(?:\.\d+)?/);
+          if (m) return m[0];
+        }
+      }
+      return '';
+    }
     function noiseLine(line) {
       return lineStartsWithLabel(line, allLabels()) || /^(?:order|طلب|الطلب)\s*\d+/i.test(String(line || '').trim());
     }
@@ -581,16 +602,20 @@
       var delivery = normalizeDeliveryName($('delivery').value);
       var employee = $('employee').value;
       var phoneRaw = readField(block, labelSets.phone) || ((String(block).match(/(?:\+?972|00972|0?5)[\d\s-]{7,}/) || [])[0] || '');
+      var rawPrice = readField(block, labelSets.price) || guessPrice(block);
+      var basePrice = priceNumber(rawPrice);
       var payload = {
         name: readField(block, labelSets.name),
         phone: phoneForSheet(phoneRaw),
         city: readField(block, labelSets.city),
         address: readField(block, labelSets.address),
-        price: cleanPrice(readField(block, labelSets.price)),
+        price: priceForSheet(rawPrice),
         offer: readField(block, labelSets.offer) || guessOffer(block),
         delivery: delivery,
         employee: employee,
-        raw_request_text: block
+        raw_request_text: block,
+        product_price: basePrice ? String(basePrice) : '',
+        delivery_fee: basePrice > 0 && basePrice < 500 ? '50' : '0'
       };
       if (!payload.name) payload.name = 'طلب جماعي ' + (index + 1);
       return { id: 'o' + index + '_' + Date.now(), index: index, raw: block, payload: payload, errors: validateOrder(payload), status: 'ready', rowIndex: '' };
@@ -601,6 +626,7 @@
       if (!payload.phone) errors.push('الهاتف');
       if (!payload.city) errors.push('المدينة');
       if (!payload.address) errors.push('العنوان');
+      if (!priceNumber(payload.price)) errors.push('السعر');
       if (!payload.offer) errors.push('الطلب');
       return errors;
     }
@@ -665,7 +691,7 @@
     function updateOrderField(i, field, value) {
       var o = state.orders[i];
       if (!o) return;
-      o.payload[field] = field === 'phone' ? phoneForSheet(value) : field === 'price' ? cleanPrice(value) : value.trim();
+      o.payload[field] = field === 'phone' ? phoneForSheet(value) : field === 'price' ? priceForSheet(value) : value.trim();
       o.errors = validateOrder(o.payload);
       o.rowIndex = '';
       o.status = 'ready';
