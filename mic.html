@@ -1,0 +1,864 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0f3d38">
+  <title>المساعد الصوتي — إملاء وتسجيل ونسخ</title>
+  <style>
+    :root {
+      --ink: #16302d;
+      --muted: #657572;
+      --paper: #fffdf8;
+      --cream: #f2eee4;
+      --green: #0f5b52;
+      --green-dark: #0b3f3a;
+      --mint: #dff1eb;
+      --red: #c43d4d;
+      --amber: #d7902f;
+      --line: #d8ddd7;
+      --shadow: 0 18px 45px rgba(27, 57, 53, .12);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 90% -10%, #cfeae0 0, transparent 32rem),
+        radial-gradient(circle at -10% 80%, #f0d8b5 0, transparent 30rem),
+        var(--cream);
+      font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+    }
+
+    button, select, input, textarea { font: inherit; }
+
+    .shell {
+      width: min(1180px, calc(100% - 28px));
+      margin: 0 auto;
+      padding: 24px 0 48px;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      margin-bottom: 18px;
+      padding: 8px 4px;
+    }
+
+    .brand { display: flex; align-items: center; gap: 14px; }
+
+    .brand-mark {
+      display: grid;
+      place-items: center;
+      width: 52px;
+      height: 52px;
+      border-radius: 17px;
+      background: var(--green);
+      color: white;
+      font-size: 27px;
+      box-shadow: 0 10px 24px rgba(15, 91, 82, .22);
+    }
+
+    h1 { margin: 0; font-size: clamp(1.45rem, 3vw, 2.2rem); letter-spacing: -.03em; }
+    .subtitle { margin: 4px 0 0; color: var(--muted); font-size: .96rem; }
+
+    .status {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 14px;
+      border: 1px solid #c7d7d1;
+      border-radius: 999px;
+      background: rgba(255,255,255,.78);
+      color: var(--green-dark);
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .status-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: #8a9996;
+    }
+
+    .status.live .status-dot {
+      background: var(--red);
+      box-shadow: 0 0 0 0 rgba(196,61,77,.5);
+      animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+      70% { box-shadow: 0 0 0 8px rgba(196,61,77,0); }
+      100% { box-shadow: 0 0 0 0 rgba(196,61,77,0); }
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.7fr) minmax(300px, .8fr);
+      gap: 18px;
+      align-items: start;
+    }
+
+    .card {
+      background: rgba(255,253,248,.94);
+      border: 1px solid rgba(190,201,195,.8);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+    }
+
+    .editor-card { overflow: hidden; }
+
+    .control-bar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+      padding: 16px;
+      border-bottom: 1px solid var(--line);
+      background: rgba(238,245,241,.75);
+    }
+
+    .mic-main {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      min-height: 48px;
+      padding: 0 18px;
+      border: 0;
+      border-radius: 15px;
+      background: var(--green);
+      color: white;
+      font-weight: 800;
+      cursor: pointer;
+      transition: transform .15s, background .15s;
+    }
+
+    .mic-main:hover { background: var(--green-dark); transform: translateY(-1px); }
+    .mic-main.listening { background: var(--red); }
+
+    select, .field {
+      min-height: 44px;
+      padding: 0 12px;
+      color: var(--ink);
+      background: white;
+      border: 1px solid #cbd5d1;
+      border-radius: 12px;
+      outline: none;
+    }
+
+    select:focus, .field:focus, textarea:focus {
+      border-color: var(--green);
+      box-shadow: 0 0 0 3px rgba(15,91,82,.12);
+    }
+
+    .toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      color: var(--muted);
+      font-size: .9rem;
+      user-select: none;
+    }
+
+    .toggle input { accent-color: var(--green); width: 18px; height: 18px; }
+
+    .interim {
+      min-height: 34px;
+      padding: 9px 18px;
+      color: var(--green);
+      background: #f5faf8;
+      border-bottom: 1px solid var(--line);
+      font-style: italic;
+    }
+
+    textarea {
+      display: block;
+      width: 100%;
+      min-height: 430px;
+      resize: vertical;
+      padding: 22px;
+      border: 0;
+      outline: none;
+      color: #172623;
+      background: transparent;
+      font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+      font-size: clamp(1.08rem, 1.8vw, 1.28rem);
+      line-height: 1.9;
+    }
+
+    .editor-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding: 13px 16px;
+      border-top: 1px solid var(--line);
+    }
+
+    .quick-tools, .actions { display: flex; flex-wrap: wrap; gap: 8px; }
+
+    .btn {
+      min-height: 39px;
+      padding: 0 12px;
+      border: 1px solid #cbd5d1;
+      border-radius: 11px;
+      color: var(--ink);
+      background: white;
+      font-weight: 650;
+      cursor: pointer;
+    }
+
+    .btn:hover { border-color: var(--green); background: var(--mint); }
+    .btn.primary { background: var(--green); color: white; border-color: var(--green); }
+    .btn.danger { color: #a02938; }
+
+    .counter { color: var(--muted); font-size: .88rem; }
+
+    aside { display: grid; gap: 18px; }
+    .side-card { padding: 18px; }
+    .side-card h2 { margin: 0 0 6px; font-size: 1.13rem; }
+    .side-card p { margin: 0 0 14px; color: var(--muted); line-height: 1.65; font-size: .93rem; }
+
+    .record-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
+
+    .record-btn {
+      min-height: 52px;
+      padding: 9px;
+      border: 1px solid #cbd5d1;
+      border-radius: 14px;
+      background: white;
+      color: var(--ink);
+      font-weight: 750;
+      cursor: pointer;
+    }
+
+    .record-btn:hover { background: var(--mint); border-color: var(--green); }
+    .record-btn.active { color: white; background: var(--red); border-color: var(--red); }
+
+    .record-state {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      min-height: 42px;
+      margin-top: 12px;
+      padding: 9px 12px;
+      border-radius: 12px;
+      background: #f3f5f2;
+      color: var(--muted);
+      font-size: .92rem;
+    }
+
+    audio { width: 100%; margin: 12px 0 8px; }
+    .hidden { display: none !important; }
+
+    .consent {
+      display: flex;
+      gap: 9px;
+      align-items: flex-start;
+      margin-top: 12px;
+      padding: 11px;
+      border-radius: 12px;
+      background: #fff7e8;
+      color: #72511b;
+      font-size: .83rem;
+      line-height: 1.5;
+    }
+
+    .consent input { margin-top: 3px; accent-color: var(--amber); }
+
+    .commands {
+      margin: 10px 0 0;
+      padding: 0;
+      list-style: none;
+      display: grid;
+      gap: 7px;
+    }
+
+    .commands li {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 8px 10px;
+      border-radius: 10px;
+      background: #f4f6f3;
+      color: var(--muted);
+      font-size: .85rem;
+    }
+
+    .commands strong { color: var(--ink); }
+
+    .notice {
+      display: none;
+      margin-bottom: 16px;
+      padding: 13px 16px;
+      border-radius: 14px;
+      background: #fff1f2;
+      border: 1px solid #efc9ce;
+      color: #8b2633;
+      line-height: 1.6;
+    }
+
+    .notice.local {
+      background: #fff7e8;
+      border-color: #ebd09f;
+      color: #72511b;
+    }
+
+    .toast {
+      position: fixed;
+      left: 22px;
+      bottom: 22px;
+      z-index: 10;
+      max-width: min(390px, calc(100% - 44px));
+      padding: 12px 16px;
+      border-radius: 13px;
+      color: white;
+      background: var(--green-dark);
+      box-shadow: 0 14px 35px rgba(0,0,0,.22);
+      opacity: 0;
+      transform: translateY(16px);
+      pointer-events: none;
+      transition: .22s ease;
+    }
+
+    .toast.show { opacity: 1; transform: translateY(0); }
+    .toast.error { background: #8e2c38; }
+
+    @media (max-width: 860px) {
+      .grid { grid-template-columns: 1fr; }
+      header { align-items: flex-start; }
+      textarea { min-height: 360px; }
+    }
+
+    @media (max-width: 560px) {
+      .shell { width: min(100% - 16px, 1180px); padding-top: 12px; }
+      header { flex-direction: column; }
+      .status { align-self: stretch; justify-content: center; }
+      .card { border-radius: 18px; }
+      .control-bar > * { flex: 1 1 auto; }
+      .mic-main { justify-content: center; }
+      .record-buttons { grid-template-columns: 1fr; }
+      textarea { padding: 17px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header>
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">🎙</div>
+        <div>
+          <h1>المساعد الصوتي</h1>
+          <p class="subtitle">تكلّم، حرّر، انسخ، واحفظ — دون الحاجة للكتابة</p>
+        </div>
+      </div>
+      <div id="globalStatus" class="status" role="status">
+        <span class="status-dot"></span>
+        <span id="globalStatusText">جاهز للاستخدام</span>
+      </div>
+    </header>
+
+    <div id="browserNotice" class="notice">
+      الإملاء الصوتي يحتاج Google Chrome أو Microsoft Edge. افتح هذا الملف بأحدهما واسمح باستخدام الميكروفون.
+    </div>
+    <div id="localNotice" class="notice local">
+      فتحت الصفحة كملف مباشر، لذلك قد يكرر المتصفح طلب إذن الميكروفون. أغلقها واستخدم ملف
+      <strong>«تشغيل المساعد الصوتي»</strong> الموجود بجانبها؛ بعدها اسمح للميكروفون مرة واحدة فقط.
+    </div>
+
+    <section class="grid">
+      <article class="card editor-card">
+        <div class="control-bar">
+          <button id="dictateBtn" class="mic-main" type="button">
+            <span aria-hidden="true">🎤</span>
+            <span id="dictateLabel">ابدأ الإملاء</span>
+          </button>
+
+          <select id="language" aria-label="لغة الإملاء">
+            <option value="ar-PS">العربية — فلسطين</option>
+            <option value="ar-JO">العربية — الأردن</option>
+            <option value="ar-SA">العربية — عامة</option>
+            <option value="he-IL">עברית</option>
+            <option value="en-US">English</option>
+          </select>
+
+          <label class="toggle">
+            <input id="commandsEnabled" type="checkbox" checked>
+            تنفيذ الأوامر الصوتية
+          </label>
+        </div>
+
+        <div id="interim" class="interim" aria-live="polite">الكلام الجاري سيظهر هنا…</div>
+
+        <textarea id="transcript" spellcheck="true" placeholder="اضغط «ابدأ الإملاء» ثم تكلّم. يُحفظ النص تلقائيًا على هذا الجهاز."></textarea>
+
+        <div class="editor-footer">
+          <div class="quick-tools">
+            <button class="btn" data-insert="&#10;" type="button">↵ سطر جديد</button>
+            <button class="btn" data-insert="، " type="button">، فاصلة</button>
+            <button class="btn" data-insert=". " type="button">. نقطة</button>
+            <button id="undoBtn" class="btn" type="button">↶ تراجع</button>
+          </div>
+
+          <div class="actions">
+            <span id="counter" class="counter">0 كلمة · 0 حرف</span>
+            <button id="copyBtn" class="btn primary" type="button">نسخ النص</button>
+            <button id="saveTxtBtn" class="btn" type="button">حفظ TXT</button>
+            <button id="saveDocBtn" class="btn" type="button">حفظ Word</button>
+            <button id="clearBtn" class="btn danger" type="button">مسح</button>
+          </div>
+        </div>
+      </article>
+
+      <aside>
+        <section class="card side-card">
+          <h2>تسجيل صوتي</h2>
+          <p>سجّل ملاحظة من الميكروفون، أو سجّل اجتماعًا مع صوت الجهاز والميكروفون معًا.</p>
+
+          <input id="recordingName" class="field" type="text" value="تسجيل صوتي" aria-label="اسم التسجيل">
+
+          <div class="record-buttons">
+            <button id="micRecordBtn" class="record-btn" type="button">🎙 تسجيل الميكروفون</button>
+            <button id="callRecordBtn" class="record-btn" type="button">🖥 تسجيل محادثة</button>
+          </div>
+
+          <label class="consent">
+            <input id="consentCheck" type="checkbox">
+            <span>أؤكد أن جميع الأطراف وافقوا على التسجيل وأنه مسموح قانونيًا. عند تسجيل محادثة اختر الشاشة أو النافذة وفعّل «مشاركة صوت النظام».</span>
+          </label>
+
+          <div class="record-state">
+            <span id="recordState">لا يوجد تسجيل جارٍ</span>
+            <strong id="timer">00:00</strong>
+          </div>
+
+          <div id="playbackArea" class="hidden">
+            <audio id="playback" controls></audio>
+            <button id="downloadRecordingBtn" class="btn primary" type="button">تنزيل آخر تسجيل</button>
+          </div>
+        </section>
+
+        <section class="card side-card">
+          <h2>الأوامر الصوتية</h2>
+          <p>قل الأمر أثناء الإملاء؛ لن يُضاف الأمر إلى النص.</p>
+          <ul class="commands">
+            <li><strong>«سطر جديد»</strong><span>ينزل سطرًا</span></li>
+            <li><strong>«نقطة» / «فاصلة»</strong><span>يضيف علامة</span></li>
+            <li><strong>«انسخ النص»</strong><span>ينسخ للحافظة</span></li>
+            <li><strong>«احفظ النص»</strong><span>يحفظ TXT</span></li>
+            <li><strong>«امسح النص»</strong><span>يمسح بعد التأكيد</span></li>
+            <li><strong>«توقف عن الإملاء»</strong><span>يوقف الاستماع</span></li>
+          </ul>
+        </section>
+      </aside>
+    </section>
+  </main>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    (() => {
+      'use strict';
+
+      const $ = (id) => document.getElementById(id);
+      const transcript = $('transcript');
+      const interim = $('interim');
+      const dictateBtn = $('dictateBtn');
+      const dictateLabel = $('dictateLabel');
+      const language = $('language');
+      const commandsEnabled = $('commandsEnabled');
+      const globalStatus = $('globalStatus');
+      const globalStatusText = $('globalStatusText');
+      const browserNotice = $('browserNotice');
+      const localNotice = $('localNotice');
+      const toast = $('toast');
+      const timer = $('timer');
+      const recordState = $('recordState');
+      const micRecordBtn = $('micRecordBtn');
+      const callRecordBtn = $('callRecordBtn');
+      const playbackArea = $('playbackArea');
+      const playback = $('playback');
+      const consentCheck = $('consentCheck');
+
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      let recognition = null;
+      let shouldListen = false;
+      let history = [];
+      let toastTimer = null;
+      let recorder = null;
+      let recordedChunks = [];
+      let activeStreams = [];
+      let audioContext = null;
+      let recordingStartedAt = 0;
+      let timerInterval = null;
+      let lastRecording = null;
+      let lastRecordingUrl = '';
+
+      if (location.protocol === 'file:') {
+        localNotice.style.display = 'block';
+      }
+
+      const saved = localStorage.getItem('voice-assistant-transcript');
+      if (saved) transcript.value = saved;
+      language.value = localStorage.getItem('voice-assistant-language') || 'ar-PS';
+      updateCounter();
+
+      function notify(message, isError = false) {
+        clearTimeout(toastTimer);
+        toast.textContent = message;
+        toast.className = `toast show${isError ? ' error' : ''}`;
+        toastTimer = setTimeout(() => toast.className = 'toast', 3200);
+      }
+
+      function setStatus(text, live = false) {
+        globalStatusText.textContent = text;
+        globalStatus.classList.toggle('live', live);
+      }
+
+      function snapshot() {
+        history.push(transcript.value);
+        if (history.length > 30) history.shift();
+      }
+
+      function persist() {
+        localStorage.setItem('voice-assistant-transcript', transcript.value);
+        updateCounter();
+      }
+
+      function updateCounter() {
+        const clean = transcript.value.trim();
+        const words = clean ? clean.split(/\s+/).length : 0;
+        $('counter').textContent = `${words} كلمة · ${transcript.value.length} حرف`;
+      }
+
+      function appendText(text) {
+        snapshot();
+        const start = transcript.selectionStart;
+        const end = transcript.selectionEnd;
+        const before = transcript.value.slice(0, start);
+        const after = transcript.value.slice(end);
+        const needsSpace = before && !/[\s\n]$/.test(before) && !/^[،,.!؟:؛]/.test(text);
+        transcript.value = before + (needsSpace ? ' ' : '') + text + after;
+        const caret = before.length + (needsSpace ? 1 : 0) + text.length;
+        transcript.setSelectionRange(caret, caret);
+        persist();
+      }
+
+      function normalizeCommand(text) {
+        return text
+          .trim()
+          .replace(/[ًٌٍَُِّْـ]/g, '')
+          .replace(/[.،,!?؟؛:]/g, '')
+          .replace(/\s+/g, ' ')
+          .toLowerCase();
+      }
+
+      async function copyText() {
+        if (!transcript.value.trim()) return notify('لا يوجد نص لنسخه', true);
+        try {
+          await navigator.clipboard.writeText(transcript.value);
+        } catch {
+          transcript.select();
+          document.execCommand('copy');
+        }
+        notify('تم نسخ النص — يمكنك لصقه الآن');
+      }
+
+      function safeName(value, fallback) {
+        return (value || fallback).trim().replace(/[\\/:*?"<>|]+/g, '-').slice(0, 90) || fallback;
+      }
+
+      function downloadBlob(blob, filename) {
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+      }
+
+      function saveTxt() {
+        if (!transcript.value.trim()) return notify('لا يوجد نص لحفظه', true);
+        const blob = new Blob(['\ufeff' + transcript.value], { type: 'text/plain;charset=utf-8' });
+        downloadBlob(blob, `نص-صوتي-${new Date().toISOString().slice(0,10)}.txt`);
+        notify('تم حفظ النص بصيغة TXT');
+      }
+
+      function saveDoc() {
+        if (!transcript.value.trim()) return notify('لا يوجد نص لحفظه', true);
+        const escaped = transcript.value
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/\n/g, '<br>');
+        const html = `<!doctype html><html dir="rtl" lang="ar"><meta charset="utf-8"><body style="font-family:Arial;line-height:1.9;font-size:16pt">${escaped}</body></html>`;
+        downloadBlob(new Blob(['\ufeff' + html], { type: 'application/msword;charset=utf-8' }), `مستند-صوتي-${new Date().toISOString().slice(0,10)}.doc`);
+        notify('تم حفظ مستند Word');
+      }
+
+      function executeCommand(text) {
+        if (!commandsEnabled.checked) return false;
+        const command = normalizeCommand(text);
+        if (['سطر جديد', 'انزل سطر', 'سطر ثاني'].includes(command)) appendText('\n');
+        else if (['نقطة', 'ضع نقطة'].includes(command)) appendText('. ');
+        else if (['فاصلة', 'ضع فاصلة'].includes(command)) appendText('، ');
+        else if (['علامة استفهام', 'سؤال'].includes(command)) appendText('؟ ');
+        else if (['انسخ النص', 'نسخ النص'].includes(command)) copyText();
+        else if (['احفظ النص', 'حفظ النص'].includes(command)) saveTxt();
+        else if (['تراجع', 'ارجع'].includes(command)) undo();
+        else if (['توقف عن الإملاء', 'اوقف الاملاء', 'أوقف الإملاء'].includes(command)) stopDictation();
+        else if (['امسح النص', 'مسح النص'].includes(command)) {
+          if (confirm('هل تريد مسح النص كاملًا؟')) clearText();
+        } else return false;
+        return true;
+      }
+
+      function startDictation() {
+        if (!recognition) return notify('الإملاء الصوتي غير مدعوم في هذا المتصفح', true);
+        shouldListen = true;
+        recognition.lang = language.value;
+        try {
+          recognition.start();
+        } catch {}
+        dictateBtn.classList.add('listening');
+        dictateLabel.textContent = 'أوقف الإملاء';
+        setStatus('أستمع الآن…', true);
+      }
+
+      function stopDictation() {
+        shouldListen = false;
+        if (recognition) {
+          try { recognition.stop(); } catch {}
+        }
+        dictateBtn.classList.remove('listening');
+        dictateLabel.textContent = 'ابدأ الإملاء';
+        interim.textContent = 'الكلام الجاري سيظهر هنا…';
+        setStatus('تم إيقاف الإملاء');
+      }
+
+      if (SpeechRecognition) {
+        recognition = new SpeechRecognition();
+        recognition.continuous = true;
+        recognition.interimResults = true;
+        recognition.maxAlternatives = 1;
+
+        recognition.onresult = (event) => {
+          let liveText = '';
+          for (let i = event.resultIndex; i < event.results.length; i++) {
+            const text = event.results[i][0].transcript;
+            if (event.results[i].isFinal) {
+              if (!executeCommand(text)) appendText(text.trim());
+            } else {
+              liveText += text;
+            }
+          }
+          interim.textContent = liveText || 'الكلام الجاري سيظهر هنا…';
+        };
+
+        recognition.onerror = (event) => {
+          const messages = {
+            'not-allowed': 'اسمح للمتصفح باستخدام الميكروفون ثم أعد المحاولة',
+            'audio-capture': 'لم يتم العثور على ميكروفون متاح',
+            'network': 'تعذر الوصول إلى خدمة تحويل الصوت إلى نص',
+            'no-speech': 'لم أسمع كلامًا واضحًا'
+          };
+          const message = messages[event.error] || `تعذر الإملاء: ${event.error}`;
+          if (event.error !== 'no-speech') notify(message, true);
+          if (['not-allowed', 'audio-capture'].includes(event.error)) stopDictation();
+        };
+
+        recognition.onend = () => {
+          if (shouldListen) {
+            setTimeout(() => {
+              try { recognition.start(); } catch {}
+            }, 350);
+          }
+        };
+      } else {
+        browserNotice.style.display = 'block';
+        dictateBtn.disabled = true;
+      }
+
+      function undo() {
+        if (!history.length) return notify('لا يوجد شيء للتراجع عنه', true);
+        transcript.value = history.pop();
+        persist();
+      }
+
+      function clearText() {
+        snapshot();
+        transcript.value = '';
+        persist();
+        notify('تم مسح النص');
+      }
+
+      function supportedMimeType() {
+        const types = ['audio/webm;codecs=opus', 'audio/webm', 'audio/mp4'];
+        return types.find(type => window.MediaRecorder && MediaRecorder.isTypeSupported(type)) || '';
+      }
+
+      function beginTimer() {
+        recordingStartedAt = Date.now();
+        clearInterval(timerInterval);
+        timerInterval = setInterval(() => {
+          const seconds = Math.floor((Date.now() - recordingStartedAt) / 1000);
+          timer.textContent = `${String(Math.floor(seconds / 60)).padStart(2,'0')}:${String(seconds % 60).padStart(2,'0')}`;
+        }, 250);
+      }
+
+      function cleanupStreams() {
+        activeStreams.forEach(stream => stream.getTracks().forEach(track => track.stop()));
+        activeStreams = [];
+        if (audioContext) {
+          audioContext.close().catch(() => {});
+          audioContext = null;
+        }
+      }
+
+      function startRecorder(stream, mode) {
+        recordedChunks = [];
+        const mimeType = supportedMimeType();
+        recorder = new MediaRecorder(stream, mimeType ? { mimeType } : undefined);
+        recorder.ondataavailable = (event) => {
+          if (event.data && event.data.size) recordedChunks.push(event.data);
+        };
+        recorder.onstop = () => {
+          clearInterval(timerInterval);
+          const type = recorder.mimeType || mimeType || 'audio/webm';
+          lastRecording = new Blob(recordedChunks, { type });
+          if (lastRecordingUrl) URL.revokeObjectURL(lastRecordingUrl);
+          lastRecordingUrl = URL.createObjectURL(lastRecording);
+          playback.src = lastRecordingUrl;
+          playbackArea.classList.remove('hidden');
+          recordState.textContent = 'اكتمل التسجيل — استمع أو نزّله';
+          timer.textContent = '00:00';
+          micRecordBtn.classList.remove('active');
+          callRecordBtn.classList.remove('active');
+          micRecordBtn.textContent = '🎙 تسجيل الميكروفون';
+          callRecordBtn.textContent = '🖥 تسجيل محادثة';
+          cleanupStreams();
+          setStatus('تم حفظ التسجيل داخل الصفحة');
+          notify(mode === 'call' ? 'اكتمل تسجيل المحادثة' : 'اكتمل التسجيل الصوتي');
+        };
+        recorder.start(1000);
+        beginTimer();
+        setStatus('التسجيل جارٍ…', true);
+      }
+
+      async function startMicRecording() {
+        if (recorder && recorder.state === 'recording') return stopRecording();
+        if (!navigator.mediaDevices?.getUserMedia || !window.MediaRecorder) {
+          return notify('التسجيل غير مدعوم في هذا المتصفح', true);
+        }
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({
+            audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true }
+          });
+          activeStreams = [stream];
+          startRecorder(stream, 'mic');
+          micRecordBtn.classList.add('active');
+          micRecordBtn.textContent = '■ إيقاف التسجيل';
+          recordState.textContent = 'تسجيل الميكروفون جارٍ';
+        } catch (error) {
+          notify('تعذر تشغيل الميكروفون. تحقق من إذن المتصفح.', true);
+        }
+      }
+
+      async function startCallRecording() {
+        if (recorder && recorder.state === 'recording') return stopRecording();
+        if (!consentCheck.checked) return notify('أكد موافقة الأطراف قبل تسجيل المحادثة', true);
+        if (!navigator.mediaDevices?.getDisplayMedia || !window.MediaRecorder) {
+          return notify('تسجيل صوت الجهاز غير مدعوم في هذا المتصفح', true);
+        }
+        try {
+          const displayStream = await navigator.mediaDevices.getDisplayMedia({
+            video: true,
+            audio: true
+          });
+          const micStream = await navigator.mediaDevices.getUserMedia({
+            audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true }
+          });
+          if (!displayStream.getAudioTracks().length) {
+            displayStream.getTracks().forEach(track => track.stop());
+            micStream.getTracks().forEach(track => track.stop());
+            return notify('لم تتم مشاركة صوت النظام. أعد المحاولة وفعّل «مشاركة الصوت».', true);
+          }
+
+          audioContext = new AudioContext();
+          const destination = audioContext.createMediaStreamDestination();
+          const systemSource = audioContext.createMediaStreamSource(new MediaStream(displayStream.getAudioTracks()));
+          const micSource = audioContext.createMediaStreamSource(micStream);
+          const systemGain = audioContext.createGain();
+          const micGain = audioContext.createGain();
+          systemGain.gain.value = 1;
+          micGain.gain.value = .9;
+          systemSource.connect(systemGain).connect(destination);
+          micSource.connect(micGain).connect(destination);
+
+          activeStreams = [displayStream, micStream];
+          displayStream.getVideoTracks()[0].addEventListener('ended', stopRecording, { once: true });
+          startRecorder(destination.stream, 'call');
+          callRecordBtn.classList.add('active');
+          callRecordBtn.textContent = '■ إيقاف المحادثة';
+          recordState.textContent = 'تسجيل صوت الجهاز والميكروفون';
+        } catch (error) {
+          cleanupStreams();
+          if (error.name !== 'NotAllowedError') notify('تعذر بدء تسجيل المحادثة', true);
+        }
+      }
+
+      function stopRecording() {
+        if (recorder && recorder.state === 'recording') {
+          recorder.stop();
+        }
+      }
+
+      dictateBtn.addEventListener('click', () => shouldListen ? stopDictation() : startDictation());
+      language.addEventListener('change', () => {
+        localStorage.setItem('voice-assistant-language', language.value);
+        if (shouldListen) {
+          stopDictation();
+          setTimeout(startDictation, 250);
+        }
+      });
+      transcript.addEventListener('input', persist);
+      transcript.addEventListener('beforeinput', snapshot);
+      document.querySelectorAll('[data-insert]').forEach(button => {
+        button.addEventListener('click', () => appendText(button.dataset.insert));
+      });
+      $('undoBtn').addEventListener('click', undo);
+      $('copyBtn').addEventListener('click', copyText);
+      $('saveTxtBtn').addEventListener('click', saveTxt);
+      $('saveDocBtn').addEventListener('click', saveDoc);
+      $('clearBtn').addEventListener('click', () => {
+        if (!transcript.value || confirm('هل تريد مسح النص كاملًا؟')) clearText();
+      });
+      micRecordBtn.addEventListener('click', startMicRecording);
+      callRecordBtn.addEventListener('click', startCallRecording);
+      $('downloadRecordingBtn').addEventListener('click', () => {
+        if (!lastRecording) return notify('لا يوجد تسجيل لتنزيله', true);
+        const ext = lastRecording.type.includes('mp4') ? 'm4a' : 'webm';
+        const name = safeName($('recordingName').value, 'تسجيل صوتي');
+        downloadBlob(lastRecording, `${name}-${new Date().toISOString().replace(/[:.]/g,'-').slice(0,19)}.${ext}`);
+        notify('تم تنزيل التسجيل');
+      });
+      window.addEventListener('beforeunload', (event) => {
+        if (recorder && recorder.state === 'recording') {
+          event.preventDefault();
+          event.returnValue = '';
+        }
+      });
+    })();
+  </script>
+</body>
+</html>
