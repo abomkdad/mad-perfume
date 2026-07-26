@@ -2880,6 +2880,9 @@
   <script>
     const qs = new URLSearchParams(location.search);
     const CATALOG_URL = "https://script.google.com/macros/s/AKfycbyOedaaojoXQ6UNdzelH4YP0IUVuROnJydls8OBRsF4djuUtPrybSF_8zzyS2I5KD5pNQ/exec";
+    const LOCAL_CATALOG_URLS = { ar: "fast-catalog-ar.json", he: "fast-catalog-he.json" };
+    const CATALOG_VERSION = "20260726-fast";
+    const PRODUCT_KEY_ALIASES = { "302": "729" };
     const ORDER_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbzd4FSy5fKZ5B3LF4ogDerw25K16oikiNv0j-4QPZGE4CzbvZFiw5vFIQpE09w486ldCA/exec";
     const FREE_DELIVERY_MIN = 500;
     const DELIVERY_FEE = 50;
@@ -3443,6 +3446,9 @@
     function findProductByKey(key) {
       const wanted = safe(key).trim().toLowerCase();
       if (!wanted) return null;
+      const wantedKeys = [wanted, PRODUCT_KEY_ALIASES[wanted]]
+        .map((value) => safe(value).trim().toLowerCase())
+        .filter(Boolean);
       return products.find((product) => {
         const keys = [
           productPageKey(product),
@@ -3451,8 +3457,8 @@
           product.id,
           product.link
         ].map((value) => safe(value).trim().toLowerCase()).filter(Boolean);
-        return keys.includes(wanted);
-      }) || products.find((product) => productSearchText(product).includes(wanted));
+        return keys.some((value) => wantedKeys.includes(value));
+      }) || products.find((product) => wantedKeys.some((value) => productSearchText(product).includes(value)));
     }
     function normalizePhone(value) {
       const digits = safe(value).replace(/\D/g, "");
@@ -4376,18 +4382,45 @@
         console.warn(error);
       }
     }
-    async function fetchCatalogProducts(catalogLocale) {
+    function normalizeFetchedCatalogRows(rows, catalogLocale) {
+      return rows
+        .map((row, index) => {
+          if (row && row.id && row.code && row.name && row.image) return normalizeProduct(row, index);
+          return normalizeRow(row, index, catalogLocale);
+        })
+        .filter((product) => product.code && product.image);
+    }
+    async function fetchLocalCatalogProducts(catalogLocale) {
+      const path = LOCAL_CATALOG_URLS[catalogLocale] || LOCAL_CATALOG_URLS.ar;
+      const url = new URL(path, location.href);
+      url.searchParams.set("v", CATALOG_VERSION);
+      const response = await fetch(url.toString(), { cache: "force-cache" });
+      if (!response.ok) throw new Error(`Local catalog failed: ${response.status}`);
+      const rows = await response.json();
+      if (!Array.isArray(rows)) throw new Error("Local catalog is not an array");
+      const nextProducts = normalizeFetchedCatalogRows(rows, catalogLocale);
+      if (!nextProducts.length) throw new Error("Local catalog is empty");
+      writeCatalogCache(catalogLocale, nextProducts);
+      return nextProducts;
+    }
+    async function fetchRemoteCatalogProducts(catalogLocale) {
       const url = new URL(CATALOG_URL);
       url.searchParams.set("lang", catalogLocale);
       const response = await fetch(url.toString(), { cache: "force-cache" });
       if (!response.ok) throw new Error(`Catalog failed: ${response.status}`);
       const rows = await response.json();
       if (!Array.isArray(rows)) throw new Error("Catalog is not an array");
-      const nextProducts = rows
-        .map((row, index) => normalizeRow(row, index, catalogLocale))
-        .filter((product) => product.code && product.image);
+      const nextProducts = normalizeFetchedCatalogRows(rows, catalogLocale);
       writeCatalogCache(catalogLocale, nextProducts);
       return nextProducts;
+    }
+    async function fetchCatalogProducts(catalogLocale) {
+      try {
+        return await fetchLocalCatalogProducts(catalogLocale);
+      } catch (localError) {
+        console.warn(localError);
+        return fetchRemoteCatalogProducts(catalogLocale);
+      }
     }
     async function loadCatalog() {
       els.status.hidden = true;
