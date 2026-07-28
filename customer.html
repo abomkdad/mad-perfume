@@ -2368,7 +2368,10 @@
   <script>
     const qs = new URLSearchParams(location.search);
     const WA_NUMBER = (qs.get("wa") || "972524033442").replace(/\D+/g, "");
-    const CATALOG_URL = "https://script.google.com/macros/s/AKfycbyOedaaojoXQ6UNdzelH4YP0IUVuROnJydls8OBRsF4djuUtPrybSF_8zzyS2I5KD5pNQ/exec";
+    
+    // الرابط المحدث ليتوافق مع السكريبت الخاص بك
+    const CATALOG_URL = "https://script.google.com/macros/s/AKfycbwA4gcpKst3QRffuLFpqhk8CwJSM0xRzL9Rd0DTs7qiso9H8QZfrk-DiVIv9px_afB-/exec";
+    
     const ORDER_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbzd4FSy5fKZ5B3LF4ogDerw25K16oikiNv0j-4QPZGE4CzbvZFiw5vFIQpE09w486ldCA/exec";
     const FREE_DELIVERY_MIN = 500;
     const DELIVERY_FEE = 50;
@@ -2906,30 +2909,34 @@
       }
       history.replaceState(null, "", url.toString());
     }
+
+    // دوال تحويل البيانات الجديدة
     function productName(row, rowLocale = locale) {
-      const name = rowLocale === "he" ? row["השם האמיתי"] : row["الاسم الحقيقي"];
-      return safe(name || row["الاسم الحقيقي"] || row["השם האמיתי"] || row["رمز العطر"] || "MAD");
+      return safe(row.real_title || row.perfume_code || "MAD");
     }
+
     function productDesc(row, rowLocale = locale) {
-      const desc = rowLocale === "he" ? row["תיאור מוצר (الوصف העברי)"] : row["الوصف التفصيلي"];
-      return safe(desc || "");
+      return safe(row.description || "");
     }
+
     function normalizeRow(row, index, rowLocale = locale) {
-      const code = safe(row["رمز العطر"] || row.code || row.sku || "").trim();
-      const link = safe(row["الرابط"] || row.link || row.url || "").trim();
-      const image = safe(row["الصورة"] || row.image || row.image_url || "").trim();
-      const category = safe(row["التصنيف"] || row.category || "").trim() || "Other";
+      const code = safe(row.perfume_code || "").trim();
+      const link = safe(row.link || "").trim();
+      const image = safe(row.image || "").trim();
+      const category = safe(row.category || "").trim() || "Other";
+      
       return {
         id: `${rowLocale}:${link || code || image || index}`,
         code: code || "MAD",
         name: productName(row, rowLocale),
         description: productDesc(row, rowLocale),
-        category,
-        image,
-        link,
-        price: parsePrice(row["السعر"] || row.price)
+        category: category,
+        image: image,
+        link: link,
+        price: parsePrice(row.price)
       };
     }
+
     function productSearchText(product) {
       return `${product.name} ${product.code} ${product.category}`.toLowerCase();
     }
@@ -3855,21 +3862,9 @@
       }).join("");
       attachReviewVideoTracking(els.content);
     }
-    function normalizeProduct(product, index) {
-      return {
-        id: safe(product.id || `${locale}:instant:${index}`),
-        code: safe(product.code || "MAD"),
-        name: safe(product.name || product.code || "MAD"),
-        description: safe(product.description || ""),
-        category: safe(product.category || "Other"),
-        image: safe(product.image || ""),
-        link: safe(product.link || ""),
-        price: Number(product.price) > 0 ? Number(product.price) : 100
-      };
-    }
+
     function setProducts(nextProducts) {
       products = nextProducts
-        .map(normalizeProduct)
         .filter((product) => product.code && product.image)
         .map((product) => ({ ...product, price: effectiveProductPrice(product) }));
     }
@@ -3898,44 +3893,66 @@
         console.warn(error);
       }
     }
-    async function fetchCatalogProducts(catalogLocale) {
-      const url = new URL(CATALOG_URL);
-      url.searchParams.set("lang", catalogLocale);
-      url.searchParams.set("_", Date.now().toString());
-      const response = await fetch(url.toString(), { cache: "no-store" });
-      if (!response.ok) throw new Error(`Catalog failed: ${response.status}`);
-      const rows = await response.json();
-      if (!Array.isArray(rows)) throw new Error("Catalog is not an array");
-      return rows
-        .map((row, index) => normalizeRow(row, index, catalogLocale))
-        .filter((product) => product.code && product.image);
-    }
+
+    // دالة التحميل الذكية (Cache First + Background Update) 🚀
     async function loadCatalog() {
       els.status.hidden = true;
       clearOldCatalogCache();
+      const cacheKey = `madCatalog_v2_${locale}`;
+      let hasCachedData = false;
+
+      // 1. العرض الفوري من الكاش (لتحقيق سرعة الثانية الواحدة)
       try {
-        const freshProducts = await fetchCatalogProducts(locale);
-        if (!freshProducts.length) throw new Error("Catalog is empty");
-        setProducts(freshProducts);
-        if (!renderCurrentProducts()) {
-          const productKey = requestedProductKey();
-          if (productKey) {
-            const alternateLocales = ["ar", "he"].filter((item) => item !== locale);
-            for (const alternateLocale of alternateLocales) {
-              const alternateProducts = await fetchCatalogProducts(alternateLocale);
-              setProducts([...freshProducts, ...alternateProducts]);
-              if (renderCurrentProducts()) return;
-            }
+        const cachedData = localStorage.getItem(cacheKey);
+        if (cachedData) {
+          const parsedCache = JSON.parse(cachedData);
+          // معالجة البيانات المحفوظة لتلائم الكود
+          const cachedProducts = parsedCache.map((row, index) => normalizeRow(row, index, locale));
+          setProducts(cachedProducts);
+          renderCurrentProducts();
+          hasCachedData = true;
+        }
+      } catch (e) {
+        console.warn("خطأ في قراءة التخزين المؤقت", e);
+      }
+
+      // 2. جلب البيانات المحدثة من الرابط في الخلفية بصمت
+      try {
+        const url = new URL(CATALOG_URL);
+        url.searchParams.set("lang", locale);
+        url.searchParams.set("_", Date.now().toString()); // لمنع كاش سيرفر جوجل
+        
+        const response = await fetch(url.toString(), { cache: "no-store" });
+        if (!response.ok) throw new Error(`فشل الاتصال بالكتالوج: ${response.status}`);
+        
+        const rows = await response.json();
+        if (!Array.isArray(rows)) throw new Error("البيانات المستلمة ليست مصفوفة");
+        
+        // حفظ البيانات الجديدة في الكاش بصيغة JSON الأصلية القادمة من السكريبت
+        localStorage.setItem(cacheKey, JSON.stringify(rows));
+        
+        // معالجة البيانات الجديدة
+        const freshProducts = rows.map((row, index) => normalizeRow(row, index, locale));
+        
+        if (!hasCachedData) {
+          setProducts(freshProducts);
+          if (!renderCurrentProducts()) {
+            document.body.classList.remove("product-view");
+            els.status.hidden = false;
+            els.status.textContent = pt("productNotFound");
           }
-          document.body.classList.remove("product-view");
-          els.status.hidden = false;
-          els.status.textContent = pt("productNotFound");
+        } else {
+           // تحديث المصفوفة بالخلفية للعمليات القادمة
+           setProducts(freshProducts);
         }
       } catch (error) {
         console.warn(error);
-        document.body.classList.remove("product-view");
-        els.status.hidden = false;
-        els.status.textContent = t("loadError");
+        // إظهار رسالة الخطأ فقط إذا لم يكن هناك بيانات معروضة من الكاش
+        if (!hasCachedData) { 
+          document.body.classList.remove("product-view");
+          els.status.hidden = false;
+          els.status.textContent = t("loadError");
+        }
       }
     }
 
@@ -4057,5 +4074,3 @@
   </script>
 </body>
 </html>
-
-
