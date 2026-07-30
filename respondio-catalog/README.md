@@ -19,6 +19,7 @@ Each JSONL row includes:
 - `p`: price in ILS
 - `share_path`: the local share-page path to send to the customer
 - `public_path`: the path from the domain root, useful for bot URL building
+- `share_url`: the full public HTTPS URL to send directly in WhatsApp
 - `product_url`: the original store product link
 - `image`: the product image used by WhatsApp preview cards
 
@@ -35,6 +36,6 @@ After publishing on GitHub Pages, build the full URL like:
 https://www.mad-parfumeur.com/respondio-catalog/share/ar/p-1-w183.html
 ```
 
-For the bot, concatenate the site domain with `public_path`.
+For the bot, prefer sending `share_url` directly. It includes a small version query so WhatsApp fetches the newest preview metadata instead of using an older cached preview.
 
 WhatsApp can show a catalog-style preview card only when the URL is public HTTPS.
