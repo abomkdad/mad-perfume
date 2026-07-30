@@ -1,4 +1,27 @@
-# MAD Catalog + Bot Cards
+# Respond.io Catalog
+
+Lightweight MAD Perfume catalog pages for Respond.io bots and WhatsApp link previews.
+
+## New Catalog
+
+- `respondio-catalog/index.html`: catalog entry page.
+- `respondio-catalog/madperfume-whatsapp-catalog-ar.html`: Arabic WhatsApp share-link catalog.
+- `respondio-catalog/madperfume-whatsapp-catalog-he.html`: Hebrew WhatsApp share-link catalog.
+- `respondio-catalog/share/ar/*.html`: Arabic product share pages with Open Graph product preview tags.
+- `respondio-catalog/share/he/*.html`: Hebrew product share pages with Open Graph product preview tags.
+- `respondio-catalog/madperfume-whatsapp-links-ar.jsonl`: compact Arabic links for the bot.
+- `respondio-catalog/madperfume-whatsapp-links-he.jsonl`: compact Hebrew links for the bot.
+
+When GitHub Pages is active on this repo, product links should look like:
+
+```text
+https://www.mad-parfumeur.com/respondio-catalog/share/ar/p-1-w183.html
+https://www.mad-parfumeur.com/respondio-catalog/share/he/p-1-w183.html
+```
+
+WhatsApp reads each product page's `og:title`, `og:description`, and `og:image` tags to show a catalog-style link card.
+
+## Legacy Files
 
 ## Files
 
