@@ -28,13 +28,13 @@ Each JSONL row includes:
 
 Send product links from:
 
-- `share/ar/*.html`
-- `share/he/*.html`
+- `wa/ar/*.html`
+- `wa/he/*.html`
 
 After publishing on GitHub Pages, build the full URL like:
 
 ```text
-https://www.mad-parfumeur.com/respondio-catalog/share/ar/p-1-w183.html
+https://www.mad-parfumeur.com/respondio-catalog/wa/ar/p-1-w183.html?v=20260731-1
 ```
 
 For the bot, send `share_url` directly. It includes a small version query so WhatsApp fetches the newest preview metadata instead of using an older cached preview. Each product page points `og:image` to a compressed image hosted under this same catalog.
