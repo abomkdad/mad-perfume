@@ -14,8 +14,9 @@
   </script>
   <title>أفضل مجموعة نسائية | MAD Parfumeur</title>
   <meta name="description" content="">
-  <meta property="og:image" content="https://www.mad-parfumeur.com/offer5-hero.png">
-  <link rel="preload" as="image" href="offer5-hero.png">
+  <meta property="og:image" content="https://www.mad-parfumeur.com/offer5-hero.png" id="ogImage">
+  <link rel="preload" as="image" href="offer5-hero.png" id="heroPreloadAr">
+  <link rel="preload" as="image" href="offer5-hero-he.png" id="heroPreloadHe">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700;800&family=Cairo:wght@400;600;700;800&family=Playfair+Display:wght@600;700;800&display=swap" rel="stylesheet">
 
@@ -116,6 +117,8 @@
       display: block;
       object-fit: contain;
     }
+    html[lang="he"] .hero-img-ar { display: none; }
+    html[lang="ar"] .hero-img-he { display: none; }
     .hero-image-wrap .hero-glow {
       position: absolute;
       inset: 0;
@@ -427,7 +430,8 @@
 <div class="announce" data-i18n-html="announce"></div>
 
 <div class="hero-image-wrap">
-  <img src="offer5-hero.png" data-i18n-alt="heroAlt" width="680" height="680" fetchpriority="high">
+  <img class="hero-img-ar" src="offer5-hero.png" data-i18n-alt="heroAlt" width="680" height="680" fetchpriority="high" alt="">
+  <img class="hero-img-he" src="offer5-hero-he.png" width="680" height="680" alt="">
   <div class="hero-glow"></div>
 </div>
 
@@ -617,9 +621,9 @@ const I18N = {
   he: {
     pageTitle: "חבילת נשים — Prada · YSL · Givenchy · Chanel · Burberry | MAD",
     metaDesc: "P107 Prada Paradoxe + Y102 Libre Intense + G104 L'Interdit + C120 Coco Mademoiselle + B103 Burberry Her — 5 בשמים EDP 100ml ב-500₪!",
-    announce: '💄 <strong>חבילת נשים יוקרתית</strong> — Prada · YSL · Givenchy · Chanel · Burberry · <strong>500₪</strong> כולל משלוח',
-    heroAlt: "חבילת 5 בשמים נשיים EDP 100ml — 500₪ | MAD Parfumeur",
-    mobileH1: 'חבילת נשים יוקרתית — <em>500₪</em> כולל משלוח!',
+    announce: '💄 <strong>הניחוח המוכר, עם עמידות מוגברת</strong> — 8 שעות ויותר · Prada · YSL · Givenchy · Chanel · Burberry · <strong>500₪</strong>',
+    heroAlt: "הניחוח המוכר, עם עמידות מוגברת – 8 שעות ויותר! 5 בשמים EDP 100ml — 500₪",
+    mobileH1: 'הניחוח המוכר — <em>עמידות 8+ שעות</em> · 500₪!',
     formTitle: "הזמיני עכשיו 👇",
     formSub: "משלוח עד 5 ימי עסקים · תשלום לשליח במזומן",
     labelName: "שם מלא", labelPhone: "טלפון נייד", labelCity: "עיר", labelAddress: "כתובת מלאה",
@@ -628,7 +632,7 @@ const I18N = {
     submitBtn: "הזמיני עכשיו — 500₪ במזומן 💄",
     formNote: "🔒 הפרטים שלך מאובטחים · ללא התחייבות",
     badge1: "💄 בשמי נשים", badge2: "🚚 משלוח חינם", badge3: "💵 תשלום במזומן",
-    mainH1: 'חבילת הנשים המושלמת — <em>5 בשמים EDP</em> ב-500₪',
+    mainH1: 'הניחוח המוכר, עם עמידות מוגברת — <em>8 שעות ויותר!</em>',
     benefits: [
       "P107 — Prada Paradoxe (Prada)",
       "Y102 — Libre Intense (Yves Saint Laurent)",
@@ -720,7 +724,22 @@ const I18N = {
   }
 };
 
-function t(key) { return (I18N[currentLang] || I18N.he)[key]; }
+const HERO_IMAGES = {
+  ar: 'offer5-hero.png',
+  he: 'offer5-hero-he.png'
+};
+
+function updateHeroImage(lang) {
+  const src = HERO_IMAGES[lang] || HERO_IMAGES.ar;
+  const og = document.getElementById('ogImage');
+  if (og) og.content = 'https://www.mad-parfumeur.com/' + src;
+  const heroHe = document.querySelector('.hero-img-he');
+  if (heroHe && lang === 'he') heroHe.alt = t('heroAlt');
+  const heroAr = document.querySelector('.hero-img-ar');
+  if (heroAr && lang === 'ar') heroAr.alt = t('heroAlt');
+}
+
+function t(key) { return (I18N[currentLang] || I18N.ar)[key]; }
 
 function applyI18n(lang) {
   currentLang = lang;
@@ -740,6 +759,7 @@ function applyI18n(lang) {
   document.getElementById('benefitsList').innerHTML = t('benefits').map(b => '<li>' + b + '</li>').join('');
   const offerEl = document.getElementById('offerNames');
   if (offerEl) offerEl.textContent = buildOfferName();
+  updateHeroImage(lang);
   document.getElementById('faqList').innerHTML = t('faq').map(item =>
     '<div class="faq-item"><button class="faq-q" type="button" onclick="toggleFaq(this)">' + item.q +
     '</button><div class="faq-a">' + item.a + '</div></div>'
