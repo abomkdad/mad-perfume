@@ -1,15 +1,26 @@
 <!DOCTYPE html>
-<html lang="he" dir="rtl">
+<html lang="ar" dir="rtl">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   <script>
   (function(){
-    var p=new URLSearchParams(location.search),s=sessionStorage.getItem('mad_lang'),l=p.get('lang')||s;
-    if(!l){var langs=navigator.languages||[navigator.language||'he'];
-    l=langs.some(function(x){return x.toLowerCase().startsWith('ar')})?'ar':
-      langs.some(function(x){return x.toLowerCase().startsWith('he')})?'he':'ar';}
-    document.documentElement.lang=l; document.documentElement.dataset.lang=l;
+    function detectDeviceLang() {
+      var list = navigator.languages && navigator.languages.length
+        ? navigator.languages
+        : [navigator.language || ''];
+      for (var i = 0; i < list.length; i++) {
+        var x = String(list[i] || '').toLowerCase();
+        if (x.indexOf('he') === 0 || x.indexOf('iw') === 0) return 'he';
+        if (x.indexOf('ar') === 0) return 'ar';
+      }
+      return 'ar';
+    }
+    var p = new URLSearchParams(location.search);
+    var l = p.get('lang');
+    if (l !== 'he' && l !== 'ar') l = detectDeviceLang();
+    document.documentElement.lang = l;
+    document.documentElement.dataset.lang = l;
   })();
   </script>
   <title>أفضل مجموعة نسائية | MAD Parfumeur</title>
@@ -588,7 +599,7 @@ const PLATINUM_PRICE = 500;
 const BUNDLE_UNIT_PRICE = 100;
 const BUNDLE_CODES = 'P107 Y102 G104 C120 B103';
 let isSubmittingOrder = false;
-let currentLang = document.documentElement.lang || 'he';
+let currentLang = document.documentElement.lang || 'ar';
 
 function getBundleProducts() {
   return (BUNDLE_PRODUCTS[currentLang] || BUNDLE_PRODUCTS.ar);
@@ -745,7 +756,6 @@ function applyI18n(lang) {
   currentLang = lang;
   document.documentElement.lang = lang;
   document.documentElement.dataset.lang = lang;
-  sessionStorage.setItem('mad_lang', lang);
   document.getElementById('langHe').classList.toggle('active', lang === 'he');
   document.getElementById('langAr').classList.toggle('active', lang === 'ar');
   document.title = t('pageTitle');
