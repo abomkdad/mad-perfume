@@ -907,9 +907,44 @@ function forgetRecentOrder(fingerprint) {
   } catch (e) {}
 }
 
-function finishOrderSuccess(btn) {
-  if (typeof fbq !== 'undefined') fbq('track', 'Lead');
-  if (typeof ttq !== 'undefined') ttq.track('SubmitForm', { content_name: 'Platinum Bundle' });
+function trackPixel(eventName, properties) {
+  if (window.ttq && typeof window.ttq.track === 'function') {
+    window.ttq.track(eventName, properties);
+  }
+  if (eventName === 'SubmitForm' && window.fbq && typeof window.fbq === 'function') {
+    const opts = properties.event_id ? { eventID: properties.event_id } : undefined;
+    window.fbq('trackCustom', 'SubmitForm', properties, opts);
+    window.fbq('track', 'Lead', { currency: properties.currency, value: properties.value }, opts);
+  } else if (eventName === 'Lead' && window.fbq && typeof window.fbq === 'function') {
+    const opts = properties.event_id ? { eventID: properties.event_id } : undefined;
+    window.fbq('track', 'Lead', properties, opts);
+  }
+}
+
+function trackSubmitFormConversion(payload) {
+  const value = Number(payload.final_total || payload.total || payload.price || PLATINUM_PRICE);
+  trackPixel('SubmitForm', {
+    content_type: 'product',
+    content_id: 'PLATINUM',
+    content_ids: ['PLATINUM'],
+    content_name: payload.offer || t('offer'),
+    contents: [{
+      content_id: 'PLATINUM',
+      content_type: 'product',
+      content_name: payload.offer || t('offer'),
+      quantity: 1,
+      price: value
+    }],
+    event_id: payload.orderId,
+    num_items: 1,
+    currency: 'ILS',
+    value,
+    description: payload.source_page || 'platinumnew'
+  });
+}
+
+function finishOrderSuccess(btn, payload) {
+  trackSubmitFormConversion(payload);
   document.getElementById('successModal').classList.add('show');
   document.getElementById('f_name').value = '';
   document.getElementById('f_phone').value = '';
@@ -946,7 +981,7 @@ async function submitOrder() {
 
   const recentOrder = readRecentOrder(payload.idempotency_key);
   if (recentOrder) {
-    finishOrderSuccess(btn);
+    finishOrderSuccess(btn, payload);
     return;
   }
 
@@ -954,10 +989,20 @@ async function submitOrder() {
   btn.disabled = true;
   document.getElementById('overlay').classList.add('show');
 
+  trackPixel('InitiateCheckout', {
+    content_type: 'product',
+    content_id: 'PLATINUM',
+    content_ids: ['PLATINUM'],
+    content_name: payload.offer,
+    currency: 'ILS',
+    value: PLATINUM_PRICE,
+    num_items: 1
+  });
+
   try {
     rememberRecentOrder(payload);
     await postOrderPayload(payload);
-    finishOrderSuccess(btn);
+    finishOrderSuccess(btn, payload);
   } catch (e) {
     forgetRecentOrder(payload.idempotency_key);
     showToast(t('errNetwork'));
