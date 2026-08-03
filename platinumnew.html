@@ -1,0 +1,981 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <script>
+  (function(){
+    var p=new URLSearchParams(location.search),s=sessionStorage.getItem('mad_lang'),l=p.get('lang')||s;
+    if(!l){var langs=navigator.languages||[navigator.language||'he'];
+    l=langs.some(function(x){return x.toLowerCase().startsWith('ar')})?'ar':
+      langs.some(function(x){return x.toLowerCase().startsWith('he')})?'he':'he';}
+    document.documentElement.lang=l; document.documentElement.dataset.lang=l;
+  })();
+  </script>
+  <title>חבילת הפלטינום | MAD Parfumeur</title>
+  <meta name="description" content="">
+  <meta property="og:image" content="https://www.mad-parfumeur.com/platinum-hero.png">
+  <link rel="preload" as="image" href="platinum-hero.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700;800&family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Meta Pixel -->
+  <script>
+  !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+  n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
+  n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
+  t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script',
+  'https://connect.facebook.net/en_US/fbevents.js');
+  fbq('init','1985638301865201'); fbq('track','PageView');
+  </script>
+
+  <!-- TikTok Pixel -->
+  <script>
+  !function(w,d,t){w.TiktokAnalyticsObject=t;var ttq=w[t]=w[t]||[];
+  ttq.methods=["page","track","identify","instances","debug","on","off","once","ready","alias","group","enableCookie","disableCookie","holdConsent","revokeConsent","grantConsent"];
+  ttq.setAndDefer=function(t,e){t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}};
+  for(var i=0;i<ttq.methods.length;i++)ttq.setAndDefer(ttq,ttq.methods[i]);
+  ttq.load=function(e,n){var r="https://analytics.tiktok.com/i18n/pixel/events.js";
+  ttq._i=ttq._i||{};ttq._i[e]=[];ttq._i[e]._u=r;ttq._t=ttq._t||{};ttq._t[e]=+new Date;
+  ttq._o=ttq._o||{};ttq._o[e]=n||{};n=document.createElement("script");n.type="text/javascript";
+  n.async=!0;n.src=r+"?sdkid="+e+"&lib="+t;e=document.getElementsByTagName("script")[0];e.parentNode.insertBefore(n,e)};
+  ttq.load('D8UJRIJC77U4748KH5B0'); ttq.page(); ttq.track('ViewContent');
+  }(window,document,'ttq');
+  </script>
+
+  <style>
+    :root {
+      --bg: #0a0a0f;
+      --surface: #14141c;
+      --surface2: #1c1c28;
+      --gold: #c9a84c;
+      --gold-light: #e8d5a3;
+      --accent: #3b82f6;
+      --success: #22c55e;
+      --danger: #ef4444;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --border: rgba(255,255,255,.08);
+      --radius: 16px;
+      --shadow: 0 20px 60px rgba(0,0,0,.5);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Assistant', 'Cairo', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      padding-bottom: 90px;
+    }
+    html[lang="ar"] body { font-family: 'Cairo', 'Assistant', system-ui, sans-serif; }
+
+    /* Language switcher */
+    .lang-switch {
+      position: fixed; top: 12px; left: 12px; z-index: 150;
+      display: flex; gap: 4px;
+      background: rgba(20,20,28,.9); backdrop-filter: blur(8px);
+      border: 1px solid var(--border); border-radius: 999px; padding: 4px;
+    }
+    .lang-switch button {
+      border: none; background: transparent; color: var(--muted);
+      font-family: inherit; font-size: 13px; font-weight: 700;
+      padding: 6px 12px; border-radius: 999px; cursor: pointer;
+    }
+    .lang-switch button.active {
+      background: var(--gold); color: #0a0a0f;
+    }
+
+    /* Announcement bar */
+    .announce {
+      background: linear-gradient(90deg, #1a1208, #2d1f0a, #1a1208);
+      border-bottom: 1px solid rgba(201,168,76,.3);
+      padding: 10px 16px;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--gold-light);
+    }
+    .announce strong { color: var(--gold); }
+
+    /* Hero image — same as TikTok ad */
+    .hero-image-wrap {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 0;
+      position: relative;
+    }
+    .hero-image-wrap img {
+      width: 100%;
+      height: auto;
+      display: block;
+      object-fit: contain;
+    }
+    .hero-image-wrap .hero-glow {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at center bottom, rgba(201,168,76,.12), transparent 70%);
+      pointer-events: none;
+    }
+    @media (min-width: 769px) {
+      .hero-image-wrap { padding: 16px 16px 0; }
+    }
+
+    /* Hero */
+    .hero {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 16px 16px 0;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 32px;
+      align-items: start;
+    }
+    @media (max-width: 768px) {
+      .hero { grid-template-columns: 1fr; gap: 16px; padding-top: 12px; }
+      .hero-form { order: 3; }
+      .hero-content { order: 2; }
+    }
+
+    .badge-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+    .badge {
+      background: rgba(201,168,76,.12);
+      border: 1px solid rgba(201,168,76,.3);
+      color: var(--gold-light);
+      font-size: 12px;
+      font-weight: 700;
+      padding: 4px 12px;
+      border-radius: 999px;
+    }
+
+    h1 {
+      font-size: clamp(22px, 4vw, 34px);
+      font-weight: 800;
+      line-height: 1.25;
+      margin-bottom: 12px;
+    }
+    h1 em { color: var(--gold); font-style: normal; }
+
+    .stars { color: var(--gold); font-size: 20px; letter-spacing: 2px; margin-bottom: 16px; }
+
+    .benefits { list-style: none; margin-bottom: 20px; }
+    .benefits li {
+      display: flex; gap: 10px; align-items: flex-start;
+      font-size: 14px; margin-bottom: 8px; color: #cbd5e1;
+    }
+    .benefits li::before { content: '✓'; color: var(--success); font-weight: 800; flex-shrink: 0; }
+
+    .price-box {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      margin-bottom: 16px;
+      display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+    }
+    .price-now { font-size: 36px; font-weight: 800; color: var(--danger); }
+    .price-now small { font-size: 20px; }
+    .price-was { font-size: 18px; color: var(--muted); text-decoration: line-through; }
+    .price-save {
+      background: rgba(239,68,68,.15);
+      color: #fca5a5;
+      font-size: 13px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 8px;
+    }
+
+    /* Countdown */
+    .countdown-wrap { margin-bottom: 20px; }
+    .countdown-label { font-size: 14px; font-weight: 700; margin-bottom: 10px; color: var(--muted); }
+    .countdown {
+      display: flex; gap: 10px; justify-content: flex-start;
+    }
+    .cd-unit {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 10px 14px;
+      text-align: center;
+      min-width: 64px;
+    }
+    .cd-num { font-size: 26px; font-weight: 800; color: var(--gold); line-height: 1; }
+    .cd-lbl { font-size: 11px; color: var(--muted); margin-top: 4px; }
+
+    .hero-headline-mobile {
+      display: none;
+      text-align: center;
+      padding: 12px 16px 0;
+      max-width: 680px;
+      margin: 0 auto;
+    }
+    @media (max-width: 768px) {
+      .hero-headline-mobile { display: block; }
+      .hero-content .badge-row,
+      .hero-content h1,
+      .hero-content .stars { display: none; }
+    }
+    .hero-headline-mobile h1 {
+      font-size: 22px;
+      margin-bottom: 8px;
+    }
+    .hero-headline-mobile .price-inline {
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--danger);
+    }
+    .hero-headline-mobile .price-inline span {
+      font-size: 16px;
+      color: var(--muted);
+      text-decoration: line-through;
+      margin-right: 8px;
+    }
+
+    /* Form */
+    .form-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 24px;
+      box-shadow: var(--shadow);
+      position: sticky; top: 16px;
+    }
+    .form-card h2 {
+      font-size: 18px; font-weight: 800; margin-bottom: 4px;
+    }
+    .form-sub { font-size: 13px; color: var(--muted); margin-bottom: 16px; }
+    .field { margin-bottom: 12px; }
+    .field label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 4px; color: var(--muted); }
+    .field input {
+      width: 100%; padding: 13px 14px;
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 12px; color: var(--text); font-size: 16px;
+      font-family: inherit; outline: none;
+      transition: border-color .2s;
+    }
+    .field input:focus { border-color: var(--gold); }
+    .field input.error { border-color: var(--danger); }
+
+    .checkbox-row {
+      display: flex; gap: 10px; align-items: flex-start;
+      font-size: 13px; color: var(--muted); margin: 14px 0;
+    }
+    .checkbox-row input { width: 18px; height: 18px; margin-top: 2px; flex-shrink: 0; accent-color: var(--gold); }
+
+    .btn-submit {
+      width: 100%; padding: 16px;
+      background: linear-gradient(135deg, #16a34a, #15803d);
+      border: none; border-radius: 14px;
+      color: #fff; font-size: 17px; font-weight: 800;
+      font-family: inherit; cursor: pointer;
+      transition: transform .15s, box-shadow .15s;
+      box-shadow: 0 8px 24px rgba(22,163,74,.35);
+    }
+    .btn-submit:hover { transform: translateY(-1px); box-shadow: 0 12px 32px rgba(22,163,74,.45); }
+    .btn-submit:active { transform: translateY(0); }
+    .btn-submit:disabled { opacity: .6; cursor: not-allowed; transform: none; }
+
+    .form-note { font-size: 12px; color: var(--muted); text-align: center; margin-top: 10px; }
+
+    /* Sections */
+    section { max-width: 1100px; margin: 0 auto; padding: 48px 16px; }
+    .section-title {
+      font-size: clamp(20px, 3vw, 28px);
+      font-weight: 800; text-align: center; margin-bottom: 32px;
+    }
+    .section-title span { color: var(--gold); }
+
+    /* Trust grid */
+    .trust-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+    @media (max-width: 600px) { .trust-grid { grid-template-columns: 1fr; } }
+    .trust-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      text-align: center;
+    }
+    .trust-icon { font-size: 32px; margin-bottom: 12px; }
+    .trust-card h3 { font-size: 16px; font-weight: 800; margin-bottom: 8px; }
+    .trust-card p { font-size: 13px; color: var(--muted); }
+
+    /* Testimonials */
+    .testimonials {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
+    }
+    .testimonial {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .testimonial img { width: 100%; aspect-ratio: 4/3; object-fit: cover; }
+    .testimonial-body { padding: 14px; }
+    .testimonial-stars { color: var(--gold); font-size: 14px; margin-bottom: 6px; }
+    .testimonial-text { font-size: 13px; color: #cbd5e1; }
+
+    /* FAQ */
+    .faq-list { max-width: 700px; margin: 0 auto; }
+    .faq-item {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      margin-bottom: 10px;
+      overflow: hidden;
+    }
+    .faq-q {
+      width: 100%; background: none; border: none;
+      color: var(--text); font-family: inherit;
+      font-size: 15px; font-weight: 700;
+      padding: 16px 20px; cursor: pointer;
+      display: flex; justify-content: space-between; align-items: center;
+      text-align: right;
+    }
+    .faq-q::after { content: '+'; font-size: 20px; color: var(--gold); transition: transform .2s; }
+    .faq-item.open .faq-q::after { transform: rotate(45deg); }
+    .faq-a {
+      max-height: 0; overflow: hidden;
+      transition: max-height .3s ease;
+      font-size: 14px; color: var(--muted);
+      padding: 0 20px;
+    }
+    .faq-item.open .faq-a { max-height: 200px; padding: 0 20px 16px; }
+
+    /* Sticky mobile CTA */
+    .sticky-cta {
+      display: none;
+      position: fixed; bottom: 0; left: 0; right: 0;
+      background: rgba(10,10,15,.95);
+      backdrop-filter: blur(12px);
+      border-top: 1px solid var(--border);
+      padding: 12px 16px;
+      z-index: 100;
+      gap: 12px; align-items: center;
+    }
+    @media (max-width: 768px) {
+      .sticky-cta { display: flex; }
+    }
+    .sticky-price { font-size: 20px; font-weight: 800; color: var(--danger); white-space: nowrap; }
+    .sticky-cta .btn-submit { padding: 12px; font-size: 15px; }
+
+    /* Toast & overlay */
+    #toast {
+      position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%);
+      background: var(--success); color: #fff;
+      padding: 14px 24px; border-radius: 999px;
+      font-weight: 700; z-index: 200; display: none;
+      box-shadow: var(--shadow);
+    }
+    #overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,.7);
+      display: none; align-items: center; justify-content: center; z-index: 300;
+    }
+    #overlay.show { display: flex; }
+    .spinner {
+      width: 48px; height: 48px;
+      border: 4px solid rgba(201,168,76,.2);
+      border-top-color: var(--gold);
+      border-radius: 50%;
+      animation: spin .8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Success modal */
+    #successModal {
+      position: fixed; inset: 0; background: rgba(0,0,0,.8);
+      display: none; align-items: center; justify-content: center;
+      z-index: 400; padding: 20px;
+    }
+    #successModal.show { display: flex; }
+    .success-box {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 24px; padding: 32px; max-width: 420px;
+      text-align: center;
+    }
+    .success-box .icon { font-size: 48px; margin-bottom: 16px; }
+    .success-box h2 { font-size: 22px; margin-bottom: 8px; }
+    .success-box p { color: var(--muted); font-size: 14px; }
+  </style>
+</head>
+<body>
+
+<div class="lang-switch" aria-label="Language">
+  <button type="button" id="langHe" onclick="setLang('he')">עב'</button>
+  <button type="button" id="langAr" onclick="setLang('ar')">عربي</button>
+</div>
+
+<div class="announce" data-i18n-html="announce"></div>
+
+<div class="hero-image-wrap">
+  <img src="platinum-hero.png" data-i18n-alt="heroAlt" width="680" height="680" fetchpriority="high">
+  <div class="hero-glow"></div>
+</div>
+
+<div class="hero-headline-mobile">
+  <h1 data-i18n-html="mobileH1"></h1>
+  <div class="stars" style="margin-bottom:8px">★★★★★</div>
+  <div class="price-inline"><span>650₪</span>500₪</div>
+</div>
+
+<div class="hero">
+  <div class="hero-form">
+    <div class="form-card" id="orderForm">
+      <h2 data-i18n="formTitle"></h2>
+      <p class="form-sub" data-i18n="formSub"></p>
+
+      <div class="field">
+        <label for="f_name" data-i18n="labelName"></label>
+        <input type="text" id="f_name" data-i18n-placeholder="phName" autocomplete="name">
+      </div>
+      <div class="field">
+        <label for="f_phone" data-i18n="labelPhone"></label>
+        <input type="tel" id="f_phone" data-i18n-placeholder="phPhone" autocomplete="tel" inputmode="tel">
+      </div>
+      <div class="field">
+        <label for="f_city" data-i18n="labelCity"></label>
+        <input type="text" id="f_city" data-i18n-placeholder="phCity" autocomplete="address-level2">
+      </div>
+      <div class="field">
+        <label for="f_address" data-i18n="labelAddress"></label>
+        <input type="text" id="f_address" data-i18n-placeholder="phAddress" autocomplete="street-address">
+      </div>
+
+      <label class="checkbox-row">
+        <input type="checkbox" id="f_confirm" checked>
+        <span data-i18n="checkbox"></span>
+      </label>
+
+      <button class="btn-submit" id="btnSubmit" type="button" onclick="submitOrder()" data-i18n="submitBtn"></button>
+      <p class="form-note" data-i18n="formNote"></p>
+    </div>
+  </div>
+
+  <div class="hero-content">
+    <div class="badge-row">
+      <span class="badge" data-i18n="badge1"></span>
+      <span class="badge" data-i18n="badge2"></span>
+      <span class="badge" data-i18n="badge3"></span>
+    </div>
+
+    <h1 data-i18n-html="mainH1"></h1>
+    <div class="stars">★★★★★</div>
+
+    <ul class="benefits" id="benefitsList"></ul>
+
+    <div class="price-box">
+      <div>
+        <div class="price-now">500<small>₪</small></div>
+        <div class="price-was">650₪</div>
+      </div>
+      <span class="price-save" data-i18n="priceSave"></span>
+    </div>
+
+    <div class="countdown-wrap">
+      <div class="countdown-label" data-i18n="countdownLabel"></div>
+      <div class="countdown" id="countdown">
+        <div class="cd-unit"><div class="cd-num" id="cd-d">00</div><div class="cd-lbl" data-i18n="cdDays"></div></div>
+        <div class="cd-unit"><div class="cd-num" id="cd-h">00</div><div class="cd-lbl" data-i18n="cdHours"></div></div>
+        <div class="cd-unit"><div class="cd-num" id="cd-m">00</div><div class="cd-lbl" data-i18n="cdMins"></div></div>
+        <div class="cd-unit"><div class="cd-num" id="cd-s">00</div><div class="cd-lbl" data-i18n="cdSecs"></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<section>
+  <h2 class="section-title" data-i18n-html="trustTitle"></h2>
+  <div class="trust-grid">
+    <div class="trust-card">
+      <div class="trust-icon">🚚</div>
+      <h3 data-i18n="trust1h"></h3>
+      <p data-i18n="trust1p"></p>
+    </div>
+    <div class="trust-card">
+      <div class="trust-icon">⭐</div>
+      <h3 data-i18n="trust2h"></h3>
+      <p data-i18n="trust2p"></p>
+    </div>
+    <div class="trust-card">
+      <div class="trust-icon">🏆</div>
+      <h3 data-i18n="trust3h"></h3>
+      <p data-i18n="trust3p"></p>
+    </div>
+  </div>
+</section>
+
+<section style="padding-top:0">
+  <h2 class="section-title" data-i18n-html="reviewsTitle"></h2>
+  <div class="testimonials">
+    <div class="testimonial">
+      <img src="https://images.ravpages.co.il/xsite_resources/user_content/cp_new_production/91/83/6b/f8/91836bf88cd439d3c9085be2a19572db/images/06b59c167c8a079951ea7ad069e59ba9.jpg?cc=8&convert=webp" alt="" loading="lazy">
+      <div class="testimonial-body">
+        <div class="testimonial-stars">★★★★★</div>
+        <p class="testimonial-text" data-i18n="review1"></p>
+      </div>
+    </div>
+    <div class="testimonial">
+      <img src="https://images.ravpages.co.il/xsite_resources/user_content/cp_new_production/91/83/6b/f8/91836bf88cd439d3c9085be2a19572db/images/05011ff0e9af037e7a9557b351aebe33.jpg?cc=8&convert=webp" alt="" loading="lazy">
+      <div class="testimonial-body">
+        <div class="testimonial-stars">★★★★★</div>
+        <p class="testimonial-text" data-i18n="review2"></p>
+      </div>
+    </div>
+    <div class="testimonial">
+      <img src="https://images.ravpages.co.il/xsite_resources/user_content/cp_new_production/91/83/6b/f8/91836bf88cd439d3c9085be2a19572db/images/c6c49311454e261570412dfbcda1bbc9.jpg?cc=8&convert=webp" alt="" loading="lazy">
+      <div class="testimonial-body">
+        <div class="testimonial-stars">★★★★★</div>
+        <p class="testimonial-text" data-i18n="review3"></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2 class="section-title" data-i18n-html="faqTitle"></h2>
+  <div class="faq-list" id="faqList"></div>
+</section>
+
+<section style="text-align:center;padding-top:0">
+  <button class="btn-submit" style="max-width:400px;margin:0 auto" type="button" onclick="scrollToForm()" data-i18n="ctaBottom"></button>
+</section>
+
+<div class="sticky-cta">
+  <div class="sticky-price">500₪</div>
+  <button class="btn-submit" type="button" onclick="scrollToForm()" data-i18n="ctaSticky"></button>
+</div>
+
+<div id="toast"></div>
+<div id="overlay"><div class="spinner"></div></div>
+
+<div id="successModal">
+  <div class="success-box">
+    <div class="icon">✅</div>
+    <h2 data-i18n="successTitle"></h2>
+    <p data-i18n-html="successMsg"></p>
+  </div>
+</div>
+
+<script>
+const ORDER_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbzd4FSy5fKZ5B3LF4ogDerw25K16oikiNv0j-4QPZGE4CzbvZFiw5vFIQpE09w486ldCA/exec";
+const ORDER_DUPLICATE_WINDOW_MS = 10 * 60 * 1000;
+const RECENT_ORDER_KEY = "madRecentOrderSubmission";
+const PLATINUM_PRICE = 500;
+let isSubmittingOrder = false;
+let currentLang = document.documentElement.lang || 'he';
+
+const I18N = {
+  he: {
+    pageTitle: "חבילת הפלטינום | MAD Parfumeur",
+    metaDesc: "5 בשמים תואמי מקור א.ד.פ 100ml רק ב-500₪ כולל משלוח. כל קונה נכנס להגרלה על iPhone 17 Pro Max!",
+    announce: '🎁 מבצע חסר תקדים! <strong>5 בשמים א.ד.פ 100ml</strong> רק ב-<strong>500₪</strong> כולל משלוח | כל קונה נכנס להגרלה על <strong>iPhone 17 Pro Max</strong>',
+    heroAlt: "5 בשמים edp 100ml — 500₪ כולל משלוח | MAD Parfumeur",
+    mobileH1: '5 בשמים א.ד.פ — רק <em>500₪</em> כולל משלוח!',
+    formTitle: "הזמינו עכשיו 👇",
+    formSub: "משלוח עד 5 ימי עסקים · תשלום לשליח במזומן",
+    labelName: "שם מלא", labelPhone: "טלפון נייד", labelCity: "עיר", labelAddress: "כתובת מלאה",
+    phName: "ישראל ישראלי", phPhone: "050-0000000", phCity: "תל אביב", phAddress: "רחוב, מספר בית, קומה",
+    checkbox: "אני מאשר/ת שאשלם לשליח במזומן בעת קבלת המשלוח",
+    submitBtn: "לחצו כאן להזמין — 500₪ במזומן 🛍️",
+    formNote: "🔒 הפרטים שלכם מאובטחים · ללא התחייבות",
+    badge1: "🎁 הגרלה iPhone 17 Pro Max", badge2: "🚚 משלוח חינם", badge3: "💵 תשלום במזומן",
+    mainH1: 'לא צריך לשלם יותר <em>5,000₪</em> — היום רק <em>500₪</em> ל-5 בשמים!',
+    benefits: [
+      "אותו ריח כמו הבושם המקורי 1:1 — בהתחייבות!",
+      "עמיד לאורך כל היום על העור (8-10 שעות)",
+      "סוחף מחמאות, פרגונים ומבטים",
+      "משאיר שובל ריח מדהים ומהפנט",
+      "5 בקבוקים של 100ml — ריכוז א.ד.פ"
+    ],
+    priceSave: "חוסכים 150₪!",
+    countdownLabel: "⏰ המבצע נגמר בעוד:",
+    cdDays: "ימים", cdHours: "שעות", cdMins: "דקות", cdSecs: "שניות",
+    trustTitle: 'למה <span>MAD Parfumeur</span>?',
+    trust1h: "משלוח מהיר", trust1p: "משלוח עד 5 ימי עסקים לכל מקום בארץ, ישירות עד הבית",
+    trust2h: "100,000+ לקוחות", trust2p: "עשרות אלפי לקוחות מרוצים בישראל ומאות אלפים בעולם",
+    trust3h: "25 שנות ניסיון", trust3p: "חברה ותיקה בעולם הבישום עם מוניטין מוכח",
+    reviewsTitle: 'מה <span>לקוחות</span> אומרים?',
+    review1: '"הריח מדהים! בדיוק כמו המקורי, כולם שואלים מאיפה קניתי"',
+    review2: '"הזמנתי את החבילה, הגיע תוך 4 ימים. ממליצה בחום!"',
+    review3: '"5 בשמים במחיר של אחד — עסקה מטורפת!"',
+    faqTitle: 'שאלות <span>נפוצות</span>',
+    faq: [
+      { q: 'כמה מ"ל הבשמים?', a: 'הבשמים הם 100 מ"ל כל אחד, ריכוז א.ד.פ (Eau de Parfum).' },
+      { q: 'עד כמה דומים לבושם המקורי?', a: 'הבשמים דומים 1:1 ללא שום הבדל בריח ובעמידות. ההבדל היחיד הוא המיתוג.' },
+      { q: 'כמה זמן משלוח?', a: 'עד 5-7 ימי עסקים לכל מקום בארץ, שליח עד הבית.' },
+      { q: 'איך משלמים?', a: 'תשלום לשליח במזומן בעת קבלת החבילה. ללא צורך בכרטיס אשראי.' },
+      { q: 'מה המחיר?', a: '5 בשמים ב-500₪ כולל משלוח עד הבית (במקום 650₪).' },
+      { q: 'האם מדובר באותו בקבוק?', a: 'לא. אותו מוצר מבחינת ריח ועמידות, רק בלי המיתוג היקר.' }
+    ],
+    ctaBottom: "הזמינו עכשיו — 500₪ בלבד 🛍️",
+    ctaSticky: "הזמינו עכשיו",
+    successTitle: "ההזמנה התקבלה!",
+    successMsg: "נציג יצור איתך קשר בהקדם לאישור ההזמנה.<br>תודה שבחרת ב-MAD Parfumeur!",
+    offer: "חבילת פלטינום — 5 בשמים א.ד.פ 100ml",
+    payment: "תשלום לשליח במזומן",
+    errName: "נא להזין שם", errPhone: "נא להזין מספר טלפון תקין",
+    errCity: "נא להזין עיר", errAddress: "נא להזין כתובת", errConfirm: "נא לאשר תשלום במזומן",
+    errSubmit: "שגיאה בשליחה, נסו שוב", errNetwork: "שגיאת רשת, נסו שוב"
+  },
+  ar: {
+    pageTitle: "باقة البلاتينيوم | MAD Parfumeur",
+    metaDesc: "5 عطور مطابقة للأصل EDP 100ml فقط 500₪ شامل الشحن. كل مشترٍ يدخل سحب iPhone 17 Pro Max!",
+    announce: '🎁 عرض استثنائي! <strong>5 عطور EDP 100ml</strong> فقط <strong>500₪</strong> شامل الشحن | كل مشترٍ يدخل سحب <strong>iPhone 17 Pro Max</strong>',
+    heroAlt: "5 عطور edp 100ml — 500₪ شامل الشحن | MAD Parfumeur",
+    mobileH1: '5 عطور EDP — فقط <em>500₪</em> شامل الشحن!',
+    formTitle: "اطلب الآن 👇",
+    formSub: "توصيل خلال 5 أيام عمل · الدفع نقداً للمندوب",
+    labelName: "الاسم الكامل", labelPhone: "رقم الجوال", labelCity: "المدينة", labelAddress: "العنوان الكامل",
+    phName: "محمد أحمد", phPhone: "050-0000000", phCity: "القدس", phAddress: "الشارع، رقم البناء، الطابق",
+    checkbox: "أؤكد أنني سأدفع نقداً للمندوب عند استلام الطلب",
+    submitBtn: "اضغط للطلب — 500₪ نقداً 🛍️",
+    formNote: "🔒 بياناتك آمنة · بدون التزام",
+    badge1: "🎁 سحب iPhone 17 Pro Max", badge2: "🚚 شحن مجاني", badge3: "💵 دفع نقدي",
+    mainH1: 'لا داعي لدفع <em>5,000₪</em> — اليوم فقط <em>500₪</em> لـ 5 عطور!',
+    benefits: [
+      "نفس رائحة العطر الأصلي 1:1 — مضمون!",
+      "ثبات طوال اليوم على البشرة (8-10 ساعات)",
+      "يجذب الإطراءات والإعجاب والنظرات",
+      "يترك أثراً عطراً مذهلاً وساحراً",
+      "5 زجاجات 100ml — تركيز EDP"
+    ],
+    priceSave: "وفّر 150₪!",
+    countdownLabel: "⏰ ينتهي العرض خلال:",
+    cdDays: "أيام", cdHours: "ساعات", cdMins: "دقائق", cdSecs: "ثوانٍ",
+    trustTitle: 'لماذا <span>MAD Parfumeur</span>؟',
+    trust1h: "توصيل سريع", trust1p: "توصيل خلال 5 أيام عمل لأي مكان في البلاد، مباشرة للبيت",
+    trust2h: "+100,000 عميل", trust2p: "عشرات آلاف العملاء الراضين في إسرائيل ومئات الآلاف حول العالم",
+    trust3h: "25 سنة خبرة", trust3p: "شركة رائدة في عالم العطور بسمعة مثبتة",
+    reviewsTitle: 'ماذا يقول <span>عملاؤنا</span>؟',
+    review1: '"الرائحة مذهلة! مطابقة للأصل تماماً، الجميع يسألون من أين اشتريت"',
+    review2: '"طلبت الباقة، وصلت خلال 4 أيام. أنصح بشدة!"',
+    review3: '"5 عطور بسعر واحد — صفقة لا تُفوّت!"',
+    faqTitle: 'أسئلة <span>شائعة</span>',
+    faq: [
+      { q: 'كم مل العطور؟', a: 'كل عطر 100 مل، تركيز EDP (Eau de Parfum).' },
+      { q: 'ما مدى التشابه مع العطر الأصلي؟', a: 'متطابق 1:1 في الرائحة والثبات. الفرق الوحيد هو العلامة التجارية.' },
+      { q: 'كم مدة التوصيل؟', a: 'حتى 5-7 أيام عمل لأي مكان، مندوب حتى الباب.' },
+      { q: 'كيف الدفع؟', a: 'الدفع نقداً للمندوب عند الاستلام. بدون بطاقة ائتمان.' },
+      { q: 'ما السعر؟', a: '5 عطور بـ 500₪ شامل الشحن (بدلاً من 650₪).' },
+      { q: 'هل نفس الزجاجة؟', a: 'لا. نفس المنتج من حيث الرائحة والثبات، بدون العلامة التجارية الباهظة.' }
+    ],
+    ctaBottom: "اطلب الآن — 500₪ فقط 🛍️",
+    ctaSticky: "اطلب الآن",
+    successTitle: "تم استلام طلبك!",
+    successMsg: "سيتواصل معك مندوبنا قريباً لتأكيد الطلب.<br>شكراً لاختيارك MAD Parfumeur!",
+    offer: "باقة البلاتينيوم — 5 عطور EDP 100ml",
+    payment: "دفع نقدي للمندوب",
+    errName: "يرجى إدخال الاسم", errPhone: "يرجى إدخال رقم هاتف صحيح",
+    errCity: "يرجى إدخال المدينة", errAddress: "يرجى إدخال العنوان", errConfirm: "يرجى تأكيد الدفع نقداً",
+    errSubmit: "خطأ في الإرسال، حاول مرة أخرى", errNetwork: "خطأ في الشبكة، حاول مرة أخرى"
+  }
+};
+
+function t(key) { return (I18N[currentLang] || I18N.he)[key]; }
+
+function applyI18n(lang) {
+  currentLang = lang;
+  document.documentElement.lang = lang;
+  document.documentElement.dataset.lang = lang;
+  sessionStorage.setItem('mad_lang', lang);
+  document.getElementById('langHe').classList.toggle('active', lang === 'he');
+  document.getElementById('langAr').classList.toggle('active', lang === 'ar');
+  document.title = t('pageTitle');
+  document.querySelector('meta[name="description"]').content = t('metaDesc');
+
+  document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t(el.dataset.i18n); });
+  document.querySelectorAll('[data-i18n-html]').forEach(el => { el.innerHTML = t(el.dataset.i18nHtml); });
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(el => { el.placeholder = t(el.dataset.i18nPlaceholder); });
+  document.querySelectorAll('[data-i18n-alt]').forEach(el => { el.alt = t(el.dataset.i18nAlt); });
+
+  document.getElementById('benefitsList').innerHTML = t('benefits').map(b => '<li>' + b + '</li>').join('');
+  document.getElementById('faqList').innerHTML = t('faq').map(item =>
+    '<div class="faq-item"><button class="faq-q" type="button" onclick="toggleFaq(this)">' + item.q +
+    '</button><div class="faq-a">' + item.a + '</div></div>'
+  ).join('');
+}
+
+function setLang(lang) { applyI18n(lang); }
+
+applyI18n(currentLang);
+
+/* Countdown — ends Sunday 23:59 */
+function getEndOfWeek() {
+  const now = new Date();
+  const day = now.getDay();
+  const daysUntilSunday = day === 0 ? 0 : 7 - day;
+  const end = new Date(now);
+  end.setDate(now.getDate() + daysUntilSunday);
+  end.setHours(23, 59, 59, 999);
+  return end;
+}
+function updateCountdown() {
+  const diff = getEndOfWeek() - Date.now();
+  if (diff <= 0) return;
+  const d = Math.floor(diff / 86400000);
+  const h = Math.floor((diff % 86400000) / 3600000);
+  const m = Math.floor((diff % 3600000) / 60000);
+  const s = Math.floor((diff % 60000) / 1000);
+  document.getElementById('cd-d').textContent = String(d).padStart(2,'0');
+  document.getElementById('cd-h').textContent = String(h).padStart(2,'0');
+  document.getElementById('cd-m').textContent = String(m).padStart(2,'0');
+  document.getElementById('cd-s').textContent = String(s).padStart(2,'0');
+}
+updateCountdown();
+setInterval(updateCountdown, 1000);
+
+/* FAQ */
+function toggleFaq(btn) {
+  const item = btn.parentElement;
+  const wasOpen = item.classList.contains('open');
+  document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+  if (!wasOpen) item.classList.add('open');
+}
+
+function scrollToForm() {
+  document.getElementById('orderForm').scrollIntoView({ behavior: 'smooth', block: 'center' });
+  document.getElementById('f_name').focus();
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.display = 'block';
+  setTimeout(() => t.style.display = 'none', 3000);
+}
+
+function trackingParam(key) {
+  return (new URLSearchParams(location.search).get(key) || '').trim();
+}
+
+function normalizePhone(value) {
+  const digits = String(value || '').replace(/\D/g, '');
+  if (/^05\d{8}$/.test(digits)) return digits;
+  if (/^5\d{8}$/.test(digits)) return '0' + digits;
+  if (/^9725\d{8}$/.test(digits) || /^9705\d{8}$/.test(digits)) return '0' + digits.slice(3);
+  if (/^009725\d{8}$/.test(digits) || /^009705\d{8}$/.test(digits)) return '0' + digits.slice(5);
+  return digits;
+}
+
+function isValidPhone(value) {
+  return /^05\d{8}$/.test(normalizePhone(value));
+}
+
+function buildOrderPayload(customer) {
+  const offer = t('offer');
+  const phone = normalizePhone(customer.phone);
+  const subtotal = PLATINUM_PRICE;
+  const fee = 0;
+  const total = PLATINUM_PRICE;
+  const orderId = 'MAD-' + Date.now() + '-' + Math.floor(10 + Math.random() * 90);
+  const items = [{
+    code: 'PLATINUM',
+    name: offer,
+    product_id: 'platinum-bundle',
+    link: location.href,
+    qty: 1,
+    unit_price: PLATINUM_PRICE,
+    line_total: PLATINUM_PRICE
+  }];
+  const rawLines = currentLang === 'he'
+    ? [
+        'שם - ' + customer.name,
+        'מספר פלאפון - ' + phone,
+        'עיר - ' + customer.city,
+        'כתובת - ' + customer.address,
+        'החבילה שהזמינו - ' + offer,
+        'מחיר מוצרים - ' + PLATINUM_PRICE + '₪',
+        'משלוח - חינם',
+        'סה"כ - ' + PLATINUM_PRICE + '₪',
+        'דרך התשלום - ' + t('payment'),
+        getUtmNotes(),
+        'קישור - ' + location.href
+      ]
+    : [
+        'الاسم: ' + customer.name,
+        'الهاتف: ' + phone,
+        'المدينة: ' + customer.city,
+        'العنوان: ' + customer.address,
+        'الطلب: ' + offer,
+        'سعر المنتجات: ' + PLATINUM_PRICE + '₪',
+        'التوصيل: مجاني',
+        'السعر النهائي: ' + PLATINUM_PRICE + '₪',
+        'طريقة الدفع: ' + t('payment'),
+        getUtmNotes(),
+        'الرابط: ' + location.href
+      ];
+
+  return {
+    action: 'saveOrder',
+    source: trackingParam('utm_source') || 'tiktok',
+    source_label: currentLang === 'he' ? 'טיקטוק' : 'تيك توك',
+    date: new Date().toISOString(),
+    orderId,
+    offer,
+    name: customer.name,
+    phone,
+    city: customer.city,
+    address: customer.address,
+    price: subtotal,
+    product_total: subtotal,
+    subtotal,
+    delivery_fee: fee,
+    delivery_fee_amount: fee,
+    delivery: 'FREE',
+    delivery_note: currentLang === 'he' ? 'משלוח חינם' : 'التوصيل مجاني',
+    total,
+    final_total: total,
+    grand_total: total,
+    status: 'NEW',
+    raw_request_text: rawLines.join('\n'),
+    source_lang: currentLang.toUpperCase(),
+    page_url: location.href,
+    page_title: document.title,
+    source_page: 'platinumnew-improved',
+    ttclid: trackingParam('ttclid'),
+    utm_source: trackingParam('utm_source'),
+    utm_campaign: trackingParam('utm_campaign'),
+    utm_medium: trackingParam('utm_medium'),
+    utm_id: trackingParam('utm_id'),
+    items
+  };
+}
+
+async function postOrderPayload(payload) {
+  await fetch(ORDER_WEBAPP_URL, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify(payload)
+  });
+}
+
+function simpleHash(text) {
+  let hash = 0;
+  for (let i = 0; i < text.length; i++) {
+    hash = ((hash << 5) - hash + text.charCodeAt(i)) | 0;
+  }
+  return Math.abs(hash).toString(36);
+}
+
+function orderFingerprint(payload) {
+  const itemText = (payload.items || []).map(item => [
+    item.product_id || item.code,
+    Number(item.qty || 0),
+    Number(item.unit_price || 0),
+    Number(item.line_total || 0)
+  ].join(':')).sort().join('|');
+  return 'mad-order-' + simpleHash([
+    normalizePhone(payload.phone),
+    String(payload.city || '').trim().toLowerCase(),
+    itemText,
+    Number(payload.subtotal || 0),
+    Number(payload.delivery_fee || 0),
+    Number(payload.final_total || payload.total || 0)
+  ].join('||'));
+}
+
+function readRecentOrder(fingerprint) {
+  try {
+    const record = JSON.parse(localStorage.getItem(RECENT_ORDER_KEY) || 'null');
+    if (!record || record.fingerprint !== fingerprint) return null;
+    if (Date.now() - Number(record.savedAt || 0) > ORDER_DUPLICATE_WINDOW_MS) return null;
+    return record;
+  } catch (e) { return null; }
+}
+
+function rememberRecentOrder(payload) {
+  try {
+    localStorage.setItem(RECENT_ORDER_KEY, JSON.stringify({
+      fingerprint: payload.idempotency_key,
+      orderId: payload.orderId,
+      savedAt: Date.now(),
+      total: payload.final_total || payload.total || payload.price
+    }));
+  } catch (e) {}
+}
+
+function forgetRecentOrder(fingerprint) {
+  try {
+    const record = JSON.parse(localStorage.getItem(RECENT_ORDER_KEY) || 'null');
+    if (record && record.fingerprint === fingerprint) localStorage.removeItem(RECENT_ORDER_KEY);
+  } catch (e) {}
+}
+
+function finishOrderSuccess(btn) {
+  if (typeof fbq !== 'undefined') fbq('track', 'Lead');
+  if (typeof ttq !== 'undefined') ttq.track('SubmitForm', { content_name: 'Platinum Bundle' });
+  document.getElementById('successModal').classList.add('show');
+  document.getElementById('f_name').value = '';
+  document.getElementById('f_phone').value = '';
+  document.getElementById('f_city').value = '';
+  document.getElementById('f_address').value = '';
+  document.getElementById('f_confirm').checked = false;
+  document.getElementById('overlay').classList.remove('show');
+  btn.disabled = false;
+  isSubmittingOrder = false;
+}
+
+async function submitOrder() {
+  if (isSubmittingOrder) return;
+
+  const name = document.getElementById('f_name').value.trim();
+  const phone = document.getElementById('f_phone').value.trim();
+  const city = document.getElementById('f_city').value.trim();
+  const address = document.getElementById('f_address').value.trim();
+  const confirmed = document.getElementById('f_confirm').checked;
+  const btn = document.getElementById('btnSubmit');
+
+  document.querySelectorAll('.field input').forEach(i => i.classList.remove('error'));
+
+  if (!name) { document.getElementById('f_name').classList.add('error'); return showToast(t('errName')); }
+  if (!isValidPhone(phone)) { document.getElementById('f_phone').classList.add('error'); return showToast(t('errPhone')); }
+  if (!city) { document.getElementById('f_city').classList.add('error'); return showToast(t('errCity')); }
+  if (!address) { document.getElementById('f_address').classList.add('error'); return showToast(t('errAddress')); }
+  if (!confirmed) return showToast(t('errConfirm'));
+
+  const customer = { name, phone, city, address };
+  const payload = buildOrderPayload(customer);
+  payload.idempotency_key = orderFingerprint(payload);
+  payload.duplicate_window_ms = ORDER_DUPLICATE_WINDOW_MS;
+
+  const recentOrder = readRecentOrder(payload.idempotency_key);
+  if (recentOrder) {
+    finishOrderSuccess(btn);
+    return;
+  }
+
+  isSubmittingOrder = true;
+  btn.disabled = true;
+  document.getElementById('overlay').classList.add('show');
+
+  try {
+    rememberRecentOrder(payload);
+    await postOrderPayload(payload);
+    finishOrderSuccess(btn);
+  } catch (e) {
+    forgetRecentOrder(payload.idempotency_key);
+    showToast(t('errNetwork'));
+    document.getElementById('overlay').classList.remove('show');
+    btn.disabled = false;
+    isSubmittingOrder = false;
+  }
+}
+
+function getUtmNotes() {
+  const parts = [];
+  ['utm_source','utm_medium','utm_campaign','utm_id','ttclid'].forEach(k => {
+    const v = trackingParam(k);
+    if (v) parts.push(k + '=' + v);
+  });
+  parts.push('lang=' + currentLang);
+  return parts.length ? 'UTM: ' + parts.join(' | ') : 'platinumnew-improved | lang=' + currentLang;
+}
+</script>
+</body>
+</html>
