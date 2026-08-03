@@ -846,12 +846,20 @@ function buildOrderPayload(customer) {
   };
 }
 
-async function postOrderPayload(payload) {
-  await fetch(ORDER_WEBAPP_URL, {
+function postOrderInBackground(payload) {
+  const body = JSON.stringify(payload);
+  fetch(ORDER_WEBAPP_URL, {
     method: 'POST',
     mode: 'no-cors',
+    keepalive: true,
     headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-    body: JSON.stringify(payload)
+    body
+  }).catch(function() {
+    try {
+      if (navigator.sendBeacon) {
+        navigator.sendBeacon(ORDER_WEBAPP_URL, new Blob([body], { type: 'text/plain;charset=utf-8' }));
+      }
+    } catch (e) {}
   });
 }
 
@@ -956,7 +964,7 @@ function finishOrderSuccess(btn, payload) {
   isSubmittingOrder = false;
 }
 
-async function submitOrder() {
+function submitOrder() {
   if (isSubmittingOrder) return;
 
   const name = document.getElementById('f_name').value.trim();
@@ -987,7 +995,6 @@ async function submitOrder() {
 
   isSubmittingOrder = true;
   btn.disabled = true;
-  document.getElementById('overlay').classList.add('show');
 
   trackPixel('InitiateCheckout', {
     content_type: 'product',
@@ -999,17 +1006,9 @@ async function submitOrder() {
     num_items: 1
   });
 
-  try {
-    rememberRecentOrder(payload);
-    await postOrderPayload(payload);
-    finishOrderSuccess(btn, payload);
-  } catch (e) {
-    forgetRecentOrder(payload.idempotency_key);
-    showToast(t('errNetwork'));
-    document.getElementById('overlay').classList.remove('show');
-    btn.disabled = false;
-    isSubmittingOrder = false;
-  }
+  rememberRecentOrder(payload);
+  finishOrderSuccess(btn, payload);
+  postOrderInBackground(payload);
 }
 
 function getUtmNotes() {
