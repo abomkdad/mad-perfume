@@ -33,6 +33,7 @@ button{touch-action:manipulation}
 .status{float:left;background:#fef3c7;color:#92400e;border-radius:99px;padding:4px 8px;font-size:12px}
 .toast{position:fixed;z-index:10000;bottom:86px;right:50%;transform:translateX(50%);background:#111827;color:#fff;border-radius:12px;padding:11px 16px;display:none;max-width:90%;text-align:center}
 .orderActions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:6px 0 10px}.orderActions button{height:46px;border-radius:12px;font-weight:900;border:0}.whatsappBtn{background:#16a34a;color:#fff}.pdfBtn{background:#111827;color:#fff}
+#cart-branch-container{position:relative}.branchMenu{position:absolute;z-index:30;top:100%;right:0;left:0;display:none;max-height:220px;overflow-y:auto;background:#fff;border:1px solid #d1d5db;border-radius:12px;box-shadow:0 10px 24px #0002}.branchMenu.open{display:block}.branchOption{display:block;width:100%;padding:12px;text-align:right;border:0;border-bottom:1px solid #f3f4f6;background:#fff;font-weight:700}.branchOption:last-child{border-bottom:0}.branchOption:active{background:#f3f4f6}
 </style>
 </head><body><div class="app">
 <header class="top"><div class="brand"><div class="logo">MAD <b>مخزن الوكلاء</b></div><div class="tools"><button class="iconBtn" onclick="openPrice()" id="priceBtn">🔒 الأسعار</button></div></div><div class="searchWrap"><input id="search" name="dealer_product_search" class="search" type="search" placeholder="ابحث بالاسم أو الكود" autocomplete="one-time-code" autocapitalize="off" spellcheck="false"></div></header>
@@ -46,52 +47,22 @@ button{touch-action:manipulation}
     type="text"
     id="cart-branch"
     class="field"
-    list="branch-options"
+    role="combobox"
+    aria-controls="branch-menu"
+    aria-expanded="false"
     placeholder="اختر فرعًا أو اكتب اسمًا يدويًا"
     autocomplete="off"
+    onfocus="showBranches()"
+    oninput="showBranches()"
     onchange="dealerChanged()"
   >
-  <datalist id="branch-options">
-    <option value="Afula"></option>
-    <option value="Albeer"></option>
-    <option value="Aldafa"></option>
-    <option value="Aldalye"></option>
-    <option value="Alnasera"></option>
-    <option value="Alquds"></option>
-    <option value="Baqa"></option>
-    <option value="Beer Sheva"></option>
-    <option value="Bet Hanena"></option>
-    <option value="Boq3ata"></option>
-    <option value="Dalya"></option>
-    <option value="Frades"></option>
-    <option value="Haifa"></option>
-    <option value="Haresh"></option>
-    <option value="Hazem"></option>
-    <option value="Hertslya"></option>
-    <option value="Kana"></option>
-    <option value="Khdera"></option>
-    <option value="Majdal"></option>
-    <option value="Maker"></option>
-    <option value="Manda"></option>
-    <option value="Qare3"></option>
-    <option value="Qasem"></option>
-    <option value="Rahat"></option>
-    <option value="Ramla"></option>
-    <option value="Skhnen"></option>
-    <option value="Tabarya"></option>
-    <option value="Taiba"></option>
-    <option value="Tamra"></option>
-    <option value="Tel Aviv"></option>
-    <option value="AKO"></option>
-    <option value="Wadi"></option>
-    <option value="Yafa"></option>
-    <option value="Yarka"></option>
-  </datalist>
+  <div id="branch-menu" class="branchMenu" role="listbox"></div>
 </div><input id="employeeName" class="field" placeholder="اسم الموظف"><input id="dealerPhone" class="field" type="tel" placeholder="رقم الهاتف"><textarea id="dealerNotes" class="field" placeholder="ملاحظات"></textarea><button id="sendBtn" class="primary" onclick="sendOrder()">إرسال الطلب إلى المخزن</button></section></div>
 <div id="confirmationModal" class="overlay" onclick="backdrop(event,this)"><section class="modal"><div class="handle"></div><button class="close" onclick="closeModal('confirmationModal')">×</button><h2>✅ تم تأكيد الطلب</h2><div id="confirmationText" class="total"></div><p>يمكنك الآن إرسال التأكيد عبر واتساب أو طباعة الطلب، وكلاهما اختياري.</p><div class="orderActions"><button type="button" class="whatsappBtn" onclick="shareOrderWhatsApp()">إرسال عبر واتساب</button><button type="button" class="pdfBtn" onclick="downloadOrderPdf()">طباعة / حفظ PDF</button></div><button type="button" class="primary" onclick="closeModal('confirmationModal');openOrders()">تم</button></section></div>
 <div id="ordersModal" class="overlay" onclick="backdrop(event,this)"><section class="modal"><div class="handle"></div><button class="close" onclick="closeModal('ordersModal')">×</button><h2>طلباتي</h2><div id="ordersList">جاري التحميل...</div></section></div><div id="toast" class="toast"></div>
 <script>
 var API='https://mad-perfume.vercel.app/api/inventory';
+var branchNames=["Afula","Albeer","Aldafa","Aldalye","Alnasera","Alquds","Baqa","Beer Sheva","Bet Hanena","Boq3ata","Dalya","Frades","Haifa","Haresh","Hazem","Hertslya","Kana","Khdera","Majdal","Maker","Manda","Qare3","Qasem","Rahat","Ramla","Skhnen","Tabarya","Taiba","Tamra","Tel Aviv","AKO","Wadi","Yafa","Yarka"];
 var products=[],filtered=[],cart=JSON.parse(localStorage.getItem('dealerCart')||'[]'),selected=null,priceUnlocked=false,priceToken='',activeCat='الكل',editingOrderId='',lastOrders=[],lastSubmittedOrder=null;
 var fallback='data:image/svg+xml;charset=UTF-8,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300"><rect width="100%" height="100%" fill="#f3f4f6"/><text x="50%" y="50%" text-anchor="middle" fill="#9ca3af" font-size="18">MAD</text></svg>');
 function api(params){return new Promise(function(resolve,reject){var cb='madCb'+Date.now()+Math.random().toString(16).slice(2),s=document.createElement('script'),timer;params.callback=cb;window[cb]=function(data){clearTimeout(timer);delete window[cb];s.remove();data&&data.ok?resolve(data):reject(new Error(data&&data.error||'فشل الاتصال'))};s.onerror=function(){clearTimeout(timer);delete window[cb];s.remove();reject(new Error('تعذر الاتصال بالنظام'))};s.src=API+'?'+Object.keys(params).map(function(k){return encodeURIComponent(k)+'='+encodeURIComponent(params[k])}).join('&');document.head.appendChild(s);timer=setTimeout(function(){s.onerror()},20000)})}
@@ -105,7 +76,7 @@ function openProduct(code){selected=products.find(function(p){return p.code===co
 function syncCart(){localStorage.setItem('dealerCart',JSON.stringify(cart));cartCount.textContent=cart.reduce(function(s,i){return s+i.quantity},0);cartTotal.textContent=priceUnlocked?'الإجمالي: '+money(cart.reduce(function(s,i){var p=products.find(function(x){return x.code===i.code});return s+i.quantity*Number(p&&p.price||0)},0)):'الأسعار مخفية'}
 function openCart(){if(!cart.length)return show('السلة فارغة');renderCart();cartModal.classList.add('open')}function renderCart(){cartItems.innerHTML=cart.map(function(i,n){return '<div class="cartItem"><span><b>'+esc(i.name)+'</b><br><small>'+esc(i.code)+'</small></span><input type="number" min="1" value="'+i.quantity+'" onchange="cart['+n+'].quantity=Math.max(1,parseInt(this.value)||1);syncCart();renderCart()"><button class="del" onclick="cart.splice('+n+',1);syncCart();renderCart()">×</button></div>'}).join('');syncCart()}
 function openPrice(){priceModal.classList.add('open');setTimeout(function(){document.getElementById('pricePassword').focus()},50)}function unlockPrices(){var v=document.getElementById('pricePassword').value;document.getElementById('priceError').textContent='';api({action:'verify',password:v}).then(function(r){if(!r.result.valid){document.getElementById('priceError').textContent='الرقم السري غير صحيح';return}priceUnlocked=true;priceToken=v;priceBtn.textContent='🔓 الأسعار';closeModal('priceModal');loadProducts()}).catch(function(e){document.getElementById('priceError').textContent=e.message})}
-function currentDealer(){return document.getElementById('cart-branch').value.trim()}function dealerChanged(){var dealer=currentDealer();if(dealer){localStorage.setItem('dealerBranch',dealer);openOrders()}}
+function currentDealer(){return document.getElementById('cart-branch').value.trim()}function hideBranches(){var menu=document.getElementById('branch-menu'),input=document.getElementById('cart-branch');menu.classList.remove('open');input.setAttribute('aria-expanded','false')}function showBranches(){var input=document.getElementById('cart-branch'),menu=document.getElementById('branch-menu'),q=input.value.trim().toLowerCase(),matches=branchNames.filter(function(b){return !q||b.toLowerCase().indexOf(q)>=0});menu.innerHTML=matches.map(function(b){return '<button type="button" class="branchOption" role="option" data-branch="'+esc(b)+'">'+esc(b)+'</button>'}).join('');menu.classList.toggle('open',matches.length>0);input.setAttribute('aria-expanded',matches.length>0?'true':'false')}function dealerChanged(){var dealer=currentDealer();if(dealer)localStorage.setItem('dealerBranch',dealer)}
 function orderReceiptData(){if(!lastSubmittedOrder){show('أكد الطلب أولاً');return null}return lastSubmittedOrder}
 function orderSummaryText(){var d=orderReceiptData();if(!d)return'';var lines=['✅ تأكيد طلب MAD','رقم الطلب: '+d.orderId,'الفرع: '+d.dealer];if(d.employee)lines.push('الموظف: '+d.employee);if(d.phone)lines.push('الهاتف: '+d.phone);lines.push('','المنتجات:');d.items.forEach(function(i){lines.push('• '+i.name+' ('+i.code+') × '+i.quantity)});if(priceUnlocked)lines.push('','الإجمالي: '+money(d.total));if(d.notes)lines.push('','ملاحظات: '+d.notes);return lines.join('\n')}
 function shareOrderWhatsApp(){var text=orderSummaryText();if(!text)return;window.open('https://wa.me/?text='+encodeURIComponent(text),'_blank','noopener')}
@@ -116,6 +87,7 @@ function renderOrders(list){lastOrders=list||[];ordersList.innerHTML=lastOrders.
 function openOrders(){var dealer=currentDealer()||localStorage.getItem('dealerBranch')||'';ordersModal.classList.add('open');ordersList.textContent=dealer?'جاري تحميل طلبات '+dealer+'...':'اختر اسم الفرع أولاً';if(!dealer)return;api({action:'branchOrders',dealer:dealer,password:priceUnlocked?priceToken:''}).then(function(r){renderOrders(r.orders||[])}).catch(function(){var ids=JSON.parse(localStorage.getItem('dealerOrderIds')||'[]');if(!ids.length)return renderOrders([]);api({action:'orders',ids:ids.join(','),password:priceUnlocked?priceToken:''}).then(function(r){renderOrders((r.orders||[]).filter(function(o){return o.dealerName===dealer}))}).catch(function(e){ordersList.textContent=e.message})})}
 function editOrder(n){var o=lastOrders[n];if(!o||!editableStatus(o.status))return show('لا يمكن تعديل طلب تم تجهيزه');editingOrderId=o.orderId;cart=o.items.map(function(i){return{code:i.code,name:i.name||i.code,quantity:Number(i.quantity)||1,price:i.price||0}});syncCart();closeModal('ordersModal');renderCart();sendBtn.textContent='حفظ تعديل الطلب '+o.orderId;cartModal.classList.add('open')}
 function loadBranches(){var saved=localStorage.getItem('dealerBranch');if(saved)document.getElementById('cart-branch').value=saved}
+document.getElementById('branch-menu').addEventListener('click',function(e){var b=e.target.closest('button[data-branch]');if(!b)return;document.getElementById('cart-branch').value=b.getAttribute('data-branch');hideBranches();dealerChanged()});document.addEventListener('click',function(e){if(!e.target.closest('#cart-branch-container'))hideBranches()});
 var productSearch=document.getElementById('search');productSearch.value='';productSearch.addEventListener('input',applyFilter);setTimeout(function(){if(/@/.test(productSearch.value)){productSearch.value='';applyFilter()}},300);document.getElementById('grid').addEventListener('click',function(e){var b=e.target.closest('button[data-action="quantity"]');if(!b)return;e.preventDefault();e.stopPropagation();openProduct(b.getAttribute('data-code'))});loadBranches();loadProducts();syncCart();
 </script>
 </body></html>
