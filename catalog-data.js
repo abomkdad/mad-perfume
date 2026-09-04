@@ -1,0 +1,4197 @@
+window.MAD_STATIC_CATALOG=[
+  {
+    "perfume_code": "A118 D117 B110",
+    "price": "300 ILS",
+    "category": "الحملات والعروض الرجاليه",
+    "image": "https://madperfume.ps/upload/07-2025/product/10.jpg",
+    "link": "https://madperfume.ps/?app=product.show.650",
+    "real_title": "A118 D117 B110",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "ELEGANCE - T106 W183 T103",
+    "price": "300 ILS",
+    "category": "الحملات والعروض الرجاليه",
+    "image": "https://madperfume.ps/upload/05-2024/product/66409f3244d70.jpg",
+    "link": "https://madperfume.ps/?app=product.show.317",
+    "real_title": "ELEGANCE - T106 W183 T103",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "G104 Y102 c120",
+    "price": "300 ILS",
+    "category": "الحملات والعروض الرجاليه",
+    "image": "https://madperfume.ps/upload/11-2024/product/673120813ea14.jpg",
+    "link": "https://madperfume.ps/?app=product.show.517",
+    "real_title": "G104 Y102 c120",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "G111 G110 W201",
+    "price": "300 ILS",
+    "category": "الحملات والعروض الرجاليه",
+    "image": "https://madperfume.ps/upload/08-2024/product/33.jpg",
+    "link": "https://madperfume.ps/?app=product.show.431",
+    "real_title": "💸 السعر: 350 شيكل فقط لثلاث عطور!",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "L102 P101 J105",
+    "price": "300 ILS",
+    "category": "الحملات والعروض الرجاليه",
+    "image": "https://madperfume.ps/upload/07-2025/product/3.jpg",
+    "link": "https://madperfume.ps/?app=product.show.643",
+    "real_title": "L102 P101 J105",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "L102 Q112 T109",
+    "price": "300 ILS",
+    "category": "الحملات والعروض الرجاليه",
+    "image": "https://madperfume.ps/upload/01-2025/product/678f713d6c992.jpg",
+    "link": "https://madperfume.ps/?app=product.show.528",
+    "real_title": "L102 Q112 T109",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "L102 Q114 Q121",
+    "price": "300 ILS",
+    "category": "الحملات والعروض الرجاليه",
+    "image": "https://madperfume.ps/upload/07-2025/product/7.jpg",
+    "link": "https://madperfume.ps/?app=product.show.647",
+    "real_title": "L102 Q114 Q121",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "LEGEND - B107 W158 A104",
+    "price": "300 ILS",
+    "category": "الحملات والعروض الرجاليه",
+    "image": "https://madperfume.ps/upload/05-2024/product/664089d9d5c26.jpg",
+    "link": "https://madperfume.ps/?app=product.show.320",
+    "real_title": "💰 السعر: فقط 350 شيكل شامل التوصيل",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "P101 W183 Q114",
+    "price": "300 ILS",
+    "category": "الحملات والعروض الرجاليه",
+    "image": "https://madperfume.ps/upload/07-2025/product/8.jpg",
+    "link": "https://madperfume.ps/?app=product.show.648",
+    "real_title": "P101 W183 Q114",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Q112 Q113 J105",
+    "price": "300 ILS",
+    "category": "الحملات والعروض الرجاليه",
+    "image": "https://madperfume.ps/upload/01-2025/product/678f6e6a35bdc.jpg",
+    "link": "https://madperfume.ps/?app=product.show.530",
+    "real_title": "Q112 Q113 J105",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Q113 W183 A114",
+    "price": "300 ILS",
+    "category": "الحملات والعروض الرجاليه",
+    "image": "https://madperfume.ps/upload/07-2025/product/6.jpg",
+    "link": "https://madperfume.ps/?app=product.show.646",
+    "real_title": "Q113 W183 A114",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Q116 W183 Q113",
+    "price": "300 ILS",
+    "category": "الحملات والعروض الرجاليه",
+    "image": "https://madperfume.ps/upload/07-2025/product/5.jpg",
+    "link": "https://madperfume.ps/?app=product.show.645",
+    "real_title": "Q116 W183 Q113",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Q118 L102 Q120",
+    "price": "300 ILS",
+    "category": "الحملات والعروض الرجاليه",
+    "image": "https://madperfume.ps/upload/07-2025/product/L102.png",
+    "link": "https://madperfume.ps/?app=product.show.542",
+    "real_title": "350 شيكل فقط – شامل التوصيل 🚚",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Q121 W183 Q114",
+    "price": "300 ILS",
+    "category": "الحملات والعروض الرجاليه",
+    "image": "https://madperfume.ps/upload/07-2025/product/9.jpg",
+    "link": "https://madperfume.ps/?app=product.show.649",
+    "real_title": "Q121 W183 Q114",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "ROYAL - W191 T104 W150",
+    "price": "300 ILS",
+    "category": "الحملات والعروض الرجاليه",
+    "image": "https://madperfume.ps/upload/05-2024/product/6640a39de887d.jpg",
+    "link": "https://madperfume.ps/?app=product.show.316",
+    "real_title": "ROYAL - W191 T104 W150",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "T109 L102 W150",
+    "price": "300 ILS",
+    "category": "الحملات والعروض الرجاليه",
+    "image": "https://madperfume.ps/upload/07-2024/product/66a21c482023b.jpg",
+    "link": "https://madperfume.ps/?app=product.show.411",
+    "real_title": "T109 L102 W150",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "T109 W183 A114",
+    "price": "300 ILS",
+    "category": "الحملات والعروض الرجاليه",
+    "image": "https://madperfume.ps/upload/07-2025/product/1.jpg",
+    "link": "https://madperfume.ps/?app=product.show.533",
+    "real_title": "الاكثر طلبا في الموقع",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Vagas",
+    "price": "300 ILS",
+    "category": "الحملات والعروض الرجاليه",
+    "image": "https://madperfume.ps/upload/09-2025/product/12.png",
+    "link": "https://madperfume.ps/?app=product.show.678",
+    "real_title": "Vagas",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "VAGAS - T107 W183 T109",
+    "price": "300 ILS",
+    "category": "الحملات والعروض الرجاليه",
+    "image": "https://madperfume.ps/upload/05-2024/product/6640787594711.jpg",
+    "link": "https://madperfume.ps/?app=product.show.296",
+    "real_title": "عطور اصليه وليست زيوت",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "W183 P101 J101",
+    "price": "300 ILS",
+    "category": "الحملات والعروض الرجاليه",
+    "image": "https://madperfume.ps/upload/07-2025/product/2.jpg",
+    "link": "https://madperfume.ps/?app=product.show.526",
+    "real_title": "الاكثر طلباً",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "W183 P101 Q116",
+    "price": "300 ILS",
+    "category": "الحملات والعروض الرجاليه",
+    "image": "https://madperfume.ps/upload/07-2025/product/4.jpg",
+    "link": "https://madperfume.ps/?app=product.show.644",
+    "real_title": "W183 P101 Q116",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "W183 W191 T105 T109 Q113",
+    "price": "500 ILS",
+    "category": "الحملات والعروض الرجاليه",
+    "image": "https://madperfume.ps/upload/08-2024/product/66c3331250f0e.jpg",
+    "link": "https://madperfume.ps/?app=product.show.487",
+    "real_title": "tom ford neroli -sauvage -creed -fucking fabulous -tomas 4",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "مجموعة Havana الجديده",
+    "price": "300 ILS",
+    "category": "الحملات والعروض الرجاليه",
+    "image": "https://madperfume.ps/upload/09-2025/product/68b65f7315bee.jpg",
+    "link": "https://madperfume.ps/?app=product.show.657",
+    "real_title": "مجموعة Havana الجديده",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "مجموعة infinite الرجاليه",
+    "price": "500 ILS",
+    "category": "الحملات والعروض الرجاليه",
+    "image": "https://madperfume.ps/upload/09-2025/product/68c69d335eb19.jpg",
+    "link": "https://madperfume.ps/?app=product.show.660",
+    "real_title": "مجموعة infinite الرجاليه",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "مجموعة MARVEL الجديده",
+    "price": "500 ILS",
+    "category": "الحملات والعروض الرجاليه",
+    "image": "https://madperfume.ps/upload/09-2025/product/6598a2a9dd8749c282fa68eb5c3da06f.jpg",
+    "link": "https://madperfume.ps/?app=product.show.654",
+    "real_title": "مجموعة MARVEL الجديده",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "مجموعة Miami الجديده",
+    "price": "500 ILS",
+    "category": "الحملات والعروض الرجاليه",
+    "image": "https://madperfume.ps/upload/09-2025/product/c6f65a29bf184ed69d71a433d5fdb3f5.jpg",
+    "link": "https://madperfume.ps/?app=product.show.655",
+    "real_title": "مجموعة Miami الجديده",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "مجموعة الأحلام",
+    "price": "500 ILS",
+    "category": "الحملات والعروض الرجاليه",
+    "image": "https://madperfume.ps/upload/03-2026/product/IMG_0209.jpeg",
+    "link": "https://madperfume.ps/?app=product.show.724",
+    "real_title": "L103 A115 T109 X102 W183",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "مجموعة اوسكار- W150 W183 W191 T103 W120",
+    "price": "500 ILS",
+    "category": "الحملات والعروض الرجاليه",
+    "image": "https://madperfume.ps/upload/02-2024/product/65bc0ae196d68.jpg",
+    "link": "https://madperfume.ps/?app=product.show.308",
+    "real_title": "مجموعة اوسكار- W150 W183 W191 T103 W120",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "A118 C120 D117",
+    "price": "300 ILS",
+    "category": "الحملات والعروض النسائيه",
+    "image": "https://madperfume.ps/upload/07-2025/product/11.jpg",
+    "link": "https://madperfume.ps/?app=product.show.651",
+    "real_title": "A118 C120 D117",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "G109 G104 G110",
+    "price": "300 ILS",
+    "category": "الحملات والعروض النسائيه",
+    "image": "https://madperfume.ps/upload/07-2025/product/12.jpg",
+    "link": "https://madperfume.ps/?app=product.show.652",
+    "real_title": "G109 G104 G110",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "noy",
+    "price": "300 ILS",
+    "category": "الحملات والعروض النسائيه",
+    "image": "https://madperfume.ps/upload/09-2025/product/68d51d9224af1.jpg",
+    "link": "https://madperfume.ps/?app=product.show.677",
+    "real_title": "noy",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "p107 y102 G104 C120 B103",
+    "price": "500 ILS",
+    "category": "الحملات والعروض النسائيه",
+    "image": "https://madperfume.ps/upload/11-2024/product/67347e0479157.jpg",
+    "link": "https://madperfume.ps/?app=product.show.520",
+    "real_title": "هذه افضل مجموعه نسائيه",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "SOFIA",
+    "price": "200 ILS",
+    "category": "الحملات والعروض النسائيه",
+    "image": "https://madperfume.ps/upload/09-2025/product/68d51c0198401.jpg",
+    "link": "https://madperfume.ps/?app=product.show.676",
+    "real_title": "SOFIA",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "مجموعة Berlin الجديده",
+    "price": "300 ILS",
+    "category": "الحملات والعروض النسائيه",
+    "image": "https://madperfume.ps/upload/09-2025/product/e0bfd5efebe54f4eba6c3e4a79022553.jpg",
+    "link": "https://madperfume.ps/?app=product.show.656",
+    "real_title": "مجموعة Berlin الجديده",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "مجموعه amoria",
+    "price": "500 ILS",
+    "category": "الحملات والعروض النسائيه",
+    "image": "https://madperfume.ps/upload/09-2025/product/68c7c7b261d82.png",
+    "link": "https://madperfume.ps/?app=product.show.661",
+    "real_title": "مجموعه amoria",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "مجموعه norma النسائيه",
+    "price": "500 ILS",
+    "category": "الحملات والعروض النسائيه",
+    "image": "https://madperfume.ps/upload/09-2025/product/68c69c6e8e3ed.jpg",
+    "link": "https://madperfume.ps/?app=product.show.658",
+    "real_title": "مجموعه norma النسائيه",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "AUTUMN WIND",
+    "price": "80 ILS",
+    "category": "شموع",
+    "image": "https://madperfume.ps/upload/04-2025/product/AUTUMN.jpg",
+    "link": "https://madperfume.ps/?app=product.show.611",
+    "real_title": "جديد",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "COFFEE BISQUIT",
+    "price": "80 ILS",
+    "category": "شموع",
+    "image": "https://madperfume.ps/upload/04-2025/product/mad-coffee-biscuit-200-gr-mum-cam-bard-cae02a.webp",
+    "link": "https://madperfume.ps/?app=product.show.605",
+    "real_title": "جديد",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "COOFFE",
+    "price": "100 ILS",
+    "category": "شموع",
+    "image": "https://madperfume.ps/upload/09-2023/product/mad-coffee-biscuit-200-gr-mum-b6d1-0.jpg",
+    "link": "https://madperfume.ps/?app=product.show.177",
+    "real_title": "COOFFE",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "halloween",
+    "price": "100 ILS",
+    "category": "شموع",
+    "image": "https://madperfume.ps/upload/09-2023/product/mad-halloween-200-gr-mum--b7a-48.jpg",
+    "link": "https://madperfume.ps/?app=product.show.236",
+    "real_title": "halloween",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Prevail",
+    "price": "100 ILS",
+    "category": "شموع",
+    "image": "https://madperfume.ps/upload/09-2023/product/mad-prevail-200-gr-mum--6-b2f8.jpg",
+    "link": "https://madperfume.ps/?app=product.show.239",
+    "real_title": "Prevail",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "SPICY APPLE",
+    "price": "80 ILS",
+    "category": "شموع",
+    "image": "https://madperfume.ps/upload/04-2025/product/mad-spicy-apple-200-gr-mum200-gr-3e3-ad.webp",
+    "link": "https://madperfume.ps/?app=product.show.612",
+    "real_title": "SPICY APPLE",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "SPRING",
+    "price": "80 ILS",
+    "category": "شموع",
+    "image": "https://madperfume.ps/upload/04-2025/product/spring.jpg",
+    "link": "https://madperfume.ps/?app=product.show.610",
+    "real_title": "SPRING",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "SUMMER TIME",
+    "price": "80 ILS",
+    "category": "شموع",
+    "image": "https://madperfume.ps/upload/04-2025/product/Summer-Time1-r.jpg",
+    "link": "https://madperfume.ps/?app=product.show.607",
+    "real_title": "جديد",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "SUN SHINE",
+    "price": "80 ILS",
+    "category": "شموع",
+    "image": "https://madperfume.ps/upload/04-2025/product/mad-sunshine-200-gr-mum-cam-bardak200--b7c-19.webp",
+    "link": "https://madperfume.ps/?app=product.show.608",
+    "real_title": "جديد",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "VANILLA CARNIVAL",
+    "price": "80 ILS",
+    "category": "شموع",
+    "image": "https://madperfume.ps/upload/04-2025/product/mad-vanilla-carnaval-200-gr-mum200-gr--fdbb-.webp",
+    "link": "https://madperfume.ps/?app=product.show.613",
+    "real_title": "VANILLA CARNIVAL",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Wellbeing Dreamy",
+    "price": "80 ILS",
+    "category": "شموع",
+    "image": "https://madperfume.ps/upload/01-2026/product/c9af599b-3ca1-40af-bbb0-2f0a5635f332_size640_cropCenter.jpg",
+    "link": "https://madperfume.ps/?app=product.show.715",
+    "real_title": "Mad Wellbeing Dreamy 200 Gr Mum",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Wellbeing Harmonious",
+    "price": "80 ILS",
+    "category": "شموع",
+    "image": "https://madperfume.ps/upload/01-2026/product/40235a8b-aa59-48da-818b-a39253a755ec_size640_cropCenter.jpg",
+    "link": "https://madperfume.ps/?app=product.show.714",
+    "real_title": "Mad Wellbeing Harmonious 200 Gr Mum",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Wellbeing Loving",
+    "price": "80 ILS",
+    "category": "شموع",
+    "image": "https://madperfume.ps/upload/01-2026/product/cebf4646-eb62-4dc2-a8ba-5f6fe68b474a_size640_cropCenter.jpg",
+    "link": "https://madperfume.ps/?app=product.show.713",
+    "real_title": "Mad Wellbeing Loving 200 Gr Mum",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Wellbeing Refreshed",
+    "price": "80 ILS",
+    "category": "شموع",
+    "image": "https://madperfume.ps/upload/01-2026/product/4bfeecc9-4bfb-49d7-9361-cde855d7ebe1_size640_cropCenter.jpg",
+    "link": "https://madperfume.ps/?app=product.show.712",
+    "real_title": "Mad Wellbeing Refreshed 200 Gr Mum",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "WINTER TALE",
+    "price": "80 ILS",
+    "category": "شموع",
+    "image": "https://madperfume.ps/upload/04-2025/product/Winter-Tale1-r-1.jpg",
+    "link": "https://madperfume.ps/?app=product.show.609",
+    "real_title": "جديد",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Wizard",
+    "price": "100 ILS",
+    "category": "شموع",
+    "image": "https://madperfume.ps/upload/09-2023/product/mad-wizard-200-gr-mum--332160.jpg",
+    "link": "https://madperfume.ps/?app=product.show.238",
+    "real_title": "Wizard",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "WIZARD",
+    "price": "80 ILS",
+    "category": "شموع",
+    "image": "https://madperfume.ps/upload/04-2025/product/mad-wizard-200-gr-mum-cam-bardak200-gr-b-48e1.webp",
+    "link": "https://madperfume.ps/?app=product.show.606",
+    "real_title": "WIZARD",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Sify Soap Mad Ice 250ml",
+    "price": "20 ILS",
+    "category": "صابون",
+    "image": "https://madperfume.ps/upload/10-2024/product/670f81e8d16d4.jpg",
+    "link": "https://madperfume.ps/?app=product.show.506",
+    "real_title": "Sify Soap Mad Ice 250ml",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "SIVI SABUN MAD AMBER250ml",
+    "price": "20 ILS",
+    "category": "صابون",
+    "image": "https://madperfume.ps/upload/10-2024/product/670f822727631.jpg",
+    "link": "https://madperfume.ps/?app=product.show.508",
+    "real_title": "SIVI SABUN MAD AMBER250ml",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "SIVI SABUN MAD JAPANESE CHERRY BLOSSOM 250ml",
+    "price": "20 ILS",
+    "category": "صابون",
+    "image": "https://madperfume.ps/upload/10-2024/product/670f820a596b0.jpg",
+    "link": "https://madperfume.ps/?app=product.show.507",
+    "real_title": "SIVI SABUN MAD JAPANESE CHERRY BLOSSOM 250ml",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "SIVI SABUN MAD VELVET LAVENDER 250ml",
+    "price": "20 ILS",
+    "category": "صابون",
+    "image": "https://madperfume.ps/upload/10-2024/product/670f81a251619.jpg",
+    "link": "https://madperfume.ps/?app=product.show.505",
+    "real_title": "SIVI SABUN MAD VELVET LAVENDER 250ml",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "-Mad-Bosphorus-120-ML",
+    "price": "45 ILS",
+    "category": "عطور البيت والمكتب",
+    "image": "https://madperfume.ps/upload/09-2023/product/mad-bosphorus-120-ml-ortam-kokusu120-m-433ad1.jpg",
+    "link": "https://madperfume.ps/?app=product.show.233",
+    "real_title": "-Mad-Bosphorus-120-ML",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "-Mad-Dream-Buquet-120-ML",
+    "price": "45 ILS",
+    "category": "عطور البيت والمكتب",
+    "image": "https://madperfume.ps/upload/09-2023/product/mad-dream-bouquet-120ml-ortam-kokusu--96658.jpg",
+    "link": "https://madperfume.ps/?app=product.show.226",
+    "real_title": "-Mad-Dream-Buquet-120-ML",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "-Mad-Limpio-120-ML",
+    "price": "45 ILS",
+    "category": "عطور البيت والمكتب",
+    "image": "https://madperfume.ps/upload/09-2023/product/mad-limpio-120-ml-ortam-kokusu120-ml-a646-b.jpeg",
+    "link": "https://madperfume.ps/?app=product.show.229",
+    "real_title": "-Mad-Limpio-120-ML",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "COFFE BISCUIT",
+    "price": "65 ILS",
+    "category": "عطور البيت والمكتب",
+    "image": "https://madperfume.ps/upload/04-2025/product/mad-coffee-biscuit-160-ml-ortam-kokusu-48ce-9.webp",
+    "link": "https://madperfume.ps/?app=product.show.578",
+    "real_title": "جديد",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Fruit Fusion",
+    "price": "45 ILS",
+    "category": "عطور البيت والمكتب",
+    "image": "https://madperfume.ps/upload/01-2026/product/e828201a-ddda-420e-828b-1c8cd0c3129b_size640_cropCenter.jpg",
+    "link": "https://madperfume.ps/?app=product.show.716",
+    "real_title": "Mad Fruit Fusion 120 ml Ortam Kokusu",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Good-Night-Kiss-120-ML-",
+    "price": "45 ILS",
+    "category": "عطور البيت والمكتب",
+    "image": "https://madperfume.ps/upload/09-2023/product/mad-good-night-kiss-120-ml-ortam-kokus-0fe9c0.jpeg",
+    "link": "https://madperfume.ps/?app=product.show.235",
+    "real_title": "Good-Night-Kiss-120-ML-",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "love me",
+    "price": "65 ILS",
+    "category": "عطور البيت والمكتب",
+    "image": "https://madperfume.ps/upload/04-2025/product/love me.jpg",
+    "link": "https://madperfume.ps/?app=product.show.577",
+    "real_title": "جديد",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Mad Bubble&amp;Sandal",
+    "price": "30 ILS",
+    "category": "عطور البيت والمكتب",
+    "image": "https://madperfume.ps/upload/04-2025/product/mad-bubblesandal-50-ml-ortam-kokusu50m-03d-4e.webp",
+    "link": "https://madperfume.ps/?app=product.show.595",
+    "real_title": "50 ml",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Mad Caramel",
+    "price": "30 ILS",
+    "category": "عطور البيت والمكتب",
+    "image": "https://madperfume.ps/upload/04-2025/product/mad-caramel-50-ml-ortam-kokusu50ml-0ce0ea.webp",
+    "link": "https://madperfume.ps/?app=product.show.594",
+    "real_title": "50 ml",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Mad Coconut",
+    "price": "30 ILS",
+    "category": "عطور البيت والمكتب",
+    "image": "https://madperfume.ps/upload/04-2025/product/mad-coconut-50-ml-ortam-kokusu50ml-f-dd29.webp",
+    "link": "https://madperfume.ps/?app=product.show.593",
+    "real_title": "50 ml",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Mad Exotic Oud",
+    "price": "30 ILS",
+    "category": "عطور البيت والمكتب",
+    "image": "https://madperfume.ps/upload/04-2025/product/mad-exotic-oud-50-ml-ortam-kokusu50ml-951ba8.webp",
+    "link": "https://madperfume.ps/?app=product.show.592",
+    "real_title": "50 ml",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Mad Kiwi",
+    "price": "30 ILS",
+    "category": "عطور البيت والمكتب",
+    "image": "https://madperfume.ps/upload/04-2025/product/mad-kiwi-50-ml-ortam-kokusu50ml-5db-9b.webp",
+    "link": "https://madperfume.ps/?app=product.show.590",
+    "real_title": "50 ml",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Mad Osmanthus",
+    "price": "30 ILS",
+    "category": "عطور البيت والمكتب",
+    "image": "https://madperfume.ps/upload/04-2025/product/mad-osmanthus-50-ml-ortam-kokusu50ml-29700c.webp",
+    "link": "https://madperfume.ps/?app=product.show.589",
+    "real_title": "50 ml",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Mad Pure Shine",
+    "price": "30 ILS",
+    "category": "عطور البيت والمكتب",
+    "image": "https://madperfume.ps/upload/04-2025/product/mad-pure-shine-50-ml-ortam-kokusu50ml-46-40d.webp",
+    "link": "https://madperfume.ps/?app=product.show.588",
+    "real_title": "50 ml",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Mad Red Moon",
+    "price": "30 ILS",
+    "category": "عطور البيت والمكتب",
+    "image": "https://madperfume.ps/upload/04-2025/product/mad-red-moon-50-ml-ortam-kokusu50ml-9-bc5d.webp",
+    "link": "https://madperfume.ps/?app=product.show.587",
+    "real_title": "50 ml",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Mad Rose&amp;Coffee",
+    "price": "30 ILS",
+    "category": "عطور البيت والمكتب",
+    "image": "https://madperfume.ps/upload/04-2025/product/mad-rosecoffee-50-ml-ortam-kokusu50ml-8-5d3e.webp",
+    "link": "https://madperfume.ps/?app=product.show.586",
+    "real_title": "50 ml",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Mad Spicy Apple",
+    "price": "65 ILS",
+    "category": "عطور البيت والمكتب",
+    "image": "https://madperfume.ps/upload/04-2025/product/mad-spicy-apple-160-ml-ortam-kokusu160--84bb-.webp",
+    "link": "https://madperfume.ps/?app=product.show.582",
+    "real_title": "جديد",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Mad Vanilla",
+    "price": "30 ILS",
+    "category": "عطور البيت والمكتب",
+    "image": "https://madperfume.ps/upload/04-2025/product/mad-vanilla-effect-50-ml-ortam-kokusu5-0dd-0f.webp",
+    "link": "https://madperfume.ps/?app=product.show.585",
+    "real_title": "50 ml",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Mad Wellbeing Dreamy",
+    "price": "145 ILS",
+    "category": "عطور البيت والمكتب",
+    "image": "https://madperfume.ps/upload/01-2026/product/17f91ac8-a8b7-4d91-ad51-927c8e1d48ac_size640_cropCenter.jpg",
+    "link": "https://madperfume.ps/?app=product.show.708",
+    "real_title": "Mad Wellbeing Dreamy – معطر جو (Reed Diffuser) 190 مل",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Mad Wellbeing Harmonious",
+    "price": "145 ILS",
+    "category": "عطور البيت والمكتب",
+    "image": "https://madperfume.ps/upload/01-2026/product/dd98770e-f116-45df-9cf7-0999359a2571_size640_cropCenter.jpg",
+    "link": "https://madperfume.ps/?app=product.show.709",
+    "real_title": "Mad Wellbeing Harmonious – معطر جو (Reed Diffuser) 190 مل",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Mad Wellbeing Loving",
+    "price": "145 ILS",
+    "category": "عطور البيت والمكتب",
+    "image": "https://madperfume.ps/upload/01-2026/product/0aeb36de-ffb5-4e87-a6b3-f992412ef15d_size640_cropCenter.jpg",
+    "link": "https://madperfume.ps/?app=product.show.707",
+    "real_title": "Mad Wellbeing Loving – معطر جو (Reed Diffuser) 190 مل",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Mad-Mona-Rosa-120-ML",
+    "price": "45 ILS",
+    "category": "عطور البيت والمكتب",
+    "image": "https://madperfume.ps/upload/09-2023/product/mad-mona-rosa-120ml-ortam-kokusu-8b-475.jpg",
+    "link": "https://madperfume.ps/?app=product.show.222",
+    "real_title": "Mad-Mona-Rosa-120-ML",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "PREVIL 160ML",
+    "price": "65 ILS",
+    "category": "عطور البيت والمكتب",
+    "image": "https://madperfume.ps/upload/04-2025/product/mad-prevail-160-ml-ortam-kokusu160-ml-7f3-86.webp",
+    "link": "https://madperfume.ps/?app=product.show.581",
+    "real_title": "جديد",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Reed Diffuser",
+    "price": "145 ILS",
+    "category": "عطور البيت والمكتب",
+    "image": "https://madperfume.ps/upload/01-2026/product/6979032762788.jpg",
+    "link": "https://madperfume.ps/?app=product.show.710",
+    "real_title": "Mad Wellbeing Refreshed 190 مل – معطر جو (Reed Diffuser)",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "ROUGH NIGHT 160 ML",
+    "price": "65 ILS",
+    "category": "عطور البيت والمكتب",
+    "image": "https://madperfume.ps/upload/04-2025/product/67f24d1e80af3.webp",
+    "link": "https://madperfume.ps/?app=product.show.579",
+    "real_title": "جديد",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "SUN SHINE",
+    "price": "65 ILS",
+    "category": "عطور البيت والمكتب",
+    "image": "https://madperfume.ps/upload/04-2025/product/mad-sunshine-160-ml-ortam-kokusu160-ml-baa3-d.webp",
+    "link": "https://madperfume.ps/?app=product.show.584",
+    "real_title": "جديد",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "turkish bath",
+    "price": "45 ILS",
+    "category": "عطور البيت والمكتب",
+    "image": "https://madperfume.ps/upload/09-2023/product/mad-turkish-bath-120-ml-ortam-kokusu12-2da8a8.jpg",
+    "link": "https://madperfume.ps/?app=product.show.234",
+    "real_title": "turkish bath",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "VANILLA CARNAVAL",
+    "price": "65 ILS",
+    "category": "عطور البيت والمكتب",
+    "image": "https://madperfume.ps/upload/04-2025/product/mad-vanilla-carnaval-160-ml-ortam-koku-b3-e07.webp",
+    "link": "https://madperfume.ps/?app=product.show.583",
+    "real_title": "جديد",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "wizard",
+    "price": "65 ILS",
+    "category": "عطور البيت والمكتب",
+    "image": "https://madperfume.ps/upload/04-2025/product/67f24c8dd8b74.jpg",
+    "link": "https://madperfume.ps/?app=product.show.576",
+    "real_title": "جديد",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "A118",
+    "price": "50 ILS",
+    "category": "عطور الجسم",
+    "image": "https://madperfume.ps/upload/01-2026/product/38184a38-6413-47b1-8475-768931fff82b_size640_cropCenter.jpg",
+    "link": "https://madperfume.ps/?app=product.show.695",
+    "real_title": "Mad A.118 – Floral Scent بخاخ عطر للجسم (Body Mist) – 200 مل",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "B103",
+    "price": "50 ILS",
+    "category": "عطور الجسم",
+    "image": "https://madperfume.ps/upload/01-2026/product/0bd0c7d9-ef7f-4dbf-a1fe-f36afd6f0b00_size640_cropCenter.jpg",
+    "link": "https://madperfume.ps/?app=product.show.701",
+    "real_title": "Mad B.103 – Fruity Scent بخاخ عطر للجسم (Body Mist) – 200 مل",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "G103",
+    "price": "50 ILS",
+    "category": "عطور الجسم",
+    "image": "https://madperfume.ps/upload/01-2026/product/e58ccb69-12d8-467f-bf89-2bba33fe9e11_size640_cropCenter.jpg",
+    "link": "https://madperfume.ps/?app=product.show.706",
+    "real_title": "Mad G103 – Oriental Scent بخاخ عطر للجسم (Body Mist) – 200 مل",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Golden Vanilla",
+    "price": "60 ILS",
+    "category": "عطور الجسم",
+    "image": "https://madperfume.ps/upload/01-2026/product/4adc2e02-5a8c-41d1-a9eb-eb595424ec3b_size640_cropCenter.jpg",
+    "link": "https://madperfume.ps/?app=product.show.718",
+    "real_title": "Mad Golden Vanilla 250 ml Body Mist",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "H103",
+    "price": "50 ILS",
+    "category": "عطور الجسم",
+    "image": "https://madperfume.ps/upload/01-2026/product/75766d0d-ddab-4d41-b6dd-d7c8b1f5f5a5_size640_cropCenter.jpg",
+    "link": "https://madperfume.ps/?app=product.show.705",
+    "real_title": "Mad H.103 – Oriental Scent بخاخ عطر للجسم (Body Mist) – 200 مل",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "H105",
+    "price": "50 ILS",
+    "category": "عطور الجسم",
+    "image": "https://madperfume.ps/upload/01-2026/product/3cba76cf-28ff-4295-8942-8b44c0f0797a_size640_cropCenter.jpg",
+    "link": "https://madperfume.ps/?app=product.show.702",
+    "real_title": "Mad H.105 – Oriental Scent بخاخ عطر للجسم (Body Mist) – 200 مل",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "L101",
+    "price": "50 ILS",
+    "category": "عطور الجسم",
+    "image": "https://madperfume.ps/upload/01-2026/product/d0d263e8-c76f-40fa-b88a-bde960a3c416_size640_cropCenter.jpg",
+    "link": "https://madperfume.ps/?app=product.show.694",
+    "real_title": "Mad L101 – Floral Scent بخاخ عطر للجسم (Body Mist) – 200 مل",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Pink Coconut",
+    "price": "60 ILS",
+    "category": "عطور الجسم",
+    "image": "https://madperfume.ps/upload/01-2026/product/4d55a8f2-7a6e-4dd0-9808-997964a0cb0c_size640_cropCenter.jpg",
+    "link": "https://madperfume.ps/?app=product.show.719",
+    "real_title": "Mad Pink Coconut 250 ml Body Mist",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "V109",
+    "price": "50 ILS",
+    "category": "عطور الجسم",
+    "image": "https://madperfume.ps/upload/01-2026/product/7afe3763-900d-41bb-af4a-973ba6628a32_size640_cropCenter.jpg",
+    "link": "https://madperfume.ps/?app=product.show.700",
+    "real_title": "Mad V.109 – Gourmand Scent بخاخ عطر للجسم (Body Mist) – 200 مل",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "V112",
+    "price": "50 ILS",
+    "category": "عطور الجسم",
+    "image": "https://madperfume.ps/upload/01-2026/product/3c4aa9ac-ae11-4b15-91b6-5d400404b0b9_size640_cropCenter.jpg",
+    "link": "https://madperfume.ps/?app=product.show.699",
+    "real_title": "Mad V.112 – Oriental Scent بخاخ عطر للجسم (Body Mist) – 200 مل",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "W201",
+    "price": "50 ILS",
+    "category": "عطور الجسم",
+    "image": "https://madperfume.ps/upload/01-2026/product/f34e4bb8-b279-4edc-a70b-f6a899aa4682_size640_cropCenter.jpg",
+    "link": "https://madperfume.ps/?app=product.show.703",
+    "real_title": "Mad W.201 – Oriental Scent بخاخ عطر للجسم (Body Mist) – 200 مل",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "W213",
+    "price": "50 ILS",
+    "category": "عطور الجسم",
+    "image": "https://madperfume.ps/upload/01-2026/product/eef08009-97f6-4a7a-8b40-4b1275410473_size640_cropCenter.jpg",
+    "link": "https://madperfume.ps/?app=product.show.697",
+    "real_title": "Mad W.213 – Oriental Scent بخاخ عطر للجسم (Body Mist) – 200 مل",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Y101",
+    "price": "50 ILS",
+    "category": "عطور الجسم",
+    "image": "https://madperfume.ps/upload/01-2026/product/3f15a958-3195-49de-b392-80fc18b4fe59_size640_cropCenter.jpg",
+    "link": "https://madperfume.ps/?app=product.show.704",
+    "real_title": "Mad Y.101 – Floral Scent بخاخ عطر للجسم (Body Mist) – 200 مل",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Y102",
+    "price": "50 ILS",
+    "category": "عطور الجسم",
+    "image": "https://madperfume.ps/upload/01-2026/product/edf47198-11a7-48a9-9b47-fa0a0f7efb44_size640_cropCenter.jpg",
+    "link": "https://madperfume.ps/?app=product.show.698",
+    "real_title": "Mad Y.102 – Oriental Scent بخاخ عطر للجسم (Body Mist) – 200 مل",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Z101",
+    "price": "50 ILS",
+    "category": "عطور الجسم",
+    "image": "https://madperfume.ps/upload/01-2026/product/d7377816-d005-4e83-b3ae-efb82b225af9_size640_cropCenter.jpg",
+    "link": "https://madperfume.ps/?app=product.show.696",
+    "real_title": "Mad Z.101 – Oriental Scent بخاخ عطر للجسم (Body Mist) – 200 مل",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "ماد تشارم 250 مل معطر للجسم",
+    "price": "60 ILS",
+    "category": "عطور الجسم",
+    "image": "https://madperfume.ps/upload/09-2024/product/66e6a6e97dc76.png",
+    "link": "https://madperfume.ps/?app=product.show.500",
+    "real_title": "ماد تشارم 250 مل معطر للجسم",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "ماد صن كيس 250 مل معطر للجسم",
+    "price": "60 ILS",
+    "category": "عطور الجسم",
+    "image": "https://madperfume.ps/upload/09-2024/product/66e6a734aa10a.png",
+    "link": "https://madperfume.ps/?app=product.show.501",
+    "real_title": "ماد صن كيس 250 مل معطر للجسم",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "ماد فانيلا سكاي 250 مل معطر للجسم",
+    "price": "60 ILS",
+    "category": "عطور الجسم",
+    "image": "https://madperfume.ps/upload/09-2024/product/66e6a550c2789.png",
+    "link": "https://madperfume.ps/?app=product.show.498",
+    "real_title": "ماد فانيلا سكاي 250 مل معطر للجسم",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "ماد كوكونت شاين 250 مل معطر للجسم",
+    "price": "60 ILS",
+    "category": "عطور الجسم",
+    "image": "https://madperfume.ps/upload/09-2024/product/66e69606eed0a.png",
+    "link": "https://madperfume.ps/?app=product.show.494",
+    "real_title": "ماد كوكونت شاين 250 مل معطر للجسم",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "ماد كوكونت شاين 250 مل معطر للجسم",
+    "price": "60 ILS",
+    "category": "عطور الجسم",
+    "image": "https://madperfume.ps/upload/09-2024/product/66e6a5ca2b4f3.png",
+    "link": "https://madperfume.ps/?app=product.show.499",
+    "real_title": "ماد كوكونت شاين 250 مل معطر للجسم",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "معطر الجسم ماد داي دريم 250 مل",
+    "price": "60 ILS",
+    "category": "عطور الجسم",
+    "image": "https://madperfume.ps/upload/09-2024/product/66e6a3ce0b411.png",
+    "link": "https://madperfume.ps/?app=product.show.496",
+    "real_title": "معطر الجسم ماد داي دريم 250 مل",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "معطر الجسم ماد سي ميست 250 مل",
+    "price": "60 ILS",
+    "category": "عطور الجسم",
+    "image": "https://madperfume.ps/upload/09-2024/product/66e6a5029fc32.png",
+    "link": "https://madperfume.ps/?app=product.show.497",
+    "real_title": "معطر الجسم ماد سي ميست 250 مل",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "معطر الجسم ماد ميستيك سمر 250 مل",
+    "price": "60 ILS",
+    "category": "عطور الجسم",
+    "image": "https://madperfume.ps/upload/09-2024/product/66e6a2a94e5d1.png",
+    "link": "https://madperfume.ps/?app=product.show.495",
+    "real_title": "معطر الجسم ماد ميستيك سمر 250 مل",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "A102",
+    "price": "100 ILS",
+    "category": "عطور الرجال",
+    "image": "https://madperfume.ps/upload/01-2026/product/697ceeb8c4a63.png",
+    "link": "https://madperfume.ps/?app=product.show.68",
+    "real_title": "Acqua di Giò by Giorgio Armani",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "A104",
+    "price": "100 ILS",
+    "category": "عطور الرجال",
+    "image": "https://madperfume.ps/upload/02-2026/product/697e7bb32c7a0.png",
+    "link": "https://madperfume.ps/?app=product.show.69",
+    "real_title": "Acqua di Giò Absolu by Giorgio Armani",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "A105",
+    "price": "100 ILS",
+    "category": "عطور الرجال",
+    "image": "https://madperfume.ps/upload/01-2026/product/697d03a4c50fd.png",
+    "link": "https://madperfume.ps/?app=product.show.568",
+    "real_title": "Wanted من Azzaro",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "A113",
+    "price": "100 ILS",
+    "category": "عطور الرجال",
+    "image": "https://madperfume.ps/upload/01-2026/product/697ca72ac7ef3.png",
+    "link": "https://madperfume.ps/?app=product.show.70",
+    "real_title": "Armani Code - Giorgio Armani",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "A114",
+    "price": "100 ILS",
+    "category": "عطور الرجال",
+    "image": "https://madperfume.ps/upload/01-2026/product/697ba9e5cfa2b.png",
+    "link": "https://madperfume.ps/?app=product.show.71",
+    "real_title": "Stronger With You",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "A115",
+    "price": "100 ILS",
+    "category": "عطور الرجال",
+    "image": "https://madperfume.ps/upload/01-2026/product/697ba8b2467f8.png",
+    "link": "https://madperfume.ps/?app=product.show.63",
+    "real_title": "Emporio Armani – Stronger With You Intensely",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "A115 GOLD",
+    "price": "120 ILS",
+    "category": "عطور الرجال",
+    "image": "https://madperfume.ps/upload/03-2026/product/IMG_0551.jpeg",
+    "link": "https://madperfume.ps/?app=product.show.673",
+    "real_title": "A115 GOLD",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "B101",
+    "price": "100 ILS",
+    "category": "عطور الرجال",
+    "image": "https://madperfume.ps/upload/03-2026/product/AFA85D59-7252-4B53-9DDA-2922830165A7.png",
+    "link": "https://madperfume.ps/?app=product.show.64",
+    "real_title": "Black Afgano by Nasomatto",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "B102",
+    "price": "100 ILS",
+    "category": "عطور الرجال",
+    "image": "https://madperfume.ps/upload/03-2026/product/2454B0BC-18AD-49A2-8AD9-55F94496553F.png",
+    "link": "https://madperfume.ps/?app=product.show.65",
+    "real_title": "Bvlgari Man Wood Essence - Bvlgari",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "B103",
+    "price": "100 ILS",
+    "category": "عطور الرجال",
+    "image": "https://madperfume.ps/upload/01-2026/product/697d079291ba1.png",
+    "link": "https://madperfume.ps/?app=product.show.66",
+    "real_title": "Hero - Burberry",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "B106",
+    "price": "100 ILS",
+    "category": "عطور الرجال",
+    "image": "https://madperfume.ps/upload/01-2026/product/697e3fdd36c72.png",
+    "link": "https://madperfume.ps/?app=product.show.60",
+    "real_title": "Burberry Men - Burberry",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "B107",
+    "price": "100 ILS",
+    "category": "عطور الرجال",
+    "image": "https://madperfume.ps/upload/03-2026/product/6875B924-7ABE-41C1-AA78-0E2E7407675E.png",
+    "link": "https://madperfume.ps/?app=product.show.61",
+    "real_title": "Bvlgari Man In Black - Bvlgari",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "B108",
+    "price": "100 ILS",
+    "category": "عطور الرجال",
+    "image": "https://madperfume.ps/upload/03-2026/product/D4057BB8-D151-4B10-983E-20B51A67A4F7.png",
+    "link": "https://madperfume.ps/?app=product.show.17",
+    "real_title": "Bvlgari Man Terrae Essence - Bvlgari",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "C101",
+    "price": "100 ILS",
+    "category": "عطور الرجال",
+    "image": "https://madperfume.ps/upload/03-2026/product/ABEAC5AE-D57C-44CE-A5C8-6711E666620E.png",
+    "link": "https://madperfume.ps/?app=product.show.62",
+    "real_title": "C101",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "C108",
+    "price": "100 ILS",
+    "category": "عطور الرجال",
+    "image": "https://madperfume.ps/upload/01-2026/product/697beab71a19a.png",
+    "link": "https://madperfume.ps/?app=product.show.57",
+    "real_title": "Bad Boy - Carolina Herrera",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "C109",
+    "price": "100 ILS",
+    "category": "عطور الرجال",
+    "image": "https://madperfume.ps/upload/03-2026/product/FF975633-DA99-4877-A122-FB490905CD2A.png",
+    "link": "https://madperfume.ps/?app=product.show.58",
+    "real_title": "212 Heroes - Carolina Herrera",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "C114",
+    "price": "100 ILS",
+    "category": "عطور الرجال",
+    "image": "https://madperfume.ps/upload/01-2026/product/697d044fdcb3d.png",
+    "link": "https://madperfume.ps/?app=product.show.603",
+    "real_title": "Euphoria Men – Calvin Klein",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "D102",
+    "price": "100 ILS",
+    "category": "عطور الرجال",
+    "image": "https://madperfume.ps/upload/03-2026/product/AE86DC26-7382-4446-B6DF-8BF17B5B87B8.png",
+    "link": "https://madperfume.ps/?app=product.show.553",
+    "real_title": "Green Irish Tweed من Creed",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "D103",
+    "price": "100 ILS",
+    "category": "عطور الرجال",
+    "image": "https://madperfume.ps/upload/03-2026/product/09CB8564-54F6-47AB-B789-726726BCF976.png",
+    "link": "https://madperfume.ps/?app=product.show.439",
+    "real_title": "K by Dolce & Gabbana Eau de Parfum",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "D110",
+    "price": "100 ILS",
+    "category": "عطور الرجال",
+    "image": "https://madperfume.ps/upload/03-2026/product/CF33FC02-F76B-4B28-89E3-5F9C122B73DC.png",
+    "link": "https://madperfume.ps/?app=product.show.638",
+    "real_title": "Dior Homme Parfum",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "E104",
+    "price": "100 ILS",
+    "category": "عطور الرجال",
+    "image": "https://madperfume.ps/upload/03-2026/product/61BFA1AC-EF08-4842-979A-806CB249AE37.png",
+    "link": "https://madperfume.ps/?app=product.show.56",
+    "real_title": "Emporio Armani He - Giorgio Armani",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "F101",
+    "price": "100 ILS",
+    "category": "عطور الرجال",
+    "image": "https://madperfume.ps/upload/01-2026/product/697cae1f89405.png",
+    "link": "https://madperfume.ps/?app=product.show.55",
+    "real_title": "Fahrenheit Le Parfum by Dior",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "G101",
+    "price": "100 ILS",
+    "category": "عطور الرجال",
+    "image": "https://madperfume.ps/upload/03-2026/product/8F705A86-A14D-4B1D-BEC7-5D52A767B1C1.png",
+    "link": "https://madperfume.ps/?app=product.show.54",
+    "real_title": "Pi - Givenchy",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "G103",
+    "price": "150 ILS",
+    "category": "عطور الرجال",
+    "image": "https://madperfume.ps/upload/06-2025/product/9.png",
+    "link": "https://madperfume.ps/?app=product.show.426",
+    "real_title": "Intense Oud by Gucci",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "GOLD W123",
+    "price": "120 ILS",
+    "category": "عطور الرجال",
+    "image": "https://madperfume.ps/upload/03-2026/product/IMG_0543.jpeg",
+    "link": "https://madperfume.ps/?app=product.show.663",
+    "real_title": "GOLD W123",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "H102",
+    "price": "100 ILS",
+    "category": "عطور الرجال",
+    "image": "https://madperfume.ps/upload/03-2026/product/7548A855-9ABC-49FA-BF59-A4B2189848FE.png",
+    "link": "https://madperfume.ps/?app=product.show.604",
+    "real_title": "H102",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "H106",
+    "price": "100 ILS",
+    "category": "عطور الرجال",
+    "image": "https://madperfume.ps/upload/01-2026/product/697e7b09e0fbd.png",
+    "link": "https://madperfume.ps/?app=product.show.14",
+    "real_title": "Hugo Energise - Hugo Boss",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "I101",
+    "price": "100 ILS",
+    "category": "عطور الرجال",
+    "image": "https://madperfume.ps/upload/01-2026/product/697caf93cf568.png",
+    "link": "https://madperfume.ps/?app=product.show.2",
+    "real_title": "Invictus Intense by Paco Rabanne",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "I102",
+    "price": "100 ILS",
+    "category": "عطور الرجال",
+    "image": "https://madperfume.ps/upload/03-2026/product/BEB1AAB4-30D1-4853-89CE-488B1ABE221C.png",
+    "link": "https://madperfume.ps/?app=product.show.51",
+    "real_title": "L'Eau d'Issey Pour Homme - Issey Miyake",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "I104",
+    "price": "100 ILS",
+    "category": "عطور الرجال",
+    "image": "https://madperfume.ps/upload/01-2026/product/697d01387acf8.png",
+    "link": "https://madperfume.ps/?app=product.show.52",
+    "real_title": "Invictus Aqua – Paco Rabanne",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "J101",
+    "price": "100 ILS",
+    "category": "عطور الرجال",
+    "image": "https://madperfume.ps/upload/03-2026/product/IMG_0416.jpeg",
+    "link": "https://madperfume.ps/?app=product.show.53",
+    "real_title": "Scandal Pour Homme – جان بول غوتييه",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "J101 GOLD",
+    "price": "120 ILS",
+    "category": "عطور الرجال",
+    "image": "https://madperfume.ps/upload/03-2026/product/IMG_0550.jpeg",
+    "link": "https://madperfume.ps/?app=product.show.674",
+    "real_title": "J101 GOLD",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "J102",
+    "price": "100 ILS",
+    "category": "عطور الرجال",
+    "image": "https://madperfume.ps/upload/01-2026/product/697cf06370378.png",
+    "link": "https://madperfume.ps/?app=product.show.47",
+    "real_title": "Le Male - Jean Paul Gaultier",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "J104",
+    "price": "100 ILS",
+    "category": "عطور الرجال",
+    "image": "https://madperfume.ps/upload/01-2026/product/697e400797790.png",
+    "link": "https://madperfume.ps/?app=product.show.48",
+    "real_title": "Jil Sander Sun Men Fresh - Jil Sander",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "J105",
+    "price": "100 ILS",
+    "category": "عطور الرجال",
+    "image": "https://madperfume.ps/upload/03-2026/product/IMG_0464.jpeg",
+    "link": "https://madperfume.ps/?app=product.show.285",
+    "real_title": "Le Male Elixir by Jean Paul Gaultier",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "J105 GOLD",
+    "price": "120 ILS",
+    "category": "عطور الرجال",
+    "image": "https://madperfume.ps/upload/03-2026/product/IMG_0545.jpeg",
+    "link": "https://madperfume.ps/?app=product.show.675",
+    "real_title": "J105 GOLD",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "J107",
+    "price": "100 ILS",
+    "category": "عطور الرجال",
+    "image": "https://madperfume.ps/upload/01-2026/product/697e4234bf725.png",
+    "link": "https://madperfume.ps/?app=product.show.437",
+    "real_title": "Le Beau Paradise Garden by Jean Paul Gaultier",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "j108",
+    "price": "100 ILS",
+    "category": "عطور الرجال",
+    "image": "https://madperfume.ps/upload/01-2026/product/697cf48604391.png",
+    "link": "https://madperfume.ps/?app=product.show.664",
+    "real_title": "Le Male Elixir Absolu Jean Paul Gaultier",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "J109",
+    "price": "100 ILS",
+    "category": "عطور الرجال",
+    "image": "https://madperfume.ps/upload/03-2026/product/C211DAB8-A2F9-43D1-9F32-1D026D6F11FF.png",
+    "link": "https://madperfume.ps/?app=product.show.438",
+    "real_title": "Ultra Male by Jean Paul Gaultier",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "J110",
+    "price": "100 ILS",
+    "category": "عطور الرجال",
+    "image": "https://madperfume.ps/upload/01-2026/product/697e37087f43a.png",
+    "link": "https://madperfume.ps/?app=product.show.688",
+    "real_title": "JEAN PAUL GAULTIER",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "K101",
+    "price": "100 ILS",
+    "category": "عطور الرجال",
+    "image": "https://madperfume.ps/upload/01-2026/product/697e45b084008.png",
+    "link": "https://madperfume.ps/?app=product.show.49",
+    "real_title": "Kenzo Pour Homme - Kenzo",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "L101",
+    "price": "100 ILS",
+    "category": "عطور الرجال",
+    "image": "https://madperfume.ps/upload/03-2026/product/ACC6BE66-19FD-450F-B147-5400A12EA589.png",
+    "link": "https://madperfume.ps/?app=product.show.50",
+    "real_title": "Santal 33 by Le Labo unisex",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "L102",
+    "price": "100 ILS",
+    "category": "عطور الرجال",
+    "image": "https://madperfume.ps/upload/03-2026/product/5FF7725D-93F0-4A19-9059-C6437272A86B.png",
+    "link": "https://madperfume.ps/?app=product.show.286",
+    "real_title": "Ombre Nomade - Louis Vuitton",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "L103",
+    "price": "100 ILS",
+    "category": "عطور الرجال",
+    "image": "https://madperfume.ps/upload/03-2026/product/7F104E4A-ADCD-4D93-A9FA-7F28B73856E6.png",
+    "link": "https://madperfume.ps/?app=product.show.287",
+    "real_title": "Imagination - Louis Vuitton",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "L103 EXTRA",
+    "price": "150 ILS",
+    "category": "عطور الرجال",
+    "image": "https://madperfume.ps/upload/06-2025/product/5.png",
+    "link": "https://madperfume.ps/?app=product.show.511",
+    "real_title": "Imagination - Louis Vuitton",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "L105",
+    "price": "100 ILS",
+    "category": "عطور الرجال",
+    "image": "https://madperfume.ps/upload/01-2026/product/697c9f3854612.png",
+    "link": "https://madperfume.ps/?app=product.show.42",
+    "real_title": "Lacoste Style In Play - Lacoste",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "L106",
+    "price": "100 ILS",
+    "category": "عطور الرجال",
+    "image": "https://madperfume.ps/upload/01-2026/product/697e45d38e373.png",
+    "link": "https://madperfume.ps/?app=product.show.43",
+    "real_title": "Lacoste Essential Collector Edition - Lacoste",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "P101",
+    "price": "100 ILS",
+    "category": "عطور الرجال",
+    "image": "https://madperfume.ps/upload/03-2026/product/F7548EA0-E6D5-4D27-84B1-4890CFF5141E.png",
+    "link": "https://madperfume.ps/?app=product.show.44",
+    "real_title": "Pegasus by Parfums de Marly",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "P102",
+    "price": "100 ILS",
+    "category": "عطور الرجال",
+    "image": "https://madperfume.ps/upload/01-2026/product/697ba79ab897c.png",
+    "link": "https://madperfume.ps/?app=product.show.45",
+    "real_title": "1 Million Lucky by Paco Rabanne",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "P103",
+    "price": "100 ILS",
+    "category": "عطور الرجال",
+    "image": "https://madperfume.ps/upload/01-2026/product/697e5a0c036fb.png",
+    "link": "https://madperfume.ps/?app=product.show.38",
+    "real_title": "Phantom by Paco Rabanne",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "P104",
+    "price": "100 ILS",
+    "category": "عطور الرجال",
+    "image": "https://madperfume.ps/upload/03-2026/product/AEBAB920-9411-4DB5-9778-6F006EA37EF3.png",
+    "link": "https://madperfume.ps/?app=product.show.15",
+    "real_title": "The Blazing Mr. Sam by Penhaligon's",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "P105",
+    "price": "100 ILS",
+    "category": "عطور الرجال",
+    "image": "https://madperfume.ps/upload/03-2026/product/3B9E57FA-186A-4896-9AF5-48B7FF305F87.png",
+    "link": "https://madperfume.ps/?app=product.show.448",
+    "real_title": "Luna Rossa Sport - Prada",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "P109",
+    "price": "100 ILS",
+    "category": "عطور الرجال",
+    "image": "https://madperfume.ps/upload/01-2026/product/697ca06c622c7.png",
+    "link": "https://madperfume.ps/?app=product.show.39",
+    "real_title": "Polo Blue Eau de Parfum - Ralph Lauren",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Q105",
+    "price": "100 ILS",
+    "category": "عطور الرجال",
+    "image": "https://madperfume.ps/upload/03-2026/product/49B1C376-EC77-42DB-B9E2-7BE7E9D2437F.png",
+    "link": "https://madperfume.ps/?app=product.show.41",
+    "real_title": "Black Orchid by Tom Ford",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Q106",
+    "price": "100 ILS",
+    "category": "عطور الرجال",
+    "image": "https://madperfume.ps/upload/03-2026/product/81556DC1-0562-48A4-AACE-946F9EE2B4B0.jpeg",
+    "link": "https://madperfume.ps/?app=product.show.34",
+    "real_title": "Vanille Fatale by Tom Ford",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Q107",
+    "price": "100 ILS",
+    "category": "عطور الرجال",
+    "image": "https://madperfume.ps/upload/03-2026/product/IMG_0358.jpeg",
+    "link": "https://madperfume.ps/?app=product.show.35",
+    "real_title": "Fucking Fabulous – Tom Ford",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Q108",
+    "price": "100 ILS",
+    "category": "عطور الرجال",
+    "image": "https://madperfume.ps/upload/01-2026/product/697e426e6fb64.png",
+    "link": "https://madperfume.ps/?app=product.show.36",
+    "real_title": "Noir Extreme by Tom Ford",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Q109",
+    "price": "100 ILS",
+    "category": "عطور الرجال",
+    "image": "https://madperfume.ps/upload/03-2026/product/IMG_0361.jpeg",
+    "link": "https://madperfume.ps/?app=product.show.3",
+    "real_title": "Tobacco Vanille by Tom Ford",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Q110",
+    "price": "100 ILS",
+    "category": "عطور الرجال",
+    "image": "https://madperfume.ps/upload/03-2026/product/IMG_0356.jpeg",
+    "link": "https://madperfume.ps/?app=product.show.436",
+    "real_title": "Ombré Leather (2018) - Tom Ford",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Q112",
+    "price": "100 ILS",
+    "category": "عطور الرجال",
+    "image": "https://madperfume.ps/upload/03-2026/product/40A7B633-073C-4A2A-B422-66EA69FC36A1.png",
+    "link": "https://madperfume.ps/?app=product.show.440",
+    "real_title": "Crush On Me - Unique'e Luxury",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Q113",
+    "price": "100 ILS",
+    "category": "عطور الرجال",
+    "image": "https://madperfume.ps/upload/03-2026/product/E33DCE31-91BC-441B-93BA-B0AADB736BDA.png",
+    "link": "https://madperfume.ps/?app=product.show.435",
+    "real_title": "Neroli Portofino - Tom Ford",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Q114",
+    "price": "100 ILS",
+    "category": "عطور الرجال",
+    "image": "https://madperfume.ps/upload/03-2026/product/F523BD9A-35F0-4CBA-8E0E-C226F226BF01.png",
+    "link": "https://madperfume.ps/?app=product.show.451",
+    "real_title": "Atlantide - Tiziana Terenzi",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Q115",
+    "price": "100 ILS",
+    "category": "عطور الرجال",
+    "image": "https://madperfume.ps/upload/03-2026/product/6306CD66-600F-4605-AA38-439A32DC5E74.png",
+    "link": "https://madperfume.ps/?app=product.show.441",
+    "real_title": "Nº4 Neon by Thomas Kosmala",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Q116",
+    "price": "100 ILS",
+    "category": "عطور الرجال",
+    "image": "https://madperfume.ps/upload/03-2026/product/99722CE0-623E-4802-85AB-346AB739D6F9.png",
+    "link": "https://madperfume.ps/?app=product.show.442",
+    "real_title": "Another 13 by Le Labo",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Q117",
+    "price": "100 ILS",
+    "category": "عطور الرجال",
+    "image": "https://madperfume.ps/upload/03-2026/product/E42C67C8-3FBD-42D8-8D5E-C03C21C881C2.png",
+    "link": "https://madperfume.ps/?app=product.show.449",
+    "real_title": "Oud Ispahan - Dior",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Q118",
+    "price": "150 ILS",
+    "category": "عطور الرجال",
+    "image": "https://madperfume.ps/upload/06-2025/product/11.png",
+    "link": "https://madperfume.ps/?app=product.show.428",
+    "real_title": "Costa Azzurra Acqua by Tom Ford",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Q120",
+    "price": "150 ILS",
+    "category": "عطور الرجال",
+    "image": "https://madperfume.ps/upload/06-2025/product/8.png",
+    "link": "https://madperfume.ps/?app=product.show.430",
+    "real_title": "ANKA by Vertus",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Q121",
+    "price": "150 ILS",
+    "category": "عطور الرجال",
+    "image": "https://madperfume.ps/upload/06-2025/product/10.png",
+    "link": "https://madperfume.ps/?app=product.show.429",
+    "real_title": "Chaos by Vertus",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "R103",
+    "price": "100 ILS",
+    "category": "عطور الرجال",
+    "image": "https://madperfume.ps/upload/01-2026/product/697d09247224a.png",
+    "link": "https://madperfume.ps/?app=product.show.40",
+    "real_title": "Rochas Man - Rochas",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "S102",
+    "price": "100 ILS",
+    "category": "عطور الرجال",
+    "image": "https://madperfume.ps/upload/03-2026/product/6DBA4662-CF7C-40CC-A366-78B932764462.png",
+    "link": "https://madperfume.ps/?app=product.show.16",
+    "real_title": "Sculpture Homme - Nikos",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "T102",
+    "price": "100 ILS",
+    "category": "عطور الرجال",
+    "image": "https://madperfume.ps/upload/03-2026/product/ED60511F-FED9-42F3-98E3-1A2929240132.png",
+    "link": "https://madperfume.ps/?app=product.show.31",
+    "real_title": "Oud Wood by Tom Ford",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "T109",
+    "price": "100 ILS",
+    "category": "عطور الرجال",
+    "image": "https://madperfume.ps/upload/03-2026/product/BED161E6-88ED-4CA5-894D-760A1CBBD1B9.png",
+    "link": "https://madperfume.ps/?app=product.show.246",
+    "real_title": "Après l’Amour - Thomas Kosmala",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "T109 EXTRA",
+    "price": "150 ILS",
+    "category": "عطور الرجال",
+    "image": "https://madperfume.ps/upload/06-2025/product/7.png",
+    "link": "https://madperfume.ps/?app=product.show.512",
+    "real_title": "Après l’Amour - Thomas Kosmala",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "W111",
+    "price": "100 ILS",
+    "category": "عطور الرجال",
+    "image": "https://madperfume.ps/upload/03-2026/product/B239BA5D-ADF2-4CAA-9803-1E2E8C650E99.png",
+    "link": "https://madperfume.ps/?app=product.show.29",
+    "real_title": "Black XS - Paco Rabanne",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "W120",
+    "price": "100 ILS",
+    "category": "عطور الرجال",
+    "image": "https://madperfume.ps/upload/01-2026/product/697e4d9faf215.png",
+    "link": "https://madperfume.ps/?app=product.show.30",
+    "real_title": "212 Sexy Men - Carolina Herrera",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "W122",
+    "price": "100 ILS",
+    "category": "عطور الرجال",
+    "image": "https://madperfume.ps/upload/03-2026/product/IMG_0445.jpeg",
+    "link": "https://madperfume.ps/?app=product.show.32",
+    "real_title": "Aqva Pour Homme - Bvlgari",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "W126",
+    "price": "100 ILS",
+    "category": "عطور الرجال",
+    "image": "https://madperfume.ps/upload/01-2026/product/697e45f59641b.png",
+    "link": "https://madperfume.ps/?app=product.show.33",
+    "real_title": "Fuel for Life Homme - Diesel",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "W127",
+    "price": "100 ILS",
+    "category": "عطور الرجال",
+    "image": "https://madperfume.ps/upload/01-2026/product/697e36b54adbe.png",
+    "link": "https://madperfume.ps/?app=product.show.691",
+    "real_title": "PACO RABANNE - 1 MILLION ROYAL",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "W128",
+    "price": "100 ILS",
+    "category": "عطور الرجال",
+    "image": "https://madperfume.ps/upload/01-2026/product/697e4dc725a18.png",
+    "link": "https://madperfume.ps/?app=product.show.25",
+    "real_title": "1 Million by Paco Rabanne",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "W129",
+    "price": "100 ILS",
+    "category": "عطور الرجال",
+    "image": "https://madperfume.ps/upload/01-2026/product/697be331b33eb.png",
+    "link": "https://madperfume.ps/?app=product.show.20",
+    "real_title": "1 Million Elixir من Paco Rabanne",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "W133",
+    "price": "100 ILS",
+    "category": "عطور الرجال",
+    "image": "https://madperfume.ps/upload/03-2026/product/1BAB9566-FC5F-4109-AABA-1C5E15E16A5F.png",
+    "link": "https://madperfume.ps/?app=product.show.26",
+    "real_title": "The One for Men - Dolce & Gabbana",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "W139",
+    "price": "100 ILS",
+    "category": "عطور الرجال",
+    "image": "https://madperfume.ps/upload/01-2026/product/697ca5fe6892f.png",
+    "link": "https://madperfume.ps/?app=product.show.27",
+    "real_title": "Only The Brave - Diesel",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "W143",
+    "price": "100 ILS",
+    "category": "عطور الرجال",
+    "image": "https://madperfume.ps/upload/03-2026/product/9FE00963-501A-47B1-BF39-3F724614071F.png",
+    "link": "https://madperfume.ps/?app=product.show.28",
+    "real_title": "Terre D'Hermes Eau Intense Vetiver - Hermès",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "W150",
+    "price": "100 ILS",
+    "category": "عطور الرجال",
+    "image": "https://madperfume.ps/upload/03-2026/product/8D854A49-1BAA-4787-9489-60AB5FAA2B45.png",
+    "link": "https://madperfume.ps/?app=product.show.19",
+    "real_title": "Blue de Chance - Maison Alhambra",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "W158",
+    "price": "100 ILS",
+    "category": "عطور الرجال",
+    "image": "https://madperfume.ps/upload/03-2026/product/A3B90F25-81C7-4F1A-B17B-7EAFF226A111.png",
+    "link": "https://madperfume.ps/?app=product.show.46",
+    "real_title": "Dior Homme Intense by Dior",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "W160",
+    "price": "100 ILS",
+    "category": "عطور الرجال",
+    "image": "https://madperfume.ps/upload/02-2026/product/697e7d8694e56.png",
+    "link": "https://madperfume.ps/?app=product.show.22",
+    "real_title": "La Nuit de l'Homme - Yves Saint Laurent",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "W161",
+    "price": "100 ILS",
+    "category": "عطور الرجال",
+    "image": "https://madperfume.ps/upload/01-2026/product/697bec08f295e.png",
+    "link": "https://madperfume.ps/?app=product.show.23",
+    "real_title": "212 VIP Men - Carolina Herrera",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "W163",
+    "price": "100 ILS",
+    "category": "عطور الرجال",
+    "image": "https://madperfume.ps/upload/03-2026/product/2E7E598E-3116-477A-92D7-CC7503B30E67.png",
+    "link": "https://madperfume.ps/?app=product.show.9",
+    "real_title": "Only The Brave Eau de Parfum - Diesel",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "W164",
+    "price": "100 ILS",
+    "category": "عطور الرجال",
+    "image": "https://madperfume.ps/upload/03-2026/product/D4EE47EC-FCAB-4608-979D-0661CBB71C69.png",
+    "link": "https://madperfume.ps/?app=product.show.10",
+    "real_title": "Guilty Pour Homme - Gucci",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "W170",
+    "price": "100 ILS",
+    "category": "عطور الرجال",
+    "image": "https://madperfume.ps/upload/03-2026/product/4D0D214E-B868-4B48-9457-238C76E3A951.png",
+    "link": "https://madperfume.ps/?app=product.show.72",
+    "real_title": "Scent Intense - CoSTUME NATIONAL",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "W171",
+    "price": "100 ILS",
+    "category": "عطور الرجال",
+    "image": "https://madperfume.ps/upload/01-2026/product/697e42c834b01.png",
+    "link": "https://madperfume.ps/?app=product.show.11",
+    "real_title": "Spicebomb - Viktor&Rolf",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "W173",
+    "price": "100 ILS",
+    "category": "عطور الرجال",
+    "image": "https://madperfume.ps/upload/03-2026/product/627CF6B8-27C5-4C6D-9322-B72585BE9AE0.png",
+    "link": "https://madperfume.ps/?app=product.show.74",
+    "real_title": "Jil Sander Man Absolute - Jil Sander",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "W174",
+    "price": "100 ILS",
+    "category": "عطور الرجال",
+    "image": "https://madperfume.ps/upload/01-2026/product/697bd68974e6d.png",
+    "link": "https://madperfume.ps/?app=product.show.18",
+    "real_title": "Eros by Versace",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "W179",
+    "price": "100 ILS",
+    "category": "عطور الرجال",
+    "image": "https://madperfume.ps/upload/01-2026/product/697e364800bdf.png",
+    "link": "https://madperfume.ps/?app=product.show.693",
+    "real_title": "W.179 – Paco Rabanne Invictus Parfum",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "W180",
+    "price": "100 ILS",
+    "category": "عطور الرجال",
+    "image": "https://madperfume.ps/upload/01-2026/product/697bab98aabb7.png",
+    "link": "https://madperfume.ps/?app=product.show.7",
+    "real_title": "Invictus by Paco Rabanne",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "W183",
+    "price": "100 ILS",
+    "category": "عطور الرجال",
+    "image": "https://madperfume.ps/upload/01-2026/product/697bd913f3a5c.png",
+    "link": "https://madperfume.ps/?app=product.show.1",
+    "real_title": "Aventus - Creed",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "W183 Extra",
+    "price": "150 ILS",
+    "category": "عطور الرجال",
+    "image": "https://madperfume.ps/upload/06-2025/product/6.png",
+    "link": "https://madperfume.ps/?app=product.show.510",
+    "real_title": "Aventus - Creed",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "W184",
+    "price": "100 ILS",
+    "category": "عطور الرجال",
+    "image": "https://madperfume.ps/upload/02-2026/product/697e84042a2be.png",
+    "link": "https://madperfume.ps/?app=product.show.8",
+    "real_title": "My Land - Trussardi",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "W189",
+    "price": "100 ILS",
+    "category": "عطور الرجال",
+    "image": "https://madperfume.ps/upload/03-2026/product/C8F61B86-E8F8-4990-A78D-165536DCA724.png",
+    "link": "https://madperfume.ps/?app=product.show.4",
+    "real_title": "Boss Bottled Intense Eau de Parfum - Hugo Boss",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "W190",
+    "price": "100 ILS",
+    "category": "عطور الرجال",
+    "image": "https://madperfume.ps/upload/03-2026/product/77A37010-8EB9-41A6-AF49-C5A252B5E388.png",
+    "link": "https://madperfume.ps/?app=product.show.12",
+    "real_title": "Acqua di Giò Profumo by Giorgio Armani",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "W191",
+    "price": "100 ILS",
+    "category": "عطور الرجال",
+    "image": "https://madperfume.ps/upload/01-2026/product/697bbae866ee3.png",
+    "link": "https://madperfume.ps/?app=product.show.5",
+    "real_title": "Sauvage by Dior",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "W191 GOLD",
+    "price": "120 ILS",
+    "category": "عطور الرجال",
+    "image": "https://madperfume.ps/upload/03-2026/product/IMG_0541.jpeg",
+    "link": "https://madperfume.ps/?app=product.show.671",
+    "real_title": "W191 GOLD",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "W192",
+    "price": "100 ILS",
+    "category": "عطور الرجال",
+    "image": "https://madperfume.ps/upload/01-2026/product/697d0069b8482.png",
+    "link": "https://madperfume.ps/?app=product.show.6",
+    "real_title": "Sauvage by Dior",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "x102",
+    "price": "100 ILS",
+    "category": "عطور الرجال",
+    "image": "https://madperfume.ps/upload/03-2026/product/82D7332C-E5A9-46D3-9CAE-7ADA4F7AFE84.png",
+    "link": "https://madperfume.ps/?app=product.show.311",
+    "real_title": "XJ 1861 Naxos - Xerjoff",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Y101",
+    "price": "100 ILS",
+    "category": "عطور الرجال",
+    "image": "https://madperfume.ps/upload/03-2026/product/9486EBC7-F209-47F4-B136-83311479F27D.png",
+    "link": "https://madperfume.ps/?app=product.show.288",
+    "real_title": "Y Eau de Parfum Intense by Yves Saint Laurent",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Y102",
+    "price": "100 ILS",
+    "category": "عطور الرجال",
+    "image": "https://madperfume.ps/upload/02-2026/product/697e809467efc.png",
+    "link": "https://madperfume.ps/?app=product.show.443",
+    "real_title": "**MYSLF Eau de Parfum من Yves Saint Laurent",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Y102 GOLD",
+    "price": "120 ILS",
+    "category": "عطور الرجال",
+    "image": "https://madperfume.ps/upload/03-2026/product/IMG_0539.jpeg",
+    "link": "https://madperfume.ps/?app=product.show.672",
+    "real_title": "Y102 GOLD",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "ماد باتش 8 مل معطر جو للسيارة",
+    "price": "15 ILS",
+    "category": "عطور السياره",
+    "image": "https://madperfume.ps/upload/06-2025/product/1-96677c38.png",
+    "link": "https://madperfume.ps/?app=product.show.278",
+    "real_title": "ماد باتش 8 مل معطر جو للسيارة",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "ماد ليمبيو معطر هواء للسيارة 7 مل",
+    "price": "15 ILS",
+    "category": "عطور السياره",
+    "image": "https://madperfume.ps/upload/06-2025/product/1-71dc13ec.png",
+    "link": "https://madperfume.ps/?app=product.show.279",
+    "real_title": "ماد ليمبيو معطر هواء للسيارة 7 مل",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "معطر جو للسيارة ماد برائحة البطيخ والفراولة 8 مل",
+    "price": "15 ILS",
+    "category": "عطور السياره",
+    "image": "https://madperfume.ps/upload/06-2025/product/water melon car.webp",
+    "link": "https://madperfume.ps/?app=product.show.276",
+    "real_title": "معطر جو للسيارة ماد برائحة البطيخ والفراولة 8 مل",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "معطر جو للسيارة ماد جود نايت 7 مل",
+    "price": "15 ILS",
+    "category": "عطور السياره",
+    "image": "https://madperfume.ps/upload/06-2025/product/good night car.webp",
+    "link": "https://madperfume.ps/?app=product.show.641",
+    "real_title": "معطر جو للسيارة ماد جود نايت 7 مل",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "معطر جو للسيارة ماد مونا روزا 7 مل",
+    "price": "15 ILS",
+    "category": "عطور السياره",
+    "image": "https://madperfume.ps/upload/06-2025/product/1-8624e5aa.png",
+    "link": "https://madperfume.ps/?app=product.show.642",
+    "real_title": "معطر جو للسيارة ماد مونا روزا 7 مل",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "معطر جو للسيارة ماد ميلون 7 مل",
+    "price": "15 ILS",
+    "category": "عطور السياره",
+    "image": "https://madperfume.ps/upload/06-2025/product/melon car.png",
+    "link": "https://madperfume.ps/?app=product.show.640",
+    "real_title": "معطر جو للسيارة ماد ميلون 7 مل",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "معطر جو للسيارة ماد هيبنوتيزيا 7 مل",
+    "price": "15 ILS",
+    "category": "عطور السياره",
+    "image": "https://madperfume.ps/upload/06-2025/product/1-6f42d6ce.png",
+    "link": "https://madperfume.ps/?app=product.show.277",
+    "real_title": "معطر جو للسيارة ماد هيبنوتيزيا 7 مل",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "عطر ماد بريتي بيوتي للشعر 160 مل",
+    "price": "35 ILS",
+    "category": "عطور الشعر",
+    "image": "https://madperfume.ps/upload/12-2023/product/mad-pretty-beauty-160-ml-sac-parfumu16-0-7b24.jpg",
+    "link": "https://madperfume.ps/?app=product.show.283",
+    "real_title": "عطر ماد بريتي بيوتي للشعر 160 مل",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "عطر ماد بيرلز ديلايت للشعر 160 مل",
+    "price": "35 ILS",
+    "category": "عطور الشعر",
+    "image": "https://madperfume.ps/upload/12-2023/product/mad-peerles-delight-160-ml-sac-parfumu-1-e358.jpg",
+    "link": "https://madperfume.ps/?app=product.show.282",
+    "real_title": "عطر ماد بيرلز ديلايت للشعر 160 مل",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "ماد باشن فروت 160 مل عطر",
+    "price": "35 ILS",
+    "category": "عطور الشعر",
+    "image": "https://madperfume.ps/upload/12-2023/product/mad-passion-fruit-160-ml-sac-parfumu16-02b382.jpg",
+    "link": "https://madperfume.ps/?app=product.show.281",
+    "real_title": "ماد باشن فروت 160 مل عطر",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "مجموعة ماد بريف 160 مل عطر",
+    "price": "35 ILS",
+    "category": "عطور الشعر",
+    "image": "https://madperfume.ps/upload/12-2023/product/mad-brave-selection-160-ml-sac-parfumu-15-b95.jpg",
+    "link": "https://madperfume.ps/?app=product.show.280",
+    "real_title": "مجموعة ماد بريف 160 مل عطر",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Mad Amber 110 ml Kolonya",
+    "price": "15 ILS",
+    "category": "عطور الكولونيا",
+    "image": "https://madperfume.ps/upload/08-2024/product/66b8726e43a9a.png",
+    "link": "https://madperfume.ps/?app=product.show.469",
+    "real_title": "Mad Amber 110 ml Kolonya",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Mad Amber 200 ml Kolonya",
+    "price": "30 ILS",
+    "category": "عطور الكولونيا",
+    "image": "https://madperfume.ps/upload/08-2024/product/66b86edc34d87.png",
+    "link": "https://madperfume.ps/?app=product.show.456",
+    "real_title": "Mad Amber 200 ml Kolonya",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Mad Aqua Di Blue 110 ml Kolonya",
+    "price": "15 ILS",
+    "category": "عطور الكولونيا",
+    "image": "https://madperfume.ps/upload/08-2024/product/66b873a989725.png",
+    "link": "https://madperfume.ps/?app=product.show.475",
+    "real_title": "Mad Aqua Di Blue 110 ml Kolonya",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Mad Aqua Di Blue 200 ml Kolonya",
+    "price": "30 ILS",
+    "category": "عطور الكولونيا",
+    "image": "https://madperfume.ps/upload/08-2024/product/66b86f67c4661.png",
+    "link": "https://madperfume.ps/?app=product.show.459",
+    "real_title": "Mad Aqua Di Blue 200 ml Kolonya",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Mad Bergamot 200 ml Kolonya",
+    "price": "30 ILS",
+    "category": "عطور الكولونيا",
+    "image": "https://madperfume.ps/upload/08-2024/product/66b87094a61d6.png",
+    "link": "https://madperfume.ps/?app=product.show.463",
+    "real_title": "Mad Bergamot 200 ml Kolonya",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Mad Bodrum Tangerine 110 ml Kolonya",
+    "price": "15 ILS",
+    "category": "عطور الكولونيا",
+    "image": "https://madperfume.ps/upload/08-2024/product/66b873cc3fcf2.png",
+    "link": "https://madperfume.ps/?app=product.show.476",
+    "real_title": "Mad Bodrum Tangerine 110 ml Kolonya",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Mad Bodrum Tangerine 200 ml Kolonya",
+    "price": "30 ILS",
+    "category": "عطور الكولونيا",
+    "image": "https://madperfume.ps/upload/08-2024/product/66b86f8a56024.png",
+    "link": "https://madperfume.ps/?app=product.show.460",
+    "real_title": "Mad Bodrum Tangerine 200 ml Kolonya",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Mad Classic Lemon 110 ml Kolonya",
+    "price": "15 ILS",
+    "category": "عطور الكولونيا",
+    "image": "https://madperfume.ps/upload/08-2024/product/66b874c38ae3a.png",
+    "link": "https://madperfume.ps/?app=product.show.478",
+    "real_title": "Mad Classic Lemon 110 ml Kolonya",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Mad Dream Bouquet 110 ml Kolonya",
+    "price": "15 ILS",
+    "category": "عطور الكولونيا",
+    "image": "https://madperfume.ps/upload/08-2024/product/66b872a3a6ed3.png",
+    "link": "https://madperfume.ps/?app=product.show.470",
+    "real_title": "Mad Dream Bouquet 110 ml Kolonya",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Mad Dream Bouquet 200 ml Kolonya",
+    "price": "30 ILS",
+    "category": "عطور الكولونيا",
+    "image": "https://madperfume.ps/upload/08-2024/product/66b86f27a8590.png",
+    "link": "https://madperfume.ps/?app=product.show.457",
+    "real_title": "Mad Dream Bouquet 200 ml Kolonya",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Mad Fig Desert 110 ml Kolonya",
+    "price": "15 ILS",
+    "category": "عطور الكولونيا",
+    "image": "https://madperfume.ps/upload/08-2024/product/66b8737a3500c.png",
+    "link": "https://madperfume.ps/?app=product.show.474",
+    "real_title": "Mad Fig Desert 110 ml Kolonya",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Mad Fig Desert 200 ml Kolonya",
+    "price": "30 ILS",
+    "category": "عطور الكولونيا",
+    "image": "https://madperfume.ps/upload/08-2024/product/66b86fcb96444.png",
+    "link": "https://madperfume.ps/?app=product.show.461",
+    "real_title": "Mad Fig Desert 200 ml Kolonya",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Mad Green Tea 110 ml Kolonya",
+    "price": "15 ILS",
+    "category": "عطور الكولونيا",
+    "image": "https://madperfume.ps/upload/08-2024/product/66b873278e2d4.png",
+    "link": "https://madperfume.ps/?app=product.show.473",
+    "real_title": "Mad Green Tea 110 ml Kolonya",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Mad Green Tea 200 ml Kolonya",
+    "price": "30 ILS",
+    "category": "عطور الكولونيا",
+    "image": "https://madperfume.ps/upload/08-2024/product/66b87164f0d95.png",
+    "link": "https://madperfume.ps/?app=product.show.466",
+    "real_title": "Mad Green Tea 200 ml Kolonya",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Mad Ice 110 ml Kolonya",
+    "price": "15 ILS",
+    "category": "عطور الكولونيا",
+    "image": "https://madperfume.ps/upload/08-2024/product/66b8744cbb37a.png",
+    "link": "https://madperfume.ps/?app=product.show.479",
+    "real_title": "Mad Ice 110 ml Kolonya",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Mad Ice 200 ml Kolonya",
+    "price": "30 ILS",
+    "category": "عطور الكولونيا",
+    "image": "https://madperfume.ps/upload/08-2024/product/66b8712085a98.png",
+    "link": "https://madperfume.ps/?app=product.show.464",
+    "real_title": "Mad Ice 200 ml Kolonya",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Mad Japanese Cherry Blossom 110 ml Kolonya",
+    "price": "15 ILS",
+    "category": "عطور الكولونيا",
+    "image": "https://madperfume.ps/upload/08-2024/product/66b872d239cc9.png",
+    "link": "https://madperfume.ps/?app=product.show.471",
+    "real_title": "Mad Japanese Cherry Blossom 110 ml Kolonya",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Mad Japanese Cherry Blossom 200 ml Kolonya",
+    "price": "30 ILS",
+    "category": "عطور الكولونيا",
+    "image": "https://madperfume.ps/upload/08-2024/product/66b86e93e4b31.png",
+    "link": "https://madperfume.ps/?app=product.show.455",
+    "real_title": "Mad Japanese Cherry Blossom 200 ml Kolonya",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Mad Lavender 200 ml Kolonya",
+    "price": "30 ILS",
+    "category": "عطور الكولونيا",
+    "image": "https://madperfume.ps/upload/08-2024/product/66b8704c45aa8.png",
+    "link": "https://madperfume.ps/?app=product.show.462",
+    "real_title": "Mad Lavender 200 ml Kolonya",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Mad Lime 110 ml Kolonya",
+    "price": "15 ILS",
+    "category": "عطور الكولونيا",
+    "image": "https://madperfume.ps/upload/08-2024/product/66b873f4f2b5e.png",
+    "link": "https://madperfume.ps/?app=product.show.477",
+    "real_title": "Mad Lime 110 ml Kolonya",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Mad Lime 200 ml Kolonya",
+    "price": "30 ILS",
+    "category": "عطور الكولونيا",
+    "image": "https://madperfume.ps/upload/08-2024/product/66b8718095f2a.png",
+    "link": "https://madperfume.ps/?app=product.show.467",
+    "real_title": "Mad Lime 200 ml Kolonya",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Mad Mimosa 110 ml Kolonya",
+    "price": "15 ILS",
+    "category": "عطور الكولونيا",
+    "image": "https://madperfume.ps/upload/08-2024/product/66b872fd367a3.png",
+    "link": "https://madperfume.ps/?app=product.show.472",
+    "real_title": "Mad Mimosa 110 ml Kolonya",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Mad Mimosa 200 ml Kolonya",
+    "price": "30 ILS",
+    "category": "عطور الكولونيا",
+    "image": "https://madperfume.ps/upload/08-2024/product/66b86f4b305c5.png",
+    "link": "https://madperfume.ps/?app=product.show.458",
+    "real_title": "Mad Mimosa 200 ml Kolonya",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Mad Neroli 200 ml Kolonya",
+    "price": "30 ILS",
+    "category": "عطور الكولونيا",
+    "image": "https://madperfume.ps/upload/08-2024/product/66b87144b6c27.png",
+    "link": "https://madperfume.ps/?app=product.show.465",
+    "real_title": "Mad Neroli 200 ml Kolonya",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Mad Velvet Lavender 200 ml Kolonya",
+    "price": "30 ILS",
+    "category": "عطور الكولونيا",
+    "image": "https://madperfume.ps/upload/08-2024/product/66b8719bd68d1.png",
+    "link": "https://madperfume.ps/?app=product.show.468",
+    "real_title": "Mad Velvet Lavender 200 ml Kolonya",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "A104 women",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/06-2025/product/6852ae61431b2.png",
+    "link": "https://madperfume.ps/?app=product.show.574",
+    "real_title": "Angel – من Mugler",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "A112",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/06-2025/product/127.png",
+    "link": "https://madperfume.ps/?app=product.show.87",
+    "real_title": "Alien Eau de Toilette - Mugler",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "A113 women",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/01-2026/product/697e4554e38c4.png",
+    "link": "https://madperfume.ps/?app=product.show.113",
+    "real_title": "Alien Goddess - Mugler",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "A114 women",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/06-2025/product/101.png",
+    "link": "https://madperfume.ps/?app=product.show.165",
+    "real_title": "Dior Addict - Dior",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "A117",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/01-2026/product/697e4e3f76517.png",
+    "link": "https://madperfume.ps/?app=product.show.163",
+    "real_title": "Amor Amor - Cacharel",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "A118",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/01-2026/product/697bd4ebe9819.png",
+    "link": "https://madperfume.ps/?app=product.show.156",
+    "real_title": "My Way - Giorgio Armani",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "A118 GOLD",
+    "price": "120 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/09-2025/product/68d430eb4522c.png",
+    "link": "https://madperfume.ps/?app=product.show.668",
+    "real_title": "A118 GOLD",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "A120",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/02-2026/product/697e83d22ef80.png",
+    "link": "https://madperfume.ps/?app=product.show.160",
+    "real_title": "Armani Code for Women - Giorgio Armani",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "A121",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/06-2025/product/190.png",
+    "link": "https://madperfume.ps/?app=product.show.94",
+    "real_title": "Emporio Armani Because It’s You - Giorgio Armani",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "A122",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/06-2025/product/140.png",
+    "link": "https://madperfume.ps/?app=product.show.78",
+    "real_title": "Sì Passione - Giorgio Armani",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "B103 GOLD women",
+    "price": "120 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/09-2025/product/68d4311cb6c13.png",
+    "link": "https://madperfume.ps/?app=product.show.669",
+    "real_title": "B103 GOLD women",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "B103 women",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/01-2026/product/697bdc5e1a126.png",
+    "link": "https://madperfume.ps/?app=product.show.134",
+    "real_title": "Burberry Her - Burberry",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "B104",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/06-2025/product/144.png",
+    "link": "https://madperfume.ps/?app=product.show.140",
+    "real_title": "Burberry Women - Burberry",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "B105",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/01-2026/product/697d081c50e5e.png",
+    "link": "https://madperfume.ps/?app=product.show.625",
+    "real_title": "Burberry Her Elixir de Parfum",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "B107 women",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/01-2026/product/697bdd71a69fd.png",
+    "link": "https://madperfume.ps/?app=product.show.602",
+    "real_title": "Goddess – من Burberry",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "B110",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/06-2025/product/110.png",
+    "link": "https://madperfume.ps/?app=product.show.445",
+    "real_title": "London - Burberry",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "C101",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/03-2026/product/IMG_1342.jpeg",
+    "link": "https://madperfume.ps/?app=product.show.729",
+    "real_title": "C101-CAROLINA HERRERA LA BOMBA",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "C119",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/06-2025/product/113.png",
+    "link": "https://madperfume.ps/?app=product.show.119",
+    "real_title": "Yes I Am - Cacharel",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "c120",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/01-2026/product/697cea837728c.png",
+    "link": "https://madperfume.ps/?app=product.show.131",
+    "real_title": "Coco Mademoiselle Intense - Chanel",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "C121",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/01-2026/product/697d023616d04.png",
+    "link": "https://madperfume.ps/?app=product.show.107",
+    "real_title": "Euphoria Crystalline - Calvin Klein",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "C122",
+    "price": "150 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/06-2025/product/24.png",
+    "link": "https://madperfume.ps/?app=product.show.425",
+    "real_title": "عطر Paris – Venise - Chanel",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "C123",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/01-2026/product/697be10458a5f.png",
+    "link": "https://madperfume.ps/?app=product.show.132",
+    "real_title": "Chance Eau de Parfum - Chanel",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "C126",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/06-2025/product/195.png",
+    "link": "https://madperfume.ps/?app=product.show.91",
+    "real_title": "212 Sexy - Carolina Herrera",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "D101",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/06-2025/product/204.png",
+    "link": "https://madperfume.ps/?app=product.show.628",
+    "real_title": "Divine Le Parfum",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "D104",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/06-2025/product/68529d7e885a8.png",
+    "link": "https://madperfume.ps/?app=product.show.93",
+    "real_title": "Joy by Dior - Dior",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "D114",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/01-2026/product/697ceb892f655.png",
+    "link": "https://madperfume.ps/?app=product.show.129",
+    "real_title": "Miss Dior Blooming Bouquet - Dior",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "D116",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/06-2025/product/198.png",
+    "link": "https://madperfume.ps/?app=product.show.387",
+    "real_title": "Q by Dolce & Gabbana - Dolce&Gabbana",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "D117",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/01-2026/product/697e3c614dcf7.png",
+    "link": "https://madperfume.ps/?app=product.show.388",
+    "real_title": "Devotion - Dolce&Gabbana",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "D119",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/01-2026/product/697d056820e9b.png",
+    "link": "https://madperfume.ps/?app=product.show.123",
+    "real_title": "Echo Woman - Davidoff",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "D121",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/01-2026/product/697e7adb85663.png",
+    "link": "https://madperfume.ps/?app=product.show.124",
+    "real_title": "DKNY Be Delicious - Donna Karan",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "E101",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/06-2025/product/100.png",
+    "link": "https://madperfume.ps/?app=product.show.127",
+    "real_title": "Girl of Now - Elie Saab",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "E104 women",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/02-2026/product/697e83709b1ac.png",
+    "link": "https://madperfume.ps/?app=product.show.128",
+    "real_title": "Emporio Armani She - Giorgio Armani",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "E117",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/01-2026/product/697e4d61ef526.png",
+    "link": "https://madperfume.ps/?app=product.show.626",
+    "real_title": "Escada Magnetism",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "G101 women",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/06-2025/product/136 (1).png",
+    "link": "https://madperfume.ps/?app=product.show.633",
+    "real_title": "Envy Me",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "G103 women",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/01-2026/product/697bb60c1956b.png",
+    "link": "https://madperfume.ps/?app=product.show.122",
+    "real_title": "Good Girl - Carolina Herrera",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "G104",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/06-2025/product/68511580218a8.png",
+    "link": "https://madperfume.ps/?app=product.show.120",
+    "real_title": "L'Interdit Eau de Parfum - Givenchy",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "G104 GOLD",
+    "price": "120 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/09-2025/product/68d431548a974.png",
+    "link": "https://madperfume.ps/?app=product.show.670",
+    "real_title": "G104 GOLD",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "G106",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/01-2026/product/697d09acb8bd4.png",
+    "link": "https://madperfume.ps/?app=product.show.121",
+    "real_title": "Good Girl Suprême - Carolina Herrera",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "G108",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/06-2025/product/172.png",
+    "link": "https://madperfume.ps/?app=product.show.92",
+    "real_title": "Mon Guerlain - Guerlain",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "G108",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/06-2025/product/6852af9942f42.png",
+    "link": "https://madperfume.ps/?app=product.show.298",
+    "real_title": "Insolence Eau de Toilette** من **Guerlain",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "G109",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/06-2025/product/68501a1f6631a.png",
+    "link": "https://madperfume.ps/?app=product.show.422",
+    "real_title": "La Petite Robe Noire** من **Guerlain",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "G110",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/06-2025/product/116.png",
+    "link": "https://madperfume.ps/?app=product.show.424",
+    "real_title": "Flora Gorgeous Gardenia** من **Gucci",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "G111",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/06-2025/product/97.png",
+    "link": "https://madperfume.ps/?app=product.show.421",
+    "real_title": "Good Girl Blush** من **Carolina Herrera",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "G112",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/01-2026/product/697cef4eb38b8.png",
+    "link": "https://madperfume.ps/?app=product.show.687",
+    "real_title": "GUCCI-FLORA GORGEOUS ORCHID",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "GOLD j107",
+    "price": "120 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/09-2025/product/68d42ffc92fc2.png",
+    "link": "https://madperfume.ps/?app=product.show.665",
+    "real_title": "Jean Paul Gaultier Scandal Absolu For Women",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "H102 women",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/02-2026/product/697e800dc91b0.png",
+    "link": "https://madperfume.ps/?app=product.show.723",
+    "real_title": "Hugo Woman Hugo Boss",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "H103",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/01-2026/product/697bb90dd7d61.png",
+    "link": "https://madperfume.ps/?app=product.show.101",
+    "real_title": "Hypnotic Poison Eau de Parfum** من **Dior",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "H104",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/01-2026/product/697e3985e284e.png",
+    "link": "https://madperfume.ps/?app=product.show.115",
+    "real_title": "Boss Alive Eau de Parfum** من **Hugo Boss",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "H106 women",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/01-2026/product/697e376ec80e5.png",
+    "link": "https://madperfume.ps/?app=product.show.685",
+    "real_title": "HERMES-BARENIA",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "I102",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/06-2025/product/146.png",
+    "link": "https://madperfume.ps/?app=product.show.135",
+    "real_title": "L'eau d'Issey** من **Issey Miyake",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "J101 women",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/06-2025/product/6851180187df0.png",
+    "link": "https://madperfume.ps/?app=product.show.117",
+    "real_title": "J'Adore Absolu** من **Dior",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "J102 women",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/06-2025/product/98.png",
+    "link": "https://madperfume.ps/?app=product.show.114",
+    "real_title": "Scandal** من **Jean Paul Gaultier",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "J103 women",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/06-2025/product/129 (1).png",
+    "link": "https://madperfume.ps/?app=product.show.116",
+    "real_title": "Gaultier 2** من **Jean Paul Gaultier**",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "j104 او Q103",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/06-2025/product/89 (1).png",
+    "link": "https://madperfume.ps/?app=product.show.162",
+    "real_title": "Nectarine Blossom & Honey** من **Jo Malone London",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "J106",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/01-2026/product/697e429e9a46d.png",
+    "link": "https://madperfume.ps/?app=product.show.627",
+    "real_title": "Divine Le Parfum",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "K101 women",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/01-2026/product/697e553c4ce99.png",
+    "link": "https://madperfume.ps/?app=product.show.118",
+    "real_title": "Good Girl Gone Bad** من **By Kilian",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "K103",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/06-2025/product/178.png",
+    "link": "https://madperfume.ps/?app=product.show.635",
+    "real_title": "Flower by Kenzo Eau de Parfum",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "L101",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/01-2026/product/697be589d9cba.png",
+    "link": "https://madperfume.ps/?app=product.show.79",
+    "real_title": "Idôle** من **Lancôme",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "L102 women",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/01-2026/product/697e39ad64e58.png",
+    "link": "https://madperfume.ps/?app=product.show.83",
+    "real_title": "La Nuit Trésor Caresse** من **Lancôme",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "L103 women",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/06-2025/product/110 (1).png",
+    "link": "https://madperfume.ps/?app=product.show.126",
+    "real_title": "La Vie est Belle en Rose** من **Lancôme",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "L105",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/01-2026/product/697e3741950ee.png",
+    "link": "https://madperfume.ps/?app=product.show.686",
+    "real_title": "LANCOME-LA VIE BST BELLE LELIXIR",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "L111",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/06-2025/product/197 (1).png",
+    "link": "https://madperfume.ps/?app=product.show.634",
+    "real_title": "Lolita Lempicka Eau de Parfum",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "L112",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/01-2026/product/697e458c3be4c.png",
+    "link": "https://madperfume.ps/?app=product.show.110",
+    "real_title": "Hypnôse Eau Legere** من **Lancôme",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "L113",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/01-2026/product/697e39e96ef21.png",
+    "link": "https://madperfume.ps/?app=product.show.630",
+    "real_title": "Lacoste Pour Femme",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "M101",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/06-2025/product/126.png",
+    "link": "https://madperfume.ps/?app=product.show.171",
+    "real_title": "Miracle** من **Lancôme",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "M104",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/06-2025/product/685d46d8dc438.png",
+    "link": "https://madperfume.ps/?app=product.show.112",
+    "real_title": "Pink Extasy من دار Montale",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "M109",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/06-2025/product/176 (1).png",
+    "link": "https://madperfume.ps/?app=product.show.632",
+    "real_title": "Armani Mania",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "N101",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/01-2026/product/697be46b2250b.png",
+    "link": "https://madperfume.ps/?app=product.show.104",
+    "real_title": "Noa من دار Cacharel",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "N105",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/02-2026/product/697e803ce6023.png",
+    "link": "https://madperfume.ps/?app=product.show.88",
+    "real_title": "Narciso Rodriguez for Her Eau de Parfum",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "N106",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/06-2025/product/152.png",
+    "link": "https://madperfume.ps/?app=product.show.106",
+    "real_title": "Narciso Rodriguez For Her",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "P101 women",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/06-2025/product/125.png",
+    "link": "https://madperfume.ps/?app=product.show.164",
+    "real_title": "Oriana – من Parfums de Marly",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "P104 women",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/06-2025/product/685070172b262.png",
+    "link": "https://madperfume.ps/?app=product.show.167",
+    "real_title": "Olympéa Solar – من Rabanne",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "P105 women",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/01-2026/product/697be905b53ca.png",
+    "link": "https://madperfume.ps/?app=product.show.130",
+    "real_title": "Fame من Rabanne",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "p107",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/01-2026/product/697be6aed3f73.png",
+    "link": "https://madperfume.ps/?app=product.show.327",
+    "real_title": "Prada Paradoxe من Prada",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "P107 DOLD",
+    "price": "120 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/09-2025/product/68d4307e90966.png",
+    "link": "https://madperfume.ps/?app=product.show.666",
+    "real_title": "P107 DOLD",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "P108",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/01-2026/product/697e3689804dc.png",
+    "link": "https://madperfume.ps/?app=product.show.692",
+    "real_title": "PACO RABANNE - MILLIN GOLD FOR HER",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "R104",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/03-2026/product/IMG_1337.jpeg",
+    "link": "https://madperfume.ps/?app=product.show.730",
+    "real_title": "R104-ROCHAS AUDACE",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "R105",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/06-2025/product/193.png",
+    "link": "https://madperfume.ps/?app=product.show.108",
+    "real_title": "Gucci Rush من Gucci",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "R109",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/06-2025/product/175.png",
+    "link": "https://madperfume.ps/?app=product.show.109",
+    "real_title": "Gucci Rush 2 من Gucci",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "R110",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/06-2025/product/170.png",
+    "link": "https://madperfume.ps/?app=product.show.100",
+    "real_title": "Ralph من Ralph Lauren",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "S101",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/06-2025/product/169.png",
+    "link": "https://madperfume.ps/?app=product.show.102",
+    "real_title": "Ginza من Shiseido",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "S112",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/06-2025/product/187.png",
+    "link": "https://madperfume.ps/?app=product.show.98",
+    "real_title": "Sexy Graffiti من Escada",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "T101",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/06-2025/product/103.png",
+    "link": "https://madperfume.ps/?app=product.show.168",
+    "real_title": "Trussardi Inside",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "T103 - Q101",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/01-2026/product/697e4deae1afe.png",
+    "link": "https://madperfume.ps/?app=product.show.99",
+    "real_title": "Velvet Orchid من Tom Ford",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "U101",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/06-2025/product/150.png",
+    "link": "https://madperfume.ps/?app=product.show.111",
+    "real_title": "Ultraviolet للنساء من Paco Rabanne",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "V101",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/01-2026/product/697e4e1a9ede3.png",
+    "link": "https://madperfume.ps/?app=product.show.401",
+    "real_title": "Scandalous من Victoria's Secret",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "V102",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/01-2026/product/697bda2eee8d5.png",
+    "link": "https://madperfume.ps/?app=product.show.103",
+    "real_title": "Night من Victoria's Secret",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "V105",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/06-2025/product/188.png",
+    "link": "https://madperfume.ps/?app=product.show.96",
+    "real_title": "Bombshell Intense من Victoria's Secret",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "V106",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/01-2026/product/697d0324aeeca.png",
+    "link": "https://madperfume.ps/?app=product.show.97",
+    "real_title": "Very Sexy Orchid من Victoria's Secret",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "V107",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/06-2025/product/6852a270f1047.png",
+    "link": "https://madperfume.ps/?app=product.show.90",
+    "real_title": "Very Sexy (إصدار 2018) من Victoria's Secret",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "V109",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/01-2026/product/697bb9f2b9acc.png",
+    "link": "https://madperfume.ps/?app=product.show.133",
+    "real_title": "Tease Crème Cloud من Victoria's Secret",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "V110",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/06-2025/product/166.png",
+    "link": "https://madperfume.ps/?app=product.show.136",
+    "real_title": "Bombshell Sundrenched – من Victoria's Secret",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "V112",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/01-2026/product/697ba660359a9.png",
+    "link": "https://madperfume.ps/?app=product.show.637",
+    "real_title": "Bare – Victoria’s Secret",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "V114",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/06-2025/product/115.png",
+    "link": "https://madperfume.ps/?app=product.show.446",
+    "real_title": "Voce Viva – من Valentino",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "V115",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/03-2026/product/IMG_1332.jpeg",
+    "link": "https://madperfume.ps/?app=product.show.731",
+    "real_title": "V115-VICTORIA'S SECRET TEASE SUGAR FLEUR",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "W101",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/06-2025/product/128.png",
+    "link": "https://madperfume.ps/?app=product.show.166",
+    "real_title": "Wish – من شوبارد",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "W113",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/06-2025/product/189.png",
+    "link": "https://madperfume.ps/?app=product.show.95",
+    "real_title": "Midnight Fantasy من Britney Spears",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "W125",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/01-2026/product/697e3b7001c7a.png",
+    "link": "https://madperfume.ps/?app=product.show.105",
+    "real_title": "Zen من دار Shiseido",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "W144",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/06-2025/product/6852a88652de9.png",
+    "link": "https://madperfume.ps/?app=product.show.84",
+    "real_title": "Chloé Eau de Parfum من Chloé",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "W150 women",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/01-2026/product/697e3c36e241e.png",
+    "link": "https://madperfume.ps/?app=product.show.85",
+    "real_title": "Crystal Noir – من فيرساتشي",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "W152",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/01-2026/product/697be21318171.png",
+    "link": "https://madperfume.ps/?app=product.show.447",
+    "real_title": "Versace Pour Femme Dylan Purple",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "W153",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/01-2026/product/697d08a82565d.png",
+    "link": "https://madperfume.ps/?app=product.show.86",
+    "real_title": "Lady Million من Rabanne",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "W154",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/06-2025/product/121.png",
+    "link": "https://madperfume.ps/?app=product.show.89",
+    "real_title": "Chance Eau Vive Chanel",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "W155",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/02-2026/product/697e8068b4425.png",
+    "link": "https://madperfume.ps/?app=product.show.148",
+    "real_title": "Acqua Di Gioia Eau Fraîche – من جورجيو أرماني",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "W160",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/06-2025/product/128 (1).png",
+    "link": "https://madperfume.ps/?app=product.show.80",
+    "real_title": "VIP للنساء من Carolina Herrera",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "W162",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/06-2025/product/6852ab1d83582.png",
+    "link": "https://madperfume.ps/?app=product.show.81",
+    "real_title": "Love Chloé من Chloé",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "W164 women",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/01-2026/product/697d05fdab03b.png",
+    "link": "https://madperfume.ps/?app=product.show.82",
+    "real_title": "Beauty من Calvin Klein",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "W165",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/01-2026/product/697e7b32d05d1.png",
+    "link": "https://madperfume.ps/?app=product.show.161",
+    "real_title": "Gucci Guilty – من غوتشي",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "W169",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/06-2025/product/192.png",
+    "link": "https://madperfume.ps/?app=product.show.169",
+    "real_title": "Jimmy Choo من Jimmy Choo",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "W175",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/06-2025/product/135.png",
+    "link": "https://madperfume.ps/?app=product.show.142",
+    "real_title": "Body – من Burberry",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "W179 women",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/06-2025/product/134.png",
+    "link": "https://madperfume.ps/?app=product.show.143",
+    "real_title": "Vanitas – من فيرساتشي",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "W183",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/01-2026/product/697e5569adb0c.png",
+    "link": "https://madperfume.ps/?app=product.show.636",
+    "real_title": "Sexy Little Things Noir Tease Temptation",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "W184",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/06-2025/product/105.png",
+    "link": "https://madperfume.ps/?app=product.show.157",
+    "real_title": "L’Ambre des Merveilles – من Hermès",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "W185",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/06-2025/product/104.png",
+    "link": "https://madperfume.ps/?app=product.show.158",
+    "real_title": "Roberto Cavalli Eau de Parfum – من Roberto Cavalli",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "W190 women",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/06-2025/product/142.png",
+    "link": "https://madperfume.ps/?app=product.show.159",
+    "real_title": "Christina Aguilera – من كريستينا",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "W197",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/06-2025/product/130.png",
+    "link": "https://madperfume.ps/?app=product.show.153",
+    "real_title": "Ange ou Démon Le Secret – من جيفنشي",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "W201",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/01-2026/product/697bdff0e34fd.png",
+    "link": "https://madperfume.ps/?app=product.show.154",
+    "real_title": "La Vie Est Belle – من Lancôme",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "W203",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/07-2025/product/6866c1abc721d.png",
+    "link": "https://madperfume.ps/?app=product.show.155",
+    "real_title": "Si – Emporio Armani",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "W208",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/06-2025/product/6852be92073a2.png",
+    "link": "https://madperfume.ps/?app=product.show.150",
+    "real_title": "Manifesto من Yves Saint Laurent",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "W209",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/06-2025/product/131.png",
+    "link": "https://madperfume.ps/?app=product.show.151",
+    "real_title": "My Burberry – من بربري",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "W212",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/02-2026/product/697e7b664072d.png",
+    "link": "https://madperfume.ps/?app=product.show.631",
+    "real_title": "Sexy Amber",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "W213",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/01-2026/product/697bad24d844c.png",
+    "link": "https://madperfume.ps/?app=product.show.152",
+    "real_title": "Black Opium – من إيف سان لوران",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "W214",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/06-2025/product/143.png",
+    "link": "https://madperfume.ps/?app=product.show.144",
+    "real_title": "Bombshell – من Victoria's Secret",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "W217",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/01-2026/product/697ced84bbc29.png",
+    "link": "https://madperfume.ps/?app=product.show.145",
+    "real_title": "Bright Crystal – من فيرساتشي",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "W222",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/06-2025/product/106.png",
+    "link": "https://madperfume.ps/?app=product.show.147",
+    "real_title": "Olympéa – من Rabanne",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "W223",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/01-2026/product/697e36da98e51.png",
+    "link": "https://madperfume.ps/?app=product.show.689",
+    "real_title": "PACO RABANNE - OLYMPEA PARFUM",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "W230",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/06-2025/product/132.png",
+    "link": "https://madperfume.ps/?app=product.show.149",
+    "real_title": "Omnia Crystalline – من بولغاري",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Y101 women",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/01-2026/product/697bdb2b877be.png",
+    "link": "https://madperfume.ps/?app=product.show.138",
+    "real_title": "Libre Yves Saint Laurent",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Y102 GOLD women",
+    "price": "120 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/09-2025/product/68d430b3d2eab.png",
+    "link": "https://madperfume.ps/?app=product.show.667",
+    "real_title": "Y102 GOLD women",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Y102 women",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/01-2026/product/697bd7a619a87.png",
+    "link": "https://madperfume.ps/?app=product.show.172",
+    "real_title": "Libre Intense – من إيف سان لوران",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Y104",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/01-2026/product/697ca24f9f620.png",
+    "link": "https://madperfume.ps/?app=product.show.720",
+    "real_title": "Black Opium Over Red Yves Saint Laurent",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Y105",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/03-2026/product/IMG_1327.jpeg",
+    "link": "https://madperfume.ps/?app=product.show.732",
+    "real_title": "Y105-YVES SAINT LAURENT LIBRE VANILLA COUTURE EDP",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Z101",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/01-2026/product/697bb4d8cb32b.png",
+    "link": "https://madperfume.ps/?app=product.show.139",
+    "real_title": "This is Her! – من Zadig & Voltaire",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Z102",
+    "price": "100 ILS",
+    "category": "عطور النساء",
+    "image": "https://madperfume.ps/upload/06-2025/product/685081ef4cc6e.png",
+    "link": "https://madperfume.ps/?app=product.show.141",
+    "real_title": "Just Rock! for Her – من Zadig & Voltaire",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Adria 100 ml Unisex",
+    "price": "350 ILS",
+    "category": "عطور النيش",
+    "image": "https://madperfume.ps/upload/01-2026/product/697a62e966bbb.png",
+    "link": "https://madperfume.ps/?app=product.show.682",
+    "real_title": "ADRIA",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Bruno Casanova",
+    "price": "300 ILS",
+    "category": "عطور النيش",
+    "image": "https://madperfume.ps/upload/01-2026/product/69794d606f005.png",
+    "link": "https://madperfume.ps/?app=product.show.392",
+    "real_title": "Casanova Tiziana Terenzi",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Bruno Exotic",
+    "price": "300 ILS",
+    "category": "عطور النيش",
+    "image": "https://madperfume.ps/upload/01-2026/product/69794c99e6ba4.png",
+    "link": "https://madperfume.ps/?app=product.show.393",
+    "real_title": "my kurkdjian amyrisv homme",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Bruno Gold",
+    "price": "300 ILS",
+    "category": "عطور النيش",
+    "image": "https://madperfume.ps/upload/01-2026/product/697950e119ad8.png",
+    "link": "https://madperfume.ps/?app=product.show.199",
+    "real_title": "Kirke Tiziana Terenzi",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Bruno Gold Intense",
+    "price": "300 ILS",
+    "category": "عطور النيش",
+    "image": "https://madperfume.ps/upload/01-2026/product/6979503f9d058.png",
+    "link": "https://madperfume.ps/?app=product.show.717",
+    "real_title": "Bruno Gold Intense 100 مل – عطر رجالي",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Dependece",
+    "price": "190 ILS",
+    "category": "عطور النيش",
+    "image": "https://madperfume.ps/upload/03-2026/product/IMG_0300.jpeg",
+    "link": "https://madperfume.ps/?app=product.show.614",
+    "real_title": "Dependece",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Deserto",
+    "price": "300 ILS",
+    "category": "عطور النيش",
+    "image": "https://madperfume.ps/upload/03-2026/product/IMG_0306.jpeg",
+    "link": "https://madperfume.ps/?app=product.show.197",
+    "real_title": "Kalemat Arabian Oud",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "DETOX",
+    "price": "300 ILS",
+    "category": "عطور النيش",
+    "image": "https://madperfume.ps/upload/01-2026/product/69794e00810ae.png",
+    "link": "https://madperfume.ps/?app=product.show.391",
+    "real_title": "Delox Tiziana Terenzi",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Devil&#039;s Trick",
+    "price": "250 ILS",
+    "category": "عطور النيش",
+    "image": "https://madperfume.ps/upload/01-2026/product/697a274fca45d.png",
+    "link": "https://madperfume.ps/?app=product.show.207",
+    "real_title": "Devil's Intrigue Haute Fragrance Company HFC",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "DIVERSE Exploration",
+    "price": "300 ILS",
+    "category": "عطور النيش",
+    "image": "https://madperfume.ps/upload/03-2026/product/IMG_0302.jpeg",
+    "link": "https://madperfume.ps/?app=product.show.217",
+    "real_title": "Italian Leather Memo Paris",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Divine",
+    "price": "300 ILS",
+    "category": "عطور النيش",
+    "image": "https://madperfume.ps/upload/01-2026/product/69795ebf9644b.png",
+    "link": "https://madperfume.ps/?app=product.show.185",
+    "real_title": "La Belle Le Parfum Jean Paul Gaultier",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Divine Tough",
+    "price": "300 ILS",
+    "category": "عطور النيش",
+    "image": "https://madperfume.ps/upload/01-2026/product/69795ade94ca9.png",
+    "link": "https://madperfume.ps/?app=product.show.196",
+    "real_title": "Le Beau Le Parfum Jean Paul Gaultier",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "DRACO",
+    "price": "350 ILS",
+    "category": "عطور النيش",
+    "image": "https://madperfume.ps/upload/03-2026/product/IMG_0325.jpeg",
+    "link": "https://madperfume.ps/?app=product.show.619",
+    "real_title": "Gris Charnel Extrait BDK Parfums",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "DREAM LIGHET",
+    "price": "350 ILS",
+    "category": "عطور النيش",
+    "image": "https://madperfume.ps/upload/01-2026/product/697a41cb44dfa.png",
+    "link": "https://madperfume.ps/?app=product.show.323",
+    "real_title": "ATTRAPE-RÊVES",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Effect",
+    "price": "300 ILS",
+    "category": "عطور النيش",
+    "image": "https://madperfume.ps/upload/03-2026/product/IMG_0309.jpeg",
+    "link": "https://madperfume.ps/?app=product.show.203",
+    "real_title": "Side Effect Initio Parfums Prives",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "EGO",
+    "price": "300 ILS",
+    "category": "عطور النيش",
+    "image": "https://madperfume.ps/upload/01-2026/product/69795ba049911.png",
+    "link": "https://madperfume.ps/?app=product.show.174",
+    "real_title": "More Than Words Xerjoff",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Exotic Oud 50 ml",
+    "price": "350 ILS",
+    "category": "عطور النيش",
+    "image": "https://madperfume.ps/upload/01-2026/product/c3e017a8-49c9-45f5-adc3-5afd27184a21_size640_cropCenter.jpg",
+    "link": "https://madperfume.ps/?app=product.show.679",
+    "real_title": "Mad Exotic Oud 50 ml Unisex",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "forza",
+    "price": "300 ILS",
+    "category": "عطور النيش",
+    "image": "https://madperfume.ps/upload/03-2026/product/IMG_0288.jpeg",
+    "link": "https://madperfume.ps/?app=product.show.181",
+    "real_title": "Alexandria II Xerjoff",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Golden Age",
+    "price": "180 ILS",
+    "category": "عطور النيش",
+    "image": "https://madperfume.ps/upload/03-2026/product/IMG_0313.jpeg",
+    "link": "https://madperfume.ps/?app=product.show.211",
+    "real_title": "Accento Xerjoff",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Golden Feel",
+    "price": "180 ILS",
+    "category": "عطور النيش",
+    "image": "https://madperfume.ps/upload/03-2026/product/IMG_0315.jpeg",
+    "link": "https://madperfume.ps/?app=product.show.191",
+    "real_title": "Oud Bouquet Lancôme",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Golden Glory",
+    "price": "180 ILS",
+    "category": "عطور النيش",
+    "image": "https://madperfume.ps/upload/03-2026/product/IMG_0320.jpeg",
+    "link": "https://madperfume.ps/?app=product.show.212",
+    "real_title": "Idylle Eau Sublime Guerlain",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Golden Soul",
+    "price": "180 ILS",
+    "category": "عطور النيش",
+    "image": "https://madperfume.ps/upload/03-2026/product/IMG_0318.jpeg",
+    "link": "https://madperfume.ps/?app=product.show.192",
+    "real_title": "Armani Prive Rouge Malachite Giorgio Armani",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Grande-Notte-100-ML",
+    "price": "300 ILS",
+    "category": "عطور النيش",
+    "image": "https://madperfume.ps/upload/01-2026/product/6979537a4237a.png",
+    "link": "https://madperfume.ps/?app=product.show.198",
+    "real_title": "Grand Soir Maison Francis Kurkdjian",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Gumin",
+    "price": "300 ILS",
+    "category": "عطور النيش",
+    "image": "https://madperfume.ps/upload/01-2026/product/69795c5609fb6.png",
+    "link": "https://madperfume.ps/?app=product.show.173",
+    "real_title": "Gumin Tiziana Terenzi",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Hot Passion",
+    "price": "280 ILS",
+    "category": "عطور النيش",
+    "image": "https://madperfume.ps/upload/03-2026/product/IMG_7838.jpeg",
+    "link": "https://madperfume.ps/?app=product.show.193",
+    "real_title": "Aventus for Her Creed",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Inspiraiton",
+    "price": "300 ILS",
+    "category": "عطور النيش",
+    "image": "https://madperfume.ps/upload/01-2026/product/69795dfb03a35.png",
+    "link": "https://madperfume.ps/?app=product.show.184",
+    "real_title": "Spring Flower Creed",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Inviting",
+    "price": "300 ILS",
+    "category": "عطور النيش",
+    "image": "https://madperfume.ps/upload/01-2026/product/697960bdcdb25.png",
+    "link": "https://madperfume.ps/?app=product.show.186",
+    "real_title": "Supreme Bouquet Yves Saint Laurent",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Lady",
+    "price": "350 ILS",
+    "category": "عطور النيش",
+    "image": "https://madperfume.ps/upload/01-2026/product/c16a65f3-3456-4962-a293-86378d821655_size640_cropCenter.jpg",
+    "link": "https://madperfume.ps/?app=product.show.216",
+    "real_title": "Lady",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "LOVE ME",
+    "price": "300 ILS",
+    "category": "عطور النيش",
+    "image": "https://madperfume.ps/upload/03-2026/product/IMG_0323.jpeg",
+    "link": "https://madperfume.ps/?app=product.show.575",
+    "real_title": "Love, Don’t Be Shy",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "M101",
+    "price": "300 ILS",
+    "category": "عطور النيش",
+    "image": "https://madperfume.ps/upload/03-2026/product/IMG_0331.jpeg",
+    "link": "https://madperfume.ps/?app=product.show.205",
+    "real_title": "M101",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Mad Absolutely",
+    "price": "300 ILS",
+    "category": "عطور النيش",
+    "image": "https://madperfume.ps/upload/01-2026/product/69794b32adeb8.png",
+    "link": "https://madperfume.ps/?app=product.show.394",
+    "real_title": "Modern Muse Nuit Estée Lauder",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Mad Cold Spire",
+    "price": "280 ILS",
+    "category": "عطور النيش",
+    "image": "https://madperfume.ps/upload/03-2026/product/IMG_1321.jpeg",
+    "link": "https://madperfume.ps/?app=product.show.727",
+    "real_title": "Mad Cold Spire",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Mad Griffin",
+    "price": "280 ILS",
+    "category": "عطور النيش",
+    "image": "https://madperfume.ps/upload/03-2026/product/IMG_1318.jpeg",
+    "link": "https://madperfume.ps/?app=product.show.726",
+    "real_title": "Mad Griffin",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Mad Kraken",
+    "price": "280 ILS",
+    "category": "عطور النيش",
+    "image": "https://madperfume.ps/upload/03-2026/product/IMG_1315.jpeg",
+    "link": "https://madperfume.ps/?app=product.show.725",
+    "real_title": "Mad Kraken",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Mad Midnight",
+    "price": "300 ILS",
+    "category": "عطور النيش",
+    "image": "https://madperfume.ps/upload/01-2026/product/a95b6150-a436-4b09-9896-8fc7bf76bbb0_size640_cropCenter.jpg",
+    "link": "https://madperfume.ps/?app=product.show.515",
+    "real_title": "عطر الاغراء",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Madam",
+    "price": "250 ILS",
+    "category": "عطور النيش",
+    "image": "https://madperfume.ps/upload/01-2026/product/697a3c3f6301f.png",
+    "link": "https://madperfume.ps/?app=product.show.189",
+    "real_title": "Modern Muse Estée Lauder",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Madam Amour",
+    "price": "250 ILS",
+    "category": "عطور النيش",
+    "image": "https://madperfume.ps/upload/01-2026/product/697a2fb111c3c.png",
+    "link": "https://madperfume.ps/?app=product.show.187",
+    "real_title": "Tyl Assoluto Tiziana Terenzi",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Madam The Roman Night",
+    "price": "250 ILS",
+    "category": "عطور النيش",
+    "image": "https://madperfume.ps/upload/01-2026/product/697a284ceb226.png",
+    "link": "https://madperfume.ps/?app=product.show.208",
+    "real_title": "Goldea The Roman Night Absolute Bvlgari",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Malaki Oud",
+    "price": "300 ILS",
+    "category": "عطور النيش",
+    "image": "https://madperfume.ps/upload/01-2026/product/697957414b4e6.png",
+    "link": "https://madperfume.ps/?app=product.show.200",
+    "real_title": "Malaki Oud 100 ml Unisex",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "MALIK",
+    "price": "300 ILS",
+    "category": "عطور النيش",
+    "image": "https://madperfume.ps/upload/03-2026/product/IMG_0298.jpeg",
+    "link": "https://madperfume.ps/?app=product.show.204",
+    "real_title": "Escentric 02 Escentric Molecules",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Mare",
+    "price": "500 ILS",
+    "category": "عطور النيش",
+    "image": "https://madperfume.ps/upload/01-2026/product/74e76c6f-95d1-454c-a178-939ca076f7e9_size640_cropCenter.jpg",
+    "link": "https://madperfume.ps/?app=product.show.214",
+    "real_title": "Mare",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Marjorie 50 ml",
+    "price": "300 ILS",
+    "category": "عطور النيش",
+    "image": "https://madperfume.ps/upload/01-2026/product/697a647e65292.png",
+    "link": "https://madperfume.ps/?app=product.show.684",
+    "real_title": "Marjorie",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Monalisa",
+    "price": "250 ILS",
+    "category": "عطور النيش",
+    "image": "https://madperfume.ps/upload/01-2026/product/697a39d4310de.png",
+    "link": "https://madperfume.ps/?app=product.show.190",
+    "real_title": "Black Opium Nuit Blanche Yves Saint Laurent",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Mystic gourmand",
+    "price": "350 ILS",
+    "category": "عطور النيش",
+    "image": "https://madperfume.ps/upload/01-2026/product/be216344-96cc-4fd1-a2cf-d30386913aac_size640_cropCenter (1).jpg",
+    "link": "https://madperfume.ps/?app=product.show.681",
+    "real_title": "Mystic Gourmand 50 مل – عطر للجنسين",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "NARCOTIC",
+    "price": "350 ILS",
+    "category": "عطور النيش",
+    "image": "https://madperfume.ps/upload/01-2026/product/697a4569af7f0.png",
+    "link": "https://madperfume.ps/?app=product.show.75",
+    "real_title": "Fleur Narcotique Ex Nihilo",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Narcotic Intense 100 ml",
+    "price": "300 ILS",
+    "category": "عطور النيش",
+    "image": "https://madperfume.ps/upload/01-2026/product/ac7faf22-6223-435b-b841-7f6f4f7fcce1_size640_cropCenter.jpg",
+    "link": "https://madperfume.ps/?app=product.show.546",
+    "real_title": "Narcotic Intense",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "New York Night",
+    "price": "300 ILS",
+    "category": "عطور النيش",
+    "image": "https://madperfume.ps/upload/01-2026/product/697a3a93ea8d6.png",
+    "link": "https://madperfume.ps/?app=product.show.516",
+    "real_title": "Bond Number One Bond No 9",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "NO47",
+    "price": "280 ILS",
+    "category": "عطور النيش",
+    "image": "https://madperfume.ps/upload/03-2026/product/IMG_1304.jpeg",
+    "link": "https://madperfume.ps/?app=product.show.77",
+    "real_title": "Sirrah Tiziana Terenzi",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "OMBER",
+    "price": "350 ILS",
+    "category": "عطور النيش",
+    "image": "https://madperfume.ps/upload/01-2026/product/697a43ef402c5.png",
+    "link": "https://madperfume.ps/?app=product.show.325",
+    "real_title": "Ombre Nomade Louis Vuitton",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Opus",
+    "price": "300 ILS",
+    "category": "عطور النيش",
+    "image": "https://madperfume.ps/upload/01-2026/product/697952055444b.png",
+    "link": "https://madperfume.ps/?app=product.show.175",
+    "real_title": "AMBER WOOD",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Oud Supreme",
+    "price": "350 ILS",
+    "category": "عطور النيش",
+    "image": "https://madperfume.ps/upload/01-2026/product/WhatsApp Image 2026-01-28 at 00.14.09.jpeg",
+    "link": "https://madperfume.ps/?app=product.show.215",
+    "real_title": "Mad Oud Supreme",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Pera",
+    "price": "300 ILS",
+    "category": "عطور النيش",
+    "image": "https://madperfume.ps/upload/01-2026/product/69795d023c412.png",
+    "link": "https://madperfume.ps/?app=product.show.194",
+    "real_title": "Pera",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Prevail",
+    "price": "250 ILS",
+    "category": "عطور النيش",
+    "image": "https://madperfume.ps/upload/01-2026/product/697a3072c22d0.png",
+    "link": "https://madperfume.ps/?app=product.show.188",
+    "real_title": "Marfa Memo Paris",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Quarter",
+    "price": "350 ILS",
+    "category": "عطور النيش",
+    "image": "https://madperfume.ps/upload/03-2026/product/IMG_1324.jpeg",
+    "link": "https://madperfume.ps/?app=product.show.728",
+    "real_title": "Quarter",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "ROUGE",
+    "price": "300 ILS",
+    "category": "عطور النيش",
+    "image": "https://madperfume.ps/upload/01-2026/product/69794a374a58d.png",
+    "link": "https://madperfume.ps/?app=product.show.76",
+    "real_title": "Barakkat Rouge 540 Extrait de Parfum Fragrance",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Rouge Empreisa 100 ml Unisex Parfüm",
+    "price": "300 ILS",
+    "category": "عطور النيش",
+    "image": "https://madperfume.ps/upload/01-2026/product/6979626224538.png",
+    "link": "https://madperfume.ps/?app=product.show.390",
+    "real_title": "Empressa Penhaligon's",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Rouge night",
+    "price": "300 ILS",
+    "category": "عطور النيش",
+    "image": "https://madperfume.ps/upload/01-2026/product/6979630e77e78.png",
+    "link": "https://madperfume.ps/?app=product.show.265",
+    "real_title": "Erba Pura Xerjoff",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Sapphire",
+    "price": "350 ILS",
+    "category": "عطور النيش",
+    "image": "https://madperfume.ps/upload/01-2026/product/b43cfddd-4e47-4dab-939a-e76f31e8ee80_size640_cropCenter.jpg",
+    "link": "https://madperfume.ps/?app=product.show.213",
+    "real_title": "عبير من الجرأة والرقي – كجوهرة ثمينة تروي حكاية",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Sateen Oud",
+    "price": "300 ILS",
+    "category": "عطور النيش",
+    "image": "https://madperfume.ps/upload/01-2026/product/697958ef4d774.png",
+    "link": "https://madperfume.ps/?app=product.show.201",
+    "real_title": "Oud Satin Mood – Sateen Oud 100 ml Unisex",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "SEALIGHET",
+    "price": "350 ILS",
+    "category": "عطور النيش",
+    "image": "https://madperfume.ps/upload/01-2026/product/697a4293a64de.png",
+    "link": "https://madperfume.ps/?app=product.show.326",
+    "real_title": "L’Immensité Louis Vuitton",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Secret Night",
+    "price": "300 ILS",
+    "category": "عطور النيش",
+    "image": "https://madperfume.ps/upload/03-2026/product/IMG_0278.jpeg",
+    "link": "https://madperfume.ps/?app=product.show.209",
+    "real_title": "DE MARLEY ATHALIA",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Sense",
+    "price": "250 ILS",
+    "category": "عطور النيش",
+    "image": "https://madperfume.ps/upload/03-2026/product/IMG_0291.jpeg",
+    "link": "https://madperfume.ps/?app=product.show.210",
+    "real_title": "Apollonia Xerjoff",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "SHAH",
+    "price": "500 ILS",
+    "category": "عطور النيش",
+    "image": "https://madperfume.ps/upload/01-2026/product/106e07a1-b587-46b0-9ba0-f30e1c359afa_size640_cropCenter.jpg",
+    "link": "https://madperfume.ps/?app=product.show.360",
+    "real_title": "Shah 50 ml Unisex",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "SPICE OUD",
+    "price": "300 ILS",
+    "category": "عطور النيش",
+    "image": "https://madperfume.ps/upload/03-2026/product/IMG_0337.jpeg",
+    "link": "https://madperfume.ps/?app=product.show.202",
+    "real_title": "Oud Wood Tom Ford - SPICE OUD",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "STARLIGHT",
+    "price": "350 ILS",
+    "category": "عطور النيش",
+    "image": "https://madperfume.ps/upload/01-2026/product/697a4348c0dd5.png",
+    "link": "https://madperfume.ps/?app=product.show.324",
+    "real_title": "City Of Stars Louis Vuitton",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Sweet Bouquet",
+    "price": "300 ILS",
+    "category": "عطور النيش",
+    "image": "https://madperfume.ps/upload/01-2026/product/69795f89e26e2.png",
+    "link": "https://madperfume.ps/?app=product.show.395",
+    "real_title": "Delina Parfums de Marly",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Timeless Leather 50",
+    "price": "350 ILS",
+    "category": "عطور النيش",
+    "image": "https://madperfume.ps/upload/01-2026/product/a89138f6-574d-4314-8f8d-841a82bc6c5f_size640_cropCenter.jpg",
+    "link": "https://madperfume.ps/?app=product.show.680",
+    "real_title": "Mad Timeless Leather 50 مل – عطر يونيكس",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Treasure 100 ml",
+    "price": "350 ILS",
+    "category": "عطور النيش",
+    "image": "https://madperfume.ps/upload/01-2026/product/d5390a37-5baa-47ce-9b5d-f1bec7c58361_size640_cropCenter.jpg",
+    "link": "https://madperfume.ps/?app=product.show.683",
+    "real_title": "Treasure",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Trono",
+    "price": "300 ILS",
+    "category": "عطور النيش",
+    "image": "https://madperfume.ps/upload/03-2026/product/IMG_0184.jpeg",
+    "link": "https://madperfume.ps/?app=product.show.206",
+    "real_title": "Layton Parfums de Marly",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Favorilere Ekle Mad Hipnotizya 500 ml",
+    "price": "60 ILS",
+    "category": "معطر الجو",
+    "image": "https://madperfume.ps/upload/12-2023/product/IMG_8808.jpeg",
+    "link": "https://madperfume.ps/?app=product.show.272",
+    "real_title": "Favorilere Ekle Mad Hipnotizya 500 ml",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Favorilere Ekle Mad Mona Rosa 500 ml",
+    "price": "60 ILS",
+    "category": "معطر الجو",
+    "image": "https://madperfume.ps/upload/12-2023/product/IMG_8810.jpeg",
+    "link": "https://madperfume.ps/?app=product.show.271",
+    "real_title": "Favorilere Ekle Mad Mona Rosa 500 ml",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Favorilere Ekle Mad Pure Natural 500 ml",
+    "price": "60 ILS",
+    "category": "معطر الجو",
+    "image": "https://madperfume.ps/upload/12-2023/product/IMG_8812.jpeg",
+    "link": "https://madperfume.ps/?app=product.show.270",
+    "real_title": "Favorilere Ekle Mad Pure Natural 500 ml",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Mad Dream Bouquet 500 ml",
+    "price": "60 ILS",
+    "category": "معطر الجو",
+    "image": "https://madperfume.ps/upload/12-2023/product/IMG_8814.jpeg",
+    "link": "https://madperfume.ps/?app=product.show.273",
+    "real_title": "Mad Dream Bouquet 500 ml",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "Mad Turkish Bath 500 ml",
+    "price": "60 ILS",
+    "category": "معطر الجو",
+    "image": "https://madperfume.ps/upload/12-2023/product/IMG_8806.jpeg",
+    "link": "https://madperfume.ps/?app=product.show.268",
+    "real_title": "Mad Turkish Bath 500 ml",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "DEREAM BOUQET",
+    "price": "35 ILS",
+    "category": "معطر الجو 250 مل جديد",
+    "image": "https://madperfume.ps/upload/04-2025/product/mad-dream-bouquet-250-ml-luks-oda-spre-3d8abc.webp",
+    "link": "https://madperfume.ps/?app=product.show.597",
+    "real_title": "DEREAM BOUQET",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "HIPONYTZYA",
+    "price": "35 ILS",
+    "category": "معطر الجو 250 مل جديد",
+    "image": "https://madperfume.ps/upload/04-2025/product/mad-hipnotizya-250-ml-luks-oda-spreyi2-78c183.webp",
+    "link": "https://madperfume.ps/?app=product.show.601",
+    "real_title": "HIPONYTZYA",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "MONA ROSA",
+    "price": "35 ILS",
+    "category": "معطر الجو 250 مل جديد",
+    "image": "https://madperfume.ps/upload/04-2025/product/mad-mona-rosa-250-ml-luks-oda-spreyi25-2-185c.webp",
+    "link": "https://madperfume.ps/?app=product.show.598",
+    "real_title": "MONA ROSA",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "PURE NATURAL",
+    "price": "35 ILS",
+    "category": "معطر الجو 250 مل جديد",
+    "image": "https://madperfume.ps/upload/04-2025/product/mad-pure-natural-250-ml-luks-oda-sprey-86f4b5.webp",
+    "link": "https://madperfume.ps/?app=product.show.600",
+    "real_title": "PURE NATURAL",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "RAIN FORREST",
+    "price": "35 ILS",
+    "category": "معطر الجو 250 مل جديد",
+    "image": "https://madperfume.ps/upload/04-2025/product/mad-rain-forest-250-ml-luks-oda-spreyi-338-d0.webp",
+    "link": "https://madperfume.ps/?app=product.show.599",
+    "real_title": "RAIN FORREST",
+    "lang": "ar"
+  },
+  {
+    "perfume_code": "TURKISH BATH",
+    "price": "35 ILS",
+    "category": "معطر الجو 250 مل جديد",
+    "image": "https://madperfume.ps/upload/04-2025/product/mad-turkish-bath-250-ml-luks-oda-sprey-acdd-9.webp",
+    "link": "https://madperfume.ps/?app=product.show.596",
+    "real_title": "TURKISH BATH",
+    "lang": "ar"
+  }
+]
+;
