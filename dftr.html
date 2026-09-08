@@ -1,284 +1,52 @@
-<!doctype html>
-<html lang="ar" dir="rtl">
-<head>
-  <meta charset="utf-8" />
-  <meta
-    name="viewport"
-    content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no"
-  />
-  <title>دفتر الفروع</title>
-  <script>
-    // Open Google authentication in the top-level tab on phones and tablets.
-    // Desktop browsers keep the embedded application.
-    const isMobileDevice = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent)
-      || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-    if (isMobileDevice) {
-      window.location.replace('https://script.google.com/macros/s/AKfycbz-t9KSyd038rxInmJp5eT1MStT3mI0YJIKj3eenyLnq97tkGMnCbDUA3JfZrKt8Pt5rA/exec');
-    }
-  </script>
-
-  <meta name="description" content="دفتر الفروع — المصاريف والمشتريات" />
-
-  <style>
-    :root{
-      --bg:#0f172a;
-      --bg2:#111827;
-      --card:#111827;
-      --line:#1f2937;
-      --txt:#e5e7eb;
-      --muted:#94a3b8;
-      --brand:#22c55e;
-      --header-h:64px;
-      --safe-top: env(safe-area-inset-top, 0px);
-      --safe-bottom: env(safe-area-inset-bottom, 0px);
-      --radius:14px;
-    }
-
-    *{
-      box-sizing:border-box;
-      -webkit-tap-highlight-color:transparent;
-    }
-
-    html,
-    body{
-      margin:0;
-      padding:0;
-      width:100%;
-      height:100%;
-      overflow:hidden;
-      background:linear-gradient(180deg,#0b1220,#111827);
-      color:var(--txt);
-      font-family:Arial,sans-serif;
-      overscroll-behavior:none;
-    }
-
-    body{
-      position:fixed;
-      inset:0;
-      touch-action:manipulation;
-    }
-
-    .app{
-      position:fixed;
-      inset:0;
-      width:100%;
-      height:100dvh;
-      height:100vh;
-      overflow:hidden;
-      background:linear-gradient(180deg,#0b1220,#111827);
-    }
-
-    .top{
-      position:absolute;
-      top:0;
-      right:0;
-      left:0;
-      height:calc(var(--header-h) + var(--safe-top));
-      padding:
-        calc(var(--safe-top) + 10px)
-        14px
-        10px
-        14px;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:10px;
-      border-bottom:1px solid var(--line);
-      background:rgba(17,24,39,.96);
-      backdrop-filter:blur(10px);
-      -webkit-backdrop-filter:blur(10px);
-      z-index:10;
-    }
-
-    .title{
-      font-weight:900;
-      letter-spacing:.5px;
-      font-size:18px;
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
-    }
-
-    .actions{
-      display:flex;
-      gap:8px;
-      flex-shrink:0;
-    }
-
-    .btn{
-      appearance:none;
-      border:1px solid #334155;
-      background:#0b1220;
-      color:#e5e7eb;
-      padding:10px 14px;
-      border-radius:12px;
-      cursor:pointer;
-      text-decoration:none;
-      font-size:13px;
-      font-weight:700;
-      line-height:1;
-      min-height:40px;
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      white-space:nowrap;
-      transition:transform .12s ease, opacity .12s ease, background .12s ease;
-    }
-
-    .btn:active{
-      transform:scale(.98);
-    }
-
-    .btn.primary{
-      background:var(--brand);
-      color:#052e16;
-      border-color:#16a34a;
-    }
-
-    .main{
-      position:absolute;
-      top:calc(var(--header-h) + var(--safe-top));
-      right:0;
-      left:0;
-      bottom:0;
-      padding:12px 12px calc(12px + var(--safe-bottom));
-      overflow:hidden;
-    }
-
-    .frame-shell{
-      position:relative;
-      width:100%;
-      height:100%;
-      border:1px solid #334155;
-      border-radius:16px;
-      overflow:hidden;
-      background:#fff;
-      box-shadow:0 12px 30px rgba(0,0,0,.28);
-    }
-
-    iframe{
-      display:block;
-      width:100%;
-      height:100%;
-      border:0;
-      background:#fff;
-    }
-
-    .note{
-      position:absolute;
-      right:50%;
-      transform:translateX(50%);
-      bottom:calc(8px + var(--safe-bottom));
-      z-index:11;
-      font-size:12px;
-      color:var(--muted);
-      background:rgba(15,23,42,.72);
-      padding:6px 10px;
-      border:1px solid rgba(51,65,85,.7);
-      border-radius:999px;
-      backdrop-filter:blur(8px);
-      -webkit-backdrop-filter:blur(8px);
-      pointer-events:none;
-    }
-
-    @media (max-width:640px){
-      :root{
-        --header-h:60px;
-      }
-
-      .top{
-        padding:
-          calc(var(--safe-top) + 8px)
-          10px
-          8px
-          10px;
-      }
-
-      .title{
-        font-size:16px;
-      }
-
-      .actions{
-        gap:6px;
-      }
-
-      .btn{
-        padding:9px 11px;
-        font-size:12px;
-        min-height:38px;
-        border-radius:10px;
-      }
-
-      .main{
-        padding:8px 8px calc(8px + var(--safe-bottom));
-      }
-
-      .frame-shell{
-        border-radius:12px;
-      }
-
-      .note{
-        font-size:11px;
-        max-width:calc(100% - 20px);
-        text-align:center;
-      }
-    }
-  </style>
-</head>
-<body>
-  <div class="app">
-    <header class="top">
-      <div class="title">دفتر الفروع</div>
-
-      <div class="actions">
-        <a
-          class="btn"
-          href="https://script.google.com/macros/s/AKfycbz-t9KSyd038rxInmJp5eT1MStT3mI0YJIKj3eenyLnq97tkGMnCbDUA3JfZrKt8Pt5rA/exec"
-          target="_blank"
-          rel="noopener"
-        >
-          فتح مباشر
-        </a>
-
-        <button class="btn primary" type="button" onclick="reloadFrame()">
-          تحديث
-        </button>
-      </div>
-    </header>
-
-    <main class="main">
-      <div class="frame-shell">
-        <iframe
-          id="appFrame"
-          title="دفتر الفروع"
-          src="https://script.google.com/macros/s/AKfycbz-t9KSyd038rxInmJp5eT1MStT3mI0YJIKj3eenyLnq97tkGMnCbDUA3JfZrKt8Pt5rA/exec"
-          loading="eager"
-          referrerpolicy="no-referrer"
-          allow="clipboard-read; clipboard-write">
-        </iframe>
-      </div>
-
-      <div class="note">إذا لم يظهر داخل الإطار، استخدم زر "فتح مباشر"</div>
-    </main>
-  </div>
-
-  <script>
-    function reloadFrame() {
-      const f = document.getElementById('appFrame');
-      const currentSrc = f.src;
-      f.src = 'about:blank';
-      setTimeout(() => {
-        f.src = currentSrc;
-      }, 60);
-    }
-
-    function setAppHeight() {
-      document.documentElement.style.setProperty('--app-height', window.innerHeight + 'px');
-    }
-
-    setAppHeight();
-    window.addEventListener('resize', setAppHeight);
-    window.addEventListener('orientationchange', setAppHeight);
-  </script>
-</body>
-</html>
+<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>دفتر الفروع</title><meta name="description" content="دفتر الفروع — إدارة المصاريف والمشتريات"><style>
+:root{--ink:#163247;--green:#087e70;--line:#dce5eb;--muted:#5b6d7c;--page:#f2f6f8}*{box-sizing:border-box}body{margin:0;background:var(--page);color:var(--ink);font:16px/1.65 Arial,Tahoma,sans-serif}button,input,textarea,select{font:inherit}button,a,input,select,textarea{-webkit-tap-highlight-color:transparent}button{cursor:pointer;min-height:44px}button:disabled{opacity:.5;cursor:wait}a{color:var(--green)}button:focus-visible,a:focus-visible{outline:3px solid #00aa91;outline-offset:3px}input,textarea,select{min-width:0;min-height:48px;width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:#fff;color:var(--ink);outline:none}input:focus,textarea:focus,select:focus{border-color:var(--green);box-shadow:0 0 0 3px #087e7015}input[type=number]{direction:ltr;text-align:right}label{display:flex;flex-direction:column;gap:6px;font-size:.9375rem}h1,h2,h3,p{margin:0}h1{font-size:2rem;line-height:1.4}h2{font-size:1.2rem}h3{font-size:1rem}.shell{max-width:1120px;margin:auto;padding:0 30px 32px}.top{display:flex;align-items:center;justify-content:space-between;gap:16px;height:96px;border-bottom:1px solid var(--line)}.brand{display:flex;align-items:center;gap:12px}.brandmark{background:var(--ink);color:white;width:46px;height:46px;display:grid;place-items:center;border-radius:14px;font-size:24px}.brand b{font-size:1.2rem;display:block}.brand small{display:block;font-size:.875rem;color:var(--muted)}.badge{font-size:.8rem;background:#e0f1ec;color:#087769;border-radius:20px;padding:5px 10px}.heading{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:28px 0 22px}.eyebrow{font-size:.875rem;color:var(--green);font-weight:bold;margin-bottom:5px}.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:10px 16px;border:1px solid var(--line);border-radius:12px;background:white;color:var(--ink);text-decoration:none;line-height:1.5}.primary{background:var(--green);border-color:var(--green);color:#fff}.danger{color:#b42c42;background:#fff4f4;border-color:#f0c5cc}.quiet{border-color:transparent;background:transparent}.nav{display:flex;gap:8px;border-bottom:1px solid var(--line);margin-bottom:22px}.nav button{border:0;background:none;color:var(--muted);min-height:55px;padding:12px 22px;font-size:1rem;border-bottom:3px solid transparent}.nav button[aria-current=page]{color:var(--green);border-bottom-color:var(--green);font-weight:bold}.nav span{margin-left:7px;font-size:20px}.filters{display:grid;grid-template-columns:1.35fr 1fr 1fr auto;gap:12px;align-items:end;margin-bottom:22px}.filters .btn{min-height:48px}.summary{display:grid;grid-template-columns:2fr 1fr 1fr;gap:16px;margin-bottom:22px}.total{padding:24px 28px;background:#12364b;color:white;border-radius:22px;min-height:180px}.total>p{color:#d2e7e6}.total strong{font-size:2.85rem;font-weight:600;display:block;line-height:1.55;letter-spacing:-1px}.total small{color:#bed5df;font-size:.875rem}.metric{padding:24px;background:#fff;border:1px solid var(--line);border-radius:22px;display:flex;flex-direction:column;justify-content:center}.metric>span,.muted{color:var(--muted)}.metric strong{font-size:2.2rem;line-height:1.5}.metric small{font-size:.875rem;color:var(--muted)}.panel{background:#fff;padding:24px;border:1px solid var(--line);border-radius:20px;margin-bottom:20px}.panel-head{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:18px}.columns{display:grid;grid-template-columns:1fr 1fr;gap:20px}.empty{padding:38px 20px;text-align:center}.empty-symbol{background:#e5f4ee;color:var(--green);font-size:28px;border-radius:20px;width:64px;height:64px;display:grid;place-items:center;margin:0 auto 16px}.empty p{max-width:370px;margin:8px auto 20px;color:var(--muted)}.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:18px}.form-grid .full{grid-column:1/-1}.expense-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:16px}.field-help{font-size:.8rem;color:var(--muted);min-height:20px}.group-heading{display:flex;align-items:center;gap:10px}.group-number{font-size:.8rem;background:#e5f4ee;color:var(--green);width:27px;height:27px;border-radius:8px;display:grid;place-items:center}.save-bar{position:sticky;bottom:12px;padding:16px 20px;background:#fff;border:1px solid var(--line);border-radius:18px;display:flex;align-items:center;justify-content:space-between;gap:16px;box-shadow:0 6px 26px #12364b12;z-index:10}.save-bar strong{font-size:1.4rem;display:block}.save-bar small{color:var(--muted)}.actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.record{padding:18px 0;border-bottom:1px solid var(--line)}.record:last-child{border-bottom:0}.record-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:10px}.record b{font-size:1.06rem}.record-total{font-weight:bold;white-space:nowrap}.record-meta{color:var(--muted);font-size:.875rem}.record .actions{justify-content:flex-end}.record-note{white-space:pre-wrap;overflow-wrap:anywhere;color:var(--muted);font-size:.875rem}.record-chips{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0}.chip{background:#f0f5f7;padding:3px 8px;border-radius:6px;font-size:.8rem}.bars{display:flex;flex-direction:column;gap:18px}.bar-label{display:flex;justify-content:space-between;gap:12px;font-size:.9375rem;margin-bottom:6px}.bar-track{height:9px;border-radius:20px;background:#edf2f4;overflow:hidden}.bar-fill{height:100%;min-width:3px;background:var(--green);border-radius:20px}.notice{background:#edf7f4;border:1px solid #c9e8df;border-radius:14px;padding:12px 16px;color:#226557;font-size:.9375rem;margin-bottom:20px}.error{background:#fff1f1;border-color:#edbcc3;color:#9d2939}.toolbar{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:18px;flex-wrap:wrap}.search{flex:1;min-width:160px;max-width:340px}.segmented{display:flex;gap:6px}.segmented .selected{background:#e5f4ee;color:var(--green);border-color:#a9d6c9}.branch-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 0;border-bottom:1px solid var(--line)}.branch-row:last-child{border-bottom:0}.branch-name{overflow-wrap:anywhere}.footer{color:var(--muted);text-align:center;font-size:.8rem;padding:16px 0}.source-note{font-size:.8rem;color:var(--muted);margin:14px 0;text-align:center}#toast{position:fixed;top:16px;left:50%;transform:translateX(-50%);background:#153b35;color:white;padding:12px 20px;border-radius:14px;box-shadow:0 6px 28px #17332725;z-index:100;max-width:calc(100% - 28px);width:max-content}dialog{border:1px solid var(--line);border-radius:20px;padding:26px;max-width:460px;width:calc(100% - 32px);color:var(--ink)}dialog::backdrop{background:#08203277;backdrop-filter:blur(3px)}dialog h2{margin-bottom:10px}dialog .actions{margin-top:22px;justify-content:flex-end}dialog p{color:var(--muted)}.loader{padding:40px;text-align:center;color:var(--muted)}.spinner{width:28px;height:28px;border:3px solid #dcebe5;border-top-color:var(--green);border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 12px}@keyframes spin{to{transform:rotate(360deg)}}[hidden]{display:none!important}.chart-foot{font-size:.875rem;color:var(--muted);padding-top:16px}.inline-link{border:0;background:none;color:var(--green);text-decoration:underline}.wide-note{max-width:660px}.status-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#0a967d;margin-left:5px}
+@media(max-width:680px){.shell{padding:0 16px 100px}.top{height:84px}.brand b{font-size:1.12rem}.brandmark{width:42px;height:42px}.badge{font-size:.75rem}h1{font-size:1.7rem}.heading{padding:24px 0 20px}.heading .add-label{display:none}.heading .btn{width:46px;font-size:24px;padding:4px}.nav{position:fixed;bottom:0;right:0;left:0;z-index:25;margin:0;padding:4px 8px env(safe-area-inset-bottom);height:calc(76px + env(safe-area-inset-bottom));background:white;border-top:1px solid var(--line);box-shadow:0 -3px 20px #12364b10;justify-content:space-around;gap:3px}.nav button{flex:1;min-width:0;padding:6px 4px;border:0;font-size:.875rem;border-radius:12px;height:66px}.nav button[aria-current=page]{background:#eaf6f1}.nav span{display:block;margin:0;font-size:22px;line-height:1.2}.summary{grid-template-columns:1fr 1fr;gap:12px}.total{grid-column:1/-1;padding:22px}.metric{padding:16px 18px;min-height:120px}.metric strong{font-size:1.9rem}.filters{grid-template-columns:1fr 1fr;gap:10px}.filters>label:first-child{grid-column:1/-1}.filters>.btn{grid-column:1/-1;min-height:40px}.panel{padding:18px;border-radius:18px}.columns{grid-template-columns:1fr;gap:0}.expense-grid{grid-template-columns:1fr 1fr;gap:14px 10px}.form-grid{gap:12px}.save-bar{bottom:88px;padding:12px;gap:8px;flex-wrap:wrap}.save-bar .actions{gap:5px}.save-bar strong{font-size:1.2rem}.btn{padding:10px 12px}.record-top{gap:8px}.record-total{font-size:.95rem}.toolbar{gap:12px}.search{max-width:none}.branch-row{align-items:flex-start;flex-wrap:wrap}.field-help{font-size:.75rem}.source-note{line-height:1.8}.bar-label{font-size:.875rem}}
+@media(max-width:370px){.expense-grid,.form-grid{grid-template-columns:1fr}.form-grid .full{grid-column:auto}.total strong{font-size:2.4rem}.record-top{flex-wrap:wrap}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;scroll-behavior:auto!important}}
+@media print{.nav,.top,.filters,.heading>.btn,.actions,.toolbar,.save-bar,.source-note{display:none!important}.shell{padding:0}.panel,.total,.metric{break-inside:avoid;box-shadow:none}.total{background:white;color:#000}.total p,.total small{color:#333}}
+</style></head><body><div class="shell"><header class="top"><div class="brand"><span class="brandmark" aria-hidden="true">▤</span><div><b>دفتر الفروع</b><small>المصاريف والمشتريات</small></div></div><span class="badge">إدارة الفروع</span></header><div class="heading"><div><p class="eyebrow" id="eyebrow">نظرة على الأرقام</p><h1 id="pageTitle">كل مصاريفك، بمكان واحد.</h1></div><button class="btn primary" id="addTop" onclick="newRecord()" disabled aria-label="إضافة سجل">＋ <span class="add-label">إضافة سجل</span></button></div><nav class="nav" aria-label="شاشات التطبيق"><button data-view="overview" aria-current="page" onclick="navigate('overview')"><span aria-hidden="true">◫</span>الملخص</button><button data-view="records" onclick="navigate('records')"><span aria-hidden="true">≡</span>السجلات</button><button data-view="new" onclick="newRecord()"><span aria-hidden="true">＋</span>إضافة</button><button data-view="branches" onclick="navigate('branches')"><span aria-hidden="true">⌂</span>الفروع</button></nav><div id="error" class="notice error" role="alert" hidden></div><div id="filters" class="filters" hidden><label>الفرع<select id="filterBranch" onchange="render()"><option value="">كل الفروع</option></select></label><label>من تاريخ<input id="filterFrom" type="date" onchange="render()"></label><label>إلى تاريخ<input id="filterTo" type="date" onchange="render()"></label><button class="btn" onclick="clearFilters()">مسح الفلاتر</button></div><div id="main" aria-live="polite"><div class="panel loader"><div class="spinner"></div>جارٍ قراءة بيانات الجدول…</div></div><p class="source-note" id="syncNote"></p><footer class="footer">دفتر الفروع · <a href="https://docs.google.com/spreadsheets/d/14z4ki8u1X87EnS5S024U0DEYwOAYQUY9_L8QTI_ssB8/edit#gid=0" target="_blank" rel="noopener">فتح Google Sheets ↗</a></footer></div><div id="toast" role="status" hidden></div><dialog id="dialog" aria-labelledby="dialogTitle"><h2 id="dialogTitle"></h2><div id="dialogBody"></div><div class="actions"><button class="btn" id="dialogCancel" onclick="closeDialog()">إلغاء</button><button class="btn primary" id="dialogConfirm">تأكيد</button></div></dialog><script>
+'use strict';
+const labels=['شراء وكلاء الضفة','شراء وكلاء إسرائيل','رواتب الموظفين والمخازن','مصاريف أخرى','إيجار المحلات','أرنونا','مشتريات تركيا والصين','أجرة المحاسب','ضريبة القيمة المضافة','التأمين الوطني','التقاعد','دفعات ضريبة الدخل','الإعلانات'];
+const originals=['شراء وكلاء الضفه','شراء وكلاء اسرائيل','رواتب موظفين-ومخازن','הוצאות','ايجار محلات','ارنونا','مشتريات تركيا والصين','اجره محاسب','מע"מ','ביטוח לאומי','פינסה','מס הכנסה מקדימות','اعلانات'];
+let data={records:[],branches:[]},loaded=false,busy=false,view='overview',draft=null,dirty=false,trash=false,search='',confirmAction=null,toastTimer;
+const $=id=>document.getElementById(id),esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])),money=n=>(n/100).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})+' ₪';
+function today(){const d=new Date();return new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,10)}
+function uid(){return crypto.randomUUID?crypto.randomUUID():'r-'+Date.now()+'-'+Math.random().toString(36).slice(2)}
+function toast(text){$('toast').textContent=text;$('toast').hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').hidden=true,5000)}
+function showError(e){$('error').textContent=e&&e.message?e.message:String(e);$('error').hidden=false}
+const endpoint='https://script.google.com/macros/s/AKfycbz-t9KSyd038rxInmJp5eT1MStT3mI0YJIKj3eenyLnq97tkGMnCbDUA3JfZrKt8Pt5rA/exec';
+const channel=crypto.randomUUID(),pending=new Map();let bridgeWindow=null,bridgeOrigin=null,bridgePromise=null;
+window.addEventListener('message',e=>{const m=e.data;if(!m||m.channel!==channel||!/^https:\/\/[a-z0-9-]+\.googleusercontent\.com$/.test(e.origin))return;if(m.type==='dftr:ready'){bridgeWindow=e.source;bridgeOrigin=e.origin;return}if(e.source!==bridgeWindow||e.origin!==bridgeOrigin||m.type!=='dftr:response')return;const p=pending.get(m.id);if(!p)return;pending.delete(m.id);clearTimeout(p.timer);m.error?p.reject(Error(m.error)):p.resolve(m.result)});
+function connectBridge(){if(bridgeWindow)return Promise.resolve();if(bridgePromise)return bridgePromise;bridgePromise=new Promise((resolve,reject)=>{let frame=document.getElementById('dataBridge');if(!frame){frame=document.createElement('iframe');frame.id='dataBridge';frame.title='اتصال البيانات';frame.hidden=true;frame.src=endpoint+'?bridge=1&channel='+encodeURIComponent(channel);document.body.appendChild(frame)}const started=Date.now();const timer=setInterval(()=>{if(bridgeWindow){clearInterval(timer);resolve()}else if(Date.now()-started>30000){clearInterval(timer);frame.remove();bridgePromise=null;reject(Error('تعذّر الاتصال بجدولك. افتح رابط الاتصال بحساب Google، ثم ارجع وأعد المحاولة.'))}},100)});return bridgePromise}
+async function rpc(name,payload){await connectBridge();return new Promise((resolve,reject)=>{const id=crypto.randomUUID();const timer=setTimeout(()=>{pending.delete(id);reject(Error(name==='getState'?'تأخرت قراءة البيانات. أعد المحاولة.':'لم يصل تأكيد الحفظ. حدّث البيانات للتحقق قبل تكرار العملية.'))},45000);pending.set(id,{resolve,reject,timer});bridgeWindow.postMessage({type:'dftr:request',channel,id,method:name,payload},bridgeOrigin)})}
+function applyState(next){data=next;loaded=true;const prev=$('filterBranch').value;$('filterBranch').innerHTML='<option value="">كل الفروع</option>'+data.branches.map(b=>'<option value="'+esc(b.name)+'">'+esc(b.name)+'</option>').join('');$('filterBranch').value=prev;const syncTime=new Date(data.updated).toLocaleTimeString('ar',{hour:'2-digit',minute:'2-digit'});$('syncNote').innerHTML='<span class="status-dot"></span>آخر قراءة من الجدول: '+esc(syncTime)+' · <button class="inline-link" onclick="refresh()">تحديث الآن</button>';$('addTop').disabled=false;}
+function setBusy(flag){busy=flag;document.querySelectorAll('button,input,select,textarea').forEach(el=>{if(flag){el.dataset.beforeDisabled=String(el.disabled);el.disabled=true;}else if(el.dataset.beforeDisabled!==undefined){el.disabled=el.dataset.beforeDisabled==='true';delete el.dataset.beforeDisabled;}});if(!flag)$('addTop').disabled=!loaded;}
+async function refresh(){if(busy)return;setBusy(true);$('error').hidden=true;try{applyState(await rpc('getState'));render();}catch(e){showError(e);if(!loaded)$('main').innerHTML='<section class="panel empty"><h2>تعذّر تحميل الجدول</h2><p>تأكد من اتصالك وصلاحية الوصول، ثم أعد المحاولة.</p><p><a href="https://script.google.com/macros/s/AKfycbz-t9KSyd038rxInmJp5eT1MStT3mI0YJIKj3eenyLnq97tkGMnCbDUA3JfZrKt8Pt5rA/exec" target="_blank" rel="noopener">فتح الاتصال بحساب Google ↗</a></p><button class="btn primary" onclick="refresh()">إعادة المحاولة</button></section>';}finally{setBusy(false);}}
+function closeDialog(){if(busy)return;$('dialog').close();confirmAction=null}
+function ask(title,body,button,action,danger=false){$('dialogTitle').textContent=title;$('dialogBody').innerHTML=body;$('dialogConfirm').textContent=button;$('dialogConfirm').className='btn '+(danger?'danger':'primary');confirmAction=action;$('dialog').showModal();}
+$('dialogConfirm').onclick=()=>{if(confirmAction&&!busy)confirmAction()};$('dialog').addEventListener('cancel',e=>{if(busy)e.preventDefault()});
+function navigate(next){if(busy)return;if(dirty&&view==='new'&&next!=='new'){ask('ترك التعديلات؟','<p>لم تُحفظ التعديلات الحالية. هل تريد تركها؟</p>','ترك التعديلات',()=>{dirty=false;closeDialog();navigate(next)});return}view=next;render();window.scrollTo({top:0,behavior:'instant'});}
+function newRecord(){if(!loaded||busy)return;if(dirty){ask('بدء سجل جديد؟','<p>ستفقد التعديلات غير المحفوظة.</p>','بدء سجل',()=>{dirty=false;closeDialog();newRecord()});return}draft={id:uid(),create:true,date:today(),branch:data.branches.length===1?data.branches[0].name:'',amounts:Array(13).fill(0),notes:''};navigate('new');}
+function editRecord(id){const r=data.records.find(x=>x.id===id);if(!r)return;draft={...r,create:false,amounts:[...r.amounts]};dirty=false;navigate('new')}
+function selectedRecords(includeDeleted=false){const branch=$('filterBranch').value,from=$('filterFrom').value,to=$('filterTo').value;if(from&&to&&from>to)return [];return data.records.filter(r=>(includeDeleted?!!r.deleted:!r.deleted)&&(!branch||r.branch===branch)&&(!from||r.date>=from)&&(!to||r.date<=to)).sort((a,b)=>b.date.localeCompare(a.date)||b.updated.localeCompare(a.updated));}
+function clearFilters(){$('filterBranch').value='';$('filterFrom').value='';$('filterTo').value='';render()}
+function empty(title,desc,action=''){return '<section class="panel empty"><div class="empty-symbol" aria-hidden="true">▤</div><h2>'+esc(title)+'</h2><p>'+esc(desc)+'</p>'+action+'</section>'}
+function render(){if(!loaded)return;const titles={overview:['نظرة على الأرقام','كل مصاريفك، بمكان واحد.'],records:['الأرشيف والمتابعة','سجلات المصاريف'],new:['إدخال المصاريف',draft&&!draft.create?'تعديل السجل':'سجل جديد'],branches:['تنظيم العمل','إدارة الفروع']};$('eyebrow').textContent=titles[view][0];$('pageTitle').textContent=titles[view][1];document.querySelectorAll('[data-view]').forEach(b=>{if(b.dataset.view===view)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current')});$('filters').hidden=!['overview','records'].includes(view);if(view==='overview')renderOverview();else if(view==='records')renderRecords();else if(view==='branches')renderBranches();else renderForm();if(['overview','records'].includes(view)&&$('filterFrom').value&&$('filterTo').value&&$('filterFrom').value>$('filterTo').value){showError(Error('تاريخ البداية يجب أن يسبق تاريخ النهاية.'));}}
+function renderOverview(){const rows=selectedRecords(),sum=rows.reduce((s,r)=>s+r.total,0),count=new Set(rows.map(r=>r.branch)).size;let html='<section class="summary"><article class="total"><p>إجمالي المصاريف للفترة المحددة</p><strong><bdi>'+money(sum)+'</bdi></strong><small>'+rows.length+' سجل · المبالغ بالشيكل</small></article><article class="metric"><span>السجلات</span><strong>'+rows.length+'</strong><small>ضمن التصفية الحالية</small></article><article class="metric"><span>الفروع المسجلة</span><strong>'+data.branches.length+'</strong><small>'+count+' فروع لها مصاريف بالفترة</small></article></section>';
+ if(!rows.length){html+=empty(data.records.some(r=>!r.deleted)?'لا توجد نتائج لهذه الفترة':'دفترك جاهز للبداية','اختر الفرع والتاريخ، وأدخل المصاريف حسب بنود جدولك.','<button class="btn primary" onclick="newRecord()">＋ إضافة سجل</button>');}else{const totals=labels.map((label,i)=>({label,total:rows.reduce((s,r)=>s+r.amounts[i],0)})).filter(x=>x.total>0).sort((a,b)=>b.total-a.total),branches=[...new Set(rows.map(r=>r.branch))].map(label=>({label,total:rows.filter(r=>r.branch===label).reduce((s,r)=>s+r.total,0)})).sort((a,b)=>b.total-a.total);html+='<div class="notice">أعلى بند صرفاً: <b>'+esc(totals[0]?.label||'—')+'</b> · '+(sum?Math.round((totals[0]?.total||0)/sum*100):0)+'٪ من الإجمالي.</div><div class="columns"><section class="panel"><div class="panel-head"><h2>توزيع المصاريف</h2></div>'+bars(totals.slice(0,6),sum)+'<p class="chart-foot">أكبر 6 بنود في الفترة المحددة</p></section><section class="panel"><div class="panel-head"><h2>المصاريف حسب الفرع</h2></div>'+bars(branches,sum)+'</section></div><section class="panel"><div class="panel-head"><h2>أحدث السجلات</h2><button class="btn quiet" onclick="navigate(\'records\')">عرض الكل ←</button></div>'+rows.slice(0,3).map(recordCard).join('')+'</section>';}$('main').innerHTML=html;}
+function bars(items,sum){return '<div class="bars">'+items.map(x=>'<div><div class="bar-label"><span>'+esc(x.label)+'</span><bdi>'+money(x.total)+'</bdi></div><div class="bar-track" role="img" aria-label="'+esc(x.label+': '+money(x.total))+'"><div class="bar-fill" style="width:'+(sum?Math.min(100,x.total/sum*100):0)+'%"></div></div></div>').join('')+'</div>'}
+function recordCard(r){return '<article class="record"><div class="record-top"><div><b>'+esc(r.branch)+'</b><div class="record-meta"><bdi>'+esc(r.date)+'</bdi> · '+r.amounts.filter(n=>n>0).length+' بنود</div></div><bdi class="record-total">'+money(r.total)+'</bdi></div><div class="record-chips">'+r.amounts.map((n,i)=>n?'<span class="chip">'+esc(labels[i])+': <bdi>'+money(n)+'</bdi></span>':'').join('')+'</div>'+(r.notes?'<p class="record-note">'+esc(r.notes)+'</p>':'')+'<div class="actions">'+(r.deleted?'<button class="btn" onclick="restoreRecord('+esc(JSON.stringify(r.id))+')">↶ استرجاع</button>':'<button class="btn" onclick="editRecord('+esc(JSON.stringify(r.id))+')">عرض / تعديل</button><button class="btn danger" onclick="deleteRecord('+esc(JSON.stringify(r.id))+')">حذف</button>')+'</div></article>'}
+function renderRecords(){const rows=selectedRecords(trash).filter(r=>(r.branch+' '+r.notes+' '+r.date).toLowerCase().includes(search.toLowerCase()));$('main').innerHTML='<div class="toolbar"><div class="segmented"><button class="btn '+(!trash?'selected':'')+'" onclick="trash=false;renderRecords()">السجلات</button><button class="btn '+(trash?'selected':'')+'" onclick="trash=true;renderRecords()">المحذوفات</button></div><button class="btn" onclick="exportCsv()">↓ تصدير CSV</button></div><div class="toolbar"><input class="search" id="search" aria-label="بحث بالسجلات" placeholder="ابحث باسم الفرع أو الملاحظات…" value="'+esc(search)+'"><span class="muted">'+rows.length+' سجل</span></div>'+(trash?'<p class="notice">السجلات المحذوفة محفوظة للاسترجاع، ولا تدخل في ملخص المصاريف أو التصدير.</p>':'')+(rows.length?'<section class="panel">'+rows.map(recordCard).join('')+'</section>':empty('لا توجد سجلات مطابقة','غيّر التصفية أو أضف سجل مصاريف جديد.'));$('search').oninput=e=>{search=e.target.value;const pos=e.target.selectionStart;renderRecords();$('search').focus();$('search').setSelectionRange(pos,pos);};}
+function renderForm(){if(!draft){newRecord();return}const groups=[['المشتريات',[0,1,6]],['التشغيل والموظفون',[2,3,4,7,12]],['الضرائب والالتزامات',[5,8,9,10,11]]];$('main').innerHTML='<form id="recordForm"><section class="panel"><h2>بيانات السجل</h2><div class="form-grid"><label>التاريخ<input id="recordDate" type="date" required value="'+esc(draft.date)+'"></label><label>الفرع<select id="recordBranch" required><option value="">اختر الفرع</option>'+data.branches.map(b=>'<option '+(b.name===draft.branch?'selected':'')+' value="'+esc(b.name)+'">'+esc(b.name)+'</option>').join('')+'</select></label></div>'+(!data.branches.length?'<p class="notice">أضف فرعك أولاً من شاشة <button type="button" class="inline-link" onclick="navigate(\'branches\')">الفروع</button>.</p>':'')+'<p class="muted">جميع المبالغ بالشيكل. اترك البنود غير المستخدمة فارغة.</p></section>'+groups.map((g,j)=>'<section class="panel"><div class="group-heading"><span class="group-number">'+(j+1)+'</span><h2>'+g[0]+'</h2></div><div class="expense-grid">'+g[1].map(i=>'<label>'+esc(labels[i])+'<input data-amount="'+i+'" inputmode="decimal" type="number" min="0" max="100000000" step="0.01" placeholder="0.00" value="'+(draft.amounts[i]?draft.amounts[i]/100:'')+'"><span class="field-help">'+(labels[i]!==originals[i]?esc(originals[i]):'')+'</span></label>').join('')+'</div></section>').join('')+'<section class="panel"><label>ملاحظات اختيارية<textarea id="recordNotes" maxlength="1000" rows="3" placeholder="تفاصيل تساعدك على مراجعة السجل لاحقاً">'+esc(draft.notes)+'</textarea></label></section><div class="save-bar"><div><small>المجموع التلقائي</small><strong id="formTotal"><bdi>'+money(draft.amounts.reduce((a,b)=>a+b,0))+'</bdi></strong></div><div class="actions"><button type="button" class="btn" onclick="navigate(\'records\')">إلغاء</button><button class="btn primary" type="submit">حفظ السجل ✓</button></div></div></form>';
+ $('recordForm').oninput=()=>{dirty=true;readForm();$('formTotal').innerHTML='<bdi>'+money(draft.amounts.reduce((a,b)=>a+b,0))+'</bdi>';};$('recordForm').onsubmit=e=>{e.preventDefault();saveDraft()};}
+function readForm(){draft.date=$('recordDate').value;draft.branch=$('recordBranch').value;draft.notes=$('recordNotes').value;document.querySelectorAll('[data-amount]').forEach(el=>draft.amounts[Number(el.dataset.amount)]=Math.round(Number(el.value||0)*100));}
+async function saveDraft(){if(busy)return;readForm();if(!draft.amounts.some(n=>n>0)){showError(Error('أدخل مبلغاً في بند واحد على الأقل.'));return}const payload={...draft,amounts:[...draft.amounts]};setBusy(true);$('error').hidden=true;try{applyState(await rpc('saveRecord',payload));dirty=false;draft=null;view='records';trash=false;search='';render();window.scrollTo(0,0);toast('تم حفظ السجل في Google Sheets');}catch(e){showError(e);window.scrollTo(0,0);}finally{setBusy(false)}}
+async function mutate(name,payload,success){if(busy)return;setBusy(true);$('error').hidden=true;try{applyState(await rpc(name,payload));$('dialog').close();confirmAction=null;render();toast(success);}catch(e){showError(e);$('dialog').close();window.scrollTo(0,0);}finally{setBusy(false)}}
+function deleteRecord(id){const r=data.records.find(x=>x.id===id);if(!r)return;ask('نقل السجل إلى المحذوفات؟','<p>'+esc(r.branch)+' · '+esc(r.date)+'<br><bdi>'+money(r.total)+'</bdi><br>يمكن استرجاعه لاحقاً. سيُستبعد من الملخصات.</p>','نقل إلى المحذوفات',()=>mutate('setDeleted',{id:r.id,fingerprint:r.fingerprint,deleted:true},'تم نقل السجل إلى المحذوفات'),true)}
+function restoreRecord(id){const r=data.records.find(x=>x.id===id);if(r)mutate('setDeleted',{id:r.id,fingerprint:r.fingerprint,deleted:false},'تم استرجاع السجل')}
+function renderBranches(){$('main').innerHTML='<section class="panel"><div class="panel-head"><h2>فروعك <span class="muted">('+data.branches.length+')</span></h2><button class="btn primary" onclick="branchDialog()">＋ إضافة فرع</button></div>'+(data.branches.length?data.branches.map(b=>'<div class="branch-row"><div><b class="branch-name">'+esc(b.name)+'</b><div class="record-meta">'+data.records.filter(r=>r.branch===b.name&&!r.deleted).length+' سجلات نشطة</div></div><div class="actions"><button class="btn" onclick="branchDialog('+esc(JSON.stringify(b.id))+')">تعديل الاسم</button><button class="btn danger" onclick="deleteBranch('+esc(JSON.stringify(b.id))+')">حذف</button></div></div>').join(''):'<div class="empty"><div class="empty-symbol">⌂</div><h2>أضف فرعك الأول</h2><p>استخدم أسماء واضحة حتى يسهل اختيار الفرع ومقارنة مصاريفه.</p></div>')+'</section><div class="notice wide-note">تعديل اسم الفرع ينعكس على سجلاته. لا يمكن حذف فرع مرتبط بسجلات محفوظة.</div><section class="panel"><h2>الربط مع جدولك</h2><p class="muted">تُحفظ المبالغ في الأعمدة الأصلية. يضيف التطبيق أعمدة تعريف وحالة وملاحظات بعد «المجموع»، وورقة مستقلة لقائمة الفروع. عند مراجعة الجدول، استبعد الصفوف التي لها تاريخ في عمود «محذوف بتاريخ».</p></section>';}
+function branchDialog(id){const b=data.branches.find(x=>x.id===id);ask(b?'تعديل اسم الفرع':'إضافة فرع','<label>اسم الفرع<input id="branchName" maxlength="100" value="'+esc(b?.name||'')+'" placeholder="مثال: الفرع الرئيسي"></label>','حفظ الفرع',()=>{const name=$('branchName').value.trim();if(!name){$('branchName').focus();return}mutate('saveBranch',{id:b?.id,name,previousName:b?.name},'تم حفظ الفرع')});$('branchName').focus();$('branchName').onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();$('dialogConfirm').click()}};}
+function deleteBranch(id){const b=data.branches.find(x=>x.id===id);if(!b)return;if(data.records.some(r=>r.branch===b.name)){showError(Error('هذا الفرع مرتبط بسجلات. يمكنك تغيير اسمه، ولا يمكن حذفه.'));return}ask('حذف الفرع؟','<p>سيُحذف '+esc(b.name)+' من قائمة الفروع.</p>','حذف الفرع',()=>mutate('removeBranch',b,'تم حذف الفرع'),true)}
+function exportCsv(){const rows=selectedRecords(false).filter(r=>(r.branch+' '+r.notes+' '+r.date).toLowerCase().includes(search.toLowerCase()));if(!rows.length){toast('لا توجد سجلات نشطة للتصدير ضمن التصفية.');return}const safe=v=>'"'+String(v??'').replace(/^[=+@\-]/,"'$&").replace(/"/g,'""')+'"',header=['تاريخ','اسم الفرع',...originals,'المجموع'];const text='\uFEFF'+[header,...rows.map(r=>[r.date,r.branch,...r.amounts.map(n=>(n/100).toFixed(2)),(r.total/100).toFixed(2)])].map(r=>r.map(safe).join(',')).join('\r\n');const url=URL.createObjectURL(new Blob([text],{type:'text/csv;charset=utf-8'}));const a=document.createElement('a');a.href=url;a.download='مصاريف-الفروع-'+today()+'.csv';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),3000);toast('تم تجهيز تصدير السجلات النشطة')}
+window.addEventListener('beforeunload',e=>{if(dirty){e.preventDefault();e.returnValue=''}});refresh();
+</script></body></html>
