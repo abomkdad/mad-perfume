@@ -15,7 +15,7 @@ const minor=v=>{if(typeof v!=='number'||!Number.isFinite(v))throw Error('Invalid
 export function normalizeReport(report,historical=true){
  const rows=Array.isArray(report)?report:Object.values(report).flat();
  return rows.map(s=>{
-  const branchId=String(s.shopId);if(!knownBranches.has(branchId)||!s.pos||!s.invoiceId||!s.cashier||!Array.isArray(s.products)||!Array.isArray(s.payments))throw Error('Incomplete transaction');
+  const branchId=String(s.shopId);if(!/^[A-Za-z0-9_-]{1,80}$/.test(branchId)||!s.pos||!s.invoiceId||!s.cashier||!Array.isArray(s.products)||!Array.isArray(s.payments))throw Error('Incomplete transaction');
   const kinds={CASH:'نقدي',CREDIT:'بطاقة',CHECK:'شيك',VOUCHER:'قسيمة'};
   return {id:String(s.invoiceId),branchId,registerId:String(s.pos),cashier:String(s.cashier),occurredAt:localMinute(s.date,s.time),timePrecision:'minute',historical,amountMinor:minor(s.total),currency:'ILS',payment:s.payments.map(p=>`${kinds[p.type]||p.type} ${(minor(p.total)/100).toFixed(2)} ₪`).join(' + '),products:s.products.map(p=>({name:p.name,quantity:p.quantity,amountMinor:minor(p.total)}))};
  });
@@ -25,7 +25,7 @@ export async function ingestSales(sales){
  if(!origin||new URL(origin).protocol!=='https:'||!process.env.MAD_INGEST_TOKEN)throw Error('Missing secure gateway configuration');
  let inserted=0,existing=0;
  let cursor=0;
- const worker=async()=>{while(cursor<sales.length){const sale=sales[cursor++];const r=await siteFetch(new URL('/api/ingest',origin),{method:'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${process.env.MAD_INGEST_TOKEN}`,'OAI-Sites-Authorization':`Bearer ${process.env.MAD_SITES_ACCESS_TOKEN}`},body:JSON.stringify(sale),redirect:'error',signal:AbortSignal.timeout(30000)});if(!r.ok)throw Error(`Ingestion rejected (${r.status}); safely rerun to resume`);const result=await r.json();if(result.inserted)inserted++;else existing++;}};
+ const worker=async()=>{while(cursor<sales.length){const sale=sales[cursor++];const r=await siteFetch(new URL('/api/ingest',origin),{method:'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${process.env.MAD_INGEST_TOKEN}`},body:JSON.stringify(sale),redirect:'error',signal:AbortSignal.timeout(30000)});if(!r.ok)throw Error(`Ingestion rejected (${r.status}); safely rerun to resume`);const result=await r.json();if(result.inserted)inserted++;else existing++;}};
  await Promise.all(Array.from({length:Math.min(4,sales.length)},worker));
  return {inserted,existing};
 }
