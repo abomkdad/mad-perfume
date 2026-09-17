@@ -43,3 +43,9 @@ Enable the retention and certificate renewal timers. Configure Certbot webroot r
 `/manage` provides branches, registers, DVR metadata, camera mappings, account roles and an audit history. The existing administrator signs in as `owner`. Viewer accounts are read-only; operators manage catalogs and mappings; administrators also manage accounts. Disabling a user revokes their sessions. Disabling catalog records stops their jobs without deleting invoices or saved clips. Disconnecting a mapping invalidates pending leases. Device IDs must match the private Mac exporter configuration; the management UI never receives camera passwords. Newly registered devices are not evidence of connectivity.
 
 Run `node scripts/test-management.mjs` after the production build for isolated HTTP integration tests including restart persistence. Run `node scripts/test-netapoz.mjs` for report normalization. Real Netapoz polling uses the vendor session stored privately on the VPS; HTTP 401 requires a renewed authorized vendor session. Browser notifications currently require the dashboard to remain open.
+
+## Automatic Netapoz authentication
+
+An administrator can configure `/integrations` once with the authorized Netapoz account. Credentials are validated against the vendor login endpoint before saving with AES-256-GCM under `MAD_DATA_DIR`; `MAD_CREDENTIALS_KEY` is a random 32-byte hex key held only in the server environment. Back up that key separately from the encrypted vault. The worker renews expired sessions automatically and retries the report once. Authentication rejection blocks further automated login attempts for that vault version; saving a corrected credential clears this condition through a new version. Do not treat renewal as verified against a real account until the first successful live login/report.
+
+Run `node scripts/test-netapoz-auth.mjs` for vault encryption, fixed vendor destination, persisted sessions and rejected-credential lockout/recovery.

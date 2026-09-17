@@ -1,3 +1,4 @@
+import {configured,renewSession} from './netapoz-auth.mjs';
 import {siteFetch} from './site-fetch.mjs';
 import {readFile,writeFile,rename} from 'node:fs/promises';
 import {normalizeReport,ingestSales} from './import-netapoz.mjs';
@@ -6,13 +7,13 @@ const dateFmt=new Intl.DateTimeFormat('sv-SE',{timeZone:'Asia/Jerusalem',year:'n
 async function heartbeat(status){const r=await siteFetch(new URL('/api/sync-status',process.env.MAD_SITE_ORIGIN),{method:'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${process.env.MAD_INGEST_TOKEN}`},body:JSON.stringify({status}),redirect:'error',signal:AbortSignal.timeout(30000)});if(!r.ok)throw Error('Status update failed')}
 let stopping=false;process.on('SIGTERM',()=>{stopping=true});process.on('SIGINT',()=>{stopping=true});
 while(!stopping){try{
- const {cookie}=JSON.parse(await readFile('.env.netapoz-session','utf8'));if(!cookie?.startsWith('SESSION='))throw Error('Session unavailable');
+ let cookie;try{({cookie}=JSON.parse(await readFile('.env.netapoz-session','utf8')))}catch(e){if(e.code!=='ENOENT')throw e;cookie=await renewSession()};if(!cookie?.startsWith('SESSION='))throw Error('Session unavailable');
  let state={initialized:false,seen:{}};try{state=JSON.parse(await readFile(statePath,'utf8'))}catch(e){if(e.code!=='ENOENT')throw e}
  let inserted=0,existing=0;
  const days=[dateFmt.format(Date.now()-86400000),dateFmt.format(Date.now())];
  for(const day of days){
-  const r=await fetch('https://www.netapoz.com/v2/reports/generator/transactions/detailed',{method:'POST',headers:{cookie,'Content-Type':'application/json'},body:JSON.stringify({startDate:day,endDate:day,startMinutes:0,endMinutes:1439}),redirect:'error',signal:AbortSignal.timeout(30000)});
-  if(!r.ok)throw Error(`Netapoz status ${r.status}`);
+  const requestReport=()=>fetch('https://www.netapoz.com/v2/reports/generator/transactions/detailed',{method:'POST',headers:{cookie,'Content-Type':'application/json'},body:JSON.stringify({startDate:day,endDate:day,startMinutes:0,endMinutes:1439}),redirect:'error',signal:AbortSignal.timeout(30000)});
+  let r=await requestReport();if(r.status===401&&await configured()){cookie=await renewSession();r=await requestReport()}if(!r.ok)throw Error(`Netapoz status ${r.status}`);
   const sales=normalizeReport(await r.json());
   const pending=[];for(const sale of sales){const key=JSON.stringify([sale.branchId,sale.registerId,sale.id]);if(state.seen[key])continue;
    sale.historical=!state.initialized||Date.parse(sale.occurredAt)<Date.now()-300000;
