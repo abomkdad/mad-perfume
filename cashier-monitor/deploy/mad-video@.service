@@ -1,0 +1,27 @@
+[Unit]
+Description=MAD private video exporter %i
+After=network-online.target mad-monitor.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=madvideo
+Group=madvideo
+WorkingDirectory=/var/lib/mad-video
+EnvironmentFile=/etc/mad-video/worker.env
+Environment=HOME=/var/lib/mad-video
+Environment=MAD_EXPORT_RESULT=/var/lib/mad-video/worker-%i-result.json
+Environment=MAD_MIN_FREE_BYTES=2147483648
+Environment=MAD_SPACE_PATH=/var/lib/mad-video
+ExecStart=/opt/mad-runtime/node-v24.21.0-linux-x64/bin/node /opt/mad-monitor/bridge/run.mjs
+Restart=always
+RestartSec=15
+KillMode=mixed
+TimeoutStopSec=510
+UMask=0077
+Delegate=yes
+MemoryMax=650M
+TasksMax=256
+
+[Install]
+WantedBy=multi-user.target

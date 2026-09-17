@@ -9,7 +9,10 @@ import sys
 import time
 import urllib.parse
 from zoneinfo import ZoneInfo
-from dahua_transport import ROOT, credential, Transport, http_client
+if sys.platform == 'linux':
+    from dahua_transport_linux import ROOT, credential, Transport, http_client
+else:
+    from dahua_transport import ROOT, credential, Transport, http_client
 
 sys.path.insert(0,str(ROOT/'work/media-tools'))
 import av
@@ -74,6 +77,11 @@ def export(job):
 if __name__=='__main__':
     try:
         os.umask(0o077)
+        if sys.platform == 'linux':
+            import signal
+            def terminate_export(*args):
+                raise TimeoutError('export interrupted')
+            signal.signal(signal.SIGTERM, terminate_export)
         request=json.loads(sys.stdin.read(8192))
         result=export(request)
         # Native Dahua libraries may log credentials; caller discards both output streams.

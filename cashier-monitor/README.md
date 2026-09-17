@@ -34,13 +34,13 @@ Keep the main domain's existing GitHub Pages records unchanged when routing only
 
 ## Background services
 
-Install the service examples in `deploy/` using the actual Node and application paths. Keep the Netapoz session in `/var/lib/mad-monitor/.env.netapoz-session` with mode 0600 and ownership `madmonitor`. Install the bridge polling modules at `/opt/mad-monitor/bridge/`. Do not run a duplicate Netapoz poller on the Mac. Camera workers continue on the Mac. Gateway requests resolve current IPv4 DNS records while retaining normal hostname and certificate validation.
+Install the service examples in `deploy/` using the actual Node and application paths. Keep the Netapoz session in `/var/lib/mad-monitor/.env.netapoz-session` with mode 0600 and ownership `madmonitor`. Install the bridge polling modules at `/opt/mad-monitor/bridge/`. Do not run a duplicate Netapoz poller on the Mac. Camera workers can run independently on the VPS using the rootless Linux transport; see [Linux video deployment](deploy/LINUX-VIDEO.md). Stop duplicate Mac workers after verifying an actual VPS export and upload. Gateway requests resolve current IPv4 DNS records while retaining normal hostname and certificate validation.
 
 Enable the retention and certificate renewal timers. Configure Certbot webroot renewal using `/home/abomkdad/public_html/monitor`, and install `mad-renew-ssl.sh` as a root-only deploy hook in `/etc/letsencrypt/renewal-hooks/deploy/`. The Apache challenge exclusion must remain ahead of the proxy rule.
 
 ## Management and access
 
-`/manage` provides branches, registers, DVR metadata, camera mappings, account roles and an audit history. The existing administrator signs in as `owner`. Viewer accounts are read-only; operators manage catalogs and mappings; administrators also manage accounts. Disabling a user revokes their sessions. Disabling catalog records stops their jobs without deleting invoices or saved clips. Disconnecting a mapping invalidates pending leases. Device IDs must match the private Mac exporter configuration; the management UI never receives camera passwords. Newly registered devices are not evidence of connectivity.
+`/manage` provides branches, registers, DVR metadata, camera mappings, account roles and an audit history. The existing administrator signs in as `owner`. Viewer accounts are read-only; operators manage catalogs and mappings; administrators also manage accounts. Disabling a user revokes their sessions. Disabling catalog records stops their jobs without deleting invoices or saved clips. Disconnecting a mapping invalidates pending leases. Device IDs must match the private exporter configuration; the management UI never receives camera passwords. Newly registered devices are not evidence of connectivity.
 
 Run `node scripts/test-management.mjs` after the production build for isolated HTTP integration tests including restart persistence. Run `node scripts/test-netapoz.mjs` for report normalization. Real Netapoz polling uses the vendor session stored privately on the VPS; HTTP 401 requires a renewed authorized vendor session. Browser notifications currently require the dashboard to remain open.
 
