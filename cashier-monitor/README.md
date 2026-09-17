@@ -6,7 +6,7 @@ Arabic RTL sales and cashier-recording dashboard. This directory is independent 
 
 Node.js 24+, Next.js, SQLite in WAL mode, private MP4 files outside the web root. No Sites, Cloudflare D1/R2 or ChatGPT sign-in is required. Never trust client identity headers. Sessions are opaque, hashed in SQLite and served in secure HttpOnly cookies. Browser writes check the configured origin.
 
-The Dahua exporter still runs on the owner's Mac using its installed SmartPSSLite native transport. That library and device credentials are not distributed. The Linux VPS hosts the dashboard, database, authenticated media and job queue.
+The Dahua exporter still runs on the owner's Mac using its installed SmartPSSLite native transport. That library and device credentials are not distributed. The Linux VPS hosts the dashboard, database, authenticated media, job queue and Netapoz polling service. Netapoz requires a valid private vendor session; an expired session is shown as an integration error.
 
 ## Setup
 
@@ -31,3 +31,9 @@ Recordings expire 30 days after the transaction time. Invoices and products rema
 - `python3 scripts/test-storage.py`: import deduplication, job leases, stale acknowledgements and retries.
 
 Keep the main domain's existing GitHub Pages records unchanged when routing only `monitor` to the VPS.
+
+## Background services
+
+Install the service examples in `deploy/` using the actual Node and application paths. Keep the Netapoz session in `/var/lib/mad-monitor/.env.netapoz-session` with mode 0600 and ownership `madmonitor`. Install the bridge polling modules at `/opt/mad-monitor/bridge/`. Do not run a duplicate Netapoz poller on the Mac. Camera workers continue on the Mac. Gateway requests resolve current IPv4 DNS records while retaining normal hostname and certificate validation.
+
+Enable the retention and certificate renewal timers. Configure Certbot webroot renewal using `/home/abomkdad/public_html/monitor`, and install `mad-renew-ssl.sh` as a root-only deploy hook in `/etc/letsencrypt/renewal-hooks/deploy/`. The Apache challenge exclusion must remain ahead of the proxy rule.

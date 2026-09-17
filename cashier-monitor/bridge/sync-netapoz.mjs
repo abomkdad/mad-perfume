@@ -1,8 +1,9 @@
+import {siteFetch} from './site-fetch.mjs';
 import {readFile,writeFile,rename} from 'node:fs/promises';
 import {normalizeReport,ingestSales} from './import-netapoz.mjs';
 const statePath='work/netapoz-sync-state.json';
 const dateFmt=new Intl.DateTimeFormat('sv-SE',{timeZone:'Asia/Jerusalem',year:'numeric',month:'2-digit',day:'2-digit'});
-async function heartbeat(status){const r=await fetch(new URL('/api/sync-status',process.env.MAD_SITE_ORIGIN),{method:'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${process.env.MAD_INGEST_TOKEN}`,'OAI-Sites-Authorization':`Bearer ${process.env.MAD_SITES_ACCESS_TOKEN}`},body:JSON.stringify({status}),redirect:'error',signal:AbortSignal.timeout(30000)});if(!r.ok)throw Error('Status update failed')}
+async function heartbeat(status){const r=await siteFetch(new URL('/api/sync-status',process.env.MAD_SITE_ORIGIN),{method:'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${process.env.MAD_INGEST_TOKEN}`,'OAI-Sites-Authorization':`Bearer ${process.env.MAD_SITES_ACCESS_TOKEN}`},body:JSON.stringify({status}),redirect:'error',signal:AbortSignal.timeout(30000)});if(!r.ok)throw Error('Status update failed')}
 let stopping=false;process.on('SIGTERM',()=>{stopping=true});process.on('SIGINT',()=>{stopping=true});
 while(!stopping){try{
  const {cookie}=JSON.parse(await readFile('.env.netapoz-session','utf8'));if(!cookie?.startsWith('SESSION='))throw Error('Session unavailable');

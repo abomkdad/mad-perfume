@@ -1,0 +1,20 @@
+[Unit]
+Description=MAD Netapoz sales synchronization
+After=network-online.target mad-monitor.service
+Wants=network-online.target
+[Service]
+Type=simple
+User=madmonitor
+Group=madmonitor
+WorkingDirectory=/var/lib/mad-monitor
+EnvironmentFile=/etc/mad-monitor/service.env
+ExecStart=/opt/mad-runtime/node-v24.21.0-linux-x64/bin/node /opt/mad-monitor/bridge/sync-netapoz.mjs
+Restart=always
+RestartSec=30
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ReadWritePaths=/var/lib/mad-monitor
+[Install]
+WantedBy=multi-user.target

@@ -1,3 +1,4 @@
+import {siteFetch} from './site-fetch.mjs';
 import {readFile} from 'node:fs/promises';
 import {pathToFileURL} from 'node:url';
 const knownBranches=new Set(['25274','29269','25351','37615','31165','16789','6386','9607','24897','23618','25066']);
@@ -24,7 +25,7 @@ export async function ingestSales(sales){
  if(!origin||new URL(origin).protocol!=='https:'||!process.env.MAD_INGEST_TOKEN)throw Error('Missing secure gateway configuration');
  let inserted=0,existing=0;
  let cursor=0;
- const worker=async()=>{while(cursor<sales.length){const sale=sales[cursor++];const r=await fetch(new URL('/api/ingest',origin),{method:'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${process.env.MAD_INGEST_TOKEN}`,'OAI-Sites-Authorization':`Bearer ${process.env.MAD_SITES_ACCESS_TOKEN}`},body:JSON.stringify(sale),redirect:'error',signal:AbortSignal.timeout(30000)});if(!r.ok)throw Error(`Ingestion rejected (${r.status}); safely rerun to resume`);const result=await r.json();if(result.inserted)inserted++;else existing++;}};
+ const worker=async()=>{while(cursor<sales.length){const sale=sales[cursor++];const r=await siteFetch(new URL('/api/ingest',origin),{method:'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${process.env.MAD_INGEST_TOKEN}`,'OAI-Sites-Authorization':`Bearer ${process.env.MAD_SITES_ACCESS_TOKEN}`},body:JSON.stringify(sale),redirect:'error',signal:AbortSignal.timeout(30000)});if(!r.ok)throw Error(`Ingestion rejected (${r.status}); safely rerun to resume`);const result=await r.json();if(result.inserted)inserted++;else existing++;}};
  await Promise.all(Array.from({length:Math.min(4,sales.length)},worker));
  return {inserted,existing};
 }
