@@ -9,7 +9,7 @@ def transcode(source, output, seconds, deadline):
     audio=next(iter(source.streams.audio),None)
     width=min(960,video.width);width-=width%2
     height=round(video.height*width/video.width/2)*2
-    frames=0;first=None;last=0;last_tick=-1;audio_frames=0
+    frames=0;first=None;last=0;last_tick=-1;audio_frames=0;audio_next=None
     with av.open(str(output),'w',options={'movflags':'+faststart'}) as target:
         out=target.add_stream('libx264',rate=10)
         out.width=width;out.height=height;out.pix_fmt='yuv420p'
@@ -41,7 +41,10 @@ def transcode(source, output, seconds, deadline):
                 elif sound and first is not None:
                     elapsed=stamp-first
                     if elapsed<0 or elapsed>seconds+5:continue
-                    frame.pts=round(elapsed*frame.sample_rate)
+                    position=round(elapsed*frame.sample_rate)
+                    if audio_next is not None:position=max(position,audio_next)
+                    frame.pts=position
+                    audio_next=position+frame.samples
                     frame.time_base=Fraction(1,frame.sample_rate)
                     for converted in resampler.resample(frame):
                         for encoded in sound.encode(converted):target.mux(encoded)
