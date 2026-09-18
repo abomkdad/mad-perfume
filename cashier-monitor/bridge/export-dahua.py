@@ -9,6 +9,7 @@ import sys
 import time
 import urllib.parse
 from zoneinfo import ZoneInfo
+from clock_history import recording_offset
 if sys.platform == 'linux':
     from dahua_transport_linux import ROOT, credential, Transport, http_client
 else:
@@ -37,6 +38,7 @@ def export(job):
         reference=dt.datetime.fromtimestamp((before+after)/2,zone).replace(tzinfo=None)
         skew=(device_wall-reference).total_seconds()
         if abs(skew)>86400 or after-before>10:raise ValueError('unreliable device clock')
+        skew=recording_offset(job['device'],start-3,end+3,skew)
         def local(epoch):return (dt.datetime.fromtimestamp(epoch,zone).replace(tzinfo=None)+dt.timedelta(seconds=skew)).strftime('%Y_%m_%d_%H_%M_%S')
         port=transport.port(int(transport.info.get('rtspport',554)))
         params=urllib.parse.urlencode({'channel':job['channel'],'subtype':0,'starttime':local(start-3),'endtime':local(end+3)})

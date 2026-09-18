@@ -57,3 +57,24 @@ volume and camera bitrate; monitor free space rather than assuming a fixed disk
 can hold every possible 30-day workload. Netapoz credentials are configured
 separately through `/integrations`; camera connectivity does not authenticate
 the sales feed.
+
+## Recorder clock corrections
+
+Before changing a recorder clock, stop both video workers and record its measured
+wall-clock offset against `Asia/Jerusalem`. Keep private correction history in
+`/var/lib/mad-video/clock-history.json` (mode 0600, owner `madvideo`); it must be
+backed up with the video service state. `MAD_CLOCK_HISTORY` can override the path.
+Each entry contains `device`, `previousOffsetSeconds`, `startedAt` (Unix seconds),
+`status` (`pending` before the write, `verified` after reading the corrected clock),
+`finishedAt`, and `newOffsetSeconds`. Persist the pending entry before issuing the
+clock change, then atomically save the verified result. Do not delete history while
+old invoices or recorder footage may still be exported.
+
+The exporter uses the offset recorded before a correction for older invoices.
+Windows overlapping a correction or an unverified correction are rejected because
+the recorder's timestamp cannot be resolved safely. Saved MP4 files are unchanged.
+This history does not itself synchronize clocks or enable recorder NTP. Before a
+future correction, account for any automatic recorder DST/NTP changes as well.
+
+Run `python3 -m unittest discover -s bridge -p test_clock_history.py` to test offset
+selection and ambiguous-window handling.
