@@ -1,0 +1,14 @@
+import {DatabaseSync} from 'node:sqlite';import {readFileSync,readdirSync} from 'node:fs';import assert from 'node:assert/strict';
+const db=new DatabaseSync(':memory:');
+for(const f of readdirSync('drizzle').filter(f=>f.endsWith('.sql')).sort())db.exec(readFileSync('drizzle/'+f,'utf8'));
+db.exec("INSERT INTO sales(id,branch_id,register_id,cashier,occurred_at,amount_minor,currency,payment,products,status,created_at,next_attempt) VALUES('test','branch','register','cashier',1,100,'ILS','cash','[]','queued',1,1)");
+const count=()=>db.prepare('SELECT count(*) AS n FROM clip_events').get().n;
+assert.equal(count(),0);
+db.exec("UPDATE sales SET status='processing' WHERE id='test'");assert.equal(count(),0);
+db.exec("UPDATE sales SET status='ready',clip_key='clips/one.mp4' WHERE id='test'");assert.equal(count(),1);
+db.exec("UPDATE sales SET status='ready' WHERE id='test'");assert.equal(count(),1);
+db.exec("UPDATE sales SET status='expired',clip_key=NULL WHERE id='test'");assert.equal(count(),1);
+db.exec("UPDATE sales SET status='ready',clip_key='clips/two.mp4' WHERE id='test'");assert.equal(count(),2);
+assert.deepEqual(db.prepare('SELECT branch_id FROM clip_events ORDER BY seq').all().map(r=>r.branch_id),['branch','branch']);
+assert.equal(db.prepare('SELECT count(*) AS n FROM clip_events WHERE seq>1').get().n,1);
+db.close();console.log('PASS: notify only completed saves, branch identity, no duplicate status updates, re-export notification, ordered replay cursor');
