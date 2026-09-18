@@ -1,6 +1,5 @@
 """Export one authorized job from Dahua P2P to browser-compatible private MP4."""
 import datetime as dt
-from fractions import Fraction
 import json
 import math
 import os
@@ -18,6 +17,7 @@ else:
 sys.path.insert(0,str(ROOT/'work/media-tools'))
 import av
 av.logging.set_level(av.logging.PANIC)
+from transcode_clip import transcode
 
 def export(job):
     if not isinstance(job.get('channel'),int) or not 1<=job['channel']<=8:raise ValueError('channel')
@@ -46,33 +46,14 @@ def export(job):
         deadline=time.monotonic()+400;frames=0;first=None;last=0;last_tick=-1
         try:
             with av.open(url,options={'rtsp_transport':'tcp'},timeout=(20,25)) as source:
-                v=source.streams.video[0]
-                width=min(960,v.width);width-=width%2;height=round(v.height*width/v.width/2)*2
-                with av.open(str(output),'w',options={'movflags':'+faststart'}) as target:
-                    out=target.add_stream('libx264',rate=10);out.width=width;out.height=height;out.pix_fmt='yuv420p';out.time_base=Fraction(1,10);out.codec_context.time_base=Fraction(1,10)
-                    out.options={'preset':'veryfast','crf':'25'}
-                    for frame in source.decode(video=0):
-                        if time.monotonic()>deadline:raise TimeoutError('export limit')
-                        if frame.pts is None:continue
-                        stamp=float(frame.pts*frame.time_base)
-                        if first is None:first=stamp
-                        elapsed=stamp-first
-                        if elapsed<0 or elapsed>end-start+12:break
-                        tick=round(elapsed*10)
-                        if tick<=last_tick:continue
-                        last_tick=tick
-                        converted=frame.reformat(width=width,height=height,format='yuv420p')
-                        converted.pts=tick;converted.time_base=Fraction(1,10)
-                        for packet in out.encode(converted):target.mux(packet)
-                        frames+=1;last=elapsed
-                        if elapsed>=end-start+5:break
-                    for packet in out.encode():target.mux(packet)
+                result=transcode(source,output,end-start,deadline)
+                frames=result['frames'];last=result['seconds']
             output.chmod(0o600)
             if frames<20 or last<end-start-2:raise ValueError('incomplete recording')
             if not 1000<output.stat().st_size<=100*1024*1024:raise ValueError('clip size')
             with av.open(str(output)) as check:
                 if check.streams.video[0].codec_context.name!='h264':raise ValueError('codec')
-            return {'frames':frames,'seconds':round(last,2),'clockOffsetSeconds':round(skew),'bytes':output.stat().st_size}
+            return {**result,'clockOffsetSeconds':round(skew),'bytes':output.stat().st_size}
         except Exception:
             output.unlink(missing_ok=True);raise
 
