@@ -8,11 +8,14 @@ def transcode(source, output, seconds, deadline):
     video=source.streams.video[0]
     audio=next(iter(source.streams.audio),None)
     width=min(960,video.width);width-=width%2
-    height=round(video.height*width/video.width/2)*2
+    # Dahua streams can omit display aspect metadata (e.g. 1440x1616).
+    # The owner uses the recorder app in widescreen mode; encode that display shape.
+    height=round(width*9/16/2)*2
     frames=0;first=None;last=0;last_tick=-1;audio_frames=0;audio_next=None
     with av.open(str(output),'w',options={'movflags':'+faststart'}) as target:
         out=target.add_stream('libx264',rate=10)
         out.width=width;out.height=height;out.pix_fmt='yuv420p'
+        out.codec_context.sample_aspect_ratio=Fraction(1,1)
         out.time_base=Fraction(1,10);out.codec_context.time_base=Fraction(1,10)
         out.options={'preset':'veryfast','crf':'25'}
         sound=target.add_stream('aac',rate=48000) if audio else None
