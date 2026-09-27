@@ -335,7 +335,7 @@ function call(fn){
   var args = Array.prototype.slice.call(arguments,1);
   if (/^https:\/\/script\.google\.com\//.test(API_URL) && !(window.google && google.script && google.script.run)) {
     var ctrl = window.AbortController ? new AbortController() : null;
-    var to = setTimeout(function(){ if(ctrl) ctrl.abort(); }, 30000);
+    var to = setTimeout(function(){ if(ctrl) ctrl.abort(); }, 60000);
     return fetch(API_URL, { method:'POST', redirect:'follow', headers:{'Content-Type':'text/plain;charset=utf-8'}, body: JSON.stringify({fn:fn,args:args}), signal: ctrl?ctrl.signal:undefined })
       .then(function(r){ if(!r.ok) throw new Error('تعذّر الاتصال بالخادم ('+r.status+')'); return r.json(); })
       .then(function(j){ clearTimeout(to); if(!j || !j.ok) throw new Error((j&&j.error)||'حدث خطأ في الخادم'); return j.result; },
@@ -472,22 +472,28 @@ function showLogin(msg){
 }
 
 /* ================= LOAD ================= */
+function readCache(){ try{ var c=JSON.parse(sget('cache')||'null'); return c && c.entries ? c : null; }catch(e){ return null; } }
 function load(first){
-  if(first) $('loading').classList.remove('hidden');
+  var cached = first ? readCache() : null;
+  if(cached){ setData(cached); $('loading').classList.add('hidden'); $('login').classList.add('hidden'); $('app').classList.remove('hidden'); }
+  else if(first) $('loading').classList.remove('hidden');
   $('refreshBtn').classList.add('spin');
   return call('apiLoad',S.pin).then(function(d){
     setData(d);
     $('loading').classList.add('hidden'); $('app').classList.remove('hidden');
     if(!first) toast('تم التحديث','ok');
+    else if(cached) { /* تحديث صامت */ }
   }).catch(function(e){
     var m=errMsg(e);
-    if(/رمز الدخول/.test(m)){ sset('pin',null); S.pin=''; showLogin(first?'':m); }
+    if(/رمز الدخول/.test(m)){ sset('pin',null); sset('cache',null); S.pin=''; S.data=null; showLogin(first?'':m); }
     else { $('loading').classList.add('hidden'); if(S.data){ $('app').classList.remove('hidden'); } else { showLogin(); } toast(m,'bad'); }
   }).then(function(){ $('refreshBtn').classList.remove('spin'); });
 }
 function setData(d){
   d.entries.forEach(function(r){ r.name=String(r.name||'').trim(); });
-  S.data=d; if(!S.day) S.day=d.today;
+  var prevToday = S.data && S.data.today;
+  S.data=d; if(!S.day || S.day===prevToday) S.day=d.today;
+  try{ sset('cache', JSON.stringify(d)); }catch(e){}
   render();
 }
 $('refreshBtn').onclick=function(){ load(false); };
@@ -739,7 +745,7 @@ $('pinBtn').onclick=function(){
   if(!/^\d{4,8}$/.test(p)){ toast('الرمز يجب أن يكون من 4 إلى 8 أرقام','bad'); return; }
   call('apiChangePin',S.pin,p).then(function(){ S.pin=p; sset('pin',p); $('newPin').value=''; toast('تم تغيير رمز الدخول','ok'); }).catch(function(e){ toast(errMsg(e),'bad'); });
 };
-$('logoutBtn').onclick=function(){ sset('pin',null); S.pin=''; S.data=null; showLogin(); };
+$('logoutBtn').onclick=function(){ sset('pin',null); sset('cache',null); S.pin=''; S.data=null; showLogin(); };
 
 /* ================= START ================= */
 if(S.pin) load(true); else showLogin();
