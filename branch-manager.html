@@ -1,996 +1,749 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>بوابة مدير الفروع والعمليات 2026</title>
-  
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://unpkg.com/lucide@latest"></script>
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0e0d0b">
+<title>MAD | إدارة الموظفين</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="MAD الموظفين">
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" href="logo.png">
+<link rel="apple-touch-icon" href="logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0e0d0b; --bg2:#15130f; --card:#1c1a16; --card2:#24211b; --line:#2f2b23;
+  --gold:#d4af6a; --gold2:#b8914a; --gold-soft:rgba(212,175,106,.14);
+  --text:#f3eee4; --muted:#a39b8b; --faint:#6e675a;
+  --green:#5cc98a; --red:#ef6b6b; --amber:#f0b44c;
+  --r:16px; --safe-b:env(safe-area-inset-bottom,0px); --safe-t:env(safe-area-inset-top,0px);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--text);font-family:'Tajawal',system-ui,-apple-system,sans-serif;font-size:16px;overscroll-behavior-y:none}
+body{min-height:100vh;min-height:100dvh}
+button,input,select{font-family:inherit;font-size:inherit;color:inherit}
+button{cursor:pointer;border:0;background:none;padding:0}
+.num{font-variant-numeric:tabular-nums;direction:ltr;unicode-bidi:isolate}
+.hidden{display:none!important}
 
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: { sans: ['Cairo', 'sans-serif'] },
-          colors: {
-            brand: {
-              50: '#f0fdf4',
-              100: '#dcfce7',
-              500: '#22c55e',
-              600: '#16a34a',
-              700: '#15803d',
-              800: '#166534',
-              900: '#14532d',
-            }
-          }
-        }
-      }
-    }
-  </script>
+/* ---------- Header ---------- */
+.top{position:sticky;top:0;z-index:20;background:linear-gradient(180deg,var(--bg) 70%,rgba(14,13,11,.0));padding:calc(12px + var(--safe-t)) 16px 10px}
+.top-row{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.brand{display:flex;align-items:center;gap:10px}
+.logo{width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,var(--gold),var(--gold2));color:#1a1408;display:grid;place-items:center;font-weight:800;font-size:13px;letter-spacing:.5px}
+.brand h1{margin:0;font-size:18px;font-weight:800}
+.brand small{display:block;color:var(--muted);font-size:12px;margin-top:1px}
+.icon-btn{width:40px;height:40px;border-radius:12px;background:var(--card);display:grid;place-items:center;border:1px solid var(--line)}
+.icon-btn svg{width:20px;height:20px;stroke:var(--text)}
+.icon-btn.spin svg{animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
 
-  <style>
-    body {
-      font-family: 'Cairo', sans-serif;
-      -webkit-tap-highlight-color: transparent;
-      user-select: none;
-    }
-    .no-scrollbar::-webkit-scrollbar { display: none; }
-    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-    .touch-btn:active { transform: scale(0.96); }
-    .animate-fadeIn {
-      animation: fadeIn 0.25s ease-in-out;
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(6px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-  </style>
+main{padding:4px 16px calc(96px + var(--safe-b))}
+.view{animation:fade .2s ease}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+/* ---------- Date nav ---------- */
+.datenav{display:flex;align-items:center;gap:8px;margin:6px 0 14px}
+.datenav .icon-btn{flex:none}
+.date-pill{flex:1;position:relative;height:44px;border-radius:14px;background:var(--card);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;gap:8px;font-weight:700}
+.date-pill small{color:var(--gold);font-weight:500}
+.date-pill input{position:absolute;inset:0;opacity:0;width:100%;height:100%}
+
+/* ---------- KPI ---------- */
+.kpis{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px;min-width:0}
+.kpi.hero{grid-column:1/-1;background:linear-gradient(135deg,#2a2213,#1c1a16 60%);border-color:#3d3322}
+.kpi label{display:block;color:var(--muted);font-size:12.5px;margin-bottom:4px}
+.kpi b{font-size:20px;font-weight:800}
+.kpi.hero b{font-size:30px;color:var(--gold)}
+.kpi .sub{color:var(--faint);font-size:12px;margin-top:2px}
+
+.sec-title{display:flex;align-items:center;justify-content:space-between;margin:18px 2px 10px}
+.sec-title h2{margin:0;font-size:16px;font-weight:800}
+.sec-title span{color:var(--muted);font-size:13px}
+
+/* ---------- Entry cards ---------- */
+.list{display:flex;flex-direction:column;gap:10px}
+.entry{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px;display:block;width:100%;text-align:right}
+.entry:active{background:var(--card2)}
+.entry-h{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.who{display:flex;align-items:center;gap:10px;min-width:0}
+.av{width:36px;height:36px;border-radius:50%;background:var(--gold-soft);color:var(--gold);display:grid;place-items:center;font-weight:800;flex:none}
+.who b{font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.who small{display:block;color:var(--muted);font-size:12px}
+.amt{font-weight:800;font-size:18px;color:var(--gold);white-space:nowrap}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.chip{font-size:12px;background:var(--bg2);border:1px solid var(--line);border-radius:999px;padding:4px 9px;color:var(--muted);white-space:nowrap}
+.chip b{color:var(--text);font-weight:700}
+.chip.good b{color:var(--green)} .chip.bad b{color:var(--red)} .chip.mid b{color:var(--amber)}
+.rank{width:26px;text-align:center;font-weight:800;color:var(--faint);flex:none}
+.rank.r1{color:#f5cf6b}.rank.r2{color:#cfd4dc}.rank.r3{color:#d9955a}
+.bar{height:6px;background:var(--bg2);border-radius:6px;margin-top:10px;overflow:hidden}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--gold2),var(--gold));border-radius:6px}
+
+.missing{display:flex;flex-wrap:wrap;gap:8px}
+.mbtn{background:var(--bg2);border:1px dashed #4a4336;border-radius:999px;padding:7px 12px;font-size:14px;color:var(--muted)}
+.mbtn:active{background:var(--gold-soft);color:var(--gold)}
+
+.empty{text-align:center;color:var(--muted);padding:28px 16px;background:var(--card);border:1px dashed var(--line);border-radius:var(--r)}
+.empty b{display:block;color:var(--text);font-size:16px;margin-bottom:4px}
+
+/* ---------- Segmented ---------- */
+.seg{display:flex;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:4px;gap:4px;margin:6px 0 12px;overflow-x:auto;scrollbar-width:none}
+.seg::-webkit-scrollbar{display:none}
+.seg button{flex:1;white-space:nowrap;padding:9px 10px;border-radius:10px;color:var(--muted);font-size:14px;font-weight:500}
+.seg button.on{background:var(--gold);color:#1a1408;font-weight:800}
+.seg.small button{padding:7px 8px;font-size:13px}
+
+/* ---------- Chart ---------- */
+.chart{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:12px 10px 6px}
+.chart svg{display:block;width:100%;height:auto}
+.chart .cap{display:flex;justify-content:space-between;color:var(--muted);font-size:12px;padding:0 4px 6px}
+
+/* ---------- Bottom nav ---------- */
+.nav{position:fixed;bottom:0;left:0;right:0;z-index:30;background:rgba(21,19,15,.96);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-top:1px solid var(--line);display:flex;padding:6px 6px calc(6px + var(--safe-b))}
+.nav button{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 0;color:var(--faint);font-size:11.5px;font-weight:500}
+.nav button svg{width:23px;height:23px;stroke:currentColor}
+.nav button.on{color:var(--gold)}
+.fab{position:fixed;left:18px;bottom:calc(78px + var(--safe-b));z-index:31;width:58px;height:58px;border-radius:18px;background:linear-gradient(135deg,var(--gold),var(--gold2));box-shadow:0 10px 28px rgba(212,175,106,.35);display:grid;place-items:center}
+.fab svg{width:28px;height:28px;stroke:#1a1408}
+
+/* ---------- Sheet (modal) ---------- */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:50;opacity:0;pointer-events:none;transition:opacity .2s}
+.overlay.on{opacity:1;pointer-events:auto}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:51;background:var(--bg2);border-radius:22px 22px 0 0;border-top:1px solid var(--line);max-height:92vh;max-height:92dvh;display:flex;flex-direction:column;transform:translateY(105%);visibility:hidden;transition:transform .25s cubic-bezier(.2,.8,.2,1),visibility 0s .25s}
+.sheet.on{transform:none;visibility:visible;transition:transform .25s cubic-bezier(.2,.8,.2,1)}
+.sheet-h{padding:10px 16px 8px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line)}
+.sheet-h::before{content:'';position:absolute;top:6px;left:50%;width:40px;height:4px;margin-left:-20px;border-radius:4px;background:#3a352b}
+.sheet-h h3{margin:8px 0 0;font-size:18px;font-weight:800}
+.sheet-b{padding:14px 16px;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.sheet-f{padding:12px 16px calc(12px + var(--safe-b));border-top:1px solid var(--line);display:flex;gap:10px}
+
+.field{margin-bottom:14px}
+.field>label{display:block;font-size:13.5px;color:var(--muted);margin-bottom:6px;font-weight:500}
+.inp{width:100%;height:50px;border-radius:14px;background:var(--card);border:1.5px solid var(--line);padding:0 14px;font-size:18px;font-weight:700;outline:none;-webkit-appearance:none;appearance:none}
+.inp:focus{border-color:var(--gold)}
+.inp.err{border-color:var(--red)}
+.inp[type=date]{font-size:16px}
+select.inp{background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),linear-gradient(135deg,var(--muted) 50%,transparent 50%);background-position:18px 22px,24px 22px;background-size:6px 6px;background-repeat:no-repeat}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.stepper{display:flex;align-items:center;gap:8px}
+.stepper button{width:50px;height:50px;border-radius:14px;background:var(--card);border:1.5px solid var(--line);font-size:24px;font-weight:700;flex:none}
+.stepper button:active{background:var(--gold-soft)}
+.stepper .inp{text-align:center}
+.hint{font-size:12.5px;color:var(--red);margin-top:6px;min-height:0}
+.preview{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:4px 0 6px}
+.preview div{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:9px 6px;text-align:center}
+.preview small{display:block;color:var(--muted);font-size:11.5px}
+.preview b{font-size:16px;color:var(--gold)}
+
+.name-grid{display:flex;flex-wrap:wrap;gap:8px;max-height:176px;overflow-y:auto;padding:2px}
+.name-grid button{padding:9px 14px;border-radius:12px;background:var(--card);border:1.5px solid var(--line);font-size:15px;font-weight:500}
+.name-grid button.on{border-color:var(--gold);background:var(--gold-soft);color:var(--gold);font-weight:800}
+.name-grid button.done{opacity:.45}
+.search{margin-bottom:8px;height:42px;font-size:15px;font-weight:500}
+
+.btn{flex:1;height:52px;border-radius:14px;font-weight:800;font-size:16px;display:flex;align-items:center;justify-content:center;gap:8px}
+.btn.primary{background:linear-gradient(135deg,var(--gold),var(--gold2));color:#1a1408}
+.btn.ghost{background:var(--card);border:1px solid var(--line)}
+.btn.danger{background:rgba(239,107,107,.12);color:var(--red);border:1px solid rgba(239,107,107,.3);flex:0 0 auto;padding:0 18px}
+.btn:disabled{opacity:.55}
+
+/* ---------- Toast ---------- */
+.toast{position:fixed;top:calc(14px + var(--safe-t));left:16px;right:16px;z-index:90;background:var(--card2);border:1px solid var(--line);border-radius:14px;padding:13px 16px;font-weight:600;box-shadow:0 12px 30px rgba(0,0,0,.45);transform:translateY(-140%);transition:transform .25s}
+.toast.on{transform:none}
+.toast.ok{border-color:rgba(92,201,138,.5)} .toast.bad{border-color:rgba(239,107,107,.6);color:#ffd2d2}
+
+/* ---------- Login ---------- */
+.login{min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;text-align:center}
+.login .logo{width:74px;height:74px;border-radius:22px;font-size:22px;margin-bottom:16px}
+.login h1{margin:0 0 4px;font-size:24px}
+.login p{margin:0 0 26px;color:var(--muted)}
+.pin{display:flex;gap:12px;justify-content:center;margin-bottom:22px;direction:ltr}
+.pin i{width:15px;height:15px;border-radius:50%;border:2px solid var(--gold2)}
+.pin i.f{background:var(--gold)}
+.pad{display:grid;grid-template-columns:repeat(3,76px);gap:14px;direction:ltr}
+.pad button{height:64px;border-radius:20px;background:var(--card);border:1px solid var(--line);font-size:26px;font-weight:700}
+.pad button:active{background:var(--gold-soft)}
+.shake{animation:shake .35s}
+@keyframes shake{25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+
+.loading{position:fixed;inset:0;display:grid;place-items:center;background:var(--bg);z-index:80}
+.loader{width:42px;height:42px;border:3px solid var(--line);border-top-color:var(--gold);border-radius:50%;animation:spin .8s linear infinite}
+
+.set-item{display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:14px;margin-bottom:10px;width:100%;text-align:right;font-weight:600}
+.set-item small{display:block;color:var(--muted);font-weight:400;font-size:12.5px;margin-top:2px}
+.tag{font-size:12px;padding:3px 9px;border-radius:999px;background:rgba(92,201,138,.12);color:var(--green);white-space:nowrap}
+.tag.off{background:rgba(239,107,107,.12);color:var(--red)}
+.row-flex{display:flex;gap:8px}
+.row-flex .inp{flex:1}
+.row-flex .btn{flex:0 0 auto;padding:0 18px;height:50px}
+.note{font-size:12.5px;color:var(--faint);margin-top:6px;line-height:1.6}
+</style>
 </head>
-<body class="bg-slate-900 text-slate-100 min-h-screen pb-28 selection:bg-brand-500 selection:text-white">
+<body>
 
-  <!-- Header العلوي الثابت للهاتف -->
-  <header class="sticky top-0 z-40 bg-slate-900/95 backdrop-blur-md border-b border-slate-800 shadow-xl">
-    <div class="max-w-md mx-auto px-4 py-3">
-      <div class="flex items-center justify-between">
-        
-        <!-- هوية التطبيق -->
-        <div class="flex items-center space-x-2.5 space-x-reverse">
-          <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-brand-600 to-emerald-400 flex items-center justify-center text-white shadow-lg shadow-brand-500/20">
-            <i data-lucide="building-2" class="w-5 h-5"></i>
-          </div>
-          <div>
-            <div class="flex items-center space-x-1.5 space-x-reverse">
-              <h1 class="text-sm font-extrabold text-white leading-tight">بوابة مدير الفروع</h1>
-              <span class="px-1.5 py-0.5 rounded text-[10px] font-mono bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">2026</span>
-            </div>
-            <p id="liveSyncStatus" class="text-[11px] text-slate-400 flex items-center space-x-1 space-x-reverse">
-              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-              <span>مزامنة حية + إدخال فوري</span>
-            </p>
-          </div>
-        </div>
+<div id="loading" class="loading"><div class="loader"></div></div>
 
-        <!-- أزرار الإجراءات -->
-        <div class="flex items-center space-x-1.5 space-x-reverse">
-          <!-- زر إدخال عملية جديدة -->
-          <button onclick="openEntryModal()" class="touch-btn flex items-center space-x-1 space-x-reverse px-3 py-1.5 rounded-xl bg-brand-600 hover:bg-brand-500 text-white text-xs font-bold shadow-md shadow-brand-600/30 transition">
-            <i data-lucide="plus-circle" class="w-4 h-4"></i>
-            <span>إدخال</span>
-          </button>
-          <!-- زر التحديث -->
-          <button onclick="fetchLiveData(true)" id="refreshBtn" class="touch-btn p-2 rounded-xl bg-slate-800 text-slate-300 hover:text-white transition" title="مزامنة فورية">
-            <i data-lucide="refresh-cw" class="w-4 h-4"></i>
-          </button>
-          <a href="https://docs.google.com/spreadsheets/d/1YcxO0CNOwMb61h3IrlcJxJex5B6rp0_EnclQvGLaPbI/edit?usp=sharing" target="_blank" class="touch-btn p-2 rounded-xl bg-slate-800 text-slate-300 hover:text-white transition" title="فتح الشيت">
-            <i data-lucide="file-spreadsheet" class="w-4 h-4 text-emerald-400"></i>
-          </a>
-        </div>
+<!-- ============ LOGIN ============ -->
+<section id="login" class="login hidden">
+  <div class="logo">MAD</div>
+  <h1>إدارة الموظفين</h1>
+  <p>أدخل رمز الدخول</p>
+  <div class="pin" id="pinDots"><i></i><i></i><i></i><i></i></div>
+  <div class="pad" id="pad"></div>
+</section>
 
+<!-- ============ APP ============ -->
+<div id="app" class="hidden">
+  <header class="top">
+    <div class="top-row">
+      <div class="brand">
+        <div class="logo">MAD</div>
+        <div><h1 id="title">اليوم</h1><small id="subtitle">MAD Parfum</small></div>
       </div>
-
-      <!-- تبويبات التصفح الرئيسية للهاتف -->
-      <div class="flex items-center space-x-2 space-x-reverse overflow-x-auto no-scrollbar pt-3 mt-1 text-xs font-bold border-t border-slate-800/80">
-        <button onclick="switchTab('overview')" id="tab-overview" class="tab-btn px-3 py-1.5 rounded-xl whitespace-nowrap bg-brand-600 text-white shadow-sm transition">
-          📊 النظرة العامة
-        </button>
-        <button onclick="switchTab('westbank')" id="tab-westbank" class="tab-btn px-3 py-1.5 rounded-xl whitespace-nowrap bg-slate-800 text-slate-400 hover:text-white transition">
-          📍 سحوبات الضفة
-        </button>
-        <button onclick="switchTab('expenses')" id="tab-expenses" class="tab-btn px-3 py-1.5 rounded-xl whitespace-nowrap bg-slate-800 text-slate-400 hover:text-white transition">
-          💸 المصاريف والتشغيل
-        </button>
-        <button onclick="switchTab('internal')" id="tab-internal" class="tab-btn px-3 py-1.5 rounded-xl whitespace-nowrap bg-slate-800 text-slate-400 hover:text-white transition">
-          🏢 فروع وتجار الداخل
-        </button>
-        <button onclick="switchTab('staff')" id="tab-staff" class="tab-btn px-3 py-1.5 rounded-xl whitespace-nowrap bg-slate-800 text-slate-400 hover:text-white transition">
-          👥 الموظفين
-        </button>
-      </div>
-
+      <button class="icon-btn" id="refreshBtn" aria-label="تحديث">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg>
+      </button>
     </div>
   </header>
 
-  <!-- محتوى التطبيق -->
-  <main class="max-w-md mx-auto px-4 pt-4 space-y-4">
-
-    <!-- شريط البحث السريع والفلترة -->
-    <div class="relative">
-      <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-slate-400">
-        <i data-lucide="search" class="w-4 h-4"></i>
+  <main>
+    <!-- TODAY -->
+    <section class="view" id="v-day">
+      <div class="datenav">
+        <button class="icon-btn" id="dayPrev" aria-label="اليوم السابق"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></button>
+        <label class="date-pill"><span id="dayLabel"></span><small id="dayRel"></small><input type="date" id="dayInput"></label>
+        <button class="icon-btn" id="dayNext" aria-label="اليوم التالي"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round"><path d="M15 6l-6 6 6 6"/></svg></button>
       </div>
-      <input type="text" id="searchInput" oninput="handleSearch()" placeholder="بحث سريع في كل الفروع والمصاريف والمدن..." 
-        class="w-full pl-9 pr-9 py-2.5 bg-slate-800/80 border border-slate-700/80 rounded-2xl text-xs sm:text-sm text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent">
-      <button id="clearSearchBtn" onclick="clearSearch()" class="hidden absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400 hover:text-white">
-        <i data-lucide="x" class="w-4 h-4"></i>
-      </button>
-    </div>
-
-    <!-- قسم 1: النظرة العامة والمؤشرات (Overview) -->
-    <div id="section-overview" class="space-y-4 tab-section">
-      
-      <!-- بطاقات الملخص المالي الحي -->
-      <div class="grid grid-cols-2 gap-2.5">
-        
-        <!-- إجمالي الإيرادات -->
-        <div class="bg-gradient-to-br from-slate-800 to-slate-800/90 border border-slate-700/80 p-4 rounded-3xl relative overflow-hidden shadow-lg">
-          <div class="absolute -left-2 -bottom-2 w-16 h-16 bg-emerald-500/10 rounded-full blur-xl pointer-events-none"></div>
-          <div class="flex items-center justify-between">
-            <span class="text-[11px] font-bold text-slate-400">إجمالي الإيرادات</span>
-            <div class="w-7 h-7 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center">
-              <i data-lucide="trending-up" class="w-4 h-4"></i>
-            </div>
-          </div>
-          <p id="kpiRevenue" class="text-lg font-black text-white mt-1">167,139 ₪</p>
-          <div class="mt-2 text-[10px] text-emerald-400 font-bold flex items-center space-x-1 space-x-reverse">
-            <span>↑ نمو متواصل</span>
-          </div>
-        </div>
-
-        <!-- إجمالي المصاريف -->
-        <div class="bg-gradient-to-br from-slate-800 to-slate-800/90 border border-slate-700/80 p-4 rounded-3xl relative overflow-hidden shadow-lg">
-          <div class="absolute -left-2 -bottom-2 w-16 h-16 bg-rose-500/10 rounded-full blur-xl pointer-events-none"></div>
-          <div class="flex items-center justify-between">
-            <span class="text-[11px] font-bold text-slate-400">إجمالي المصاريف</span>
-            <div class="w-7 h-7 rounded-xl bg-rose-500/20 text-rose-400 flex items-center justify-center">
-              <i data-lucide="trending-down" class="w-4 h-4"></i>
-            </div>
-          </div>
-          <p id="kpiExpenses" class="text-lg font-black text-white mt-1">34,007 ₪</p>
-          <div class="mt-2 text-[10px] text-slate-400 font-semibold">
-            <span>تشمل الإعلانات والتشغيل</span>
-          </div>
-        </div>
-
-        <!-- صافي الفائض / الأرباح -->
-        <div class="col-span-2 bg-gradient-to-r from-emerald-950/80 via-slate-800 to-slate-800 border border-emerald-500/30 p-4 rounded-3xl shadow-xl flex items-center justify-between">
-          <div>
-            <p class="text-xs font-bold text-emerald-400">صافي الفائض والأرباح</p>
-            <p id="kpiProfit" class="text-2xl font-black text-white mt-0.5">133,132 ₪</p>
-            <p id="kpiMargin" class="text-[11px] text-slate-400 mt-1">هامش ربح تشغيلي قوي: <strong class="text-emerald-400 font-bold">79.6%</strong></p>
-          </div>
-          <button onclick="openEntryModal()" class="w-12 h-12 rounded-2xl bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-500/40 text-emerald-300 flex items-center justify-center text-xl shadow-inner active:scale-95 transition" title="إضافة عملية جديدة">
-            ➕
-          </button>
-        </div>
-
+      <div class="kpis" id="dayKpis"></div>
+      <div id="dayMissingWrap">
+        <div class="sec-title"><h2>لم يُسجَّل لهم</h2><span id="missCount"></span></div>
+        <div class="missing" id="dayMissing"></div>
       </div>
+      <div class="sec-title"><h2>سجلات اليوم</h2><span id="dayCount"></span></div>
+      <div class="list" id="dayList"></div>
+    </section>
 
-      <!-- كارت العمليات المضافة حديثاً من التطبيق -->
-      <div id="recentEntriesContainer" class="hidden bg-slate-800/80 border border-brand-500/40 p-4 rounded-3xl space-y-2.5 shadow-lg animate-fadeIn">
-        <div class="flex items-center justify-between">
-          <div class="flex items-center space-x-1.5 space-x-reverse">
-            <span class="w-2 h-2 rounded-full bg-brand-400 animate-ping"></span>
-            <h3 class="text-xs font-bold text-white">العمليات المدخلة حديثاً عبر الجوال</h3>
-          </div>
-          <span id="recentEntriesCount" class="text-[10px] px-2 py-0.5 rounded-full bg-brand-500/20 text-brand-300 font-bold">0 عمليات</span>
-        </div>
-        <div id="recentEntriesList" class="space-y-2">
-          <!-- تملأ برمجياً -->
-        </div>
+    <!-- STAFF -->
+    <section class="view hidden" id="v-staff">
+      <div class="seg" id="staffPeriod"></div>
+      <div class="seg small" id="staffMetric"></div>
+      <div class="list" id="staffList"></div>
+    </section>
+
+    <!-- REPORTS -->
+    <section class="view hidden" id="v-rep">
+      <div class="seg" id="repPeriod"></div>
+      <div class="kpis" id="repKpis"></div>
+      <div class="sec-title"><h2>المبيعات اليومية</h2><span id="repChartCap"></span></div>
+      <div class="chart" id="repChart"></div>
+      <div class="sec-title"><h2>أفضل الموظفين</h2><span>حسب المبلغ</span></div>
+      <div class="list" id="repTop"></div>
+      <div class="sec-title"><h2>أعلى نسبة بيع</h2><span>بحد أدنى 3 أيام</span></div>
+      <div class="list" id="repConv"></div>
+    </section>
+
+    <!-- SETTINGS -->
+    <section class="view hidden" id="v-set">
+      <div class="sec-title"><h2>الموظفون</h2><span id="empCount"></span></div>
+      <div class="field row-flex">
+        <input class="inp" id="newEmp" placeholder="اسم موظف جديد" maxlength="40" style="font-size:16px;font-weight:500">
+        <button class="btn primary" id="addEmpBtn">إضافة</button>
       </div>
-
-      <!-- مقارنة الأشهر -->
-      <div class="bg-slate-800/60 border border-slate-700/80 p-4 rounded-3xl space-y-3">
-        <h3 class="text-xs font-bold text-white flex items-center justify-between">
-          <span>مقارنة الأداء المالي الشهري</span>
-          <span class="text-[11px] text-slate-400">2026</span>
-        </h3>
-
-        <!-- يوليو -->
-        <div class="space-y-1 bg-slate-900/60 p-3 rounded-2xl border border-slate-800">
-          <div class="flex justify-between text-xs font-bold">
-            <span class="text-slate-300">شهر يوليو (7)</span>
-            <span class="text-emerald-400">فائض: 76,950 ₪</span>
-          </div>
-          <div class="flex justify-between text-[11px] text-slate-400 pt-0.5">
-            <span>إيرادات: 80,000 ₪</span>
-            <span>مصاريف: 3,050 ₪</span>
-          </div>
-          <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden mt-1.5">
-            <div class="bg-emerald-500 h-full rounded-full" style="width: 96%"></div>
-          </div>
-        </div>
-
-        <!-- أغسطس -->
-        <div class="space-y-1 bg-slate-900/60 p-3 rounded-2xl border border-slate-800">
-          <div class="flex justify-between text-xs font-bold">
-            <span class="text-slate-300">شهر أغسطس (8)</span>
-            <span class="text-emerald-400">فائض: 56,182 ₪</span>
-          </div>
-          <div class="flex justify-between text-[11px] text-slate-400 pt-0.5">
-            <span>إيرادات: 87,139 ₪</span>
-            <span>مصاريف: 30,957 ₪</span>
-          </div>
-          <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden mt-1.5">
-            <div class="bg-emerald-500 h-full rounded-full" style="width: 64%"></div>
-          </div>
-        </div>
+      <div id="empList"></div>
+      <div class="sec-title"><h2>الأمان</h2></div>
+      <div class="field row-flex">
+        <input class="inp num" id="newPin" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="8" placeholder="رمز جديد (4-8 أرقام)" style="font-size:16px;font-weight:500;text-align:right">
+        <button class="btn primary" id="pinBtn">تغيير</button>
       </div>
-
-      <!-- أعلى الفروع أداءً في الضفة -->
-      <div class="bg-slate-800/60 border border-slate-700/80 p-4 rounded-3xl space-y-3">
-        <div class="flex items-center justify-between">
-          <h3 class="text-xs font-bold text-white">أعلى الفروع والمدن تحصيلاً</h3>
-          <button onclick="openEntryModal('revenue')" class="text-[11px] font-bold text-emerald-400 hover:text-emerald-300">
-            + تسجيل سحب
-          </button>
-        </div>
-        <div class="space-y-2" id="topBranchesList"></div>
-      </div>
-
-    </div>
-
-    <!-- قسم 2: سحوبات الضفة (West Bank) -->
-    <div id="section-westbank" class="space-y-3 tab-section hidden">
-      <div class="flex items-center justify-between px-1">
-        <h2 class="text-xs font-extrabold text-white">تفاصيل سحوبات مدن الضفة</h2>
-        <button onclick="openEntryModal('revenue')" class="text-[11px] text-emerald-400 font-bold bg-emerald-500/10 hover:bg-emerald-500/20 px-2.5 py-1 rounded-xl border border-emerald-500/20 flex items-center space-x-1 space-x-reverse transition touch-btn">
-          <i data-lucide="plus" class="w-3.5 h-3.5"></i>
-          <span>إضافة سحب فرع</span>
-        </button>
-      </div>
-      <div id="westBankCards" class="space-y-2.5"></div>
-    </div>
-
-    <!-- قسم 3: المصاريف والتشغيل (Expenses) -->
-    <div id="section-expenses" class="space-y-3 tab-section hidden">
-      <div class="flex items-center justify-between px-1">
-        <h2 class="text-xs font-extrabold text-white">المصاريف والصيانة والإعلانات</h2>
-        <button onclick="openEntryModal('expense')" class="text-[11px] text-rose-400 font-bold bg-rose-500/10 hover:bg-rose-500/20 px-2.5 py-1 rounded-xl border border-rose-500/20 flex items-center space-x-1 space-x-reverse transition touch-btn">
-          <i data-lucide="plus" class="w-3.5 h-3.5"></i>
-          <span>تسجيل مصروف</span>
-        </button>
-      </div>
-      <div id="expensesCards" class="space-y-2.5"></div>
-    </div>
-
-    <!-- قسم 4: فروع وتجار الداخل (Internal) -->
-    <div id="section-internal" class="space-y-3 tab-section hidden">
-      <div class="flex items-center justify-between px-1">
-        <h2 class="text-xs font-extrabold text-white">فروع وتجار الداخل</h2>
-        <button onclick="openEntryModal('branch')" class="text-[11px] text-indigo-400 font-bold bg-indigo-500/10 hover:bg-indigo-500/20 px-2.5 py-1 rounded-xl border border-indigo-500/20 flex items-center space-x-1 space-x-reverse transition touch-btn">
-          <i data-lucide="plus" class="w-3.5 h-3.5"></i>
-          <span>إضافة فرع / تاجر</span>
-        </button>
-      </div>
-      <div id="internalCards" class="space-y-2.5"></div>
-    </div>
-
-    <!-- قسم 5: الموظفين (Staff) -->
-    <div id="section-staff" class="space-y-3 tab-section hidden">
-      <div class="flex items-center justify-between px-1">
-        <h2 class="text-xs font-extrabold text-white">قائمة الموظفين والرواتب</h2>
-        <button onclick="openEntryModal('staff')" class="text-[11px] text-emerald-400 font-bold bg-emerald-500/10 hover:bg-emerald-500/20 px-2.5 py-1 rounded-xl border border-emerald-500/20 flex items-center space-x-1 space-x-reverse transition touch-btn">
-          <i data-lucide="plus" class="w-3.5 h-3.5"></i>
-          <span>إضافة موظف</span>
-        </button>
-      </div>
-      <div id="staffCards" class="grid grid-cols-2 gap-2"></div>
-    </div>
-
+      <a class="set-item" id="sheetLink" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">
+        <div>فتح جدول البيانات<small>Google Sheets — المبيعات</small></div><span>↗</span>
+      </a>
+      <button class="set-item" id="logoutBtn" style="color:var(--red)"><div>تسجيل الخروج</div><span>⎋</span></button>
+      <p class="note" id="fixNote"></p>
+    </section>
   </main>
 
-  <!-- زر عائم لإدخال المعلومات السريع (Floating Action Button) -->
-  <div class="fixed bottom-5 left-5 z-40">
-    <button onclick="openEntryModal()" class="touch-btn w-14 h-14 rounded-full bg-gradient-to-tr from-brand-600 to-emerald-400 text-white shadow-2xl shadow-emerald-500/50 flex items-center justify-center text-2xl font-bold border-2 border-white/20 active:scale-90 transition">
-      <i data-lucide="plus" class="w-7 h-7"></i>
-    </button>
-  </div>
+  <button class="fab" id="fab" aria-label="إضافة سجل"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button>
 
-  <!-- نافذة إدخال المعلومات السريعة (Modal Sheet) -->
-  <div id="entryModal" class="hidden fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4">
-    <div class="bg-slate-900 border border-slate-700 w-full sm:max-w-md rounded-t-3xl sm:rounded-3xl p-5 space-y-4 shadow-2xl max-h-[92vh] overflow-y-auto">
-      
-      <!-- ترويسة نافذة الإدخال -->
-      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-        <div class="flex items-center space-x-2 space-x-reverse">
-          <div class="w-8 h-8 rounded-xl bg-brand-500/20 text-brand-400 flex items-center justify-center">
-            <i data-lucide="edit-3" class="w-4 h-4"></i>
-          </div>
-          <div>
-            <h3 class="text-sm font-bold text-white">إدخال وتسجيل عملية جديدة</h3>
-            <p class="text-[10px] text-slate-400">تحديث فوري للأرصدة والإحصائيات</p>
-          </div>
-        </div>
-        <button onclick="closeEntryModal()" class="p-1.5 text-slate-400 hover:text-white rounded-xl bg-slate-800">
-          <i data-lucide="x" class="w-4 h-4"></i>
-        </button>
-      </div>
+  <nav class="nav" id="nav">
+    <button data-v="day" class="on"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="3"/><path d="M8 2v4M16 2v4M3 10h18"/></svg>اليوم</button>
+    <button data-v="staff"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.6 3.4-5.5 6.5-5.5s5.7 1.9 6.5 5.5"/><circle cx="17.5" cy="9" r="2.5"/><path d="M17 14.6c2.3.3 3.9 1.9 4.5 4.4"/></svg>الموظفين</button>
+    <button data-v="rep"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>التقارير</button>
+    <button data-v="set"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>الإعدادات</button>
+  </nav>
+</div>
 
-      <!-- محدد نوع العملية -->
-      <div class="grid grid-cols-3 gap-1.5 bg-slate-800/80 p-1.5 rounded-2xl text-center text-xs font-bold">
-        <button type="button" onclick="setEntryType('revenue')" id="btnTypeRevenue" class="py-2 rounded-xl bg-brand-600 text-white transition">
-          💰 سحب / إيراد
-        </button>
-        <button type="button" onclick="setEntryType('expense')" id="btnTypeExpense" class="py-2 rounded-xl text-slate-400 hover:text-white transition">
-          💸 مصروف
-        </button>
-        <button type="button" onclick="setEntryType('staff')" id="btnTypeStaff" class="py-2 rounded-xl text-slate-400 hover:text-white transition">
-          👥 موظف
-        </button>
-      </div>
+<!-- ============ SHEETS ============ -->
+<div class="overlay" id="overlay"></div>
 
-      <!-- نموذج إدخال سحب / إيراد فرع -->
-      <form id="formRevenue" onsubmit="submitRevenue(event)" class="space-y-3">
-        <div class="space-y-1">
-          <label class="block text-xs font-bold text-slate-300">الفرع / الموقع:</label>
-          <select id="revBranch" required class="w-full px-3 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-xs sm:text-sm text-white focus:outline-none focus:ring-2 focus:ring-brand-500">
-            <option value="رام الله">رام الله</option>
-            <option value="ايكون">ايكون</option>
-            <option value="طولكرم">طولكرم</option>
-            <option value="نابلس">نابلس</option>
-            <option value="اريحا">أريحا</option>
-            <option value="جنين">جنين</option>
-            <option value="وزن">وزن</option>
-            <option value="قلقيليه">قلقيلية</option>
-            <option value="كفر عقب">كفر عقب</option>
-            <option value="فرع البير">فرع البير</option>
-            <option value="فرع يركا">فرع يركا</option>
-            <option value="فرع كفر قرع">فرع كفر قرع</option>
-            <option value="فرع الناصره">فرع الناصرة</option>
-            <option value="فرع حيفا">فرع حيفا</option>
-            <option value="فرع العفوله">فرع العفولة</option>
-            <option value="موقع جديد">+ موقع / فرع آخر</option>
-          </select>
-        </div>
-
-        <div id="customRevBranchBox" class="hidden space-y-1">
-          <label class="block text-xs font-bold text-slate-300">اسم الموقع الجديد:</label>
-          <input type="text" id="customRevBranch" placeholder="اكتب اسم الفرع أو التاجر..." class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white">
-        </div>
-
-        <div class="grid grid-cols-2 gap-2">
-          <div class="space-y-1">
-            <label class="block text-xs font-bold text-slate-300">المبلغ (شيكل / ر.س):</label>
-            <input type="number" step="0.01" id="revAmount" required placeholder="0.00" inputmode="decimal" class="w-full px-3 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-xs sm:text-sm text-white font-mono font-bold focus:outline-none focus:ring-2 focus:ring-brand-500">
-          </div>
-          <div class="space-y-1">
-            <label class="block text-xs font-bold text-slate-300">الشهر:</label>
-            <select id="revMonth" class="w-full px-3 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-xs sm:text-sm text-white focus:outline-none focus:ring-2 focus:ring-brand-500">
-              <option value="سبتمبر">سبتمبر (9)</option>
-              <option value="أغسطس">أغسطس (8)</option>
-              <option value="يوليو">يوليو (7)</option>
-              <option value="أكتوبر">أكتوبر (10)</option>
-              <option value="نوفمبر">نوفمبر (11)</option>
-              <option value="ديسمبر">ديسمبر (12)</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="space-y-1">
-          <label class="block text-xs font-bold text-slate-300">ملاحظات / طريقة الدفع:</label>
-          <input type="text" id="revNote" placeholder="نقداً، تحويل، سحوبات بضاعة..." class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white focus:outline-none focus:ring-2 focus:ring-brand-500">
-        </div>
-
-        <button type="submit" class="w-full py-3 bg-brand-600 hover:bg-brand-500 text-white font-bold text-xs rounded-xl shadow-lg shadow-brand-600/30 flex items-center justify-center space-x-1.5 space-x-reverse touch-btn transition">
-          <i data-lucide="check" class="w-4 h-4"></i>
-          <span>حفظ وتحديث الأرصدة فوراً</span>
-        </button>
-      </form>
-
-      <!-- نموذج إدخال مصروف / صيانة -->
-      <form id="formExpense" onsubmit="submitExpense(event)" class="space-y-3 hidden">
-        <div class="space-y-1">
-          <label class="block text-xs font-bold text-slate-300">بند المصروف / العمل المطلوب:</label>
-          <input type="text" id="expName" required placeholder="مثلاً: صيانة مكيفات، شراء خشب، فاتورة كهرباء..." class="w-full px-3 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-xs sm:text-sm text-white focus:outline-none focus:ring-2 focus:ring-rose-500">
-        </div>
-
-        <div class="grid grid-cols-2 gap-2">
-          <div class="space-y-1">
-            <label class="block text-xs font-bold text-slate-300">التصنيف:</label>
-            <select id="expCategory" class="w-full px-3 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white">
-              <option value="صيانة وتصليح">صيانة وتصليح</option>
-              <option value="فواتير ومرافق">فواتير ومرافق (كهرباء/مياه)</option>
-              <option value="تجهيزات ومواد">تجهيزات ومواد</option>
-              <option value="تسويق وإعلان">تسويق وإعلانات</option>
-              <option value="إيجارات">إيجارات</option>
-              <option value="مصاريف تشغيلية">مصاريف تشغيلية</option>
-            </select>
-          </div>
-          <div class="space-y-1">
-            <label class="block text-xs font-bold text-slate-300">المبلغ (شيكل / ر.س):</label>
-            <input type="number" step="0.01" id="expAmount" required placeholder="0.00" inputmode="decimal" class="w-full px-3 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-xs sm:text-sm text-white font-mono font-bold focus:outline-none focus:ring-2 focus:ring-rose-500">
-          </div>
-        </div>
-
-        <div class="grid grid-cols-2 gap-2">
-          <div class="space-y-1">
-            <label class="block text-xs font-bold text-slate-300">الموقع / الفرع:</label>
-            <input type="text" id="expLocation" placeholder="كفر قرع، يركا..." class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white">
-          </div>
-          <div class="space-y-1">
-            <label class="block text-xs font-bold text-slate-300">المسؤول / المستلم:</label>
-            <input type="text" id="expRecipient" placeholder="محمد ابو عمر، سندس..." class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white">
-          </div>
-        </div>
-
-        <button type="submit" class="w-full py-3 bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs rounded-xl shadow-lg shadow-rose-600/30 flex items-center justify-center space-x-1.5 space-x-reverse touch-btn transition">
-          <i data-lucide="check" class="w-4 h-4"></i>
-          <span>تسجيل المصروف وخصمه من الفائض</span>
-        </button>
-      </form>
-
-      <!-- نموذج إدخال موظف جديد -->
-      <form id="formStaff" onsubmit="submitStaff(event)" class="space-y-3 hidden">
-        <div class="space-y-1">
-          <label class="block text-xs font-bold text-slate-300">اسم الموظف / الموظفة:</label>
-          <input type="text" id="staffName" required placeholder="الاسم ثلاثي أو الاسم والفرع..." class="w-full px-3 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-xs sm:text-sm text-white focus:outline-none focus:ring-2 focus:ring-brand-500">
-        </div>
-        <div class="space-y-1">
-          <label class="block text-xs font-bold text-slate-300">الفرع المخصص:</label>
-          <input type="text" id="staffBranch" placeholder="مثلاً: فرع يركا، فرع الناصرة..." class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white">
-        </div>
-        <button type="submit" class="w-full py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl shadow-lg shadow-indigo-600/30 flex items-center justify-center space-x-1.5 space-x-reverse touch-btn transition">
-          <i data-lucide="user-plus" class="w-4 h-4"></i>
-          <span>إضافة الموظف للكادر</span>
-        </button>
-      </form>
-
+<div class="sheet" id="entrySheet" role="dialog" aria-modal="true">
+  <div class="sheet-h"><h3 id="entryTitle">سجل جديد</h3><button class="icon-btn" data-close aria-label="إغلاق"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+  <div class="sheet-b">
+    <div class="field"><label>التاريخ</label><input class="inp" type="date" id="fDate"></div>
+    <div class="field">
+      <label>الموظف <span id="fNameSel" style="color:var(--gold)"></span></label>
+      <input class="inp search" id="fSearch" placeholder="ابحث أو اكتب اسماً جديداً">
+      <div class="name-grid" id="fNames"></div>
+      <div class="hint" id="hName"></div>
+    </div>
+    <div class="field"><label>عدد الساعات</label>
+      <div class="stepper"><button type="button" data-step="0.5">+</button><input class="inp num" id="fHours" inputmode="decimal"><button type="button" data-step="-0.5">−</button></div>
+      <div class="hint" id="hHours"></div>
+    </div>
+    <div class="grid2">
+      <div class="field"><label>عدد الزبائن</label><input class="inp num" id="fCust" inputmode="numeric" pattern="[0-9]*" placeholder="0"><div class="hint" id="hCust"></div></div>
+      <div class="field"><label>عدد المبيعات</label><input class="inp num" id="fSales" inputmode="numeric" pattern="[0-9]*" placeholder="0"><div class="hint" id="hSales"></div></div>
+    </div>
+    <div class="field"><label>مبلغ المبيعات (₪)</label><input class="inp num" id="fAmount" inputmode="decimal" placeholder="0"><div class="hint" id="hAmount"></div></div>
+    <div class="preview">
+      <div><small>البيع بالساعة</small><b class="num" id="pHour">—</b></div>
+      <div><small>نسبة المبيعات</small><b class="num" id="pConv">—</b></div>
+      <div><small>معدل الزبون</small><b class="num" id="pAvg">—</b></div>
     </div>
   </div>
+  <div class="sheet-f">
+    <button class="btn danger hidden" id="delBtn">حذف</button>
+    <button class="btn primary" id="saveBtn">حفظ</button>
+  </div>
+</div>
 
-  <script>
-    // قاعدة البيانات الأصلية المسترجعة من شيت جوجل
-    const defaultData = {
-      westBank: [
-        { name: "رام الله", jul: 21240, aug: 23570, total: 44810, note: "الفرع الأكثر تحصيلاً" },
-        { name: "ايكون", jul: 18200, aug: 15317, total: 33517, note: "نشاط مالي ممتاز" },
-        { name: "طولكرم", jul: 7437, aug: 17754, total: 25191, note: "قفزة بنسبة +138% في أغسطس" },
-        { name: "نابلس", jul: 8900, aug: 16169, total: 25069, note: "نمو مضاعف في أغسطس" },
-        { name: "اريحا", jul: 10080, aug: 5509, total: 15589, note: "تحصيل منتظم" },
-        { name: "جنين", jul: 7564, aug: 0, total: 7564, note: "سحوبات يوليو" },
-        { name: "وزن", jul: 6579, aug: 0, total: 6579, note: "سحوبات يوليو" },
-        { name: "قلقيليه", jul: 0, aug: 4500, total: 4500, note: "سحوبات أغسطس" },
-        { name: "كفر عقب", jul: 0, aug: 4320, total: 4320, note: "سحوبات أغسطس" }
-      ],
-      expenses: [
-        { name: "خشب (كفر قرع)", amount: 3500, month: "أغسطس", note: "كفر قرع", cat: "تجهيزات ومواد" },
-        { name: "حومر (كفر قرع)", amount: 3500, month: "أغسطس", note: "كفر قرع", cat: "تجهيزات ومواد" },
-        { name: "كهرباء (كفر قرع)", amount: 4050, month: "أغسطس", note: "كفر قرع", cat: "فواتير ومرافق" },
-        { name: "مصاريف (محمد ابو عمر)", amount: 4000, month: "أغسطس", note: "محمد ابو عمر", cat: "مصاريف تشغيلية" },
-        { name: "مصاريف تحويلة (سندس)", amount: 3186, month: "أغسطس", note: "تحويله عملتها سندس", cat: "مصاريف إدارية" },
-        { name: "بركيت (كفر قرع)", amount: 2800, month: "أغسطس", note: "كفر قرع", cat: "تجهيزات ومواد" },
-        { name: "ايجار بركيت (كفر قرع)", amount: 1800, month: "أغسطس", note: "كفر قرع", cat: "إيجارات" },
-        { name: "كهرباء (يركا)", amount: 1741, month: "أغسطس", note: "يركا", cat: "فواتير ومرافق" },
-        { name: "تصليح كهرباء (عمي خالد)", amount: 1600, month: "أغسطس", note: "تصليح كهرباء عمي خالد", cat: "صيانة وتصليح" },
-        { name: "صيانة ونظافة مزكان (عياش)", amount: 1000, month: "أغسطس", note: "تصليح مزكان عياش", cat: "صيانة وتصليح" },
-        { name: "إعلانات ممولة وتسويق إلكتروني", amount: 5400, month: "يوليو وأغسطس", note: "المسؤول: ايلياء (2700 يوليو + 2700 أغسطس)", cat: "تسويق وإعلان" },
-        { name: "مطبوعات ودعاية ميدانية", amount: 1350, month: "يوليو وأغسطس", note: "المسؤول: عمي كمال (350 يوليو + 1000 أغسطس)", cat: "تسويق وإعلان" },
-        { name: "شراء اغراض (تستر)", amount: 80, month: "أغسطس", note: "تستر", cat: "مشتريات" }
-      ],
-      internal: [
-        { name: "فرع البير", type: "فرع رئيسي", status: "متاح" },
-        { name: "فرع يركا", type: "فرع رئيسي", status: "نشط (فواتير كهرباء مسجلة)" },
-        { name: "فرع الناصره", type: "فرع رئيسي", status: "متاح" },
-        { name: "فرع العفوله", type: "فرع رئيسي", status: "متاح" },
-        { name: "فرع هرتسليا", type: "فرع رئيسي", status: "متاح" },
-        { name: "فرع حيفا", type: "فرع رئيسي", status: "متاح" },
-        { name: "فرع كفر قرع", type: "فرع رئيسي", status: "نشط (تجهيزات وصيانة جارية)" },
-        { name: "فرع وادي النسور", type: "فرع رئيسي", status: "متاح" },
-        { name: "مجدل شمس", type: "تاجر داخل", status: "معتمد" },
-        { name: "سخنين", type: "تاجر داخل", status: "معتمد" },
-        { name: "باقه", type: "تاجر داخل", status: "معتمد" },
-        { name: "كفر قاسم", type: "تاجر داخل", status: "معتمد" },
-        { name: "طبريا", type: "تاجر داخل", status: "معتمد" },
-        { name: "الداليه", type: "تاجر داخل", status: "معتمد" },
-        { name: "الرمله", type: "تاجر داخل", status: "معتمد" },
-        { name: "المكر", type: "تاجر داخل", status: "معتمد" },
-        { name: "كفر مندا", type: "تاجر داخل", status: "معتمد" },
-        { name: "الخضيره +الطيبه", type: "تاجر داخل", status: "معتمد" },
-        { name: "طمره", type: "تاجر داخل", status: "معتمد" }
-      ],
-      staff: [
-        "عبير", "ميرا", "الاء محاميد", "ايليا", "قمر", "تمار", "دعاء", "رؤيا", 
-        "ليانا", "ريتاج", "سبا", "زهور", "تمام", "سماره", "دارين", "اشواق", 
-        "غزل", "يردين", "ريماس", "حلا", "سجى", "ايه", "نرمين", "رازي", "لين", "ريان"
-      ],
-      recentEntries: []
-    };
+<div class="sheet" id="empSheet" role="dialog" aria-modal="true">
+  <div class="sheet-h"><h3 id="empTitle"></h3><button class="icon-btn" data-close aria-label="إغلاق"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+  <div class="sheet-b" id="empBody"></div>
+</div>
 
-    // تحميل البيانات من localStorage إن وجدت للحفاظ على الإدخالات
-    let currentData = defaultData;
-    try {
-      const saved = localStorage.getItem('branch_manager_data_2026');
-      if (saved) {
-        currentData = JSON.parse(saved);
-      }
-    } catch(e) {
-      console.warn("تعذر تحميل localStorage");
+<div class="sheet" id="confirmSheet" role="alertdialog" aria-modal="true">
+  <div class="sheet-h"><h3 id="cfTitle">تأكيد</h3></div>
+  <div class="sheet-b"><p id="cfText" style="margin:4px 0 8px;line-height:1.7;color:var(--muted)"></p></div>
+  <div class="sheet-f"><button class="btn ghost" id="cfNo">إلغاء</button><button class="btn primary" id="cfYes">تأكيد</button></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+'use strict';
+/* ================= API ================= */
+var API_URL = 'https://script.google.com/macros/s/AKfycbwZeolHAxhUkdvdiyZgwcy4kLGFv3f5LwxnI5P_KseZw1Ytr4zHco8N59QbJybKC7hhTQ/exec';
+function call(fn){
+  var args = Array.prototype.slice.call(arguments,1);
+  if (/^https:\/\/script\.google\.com\//.test(API_URL) && !(window.google && google.script && google.script.run)) {
+    var ctrl = window.AbortController ? new AbortController() : null;
+    var to = setTimeout(function(){ if(ctrl) ctrl.abort(); }, 30000);
+    return fetch(API_URL, { method:'POST', redirect:'follow', headers:{'Content-Type':'text/plain;charset=utf-8'}, body: JSON.stringify({fn:fn,args:args}), signal: ctrl?ctrl.signal:undefined })
+      .then(function(r){ if(!r.ok) throw new Error('تعذّر الاتصال بالخادم ('+r.status+')'); return r.json(); })
+      .then(function(j){ clearTimeout(to); if(!j || !j.ok) throw new Error((j&&j.error)||'حدث خطأ في الخادم'); return j.result; },
+            function(e){ clearTimeout(to); throw (e && e.name==='AbortError') ? new Error('انتهت مهلة الاتصال، حاول مرة أخرى') : e; });
+  }
+  return new Promise(function(res,rej){
+    if (window.google && google.script && google.script.run){
+      var r = google.script.run.withSuccessHandler(res).withFailureHandler(function(e){ rej(e && e.message ? e : new Error(String(e))); });
+      r[fn].apply(r,args);
+    } else if (window.MOCK_API && window.MOCK_API[fn]) {
+      setTimeout(function(){ try{ res(window.MOCK_API[fn].apply(null,args)); }catch(e){ rej(e); } }, 150);
+    } else rej(new Error('لا يوجد اتصال بالخادم'));
+  });
+}
+function errMsg(e){
+  var m = (e && e.message) || String(e || '');
+  m = m.replace(/^Exception:\s*/,'').replace(/^Error:\s*/,'');
+  if (/NetworkError|network|Failed to fetch/i.test(m)) return 'تعذّر الاتصال، تأكد من الإنترنت';
+  return m || 'حدث خطأ غير متوقع';
+}
+
+/* ================= STORAGE ================= */
+function sget(k){ try{ return localStorage.getItem('madstaff_'+k); }catch(e){ return null; } }
+function sset(k,v){ try{ if (v===null) localStorage.removeItem('madstaff_'+k); else localStorage.setItem('madstaff_'+k,v); }catch(e){} }
+
+/* ================= STATE ================= */
+var S = { pin: sget('pin') || '', data: null, view: 'day', day: null, staffP: 'month', staffM: 'amount', repP: 'month', editing: null };
+var $ = function(id){ return document.getElementById(id); };
+
+/* ================= HELPERS ================= */
+var MONTHS = ['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
+var DAYS = ['الأحد','الإثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
+function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+function pd(iso){ var p=iso.split('-').map(Number); return new Date(p[0],p[1]-1,p[2]); }
+function toIso(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+function addDays(iso,n){ var d=pd(iso); d.setDate(d.getDate()+n); return toIso(d); }
+function fmtDay(iso){ var d=pd(iso); return DAYS[d.getDay()]+' '+d.getDate()+' '+MONTHS[d.getMonth()]; }
+function fmtShort(iso){ var d=pd(iso); return d.getDate()+'/'+(d.getMonth()+1); }
+function money(n){ return '₪'+Math.round(n||0).toLocaleString('en-US'); }
+function n1(n){ return (Math.round((n||0)*10)/10).toLocaleString('en-US'); }
+function pct(n){ return Math.round((n||0)*100)+'%'; }
+function today(){ return S.data ? S.data.today : toIso(new Date()); }
+function initials(n){ return String(n||'?').trim().charAt(0); }
+function convClass(c){ return c>=.85?'good':c>=.65?'mid':'bad'; }
+
+function periodRange(p){
+  var t = today(), d = pd(t);
+  if (p==='today') return [t,t,'اليوم'];
+  if (p==='week'){ var s=new Date(d); s.setDate(d.getDate()-d.getDay()); return [toIso(s),t,'هذا الأسبوع']; }
+  if (p==='month'){ return [toIso(new Date(d.getFullYear(),d.getMonth(),1)),t,MONTHS[d.getMonth()]]; }
+  if (p==='last'){ var a=new Date(d.getFullYear(),d.getMonth()-1,1), b=new Date(d.getFullYear(),d.getMonth(),0); return [toIso(a),toIso(b),MONTHS[a.getMonth()]]; }
+  return ['0000-01-01','9999-12-31','الكل'];
+}
+var PERIODS = [['week','الأسبوع'],['month','هذا الشهر'],['last','الشهر الماضي'],['all','الكل']];
+
+function inRange(r,a,b){ return r.date>=a && r.date<=b; }
+function agg(rows){
+  var t={amount:0,customers:0,sales:0,hours:0,n:rows.length,days:{}};
+  rows.forEach(function(r){ t.amount+=r.amount; t.customers+=r.customers; t.sales+=r.sales; t.hours+=r.hours; t.days[r.date]=1; });
+  t.nd = Object.keys(t.days).length;
+  t.perHour = t.hours? t.amount/t.hours : 0;
+  t.conv = t.customers? t.sales/t.customers : 0;
+  t.perCust = t.sales? t.amount/t.sales : 0;
+  return t;
+}
+function byEmployee(rows){
+  var m={};
+  rows.forEach(function(r){ (m[r.name]=m[r.name]||[]).push(r); });
+  return Object.keys(m).map(function(k){ var a=agg(m[k]); a.name=k; a.rows=m[k]; return a; });
+}
+
+/* ================= UI BASICS ================= */
+var toastT;
+function toast(msg,type){
+  var t=$('toast'); t.textContent=msg; t.className='toast on '+(type||'');
+  clearTimeout(toastT); toastT=setTimeout(function(){ t.className='toast'; }, type==='bad'?4200:2400);
+}
+var openSheet=null;
+function showSheet(id){ if(openSheet) hideSheet(true); openSheet=$(id); $('overlay').classList.add('on'); openSheet.classList.add('on'); }
+function hideSheet(keepOverlay){ if(openSheet) openSheet.classList.remove('on'); openSheet=null; if(!keepOverlay) $('overlay').classList.remove('on'); }
+$('overlay').onclick=function(){ hideSheet(); };
+document.querySelectorAll('[data-close]').forEach(function(b){ b.onclick=function(){ hideSheet(); }; });
+
+function confirmBox(title,text,yesLabel){
+  return new Promise(function(res){
+    var prev = openSheet;
+    $('cfTitle').textContent=title; $('cfText').textContent=text; $('cfYes').textContent=yesLabel||'تأكيد';
+    showSheet('confirmSheet');
+    $('cfYes').onclick=function(){ hideSheet(); res(true); };
+    $('cfNo').onclick=function(){ hideSheet(); if(prev){ showSheet(prev.id); } res(false); };
+  });
+}
+
+/* ================= LOGIN ================= */
+var pinBuf='', busy=false;
+function buildPad(){
+  var keys=['1','2','3','4','5','6','7','8','9','⌫','0','✓'], pad=$('pad'); pad.innerHTML='';
+  keys.forEach(function(k){
+    var b=document.createElement('button'); b.textContent=k;
+    if(k==='✓'){ b.style.background='linear-gradient(135deg,var(--gold),var(--gold2))'; b.style.color='#1a1408'; }
+    b.onclick=function(){ padKey(k); };
+    pad.appendChild(b);
+  });
+  drawDots();
+}
+function padKey(k){
+  if(busy) return;
+  if(k==='⌫') pinBuf=pinBuf.slice(0,-1);
+  else if(k==='✓') return tryLogin();
+  else if(pinBuf.length<8) pinBuf+=k;
+  drawDots();
+}
+function drawDots(){
+  var n=Math.max(4,pinBuf.length), h='';
+  for(var i=0;i<n;i++) h+='<i class="'+(i<pinBuf.length?'f':'')+'"></i>';
+  $('pinDots').innerHTML=h;
+}
+function tryLogin(){
+  if(pinBuf.length<4){ toast('الرمز من 4 أرقام على الأقل','bad'); return; }
+  var p=pinBuf; busy=true; $('pinDots').style.opacity=.5;
+  call('apiLogin',p).then(function(){ S.pin=p; sset('pin',p); pinBuf=''; $('login').classList.add('hidden'); load(true); })
+  .catch(function(e){ pinBuf=''; drawDots(); $('pinDots').classList.remove('shake'); void $('pinDots').offsetWidth; $('pinDots').classList.add('shake'); toast(errMsg(e),'bad'); })
+  .then(function(){ busy=false; $('pinDots').style.opacity=1; });
+}
+document.addEventListener('keydown',function(ev){
+  if($('login').classList.contains('hidden')) return;
+  if(/^\d$/.test(ev.key)) padKey(ev.key);
+  else if(ev.key==='Backspace') padKey('⌫');
+  else if(ev.key==='Enter') padKey('✓');
+});
+function showLogin(msg){
+  $('loading').classList.add('hidden'); $('app').classList.add('hidden'); $('login').classList.remove('hidden');
+  pinBuf=''; buildPad(); if(msg) toast(msg,'bad');
+}
+
+/* ================= LOAD ================= */
+function load(first){
+  if(first) $('loading').classList.remove('hidden');
+  $('refreshBtn').classList.add('spin');
+  return call('apiLoad',S.pin).then(function(d){
+    setData(d);
+    $('loading').classList.add('hidden'); $('app').classList.remove('hidden');
+    if(!first) toast('تم التحديث','ok');
+  }).catch(function(e){
+    var m=errMsg(e);
+    if(/رمز الدخول/.test(m)){ sset('pin',null); S.pin=''; showLogin(first?'':m); }
+    else { $('loading').classList.add('hidden'); if(S.data){ $('app').classList.remove('hidden'); } else { showLogin(); } toast(m,'bad'); }
+  }).then(function(){ $('refreshBtn').classList.remove('spin'); });
+}
+function setData(d){
+  d.entries.forEach(function(r){ r.name=String(r.name||'').trim(); });
+  S.data=d; if(!S.day) S.day=d.today;
+  render();
+}
+$('refreshBtn').onclick=function(){ load(false); };
+
+/* ================= NAV ================= */
+var TITLES={day:'اليوم',staff:'الموظفين',rep:'التقارير',set:'الإعدادات'};
+$('nav').onclick=function(e){
+  var b=e.target.closest('button'); if(!b) return;
+  S.view=b.dataset.v;
+  document.querySelectorAll('#nav button').forEach(function(x){ x.classList.toggle('on',x===b); });
+  ['day','staff','rep','set'].forEach(function(v){ $('v-'+v).classList.toggle('hidden',v!==S.view); });
+  $('title').textContent=TITLES[S.view];
+  $('fab').classList.toggle('hidden', S.view==='set');
+  window.scrollTo(0,0); render();
+};
+
+function render(){
+  if(!S.data) return;
+  var sub = S.data.entries.length+' سجل • '+S.data.employees.filter(function(e){return e.active;}).length+' موظف فعال';
+  $('subtitle').textContent=sub;
+  if(S.view==='day') renderDay();
+  else if(S.view==='staff') renderStaff();
+  else if(S.view==='rep') renderRep();
+  else renderSet();
+}
+
+/* ================= DAY ================= */
+$('dayPrev').onclick=function(){ S.day=addDays(S.day,-1); renderDay(); };
+$('dayNext').onclick=function(){ if(S.day<today()){ S.day=addDays(S.day,1); renderDay(); } };
+$('dayInput').onchange=function(){ if(this.value){ S.day=this.value>today()?today():this.value; renderDay(); } };
+
+function kpiHtml(t,label){
+  return '<div class="kpi hero"><label>'+esc(label)+'</label><b class="num">'+money(t.amount)+'</b><div class="sub">'+t.sales+' مبيعة من '+t.customers+' زبون</div></div>'+
+    '<div class="kpi"><label>نسبة المبيعات</label><b class="num">'+pct(t.conv)+'</b></div>'+
+    '<div class="kpi"><label>معدل الزبون</label><b class="num">'+money(t.perCust)+'</b></div>'+
+    '<div class="kpi"><label>البيع بالساعة</label><b class="num">'+money(t.perHour)+'</b></div>'+
+    '<div class="kpi"><label>ساعات العمل</label><b class="num">'+n1(t.hours)+'</b><div class="sub">'+t.n+' سجل</div></div>';
+}
+function entryCard(r){
+  var ph=r.hours?r.amount/r.hours:0, cv=r.customers?r.sales/r.customers:0, pc=r.sales?r.amount/r.sales:0;
+  return '<button class="entry" data-row="'+r.row+'"><div class="entry-h"><div class="who"><div class="av">'+esc(initials(r.name))+'</div><div><b>'+esc(r.name)+'</b><small>'+n1(r.hours)+' ساعات</small></div></div><div class="amt num">'+money(r.amount)+'</div></div>'+
+    '<div class="chips"><span class="chip">زبائن <b class="num">'+r.customers+'</b></span><span class="chip">مبيعات <b class="num">'+r.sales+'</b></span>'+
+    '<span class="chip '+convClass(cv)+'">النسبة <b class="num">'+pct(cv)+'</b></span><span class="chip">بالساعة <b class="num">'+money(ph)+'</b></span><span class="chip">للزبون <b class="num">'+money(pc)+'</b></span></div></button>';
+}
+function renderDay(){
+  var d=S.day, t=today();
+  $('dayLabel').textContent=fmtDay(d);
+  $('dayRel').textContent = d===t?'• اليوم':d===addDays(t,-1)?'• أمس':'';
+  $('dayInput').value=d; $('dayInput').max=t;
+  $('dayNext').style.opacity = d>=t?.35:1;
+  var rows=S.data.entries.filter(function(r){ return r.date===d; }).sort(function(a,b){ return b.amount-a.amount; });
+  var a=agg(rows);
+  $('dayKpis').innerHTML=kpiHtml(a,'إجمالي مبيعات اليوم');
+  $('dayCount').textContent=rows.length?rows.length+' سجل':'';
+  $('dayList').innerHTML = rows.length? rows.map(entryCard).join('') : '<div class="empty"><b>لا توجد سجلات لهذا اليوم</b>اضغط + لإضافة سجل موظف</div>';
+  var done={}; rows.forEach(function(r){ done[r.name]=1; });
+  var miss=S.data.employees.filter(function(e){ return e.active && !done[e.name]; });
+  $('dayMissingWrap').classList.toggle('hidden', !miss.length || d<addDays(t,-6));
+  $('missCount').textContent=miss.length+' موظف';
+  $('dayMissing').innerHTML=miss.map(function(e){ return '<button class="mbtn" data-name="'+esc(e.name)+'">+ '+esc(e.name)+'</button>'; }).join('');
+}
+$('dayList').onclick=function(e){ var b=e.target.closest('[data-row]'); if(b) openEntry(Number(b.dataset.row)); };
+$('dayMissing').onclick=function(e){ var b=e.target.closest('[data-name]'); if(b) openEntry(null,b.dataset.name); };
+$('fab').onclick=function(){ openEntry(null); };
+
+/* ================= ENTRY FORM ================= */
+var F={name:''};
+function openEntry(row,presetName){
+  var r = row? S.data.entries.filter(function(x){ return x.row===row; })[0] : null;
+  S.editing=r||null;
+  $('entryTitle').textContent = r?'تعديل سجل':'سجل جديد';
+  $('delBtn').classList.toggle('hidden',!r);
+  $('fDate').value = r? r.date : (S.view==='day'?S.day:today());
+  $('fDate').max = today();
+  F.name = r? r.name : (presetName||'');
+  $('fSearch').value='';
+  $('fHours').value = r? r.hours : 6;
+  $('fCust').value = r? r.customers : '';
+  $('fSales').value = r? r.sales : '';
+  $('fAmount').value = r? r.amount : '';
+  ['hName','hHours','hCust','hSales','hAmount'].forEach(function(h){ $(h).textContent=''; });
+  document.querySelectorAll('#entrySheet .inp').forEach(function(i){ i.classList.remove('err'); });
+  drawNames(); preview();
+  $('saveBtn').disabled=false; $('saveBtn').textContent='حفظ';
+  showSheet('entrySheet');
+}
+function drawNames(){
+  var q=$('fSearch').value.trim(), date=$('fDate').value;
+  var done={}; S.data.entries.forEach(function(r){ if(r.date===date && (!S.editing || r.row!==S.editing.row)) done[r.name]=1; });
+  var list=S.data.employees.filter(function(e){ return e.active || e.name===F.name; }).map(function(e){ return e.name; });
+  if(F.name && list.indexOf(F.name)<0) list.unshift(F.name);
+  if(q) list=list.filter(function(n){ return n.indexOf(q)>=0; });
+  var h=list.map(function(n){ return '<button type="button" class="'+(n===F.name?'on ':'')+(done[n]?'done':'')+'" data-n="'+esc(n)+'">'+esc(n)+(done[n]?' ✓':'')+'</button>'; }).join('');
+  if(q && !S.data.employees.some(function(e){ return e.name===q; })) h+='<button type="button" data-n="'+esc(q)+'" data-new="1">+ إضافة «'+esc(q)+'»</button>';
+  $('fNames').innerHTML = h || '<span style="color:var(--muted);font-size:14px">لا يوجد موظفون — اكتب اسماً لإضافته</span>';
+  $('fNameSel').textContent = F.name? '— '+F.name : '';
+}
+$('fNames').onclick=function(e){ var b=e.target.closest('[data-n]'); if(!b) return; F.name=b.dataset.n; if(b.dataset.new) $('fSearch').value=''; $('hName').textContent=''; drawNames(); };
+$('fSearch').oninput=drawNames;
+$('fDate').onchange=drawNames;
+document.querySelectorAll('[data-step]').forEach(function(b){ b.onclick=function(){ var v=parseFloat($('fHours').value)||0; v=Math.min(24,Math.max(0.5,v+parseFloat(b.dataset.step))); $('fHours').value=v; preview(); }; });
+['fHours','fCust','fSales','fAmount'].forEach(function(id){ $(id).addEventListener('input',function(){ this.value=toLatin(this.value); this.classList.remove('err'); preview(); }); });
+function toLatin(s){ return String(s).replace(/[٠-٩]/g,function(c){ return '٠١٢٣٤٥٦٧٨٩'.indexOf(c); }).replace(/[۰-۹]/g,function(c){ return '۰۱۲۳۴۵۶۷۸۹'.indexOf(c); }).replace(/[٫,]/g,'.').replace(/[^\d.]/g,''); }
+function vals(){ return { hours:parseFloat($('fHours').value), customers:$('fCust').value===''?NaN:Number($('fCust').value), sales:$('fSales').value===''?NaN:Number($('fSales').value), amount:$('fAmount').value===''?NaN:Number($('fAmount').value) }; }
+function preview(){
+  var v=vals();
+  $('pHour').textContent = v.hours>0 && v.amount>=0 ? money(v.amount/v.hours) : '—';
+  $('pConv').textContent = v.customers>0 && v.sales>=0 ? pct(v.sales/v.customers) : '—';
+  $('pAvg').textContent = v.sales>0 && v.amount>=0 ? money(v.amount/v.sales) : '—';
+}
+function validateForm(){
+  var v=vals(), ok=true;
+  function bad(inp,hint,msg){ ok=false; if(inp) $(inp).classList.add('err'); $(hint).textContent=msg; }
+  ['hName','hHours','hCust','hSales','hAmount'].forEach(function(h){ $(h).textContent=''; });
+  if(!F.name) bad(null,'hName','اختر الموظف');
+  if(!$('fDate').value) { ok=false; $('fDate').classList.add('err'); }
+  else if($('fDate').value>today()) { ok=false; $('fDate').classList.add('err'); toast('لا يمكن التسجيل لتاريخ مستقبلي','bad'); }
+  if(!(v.hours>0 && v.hours<=24)) bad('fHours','hHours','بين 0.5 و 24 ساعة');
+  if(isNaN(v.customers) || v.customers<0 || v.customers%1) bad('fCust','hCust','رقم صحيح');
+  if(isNaN(v.sales) || v.sales<0 || v.sales%1) bad('fSales','hSales','رقم صحيح');
+  else if(v.sales>v.customers) bad('fSales','hSales','أكبر من عدد الزبائن');
+  if(isNaN(v.amount) || v.amount<0) bad('fAmount','hAmount','أدخل المبلغ');
+  else if(v.sales>0 && v.amount===0) bad('fAmount','hAmount','المبلغ لا يمكن أن يكون 0 مع وجود مبيعات');
+  else if(v.sales===0 && v.amount>0) bad('fSales','hSales','يوجد مبلغ بدون مبيعات');
+  return ok? v : null;
+}
+$('saveBtn').onclick=function(){ save(false); };
+function save(force){
+  var v=validateForm(); if(!v) return;
+  var entry={ date:$('fDate').value, name:F.name, hours:v.hours, customers:v.customers, sales:v.sales, amount:v.amount };
+  if(S.editing){ entry.row=S.editing.row; entry.origName=S.editing.name; }
+  var btn=$('saveBtn'); btn.disabled=true; btn.textContent='جارٍ الحفظ…';
+  call('apiSaveEntry',S.pin,entry,force).then(function(res){
+    if(res && res.duplicate){
+      btn.disabled=false; btn.textContent='حفظ';
+      return confirmBox('سجل مكرر', 'يوجد سجل لـ «'+entry.name+'» بتاريخ '+fmtDay(entry.date)+'. هل تريد إضافة سجل آخر لنفس اليوم؟','نعم، احفظ').then(function(y){ if(y){ showSheet('entrySheet'); save(true); } });
     }
+    hideSheet(); S.day=entry.date; setData(res);
+    toast(S.editing?'تم تعديل السجل ✓':'تم حفظ السجل ✓','ok');
+  }).catch(function(e){ btn.disabled=false; btn.textContent='حفظ'; toast(errMsg(e),'bad'); });
+}
+$('delBtn').onclick=function(){
+  var r=S.editing; if(!r) return;
+  confirmBox('حذف السجل','سيتم حذف سجل «'+r.name+'» بتاريخ '+fmtDay(r.date)+' نهائياً من الجدول.','حذف').then(function(y){
+    if(!y) return;
+    $('loading').classList.remove('hidden');
+    call('apiDeleteEntry',S.pin,r.row,r.name).then(function(res){ setData(res); toast('تم حذف السجل','ok'); })
+    .catch(function(e){ toast(errMsg(e),'bad'); }).then(function(){ $('loading').classList.add('hidden'); });
+  });
+};
 
-    let activeTab = 'overview';
-    let searchQuery = '';
+/* ================= STAFF ================= */
+function segHtml(items,cur){ return items.map(function(p){ return '<button data-k="'+p[0]+'" class="'+(p[0]===cur?'on':'')+'">'+p[1]+'</button>'; }).join(''); }
+var METRICS=[['amount','المبلغ'],['perHour','بالساعة'],['conv','النسبة'],['perCust','معدل الزبون']];
+$('staffPeriod').onclick=function(e){ var b=e.target.closest('[data-k]'); if(b){ S.staffP=b.dataset.k; renderStaff(); } };
+$('staffMetric').onclick=function(e){ var b=e.target.closest('[data-k]'); if(b){ S.staffM=b.dataset.k; renderStaff(); } };
+function metricVal(a,m){ return m==='conv'?pct(a.conv):money(a[m]); }
+function renderStaff(){
+  $('staffPeriod').innerHTML=segHtml(PERIODS,S.staffP);
+  $('staffMetric').innerHTML=segHtml(METRICS,S.staffM);
+  var rg=periodRange(S.staffP), m=S.staffM;
+  var list=byEmployee(S.data.entries.filter(function(r){ return inRange(r,rg[0],rg[1]); }));
+  list.sort(function(a,b){ return b[m]-a[m]; });
+  var max=list.length? Math.max.apply(null,list.map(function(a){ return a[m]; })) : 0;
+  $('staffList').innerHTML = list.length? list.map(function(a,i){
+    return '<button class="entry" data-emp="'+esc(a.name)+'"><div class="entry-h"><div class="who"><div class="rank r'+(i+1)+'">'+(i+1)+'</div><div class="av">'+esc(initials(a.name))+'</div><div><b>'+esc(a.name)+'</b><small>'+a.nd+' يوم • '+n1(a.hours)+' ساعة</small></div></div><div class="amt num">'+metricVal(a,m)+'</div></div>'+
+      '<div class="bar"><i style="width:'+(max?Math.max(3,a[m]/max*100):0)+'%"></i></div>'+
+      '<div class="chips"><span class="chip">المبلغ <b class="num">'+money(a.amount)+'</b></span><span class="chip '+convClass(a.conv)+'">النسبة <b class="num">'+pct(a.conv)+'</b></span><span class="chip">بالساعة <b class="num">'+money(a.perHour)+'</b></span><span class="chip">للزبون <b class="num">'+money(a.perCust)+'</b></span></div></button>';
+  }).join('') : '<div class="empty"><b>لا توجد بيانات</b>لا توجد سجلات في '+esc(rg[2])+'</div>';
+}
+$('staffList').onclick=function(e){ var b=e.target.closest('[data-emp]'); if(b) openEmp(b.dataset.emp); };
+function openEmp(name){
+  var rg=periodRange(S.staffP);
+  var rows=S.data.entries.filter(function(r){ return r.name===name && inRange(r,rg[0],rg[1]); }).sort(function(a,b){ return a.date<b.date?1:a.date>b.date?-1:0; });
+  var a=agg(rows);
+  $('empTitle').textContent=name+' — '+rg[2];
+  var byDay={}; rows.forEach(function(r){ byDay[r.date]=(byDay[r.date]||0)+r.amount; });
+  var h='<div class="kpis">'+kpiHtml(a,'إجمالي المبيعات')+'</div>';
+  if(rows.length>1) h+='<div class="chart">'+barChart(Object.keys(byDay).sort().map(function(k){ return [k,byDay[k]]; }))+'</div>';
+  h+='<div class="sec-title"><h2>السجلات</h2><span>'+rows.length+'</span></div><div class="list">'+
+    (rows.map(function(r){ return entryCard(r).replace('<div><b>'+esc(r.name)+'</b>','<div><b>'+fmtDay(r.date)+'</b>'); }).join('') || '<div class="empty">لا توجد سجلات</div>')+'</div>';
+  $('empBody').innerHTML=h;
+  showSheet('empSheet');
+}
+$('empBody').onclick=function(e){ var b=e.target.closest('[data-row]'); if(b){ openEntry(Number(b.dataset.row)); } };
 
-    window.addEventListener('DOMContentLoaded', () => {
-      lucide.createIcons();
-      recalculateKPIs();
-      renderAll();
+/* ================= REPORTS ================= */
+$('repPeriod').onclick=function(e){ var b=e.target.closest('[data-k]'); if(b){ S.repP=b.dataset.k; renderRep(); } };
+function barChart(pts){
+  if(!pts.length) return '<div class="empty" style="border:0">لا توجد بيانات</div>';
+  var W=340,H=170,pl=6,pr=6,pt=18,pb=22, n=pts.length, max=Math.max.apply(null,pts.map(function(p){ return p[1]; }))||1;
+  var bw=(W-pl-pr)/n, g=Math.min(4,bw*.25), s='<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="رسم بياني للمبيعات اليومية">';
+  for(var k=1;k<=3;k++){ var y=pt+(H-pt-pb)*(1-k/3); s+='<line x1="0" x2="'+W+'" y1="'+y+'" y2="'+y+'" stroke="#2f2b23" stroke-dasharray="3 4"/>'; }
+  var best=0; pts.forEach(function(p,i){ if(p[1]>pts[best][1]) best=i; });
+  pts.forEach(function(p,i){
+    var h=(H-pt-pb)*(p[1]/max), x=W-pr-(i+1)*bw+g/2, y=H-pb-h; // RTL: الأحدث يسار
+    s+='<rect x="'+x.toFixed(1)+'" y="'+y.toFixed(1)+'" width="'+Math.max(1,bw-g).toFixed(1)+'" height="'+Math.max(1,h).toFixed(1)+'" rx="'+Math.min(4,(bw-g)/2).toFixed(1)+'" fill="'+(i===best?'#f5cf6b':'#b8914a')+'"><title>'+fmtShort(p[0])+': '+money(p[1])+'</title></rect>';
+    if(i===best) s+='<text x="'+(x+(bw-g)/2).toFixed(1)+'" y="'+(y-5).toFixed(1)+'" fill="#f5cf6b" font-size="10" text-anchor="middle" font-weight="700">'+money(p[1])+'</text>';
+    var every=Math.ceil(n/7);
+    if(i%every===0 || i===n-1) s+='<text x="'+(x+(bw-g)/2).toFixed(1)+'" y="'+(H-6)+'" fill="#6e675a" font-size="10" text-anchor="middle">'+fmtShort(p[0])+'</text>';
+  });
+  return s+'</svg>';
+}
+function renderRep(){
+  $('repPeriod').innerHTML=segHtml(PERIODS,S.repP);
+  var rg=periodRange(S.repP);
+  var rows=S.data.entries.filter(function(r){ return inRange(r,rg[0],rg[1]); });
+  var a=agg(rows);
+  $('repKpis').innerHTML=kpiHtml(a,'إجمالي المبيعات — '+rg[2])+
+    '<div class="kpi"><label>أيام العمل</label><b class="num">'+a.nd+'</b></div><div class="kpi"><label>متوسط اليوم</label><b class="num">'+money(a.nd?a.amount/a.nd:0)+'</b></div>';
+  var byDay={}; rows.forEach(function(r){ byDay[r.date]=(byDay[r.date]||0)+r.amount; });
+  var pts=Object.keys(byDay).sort().map(function(k){ return [k,byDay[k]]; });
+  if(S.repP==='all' && pts.length>60) pts=pts.slice(-60);
+  $('repChartCap').textContent=pts.length?pts.length+' يوم':'';
+  $('repChart').innerHTML=barChart(pts);
+  var emps=byEmployee(rows);
+  var top=emps.slice().sort(function(x,y){ return y.amount-x.amount; }).slice(0,5);
+  var mx=top.length?top[0].amount:0;
+  $('repTop').innerHTML=top.map(function(e,i){ return '<button class="entry" data-emp="'+esc(e.name)+'"><div class="entry-h"><div class="who"><div class="rank r'+(i+1)+'">'+(i+1)+'</div><div><b>'+esc(e.name)+'</b><small>'+e.nd+' يوم</small></div></div><div class="amt num">'+money(e.amount)+'</div></div><div class="bar"><i style="width:'+(mx?e.amount/mx*100:0)+'%"></i></div></button>'; }).join('') || '<div class="empty">لا توجد بيانات</div>';
+  var conv=emps.filter(function(e){ return e.nd>=3; }).sort(function(x,y){ return y.conv-x.conv; }).slice(0,5);
+  $('repConv').innerHTML=conv.map(function(e,i){ return '<button class="entry" data-emp="'+esc(e.name)+'"><div class="entry-h"><div class="who"><div class="rank r'+(i+1)+'">'+(i+1)+'</div><div><b>'+esc(e.name)+'</b><small>'+e.sales+' من '+e.customers+' زبون</small></div></div><div class="amt num" style="color:var(--green)">'+pct(e.conv)+'</div></div></button>'; }).join('') || '<div class="empty">لا توجد بيانات كافية</div>';
+}
+$('repTop').onclick=$('repConv').onclick=function(e){ var b=e.target.closest('[data-emp]'); if(b){ S.staffP=S.repP; openEmp(b.dataset.emp); } };
 
-      document.getElementById('revBranch').addEventListener('change', (e) => {
-        const box = document.getElementById('customRevBranchBox');
-        box.classList.toggle('hidden', e.target.value !== 'موقع جديد');
-      });
-    });
+/* ================= SETTINGS ================= */
+function renderSet(){
+  var emps=S.data.employees.slice().sort(function(a,b){ return (b.active-a.active) || a.name.localeCompare(b.name,'ar'); });
+  $('empCount').textContent=emps.filter(function(e){return e.active;}).length+' فعال من '+emps.length;
+  $('empList').innerHTML=emps.map(function(e){ return '<button class="set-item" data-toggle="'+esc(e.name)+'" data-act="'+(e.active?1:0)+'"><div>'+esc(e.name)+'<small>'+(e.active?'اضغط للإيقاف':'اضغط للتفعيل')+'</small></div><span class="tag '+(e.active?'':'off')+'">'+(e.active?'فعال':'موقوف')+'</span></button>'; }).join('');
+  $('sheetLink').href=S.data.sheetUrl||'#';
+  var fixed=S.data.entries.filter(function(r){ return r.dateFixed; }).length;
+  $('fixNote').textContent = fixed? 'ملاحظة: '+fixed+' سجل قديم في الجدول تاريخه فارغ أو فيه خطأ في السنة، التطبيق يقرأه تلقائياً بتاريخ الصف الذي قبله.' : '';
+}
+$('empList').onclick=function(e){
+  var b=e.target.closest('[data-toggle]'); if(!b) return;
+  var name=b.dataset.toggle, act=b.dataset.act==='1';
+  confirmBox(act?'إيقاف موظف':'تفعيل موظف', act?'لن يظهر «'+name+'» في قائمة الإدخال اليومي، وتبقى سجلاته القديمة محفوظة.':'سيظهر «'+name+'» مجدداً في قائمة الإدخال.', act?'إيقاف':'تفعيل').then(function(y){
+    if(!y) return;
+    call('apiSetEmployeeActive',S.pin,name,!act).then(function(d){ setData(d); toast('تم التحديث','ok'); }).catch(function(e){ toast(errMsg(e),'bad'); });
+  });
+};
+$('addEmpBtn').onclick=function(){
+  var n=$('newEmp').value.trim(); if(!n){ $('newEmp').focus(); return; }
+  var b=this; b.disabled=true;
+  call('apiAddEmployee',S.pin,n).then(function(d){ $('newEmp').value=''; setData(d); toast('تمت إضافة '+n,'ok'); }).catch(function(e){ toast(errMsg(e),'bad'); }).then(function(){ b.disabled=false; });
+};
+$('pinBtn').onclick=function(){
+  var p=toLatin($('newPin').value);
+  if(!/^\d{4,8}$/.test(p)){ toast('الرمز يجب أن يكون من 4 إلى 8 أرقام','bad'); return; }
+  call('apiChangePin',S.pin,p).then(function(){ S.pin=p; sset('pin',p); $('newPin').value=''; toast('تم تغيير رمز الدخول','ok'); }).catch(function(e){ toast(errMsg(e),'bad'); });
+};
+$('logoutBtn').onclick=function(){ sset('pin',null); S.pin=''; S.data=null; showLogin(); };
 
-    function saveState() {
-      try {
-        localStorage.setItem('branch_manager_data_2026', JSON.stringify(currentData));
-      } catch(e) {}
-    }
-
-    // إعادة حساب المؤشرات المالية العامة
-    function recalculateKPIs() {
-      // إجمالي الإيرادات
-      const totalRev = currentData.westBank.reduce((acc, curr) => acc + (parseFloat(curr.total) || 0), 0);
-      // إجمالي المصاريف
-      const totalExp = currentData.expenses.reduce((acc, curr) => acc + (parseFloat(curr.amount) || 0), 0);
-      // صافي الفائض
-      const profit = totalRev - totalExp;
-      const margin = totalRev > 0 ? ((profit / totalRev) * 100).toFixed(1) : 0;
-
-      document.getElementById('kpiRevenue').textContent = totalRev.toLocaleString() + ' ₪';
-      document.getElementById('kpiExpenses').textContent = totalExp.toLocaleString() + ' ₪';
-      document.getElementById('kpiProfit').textContent = profit.toLocaleString() + ' ₪';
-      document.getElementById('kpiMargin').innerHTML = `هامش ربح تشغيلي: <strong class="text-emerald-400 font-bold">${margin}%</strong>`;
-    }
-
-    // تبديل التبويبات
-    function switchTab(tabId) {
-      activeTab = tabId;
-      document.querySelectorAll('.tab-section').forEach(sec => sec.classList.add('hidden'));
-      document.querySelectorAll('.tab-btn').forEach(btn => {
-        btn.classList.remove('bg-brand-600', 'text-white');
-        btn.classList.add('bg-slate-800', 'text-slate-400');
-      });
-
-      const activeSection = document.getElementById(`section-${tabId}`);
-      if (activeSection) activeSection.classList.remove('hidden');
-
-      const activeBtn = document.getElementById(`tab-${tabId}`);
-      if (activeBtn) {
-        activeBtn.classList.remove('bg-slate-800', 'text-slate-400');
-        activeBtn.classList.add('bg-brand-600', 'text-white');
-      }
-
-      lucide.createIcons();
-    }
-
-    // التحكم في نافذة الإدخال
-    function openEntryModal(defaultType = 'revenue') {
-      setEntryType(defaultType);
-      document.getElementById('entryModal').classList.remove('hidden');
-      lucide.createIcons();
-    }
-
-    function closeEntryModal() {
-      document.getElementById('entryModal').classList.add('hidden');
-    }
-
-    function setEntryType(type) {
-      const btnRev = document.getElementById('btnTypeRevenue');
-      const btnExp = document.getElementById('btnTypeExpense');
-      const btnStf = document.getElementById('btnTypeStaff');
-
-      const formRev = document.getElementById('formRevenue');
-      const formExp = document.getElementById('formExpense');
-      const formStf = document.getElementById('formStaff');
-
-      [btnRev, btnExp, btnStf].forEach(b => {
-        b.className = 'py-2 rounded-xl text-slate-400 hover:text-white transition';
-      });
-      [formRev, formExp, formStf].forEach(f => f.classList.add('hidden'));
-
-      if (type === 'revenue' || type === 'branch') {
-        btnRev.className = 'py-2 rounded-xl bg-brand-600 text-white transition';
-        formRev.classList.remove('hidden');
-      } else if (type === 'expense') {
-        btnExp.className = 'py-2 rounded-xl bg-rose-600 text-white transition';
-        formExp.classList.remove('hidden');
-      } else if (type === 'staff') {
-        btnStf.className = 'py-2 rounded-xl bg-indigo-600 text-white transition';
-        formStf.classList.remove('hidden');
-      }
-      lucide.createIcons();
-    }
-
-    // حفظ سحب / إيراد فرع
-    function submitRevenue(e) {
-      e.preventDefault();
-      let branchName = document.getElementById('revBranch').value;
-      if (branchName === 'موقع جديد') {
-        branchName = document.getElementById('customRevBranch').value.trim() || 'فرع جديد';
-      }
-
-      const amount = parseFloat(document.getElementById('revAmount').value) || 0;
-      const month = document.getElementById('revMonth').value;
-      const note = document.getElementById('revNote').value.trim() || 'سحب نقدي';
-
-      // فحص إذا كان الفرع موجوداً مسبقاً في القائمة
-      const existing = currentData.westBank.find(b => b.name === branchName);
-      if (existing) {
-        existing.total += amount;
-        if (month.includes('أغسطس')) {
-          existing.aug = (existing.aug || 0) + amount;
-        } else if (month.includes('يوليو')) {
-          existing.jul = (existing.jul || 0) + amount;
-        }
-        existing.note = note + ` (${month})`;
-      } else {
-        currentData.westBank.unshift({
-          name: branchName,
-          jul: month.includes('يوليو') ? amount : 0,
-          aug: month.includes('أغسطس') ? amount : 0,
-          total: amount,
-          note: note + ` (${month})`
-        });
-      }
-
-      // إضافة لسجل العمليات الحديثة
-      if (!currentData.recentEntries) currentData.recentEntries = [];
-      currentData.recentEntries.unshift({
-        type: 'revenue',
-        title: `سحب فرع: ${branchName}`,
-        amount: amount,
-        subtitle: `${month} - ${note}`,
-        time: new Date().toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' })
-      });
-
-      saveState();
-      recalculateKPIs();
-      renderAll();
-      closeEntryModal();
-      document.getElementById('formRevenue').reset();
-
-      Swal.fire({
-        icon: 'success',
-        title: 'تم تسجيل السحب بنجاح!',
-        text: `تمت إضافة ${amount.toLocaleString()} ₪ لفرع ${branchName} وتحديث الإجمالي.`,
-        timer: 1800,
-        showConfirmButton: false,
-        background: '#1e293b',
-        color: '#fff'
-      });
-    }
-
-    // حفظ مصروف جديد
-    function submitExpense(e) {
-      e.preventDefault();
-      const name = document.getElementById('expName').value.trim();
-      const amount = parseFloat(document.getElementById('expAmount').value) || 0;
-      const cat = document.getElementById('expCategory').value;
-      const loc = document.getElementById('expLocation').value.trim() || 'المركز';
-      const rec = document.getElementById('expRecipient').value.trim() || 'المسؤول';
-
-      currentData.expenses.unshift({
-        name: `${name} (${loc})`,
-        amount: amount,
-        month: "سبتمبر 2026",
-        note: `الموقع: ${loc} | المسؤول: ${rec}`,
-        cat: cat
-      });
-
-      // إضافة لسجل العمليات الحديثة
-      if (!currentData.recentEntries) currentData.recentEntries = [];
-      currentData.recentEntries.unshift({
-        type: 'expense',
-        title: `مصروف: ${name}`,
-        amount: amount,
-        subtitle: `${cat} - ${loc} (${rec})`,
-        time: new Date().toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' })
-      });
-
-      saveState();
-      recalculateKPIs();
-      renderAll();
-      closeEntryModal();
-      document.getElementById('formExpense').reset();
-
-      Swal.fire({
-        icon: 'success',
-        title: 'تم تسجيل المصروف بنجاح!',
-        text: `تم خصم ${amount.toLocaleString()} ₪ وتحديث مؤشر الفائض.`,
-        timer: 1800,
-        showConfirmButton: false,
-        background: '#1e293b',
-        color: '#fff'
-      });
-    }
-
-    // إضافة موظف جديد
-    function submitStaff(e) {
-      e.preventDefault();
-      const name = document.getElementById('staffName').value.trim();
-      const branch = document.getElementById('staffBranch').value.trim();
-
-      const fullName = branch ? `${name} (${branch})` : name;
-      currentData.staff.unshift(fullName);
-
-      saveState();
-      renderStaff();
-      closeEntryModal();
-      document.getElementById('formStaff').reset();
-
-      Swal.fire({
-        icon: 'success',
-        title: 'تمت إضافة الموظف!',
-        text: `أضيف الموظف ${fullName} إلى كادر العمل بنجاح.`,
-        timer: 1500,
-        showConfirmButton: false,
-        background: '#1e293b',
-        color: '#fff'
-      });
-    }
-
-    // بناء الواجهة كاملة
-    function renderAll() {
-      renderRecentEntries();
-      renderTopBranches();
-      renderWestBank();
-      renderExpenses();
-      renderInternal();
-      renderStaff();
-      lucide.createIcons();
-    }
-
-    // عرض العمليات الحديثة
-    function renderRecentEntries() {
-      const box = document.getElementById('recentEntriesContainer');
-      const list = document.getElementById('recentEntriesList');
-      const count = document.getElementById('recentEntriesCount');
-
-      if (!currentData.recentEntries || currentData.recentEntries.length === 0) {
-        box.classList.add('hidden');
-        return;
-      }
-
-      box.classList.remove('hidden');
-      count.textContent = `${currentData.recentEntries.length} عملية`;
-      list.innerHTML = '';
-
-      currentData.recentEntries.slice(0, 5).forEach((item, idx) => {
-        const isRev = item.type === 'revenue';
-        const div = document.createElement('div');
-        div.className = "flex items-center justify-between p-2.5 rounded-2xl bg-slate-900/80 border border-slate-800 text-xs";
-        div.innerHTML = `
-          <div class="flex items-center space-x-2 space-x-reverse">
-            <span class="w-6 h-6 rounded-lg ${isRev ? 'bg-emerald-500/20 text-emerald-400' : 'bg-rose-500/20 text-rose-400'} flex items-center justify-center font-bold text-[10px]">
-              ${isRev ? '↑' : '↓'}
-            </span>
-            <div>
-              <p class="font-bold text-white">${item.title}</p>
-              <p class="text-[10px] text-slate-400">${item.subtitle} • ${item.time}</p>
-            </div>
-          </div>
-          <span class="font-extrabold ${isRev ? 'text-emerald-400' : 'text-rose-400'}">
-            ${isRev ? '+' : '-'}${item.amount.toLocaleString()} ₪
-          </span>
-        `;
-        list.appendChild(div);
-      });
-    }
-
-    // أعلى الفروع
-    function renderTopBranches() {
-      const list = document.getElementById('topBranchesList');
-      list.innerHTML = '';
-      const top5 = [...currentData.westBank].sort((a, b) => b.total - a.total).slice(0, 5);
-      const max = top5[0] ? top5[0].total : 1;
-
-      top5.forEach((item, idx) => {
-        const pct = Math.round((item.total / max) * 100);
-        const div = document.createElement('div');
-        div.className = "space-y-1 bg-slate-900/50 p-2.5 rounded-2xl border border-slate-800";
-        div.innerHTML = `
-          <div class="flex justify-between items-center text-xs">
-            <span class="font-bold text-white flex items-center space-x-1.5 space-x-reverse">
-              <span class="w-4 h-4 rounded-full bg-slate-800 text-[10px] text-slate-400 flex items-center justify-center font-mono">${idx + 1}</span>
-              <span>${item.name}</span>
-            </span>
-            <span class="font-extrabold text-emerald-400">${item.total.toLocaleString()} ₪</span>
-          </div>
-          <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
-            <div class="bg-gradient-to-l from-emerald-400 to-brand-600 h-full rounded-full" style="width: ${pct}%"></div>
-          </div>
-        `;
-        list.appendChild(div);
-      });
-    }
-
-    // سحوبات الضفة
-    function renderWestBank() {
-      const container = document.getElementById('westBankCards');
-      container.innerHTML = '';
-
-      const items = currentData.westBank.filter(b => 
-        !searchQuery || b.name.includes(searchQuery) || b.note.includes(searchQuery)
-      );
-
-      if (items.length === 0) {
-        container.innerHTML = `<p class="text-center text-xs text-slate-500 py-6">لا توجد نتائج مطابقة</p>`;
-        return;
-      }
-
-      items.forEach(b => {
-        const card = document.createElement('div');
-        card.className = "bg-slate-800/80 border border-slate-700/80 p-3.5 rounded-2xl hover:border-slate-600 transition space-y-2";
-        card.innerHTML = `
-          <div class="flex items-center justify-between">
-            <div class="flex items-center space-x-2 space-x-reverse">
-              <div class="w-8 h-8 rounded-xl bg-slate-700/60 text-emerald-400 flex items-center justify-center text-xs font-bold">
-                📍
-              </div>
-              <div>
-                <h4 class="text-xs font-bold text-white">${b.name}</h4>
-                <p class="text-[10px] text-slate-400">${b.note}</p>
-              </div>
-            </div>
-            <div class="text-left">
-              <p class="text-xs font-extrabold text-emerald-400">${b.total.toLocaleString()} ₪</p>
-              <p class="text-[9px] text-slate-500">الإجمالي</p>
-            </div>
-          </div>
-          <div class="grid grid-cols-2 gap-2 text-[10px] bg-slate-900/60 p-2 rounded-xl border border-slate-800/80">
-            <div>
-              <span class="text-slate-400">يوليو: </span>
-              <strong class="text-slate-200">${b.jul ? b.jul.toLocaleString() + ' ₪' : '-'}</strong>
-            </div>
-            <div>
-              <span class="text-slate-400">أغسطس: </span>
-              <strong class="text-slate-200">${b.aug ? b.aug.toLocaleString() + ' ₪' : '-'}</strong>
-            </div>
-          </div>
-        `;
-        container.appendChild(card);
-      });
-    }
-
-    // المصاريف
-    function renderExpenses() {
-      const container = document.getElementById('expensesCards');
-      container.innerHTML = '';
-
-      const items = currentData.expenses.filter(e => 
-        !searchQuery || e.name.includes(searchQuery) || e.note.includes(searchQuery) || e.cat.includes(searchQuery)
-      );
-
-      if (items.length === 0) {
-        container.innerHTML = `<p class="text-center text-xs text-slate-500 py-6">لا توجد نتائج مطابقة</p>`;
-        return;
-      }
-
-      items.forEach(e => {
-        const card = document.createElement('div');
-        card.className = "bg-slate-800/80 border border-slate-700/80 p-3.5 rounded-2xl hover:border-slate-600 transition space-y-1.5";
-        card.innerHTML = `
-          <div class="flex items-center justify-between">
-            <div class="flex items-center space-x-2 space-x-reverse">
-              <span class="text-xs px-2 py-0.5 rounded-lg bg-slate-700/80 text-slate-300 font-bold text-[10px]">${e.cat}</span>
-              <h4 class="text-xs font-bold text-white">${e.name}</h4>
-            </div>
-            <span class="text-xs font-extrabold text-rose-400">${e.amount.toLocaleString()} ₪</span>
-          </div>
-          <div class="flex items-center justify-between text-[10px] text-slate-400 pt-1">
-            <span>الملاحظات / المستلم: <strong class="text-slate-300">${e.note}</strong></span>
-            <span>الفترة: ${e.month}</span>
-          </div>
-        `;
-        container.appendChild(card);
-      });
-    }
-
-    // فروع الداخل
-    function renderInternal() {
-      const container = document.getElementById('internalCards');
-      container.innerHTML = '';
-
-      const items = currentData.internal.filter(i => 
-        !searchQuery || i.name.includes(searchQuery) || i.type.includes(searchQuery)
-      );
-
-      items.forEach(item => {
-        const card = document.createElement('div');
-        card.className = "bg-slate-800/70 border border-slate-700/70 p-3 rounded-2xl flex items-center justify-between";
-        card.innerHTML = `
-          <div>
-            <h4 class="text-xs font-bold text-white">${item.name}</h4>
-            <p class="text-[10px] text-slate-400 mt-0.5">${item.status}</p>
-          </div>
-          <span class="text-[10px] font-bold px-2 py-1 rounded-xl ${item.type === 'فرع رئيسي' ? 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/30' : 'bg-slate-700/60 text-slate-300'}">
-            ${item.type}
-          </span>
-        `;
-        container.appendChild(card);
-      });
-    }
-
-    // الموظفون
-    function renderStaff() {
-      const container = document.getElementById('staffCards');
-      container.innerHTML = '';
-
-      const items = currentData.staff.filter(s => !searchQuery || s.includes(searchQuery));
-
-      items.forEach((emp, idx) => {
-        const div = document.createElement('div');
-        div.className = "bg-slate-800/60 border border-slate-700/60 p-2.5 rounded-2xl flex items-center space-x-2 space-x-reverse";
-        div.innerHTML = `
-          <div class="w-7 h-7 rounded-xl bg-slate-700 text-slate-300 flex items-center justify-center text-xs font-bold">
-            ${emp.charAt(0)}
-          </div>
-          <div class="overflow-hidden">
-            <p class="text-xs font-bold text-white truncate">${emp}</p>
-            <p class="text-[9px] text-slate-400">موظف #${idx + 1}</p>
-          </div>
-        `;
-        container.appendChild(div);
-      });
-    }
-
-    // البحث
-    function handleSearch() {
-      searchQuery = document.getElementById('searchInput').value.trim();
-      document.getElementById('clearSearchBtn').classList.toggle('hidden', searchQuery === '');
-      renderAll();
-    }
-
-    function clearSearch() {
-      document.getElementById('searchInput').value = '';
-      searchQuery = '';
-      document.getElementById('clearSearchBtn').classList.add('hidden');
-      renderAll();
-    }
-
-    // التحديث من جوجل شيت
-    function fetchLiveData(animate) {
-      const btn = document.getElementById('refreshBtn');
-      if (animate && btn) btn.classList.add('animate-spin');
-
-      fetch("https://docs.google.com/spreadsheets/d/1YcxO0CNOwMb61h3IrlcJxJex5B6rp0_EnclQvGLaPbI/gviz/tq?tqx=out:json&gid=0")
-        .then(res => res.text())
-        .then(text => {
-          if (btn) btn.classList.remove('animate-spin');
-          document.getElementById('liveSyncStatus').innerHTML = `
-            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-            <span>محدث الآن: ${new Date().toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' })}</span>
-          `;
-          Swal.fire({
-            icon: 'info',
-            title: 'تم التحديث من شيت جوجل',
-            timer: 1000,
-            showConfirmButton: false,
-            background: '#1e293b',
-            color: '#fff'
-          });
-        })
-        .catch(err => {
-          if (btn) btn.classList.remove('animate-spin');
-        });
-    }
-  </script>
+/* ================= START ================= */
+if(S.pin) load(true); else showLogin();
+})();
+</script>
 </body>
 </html>
