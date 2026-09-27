@@ -196,6 +196,7 @@ select.inp{background-image:linear-gradient(45deg,transparent 50%,var(--muted) 5
   <p>أدخل رمز الدخول</p>
   <div class="pin" id="pinDots"><i></i><i></i><i></i><i></i></div>
   <div class="pad" id="pad"></div>
+  <p id="loginMsg" style="margin:18px 0 0;min-height:22px;color:var(--muted);font-size:14px"></p>
 </section>
 
 <!-- ============ APP ============ -->
@@ -331,16 +332,32 @@ select.inp{background-image:linear-gradient(45deg,transparent 50%,var(--muted) 5
 'use strict';
 /* ================= API ================= */
 var API_URL = 'https://script.google.com/macros/s/AKfycbwZeolHAxhUkdvdiyZgwcy4kLGFv3f5LwxnI5P_KseZw1Ytr4zHco8N59QbJybKC7hhTQ/exec';
+var seq=0;
+function jsonp(fn,args,tries){
+  tries = tries||0;
+  return new Promise(function(res,rej){
+    var cb='__mad'+Date.now().toString(36)+(seq++), s=document.createElement('script'), done=false;
+    var to=setTimeout(function(){ finish(new Error('timeout')); }, 40000);
+    function finish(err,val){
+      if(done) return; done=true; clearTimeout(to);
+      window[cb]=function(){}; if(s.parentNode) s.parentNode.removeChild(s);
+      if(err) rej(err); else res(val);
+    }
+    window[cb]=function(j){ if(!j||!j.ok) finish(new Error((j&&j.error)||'حدث خطأ في الخادم')); else finish(null,j.result); };
+    s.onerror=function(){ finish(new Error('net')); };
+    s.async=true;
+    s.src=API_URL+'?fn='+encodeURIComponent(fn)+'&args='+encodeURIComponent(JSON.stringify(args))+'&cb='+cb+'&_='+Date.now();
+    document.head.appendChild(s);
+  }).catch(function(e){
+    if((e.message==='net'||e.message==='timeout') && tries<1 && (fn==='apiLoad'||fn==='apiLogin')) return jsonp(fn,args,tries+1);
+    if(e.message==='net') throw new Error('تعذّر الاتصال بالخادم، تأكد من الإنترنت');
+    if(e.message==='timeout') throw new Error('انتهت مهلة الاتصال، حاول مرة أخرى');
+    throw e;
+  });
+}
 function call(fn){
   var args = Array.prototype.slice.call(arguments,1);
-  if (/^https:\/\/script\.google\.com\//.test(API_URL) && !(window.google && google.script && google.script.run)) {
-    var ctrl = window.AbortController ? new AbortController() : null;
-    var to = setTimeout(function(){ if(ctrl) ctrl.abort(); }, 60000);
-    return fetch(API_URL, { method:'POST', redirect:'follow', headers:{'Content-Type':'text/plain;charset=utf-8'}, body: JSON.stringify({fn:fn,args:args}), signal: ctrl?ctrl.signal:undefined })
-      .then(function(r){ if(!r.ok) throw new Error('تعذّر الاتصال بالخادم ('+r.status+')'); return r.json(); })
-      .then(function(j){ clearTimeout(to); if(!j || !j.ok) throw new Error((j&&j.error)||'حدث خطأ في الخادم'); return j.result; },
-            function(e){ clearTimeout(to); throw (e && e.name==='AbortError') ? new Error('انتهت مهلة الاتصال، حاول مرة أخرى') : e; });
-  }
+  if (/^https:\/\/script\.google\.com\//.test(API_URL)) return jsonp(fn,args);
   return new Promise(function(res,rej){
     if (window.google && google.script && google.script.run){
       var r = google.script.run.withSuccessHandler(res).withFailureHandler(function(e){ rej(e && e.message ? e : new Error(String(e))); });
@@ -455,10 +472,10 @@ function drawDots(){
 }
 function tryLogin(){
   if(pinBuf.length<4){ toast('الرمز من 4 أرقام على الأقل','bad'); return; }
-  var p=pinBuf; busy=true; $('pinDots').style.opacity=.5;
+  var p=pinBuf; busy=true; $('pinDots').style.opacity=.5; $('loginMsg').textContent='جارٍ التحقق…';
   call('apiLogin',p).then(function(){ S.pin=p; sset('pin',p); pinBuf=''; $('login').classList.add('hidden'); load(true); })
   .catch(function(e){ pinBuf=''; drawDots(); $('pinDots').classList.remove('shake'); void $('pinDots').offsetWidth; $('pinDots').classList.add('shake'); toast(errMsg(e),'bad'); })
-  .then(function(){ busy=false; $('pinDots').style.opacity=1; });
+  .then(function(){ busy=false; $('pinDots').style.opacity=1; $('loginMsg').textContent=''; });
 }
 document.addEventListener('keydown',function(ev){
   if($('login').classList.contains('hidden')) return;
