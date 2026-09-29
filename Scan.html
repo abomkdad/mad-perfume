@@ -93,7 +93,12 @@
     var OPS = [{ key: 'PICKUP', label: 'استلام شركة التوصيل' }, { key: 'RETURN', label: 'إرجاع للمخزن' }];
     var queue = [], seen = {}, recentCodes = {};
     var settings = { op: 'PICKUP', carrier: '', user: '' };
-    var cfg = { carriers: [], employees: [] };
+    // قائمة احتياطية داخل الصفحة: المنسدلة ما بتكون فاضية أبداً حتى لو السيرفر بطيء أو النت مقطوع
+    var DEFAULT_CFG = {
+      carriers: ['Hi Express', 'DriveX', 'Areen', 'Marwa', 'Lama', 'Aiat', 'Saeed', 'Manual'],
+      employees: ['عبير', 'الاء', 'ليلى', 'مهى', 'تسنيم', 'نانسي', 'שי']
+    };
+    var cfg = { carriers: DEFAULT_CFG.carriers.slice(), employees: DEFAULT_CFG.employees.slice() };
     var inFlight = false, inFlightAt = 0, lastSyncOk = 0, netOk = true;
     var stream = null, track = null, detector = null, scanning = false, torchOn = false, busyDetect = false;
     var audioCtx = null, renderQueued = false, syncTimer = null;
@@ -341,7 +346,7 @@
       var sel = $('carrierSel');
       sel.innerHTML = '<option value="">— شركة التوصيل —</option>' + cfg.carriers.map(function (c) { return '<option value="' + esc(c) + '">' + esc(c === 'Manual' ? 'توصيل يدوي' : c) + '</option>'; }).join('');
       sel.value = settings.carrier || '';
-      sel.style.visibility = settings.op === 'PICKUP' ? 'visible' : 'hidden';
+      sel.disabled = settings.op !== 'PICKUP'; sel.style.opacity = settings.op === 'PICKUP' ? '1' : '.35';
       $('empList').innerHTML = cfg.employees.map(function (e) { return '<option value="' + esc(e) + '"></option>'; }).join('');
       $('userInp').value = settings.user || '';
     }
@@ -349,9 +354,15 @@
     async function loadConfig() {
       try {
         var c = await post({ action: 'scan_config' }, 30000);
-        cfg = { carriers: c.carriers || [], employees: c.employees || [] };
-        save(CFG_KEY, cfg); renderSettings(); netOk = true; renderSoon();
-      } catch (e) { /* بنكمل من النسخة المحفوظة على الجهاز */ }
+        if (c && c.carriers && c.carriers.length) {
+          cfg = { carriers: c.carriers, employees: (c.employees && c.employees.length) ? c.employees : DEFAULT_CFG.employees };
+          save(CFG_KEY, cfg); renderSettings();
+        }
+        netOk = true; renderSoon();
+      } catch (e) {
+        netOk = false; renderSoon();
+        setTimeout(loadConfig, 15000); // بنعيد لحالنا — والقائمة الاحتياطية شغالة بالنص
+      }
     }
 
     function init() {
@@ -359,7 +370,8 @@
       queue.forEach(function (it) { if (it.state === 'sending') it.state = 'pending'; });
       rebuildSeen();
       settings = Object.assign(settings, load(S_KEY, {}));
-      cfg = load(CFG_KEY, cfg);
+      var savedCfg = load(CFG_KEY, null);
+      if (savedCfg && savedCfg.carriers && savedCfg.carriers.length) cfg = savedCfg;
       renderSettings(); render();
       loadConfig();
 
