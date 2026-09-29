@@ -1,274 +1,398 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="utf-8" />
-  <meta
-    name="viewport"
-    content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no"
-  />
-  <title>scan</title>
-  <meta name="description" content="MAD Print Manager" />
-
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>MAD - مسح سريع</title>
+  <meta name="theme-color" content="#0b1220" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jsQR/1.4.0/jsQR.min.js"></script>
   <style>
-    :root{
-      --bg:#0f172a;
-      --bg2:#111827;
-      --card:#111827;
-      --line:#1f2937;
-      --txt:#e5e7eb;
-      --muted:#94a3b8;
-      --brand:#22c55e;
-      --header-h:64px;
-      --safe-top: env(safe-area-inset-top, 0px);
-      --safe-bottom: env(safe-area-inset-bottom, 0px);
-      --radius:14px;
-    }
-
-    *{
-      box-sizing:border-box;
-      -webkit-tap-highlight-color:transparent;
-    }
-
-    html,
-    body{
-      margin:0;
-      padding:0;
-      width:100%;
-      height:100%;
-      overflow:hidden;
-      background:linear-gradient(180deg,#0b1220,#111827);
-      color:var(--txt);
-      font-family:Arial,sans-serif;
-      overscroll-behavior:none;
-    }
-
-    body{
-      position:fixed;
-      inset:0;
-      touch-action:manipulation;
-    }
-
-    .app{
-      position:fixed;
-      inset:0;
-      width:100%;
-      height:100dvh;
-      height:100vh;
-      overflow:hidden;
-      background:linear-gradient(180deg,#0b1220,#111827);
-    }
-
-    .top{
-      position:absolute;
-      top:0;
-      right:0;
-      left:0;
-      height:calc(var(--header-h) + var(--safe-top));
-      padding:
-        calc(var(--safe-top) + 10px)
-        14px
-        10px
-        14px;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:10px;
-      border-bottom:1px solid var(--line);
-      background:rgba(17,24,39,.96);
-      backdrop-filter:blur(10px);
-      -webkit-backdrop-filter:blur(10px);
-      z-index:10;
-    }
-
-    .title{
-      font-weight:900;
-      letter-spacing:.5px;
-      font-size:18px;
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
-    }
-
-    .actions{
-      display:flex;
-      gap:8px;
-      flex-shrink:0;
-    }
-
-    .btn{
-      appearance:none;
-      border:1px solid #334155;
-      background:#0b1220;
-      color:#e5e7eb;
-      padding:10px 14px;
-      border-radius:12px;
-      cursor:pointer;
-      text-decoration:none;
-      font-size:13px;
-      font-weight:700;
-      line-height:1;
-      min-height:40px;
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      white-space:nowrap;
-      transition:transform .12s ease, opacity .12s ease, background .12s ease;
-    }
-
-    .btn:active{
-      transform:scale(.98);
-    }
-
-    .btn.primary{
-      background:var(--brand);
-      color:#052e16;
-      border-color:#16a34a;
-    }
-
-    .main{
-      position:absolute;
-      top:calc(var(--header-h) + var(--safe-top));
-      right:0;
-      left:0;
-      bottom:0;
-      padding:12px 12px calc(12px + var(--safe-bottom));
-      overflow:hidden;
-    }
-
-    .frame-shell{
-      position:relative;
-      width:100%;
-      height:100%;
-      border:1px solid #334155;
-      border-radius:16px;
-      overflow:hidden;
-      background:#fff;
-      box-shadow:0 12px 30px rgba(0,0,0,.28);
-    }
-
-    iframe{
-      display:block;
-      width:100%;
-      height:100%;
-      border:0;
-      background:#fff;
-    }
-
-    .note{
-      position:absolute;
-      right:50%;
-      transform:translateX(50%);
-      bottom:calc(8px + var(--safe-bottom));
-      z-index:11;
-      font-size:12px;
-      color:var(--muted);
-      background:rgba(15,23,42,.72);
-      padding:6px 10px;
-      border:1px solid rgba(51,65,85,.7);
-      border-radius:999px;
-      backdrop-filter:blur(8px);
-      -webkit-backdrop-filter:blur(8px);
-      pointer-events:none;
-    }
-
-    @media (max-width:640px){
-      :root{
-        --header-h:60px;
-      }
-
-      .top{
-        padding:
-          calc(var(--safe-top) + 8px)
-          10px
-          8px
-          10px;
-      }
-
-      .title{
-        font-size:16px;
-      }
-
-      .actions{
-        gap:6px;
-      }
-
-      .btn{
-        padding:9px 11px;
-        font-size:12px;
-        min-height:38px;
-        border-radius:10px;
-      }
-
-      .main{
-        padding:8px 8px calc(8px + var(--safe-bottom));
-      }
-
-      .frame-shell{
-        border-radius:12px;
-      }
-
-      .note{
-        font-size:11px;
-        max-width:calc(100% - 20px);
-        text-align:center;
-      }
-    }
+    @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap');
+    body { font-family: 'Tajawal', sans-serif; background: #0b1220; color: #f8fafc; margin: 0; -webkit-tap-highlight-color: transparent; padding-bottom: env(safe-area-inset-bottom, 0px); }
+    .seg { flex: 1; padding: 10px 6px; border-radius: 12px; font-weight: 900; font-size: 14px; background: #1e293b; color: #94a3b8; border: 1px solid #334155; }
+    .seg.on { background: #4f46e5; color: #fff; border-color: #818cf8; }
+    .seg.on.ret { background: #e11d48; border-color: #fb7185; }
+    .fld { width: 100%; height: 42px; border-radius: 12px; background: #0f172a; border: 1px solid #475569; color: #fff; font-weight: 800; padding: 0 10px; font-size: 16px; }
+    .btn { min-height: 44px; border-radius: 12px; font-weight: 900; font-size: 15px; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 0 12px; }
+    .btn:active { transform: scale(.98); }
+    .stat { background: #111a2e; border: 1px solid #22304d; border-radius: 14px; padding: 8px 4px; text-align: center; }
+    .stat b { display: block; font-size: 22px; line-height: 1.1; }
+    .stat span { font-size: 11px; font-weight: 900; color: #94a3b8; }
+    #camWrap { position: relative; background: #000; border-radius: 18px; overflow: hidden; aspect-ratio: 4 / 3; }
+    #video { width: 100%; height: 100%; object-fit: cover; display: block; }
+    #frame { position: absolute; inset: 12% 16%; border: 3px solid rgba(255,255,255,.75); border-radius: 18px; box-shadow: 0 0 0 999px rgba(0,0,0,.25); pointer-events: none; transition: border-color .1s; }
+    #flash { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; font-weight: 900; opacity: 0; transition: opacity .1s; pointer-events: none; }
+    #flash.show { opacity: 1; }
+    #flash .big { font-size: 84px; line-height: 1; }
+    #flash .code { font-size: 20px; margin-top: 4px; background: rgba(0,0,0,.45); padding: 2px 12px; border-radius: 10px; }
+    .row { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 7px 10px; border-bottom: 1px solid #1e293b; font-size: 13px; font-weight: 700; }
   </style>
 </head>
 <body>
-  <div class="app">
-    <header class="top">
-      <div class="title">MAD PRINT</div>
+  <div class="max-w-lg mx-auto px-3 pt-3 pb-10">
+    <div class="flex items-center justify-between mb-2">
+      <div><div class="text-[10px] font-black text-indigo-400 tracking-widest">MAD PRINT</div><div class="text-lg font-black">مسح سريع</div></div>
+      <div id="net" class="text-xs font-black text-slate-400 text-left"></div>
+    </div>
 
-      <div class="actions">
-        <a
-          class="btn"
-          href="https://script.google.com/macros/s/AKfycbzy-fmEXBzIzAslvyvJdbSpdfxVeM2f_ZEI2YoV-I1pEs1XE6GJTwPmgW4uH4XinDMl7Q/exec?page=scan"
-          target="_blank"
-          rel="noopener"
-        >
-          فتح مباشر
-        </a>
+    <div class="flex gap-2 mb-2" id="ops"></div>
+    <div class="grid grid-cols-2 gap-2 mb-2">
+      <select id="carrierSel" class="fld"></select>
+      <input id="userInp" class="fld" list="empList" placeholder="اسمك (الموظف/المندوب)" autocomplete="off" />
+      <datalist id="empList"></datalist>
+    </div>
 
-        <button class="btn primary" type="button" onclick="reloadFrame()">
-          تحديث
-        </button>
-      </div>
-    </header>
+    <div id="camWrap" class="mb-2">
+      <video id="video" playsinline muted autoplay></video>
+      <div id="frame"></div>
+      <div id="flash"><div class="big" id="flashIcon"></div><div class="code" id="flashCode"></div></div>
+      <div id="camMsg" class="absolute inset-0 flex items-center justify-center text-center p-6 font-black text-slate-300">اضغط «ابدأ المسح»</div>
+    </div>
 
-    <main class="main">
-      <div class="frame-shell">
-        <iframe
-          id="appFrame"
-          title="MAD Print Manager"
-          src="https://script.google.com/macros/s/AKfycbzy-fmEXBzIzAslvyvJdbSpdfxVeM2f_ZEI2YoV-I1pEs1XE6GJTwPmgW4uH4XinDMl7Q/exec?page=scan"
-          loading="eager"
-          referrerpolicy="no-referrer"
-          allow="clipboard-read; clipboard-write">
-        </iframe>
-      </div>
+    <div class="flex gap-2 mb-2">
+      <button id="startBtn" class="btn flex-1 bg-emerald-600 text-white">▶ ابدأ المسح</button>
+      <button id="torchBtn" class="btn bg-slate-700 text-white hidden">🔦</button>
+      <button id="syncBtn" class="btn bg-slate-700 text-white">⟳ مزامنة</button>
+    </div>
 
-      <div class="note">إذا لم يظهر داخل الإطار، استخدم زر "فتح مباشر"</div>
-    </main>
+    <div class="grid grid-cols-4 gap-2 mb-2">
+      <div class="stat"><b id="sScanned">0</b><span>تم المسح</span></div>
+      <div class="stat"><b id="sSynced" class="text-emerald-400">0</b><span>تمت المزامنة</span></div>
+      <div class="stat"><b id="sPending" class="text-amber-300">0</b><span>بانتظار</span></div>
+      <div class="stat"><b id="sErrors" class="text-rose-400">0</b><span>أخطاء</span></div>
+    </div>
+
+    <div class="flex gap-2 mb-2">
+      <input id="manualInp" class="fld" inputmode="numeric" placeholder="أو اكتب الرقم يدوياً" />
+      <button id="manualBtn" class="btn bg-indigo-600 text-white">إضافة</button>
+    </div>
+
+    <div id="errBox" class="hidden mb-2 rounded-xl border border-rose-700 bg-rose-950/40">
+      <div class="flex items-center justify-between px-3 py-2"><b class="text-rose-300 text-sm">أخطاء لازم تنتبهلها</b>
+        <div class="flex gap-2"><button id="retryErrBtn" class="text-xs font-black bg-slate-700 rounded-lg px-2 py-1">إعادة المحاولة</button><button id="clearErrBtn" class="text-xs font-black bg-slate-700 rounded-lg px-2 py-1">إخفاء</button></div></div>
+      <div id="errList"></div>
+    </div>
+
+    <div class="rounded-xl bg-slate-900/60 border border-slate-800">
+      <div class="flex items-center justify-between px-3 py-2"><b class="text-sm">آخر عمليات المسح</b><button id="newSessionBtn" class="text-xs font-black bg-slate-700 rounded-lg px-2 py-1">جلسة جديدة</button></div>
+      <div id="recent"></div>
+    </div>
   </div>
+  <canvas id="cv" class="hidden"></canvas>
 
   <script>
-    function reloadFrame() {
-      const f = document.getElementById('appFrame');
-      const currentSrc = f.src;
-      f.src = 'about:blank';
-      setTimeout(() => {
-        f.src = currentSrc;
-      }, 60);
+  (function () {
+    /* رابط النظام المنشور (Google Apps Script) — الصفحة بتبعتله دفعات المسح بالخلفية */
+    var API_URL = 'https://script.google.com/macros/s/AKfycbzy-fmEXBzIzAslvyvJdbSpdfxVeM2f_ZEI2YoV-I1pEs1XE6GJTwPmgW4uH4XinDMl7Q/exec';
+
+    var Q_KEY = 'mad_scan_queue_v1', S_KEY = 'mad_scan_settings_v1', CFG_KEY = 'mad_scan_cfg_v1';
+    var BATCH = 25, COOLDOWN_MS = 2500, MAX_KEEP = 3000;
+    var OPS = [{ key: 'PICKUP', label: 'استلام شركة التوصيل' }, { key: 'RETURN', label: 'إرجاع للمخزن' }];
+    var queue = [], seen = {}, recentCodes = {};
+    var settings = { op: 'PICKUP', carrier: '', user: '' };
+    var cfg = { carriers: [], employees: [] };
+    var inFlight = false, inFlightAt = 0, lastSyncOk = 0, netOk = true;
+    var stream = null, track = null, detector = null, scanning = false, torchOn = false, busyDetect = false;
+    var audioCtx = null, renderQueued = false, syncTimer = null;
+
+    function $(id) { return document.getElementById(id); }
+    function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+    function load(k, d) { try { var v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch (e) { return d; } }
+    function save(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch (e) { return false; } }
+    function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 8); }
+    function hhmmss(t) { var d = new Date(t); return isNaN(d) ? '' : d.toLocaleTimeString('en-GB'); }
+    function opLabel(k) { for (var i = 0; i < OPS.length; i++) if (OPS[i].key === k) return OPS[i].label; return k; }
+
+    /* ---------- الاتصال بالنظام (POST نصي بسيط — بدون انتظار من شاشة المسح) ---------- */
+    async function post(body, timeoutMs) {
+      var ctl = window.AbortController ? new AbortController() : null;
+      var timer = ctl ? setTimeout(function () { ctl.abort(); }, timeoutMs || 60000) : null;
+      try {
+        var r = await fetch(API_URL, {
+          method: 'POST', redirect: 'follow',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify(body), signal: ctl ? ctl.signal : undefined
+        });
+        var txt = await r.text(), j;
+        try { j = JSON.parse(txt); } catch (e) { var pe = new Error('رد غير مفهوم من السيرفر'); pe.code = 'NETWORK'; throw pe; }
+        if (!j || !j.ok) { var er = new Error((j && j.error) || 'خطأ من السيرفر'); er.code = (j && j.code) || 'ERROR'; throw er; }
+        return j.data;
+      } catch (e) {
+        if (e && e.name === 'AbortError') { var te = new Error('السيرفر تأخر'); te.code = 'NETWORK'; throw te; }
+        throw e;
+      } finally { if (timer) clearTimeout(timer); }
     }
 
-    function setAppHeight() {
-      document.documentElement.style.setProperty('--app-height', window.innerHeight + 'px');
+    /* ---------- الطابور المحلي ---------- */
+    function trimOld() {
+      if (queue.length <= MAX_KEEP) return;
+      var extra = queue.length - MAX_KEEP;
+      queue = queue.filter(function (it) { if (extra > 0 && it.state === 'synced') { extra--; return false; } return true; });
+    }
+    function persist() { trimOld(); if (!save(Q_KEY, queue)) { queue = queue.filter(function (it) { return it.state !== 'synced'; }); save(Q_KEY, queue); } }
+    function rebuildSeen() { seen = {}; queue.forEach(function (it) { if (it.state !== 'error' && it.state !== 'dismissed') seen[it.op + '|' + String(it.code).toUpperCase()] = it.id; }); }
+
+    function cleanCode(raw) {
+      var c = String(raw || '').trim();
+      if (/^[A-Za-z0-9-]{3,40}$/.test(c)) return c;
+      var m = c.match(/(?:order_?id|id)=([A-Za-z0-9-]{3,40})/i);
+      return m ? m[1] : '';
     }
 
-    setAppHeight();
-    window.addEventListener('resize', setAppHeight);
-    window.addEventListener('orientationchange', setAppHeight);
+    function currentCheck() {
+      if (settings.op === 'PICKUP' && !settings.carrier) return 'اختار شركة التوصيل فوق';
+      if (!settings.user) return 'اكتب اسمك فوق';
+      return '';
+    }
+
+    function onScan(raw, manual) {
+      var code = cleanCode(raw), now = Date.now();
+      var rk = code || String(raw);
+      if (!manual && recentCodes[rk] && now - recentCodes[rk] < COOLDOWN_MS) return; // نفس الكود لسا قدام الكاميرا
+      recentCodes[rk] = now;
+      if (!code) { feedback('bad', 'كود مش تبعنا'); return; }
+      var why = currentCheck(); if (why) { feedback('bad', why); return; }
+      var key = settings.op + '|' + code.toUpperCase();
+      if (seen[key]) { feedback('dup', code); return; }
+      var it = { id: uid(), code: code, op: settings.op, carrier: settings.op === 'PICKUP' ? settings.carrier : '', user: settings.user,
+                 at: new Date().toISOString(), state: 'pending', tries: 0, next: 0 };
+      queue.push(it); seen[key] = it.id; persist();   // محفوظ على الجهاز قبل الـ ✓
+      feedback('ok', code);
+      renderSoon();
+      var pend = 0; queue.forEach(function (x) { if (x.state === 'pending') pend++; });
+      scheduleSync(pend >= BATCH ? 0 : 1200);
+    }
+
+    /* ---------- التأكيد الفوري: صوت + اهتزاز + ✓ ---------- */
+    function beep(kind) {
+      try {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        var tones = kind === 'ok' ? [[1250, 0, .07]] : kind === 'dup' ? [[520, 0, .08], [520, .13, .08]] : [[200, 0, .28]];
+        tones.forEach(function (t) {
+          var o = audioCtx.createOscillator(), g = audioCtx.createGain(), s = audioCtx.currentTime + t[1];
+          o.type = kind === 'bad' ? 'square' : 'sine'; o.frequency.value = t[0];
+          g.gain.setValueAtTime(.3, s); g.gain.exponentialRampToValueAtTime(.001, s + t[2]);
+          o.connect(g); g.connect(audioCtx.destination); o.start(s); o.stop(s + t[2] + .02);
+        });
+      } catch (e) {}
+    }
+    function feedback(kind, text) {
+      beep(kind);
+      try { if (navigator.vibrate) navigator.vibrate(kind === 'ok' ? 40 : [70, 60, 70]); } catch (e) {}
+      var f = $('flash');
+      f.style.background = kind === 'ok' ? 'rgba(16,185,129,.55)' : kind === 'dup' ? 'rgba(245,158,11,.6)' : 'rgba(225,29,72,.65)';
+      $('flashIcon').textContent = kind === 'ok' ? '✓' : kind === 'dup' ? '↺' : '✕';
+      $('flashCode').textContent = kind === 'dup' ? ('مكرر — ' + text) : text;
+      $('frame').style.borderColor = kind === 'ok' ? '#10b981' : kind === 'dup' ? '#f59e0b' : '#e11d48';
+      f.classList.add('show');
+      clearTimeout(feedback._t);
+      feedback._t = setTimeout(function () { f.classList.remove('show'); $('frame').style.borderColor = ''; }, kind === 'ok' ? 320 : 900);
+    }
+
+    /* ---------- الكاميرا (مستقلة تماماً عن السيرفر) ---------- */
+    async function startCam() {
+      var why = currentCheck(); if (why) { feedback('bad', why); return; }
+      try { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); audioCtx.resume(); } catch (e) {}
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        $('camMsg').textContent = 'المتصفح ما بيدعم الكاميرا — افتح الصفحة بـ Safari أو Chrome';
+        $('camMsg').classList.remove('hidden'); return;
+      }
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({ audio: false, video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } } });
+      } catch (e) {
+        $('camMsg').textContent = e && e.name === 'NotAllowedError'
+          ? 'الكاميرا ممنوعة — اسمح للموقع بالكاميرا من إعدادات المتصفح وجرّب ثاني'
+          : 'ما قدرنا نفتح الكاميرا (' + ((e && (e.name || e.message)) || e) + ') — استعمل الإدخال اليدوي تحت';
+        $('camMsg').classList.remove('hidden'); return;
+      }
+      var v = $('video'); v.srcObject = stream;
+      try { await v.play(); } catch (e) {}
+      track = stream.getVideoTracks()[0];
+      try { var caps = track.getCapabilities ? track.getCapabilities() : {}; if (caps.torch) $('torchBtn').classList.remove('hidden'); } catch (e) {}
+      detector = null;
+      if ('BarcodeDetector' in window) {
+        try {
+          var f = await BarcodeDetector.getSupportedFormats();
+          if (f.indexOf('qr_code') !== -1) detector = new BarcodeDetector({ formats: f.indexOf('code_128') !== -1 ? ['qr_code', 'code_128'] : ['qr_code'] });
+        } catch (e) { detector = null; }
+      }
+      scanning = true;
+      $('camMsg').classList.add('hidden');
+      $('startBtn').textContent = '■ أوقف'; $('startBtn').className = 'btn flex-1 bg-rose-600 text-white';
+      loop();
+    }
+    function stopCam() {
+      scanning = false;
+      try { if (stream) stream.getTracks().forEach(function (t) { t.stop(); }); } catch (e) {}
+      stream = null; track = null; torchOn = false;
+      $('torchBtn').classList.add('hidden');
+      $('camMsg').textContent = 'اضغط «ابدأ المسح»'; $('camMsg').classList.remove('hidden');
+      $('startBtn').textContent = '▶ ابدأ المسح'; $('startBtn').className = 'btn flex-1 bg-emerald-600 text-white';
+    }
+    function loop() {
+      if (!scanning) return;
+      setTimeout(loop, detector ? 50 : 80);
+      if (busyDetect) return;
+      var v = $('video'); if (v.readyState < 2) return;
+      busyDetect = true;
+      if (detector) {
+        detector.detect(v).then(function (codes) {
+          busyDetect = false;
+          (codes || []).forEach(function (c) { onScan(c.rawValue); });
+        }).catch(function () { busyDetect = false; });
+        return;
+      }
+      try {
+        var cv = $('cv'), vw = v.videoWidth, vh = v.videoHeight;
+        var side = Math.min(vw, vh) * 0.85, sx = (vw - side) / 2, sy = (vh - side) / 2, size = 520;
+        cv.width = size; cv.height = size;
+        var ctx = cv.getContext('2d', { willReadFrequently: true });
+        ctx.drawImage(v, sx, sy, side, side, 0, 0, size, size);
+        var img = ctx.getImageData(0, 0, size, size);
+        var r = window.jsQR ? jsQR(img.data, size, size, { inversionAttempts: 'dontInvert' }) : null;
+        if (r && r.data) onScan(r.data);
+      } catch (e) {}
+      busyDetect = false;
+    }
+    async function toggleTorch() {
+      if (!track) return;
+      try { torchOn = !torchOn; await track.applyConstraints({ advanced: [{ torch: torchOn }] }); } catch (e) { torchOn = false; }
+    }
+
+    /* ---------- المزامنة بالخلفية على دفعات ---------- */
+    function backoff(it, msg) {
+      it.state = 'pending'; it.tries = (it.tries || 0) + 1; it.lastError = msg || '';
+      it.next = Date.now() + Math.min(60000, 2000 * Math.pow(2, Math.min(it.tries, 5)));
+    }
+    function scheduleSync(ms) { clearTimeout(syncTimer); syncTimer = setTimeout(sync, ms); }
+    async function sync(force) {
+      if (inFlight) {
+        if (Date.now() - inFlightAt < 100000) return;
+        queue.forEach(function (it) { if (it.state === 'sending') backoff(it, 'انتهى وقت الانتظار'); });
+        inFlight = false;
+      }
+      var now = Date.now();
+      var batch = queue.filter(function (it) { return it.state === 'pending' && (force === true || (it.next || 0) <= now); }).slice(0, BATCH);
+      if (!batch.length) return;
+      inFlight = true; inFlightAt = now;
+      batch.forEach(function (it) { it.state = 'sending'; });
+      persist(); renderSoon();
+      var payload = batch.map(function (it) { return { id: it.id, code: it.code, op: it.op, carrier: it.carrier, user: it.user, at: it.at }; });
+      try {
+        var res = await post({ action: 'scan_batch', items: payload }, 90000);
+        var map = {}; (res || []).forEach(function (r) { map[r.id] = r; });
+        batch.forEach(function (it) {
+          var r = map[it.id];
+          if (r && r.ok) { it.state = 'synced'; it.result = r.result; it.order_id = r.order_id; it.status = r.status; it.error = ''; }
+          else if (r && !r.retry) { it.state = 'error'; it.error = r.error || 'خطأ'; it.order_id = r.order_id || ''; }
+          else backoff(it, r ? r.error : 'ما رجع رد');
+        });
+        lastSyncOk = Date.now(); netOk = true;
+      } catch (e) {
+        batch.forEach(function (it) { if (it.state === 'sending') backoff(it, e.message); });
+        netOk = false;
+      } finally {
+        inFlight = false;
+        rebuildSeen(); persist(); renderSoon();
+        var more = queue.some(function (it) { return it.state === 'pending' && (it.next || 0) <= Date.now(); });
+        if (more) scheduleSync(100);
+      }
+    }
+
+    /* ---------- الشاشة ---------- */
+    function renderSoon() { if (renderQueued) return; renderQueued = true; requestAnimationFrame(function () { renderQueued = false; render(); }); }
+    function render() {
+      var c = { all: 0, synced: 0, pending: 0, error: 0 };
+      queue.forEach(function (it) {
+        c.all++;
+        if (it.state === 'synced') c.synced++;
+        else if (it.state === 'pending' || it.state === 'sending') c.pending++;
+        else if (it.state === 'error') c.error++;
+      });
+      $('sScanned').textContent = c.all; $('sSynced').textContent = c.synced; $('sPending').textContent = c.pending; $('sErrors').textContent = c.error;
+      $('net').innerHTML = netOk
+        ? '<span class="text-emerald-400">● متصل</span>' + (lastSyncOk ? '<br>آخر مزامنة ' + hhmmss(lastSyncOk) : '')
+        : '<span class="text-amber-400">● النت ضعيف — بيعيد لحاله</span>';
+      var errs = queue.filter(function (it) { return it.state === 'error'; });
+      $('errBox').classList.toggle('hidden', !errs.length);
+      $('errList').innerHTML = errs.slice(-50).reverse().map(function (it) {
+        return '<div class="row"><span>✕ ' + esc(it.code) + ' <span class="text-slate-400">(' + esc(opLabel(it.op)) + ')</span></span><span class="text-rose-300 text-xs">' + esc(it.error) + '</span></div>';
+      }).join('');
+      $('recent').innerHTML = queue.slice(-40).reverse().map(function (it) {
+        var st = it.state === 'synced' ? '<span class="text-emerald-400">✓' + (it.result === 'already' ? ' من قبل' : '') + '</span>'
+          : it.state === 'sending' ? '<span class="text-sky-300">⇡ بيتبعت</span>'
+          : it.state === 'pending' ? '<span class="text-amber-300">⏳ بانتظار</span>'
+          : it.state === 'dismissed' ? '<span class="text-slate-500">مخفي</span>'
+          : '<span class="text-rose-400">✕ خطأ</span>';
+        return '<div class="row"><span>' + esc(it.code) + ' <span class="text-slate-500 text-xs">' + hhmmss(it.at) + ' · ' + esc(opLabel(it.op)) + '</span></span>' + st + '</div>';
+      }).join('') || '<div class="row text-slate-500">لسا ما في مسح</div>';
+    }
+
+    function renderSettings() {
+      $('ops').innerHTML = OPS.map(function (o) {
+        return '<button class="seg' + (settings.op === o.key ? ' on' + (o.key === 'RETURN' ? ' ret' : '') : '') + '" data-op="' + o.key + '">' + esc(o.label) + '</button>';
+      }).join('');
+      Array.prototype.forEach.call(document.querySelectorAll('#ops .seg'), function (b) {
+        b.onclick = function () { settings.op = b.getAttribute('data-op'); save(S_KEY, settings); renderSettings(); };
+      });
+      var sel = $('carrierSel');
+      sel.innerHTML = '<option value="">— شركة التوصيل —</option>' + cfg.carriers.map(function (c) { return '<option value="' + esc(c) + '">' + esc(c === 'Manual' ? 'توصيل يدوي' : c) + '</option>'; }).join('');
+      sel.value = settings.carrier || '';
+      sel.style.visibility = settings.op === 'PICKUP' ? 'visible' : 'hidden';
+      $('empList').innerHTML = cfg.employees.map(function (e) { return '<option value="' + esc(e) + '"></option>'; }).join('');
+      $('userInp').value = settings.user || '';
+    }
+
+    async function loadConfig() {
+      try {
+        var c = await post({ action: 'scan_config' }, 30000);
+        cfg = { carriers: c.carriers || [], employees: c.employees || [] };
+        save(CFG_KEY, cfg); renderSettings(); netOk = true; renderSoon();
+      } catch (e) { /* بنكمل من النسخة المحفوظة على الجهاز */ }
+    }
+
+    function init() {
+      queue = load(Q_KEY, []);
+      queue.forEach(function (it) { if (it.state === 'sending') it.state = 'pending'; });
+      rebuildSeen();
+      settings = Object.assign(settings, load(S_KEY, {}));
+      cfg = load(CFG_KEY, cfg);
+      renderSettings(); render();
+      loadConfig();
+
+      $('carrierSel').onchange = function () { settings.carrier = this.value; save(S_KEY, settings); };
+      $('userInp').oninput = function () { settings.user = this.value.trim(); save(S_KEY, settings); };
+      $('startBtn').onclick = function () { if (scanning) stopCam(); else startCam(); };
+      $('torchBtn').onclick = toggleTorch;
+      $('syncBtn').onclick = function () { sync(true); };
+      $('manualBtn').onclick = function () { var i = $('manualInp'); onScan(i.value, true); i.value = ''; i.focus(); };
+      $('manualInp').onkeydown = function (e) { if (e.key === 'Enter') { e.preventDefault(); $('manualBtn').onclick(); } };
+      $('retryErrBtn').onclick = function () {
+        queue.forEach(function (it) { if (it.state === 'error') { it.state = 'pending'; it.tries = 0; it.next = 0; it.error = ''; } });
+        rebuildSeen(); persist(); render(); sync(true);
+      };
+      $('clearErrBtn').onclick = function () { queue.forEach(function (it) { if (it.state === 'error') it.state = 'dismissed'; }); rebuildSeen(); persist(); render(); };
+      $('newSessionBtn').onclick = function () {
+        var pend = queue.filter(function (it) { return it.state === 'pending' || it.state === 'sending'; }).length;
+        if (!confirm('بدء جلسة جديدة؟ العدادات بتتصفّر' + (pend ? ' (' + pend + ' مسح لسا ما انبعت رح يضل ويتبعت)' : ''))) return;
+        queue = queue.filter(function (it) { return it.state === 'pending' || it.state === 'sending'; });
+        rebuildSeen(); persist(); render();
+      };
+
+      setInterval(function () { sync(); renderSoon(); }, 2500);
+      window.addEventListener('online', function () { sync(true); });
+      document.addEventListener('visibilitychange', function () {
+        if (!document.hidden) sync(true);
+        else if (scanning) stopCam(); // بيوفر بطارية لما تطلع من الصفحة
+      });
+      if (queue.some(function (it) { return it.state === 'pending'; })) scheduleSync(300);
+    }
+
+    init();
+  })();
   </script>
 </body>
 </html>
