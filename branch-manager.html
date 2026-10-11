@@ -247,6 +247,8 @@ select.inp{background-image:linear-gradient(45deg,transparent 50%,var(--muted) 5
       <div class="list" id="repTop"></div>
       <div class="sec-title"><h2>أعلى نسبة بيع</h2><span>بحد أدنى 3 أيام</span></div>
       <div class="list" id="repConv"></div>
+      <div class="sec-title"><h2>الأضعف أداءً</h2><span>متوسط اليوم • بحد أدنى 3 أيام</span></div>
+      <div class="list" id="repWorst"></div>
     </section>
 
     <!-- SETTINGS -->
@@ -732,8 +734,12 @@ function renderRep(){
   $('repTop').innerHTML=top.map(function(e,i){ return '<button class="entry" data-emp="'+esc(e.name)+'"><div class="entry-h"><div class="who"><div class="rank r'+(i+1)+'">'+(i+1)+'</div><div><b>'+esc(e.name)+'</b><small>'+e.nd+' يوم</small></div></div><div class="amt num">'+money(e.amount)+'</div></div><div class="bar"><i style="width:'+(mx?e.amount/mx*100:0)+'%"></i></div></button>'; }).join('') || '<div class="empty">لا توجد بيانات</div>';
   var conv=emps.filter(function(e){ return e.nd>=3; }).sort(function(x,y){ return y.conv-x.conv; }).slice(0,5);
   $('repConv').innerHTML=conv.map(function(e,i){ return '<button class="entry" data-emp="'+esc(e.name)+'"><div class="entry-h"><div class="who"><div class="rank r'+(i+1)+'">'+(i+1)+'</div><div><b>'+esc(e.name)+'</b><small>'+e.sales+' من '+e.customers+' زبون</small></div></div><div class="amt num" style="color:var(--green)">'+pct(e.conv)+'</div></div></button>'; }).join('') || '<div class="empty">لا توجد بيانات كافية</div>';
+  var wq=emps.filter(function(e){ return e.nd>=3; }).map(function(e){ e.avg=e.amount/e.nd; return e; });
+  var worst=wq.length>=2? wq.sort(function(x,y){ return x.avg-y.avg; }).slice(0,Math.min(3,wq.length-1)) : [];
+  var wmx=wq.length?Math.max.apply(null,wq.map(function(e){ return e.avg; })):0;
+  $('repWorst').innerHTML=worst.map(function(e,i){ return '<button class="entry" data-emp="'+esc(e.name)+'"><div class="entry-h"><div class="who"><div class="rank" style="color:var(--red)">'+(i+1)+'</div><div><b>'+esc(e.name)+'</b><small>'+e.nd+' يوم • '+money(e.amount)+' • بيع '+pct(e.conv)+'</small></div></div><div class="amt num" style="color:var(--red)">'+money(e.avg)+'</div></div><div class="bar"><i style="width:'+(wmx?e.avg/wmx*100:0)+'%;background:var(--red)"></i></div></button>'; }).join('') || '<div class="empty">لا توجد بيانات كافية</div>';
 }
-$('repTop').onclick=$('repConv').onclick=function(e){ var b=e.target.closest('[data-emp]'); if(b){ S.staffP=S.repP; openEmp(b.dataset.emp); } };
+$('repTop').onclick=$('repConv').onclick=$('repWorst').onclick=function(e){ var b=e.target.closest('[data-emp]'); if(b){ S.staffP=S.repP; openEmp(b.dataset.emp); } };
 
 /* ================= SETTINGS ================= */
 function renderSet(){
