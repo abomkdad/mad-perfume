@@ -2842,6 +2842,21 @@
       if (properties.event_id) output.client_dedup_id = properties.event_id;
       return output;
     }
+    function trackPurchaseOnce(payload) {
+      try {
+        const id = String((payload && payload.orderId) || "");
+        const key = "madPurchaseSent_" + id;
+        try { if (id && sessionStorage.getItem(key)) return; if (id) sessionStorage.setItem(key, "1"); } catch (storageError) {}
+        const props = {
+          content_type: "product",
+          content_ids: ((payload && payload.items) || []).map((item) => item.code).filter(Boolean),
+          currency: "ILS",
+          value: Number((payload && (payload.final_total || payload.total || payload.price)) || 0)
+        };
+        if (window.ttq && typeof window.ttq.track === "function") window.ttq.track("Purchase", props, id ? { event_id: id } : undefined);
+        if (window.fbq && typeof window.fbq === "function") window.fbq("track", "Purchase", props, id ? { eventID: id } : undefined);
+      } catch (error) { console.warn(error); }
+    }
     function trackEvent(eventName, properties = {}) {
       if (window.ttq && typeof window.ttq.track === "function") {
         window.ttq.track(eventName, properties);
@@ -3309,6 +3324,7 @@
           currency: "ILS",
           value: orderValue
         });
+        trackPurchaseOnce(payload);
         trackEvent("Contact", {
           event_source: "order_form",
           order_source: source,

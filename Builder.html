@@ -560,7 +560,6 @@ function app() {
     },
     async submitForm() {
       this.loading = true; 
-      this.track('Purchase');
       const cfg = this.c;
       const zapUrl = '${this.config.zapierUrl || "https://hooks.zapier.com/hooks/catch/14790106/ue4uy7j/"}';
       const finalProduct = this.selectedOffer ? this.selectedOffer : cfg.productName;
@@ -583,6 +582,7 @@ function app() {
 
       try {
         await fetch(cfg.sheetUrl, { method: 'POST', body: fd, mode: 'no-cors' });
+        this.track('Purchase');
         this.submitted = true;
       } catch (e) { alert('Error'); } finally { this.loading = false; }
     }
